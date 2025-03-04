@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 售后原因</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-brand-id { width: 12%; min-width: 100px; }
+        .col-aftersales-type-id { width: 12%; min-width: 100px; }
+        .col-status { width: 8%; min-width: 80px; }
+        .col-language { width: 8%; min-width: 80px; }
+        .col-reason { width: 15%; min-width: 120px; }
+        .col-create-time { width: 12%; min-width: 120px; }
+        .col-update-time { width: 12%; min-width: 120px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .ant-tabs-content { min-height: 400px; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">售后原因</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="brandIdFilter" class="ant-select">
+                                        <option value="">全部品牌</option>
+                                    </select>
+                                    <select id="aftersalesTypeIdFilter" class="ant-select">
+                                        <option value="">全部售后类型</option>
+                                    </select>
+                                    <select id="statusFilter" class="ant-select">
+                                        <option value="">全部状态</option>
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                    <select id="languageFilter" class="ant-select">
+                                        <option value="">全部语言</option>
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">English</option>
+                                    </select>
+                                    <input type="text" id="reasonFilter" class="ant-input" placeholder="原因">
+                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addAftersales()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-brand-id">品牌名称</div>
+                                        <div class="col-aftersales-type-id">售后类型名称</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-language">语言</div>
+                                        <div class="col-reason">原因</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-update-time">更新时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="aftersales-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="aftersalesModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加售后原因</h3>
+            <form id="aftersalesForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="lang">
+                                    <span class="ant-tabs-tab-btn">多语言信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>品牌ID:</label>
+                                    <select id="modalBrandId">
+                                        <option value="0">请选择品牌</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>售后类型ID:</label>
+                                    <select id="modalAftersalesTypeId">
+                                        <option value="0">请选择售后类型</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalStatus">
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                                <div class="ant-form-item" id="updateTimeField" style="display: none;">
+                                    <label>更新时间:</label>
+                                    <input type="datetime-local" id="modalUpdateTime" disabled>
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>语言:</label>
+                                    <select id="modalLanguage">
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">English</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>原因:</label>
+                                    <input type="text" id="modalReason" maxlength="256">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveAftersales()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">关闭</option>
+                        <option value="1">启用</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let aftersalesData = [];
+    let aftersalesLangData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        brand_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `品牌 ${i + 1}` })),
+        aftersales_type_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `售后类型 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const brandSelect = document.getElementById('modalBrandId');
+        const typeSelect = document.getElementById('modalAftersalesTypeId');
+        const brandFilter = document.getElementById('brandIdFilter');
+        const typeFilter = document.getElementById('aftersalesTypeIdFilter');
+
+        relationMap.brand_id.forEach(item => {
+            brandSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            brandFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.aftersales_type_id.forEach(item => {
+            typeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            typeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        aftersalesData = [];
+        aftersalesLangData = [];
+        const languages = ['zh_CN', 'en_US'];
+        for (let i = 1; i <= 200; i++) {
+            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            const updateTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
+            aftersalesData.push({
+                id: i,
+                brand_id: Math.floor(Math.random() * 15) + 1,
+                aftersales_type_id: Math.floor(Math.random() * 15) + 1,
+                status: Math.floor(Math.random() * 2),
+                create_time: createTime,
+                update_time: updateTime
+            });
+
+            languages.forEach(lang => {
+                aftersalesLangData.push({
+                    id: aftersalesLangData.length + 1,
+                    aftersales_id: i,
+                    language: lang,
+                    reason: lang === 'zh_CN' ? `原因 ${i}` : `Reason ${i}`
+                });
+            });
+        }
+        renderAftersalesList();
+    }
+
+    // 渲染列表
+    function renderAftersalesList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = aftersalesData.slice(start, end);
+        const listContainer = document.getElementById('aftersales-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(aftersales => {
+            const langEntries = aftersalesLangData.filter(item => item.aftersales_id === aftersales.id);
+            langEntries.forEach(langEntry => {
+                const statusTag = aftersales.status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
+                    '<span class="ant-tag ant-tag-green">启用</span>';
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'task-item';
+                itemDiv.style = 'border-bottom: 1px solid #ddd;';
+                itemDiv.innerHTML = `
+                    <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${langEntry.id}"></div>
+                    <div class="col-id">${aftersales.id}</div>
+                    <div class="col-brand-id">${getRelationName('brand_id', aftersales.brand_id)}</div>
+                    <div class="col-aftersales-type-id">${getRelationName('aftersales_type_id', aftersales.aftersales_type_id)}</div>
+                    <div class="col-status">${statusTag}</div>
+                    <div class="col-language">${langEntry.language}</div>
+                    <div class="col-reason">${langEntry.reason}</div>
+                    <div class="col-create-time">${moment.unix(aftersales.create_time).format('YYYY-MM-DD HH:mm')}</div>
+                    <div class="col-update-time">${moment.unix(aftersales.update_time).format('YYYY-MM-DD HH:mm')}</div>
+                    <div class="col-actions">
+                        <button class="ant-btn" onclick="editAftersales(${langEntry.id})">编辑</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteAftersales(${langEntry.id})">删除</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+        });
+
+        const totalPages = Math.ceil(aftersalesData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredAftersales = [...aftersalesData];
+        let filteredLangs = [...aftersalesLangData];
+        const brandId = document.getElementById('brandIdFilter').value;
+        const aftersalesTypeId = document.getElementById('aftersalesTypeIdFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const language = document.getElementById('languageFilter').value;
+        const reason = document.getElementById('reasonFilter').value.toLowerCase();
+        const createTimeStart = document.getElementById('createTimeStartFilter').value;
+        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+
+        if (brandId) filteredAftersales = filteredAftersales.filter(item => item.brand_id === parseInt(brandId));
+        if (aftersalesTypeId) filteredAftersales = filteredAftersales.filter(item => item.aftersales_type_id === parseInt(aftersalesTypeId));
+        if (status) filteredAftersales = filteredAftersales.filter(item => item.status === parseInt(status));
+        if (createTimeStart) filteredAftersales = filteredAftersales.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
+        if (createTimeEnd) filteredAftersales = filteredAftersales.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+        if (language) filteredLangs = filteredLangs.filter(item => item.language === language);
+        if (reason) filteredLangs = filteredLangs.filter(item => item.reason.toLowerCase().includes(reason));
+
+        const aftersalesIds = new Set(filteredAftersales.map(a => a.id));
+        filteredLangs = filteredLangs.filter(lang => aftersalesIds.has(lang.aftersales_id));
+        aftersalesData = filteredAftersales.filter(a => filteredLangs.some(l => l.aftersales_id === a.id));
+        page = 1;
+        renderAftersalesList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(aftersalesData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderAftersalesList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(aftersalesData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderAftersalesList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderAftersalesList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addAftersales() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加售后原因';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalBrandId').value = '0';
+        document.getElementById('modalAftersalesTypeId').value = '0';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('createTimeField').style.display = 'none';
+        document.getElementById('updateTimeField').style.display = 'none';
+        document.getElementById('modalLanguage').value = 'zh_CN';
+        document.getElementById('modalLanguage').disabled = false;
+        document.getElementById('modalReason').value = '';
+        setupTabs();
+        document.getElementById('aftersalesModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editAftersales(id) {
+        isEditing = true;
+        editId = id;
+        const langEntry = aftersalesLangData.find(item => item.id === id);
+        const aftersales = aftersalesData.find(item => item.id === langEntry.aftersales_id);
+        document.getElementById('modalTitle').textContent = '编辑售后原因';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = aftersales.id;
+        document.getElementById('modalBrandId').value = aftersales.brand_id;
+        document.getElementById('modalAftersalesTypeId').value = aftersales.aftersales_type_id;
+        document.getElementById('modalStatus').value = aftersales.status;
+        document.getElementById('createTimeField').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment.unix(aftersales.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('updateTimeField').style.display = 'block';
+        document.getElementById('modalUpdateTime').value = moment.unix(aftersales.update_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalLanguage').value = langEntry.language;
+        document.getElementById('modalLanguage').disabled = true;
+        document.getElementById('modalReason').value = langEntry.reason;
+        setupTabs();
+        document.getElementById('aftersalesModal').style.display = 'block';
+    }
+
+    // Tab 设置
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#aftersalesModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#aftersalesModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#aftersalesModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#aftersalesModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
+
+    // 保存
+    function saveAftersales() {
+        const aftersalesId = isEditing ? parseInt(document.getElementById('modalId').value) : aftersalesData.length + 1;
+        const langId = isEditing ? editId : aftersalesLangData.length + 1;
+        const now = moment().unix();
+
+        let aftersales = aftersalesData.find(item => item.id === aftersalesId);
+        if (!aftersales) {
+            aftersales = {
+                id: aftersalesId,
+                brand_id: parseInt(document.getElementById('modalBrandId').value) || 0,
+                aftersales_type_id: parseInt(document.getElementById('modalAftersalesTypeId').value) || 0,
+                status: parseInt(document.getElementById('modalStatus').value),
+                create_time: now,
+                update_time: now
+            };
+            aftersalesData.push(aftersales);
+        } else {
+            aftersales.brand_id = parseInt(document.getElementById('modalBrandId').value) || 0;
+            aftersales.aftersales_type_id = parseInt(document.getElementById('modalAftersalesTypeId').value) || 0;
+            aftersales.status = parseInt(document.getElementById('modalStatus').value);
+            aftersales.update_time = now;
+        }
+
+        let langEntry = aftersalesLangData.find(item => item.id === langId);
+        if (!langEntry) {
+            langEntry = {
+                id: langId,
+                aftersales_id: aftersalesId,
+                language: document.getElementById('modalLanguage').value,
+                reason: document.getElementById('modalReason').value
+            };
+            aftersalesLangData.push(langEntry);
+        } else {
+            langEntry.reason = document.getElementById('modalReason').value;
+        }
+
+        closeModal();
+        renderAftersalesList();
+    }
+
+    // 删除
+    function deleteAftersales(id) {
+        if (confirm('确定要删除此售后原因吗？')) {
+            const langEntry = aftersalesLangData.find(item => item.id === id);
+            aftersalesLangData = aftersalesLangData.filter(item => item.id !== id);
+            if (!aftersalesLangData.some(item => item.aftersales_id === langEntry.aftersales_id)) {
+                aftersalesData = aftersalesData.filter(item => item.id !== langEntry.aftersales_id);
+            }
+            renderAftersalesList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的售后原因');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个售后原因吗？`)) {
+            const aftersalesIdsToDelete = new Set();
+            selectedIds.forEach(id => {
+                const langEntry = aftersalesLangData.find(item => item.id === id);
+                if (langEntry) aftersalesIdsToDelete.add(langEntry.aftersales_id);
+                aftersalesLangData = aftersalesLangData.filter(item => item.id !== id);
+            });
+            aftersalesData = aftersalesData.filter(item => !aftersalesIdsToDelete.has(item.id));
+            renderAftersalesList();
+        }
+    }
+
+    // 批量修改状态
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的售后原因');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
+        const aftersalesIds = new Set();
+        selectedIds.forEach(id => {
+            const langEntry = aftersalesLangData.find(item => item.id === id);
+            if (langEntry) aftersalesIds.add(langEntry.aftersales_id);
+        });
+        aftersalesData = aftersalesData.map(item => aftersalesIds.has(item.id) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
+        closeStatusModal();
+        renderAftersalesList();
+    }
+
+    function closeModal() {
+        document.getElementById('aftersalesModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

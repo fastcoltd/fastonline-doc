@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 专页商品</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 60px; }
+        .col-campaign-id { width: 15%; min-width: 120px; }
+        .col-item-id { width: 15%; min-width: 120px; }
+        .col-store-id { width: 15%; min-width: 120px; }
+        .col-create-time { width: 15%; min-width: 120px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">专页商品</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="campaignIdFilter" class="ant-select">
+                                        <option value="">全部专页</option>
+                                    </select>
+                                    <select id="itemIdFilter" class="ant-select">
+                                        <option value="">全部商品</option>
+                                    </select>
+                                    <select id="storeIdFilter" class="ant-select">
+                                        <option value="">全部店铺</option>
+                                    </select>
+                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addCampaignItem()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-campaign-id">专页名称</div>
+                                        <div class="col-item-id">商品名称</div>
+                                        <div class="col-store-id">店铺名称</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="campaign-item-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="campaignItemModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加专页商品</h3>
+            <form id="campaignItemForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>专页ID:</label>
+                    <select id="modalCampaignId">
+                        <option value="0">请选择专页</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>商品ID:</label>
+                    <select id="modalItemId">
+                        <option value="0">请选择商品</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>店铺ID:</label>
+                    <select id="modalStoreId">
+                        <option value="0">请选择店铺</option>
+                    </select>
+                </div>
+                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                    <label>创建时间:</label>
+                    <input type="datetime-local" id="modalCreateTime" disabled>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveCampaignItem()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let campaignItemData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        campaign_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `专页 ${i + 1}` })),
+        item_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `商品 ${i + 1}` })),
+        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const campaignSelect = document.getElementById('modalCampaignId');
+        const itemSelect = document.getElementById('modalItemId');
+        const storeSelect = document.getElementById('modalStoreId');
+        const campaignFilter = document.getElementById('campaignIdFilter');
+        const itemFilter = document.getElementById('itemIdFilter');
+        const storeFilter = document.getElementById('storeIdFilter');
+
+        relationMap.campaign_id.forEach(item => {
+            campaignSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            campaignFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.item_id.forEach(item => {
+            itemSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            itemFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.store_id.forEach(item => {
+            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        campaignItemData = [];
+        for (let i = 1; i <= 200; i++) {
+            campaignItemData.push({
+                id: i,
+                campaign_id: Math.floor(Math.random() * 15) + 1,
+                item_id: Math.floor(Math.random() * 15) + 1,
+                store_id: Math.floor(Math.random() * 15) + 1,
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
+            });
+        }
+        renderCampaignItemList();
+    }
+
+    // 渲染列表
+    function renderCampaignItemList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = campaignItemData.slice(start, end);
+        const listContainer = document.getElementById('campaign-item-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${item.id}"></div>
+                <div class="col-id">${item.id}</div>
+                <div class="col-campaign-id">${getRelationName('campaign_id', item.campaign_id)}</div>
+                <div class="col-item-id">${getRelationName('item_id', item.item_id)}</div>
+                <div class="col-store-id">${getRelationName('store_id', item.store_id)}</div>
+                <div class="col-create-time">${moment.unix(item.create_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editCampaignItem(${item.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteCampaignItem(${item.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(campaignItemData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...campaignItemData];
+        const campaignId = document.getElementById('campaignIdFilter').value;
+        const itemId = document.getElementById('itemIdFilter').value;
+        const storeId = document.getElementById('storeIdFilter').value;
+        const createTimeStart = document.getElementById('createTimeStartFilter').value;
+        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+
+        if (campaignId) filteredData = filteredData.filter(item => item.campaign_id === parseInt(campaignId));
+        if (itemId) filteredData = filteredData.filter(item => item.item_id === parseInt(itemId));
+        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
+        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
+        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+
+        campaignItemData = filteredData;
+        page = 1;
+        renderCampaignItemList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(campaignItemData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderCampaignItemList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(campaignItemData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderCampaignItemList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderCampaignItemList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addCampaignItem() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加专页商品';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalCampaignId').value = '0';
+        document.getElementById('modalItemId').value = '0';
+        document.getElementById('modalStoreId').value = '0';
+        document.getElementById('createTimeField').style.display = 'none';
+        document.getElementById('campaignItemModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editCampaignItem(id) {
+        isEditing = true;
+        editId = id;
+        const item = campaignItemData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑专页商品';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = item.id;
+        document.getElementById('modalCampaignId').value = item.campaign_id;
+        document.getElementById('modalItemId').value = item.item_id;
+        document.getElementById('modalStoreId').value = item.store_id;
+        document.getElementById('createTimeField').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment.unix(item.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('campaignItemModal').style.display = 'block';
+    }
+
+    // 保存
+    function saveCampaignItem() {
+        const item = {
+            id: isEditing ? editId : campaignItemData.length + 1,
+            campaign_id: parseInt(document.getElementById('modalCampaignId').value) || 0,
+            item_id: parseInt(document.getElementById('modalItemId').value) || 0,
+            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
+            create_time: isEditing ? campaignItemData.find(item => item.id === editId).create_time : moment().unix()
+        };
+
+        if (isEditing) {
+            const index = campaignItemData.findIndex(item => item.id === editId);
+            campaignItemData[index] = item;
+        } else {
+            campaignItemData.push(item);
+        }
+        closeModal();
+        renderCampaignItemList();
+    }
+
+    // 删除
+    function deleteCampaignItem(id) {
+        if (confirm('确定要删除此专页商品吗？')) {
+            campaignItemData = campaignItemData.filter(item => item.id !== id);
+            renderCampaignItemList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的专页商品');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个专页商品吗？`)) {
+            campaignItemData = campaignItemData.filter(item => !selectedIds.includes(item.id));
+            renderCampaignItemList();
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('campaignItemModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

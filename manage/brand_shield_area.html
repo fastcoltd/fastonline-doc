@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 禁售区域</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 800px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 920px; overflow-y: auto; }
+        .modal-content h3 { margin-top: 0; }
+        .modal-content label { display: block; margin: 10px 0 5px; }
+        .modal-content input, .modal-content select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .task-list { overflow-x: auto; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 10%; min-width: 50px; }
+        .col-id { width: 15%; min-width: 60px; }
+        .col-brand-id { width: 15%; min-width: 80px; }
+        .col-status { width: 15%; min-width: 80px; }
+        .col-country { width: 15%; min-width: 80px; }
+        .col-mark { width: 20%; min-width: 100px; }
+        .col-actions { width: 20%; min-width: 120px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="header" w3-include-html="_header.html"></div>
+        <div class="content-wrapper">
+            <div id="sidebar" w3-include-html="_sidebar.html"></div>
+            <div class="main-content">
+                <div class="tabs-container">
+                    <div class="ant-tabs ant-tabs-top">
+                        <div class="ant-tabs-nav" role="tablist">
+                            <div class="ant-tabs-nav-wrap">
+                                <div class="ant-tabs-nav-list">
+                                    <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('brand_shield_area.html')" role="tab" aria-selected="true">
+                                        <span class="ant-tabs-tab-btn">禁售区域</span>
+                                    </div>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ant-tabs-content-holder">
+                            <div class="ant-tabs-content ant-tabs-content-top">
+                                <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                    <div class="filter-container" style="margin-bottom: 20px;">
+                                        <input type="number" id="brandIdFilter" class="ant-input" placeholder="品牌ID">
+                                        <select id="statusFilter" class="ant-select">
+                                            <option value="">全部状态</option>
+                                            <option value="0">禁用</option>
+                                            <option value="1">启用</option>
+                                        </select>
+                                        <input type="text" id="countryFilter" class="ant-input" placeholder="国家">
+                                        <button class="ant-btn ant-btn-primary" onclick="applyFilters()">搜索</button>
+                                    </div>
+                                    <div class="action-container" style="margin-bottom: 20px;">
+                                        <button class="ant-btn ant-btn-primary" onclick="addShieldArea()">添加</button>
+                                        <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    </div>
+                                    <div class="task-list">
+                                        <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                            <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                            <div class="col-id">ID</div>
+                                            <div class="col-brand-id">品牌ID</div>
+                                            <div class="col-status">状态</div>
+                                            <div class="col-country">国家</div>
+                                            <div class="col-mark">备注</div>
+                                            <div class="col-actions">操作</div>
+                                        </div>
+                                        <div id="shield-area-list">加载中...</div>
+                                        <div class="pagination" style="margin-top: 20px; text-align: center;">
+                                            <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                            <span id="page-info">第 1 页 / 共 1 页</span>
+                                            <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="footer" w3-include-html="_footer.html"></div>
+
+        <!-- 添加/编辑弹窗 -->
+        <div id="shieldAreaModal" class="modal">
+            <div class="modal-content">
+                <h3 id="modalTitle">添加禁售区域</h3>
+                <form id="shieldAreaForm">
+                    <label>ID (自动生成):</label>
+                    <input type="text" id="modalId" disabled>
+                    <label>品牌ID:</label>
+                    <input type="number" id="modalBrandId">
+                    <label>状态:</label>
+                    <select id="modalStatus">
+                        <option value="0">禁用</option>
+                        <option value="1">启用</option>
+                    </select>
+                    <label>国家:</label>
+                    <input type="text" id="modalCountry">
+                    <label>备注:</label>
+                    <input type="text" id="modalMark">
+                    <div class="modal-buttons">
+                        <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                        <button type="button" class="ant-btn ant-btn-primary" onclick="saveShieldArea()">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let shieldAreaData = [];
+        let shieldAreaPage = 1, shieldAreaPerPage = 10;
+        let isEditing = false;
+        let editId = null;
+
+        function fetchShieldAreaData() {
+            console.log('Fetching shield area data...');
+            const sampleData = [];
+            for (let i = 1; i <= 50; i++) {
+                sampleData.push({
+                    id: i,
+                    brand_id: Math.floor(Math.random() * 10) + 1,
+                    status: Math.floor(Math.random() * 2),
+                    country: `Country_${i}`,
+                    mark: `Shield Mark ${i}`
+                });
+            }
+            shieldAreaData = sampleData;
+            renderShieldAreaList(shieldAreaData);
+        }
+
+        function renderShieldAreaList(data) {
+            const start = (shieldAreaPage - 1) * shieldAreaPerPage;
+            const end = start + shieldAreaPerPage;
+            const paginatedData = data.slice(start, end);
+            const listContainer = document.getElementById('shield-area-list');
+            listContainer.innerHTML = '';
+
+            paginatedData.forEach(item => {
+                const statusTag = item.status === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' :
+                                  '<span class="ant-tag ant-tag-green">启用</span>';
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'task-item';
+                itemDiv.style = `border-bottom: 1px solid #ddd;`;
+                itemDiv.innerHTML = `
+                    <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${item.id}"></div>
+                    <div class="col-id">${item.id}</div>
+                    <div class="col-brand-id">${item.brand_id}</div>
+                    <div class="col-status">${statusTag}</div>
+                    <div class="col-country">${item.country}</div>
+                    <div class="col-mark">${item.mark}</div>
+                    <div class="col-actions">
+                        <button class="ant-btn" onclick="editShieldArea(${item.id})">编辑</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteShieldArea(${item.id})">删除</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+
+            const totalPages = Math.ceil(data.length / shieldAreaPerPage);
+            document.getElementById('page-info').textContent = `第 ${shieldAreaPage} 页 / 共 ${totalPages} 页`;
+        }
+
+        function applyFilters() {
+            const brandId = document.getElementById('brandIdFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const country = document.getElementById('countryFilter').value.toLowerCase();
+
+            let filteredData = shieldAreaData;
+            if (brandId) filteredData = filteredData.filter(item => item.brand_id === parseInt(brandId));
+            if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
+            if (country) filteredData = filteredData.filter(item => item.country.toLowerCase().includes(country));
+
+            shieldAreaPage = 1;
+            renderShieldAreaList(filteredData);
+        }
+
+        function changePage(delta) {
+            const totalPages = Math.ceil(shieldAreaData.length / shieldAreaPerPage);
+            shieldAreaPage += delta;
+            if (shieldAreaPage < 1) shieldAreaPage = 1;
+            if (shieldAreaPage > totalPages) shieldAreaPage = totalPages;
+            applyFilters();
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+        }
+
+        function addShieldArea() {
+            isEditing = false;
+            editId = null;
+            document.getElementById('modalTitle').textContent = '添加禁售区域';
+            document.getElementById('modalId').value = '';
+            document.getElementById('modalBrandId').value = '';
+            document.getElementById('modalStatus').value = '0';
+            document.getElementById('modalCountry').value = '';
+            document.getElementById('modalMark').value = '';
+            document.getElementById('shieldAreaModal').style.display = 'block';
+        }
+
+        function editShieldArea(id) {
+            isEditing = true;
+            editId = id;
+            const shieldArea = shieldAreaData.find(item => item.id === id);
+            document.getElementById('modalTitle').textContent = '编辑禁售区域';
+            document.getElementById('modalId').value = shieldArea.id;
+            document.getElementById('modalBrandId').value = shieldArea.brand_id;
+            document.getElementById('modalStatus').value = shieldArea.status;
+            document.getElementById('modalCountry').value = shieldArea.country;
+            document.getElementById('modalMark').value = shieldArea.mark;
+            document.getElementById('shieldAreaModal').style.display = 'block';
+        }
+
+        function saveShieldArea() {
+            const newShieldArea = {
+                id: isEditing ? parseInt(document.getElementById('modalId').value) : shieldAreaData.reduce((max, item) => Math.max(max, item.id), 0) + 1,
+                brand_id: parseInt(document.getElementById('modalBrandId').value) || 0,
+                status: parseInt(document.getElementById('modalStatus').value),
+                country: document.getElementById('modalCountry').value,
+                mark: document.getElementById('modalMark').value
+            };
+            if (isEditing) {
+                const index = shieldAreaData.findIndex(item => item.id === editId);
+                shieldAreaData[index] = newShieldArea;
+            } else {
+                shieldAreaData.push(newShieldArea);
+            }
+            closeModal();
+            applyFilters();
+        }
+
+        function deleteShieldArea(id) {
+            if (confirm('确定要删除此禁售区域吗？')) {
+                shieldAreaData = shieldAreaData.filter(item => item.id !== id);
+                applyFilters();
+            }
+        }
+
+        function batchDelete() {
+            const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+            if (selectedIds.length === 0) {
+                alert('请先选择要删除的禁售区域');
+                return;
+            }
+            if (confirm(`确定要删除 ${selectedIds.length} 个禁售区域吗？`)) {
+                shieldAreaData = shieldAreaData.filter(item => !selectedIds.includes(item.id));
+                applyFilters();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('shieldAreaModal').style.display = 'none';
+        }
+
+        window.onload = () => {
+            console.log('Page loaded, initializing...');
+            w3.includeHTML(() => {
+                console.log('External HTML included');
+                initMenus();
+                fetchShieldAreaData();
+            });
+        };
+    </script>
+</body>
+</html>

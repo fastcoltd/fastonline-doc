@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 评分项管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 60px; }
+        .col-status { width: 10%; min-width: 80px; }
+        .col-rating-type { width: 12%; min-width: 100px; }
+        .col-language { width: 10%; min-width: 80px; }
+        .col-lang-status { width: 10%; min-width: 80px; }
+        .col-rating-name { width: 15%; min-width: 120px; }
+        .col-create-time { width: 15%; min-width: 120px; }
+        .col-actions { width: 15%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .ant-tabs-content { min-height: 400px; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">评分项管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="statusFilter" class="ant-select">
+                                        <option value="">全部状态</option>
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                    <select id="ratingTypeFilter" class="ant-select">
+                                        <option value="">全部类型</option>
+                                        <option value="0">商品</option>
+                                        <option value="1">帖子</option>
+                                        <option value="2">店铺</option>
+                                    </select>
+                                    <select id="languageFilter" class="ant-select">
+                                        <option value="">全部语言</option>
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">English</option>
+                                    </select>
+                                    <select id="langStatusFilter" class="ant-select">
+                                        <option value="">全部语言状态</option>
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                    <input type="text" id="ratingNameFilter" class="ant-input" placeholder="评分项名称">
+                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addRating()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-rating-type">评分类型</div>
+                                        <div class="col-language">语言</div>
+                                        <div class="col-lang-status">语言状态</div>
+                                        <div class="col-rating-name">评分项名称</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="rating-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="ratingModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加评分项</h3>
+            <form id="ratingForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="lang">
+                                    <span class="ant-tabs-tab-btn">多语言信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalStatus">
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>评分类型:</label>
+                                    <select id="modalRatingType">
+                                        <option value="0">商品</option>
+                                        <option value="1">帖子</option>
+                                        <option value="2">店铺</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>语言:</label>
+                                    <select id="modalLanguage">
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">English</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>语言状态:</label>
+                                    <select id="modalLangStatus">
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>评分项名称:</label>
+                                    <input type="text" id="modalRatingName" maxlength="128">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveRating()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">关闭</option>
+                        <option value="1">启用</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let ratingData = [];
+    let ratingLangData = [];
+    let page = 1, perPage = 20;
+
+    // 生成样本数据
+    function generateSampleData() {
+        ratingData = [];
+        ratingLangData = [];
+        const languages = ['zh_CN', 'en_US'];
+        for (let i = 1; i <= 200; i++) {
+            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            ratingData.push({
+                id: i,
+                status: Math.floor(Math.random() * 2),
+                rating_type: Math.floor(Math.random() * 3),
+                create_time: createTime
+            });
+
+            languages.forEach(lang => {
+                ratingLangData.push({
+                    id: ratingLangData.length + 1,
+                    rating_id: i,
+                    language: lang,
+                    status: Math.floor(Math.random() * 2),
+                    rating_name: lang === 'zh_CN' ? `评分项 ${i}` : `Rating ${i}`
+                });
+            });
+        }
+        renderRatingList();
+    }
+
+    // 渲染列表
+    function renderRatingList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = ratingData.slice(start, end);
+        const listContainer = document.getElementById('rating-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(rating => {
+            const langEntries = ratingLangData.filter(item => item.rating_id === rating.id);
+            langEntries.forEach(langEntry => {
+                const statusTag = rating.status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
+                    '<span class="ant-tag ant-tag-green">启用</span>';
+                const langStatusTag = langEntry.status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
+                    '<span class="ant-tag ant-tag-green">启用</span>';
+                const ratingTypeText = rating.rating_type === 0 ? '商品' : rating.rating_type === 1 ? '帖子' : '店铺';
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'task-item';
+                itemDiv.style = 'border-bottom: 1px solid #ddd;';
+                itemDiv.innerHTML = `
+                    <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${langEntry.id}"></div>
+                    <div class="col-id">${rating.id}</div>
+                    <div class="col-status">${statusTag}</div>
+                    <div class="col-rating-type">${ratingTypeText}</div>
+                    <div class="col-language">${langEntry.language}</div>
+                    <div class="col-lang-status">${langStatusTag}</div>
+                    <div class="col-rating-name">${langEntry.rating_name}</div>
+                    <div class="col-create-time">${moment.unix(rating.create_time).format('YYYY-MM-DD HH:mm')}</div>
+                    <div class="col-actions">
+                        <button class="ant-btn" onclick="editRating(${langEntry.id})">编辑</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteRating(${langEntry.id})">删除</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+        });
+
+        const totalPages = Math.ceil(ratingData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredRatings = [...ratingData];
+        let filteredLangs = [...ratingLangData];
+        const status = document.getElementById('statusFilter').value;
+        const ratingType = document.getElementById('ratingTypeFilter').value;
+        const language = document.getElementById('languageFilter').value;
+        const langStatus = document.getElementById('langStatusFilter').value;
+        const ratingName = document.getElementById('ratingNameFilter').value.toLowerCase();
+        const createTimeStart = document.getElementById('createTimeStartFilter').value;
+        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+
+        if (status) filteredRatings = filteredRatings.filter(item => item.status === parseInt(status));
+        if (ratingType) filteredRatings = filteredRatings.filter(item => item.rating_type === parseInt(ratingType));
+        if (createTimeStart) filteredRatings = filteredRatings.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
+        if (createTimeEnd) filteredRatings = filteredRatings.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+        if (language) filteredLangs = filteredLangs.filter(item => item.language === language);
+        if (langStatus) filteredLangs = filteredLangs.filter(item => item.status === parseInt(langStatus));
+        if (ratingName) filteredLangs = filteredLangs.filter(item => item.rating_name.toLowerCase().includes(ratingName));
+
+        const ratingIds = new Set(filteredRatings.map(r => r.id));
+        filteredLangs = filteredLangs.filter(lang => ratingIds.has(lang.rating_id));
+        ratingData = filteredRatings.filter(r => filteredLangs.some(l => l.rating_id === r.id));
+        page = 1;
+        renderRatingList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(ratingData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderRatingList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(ratingData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderRatingList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderRatingList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addRating() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加评分项';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalRatingType').value = '0';
+        document.getElementById('createTimeField').style.display = 'none';
+        document.getElementById('modalLanguage').value = 'zh_CN';
+        document.getElementById('modalLanguage').disabled = false;
+        document.getElementById('modalLangStatus').value = '0';
+        document.getElementById('modalRatingName').value = '';
+        setupTabs();
+        document.getElementById('ratingModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editRating(id) {
+        isEditing = true;
+        editId = id;
+        const langEntry = ratingLangData.find(item => item.id === id);
+        const rating = ratingData.find(item => item.id === langEntry.rating_id);
+        document.getElementById('modalTitle').textContent = '编辑评分项';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = rating.id;
+        document.getElementById('modalStatus').value = rating.status;
+        document.getElementById('modalRatingType').value = rating.rating_type;
+        document.getElementById('createTimeField').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment.unix(rating.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalLanguage').value = langEntry.language;
+        document.getElementById('modalLanguage').disabled = true;
+        document.getElementById('modalLangStatus').value = langEntry.status;
+        document.getElementById('modalRatingName').value = langEntry.rating_name || '';
+        setupTabs();
+        document.getElementById('ratingModal').style.display = 'block';
+    }
+
+    // Tab 设置
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#ratingModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#ratingModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#ratingModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#ratingModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
+
+    // 保存
+    function saveRating() {
+        const ratingId = isEditing ? parseInt(document.getElementById('modalId').value) : ratingData.length + 1;
+        const langId = isEditing ? editId : ratingLangData.length + 1;
+        const now = moment().unix();
+
+        let rating = ratingData.find(item => item.id === ratingId);
+        if (!rating) {
+            rating = {
+                id: ratingId,
+                status: parseInt(document.getElementById('modalStatus').value),
+                rating_type: parseInt(document.getElementById('modalRatingType').value),
+                create_time: now
+            };
+            ratingData.push(rating);
+        } else {
+            rating.status = parseInt(document.getElementById('modalStatus').value);
+            rating.rating_type = parseInt(document.getElementById('modalRatingType').value);
+        }
+
+        let langEntry = ratingLangData.find(item => item.id === langId);
+        if (!langEntry) {
+            langEntry = {
+                id: langId,
+                rating_id: ratingId,
+                language: document.getElementById('modalLanguage').value,
+                status: parseInt(document.getElementById('modalLangStatus').value),
+                rating_name: document.getElementById('modalRatingName').value || ''
+            };
+            ratingLangData.push(langEntry);
+        } else {
+            langEntry.status = parseInt(document.getElementById('modalLangStatus').value);
+            langEntry.rating_name = document.getElementById('modalRatingName').value || '';
+        }
+
+        closeModal();
+        renderRatingList();
+    }
+
+    // 删除
+    function deleteRating(id) {
+        if (confirm('确定要删除此评分项吗？')) {
+            const langEntry = ratingLangData.find(item => item.id === id);
+            ratingLangData = ratingLangData.filter(item => item.id !== id);
+            if (!ratingLangData.some(item => item.rating_id === langEntry.rating_id)) {
+                ratingData = ratingData.filter(item => item.id !== langEntry.rating_id);
+            }
+            renderRatingList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的评分项');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个评分项吗？`)) {
+            const ratingIdsToDelete = new Set();
+            selectedIds.forEach(id => {
+                const langEntry = ratingLangData.find(item => item.id === id);
+                if (langEntry) ratingIdsToDelete.add(langEntry.rating_id);
+                ratingLangData = ratingLangData.filter(item => item.id !== id);
+            });
+            ratingData = ratingData.filter(item => !ratingIdsToDelete.has(item.id));
+            renderRatingList();
+        }
+    }
+
+    // 批量修改状态
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的评分项');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
+        const ratingIds = new Set();
+        selectedIds.forEach(id => {
+            const langEntry = ratingLangData.find(item => item.id === id);
+            if (langEntry) ratingIds.add(langEntry.rating_id);
+        });
+        ratingData = ratingData.map(item => ratingIds.has(item.id) ? { ...item, status: newStatus } : item);
+        closeStatusModal();
+        renderRatingList();
+    }
+
+    function closeModal() {
+        document.getElementById('ratingModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

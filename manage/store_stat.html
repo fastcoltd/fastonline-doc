@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 店铺统计管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-store-id { width: 10%; min-width: 80px; }
+        .col-visit-count { width: 10%; min-width: 80px; }
+        .col-orders-count { width: 10%; min-width: 80px; }
+        .col-sales-amount { width: 10%; min-width: 80px; }
+        .col-sales-count { width: 10%; min-width: 80px; }
+        .col-refund-amount { width: 10%; min-width: 80px; }
+        .col-withdraw-amount { width: 10%; min-width: 80px; }
+        .col-update-time { width: 10%; min-width: 100px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">店铺统计管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="storeIdFilter" class="ant-select">
+                                        <option value="">全部店铺</option>
+                                    </select>
+                                    <input type="datetime-local" id="updateTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="updateTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addStoreStat()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-store-id">店铺</div>
+                                        <div class="col-visit-count">访问次数</div>
+                                        <div class="col-orders-count">订单数</div>
+                                        <div class="col-sales-amount">销售额</div>
+                                        <div class="col-sales-count">销售数量</div>
+                                        <div class="col-refund-amount">退款金额</div>
+                                        <div class="col-withdraw-amount">提现金额</div>
+                                        <div class="col-update-time">更新时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="store-stat-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="storeStatModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加店铺统计</h3>
+            <form id="storeStatForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>店铺ID:</label>
+                    <select id="modalStoreId">
+                        <option value="0">请选择店铺</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>访问次数:</label>
+                    <input type="number" id="modalVisitCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>订单数:</label>
+                    <input type="number" id="modalOrdersCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>销售额:</label>
+                    <input type="number" id="modalSalesAmount" step="0.01" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>销售数量:</label>
+                    <input type="number" id="modalSalesCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>销售利润:</label>
+                    <input type="number" id="modalSalesProfit" step="0.01" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>退款金额:</label>
+                    <input type="number" id="modalRefundAmount" step="0.01" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>提现金额:</label>
+                    <input type="number" id="modalWithdrawAmount" step="0.01" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>风险聊天数:</label>
+                    <input type="number" id="modalRiskChatCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>风险销售数:</label>
+                    <input type="number" id="modalRiskSaleCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>换货数:</label>
+                    <input type="number" id="modalReplacementCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>退款数:</label>
+                    <input type="number" id="modalRefundCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>评论数:</label>
+                    <input type="number" id="modalCommentCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>收藏数:</label>
+                    <input type="number" id="modalSaveCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>工单数:</label>
+                    <input type="number" id="modalTicketCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>举报数:</label>
+                    <input type="number" id="modalReportCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>评分次数:</label>
+                    <input type="number" id="modalRatingCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>评分:</label>
+                    <input type="number" id="modalRating" step="0.01" min="0" max="5">
+                </div>
+                <div class="ant-form-item">
+                    <label>平均响应时间:</label>
+                    <input type="number" id="modalResponseAvgTime" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>平均交易金额:</label>
+                    <input type="number" id="modalDealAvgMoney" step="0.01" min="0">
+                </div>
+                <div class="ant-form-item" id="updateTimeField" style="display: none;">
+                    <label>更新时间:</label>
+                    <input type="datetime-local" id="modalUpdateTime" disabled>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveStoreStat()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let storeStatData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const storeSelect = document.getElementById('modalStoreId');
+        const storeFilter = document.getElementById('storeIdFilter');
+        relationMap.store_id.forEach(item => {
+            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        storeStatData = [];
+        for (let i = 1; i <= 200; i++) {
+            const updateTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            storeStatData.push({
+                id: i,
+                store_id: Math.floor(Math.random() * 15) + 1,
+                visit_count: Math.floor(Math.random() * 1000),
+                orders_count: Math.floor(Math.random() * 500),
+                sales_amount: (Math.random() * 10000).toFixed(2),
+                sales_count: Math.floor(Math.random() * 200),
+                sales_profit: (Math.random() * 5000).toFixed(2),
+                refund_amount: (Math.random() * 2000).toFixed(2),
+                withdraw_amount: (Math.random() * 3000).toFixed(2),
+                risk_chat_count: Math.floor(Math.random() * 50),
+                risk_sale_count: Math.floor(Math.random() * 20),
+                replacement_count: Math.floor(Math.random() * 10),
+                refund_count: Math.floor(Math.random() * 15),
+                comment_count: Math.floor(Math.random() * 100),
+                save_count: Math.floor(Math.random() * 50),
+                ticket_count: Math.floor(Math.random() * 30),
+                report_count: Math.floor(Math.random() * 20),
+                rating_count: Math.floor(Math.random() * 100),
+                rating: (Math.random() * 5).toFixed(2),
+                response_avg_time: Math.floor(Math.random() * 3600),
+                deal_avg_money: (Math.random() * 1000).toFixed(2),
+                update_time: updateTime
+            });
+        }
+        renderStoreStatList();
+    }
+
+    // 渲染列表
+    function renderStoreStatList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = storeStatData.slice(start, end);
+        const listContainer = document.getElementById('store-stat-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(stat => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${stat.id}"></div>
+                <div class="col-store-id">${getRelationName('store_id', stat.store_id)}</div>
+                <div class="col-visit-count">${stat.visit_count}</div>
+                <div class="col-orders-count">${stat.orders_count}</div>
+                <div class="col-sales-amount">${stat.sales_amount}</div>
+                <div class="col-sales-count">${stat.sales_count}</div>
+                <div class="col-refund-amount">${stat.refund_amount}</div>
+                <div class="col-withdraw-amount">${stat.withdraw_amount}</div>
+                <div class="col-update-time">${moment.unix(stat.update_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editStoreStat(${stat.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteStoreStat(${stat.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(storeStatData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...storeStatData];
+        const storeId = document.getElementById('storeIdFilter').value;
+        const updateTimeStart = document.getElementById('updateTimeStartFilter').value;
+        const updateTimeEnd = document.getElementById('updateTimeEndFilter').value;
+
+        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
+        if (updateTimeStart) filteredData = filteredData.filter(item => moment.unix(item.update_time).isSameOrAfter(updateTimeStart));
+        if (updateTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.update_time).isSameOrBefore(updateTimeEnd));
+
+        storeStatData = filteredData;
+        page = 1;
+        renderStoreStatList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(storeStatData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderStoreStatList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(storeStatData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderStoreStatList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderStoreStatList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addStoreStat() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加店铺统计';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalStoreId').value = '0';
+        document.getElementById('modalVisitCount').value = '0';
+        document.getElementById('modalOrdersCount').value = '0';
+        document.getElementById('modalSalesAmount').value = '0.00';
+        document.getElementById('modalSalesCount').value = '0';
+        document.getElementById('modalSalesProfit').value = '0.00';
+        document.getElementById('modalRefundAmount').value = '0.00';
+        document.getElementById('modalWithdrawAmount').value = '0.00';
+        document.getElementById('modalRiskChatCount').value = '0';
+        document.getElementById('modalRiskSaleCount').value = '0';
+        document.getElementById('modalReplacementCount').value = '0';
+        document.getElementById('modalRefundCount').value = '0';
+        document.getElementById('modalCommentCount').value = '0';
+        document.getElementById('modalSaveCount').value = '0';
+        document.getElementById('modalTicketCount').value = '0';
+        document.getElementById('modalReportCount').value = '0';
+        document.getElementById('modalRatingCount').value = '0';
+        document.getElementById('modalRating').value = '5.00';
+        document.getElementById('modalResponseAvgTime').value = '0';
+        document.getElementById('modalDealAvgMoney').value = '0.00';
+        document.getElementById('updateTimeField').style.display = 'none';
+        document.getElementById('storeStatModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editStoreStat(id) {
+        isEditing = true;
+        editId = id;
+        const stat = storeStatData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑店铺统计';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = stat.id;
+        document.getElementById('modalStoreId').value = stat.store_id;
+        document.getElementById('modalVisitCount').value = stat.visit_count;
+        document.getElementById('modalOrdersCount').value = stat.orders_count;
+        document.getElementById('modalSalesAmount').value = stat.sales_amount;
+        document.getElementById('modalSalesCount').value = stat.sales_count;
+        document.getElementById('modalSalesProfit').value = stat.sales_profit;
+        document.getElementById('modalRefundAmount').value = stat.refund_amount;
+        document.getElementById('modalWithdrawAmount').value = stat.withdraw_amount;
+        document.getElementById('modalRiskChatCount').value = stat.risk_chat_count;
+        document.getElementById('modalRiskSaleCount').value = stat.risk_sale_count;
+        document.getElementById('modalReplacementCount').value = stat.replacement_count;
+        document.getElementById('modalRefundCount').value = stat.refund_count;
+        document.getElementById('modalCommentCount').value = stat.comment_count;
+        document.getElementById('modalSaveCount').value = stat.save_count;
+        document.getElementById('modalTicketCount').value = stat.ticket_count;
+        document.getElementById('modalReportCount').value = stat.report_count;
+        document.getElementById('modalRatingCount').value = stat.rating_count;
+        document.getElementById('modalRating').value = stat.rating;
+        document.getElementById('modalResponseAvgTime').value = stat.response_avg_time;
+        document.getElementById('modalDealAvgMoney').value = stat.deal_avg_money;
+        document.getElementById('updateTimeField').style.display = 'block';
+        document.getElementById('modalUpdateTime').value = moment.unix(stat.update_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('storeStatModal').style.display = 'block';
+    }
+
+    // 保存
+    function saveStoreStat() {
+        const stat = {
+            id: isEditing ? editId : storeStatData.length + 1,
+            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
+            visit_count: parseInt(document.getElementById('modalVisitCount').value) || 0,
+            orders_count: parseInt(document.getElementById('modalOrdersCount').value) || 0,
+            sales_amount: parseFloat(document.getElementById('modalSalesAmount').value) || 0,
+            sales_count: parseInt(document.getElementById('modalSalesCount').value) || 0,
+            sales_profit: parseFloat(document.getElementById('modalSalesProfit').value) || 0,
+            refund_amount: parseFloat(document.getElementById('modalRefundAmount').value) || 0,
+            withdraw_amount: parseFloat(document.getElementById('modalWithdrawAmount').value) || 0,
+            risk_chat_count: parseInt(document.getElementById('modalRiskChatCount').value) || 0,
+            risk_sale_count: parseInt(document.getElementById('modalRiskSaleCount').value) || 0,
+            replacement_count: parseInt(document.getElementById('modalReplacementCount').value) || 0,
+            refund_count: parseInt(document.getElementById('modalRefundCount').value) || 0,
+            comment_count: parseInt(document.getElementById('modalCommentCount').value) || 0,
+            save_count: parseInt(document.getElementById('modalSaveCount').value) || 0,
+            ticket_count: parseInt(document.getElementById('modalTicketCount').value) || 0,
+            report_count: parseInt(document.getElementById('modalReportCount').value) || 0,
+            rating_count: parseInt(document.getElementById('modalRatingCount').value) || 0,
+            rating: parseFloat(document.getElementById('modalRating').value) || 5.00,
+            response_avg_time: parseInt(document.getElementById('modalResponseAvgTime').value) || 0,
+            deal_avg_money: parseFloat(document.getElementById('modalDealAvgMoney').value) || 0,
+            update_time: moment().unix()
+        };
+
+        if (isEditing) {
+            const index = storeStatData.findIndex(item => item.id === editId);
+            storeStatData[index] = stat;
+        } else {
+            storeStatData.push(stat);
+        }
+        closeModal();
+        renderStoreStatList();
+    }
+
+    // 删除
+    function deleteStoreStat(id) {
+        if (confirm('确定要删除此店铺统计吗？')) {
+            storeStatData = storeStatData.filter(item => item.id !== id);
+            renderStoreStatList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的店铺统计');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个店铺统计吗？`)) {
+            storeStatData = storeStatData.filter(item => !selectedIds.includes(item.id));
+            renderStoreStatList();
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('storeStatModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

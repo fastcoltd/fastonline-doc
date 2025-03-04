@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 文章分类管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 15%; min-width: 60px; }
+        .col-status { width: 15%; min-width: 80px; }
+        .col-custom-url { width: 20%; min-width: 120px; }
+        .col-language { width: 15%; min-width: 80px; }
+        .col-type-name { width: 20%; min-width: 120px; }
+        .col-create-time { width: 15%; min-width: 120px; }
+        .col-actions { width: 15%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .ant-tabs-content { min-height: 400px; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">文章分类管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="statusFilter" class="ant-select">
+                                        <option value="">全部状态</option>
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                    <input type="text" id="customUrlFilter" class="ant-input" placeholder="自定义URL">
+                                    <input type="text" id="typeNameFilter" class="ant-input" placeholder="分类名称">
+                                    <select id="languageFilter" class="ant-select">
+                                        <option value="">全部语言</option>
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">英语</option>
+                                        <option value="fr_FR">法语</option>
+                                        <option value="es_ES">西班牙语</option>
+                                        <option value="vi_VN">越南语</option>
+                                        <option value="ru_RU">俄语</option>
+                                    </select>
+                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addPostsType()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-custom-url">自定义URL</div>
+                                        <div class="col-language">语言</div>
+                                        <div class="col-type-name">分类名称</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="posts-type-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="postsTypeModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加文章分类</h3>
+            <form id="postsTypeForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="lang">
+                                    <span class="ant-tabs-tab-btn">多语言信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalStatus">
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>自定义URL:</label>
+                                    <input type="text" id="modalCustomUrl" maxlength="64">
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>语言:</label>
+                                    <select id="modalLangLanguage">
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">英语</option>
+                                        <option value="fr_FR">法语</option>
+                                        <option value="es_ES">西班牙语</option>
+                                        <option value="vi_VN">越南语</option>
+                                        <option value="ru_RU">俄语</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>SEO关键词:</label>
+                                    <input type="text" id="modalLangSeoKeywords" maxlength="256">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>SEO描述:</label>
+                                    <input type="text" id="modalLangSeoDescription" maxlength="256">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>分类名称:</label>
+                                    <input type="text" id="modalLangTypeName" maxlength="256">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>封面图片:</label>
+                                    <input type="text" id="modalLangCoverPic" maxlength="128">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>摘要:</label>
+                                    <input type="text" id="modalLangSummary" maxlength="256">
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>分类内容:</label>
+                                    <textarea id="modalLangTypeContent" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                    <label>创建时间:</label>
+                    <input type="datetime-local" id="modalCreateTime" disabled>
+                </div>
+                <div class="ant-form-item" id="updateTimeField" style="display: none;">
+                    <label>更新时间:</label>
+                    <input type="datetime-local" id="modalUpdateTime" disabled>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="savePostsType()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">关闭</option>
+                        <option value="1">启用</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let postsTypeData = [];
+    let postsTypeLangData = [];
+    let page = 1, perPage = 20;
+
+    // 获取分类名称
+    function getTypeName(typeId, language = 'en_US') {
+        const lang = postsTypeLangData.find(item => item.posts_type_id === typeId && item.language === language);
+        return lang ? lang.type_name : '未设置';
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        postsTypeData = [];
+        postsTypeLangData = [];
+        const languages = ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'];
+        for (let i = 1; i <= 200; i++) {
+            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            const updateTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
+            postsTypeData.push({
+                id: i,
+                status: Math.floor(Math.random() * 2),
+                custom_url: `type${i}.com`,
+                create_time: createTime,
+                update_time: updateTime
+            });
+
+            const langIndex = i % languages.length; // 循环分配语言
+            const lang = languages[langIndex];
+            postsTypeLangData.push({
+                id: i,
+                posts_type_id: i,
+                status: postsTypeData[i-1].status,
+                language: lang,
+                seo_keywords: `${lang === 'zh_CN' ? '关键词' : lang === 'en_US' ? 'keyword' : lang === 'fr_FR' ? 'mot-clé' : lang === 'es_ES' ? 'palabra clave' : lang === 'vi_VN' ? 'từ khóa' : 'ключевое слово'}${i}`,
+                seo_description: `${lang === 'zh_CN' ? '分类描述' : lang === 'en_US' ? 'Category description' : lang === 'fr_FR' ? 'Description de la catégorie' : lang === 'es_ES' ? 'Descripción de la categoría' : lang === 'vi_VN' ? 'Mô tả danh mục' : 'Описание категории'} ${i}`,
+                type_name: `${lang === 'zh_CN' ? '分类名称' : lang === 'en_US' ? 'Category Name' : lang === 'fr_FR' ? 'Nom de la catégorie' : lang === 'es_ES' ? 'Nombre de la categoría' : lang === 'vi_VN' ? 'Tên danh mục' : 'Название категории'} ${i}`,
+                cover_pic: `cover${i}.jpg`,
+                summary: `${lang === 'zh_CN' ? '分类摘要' : lang === 'en_US' ? 'Summary' : lang === 'fr_FR' ? 'Résumé' : lang === 'es_ES' ? 'Resumen' : lang === 'vi_VN' ? 'Tóm tắt' : 'Резюме'} ${i}`,
+                type_content: `${lang === 'zh_CN' ? '分类内容' : lang === 'en_US' ? 'Category content' : lang === 'fr_FR' ? 'Contenu de la catégorie' : lang === 'es_ES' ? 'Contenido de la categoría' : lang === 'vi_VN' ? 'Nội dung danh mục' : 'Содержание категории'} ${i}`,
+                create_time: createTime,
+                update_time: updateTime
+            });
+        }
+        renderPostsTypeList();
+    }
+
+    // 渲染列表
+    function renderPostsTypeList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = postsTypeData.slice(start, end);
+        const listContainer = document.getElementById('posts-type-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(type => {
+            const lang = postsTypeLangData.find(item => item.posts_type_id === type.id) || {};
+            const statusTag = type.status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
+                '<span class="ant-tag ant-tag-green">启用</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${type.id}"></div>
+                <div class="col-id">${type.id}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-custom-url">${type.custom_url}</div>
+                <div class="col-language">${lang.language || '未设置'}</div>
+                <div class="col-type-name">${lang.type_name || '未设置'}</div>
+                <div class="col-create-time">${moment.unix(type.create_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editPostsType(${type.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deletePostsType(${type.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(postsTypeData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...postsTypeData];
+        const status = document.getElementById('statusFilter').value;
+        const customUrl = document.getElementById('customUrlFilter').value.toLowerCase();
+        const typeName = document.getElementById('typeNameFilter').value.toLowerCase();
+        const language = document.getElementById('languageFilter').value;
+        const createTimeStart = document.getElementById('createTimeStartFilter').value;
+        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+
+        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
+        if (customUrl) filteredData = filteredData.filter(item => item.custom_url.toLowerCase().includes(customUrl));
+        if (typeName) filteredData = filteredData.filter(item => (getTypeName(item.id) || '').toLowerCase().includes(typeName));
+        if (language) filteredData = filteredData.filter(item => postsTypeLangData.some(lang => lang.posts_type_id === item.id && lang.language === language));
+        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
+        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+
+        postsTypeData = filteredData;
+        page = 1;
+        renderPostsTypeList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(postsTypeData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderPostsTypeList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(postsTypeData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderPostsTypeList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderPostsTypeList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addPostsType() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加文章分类';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalCustomUrl').value = '';
+        document.getElementById('modalLangLanguage').disabled = false;
+        document.getElementById('modalLangLanguage').value = 'en_US';
+        document.getElementById('modalLangSeoKeywords').value = '';
+        document.getElementById('modalLangSeoDescription').value = '';
+        document.getElementById('modalLangTypeName').value = '';
+        document.getElementById('modalLangCoverPic').value = '';
+        document.getElementById('modalLangSummary').value = '';
+        document.getElementById('modalLangTypeContent').value = '';
+        document.getElementById('createTimeField').style.display = 'none';
+        document.getElementById('updateTimeField').style.display = 'none';
+        setupTabs();
+        document.getElementById('postsTypeModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editPostsType(id) {
+        isEditing = true;
+        editId = id;
+        const type = postsTypeData.find(item => item.id === id);
+        const lang = postsTypeLangData.find(item => item.posts_type_id === id) || {};
+        document.getElementById('modalTitle').textContent = '编辑文章分类';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = type.id;
+        document.getElementById('modalStatus').value = type.status;
+        document.getElementById('modalCustomUrl').value = type.custom_url;
+        document.getElementById('modalLangLanguage').disabled = true;
+        document.getElementById('modalLangLanguage').value = lang.language || 'en_US';
+        document.getElementById('modalLangSeoKeywords').value = lang.seo_keywords || '';
+        document.getElementById('modalLangSeoDescription').value = lang.seo_description || '';
+        document.getElementById('modalLangTypeName').value = lang.type_name || '';
+        document.getElementById('modalLangCoverPic').value = lang.cover_pic || '';
+        document.getElementById('modalLangSummary').value = lang.summary || '';
+        document.getElementById('modalLangTypeContent').value = lang.type_content || '';
+        document.getElementById('createTimeField').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment.unix(type.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('updateTimeField').style.display = 'block';
+        document.getElementById('modalUpdateTime').value = moment.unix(type.update_time).format('YYYY-MM-DDTHH:mm');
+        setupTabs();
+        document.getElementById('postsTypeModal').style.display = 'block';
+    }
+
+    // 设置 Tab
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#postsTypeModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#postsTypeModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#postsTypeModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#postsTypeModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].click(); // 默认激活第一个 Tab
+    }
+
+    // 保存
+    function savePostsType() {
+        const type = {
+            id: isEditing ? editId : postsTypeData.length + 1,
+            status: parseInt(document.getElementById('modalStatus').value),
+            custom_url: document.getElementById('modalCustomUrl').value,
+            create_time: isEditing ? postsTypeData.find(item => item.id === editId).create_time : moment().unix(),
+            update_time: moment().unix()
+        };
+
+        const lang = {
+            id: isEditing ? (postsTypeLangData.find(item => item.posts_type_id === editId && item.language === document.getElementById('modalLangLanguage').value)?.id || postsTypeLangData.length + 1) : postsTypeLangData.length + 1,
+            posts_type_id: type.id,
+            status: type.status,
+            language: document.getElementById('modalLangLanguage').value,
+            seo_keywords: document.getElementById('modalLangSeoKeywords').value,
+            seo_description: document.getElementById('modalLangSeoDescription').value,
+            type_name: document.getElementById('modalLangTypeName').value,
+            cover_pic: document.getElementById('modalLangCoverPic').value,
+            summary: document.getElementById('modalLangSummary').value,
+            type_content: document.getElementById('modalLangTypeContent').value,
+            create_time: isEditing ? (postsTypeLangData.find(item => item.posts_type_id === editId && item.language === document.getElementById('modalLangLanguage').value)?.create_time || moment().unix()) : moment().unix(),
+            update_time: moment().unix()
+        };
+
+        if (isEditing) {
+            const typeIndex = postsTypeData.findIndex(item => item.id === editId);
+            postsTypeData[typeIndex] = type;
+            const langIndex = postsTypeLangData.findIndex(item => item.posts_type_id === editId && item.language === lang.language);
+            if (langIndex >= 0) {
+                postsTypeLangData[langIndex] = lang;
+            } else {
+                postsTypeLangData.push(lang);
+            }
+        } else {
+            postsTypeData.push(type);
+            postsTypeLangData.push(lang);
+        }
+        closeModal();
+        renderPostsTypeList();
+    }
+
+    // 删除
+    function deletePostsType(id) {
+        if (confirm('确定要删除此文章分类吗？')) {
+            postsTypeData = postsTypeData.filter(item => item.id !== id);
+            postsTypeLangData = postsTypeLangData.filter(item => item.posts_type_id !== id);
+            renderPostsTypeList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的文章分类');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个文章分类吗？`)) {
+            postsTypeData = postsTypeData.filter(item => !selectedIds.includes(item.id));
+            postsTypeLangData = postsTypeLangData.filter(item => !selectedIds.includes(item.posts_type_id));
+            renderPostsTypeList();
+        }
+    }
+
+    // 批量修改状态
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的文章分类');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
+        postsTypeData = postsTypeData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
+        postsTypeLangData = postsTypeLangData.map(item => selectedIds.includes(item.posts_type_id) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
+        closeStatusModal();
+        renderPostsTypeList();
+    }
+
+    function closeModal() {
+        document.getElementById('postsTypeModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

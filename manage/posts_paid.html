@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 文章付费记录管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 15%; min-width: 60px; }
+        .col-posts-id { width: 15%; min-width: 100px; }
+        .col-user-id { width: 15%; min-width: 100px; }
+        .col-status { width: 15%; min-width: 80px; }
+        .col-paid-price { width: 15%; min-width: 100px; }
+        .col-create-time { width: 15%; min-width: 120px; }
+        .col-actions { width: 15%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">文章付费记录管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="postsIdFilter" class="ant-select">
+                                        <option value="">全部文章</option>
+                                    </select>
+                                    <select id="userIdFilter" class="ant-select">
+                                        <option value="">全部用户</option>
+                                    </select>
+                                    <select id="statusFilter" class="ant-select">
+                                        <option value="">全部状态</option>
+                                        <option value="0">未支付</option>
+                                        <option value="1">已支付</option>
+                                    </select>
+                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addPostsPaid()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-posts-id">文章</div>
+                                        <div class="col-user-id">用户</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-paid-price">支付金额</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="posts-paid-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="postsPaidModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加文章付费记录</h3>
+            <form id="postsPaidForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>文章ID:</label>
+                    <select id="modalPostsId">
+                        <option value="0">请选择文章</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>用户ID:</label>
+                    <select id="modalUserId">
+                        <option value="0">请选择用户</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>状态:</label>
+                    <select id="modalStatus">
+                        <option value="0">未支付</option>
+                        <option value="1">已支付</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>支付金额:</label>
+                    <input type="number" id="modalPaidPrice" step="0.01" min="0">
+                </div>
+                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                    <label>创建时间:</label>
+                    <input type="datetime-local" id="modalCreateTime" disabled>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="savePostsPaid()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">未支付</option>
+                        <option value="1">已支付</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let postsPaidData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        posts_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `文章 ${i + 1}` })),
+        user_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `用户 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const postsSelect = document.getElementById('modalPostsId');
+        const postsFilter = document.getElementById('postsIdFilter');
+        const userSelect = document.getElementById('modalUserId');
+        const userFilter = document.getElementById('userIdFilter');
+        relationMap.posts_id.forEach(item => {
+            postsSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            postsFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.user_id.forEach(item => {
+            userSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            userFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        postsPaidData = [];
+        for (let i = 1; i <= 200; i++) {
+            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            postsPaidData.push({
+                id: i,
+                posts_id: Math.floor(Math.random() * 15) + 1,
+                user_id: Math.floor(Math.random() * 15) + 1,
+                status: Math.floor(Math.random() * 2),
+                paid_price: (Math.random() * 50).toFixed(2),
+                create_time: createTime
+            });
+        }
+        renderPostsPaidList();
+    }
+
+    // 渲染列表
+    function renderPostsPaidList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = postsPaidData.slice(start, end);
+        const listContainer = document.getElementById('posts-paid-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(paid => {
+            const statusTag = paid.status === 0 ? '<span class="ant-tag ant-tag-blue">未支付</span>' :
+                '<span class="ant-tag ant-tag-green">已支付</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${paid.id}"></div>
+                <div class="col-id">${paid.id}</div>
+                <div class="col-posts-id">${getRelationName('posts_id', paid.posts_id)}</div>
+                <div class="col-user-id">${getRelationName('user_id', paid.user_id)}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-paid-price">${paid.paid_price}</div>
+                <div class="col-create-time">${moment.unix(paid.create_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editPostsPaid(${paid.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deletePostsPaid(${paid.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(postsPaidData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...postsPaidData];
+        const postsId = document.getElementById('postsIdFilter').value;
+        const userId = document.getElementById('userIdFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const createTimeStart = document.getElementById('createTimeStartFilter').value;
+        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+
+        if (postsId) filteredData = filteredData.filter(item => item.posts_id === parseInt(postsId));
+        if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
+        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
+        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
+        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+
+        postsPaidData = filteredData;
+        page = 1;
+        renderPostsPaidList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(postsPaidData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderPostsPaidList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(postsPaidData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderPostsPaidList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderPostsPaidList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addPostsPaid() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加文章付费记录';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalPostsId').value = '0';
+        document.getElementById('modalUserId').value = '0';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalPaidPrice').value = '0.00';
+        document.getElementById('createTimeField').style.display = 'none';
+        document.getElementById('postsPaidModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editPostsPaid(id) {
+        isEditing = true;
+        editId = id;
+        const paid = postsPaidData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑文章付费记录';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = paid.id;
+        document.getElementById('modalPostsId').value = paid.posts_id;
+        document.getElementById('modalUserId').value = paid.user_id;
+        document.getElementById('modalStatus').value = paid.status;
+        document.getElementById('modalPaidPrice').value = paid.paid_price;
+        document.getElementById('createTimeField').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment.unix(paid.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('postsPaidModal').style.display = 'block';
+    }
+
+    // 保存
+    function savePostsPaid() {
+        const paid = {
+            id: isEditing ? editId : postsPaidData.length + 1,
+            posts_id: parseInt(document.getElementById('modalPostsId').value) || 0,
+            user_id: parseInt(document.getElementById('modalUserId').value) || 0,
+            status: parseInt(document.getElementById('modalStatus').value),
+            paid_price: parseFloat(document.getElementById('modalPaidPrice').value) || 0,
+            create_time: isEditing ? postsPaidData.find(item => item.id === editId).create_time : moment().unix()
+        };
+
+        if (isEditing) {
+            const index = postsPaidData.findIndex(item => item.id === editId);
+            postsPaidData[index] = paid;
+        } else {
+            postsPaidData.push(paid);
+        }
+        closeModal();
+        renderPostsPaidList();
+    }
+
+    // 删除
+    function deletePostsPaid(id) {
+        if (confirm('确定要删除此文章付费记录吗？')) {
+            postsPaidData = postsPaidData.filter(item => item.id !== id);
+            renderPostsPaidList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的文章付费记录');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个文章付费记录吗？`)) {
+            postsPaidData = postsPaidData.filter(item => !selectedIds.includes(item.id));
+            renderPostsPaidList();
+        }
+    }
+
+    // 批量修改状态
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的文章付费记录');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
+        postsPaidData = postsPaidData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus } : item);
+        closeStatusModal();
+        renderPostsPaidList();
+    }
+
+    function closeModal() {
+        document.getElementById('postsPaidModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

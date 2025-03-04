@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 付费推广管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-promotion-type { width: 8%; min-width: 80px; }
+        .col-brand-id { width: 10%; min-width: 80px; }
+        .col-search-id { width: 10%; min-width: 80px; }
+        .col-user-id { width: 10%; min-width: 80px; }
+        .col-store-id { width: 10%; min-width: 80px; }
+        .col-item-id { width: 10%; min-width: 80px; }
+        .col-status { width: 8%; min-width: 80px; }
+        .col-price { width: 10%; min-width: 80px; }
+        .col-amount { width: 10%; min-width: 80px; }
+        .col-create-time { width: 10%; min-width: 100px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">付费推广管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="brandIdFilter" class="ant-select">
+                                        <option value="">全部品牌</option>
+                                    </select>
+                                    <select id="searchIdFilter" class="ant-select">
+                                        <option value="">全部搜索</option>
+                                    </select>
+                                    <select id="userIdFilter" class="ant-select">
+                                        <option value="">全部用户</option>
+                                    </select>
+                                    <select id="storeIdFilter" class="ant-select">
+                                        <option value="">全部店铺</option>
+                                    </select>
+                                    <select id="itemIdFilter" class="ant-select">
+                                        <option value="">全部商品</option>
+                                    </select>
+                                    <select id="statusFilter" class="ant-select">
+                                        <option value="">全部状态</option>
+                                        <option value="0">未激活</option>
+                                        <option value="1">已激活</option>
+                                    </select>
+                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addPromotion()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-promotion-type">推广类型</div>
+                                        <div class="col-brand-id">品牌</div>
+                                        <div class="col-search-id">搜索</div>
+                                        <div class="col-user-id">用户</div>
+                                        <div class="col-store-id">店铺</div>
+                                        <div class="col-item-id">商品</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-price">最低价格</div>
+                                        <div class="col-amount">总额</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="promotion-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="promotionModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加付费推广</h3>
+            <form id="promotionForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>推广类型:</label>
+                    <select id="modalPromotionType">
+                        <option value="0">CPV</option>
+                        <option value="1">CPA</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>品牌ID:</label>
+                    <select id="modalBrandId">
+                        <option value="0">请选择品牌</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>搜索ID:</label>
+                    <select id="modalSearchId">
+                        <option value="0">请选择搜索</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>用户ID:</label>
+                    <select id="modalUserId">
+                        <option value="0">请选择用户</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>店铺ID:</label>
+                    <select id="modalStoreId">
+                        <option value="0">请选择店铺</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>商品ID:</label>
+                    <select id="modalItemId">
+                        <option value="0">请选择商品</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>状态:</label>
+                    <select id="modalStatus">
+                        <option value="0">未激活</option>
+                        <option value="1">已激活</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>最低价格:</label>
+                    <input type="number" id="modalPrice" step="0.01" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>溢价:</label>
+                    <input type="number" id="modalPremiumPrice" step="0.01" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>单价:</label>
+                    <input type="number" id="modalUnitPrice" step="0.01" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>总额:</label>
+                    <input type="number" id="modalAmount" step="0.01" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>开始时间:</label>
+                    <input type="datetime-local" id="modalStartTime">
+                </div>
+                <div class="ant-form-item">
+                    <label>结束时间:</label>
+                    <input type="datetime-local" id="modalEndTime">
+                </div>
+                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                    <label>创建时间:</label>
+                    <input type="datetime-local" id="modalCreateTime" disabled>
+                </div>
+                <div class="ant-form-item" id="paidTimeField" style="display: none;">
+                    <label>支付时间:</label>
+                    <input type="datetime-local" id="modalPaidTime" disabled>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="savePromotion()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">未激活</option>
+                        <option value="1">已激活</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let promotionData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        brand_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `品牌 ${i + 1}` })),
+        search_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `搜索 ${i + 1}` })),
+        user_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `用户 ${i + 1}` })),
+        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` })),
+        item_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `商品 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const brandSelect = document.getElementById('modalBrandId');
+        const brandFilter = document.getElementById('brandIdFilter');
+        const searchSelect = document.getElementById('modalSearchId');
+        const searchFilter = document.getElementById('searchIdFilter');
+        const userSelect = document.getElementById('modalUserId');
+        const userFilter = document.getElementById('userIdFilter');
+        const storeSelect = document.getElementById('modalStoreId');
+        const storeFilter = document.getElementById('storeIdFilter');
+        const itemSelect = document.getElementById('modalItemId');
+        const itemFilter = document.getElementById('itemIdFilter');
+
+        relationMap.brand_id.forEach(item => {
+            brandSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            brandFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.search_id.forEach(item => {
+            searchSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            searchFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.user_id.forEach(item => {
+            userSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            userFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.store_id.forEach(item => {
+            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.item_id.forEach(item => {
+            itemSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            itemFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        promotionData = [];
+        for (let i = 1; i <= 200; i++) {
+            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            const startTime = moment().subtract(Math.floor(Math.random() * 50), 'days').unix();
+            const endTime = moment().add(Math.floor(Math.random() * 30), 'days').unix();
+            const paidTime = i % 2 === 0 ? moment().subtract(Math.floor(Math.random() * 40), 'days').unix() : 0;
+            promotionData.push({
+                id: i,
+                promotion_type: Math.floor(Math.random() * 2),
+                brand_id: Math.floor(Math.random() * 15) + 1,
+                search_id: Math.floor(Math.random() * 15) + 1,
+                user_id: Math.floor(Math.random() * 15) + 1,
+                store_id: Math.floor(Math.random() * 15) + 1,
+                item_id: Math.floor(Math.random() * 15) + 1,
+                status: Math.floor(Math.random() * 2),
+                price: (Math.random() * 100).toFixed(2),
+                premium_price: (Math.random() * 50).toFixed(2),
+                unit_price: (Math.random() * 10).toFixed(2),
+                amount: (Math.random() * 1000).toFixed(2),
+                start_time: startTime,
+                end_time: endTime,
+                create_time: createTime,
+                paid_time: paidTime
+            });
+        }
+        renderPromotionList();
+    }
+
+    // 渲染列表
+    function renderPromotionList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = promotionData.slice(start, end);
+        const listContainer = document.getElementById('promotion-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(promotion => {
+            const typeTag = promotion.promotion_type === 0 ? '<span class="ant-tag ant-tag-blue">CPV</span>' :
+                '<span class="ant-tag ant-tag-green">CPA</span>';
+            const statusTag = promotion.status === 0 ? '<span class="ant-tag ant-tag-blue">未激活</span>' :
+                '<span class="ant-tag ant-tag-green">已激活</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${promotion.id}"></div>
+                <div class="col-promotion-type">${typeTag}</div>
+                <div class="col-brand-id">${getRelationName('brand_id', promotion.brand_id)}</div>
+                <div class="col-search-id">${getRelationName('search_id', promotion.search_id)}</div>
+                <div class="col-user-id">${getRelationName('user_id', promotion.user_id)}</div>
+                <div class="col-store-id">${getRelationName('store_id', promotion.store_id)}</div>
+                <div class="col-item-id">${getRelationName('item_id', promotion.item_id)}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-price">${promotion.price}</div>
+                <div class="col-amount">${promotion.amount}</div>
+                <div class="col-create-time">${moment.unix(promotion.create_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editPromotion(${promotion.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deletePromotion(${promotion.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(promotionData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...promotionData];
+        const brandId = document.getElementById('brandIdFilter').value;
+        const searchId = document.getElementById('searchIdFilter').value;
+        const userId = document.getElementById('userIdFilter').value;
+        const storeId = document.getElementById('storeIdFilter').value;
+        const itemId = document.getElementById('itemIdFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const createTimeStart = document.getElementById('createTimeStartFilter').value;
+        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+
+        if (brandId) filteredData = filteredData.filter(item => item.brand_id === parseInt(brandId));
+        if (searchId) filteredData = filteredData.filter(item => item.search_id === parseInt(searchId));
+        if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
+        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
+        if (itemId) filteredData = filteredData.filter(item => item.item_id === parseInt(itemId));
+        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
+        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
+        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+
+        promotionData = filteredData;
+        page = 1;
+        renderPromotionList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(promotionData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderPromotionList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(promotionData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderPromotionList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderPromotionList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addPromotion() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加付费推广';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalPromotionType').value = '0';
+        document.getElementById('modalBrandId').value = '0';
+        document.getElementById('modalSearchId').value = '0';
+        document.getElementById('modalUserId').value = '0';
+        document.getElementById('modalStoreId').value = '0';
+        document.getElementById('modalItemId').value = '0';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalPrice').value = '0.00';
+        document.getElementById('modalPremiumPrice').value = '0.00';
+        document.getElementById('modalUnitPrice').value = '0.00';
+        document.getElementById('modalAmount').value = '0.00';
+        document.getElementById('modalStartTime').value = '';
+        document.getElementById('modalEndTime').value = '';
+        document.getElementById('createTimeField').style.display = 'none';
+        document.getElementById('paidTimeField').style.display = 'none';
+        document.getElementById('promotionModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editPromotion(id) {
+        isEditing = true;
+        editId = id;
+        const promotion = promotionData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑付费推广';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = promotion.id;
+        document.getElementById('modalPromotionType').value = promotion.promotion_type;
+        document.getElementById('modalBrandId').value = promotion.brand_id;
+        document.getElementById('modalSearchId').value = promotion.search_id;
+        document.getElementById('modalUserId').value = promotion.user_id;
+        document.getElementById('modalStoreId').value = promotion.store_id;
+        document.getElementById('modalItemId').value = promotion.item_id;
+        document.getElementById('modalStatus').value = promotion.status;
+        document.getElementById('modalPrice').value = promotion.price;
+        document.getElementById('modalPremiumPrice').value = promotion.premium_price;
+        document.getElementById('modalUnitPrice').value = promotion.unit_price;
+        document.getElementById('modalAmount').value = promotion.amount;
+        document.getElementById('modalStartTime').value = moment.unix(promotion.start_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalEndTime').value = moment.unix(promotion.end_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('createTimeField').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment.unix(promotion.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('paidTimeField').style.display = 'block';
+        document.getElementById('modalPaidTime').value = promotion.paid_time ? moment.unix(promotion.paid_time).format('YYYY-MM-DDTHH:mm') : '';
+        document.getElementById('promotionModal').style.display = 'block';
+    }
+
+    // 保存
+    function savePromotion() {
+        const promotion = {
+            id: isEditing ? editId : promotionData.length + 1,
+            promotion_type: parseInt(document.getElementById('modalPromotionType').value),
+            brand_id: parseInt(document.getElementById('modalBrandId').value) || 0,
+            search_id: parseInt(document.getElementById('modalSearchId').value) || 0,
+            user_id: parseInt(document.getElementById('modalUserId').value) || 0,
+            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
+            item_id: parseInt(document.getElementById('modalItemId').value) || 0,
+            status: parseInt(document.getElementById('modalStatus').value),
+            price: parseFloat(document.getElementById('modalPrice').value) || 0,
+            premium_price: parseFloat(document.getElementById('modalPremiumPrice').value) || 0,
+            unit_price: parseFloat(document.getElementById('modalUnitPrice').value) || 0,
+            amount: parseFloat(document.getElementById('modalAmount').value) || 0,
+            start_time: document.getElementById('modalStartTime').value ? moment(document.getElementById('modalStartTime').value).unix() : 0,
+            end_time: document.getElementById('modalEndTime').value ? moment(document.getElementById('modalEndTime').value).unix() : 0,
+            create_time: isEditing ? promotionData.find(item => item.id === editId).create_time : moment().unix(),
+            paid_time: isEditing ? promotionData.find(item => item.id === editId).paid_time : 0
+        };
+
+        if (isEditing) {
+            const index = promotionData.findIndex(item => item.id === editId);
+            promotionData[index] = promotion;
+        } else {
+            promotionData.push(promotion);
+        }
+        closeModal();
+        renderPromotionList();
+    }
+
+    // 删除
+    function deletePromotion(id) {
+        if (confirm('确定要删除此付费推广吗？')) {
+            promotionData = promotionData.filter(item => item.id !== id);
+            renderPromotionList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的付费推广');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个付费推广吗？`)) {
+            promotionData = promotionData.filter(item => !selectedIds.includes(item.id));
+            renderPromotionList();
+        }
+    }
+
+    // 批量修改状态
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的付费推广');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
+        promotionData = promotionData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus } : item);
+        closeStatusModal();
+        renderPromotionList();
+    }
+
+    function closeModal() {
+        document.getElementById('promotionModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

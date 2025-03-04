@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 商品信息</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-language { width: 8%; min-width: 60px; }
+        .col-name { width: 12%; min-width: 100px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-store-id { width: 8%; min-width: 60px; }
+        .col-brand-id { width: 8%; min-width: 60px; }
+        .col-services-id { width: 8%; min-width: 60px; }
+        .col-price { width: 8%; min-width: 60px; }
+        .col-stock-quantity { width: 8%; min-width: 60px; }
+        .col-custom-url { width: 12%; min-width: 100px; }
+        .col-cover-pic { width: 12%; min-width: 100px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-update-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .ant-tabs-content { min-height: 400px; }
+        .ant-tabs-tabpane { padding: 10px 0; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item, .image-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item, .image-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item, .image-item) input, .modal-content .ant-form-item:not(.textarea-item, .image-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        .modal-content .ant-form-item.image-item { display: block; }
+        .modal-content .ant-form-item.image-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.image-item input[type="file"] { display: block; margin-bottom: 8px; }
+        .modal-content .ant-form-item.image-item .image-preview { display: flex; flex-wrap: wrap; gap: 8px; }
+        .modal-content .ant-form-item.image-item .image-preview img { max-width: 100px; max-height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('item.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">商品信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="languageFilter">
+                                            <option value="">全部语言</option>
+                                            <option value="zh_CN">中文</option>
+                                            <option value="en_US">English</option>
+                                            <option value="fr_FR">Français</option>
+                                            <option value="es_ES">Español</option>
+                                            <option value="vi_VN">Tiếng Việt</option>
+                                            <option value="ru_RU">Русский</option>
+                                        </select>
+                                    </div>
+                                    <input type="text" id="nameFilter" class="ant-input" placeholder="商品名称">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="storeIdFilter">
+                                            <option value="">全部店铺</option>
+                                            <option value="1">Shop A</option>
+                                            <option value="2">Shop B</option>
+                                            <option value="3">Shop C</option>
+                                            <option value="4">Shop D</option>
+                                            <option value="5">Shop E</option>
+                                            <option value="6">Shop F</option>
+                                            <option value="7">Shop G</option>
+                                            <option value="8">Shop H</option>
+                                            <option value="9">Shop I</option>
+                                            <option value="10">Shop J</option>
+                                            <option value="11">Shop K</option>
+                                            <option value="12">Shop L</option>
+                                            <option value="13">Shop M</option>
+                                            <option value="14">Shop N</option>
+                                            <option value="15">Shop O</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="statusFilter">
+                                            <option value="">全部状态</option>
+                                            <option value="0">未上架</option>
+                                            <option value="1">已上架</option>
+                                        </select>
+                                    </div>
+                                    <input type="date" id="startDate" class="ant-input">
+                                    <input type="date" id="endDate" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addItem()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-language">语言</div>
+                                        <div class="col-name">商品名称</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-store-id">店铺</div>
+                                        <div class="col-brand-id">品牌</div>
+                                        <div class="col-services-id">服务</div>
+                                        <div class="col-price">价格</div>
+                                        <div class="col-stock-quantity">库存</div>
+                                        <div class="col-custom-url">自定义URL</div>
+                                        <div class="col-cover-pic">封面图</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-update-time">更新时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="item-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加商品</h3>
+            <form id="itemForm">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="stock">
+                                    <span class="ant-tabs-tab-btn">库存与价格</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="lang">
+                                    <span class="ant-tabs-tab-btn">多语言信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <!-- 基本信息 Tab -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>ID (自动生成):</label>
+                                    <input type="text" id="modalId" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>用户ID:</label>
+                                    <select id="modalUserId">
+                                        <option value="0">未关联</option>
+                                        <option value="1">User A</option>
+                                        <option value="2">User B</option>
+                                        <option value="3">User C</option>
+                                        <option value="4">User D</option>
+                                        <option value="5">User E</option>
+                                        <option value="6">User F</option>
+                                        <option value="7">User G</option>
+                                        <option value="8">User H</option>
+                                        <option value="9">User I</option>
+                                        <option value="10">User J</option>
+                                        <option value="11">User K</option>
+                                        <option value="12">User L</option>
+                                        <option value="13">User M</option>
+                                        <option value="14">User N</option>
+                                        <option value="15">User O</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>店铺ID:</label>
+                                    <select id="modalStoreId">
+                                        <option value="0">未关联</option>
+                                        <option value="1">Shop A</option>
+                                        <option value="2">Shop B</option>
+                                        <option value="3">Shop C</option>
+                                        <option value="4">Shop D</option>
+                                        <option value="5">Shop E</option>
+                                        <option value="6">Shop F</option>
+                                        <option value="7">Shop G</option>
+                                        <option value="8">Shop H</option>
+                                        <option value="9">Shop I</option>
+                                        <option value="10">Shop J</option>
+                                        <option value="11">Shop K</option>
+                                        <option value="12">Shop L</option>
+                                        <option value="13">Shop M</option>
+                                        <option value="14">Shop N</option>
+                                        <option value="15">Shop O</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>品牌ID:</label>
+                                    <select id="modalBrandId">
+                                        <option value="0">未关联</option>
+                                        <option value="1">Brand A</option>
+                                        <option value="2">Brand B</option>
+                                        <option value="3">Brand C</option>
+                                        <option value="4">Brand D</option>
+                                        <option value="5">Brand E</option>
+                                        <option value="6">Brand F</option>
+                                        <option value="7">Brand G</option>
+                                        <option value="8">Brand H</option>
+                                        <option value="9">Brand I</option>
+                                        <option value="10">Brand J</option>
+                                        <option value="11">Brand K</option>
+                                        <option value="12">Brand L</option>
+                                        <option value="13">Brand M</option>
+                                        <option value="14">Brand N</option>
+                                        <option value="15">Brand O</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>服务ID:</label>
+                                    <select id="modalServicesId">
+                                        <option value="0">未关联</option>
+                                        <option value="1">Service A</option>
+                                        <option value="2">Service B</option>
+                                        <option value="3">Service C</option>
+                                        <option value="4">Service D</option>
+                                        <option value="5">Service E</option>
+                                        <option value="6">Service F</option>
+                                        <option value="7">Service G</option>
+                                        <option value="8">Service H</option>
+                                        <option value="9">Service I</option>
+                                        <option value="10">Service J</option>
+                                        <option value="11">Service K</option>
+                                        <option value="12">Service L</option>
+                                        <option value="13">Service M</option>
+                                        <option value="14">Service N</option>
+                                        <option value="15">Service O</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalStatus">
+                                        <option value="0">未上架</option>
+                                        <option value="1">已上架</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>配送类型:</label>
+                                    <input type="number" id="modalDeliveryType" min="0" value="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>排序索引:</label>
+                                    <input type="number" id="modalSortIndex" min="0" value="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>自定义URL:</label>
+                                    <input type="text" id="modalCustomUrl">
+                                </div>
+                                <div class="ant-form-item image-item">
+                                    <label>封面图:</label>
+                                    <input type="file" id="modalCoverPic" accept="image/*" onchange="previewCoverPic()">
+                                    <div id="coverPicPreview" class="image-preview"></div>
+                                </div>
+                            </div>
+                            <!-- 库存与价格 Tab -->
+                            <div class="ant-tabs-tabpane" id="stock" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>库存数量:</label>
+                                    <input type="number" id="modalStockQuantity" min="0" value="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>最低通知数量:</label>
+                                    <input type="number" id="modalLowerNoticeQuantity" min="0" value="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>保质期 (年):</label>
+                                    <input type="number" id="modalShelfLife" min="0" value="3">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>售后时间 (天):</label>
+                                    <input type="number" id="modalAfterSalesTime" min="0" value="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>价格:</label>
+                                    <input type="number" id="modalPrice" step="0.01" min="0" value="0.00">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>原价:</label>
+                                    <input type="number" id="modalOriginalPrice" step="0.01" min="0" value="0.00">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>最近补货时间:</label>
+                                    <input type="datetime-local" id="modalLastRestockTime">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>更新时间:</label>
+                                    <input type="datetime-local" id="modalUpdateTime" disabled>
+                                </div>
+                            </div>
+                            <!-- 多语言信息 Tab -->
+                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>语言:</label>
+                                    <select id="modalLanguage">
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">English</option>
+                                        <option value="fr_FR">Français</option>
+                                        <option value="es_ES">Español</option>
+                                        <option value="vi_VN">Tiếng Việt</option>
+                                        <option value="ru_RU">Русский</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalLangStatus">
+                                        <option value="0">未审核</option>
+                                        <option value="1">已审核</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>版本:</label>
+                                    <input type="number" id="modalVersion" min="0" value="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>商品名称:</label>
+                                    <input type="text" id="modalName">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>SEO 关键词:</label>
+                                    <input type="text" id="modalSeoKeywords">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>SEO 描述:</label>
+                                    <input type="text" id="modalSeoDescription">
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>售后规则:</label>
+                                    <textarea id="modalAfterSalesRules" rows="5"></textarea>
+                                </div>
+                                <div class="ant-form-item image-item">
+                                    <label>示例图片:</label>
+                                    <input type="file" id="modalSamplePics" multiple accept="image/*" onchange="previewSamplePics()">
+                                    <div id="samplePicsPreview" class="image-preview"></div>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>内容:</label>
+                                    <textarea id="modalContent" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveItem()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">未上架</option>
+                        <option value="1">已上架</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let itemData = [];
+    let itemLangData = [];
+    let itemPage = 1, itemPerPage = 20;
+
+    function fetchItemData() {
+        console.log('Fetching item data...');
+        itemData = [];
+        itemLangData = [];
+        const languages = ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'];
+        for (let i = 1; i <= 200; i++) {
+            const item = {
+                id: i,
+                user_id: Math.floor(Math.random() * 15) + 1,
+                store_id: Math.floor(Math.random() * 15) + 1,
+                brand_id: Math.floor(Math.random() * 15) + 1,
+                services_id: Math.floor(Math.random() * 15) + 1,
+                status: Math.floor(Math.random() * 2),
+                delivery_type: Math.floor(Math.random() * 3),
+                sort_index: Math.floor(Math.random() * 100),
+                stock_quantity: Math.floor(Math.random() * 1000),
+                lower_notice_quantity: Math.floor(Math.random() * 50),
+                shelf_life: Math.floor(Math.random() * 5) + 1,
+                after_sales_time: Math.floor(Math.random() * 30),
+                price: (Math.random() * 1000).toFixed(2),
+                original_price: (Math.random() * 1200).toFixed(2),
+                custom_url: `item-${i}`,
+                cover_pic: `https://example.com/cover${i}.jpg`,
+                last_restock_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix(),
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix(),
+                update_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix()
+            };
+            itemData.push(item);
+
+            languages.forEach(lang => {
+                const langData = {
+                    id: itemData.length * 6 + languages.indexOf(lang) + 1,
+                    item_id: i,
+                    status: Math.floor(Math.random() * 2),
+                    version: Math.floor(Math.random() * 5),
+                    language: lang,
+                    seo_keywords: `${lang === 'zh_CN' ? '商品' : 'Item'} ${i}, keyword${i}`,
+                    seo_description: `${lang === 'zh_CN' ? '商品' : 'Item'} ${i} description`,
+                    name: `${lang === 'zh_CN' ? '商品' : 'Item'} ${i}`,
+                    after_sales_rules: `${lang === 'zh_CN' ? '售后规则' : 'After-sales rules'} for Item ${i}`,
+                    sample_pics: JSON.stringify([`https://example.com/pic${i}-${lang}.jpg`]),
+                    content: `${lang === 'zh_CN' ? '商品内容' : 'Item content'} for ${i}`,
+                    create_time: item.create_time,
+                    update_time: item.update_time
+                };
+                itemLangData.push(langData);
+            });
+        }
+        renderItemList(itemData, itemLangData);
+    }
+
+    function renderItemList(items, langs) {
+        const start = (itemPage - 1) * itemPerPage;
+        const end = start + itemPerPage;
+        const paginatedItems = items.slice(start, end);
+        const listContainer = document.getElementById('item-list');
+        listContainer.innerHTML = '';
+
+        paginatedItems.forEach(item => {
+            const langEntries = langs.filter(lang => lang.item_id === item.id);
+            langEntries.forEach(langEntry => {
+                const statusTag = item.status === 0 ? '<span class="ant-tag ant-tag-blue">未上架</span>' :
+                    '<span class="ant-tag ant-tag-green">已上架</span>';
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'task-item';
+                itemDiv.style = 'border-bottom: 1px solid #ddd;';
+                itemDiv.innerHTML = `
+                    <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${langEntry.id}"></div>
+                    <div class="col-id">${item.id}</div>
+                    <div class="col-language">${langEntry.language}</div>
+                    <div class="col-name">${langEntry.name}</div>
+                    <div class="col-status">${statusTag}</div>
+                    <div class="col-store-id">Shop ${item.store_id}</div>
+                    <div class="col-brand-id">Brand ${item.brand_id}</div>
+                    <div class="col-services-id">Service ${item.services_id}</div>
+                    <div class="col-price">${item.price}</div>
+                    <div class="col-stock-quantity">${item.stock_quantity}</div>
+                    <div class="col-custom-url">${item.custom_url}</div>
+                    <div class="col-cover-pic"><img src="${item.cover_pic}" style="max-width: 50px; max-height: 50px;"></div>
+                    <div class="col-create-time">${moment.unix(item.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div class="col-update-time">${moment.unix(item.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div class="col-actions">
+                        <button class="ant-btn" onclick="editItem('${langEntry.id}')">编辑</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteItem('${langEntry.id}')">删除</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+        });
+
+        const totalPages = Math.ceil(items.length / itemPerPage);
+        document.getElementById('page-info').textContent = `第 ${itemPage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const language = document.getElementById('languageFilter').value;
+        const name = document.getElementById('nameFilter').value.toLowerCase();
+        const storeId = document.getElementById('storeIdFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredItems = itemData;
+        let filteredLangs = itemLangData;
+
+        if (storeId) filteredItems = filteredItems.filter(item => item.store_id === parseInt(storeId));
+        if (status) filteredItems = filteredItems.filter(item => item.status === parseInt(status));
+        if (startDate) filteredItems = filteredItems.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredItems = filteredItems.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+        if (language) filteredLangs = filteredLangs.filter(lang => lang.language === language);
+        if (name) filteredLangs = filteredLangs.filter(lang => lang.name.toLowerCase().includes(name));
+
+        const itemIds = new Set(filteredItems.map(item => item.id));
+        filteredLangs = filteredLangs.filter(lang => itemIds.has(lang.item_id));
+
+        itemPage = 1;
+        renderItemList(filteredItems, filteredLangs);
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(itemData.length / itemPerPage);
+        itemPage += delta;
+        if (itemPage < 1) itemPage = 1;
+        if (itemPage > totalPages) itemPage = totalPages;
+        applyFilters();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(itemData.length / itemPerPage);
+        if (page >= 1 && page <= totalPages) {
+            itemPage = page;
+            applyFilters();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        itemPerPage = parseInt(document.getElementById('perPage').value);
+        itemPage = 1;
+        applyFilters();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    function previewCoverPic() {
+        const file = document.getElementById('modalCoverPic').files[0];
+        const preview = document.getElementById('coverPicPreview');
+        preview.innerHTML = '';
+        if (file) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            preview.appendChild(img);
+        }
+    }
+
+    function previewSamplePics() {
+        const files = document.getElementById('modalSamplePics').files;
+        const preview = document.getElementById('samplePicsPreview');
+        preview.innerHTML = '';
+        Array.from(files).forEach(file => {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            preview.appendChild(img);
+        });
+    }
+
+    let isEditing = false;
+    let editId = null;
+
+    function addItem() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加商品';
+        document.getElementById('modalId').value = '';
+        document.getElementById('modalUserId').value = '0';
+        document.getElementById('modalStoreId').value = '0';
+        document.getElementById('modalBrandId').value = '0';
+        document.getElementById('modalServicesId').value = '0';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalDeliveryType').value = '0';
+        document.getElementById('modalSortIndex').value = '0';
+        document.getElementById('modalCustomUrl').value = '';
+        document.getElementById('modalCoverPic').value = '';
+        document.getElementById('coverPicPreview').innerHTML = '';
+        document.getElementById('modalStockQuantity').value = '0';
+        document.getElementById('modalLowerNoticeQuantity').value = '0';
+        document.getElementById('modalShelfLife').value = '3';
+        document.getElementById('modalAfterSalesTime').value = '0';
+        document.getElementById('modalPrice').value = '0.00';
+        document.getElementById('modalOriginalPrice').value = '0.00';
+        document.getElementById('modalLastRestockTime').value = '';
+        document.getElementById('modalLanguage').value = 'zh_CN';
+        document.getElementById('modalLanguage').disabled = false;
+        document.getElementById('modalLangStatus').value = '0';
+        document.getElementById('modalVersion').value = '0';
+        document.getElementById('modalName').value = '';
+        document.getElementById('modalSeoKeywords').value = '';
+        document.getElementById('modalSeoDescription').value = '';
+        document.getElementById('modalAfterSalesRules').value = '';
+        document.getElementById('modalSamplePics').value = '';
+        document.getElementById('samplePicsPreview').innerHTML = '';
+        document.getElementById('modalContent').value = '';
+        setupTabs();
+        document.getElementById('itemModal').style.display = 'block';
+    }
+
+    function editItem(langId) {
+        isEditing = true;
+        editId = langId;
+        const langEntry = itemLangData.find(lang => lang.id === parseInt(langId));
+        const item = itemData.find(item => item.id === langEntry.item_id);
+        document.getElementById('modalTitle').textContent = '编辑商品';
+        document.getElementById('modalId').value = item.id;
+        document.getElementById('modalUserId').value = item.user_id;
+        document.getElementById('modalStoreId').value = item.store_id;
+        document.getElementById('modalBrandId').value = item.brand_id;
+        document.getElementById('modalServicesId').value = item.services_id;
+        document.getElementById('modalStatus').value = item.status;
+        document.getElementById('modalDeliveryType').value = item.delivery_type;
+        document.getElementById('modalSortIndex').value = item.sort_index;
+        document.getElementById('modalCustomUrl').value = item.custom_url;
+        document.getElementById('modalCoverPic').value = '';
+        const preview = document.getElementById('coverPicPreview');
+        preview.innerHTML = `<img src="${item.cover_pic}">`;
+        document.getElementById('modalStockQuantity').value = item.stock_quantity;
+        document.getElementById('modalLowerNoticeQuantity').value = item.lower_notice_quantity;
+        document.getElementById('modalShelfLife').value = item.shelf_life;
+        document.getElementById('modalAfterSalesTime').value = item.after_sales_time;
+        document.getElementById('modalPrice').value = item.price;
+        document.getElementById('modalOriginalPrice').value = item.original_price;
+        document.getElementById('modalLastRestockTime').value = moment.unix(item.last_restock_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalCreateTime').value = moment.unix(item.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalUpdateTime').value = moment.unix(item.update_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalLanguage').value = langEntry.language;
+        document.getElementById('modalLanguage').disabled = true;
+        document.getElementById('modalLangStatus').value = langEntry.status;
+        document.getElementById('modalVersion').value = langEntry.version;
+        document.getElementById('modalName').value = langEntry.name;
+        document.getElementById('modalSeoKeywords').value = langEntry.seo_keywords;
+        document.getElementById('modalSeoDescription').value = langEntry.seo_description;
+        document.getElementById('modalAfterSalesRules').value = langEntry.after_sales_rules;
+        document.getElementById('modalSamplePics').value = '';
+        const pics = JSON.parse(langEntry.sample_pics);
+        const samplePreview = document.getElementById('samplePicsPreview');
+        samplePreview.innerHTML = '';
+        pics.forEach(pic => {
+            const img = document.createElement('img');
+            img.src = pic;
+            samplePreview.appendChild(img);
+        });
+        document.getElementById('modalContent').value = langEntry.content;
+        setupTabs();
+        document.getElementById('itemModal').style.display = 'block';
+    }
+
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#itemModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#itemModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#itemModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#itemModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
+
+    function saveItem() {
+        const itemId = isEditing ? parseInt(document.getElementById('modalId').value) : itemData.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+        const langId = isEditing ? editId : itemLangData.length + 1;
+        const lang = document.getElementById('modalLanguage').value;
+
+        let item = itemData.find(item => item.id === itemId);
+        const coverFile = document.getElementById('modalCoverPic').files[0];
+        const coverPic = coverFile ? URL.createObjectURL(coverFile) : (item ? item.cover_pic : '');
+
+        if (!item) {
+            item = {
+                id: itemId,
+                user_id: parseInt(document.getElementById('modalUserId').value),
+                store_id: parseInt(document.getElementById('modalStoreId').value),
+                brand_id: parseInt(document.getElementById('modalBrandId').value),
+                services_id: parseInt(document.getElementById('modalServicesId').value),
+                status: parseInt(document.getElementById('modalStatus').value),
+                delivery_type: parseInt(document.getElementById('modalDeliveryType').value),
+                sort_index: parseInt(document.getElementById('modalSortIndex').value),
+                stock_quantity: parseInt(document.getElementById('modalStockQuantity').value),
+                lower_notice_quantity: parseInt(document.getElementById('modalLowerNoticeQuantity').value),
+                shelf_life: parseInt(document.getElementById('modalShelfLife').value),
+                after_sales_time: parseInt(document.getElementById('modalAfterSalesTime').value),
+                price: parseFloat(document.getElementById('modalPrice').value),
+                original_price: parseFloat(document.getElementById('modalOriginalPrice').value),
+                custom_url: document.getElementById('modalCustomUrl').value,
+                cover_pic: coverPic,
+                last_restock_time: document.getElementById('modalLastRestockTime').value ? moment(document.getElementById('modalLastRestockTime').value).unix() : 0,
+                create_time: moment().unix(),
+                update_time: moment().unix()
+            };
+            itemData.push(item);
+        } else {
+            item.user_id = parseInt(document.getElementById('modalUserId').value);
+            item.store_id = parseInt(document.getElementById('modalStoreId').value);
+            item.brand_id = parseInt(document.getElementById('modalBrandId').value);
+            item.services_id = parseInt(document.getElementById('modalServicesId').value);
+            item.status = parseInt(document.getElementById('modalStatus').value);
+            item.delivery_type = parseInt(document.getElementById('modalDeliveryType').value);
+            item.sort_index = parseInt(document.getElementById('modalSortIndex').value);
+            item.stock_quantity = parseInt(document.getElementById('modalStockQuantity').value);
+            item.lower_notice_quantity = parseInt(document.getElementById('modalLowerNoticeQuantity').value);
+            item.shelf_life = parseInt(document.getElementById('modalShelfLife').value);
+            item.after_sales_time = parseInt(document.getElementById('modalAfterSalesTime').value);
+            item.price = parseFloat(document.getElementById('modalPrice').value);
+            item.original_price = parseFloat(document.getElementById('modalOriginalPrice').value);
+            item.custom_url = document.getElementById('modalCustomUrl').value;
+            item.cover_pic = coverPic;
+            item.last_restock_time = document.getElementById('modalLastRestockTime').value ? moment(document.getElementById('modalLastRestockTime').value).unix() : item.last_restock_time;
+            item.update_time = moment().unix();
+        }
+
+        const files = document.getElementById('modalSamplePics').files;
+        let samplePics = langEntry ? JSON.parse(langEntry.sample_pics) : [];
+        if (files.length > 0) {
+            samplePics = Array.from(files).map(file => URL.createObjectURL(file));
+        }
+
+        let langEntry = itemLangData.find(lang => lang.id === parseInt(langId));
+        if (!langEntry) {
+            langEntry = {
+                id: langId,
+                item_id: itemId,
+                status: parseInt(document.getElementById('modalLangStatus').value),
+                version: parseInt(document.getElementById('modalVersion').value),
+                language: lang,
+                seo_keywords: document.getElementById('modalSeoKeywords').value,
+                seo_description: document.getElementById('modalSeoDescription').value,
+                name: document.getElementById('modalName').value,
+                after_sales_rules: document.getElementById('modalAfterSalesRules').value,
+                sample_pics: JSON.stringify(samplePics),
+                content: document.getElementById('modalContent').value,
+                create_time: item.create_time,
+                update_time: item.update_time
+            };
+            itemLangData.push(langEntry);
+        } else {
+            langEntry.status = parseInt(document.getElementById('modalLangStatus').value);
+            langEntry.version = parseInt(document.getElementById('modalVersion').value);
+            langEntry.seo_keywords = document.getElementById('modalSeoKeywords').value;
+            langEntry.seo_description = document.getElementById('modalSeoDescription').value;
+            langEntry.name = document.getElementById('modalName').value;
+            langEntry.after_sales_rules = document.getElementById('modalAfterSalesRules').value;
+            langEntry.sample_pics = JSON.stringify(samplePics);
+            langEntry.content = document.getElementById('modalContent').value;
+            langEntry.update_time = item.update_time;
+        }
+
+        closeModal();
+        applyFilters();
+    }
+
+    function deleteItem(langId) {
+        if (confirm('确定要删除此商品记录吗？')) {
+            const langEntry = itemLangData.find(lang => lang.id === parseInt(langId));
+            if (langEntry) {
+                itemLangData = itemLangData.filter(lang => lang.id !== parseInt(langId));
+                const remainingLangs = itemLangData.filter(lang => lang.item_id === langEntry.item_id);
+                if (remainingLangs.length === 0) {
+                    itemData = itemData.filter(item => item.id !== langEntry.item_id);
+                }
+            }
+            applyFilters();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的商品');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个商品记录吗？`)) {
+            const itemIdsToDelete = new Set();
+            selectedIds.forEach(langId => {
+                const langEntry = itemLangData.find(lang => lang.id === parseInt(langId));
+                if (langEntry) {
+                    itemIdsToDelete.add(langEntry.item_id);
+                    itemLangData = itemLangData.filter(lang => lang.id !== parseInt(langId));
+                }
+            });
+            itemData = itemData.filter(item => !itemIdsToDelete.has(item.id));
+            applyFilters();
+        }
+    }
+
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的商品');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        const itemIds = new Set();
+        selectedIds.forEach(langId => {
+            const langEntry = itemLangData.find(lang => lang.id === parseInt(langId));
+            if (langEntry) itemIds.add(langEntry.item_id);
+        });
+        itemData = itemData.map(item => itemIds.has(item.id) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
+        closeStatusModal();
+        applyFilters();
+    }
+
+    function closeModal() {
+        document.getElementById('itemModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchItemData();
+        });
+    };
+</script>
+</body>
+</html>

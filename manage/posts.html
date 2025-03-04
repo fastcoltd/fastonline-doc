@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 博客文章管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-posts-type { width: 10%; min-width: 100px; }
+        .col-blog-id { width: 10%; min-width: 100px; }
+        .col-user-id { width: 10%; min-width: 100px; }
+        .col-store-id { width: 10%; min-width: 100px; }
+        .col-status { width: 8%; min-width: 80px; }
+        .col-money { width: 8%; min-width: 80px; }
+        .col-language { width: 8%; min-width: 80px; }
+        .col-title { width: 12%; min-width: 120px; }
+        .col-create-time { width: 10%; min-width: 100px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .ant-tabs-content { min-height: 400px; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">博客文章管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="postsTypeFilter" class="ant-select">
+                                        <option value="">全部文章类型</option>
+                                    </select>
+                                    <select id="blogIdFilter" class="ant-select">
+                                        <option value="">全部博客</option>
+                                    </select>
+                                    <select id="userIdFilter" class="ant-select">
+                                        <option value="">全部用户</option>
+                                    </select>
+                                    <select id="storeIdFilter" class="ant-select">
+                                        <option value="">全部店铺</option>
+                                    </select>
+                                    <select id="statusFilter" class="ant-select">
+                                        <option value="">全部状态</option>
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                    <input type="text" id="customUrlFilter" class="ant-input" placeholder="自定义URL">
+                                    <input type="text" id="titleFilter" class="ant-input" placeholder="标题">
+                                    <select id="languageFilter" class="ant-select">
+                                        <option value="">全部语言</option>
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">英语</option>
+                                        <option value="fr_FR">法语</option>
+                                        <option value="es_ES">西班牙语</option>
+                                        <option value="vi_VN">越南语</option>
+                                        <option value="ru_RU">俄语</option>
+                                    </select>
+                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addPost()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-posts-type">文章类型</div>
+                                        <div class="col-blog-id">博客</div>
+                                        <div class="col-user-id">用户</div>
+                                        <div class="col-store-id">店铺</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-money">金额</div>
+                                        <div class="col-custom-url">自定义URL</div>
+                                        <div class="col-language">语言</div>
+                                        <div class="col-title">标题</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="posts-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加博客文章</h3>
+            <form id="postForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="counts">
+                                    <span class="ant-tabs-tab-btn">计数信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="lang">
+                                    <span class="ant-tabs-tab-btn">多语言信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>文章类型:</label>
+                                    <select id="modalPostsType">
+                                        <option value="0">请选择文章类型</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>博客ID:</label>
+                                    <select id="modalBlogId">
+                                        <option value="0">请选择博客</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>用户ID:</label>
+                                    <select id="modalUserId">
+                                        <option value="0">请选择用户</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>店铺ID:</label>
+                                    <select id="modalStoreId">
+                                        <option value="0">请选择店铺</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalStatus">
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>金额:</label>
+                                    <input type="number" id="modalMoney" step="0.01" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>自定义URL:</label>
+                                    <input type="text" id="modalCustomUrl" maxlength="256">
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="counts" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>阅读数:</label>
+                                    <input type="number" id="modalReadCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>付费数:</label>
+                                    <input type="number" id="modalPaidCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>评论数:</label>
+                                    <input type="number" id="modalCommentCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>评分数:</label>
+                                    <input type="number" id="modalRatingCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>收藏数:</label>
+                                    <input type="number" id="modalSaveCount" min="0">
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>语言:</label>
+                                    <select id="modalLangLanguage">
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">英语</option>
+                                        <option value="fr_FR">法语</option>
+                                        <option value="es_ES">西班牙语</option>
+                                        <option value="vi_VN">越南语</option>
+                                        <option value="ru_RU">俄语</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>SEO关键词:</label>
+                                    <input type="text" id="modalLangSeoKeywords" maxlength="256">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>SEO描述:</label>
+                                    <input type="text" id="modalLangSeoDescription" maxlength="256">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>标题:</label>
+                                    <input type="text" id="modalLangTitle" maxlength="256">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>封面图片:</label>
+                                    <input type="text" id="modalLangCoverPic" maxlength="128">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>摘要:</label>
+                                    <input type="text" id="modalLangSummary" maxlength="256">
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>免费内容:</label>
+                                    <textarea id="modalLangFreeContent" rows="5"></textarea>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>付费内容:</label>
+                                    <textarea id="modalLangMoneyContent" rows="5"></textarea>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>网站回复:</label>
+                                    <textarea id="modalLangSiteReply" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                    <label>创建时间:</label>
+                    <input type="datetime-local" id="modalCreateTime" disabled>
+                </div>
+                <div class="ant-form-item" id="updateTimeField" style="display: none;">
+                    <label>更新时间:</label>
+                    <input type="datetime-local" id="modalUpdateTime" disabled>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="savePost()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">关闭</option>
+                        <option value="1">启用</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let postsData = [];
+    let postsLangData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        posts_type: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `文章类型 ${i + 1}` })),
+        blog_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `博客 ${i + 1}` })),
+        user_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `用户 ${i + 1}` })),
+        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const postsTypeSelect = document.getElementById('modalPostsType');
+        const postsTypeFilter = document.getElementById('postsTypeFilter');
+        const blogSelect = document.getElementById('modalBlogId');
+        const blogFilter = document.getElementById('blogIdFilter');
+        const userSelect = document.getElementById('modalUserId');
+        const userFilter = document.getElementById('userIdFilter');
+        const storeSelect = document.getElementById('modalStoreId');
+        const storeFilter = document.getElementById('storeIdFilter');
+
+        relationMap.posts_type.forEach(item => {
+            postsTypeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            postsTypeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.blog_id.forEach(item => {
+            blogSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            blogFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.user_id.forEach(item => {
+            userSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            userFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.store_id.forEach(item => {
+            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 获取多语言数据
+    function getLangData(postId, language = 'en_US') {
+        return postsLangData.find(item => item.posts_id === postId && item.language === language) || {};
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        postsData = [];
+        postsLangData = [];
+        const languages = ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'];
+        for (let i = 1; i <= 200; i++) {
+            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            const updateTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
+            postsData.push({
+                id: i,
+                posts_type: Math.floor(Math.random() * 15) + 1,
+                blog_id: Math.floor(Math.random() * 15) + 1,
+                user_id: Math.floor(Math.random() * 15) + 1,
+                store_id: Math.floor(Math.random() * 15) + 1,
+                status: Math.floor(Math.random() * 2),
+                money: (Math.random() * 100).toFixed(2),
+                custom_url: `post${i}.com`,
+                read_count: Math.floor(Math.random() * 1000),
+                paid_count: Math.floor(Math.random() * 50),
+                comment_count: Math.floor(Math.random() * 200),
+                rating_count: Math.floor(Math.random() * 100),
+                save_count: Math.floor(Math.random() * 300),
+                create_time: createTime,
+                update_time: updateTime
+            });
+
+            const langIndex = i % languages.length; // 循环分配语言
+            const lang = languages[langIndex];
+            postsLangData.push({
+                id: i,
+                posts_id: i,
+                status: postsData[i-1].status,
+                version: 1,
+                language: lang,
+                seo_keywords: `${lang === 'zh_CN' ? '关键词' : lang === 'en_US' ? 'keyword' : lang === 'fr_FR' ? 'mot-clé' : lang === 'es_ES' ? 'palabra clave' : lang === 'vi_VN' ? 'từ khóa' : 'ключевое слово'}${i}`,
+                seo_description: `${lang === 'zh_CN' ? '文章描述' : lang === 'en_US' ? 'Post description' : lang === 'fr_FR' ? 'Description de l\'article' : lang === 'es_ES' ? 'Descripción del artículo' : lang === 'vi_VN' ? 'Mô tả bài viết' : 'Описание статьи'} ${i}`,
+                title: `${lang === 'zh_CN' ? '文章标题' : lang === 'en_US' ? 'Post Title' : lang === 'fr_FR' ? 'Titre de l\'article' : lang === 'es_ES' ? 'Título del artículo' : lang === 'vi_VN' ? 'Tiêu đề bài viết' : 'Заголовок статьи'} ${i}`,
+                cover_pic: `cover${i}.jpg`,
+                summary: `${lang === 'zh_CN' ? '文章摘要' : lang === 'en_US' ? 'Summary' : lang === 'fr_FR' ? 'Résumé' : lang === 'es_ES' ? 'Resumen' : lang === 'vi_VN' ? 'Tóm tắt' : 'Резюме'} ${i}`,
+                free_content: `${lang === 'zh_CN' ? '免费内容' : lang === 'en_US' ? 'Free content' : lang === 'fr_FR' ? 'Contenu gratuit' : lang === 'es_ES' ? 'Contenido gratuito' : lang === 'vi_VN' ? 'Nội dung miễn phí' : 'Бесплатный контент'} ${i}`,
+                money_content: `${lang === 'zh_CN' ? '付费内容' : lang === 'en_US' ? 'Paid content' : lang === 'fr_FR' ? 'Contenu payant' : lang === 'es_ES' ? 'Contenido de pago' : lang === 'vi_VN' ? 'Nội dung trả phí' : 'Платный контент'} ${i}`,
+                create_time: createTime,
+                update_time: updateTime,
+                site_reply: i % 2 === 0 ? `${lang === 'zh_CN' ? '网站回复' : lang === 'en_US' ? 'Site reply' : lang === 'fr_FR' ? 'Réponse du site' : lang === 'es_ES' ? 'Respuesta del sitio' : lang === 'vi_VN' ? 'Phản hồi trang web' : 'Ответ сайта'} ${i}` : null
+            });
+        }
+        renderPostsList();
+    }
+
+    // 渲染列表
+    function renderPostsList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = postsData.slice(start, end);
+        const listContainer = document.getElementById('posts-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(post => {
+            const lang = getLangData(post.id);
+            const statusTag = post.status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
+                '<span class="ant-tag ant-tag-green">启用</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${post.id}"></div>
+                <div class="col-id">${post.id}</div>
+                <div class="col-posts-type">${getRelationName('posts_type', post.posts_type)}</div>
+                <div class="col-blog-id">${getRelationName('blog_id', post.blog_id)}</div>
+                <div class="col-user-id">${getRelationName('user_id', post.user_id)}</div>
+                <div class="col-store-id">${getRelationName('store_id', post.store_id)}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-money">${post.money}</div>
+                <div class="col-custom-url">${post.custom_url}</div>
+                <div class="col-language">${lang.language || '未设置'}</div>
+                <div class="col-title">${lang.title || '未设置'}</div>
+                <div class="col-create-time">${moment.unix(post.create_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editPost(${post.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deletePost(${post.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(postsData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...postsData];
+        const postsType = document.getElementById('postsTypeFilter').value;
+        const blogId = document.getElementById('blogIdFilter').value;
+        const userId = document.getElementById('userIdFilter').value;
+        const storeId = document.getElementById('storeIdFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const customUrl = document.getElementById('customUrlFilter').value.toLowerCase();
+        const title = document.getElementById('titleFilter').value.toLowerCase();
+        const language = document.getElementById('languageFilter').value;
+        const createTimeStart = document.getElementById('createTimeStartFilter').value;
+        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+
+        if (postsType) filteredData = filteredData.filter(item => item.posts_type === parseInt(postsType));
+        if (blogId) filteredData = filteredData.filter(item => item.blog_id === parseInt(blogId));
+        if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
+        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
+        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
+        if (customUrl) filteredData = filteredData.filter(item => item.custom_url.toLowerCase().includes(customUrl));
+        if (title) filteredData = filteredData.filter(item => (getLangData(item.id).title || '').toLowerCase().includes(title));
+        if (language) filteredData = filteredData.filter(item => postsLangData.some(lang => lang.posts_id === item.id && lang.language === language));
+        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
+        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+
+        postsData = filteredData;
+        page = 1;
+        renderPostsList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(postsData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderPostsList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(postsData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderPostsList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderPostsList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addPost() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加博客文章';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalPostsType').value = '0';
+        document.getElementById('modalBlogId').value = '0';
+        document.getElementById('modalUserId').value = '0';
+        document.getElementById('modalStoreId').value = '0';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalMoney').value = '0.00';
+        document.getElementById('modalCustomUrl').value = '';
+        document.getElementById('modalReadCount').value = '0';
+        document.getElementById('modalPaidCount').value = '0';
+        document.getElementById('modalCommentCount').value = '0';
+        document.getElementById('modalRatingCount').value = '0';
+        document.getElementById('modalSaveCount').value = '0';
+        document.getElementById('modalLangLanguage').disabled = false;
+        document.getElementById('modalLangLanguage').value = 'en_US';
+        document.getElementById('modalLangSeoKeywords').value = '';
+        document.getElementById('modalLangSeoDescription').value = '';
+        document.getElementById('modalLangTitle').value = '';
+        document.getElementById('modalLangCoverPic').value = '';
+        document.getElementById('modalLangSummary').value = '';
+        document.getElementById('modalLangFreeContent').value = '';
+        document.getElementById('modalLangMoneyContent').value = '';
+        document.getElementById('modalLangSiteReply').value = '';
+        document.getElementById('createTimeField').style.display = 'none';
+        document.getElementById('updateTimeField').style.display = 'none';
+        setupTabs();
+        document.getElementById('postModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editPost(id) {
+        isEditing = true;
+        editId = id;
+        const post = postsData.find(item => item.id === id);
+        const lang = getLangData(post.id);
+        document.getElementById('modalTitle').textContent = '编辑博客文章';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = post.id;
+        document.getElementById('modalPostsType').value = post.posts_type;
+        document.getElementById('modalBlogId').value = post.blog_id;
+        document.getElementById('modalUserId').value = post.user_id;
+        document.getElementById('modalStoreId').value = post.store_id;
+        document.getElementById('modalStatus').value = post.status;
+        document.getElementById('modalMoney').value = post.money;
+        document.getElementById('modalCustomUrl').value = post.custom_url;
+        document.getElementById('modalReadCount').value = post.read_count;
+        document.getElementById('modalPaidCount').value = post.paid_count;
+        document.getElementById('modalCommentCount').value = post.comment_count;
+        document.getElementById('modalRatingCount').value = post.rating_count;
+        document.getElementById('modalSaveCount').value = post.save_count;
+        document.getElementById('modalLangLanguage').disabled = true;
+        document.getElementById('modalLangLanguage').value = lang.language || 'en_US';
+        document.getElementById('modalLangSeoKeywords').value = lang.seo_keywords || '';
+        document.getElementById('modalLangSeoDescription').value = lang.seo_description || '';
+        document.getElementById('modalLangTitle').value = lang.title || '';
+        document.getElementById('modalLangCoverPic').value = lang.cover_pic || '';
+        document.getElementById('modalLangSummary').value = lang.summary || '';
+        document.getElementById('modalLangFreeContent').value = lang.free_content || '';
+        document.getElementById('modalLangMoneyContent').value = lang.money_content || '';
+        document.getElementById('modalLangSiteReply').value = lang.site_reply || '';
+        document.getElementById('createTimeField').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment.unix(post.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('updateTimeField').style.display = 'block';
+        document.getElementById('modalUpdateTime').value = moment.unix(post.update_time).format('YYYY-MM-DDTHH:mm');
+        setupTabs();
+        document.getElementById('postModal').style.display = 'block';
+    }
+
+    // 设置 Tab
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#postModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#postModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#postModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#postModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].click(); // 默认激活第一个 Tab
+    }
+
+    // 保存
+    function savePost() {
+        const post = {
+            id: isEditing ? editId : postsData.length + 1,
+            posts_type: parseInt(document.getElementById('modalPostsType').value) || 0,
+            blog_id: parseInt(document.getElementById('modalBlogId').value) || 0,
+            user_id: parseInt(document.getElementById('modalUserId').value) || 0,
+            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
+            status: parseInt(document.getElementById('modalStatus').value),
+            money: parseFloat(document.getElementById('modalMoney').value) || 0,
+            custom_url: document.getElementById('modalCustomUrl').value,
+            read_count: parseInt(document.getElementById('modalReadCount').value) || 0,
+            paid_count: parseInt(document.getElementById('modalPaidCount').value) || 0,
+            comment_count: parseInt(document.getElementById('modalCommentCount').value) || 0,
+            rating_count: parseInt(document.getElementById('modalRatingCount').value) || 0,
+            save_count: parseInt(document.getElementById('modalSaveCount').value) || 0,
+            create_time: isEditing ? postsData.find(item => item.id === editId).create_time : moment().unix(),
+            update_time: moment().unix()
+        };
+
+        const lang = {
+            id: isEditing ? (postsLangData.find(item => item.posts_id === editId && item.language === document.getElementById('modalLangLanguage').value)?.id || postsLangData.length + 1) : postsLangData.length + 1,
+            posts_id: post.id,
+            status: post.status,
+            version: 1,
+            language: document.getElementById('modalLangLanguage').value,
+            seo_keywords: document.getElementById('modalLangSeoKeywords').value,
+            seo_description: document.getElementById('modalLangSeoDescription').value,
+            title: document.getElementById('modalLangTitle').value,
+            cover_pic: document.getElementById('modalLangCoverPic').value,
+            summary: document.getElementById('modalLangSummary').value,
+            free_content: document.getElementById('modalLangFreeContent').value,
+            money_content: document.getElementById('modalLangMoneyContent').value || null,
+            create_time: isEditing ? (postsLangData.find(item => item.posts_id === editId && item.language === document.getElementById('modalLangLanguage').value)?.create_time || moment().unix()) : moment().unix(),
+            update_time: moment().unix(),
+            site_reply: document.getElementById('modalLangSiteReply').value || null
+        };
+
+        if (isEditing) {
+            const postIndex = postsData.findIndex(item => item.id === editId);
+            postsData[postIndex] = post;
+            const langIndex = postsLangData.findIndex(item => item.posts_id === editId && item.language === lang.language);
+            if (langIndex >= 0) {
+                postsLangData[langIndex] = lang;
+            } else {
+                postsLangData.push(lang);
+            }
+        } else {
+            postsData.push(post);
+            postsLangData.push(lang);
+        }
+        closeModal();
+        renderPostsList();
+    }
+
+    // 删除
+    function deletePost(id) {
+        if (confirm('确定要删除此博客文章吗？')) {
+            postsData = postsData.filter(item => item.id !== id);
+            postsLangData = postsLangData.filter(item => item.posts_id !== id);
+            renderPostsList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的博客文章');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个博客文章吗？`)) {
+            postsData = postsData.filter(item => !selectedIds.includes(item.id));
+            postsLangData = postsLangData.filter(item => !selectedIds.includes(item.posts_id));
+            renderPostsList();
+        }
+    }
+
+    // 批量修改状态
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的博客文章');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
+        postsData = postsData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
+        postsLangData = postsLangData.map(item => selectedIds.includes(item.posts_id) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
+        closeStatusModal();
+        renderPostsList();
+    }
+
+    function closeModal() {
+        document.getElementById('postModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

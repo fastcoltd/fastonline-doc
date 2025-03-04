@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 系统配置</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 60px; }
+        .col-config-key { width: 15%; min-width: 100px; }
+        .col-config-class { width: 15%; min-width: 100px; }
+        .col-config-value { width: 20%; min-width: 120px; }
+        .col-mark { width: 20%; min-width: 120px; }
+        .col-create-time { width: 15%; min-width: 100px; }
+        .col-update-time { width: 15%; min-width: 100px; }
+        .col-actions { width: 15%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
+        .modal-content .ant-form-item label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('system_config.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">系统配置</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <input type="text" id="configKeyFilter" class="ant-input" placeholder="配置键" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <input type="date" id="startDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <input type="date" id="endDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addConfig()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-config-key">配置键</div>
+                                        <div class="col-config-class">解析对象</div>
+                                        <div class="col-config-value">配置值</div>
+                                        <div class="col-mark">备注</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-update-time">更新时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="config-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="configModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加系统配置</h3>
+            <form id="configForm">
+                <div id="systemFields" style="display: none;">
+                    <div class="ant-form-item">
+                        <label>ID:</label>
+                        <input type="text" id="modalId" disabled>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>创建时间:</label>
+                        <input type="datetime-local" id="modalCreateTime" disabled>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>更新时间:</label>
+                        <input type="datetime-local" id="modalUpdateTime" disabled>
+                    </div>
+                </div>
+                <div id="editableFields">
+                    <div class="ant-form-item">
+                        <label>配置键:</label>
+                        <input type="text" id="modalConfigKey" maxlength="32">
+                    </div>
+                    <div class="ant-form-item">
+                        <label>解析对象:</label>
+                        <input type="text" id="modalConfigClass" maxlength="128">
+                    </div>
+                    <div class="ant-form-item textarea-item">
+                        <label>配置值:</label>
+                        <textarea id="modalConfigValue" rows="5"></textarea>
+                    </div>
+                    <div class="ant-form-item textarea-item">
+                        <label>备注:</label>
+                        <textarea id="modalMark" rows="5" maxlength="256"></textarea>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveConfig()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改配置键弹窗 -->
+    <div id="configKeyModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeConfigKeyModal()">×</button>
+            <h3>批量修改配置键</h3>
+            <form id="configKeyForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新配置键:</label>
+                    <input type="text" id="newConfigKey" maxlength="32">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeConfigKeyModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchConfigKey()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let configData = [];
+    let configPage = 1, configPerPage = 20;
+
+    function fetchConfigData() {
+        console.log('Fetching config data...');
+        configData = [];
+        const classes = ['General', 'Security', 'Payment', 'Notification', 'UI'];
+        for (let i = 1; i <= 200; i++) {
+            const config = {
+                id: i,
+                config_key: `key_${i}`,
+                config_class: classes[Math.floor(Math.random() * classes.length)],
+                config_value: `Value for configuration ${i}, potentially a long text describing settings.`,
+                mark: `Configuration ${i} description`,
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix(),
+                update_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix()
+            };
+            configData.push(config);
+        }
+        renderConfigList();
+    }
+
+    function renderConfigList() {
+        const start = (configPage - 1) * configPerPage;
+        const end = start + configPerPage;
+        const paginatedConfigs = configData.slice(start, end);
+        const listContainer = document.getElementById('config-list');
+        listContainer.innerHTML = '';
+
+        paginatedConfigs.forEach(config => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`;
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${config.id}"></div>
+                <div class="col-id">${config.id}</div>
+                <div class="col-config-key">${config.config_key}</div>
+                <div class="col-config-class">${config.config_class}</div>
+                <div class="col-config-value">${config.config_value.substring(0, 50)}${config.config_value.length > 50 ? '...' : ''}</div>
+                <div class="col-mark">${config.mark.substring(0, 50)}${config.mark.length > 50 ? '...' : ''}</div>
+                <div class="col-create-time">${moment.unix(config.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div class="col-update-time">${moment.unix(config.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editConfig(${config.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteConfig(${config.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(configData.length / configPerPage);
+        document.getElementById('page-info').textContent = `第 ${configPage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const configKey = document.getElementById('configKeyFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredConfigs = configData;
+        if (configKey) filteredConfigs = filteredConfigs.filter(item => item.config_key.includes(configKey));
+        if (startDate) filteredConfigs = filteredConfigs.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredConfigs = filteredConfigs.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+        configPage = 1;
+        configData = filteredConfigs;
+        renderConfigList();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(configData.length / configPerPage);
+        configPage += delta;
+        if (configPage < 1) configPage = 1;
+        if (configPage > totalPages) configPage = totalPages;
+        renderConfigList();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(configData.length / configPerPage);
+        if (page >= 1 && page <= totalPages) {
+            configPage = page;
+            renderConfigList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        configPerPage = parseInt(document.getElementById('perPage').value);
+        configPage = 1;
+        renderConfigList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    let isEditing = false;
+    let editId = null;
+
+    function addConfig() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加系统配置';
+        document.getElementById('systemFields').style.display = 'none';
+        document.getElementById('editableFields').style.display = 'block';
+        document.getElementById('modalConfigKey').value = '';
+        document.getElementById('modalConfigClass').value = '';
+        document.getElementById('modalConfigValue').value = '';
+        document.getElementById('modalMark').value = '';
+        document.getElementById('configModal').style.display = 'block';
+    }
+
+    function editConfig(id) {
+        isEditing = true;
+        editId = id;
+        const config = configData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑系统配置';
+        document.getElementById('systemFields').style.display = 'block';
+        document.getElementById('editableFields').style.display = 'block';
+        document.getElementById('modalId').value = config.id;
+        document.getElementById('modalConfigKey').value = config.config_key;
+        document.getElementById('modalConfigClass').value = config.config_class;
+        document.getElementById('modalConfigValue').value = config.config_value;
+        document.getElementById('modalMark').value = config.mark;
+        document.getElementById('modalCreateTime').value = moment.unix(config.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalUpdateTime').value = moment.unix(config.update_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('configModal').style.display = 'block';
+    }
+
+    function saveConfig() {
+        const newConfig = {
+            id: isEditing ? editId : configData.length + 1,
+            config_key: document.getElementById('modalConfigKey').value,
+            config_class: document.getElementById('modalConfigClass').value,
+            config_value: document.getElementById('modalConfigValue').value,
+            mark: document.getElementById('modalMark').value,
+            create_time: isEditing ? configData.find(item => item.id === editId).create_time : moment().unix(),
+            update_time: moment().unix()
+        };
+
+        if (isEditing) {
+            const index = configData.findIndex(item => item.id === editId);
+            configData[index] = newConfig;
+        } else {
+            configData.push(newConfig);
+        }
+
+        closeModal();
+        renderConfigList();
+    }
+
+    function deleteConfig(id) {
+        if (confirm('确定要删除此系统配置吗？')) {
+            configData = configData.filter(item => item.id !== id);
+            renderConfigList();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的系统配置');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个系统配置吗？`)) {
+            configData = configData.filter(item => !selectedIds.includes(item.id));
+            renderConfigList();
+        }
+    }
+
+    function batchEditConfigKey() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改的系统配置');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('newConfigKey').value = '';
+        document.getElementById('configKeyModal').style.display = 'block';
+    }
+
+    function saveBatchConfigKey() {
+        const newConfigKey = document.getElementById('newConfigKey').value;
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        configData = configData.map(item => selectedIds.includes(item.id) ? { ...item, config_key: newConfigKey, update_time: moment().unix() } : item);
+        closeConfigKeyModal();
+        renderConfigList();
+    }
+
+    function closeModal() {
+        document.getElementById('configModal').style.display = 'none';
+    }
+
+    function closeConfigKeyModal() {
+        document.getElementById('configKeyModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchConfigData();
+        });
+    };
+</script>
+</body>
+</html>

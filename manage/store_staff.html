@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 店铺员工管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-store-id { width: 10%; min-width: 80px; }
+        .col-status { width: 8%; min-width: 80px; }
+        .col-title { width: 10%; min-width: 80px; }
+        .col-username { width: 10%; min-width: 100px; }
+        .col-nick-name { width: 10%; min-width: 100px; }
+        .col-phone { width: 10%; min-width: 80px; }
+        .col-telegram { width: 10%; min-width: 80px; }
+        .col-create-time { width: 10%; min-width: 100px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">店铺员工管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="storeIdFilter" class="ant-select">
+                                        <option value="">全部店铺</option>
+                                    </select>
+                                    <select id="statusFilter" class="ant-select">
+                                        <option value="">全部状态</option>
+                                        <option value="0">未激活</option>
+                                        <option value="1">已激活</option>
+                                    </select>
+                                    <input type="text" id="usernameFilter" class="ant-input" placeholder="用户名">
+                                    <input type="text" id="nickNameFilter" class="ant-input" placeholder="昵称">
+                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addStoreStaff()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-store-id">店铺</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-title">职位</div>
+                                        <div class="col-username">用户名</div>
+                                        <div class="col-nick-name">昵称</div>
+                                        <div class="col-phone">电话</div>
+                                        <div class="col-telegram">Telegram</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="store-staff-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="storeStaffModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加店铺员工</h3>
+            <form id="storeStaffForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>店铺ID:</label>
+                    <select id="modalStoreId">
+                        <option value="0">请选择店铺</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>状态:</label>
+                    <select id="modalStatus">
+                        <option value="0">未激活</option>
+                        <option value="1">已激活</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>职位:</label>
+                    <input type="text" id="modalTitle" maxlength="16">
+                </div>
+                <div class="ant-form-item">
+                    <label>用户名:</label>
+                    <input type="text" id="modalUsername" maxlength="64">
+                </div>
+                <div class="ant-form-item">
+                    <label>密码:</label>
+                    <input type="text" id="modalPassword" maxlength="64">
+                </div>
+                <div class="ant-form-item">
+                    <label>盐值:</label>
+                    <input type="text" id="modalSalt" maxlength="16">
+                </div>
+                <div class="ant-form-item">
+                    <label>昵称:</label>
+                    <input type="text" id="modalNickName" maxlength="64">
+                </div>
+                <div class="ant-form-item">
+                    <label>头像:</label>
+                    <input type="text" id="modalAvatar" maxlength="256">
+                </div>
+                <div class="ant-form-item">
+                    <label>电话:</label>
+                    <input type="text" id="modalPhone" maxlength="16">
+                </div>
+                <div class="ant-form-item">
+                    <label>Telegram:</label>
+                    <input type="text" id="modalTelegram" maxlength="32">
+                </div>
+                <div class="ant-form-item">
+                    <label>权限:</label>
+                    <input type="text" id="modalPermissions" maxlength="512">
+                </div>
+                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                    <label>创建时间:</label>
+                    <input type="datetime-local" id="modalCreateTime" disabled>
+                </div>
+                <div class="ant-form-item" id="lastLoginIpField" style="display: none;">
+                    <label>最后登录IP:</label>
+                    <input type="number" id="modalLastLoginIp" disabled>
+                </div>
+                <div class="ant-form-item" id="lastLoginTimeField" style="display: none;">
+                    <label>最后登录时间:</label>
+                    <input type="datetime-local" id="modalLastLoginTime" disabled>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveStoreStaff()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">未激活</option>
+                        <option value="1">已激活</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let storeStaffData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const storeSelect = document.getElementById('modalStoreId');
+        const storeFilter = document.getElementById('storeIdFilter');
+        relationMap.store_id.forEach(item => {
+            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        storeStaffData = [];
+        for (let i = 1; i <= 200; i++) {
+            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            const lastLoginTime = i % 2 === 0 ? moment().subtract(Math.floor(Math.random() * 50), 'days').unix() : 0;
+            storeStaffData.push({
+                id: i,
+                store_id: Math.floor(Math.random() * 15) + 1,
+                status: Math.floor(Math.random() * 2),
+                title: `职位 ${i}`,
+                username: `staff${i}`,
+                password: `pass${i}`,
+                salt: `salt${i}`,
+                nick_name: `员工 ${i}`,
+                avatar: `/avatars/staff${i}.jpg`,
+                phone: `12345678${i}`,
+                telegram: `telegram${i}`,
+                create_time: createTime,
+                last_login_ip: Math.floor(Math.random() * 1000000000),
+                last_login_time: lastLoginTime,
+                permissions: `["perm${i}_1", "perm${i}_2"]`
+            });
+        }
+        renderStoreStaffList();
+    }
+
+    // 渲染列表
+    function renderStoreStaffList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = storeStaffData.slice(start, end);
+        const listContainer = document.getElementById('store-staff-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(staff => {
+            const statusTag = staff.status === 0 ? '<span class="ant-tag ant-tag-blue">未激活</span>' :
+                '<span class="ant-tag ant-tag-green">已激活</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${staff.id}"></div>
+                <div class="col-store-id">${getRelationName('store_id', staff.store_id)}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-title">${staff.title}</div>
+                <div class="col-username">${staff.username}</div>
+                <div class="col-nick-name">${staff.nick_name}</div>
+                <div class="col-phone">${staff.phone || '无'}</div>
+                <div class="col-telegram">${staff.telegram}</div>
+                <div class="col-create-time">${moment.unix(staff.create_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editStoreStaff(${staff.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteStoreStaff(${staff.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(storeStaffData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...storeStaffData];
+        const storeId = document.getElementById('storeIdFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const username = document.getElementById('usernameFilter').value;
+        const nickName = document.getElementById('nickNameFilter').value;
+        const createTimeStart = document.getElementById('createTimeStartFilter').value;
+        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+
+        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
+        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
+        if (username) filteredData = filteredData.filter(item => item.username.toLowerCase().includes(username.toLowerCase()));
+        if (nickName) filteredData = filteredData.filter(item => item.nick_name.toLowerCase().includes(nickName.toLowerCase()));
+        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
+        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+
+        storeStaffData = filteredData;
+        page = 1;
+        renderStoreStaffList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(storeStaffData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderStoreStaffList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(storeStaffData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderStoreStaffList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderStoreStaffList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addStoreStaff() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加店铺员工';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalStoreId').value = '0';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalTitle').value = '';
+        document.getElementById('modalUsername').value = '';
+        document.getElementById('modalPassword').value = '';
+        document.getElementById('modalSalt').value = '';
+        document.getElementById('modalNickName').value = '';
+        document.getElementById('modalAvatar').value = '';
+        document.getElementById('modalPhone').value = '';
+        document.getElementById('modalTelegram').value = '';
+        document.getElementById('modalPermissions').value = '[]';
+        document.getElementById('createTimeField').style.display = 'none';
+        document.getElementById('lastLoginIpField').style.display = 'none';
+        document.getElementById('lastLoginTimeField').style.display = 'none';
+        document.getElementById('storeStaffModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editStoreStaff(id) {
+        isEditing = true;
+        editId = id;
+        const staff = storeStaffData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑店铺员工';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = staff.id;
+        document.getElementById('modalStoreId').value = staff.store_id;
+        document.getElementById('modalStatus').value = staff.status;
+        document.getElementById('modalTitle').value = staff.title;
+        document.getElementById('modalUsername').value = staff.username;
+        document.getElementById('modalPassword').value = staff.password;
+        document.getElementById('modalSalt').value = staff.salt;
+        document.getElementById('modalNickName').value = staff.nick_name;
+        document.getElementById('modalAvatar').value = staff.avatar;
+        document.getElementById('modalPhone').value = staff.phone;
+        document.getElementById('modalTelegram').value = staff.telegram;
+        document.getElementById('modalPermissions').value = staff.permissions;
+        document.getElementById('createTimeField').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment.unix(staff.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('lastLoginIpField').style.display = 'block';
+        document.getElementById('modalLastLoginIp').value = staff.last_login_ip;
+        document.getElementById('lastLoginTimeField').style.display = 'block';
+        document.getElementById('modalLastLoginTime').value = staff.last_login_time ? moment.unix(staff.last_login_time).format('YYYY-MM-DDTHH:mm') : '';
+        document.getElementById('storeStaffModal').style.display = 'block';
+    }
+
+    // 保存
+    function saveStoreStaff() {
+        const staff = {
+            id: isEditing ? editId : storeStaffData.length + 1,
+            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
+            status: parseInt(document.getElementById('modalStatus').value),
+            title: document.getElementById('modalTitle').value,
+            username: document.getElementById('modalUsername').value,
+            password: document.getElementById('modalPassword').value,
+            salt: document.getElementById('modalSalt').value,
+            nick_name: document.getElementById('modalNickName').value,
+            avatar: document.getElementById('modalAvatar').value,
+            phone: document.getElementById('modalPhone').value,
+            telegram: document.getElementById('modalTelegram').value,
+            create_time: isEditing ? storeStaffData.find(item => item.id === editId).create_time : moment().unix(),
+            last_login_ip: isEditing ? storeStaffData.find(item => item.id === editId).last_login_ip : 0,
+            last_login_time: isEditing ? storeStaffData.find(item => item.id === editId).last_login_time : 0,
+            permissions: document.getElementById('modalPermissions').value
+        };
+
+        if (isEditing) {
+            const index = storeStaffData.findIndex(item => item.id === editId);
+            storeStaffData[index] = staff;
+        } else {
+            storeStaffData.push(staff);
+        }
+        closeModal();
+        renderStoreStaffList();
+    }
+
+    // 删除
+    function deleteStoreStaff(id) {
+        if (confirm('确定要删除此店铺员工吗？')) {
+            storeStaffData = storeStaffData.filter(item => item.id !== id);
+            renderStoreStaffList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的店铺员工');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个店铺员工吗？`)) {
+            storeStaffData = storeStaffData.filter(item => !selectedIds.includes(item.id));
+            renderStoreStaffList();
+        }
+    }
+
+    // 批量修改状态
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的店铺员工');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
+        storeStaffData = storeStaffData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus } : item);
+        closeStatusModal();
+        renderStoreStaffList();
+    }
+
+    function closeModal() {
+        document.getElementById('storeStaffModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns();
+            generateSampleData();
+        });
+    };
+    </script>
+</body>
+</html>

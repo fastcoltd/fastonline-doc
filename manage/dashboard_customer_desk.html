@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 客服工作台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+</head>
+<body>
+<div class="container">
+    <!-- 顶部 -->
+    <div id="header" w3-include-html="_header.html"></div>
+
+    <!-- 内容区域 -->
+    <div class="content-wrapper">
+        <!-- 侧边栏 -->
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <div class="ant-tabs-tab-btn">客服工作台</div>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <h2>待办事项小结</h2>
+                                <div class="summary-grid">
+                                    <div class="summary-item selected" onclick="filterTasks('全部')" id="全部">全部任务: <span id="全部-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('文章审核')" id="文章审核">文章审核: <span id="文章审核-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('KYC 审核')" id="KYC 审核">KYC 审核: <span id="KYC 审核-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('店铺审核')" id="店铺审核">店铺审核: <span id="店铺审核-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('FAQ 审核')" id="FAQ 审核">FAQ 审核: <span id="FAQ 审核-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('工单处理')" id="工单处理">工单处理: <span id="工单处理-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('需求审核')" id="需求审核">需求审核: <span id="需求审核-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('博客审核')" id="博客审核">博客审核: <span id="博客审核-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('投诉处理')" id="投诉处理">投诉处理: <span id="投诉处理-count">0</span></div>
+                                </div>
+                                <h2>待办任务列表</h2>
+                                <div class="task-list">
+                                    <div id="task-list">加载中...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <div id="footer" w3-include-html="_footer.html"></div>
+</div>
+
+<script>
+    // 全局变量
+    let allTasks = [];
+
+    // Tab 切换函数（仅保留一个 Tab，无需切换逻辑）
+    function switchTab(page) {
+        // 由于只有一个 Tab，此函数暂时无实际作用
+        console.log('Tab is static: 客服工作台');
+    }
+
+    // 任务加载
+    function fetchTasks() {
+        console.log('Fetching tasks...');
+        const storedTasks = localStorage.getItem('allTasks');
+        if (storedTasks && JSON.parse(storedTasks).every(task => task.description)) {
+            allTasks = JSON.parse(storedTasks);
+        } else {
+            localStorage.removeItem('allTasks');
+            const tasks = [];
+            const types = ['文章审核', 'KYC 审核', '店铺审核', 'FAQ 审核', '工单处理', '需求审核', '博客审核', '投诉处理'];
+            const descriptions = {
+                '文章审核': ['用户提交的文章内容需审核', '检查文章是否符合平台规范', '审核新上传的文章草稿'],
+                'KYC 审核': ['用户身份验证待审核', '检查KYC资料完整性', '审核用户提交的身份证明'],
+                '店铺审核': ['新店铺注册信息待审核', '检查店铺资质文件', '审核店铺运营许可'],
+                'FAQ 审核': ['新FAQ内容待审核', '检查FAQ问题与回答一致性', '审核FAQ更新请求'],
+                '工单处理': ['用户提交的工单待处理', '处理技术支持请求', '解决用户账户问题'],
+                '需求审核': ['用户需求申请待审核', '检查需求描述是否清晰', '审核需求优先级'],
+                '博客审核': ['用户博客文章待审核', '检查博客内容原创性', '审核博客图片版权'],
+                '投诉处理': ['用户投诉待处理', '调查订单相关投诉', '处理用户服务纠纷']
+            };
+            for (let i = 1; i <= 40; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                const description = descriptions[type][Math.floor(Math.random() * descriptions[type].length)];
+                tasks.push({
+                    id: i,
+                    type: type,
+                    name: `任务 #${i}`,
+                    description: description,
+                    created_at: `2025-03-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
+                    status: '待处理'
+                });
+            }
+            allTasks = tasks;
+            localStorage.setItem('allTasks', JSON.stringify(tasks));
+        }
+        updateSummary();
+        const selectedFilter = localStorage.getItem('selectedFilter') || '全部';
+        filterTasks(selectedFilter);
+    }
+
+    // 渲染任务列表
+    function renderTasks(taskList) {
+        console.log('Rendering tasks:', taskList.length);
+        const taskContainer = document.getElementById('task-list');
+        if (!taskContainer) {
+            console.error('Task list container not found');
+            return;
+        }
+        taskContainer.innerHTML = '';
+        taskList.forEach(task => {
+            const taskItem = document.createElement('div');
+            taskItem.className = 'task-item';
+            taskItem.style = `padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; margin: 5px 0;`;
+            taskItem.innerHTML = `<div style="flex: 1;"><strong>${task.type}</strong><br>${task.name}</div>
+                                      <div style="flex: 2;">${task.description}</div>
+                                      <div style="flex: 1;">${task.created_at}</div>
+                                      <div style="flex: 1;">${task.status}</div>
+                                      <button class='ant-btn ant-btn-primary' onclick='handleTask(${task.id})'>处理</button>`;
+            taskContainer.appendChild(taskItem);
+        });
+        console.log('Tasks rendered');
+    }
+
+    // 更新待办事项统计
+    function updateSummary() {
+        console.log('Updating summary...');
+        const counts = {'全部': allTasks.length};
+        allTasks.forEach(task => {
+            counts[task.type] = (counts[task.type] || 0) + 1;
+        });
+        for (const type in counts) {
+            const element = document.getElementById(`${type}-count`);
+            if (element) element.innerText = counts[type];
+        }
+    }
+
+    // 筛选任务
+    function filterTasks(type) {
+        console.log('Filtering tasks by:', type);
+        document.querySelectorAll('.summary-item').forEach(el => {
+            el.classList.remove('selected');
+            el.style.border = '2px solid #ddd';
+        });
+        const selectedItem = document.getElementById(type);
+        if (selectedItem) {
+            selectedItem.classList.add('selected');
+            selectedItem.style.border = '2px solid #f97316';
+        }
+
+        if (type === '全部') {
+            renderTasks(allTasks);
+        } else {
+            renderTasks(allTasks.filter(task => task.type === type));
+        }
+    }
+
+    // 处理任务
+    function handleTask(taskId) {
+        console.log('Handling task:', taskId);
+        alert('处理任务 ID: ' + taskId);
+    }
+
+    // 初始化
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchTasks();
+        });
+    };
+</script>
+</body>
+</html>

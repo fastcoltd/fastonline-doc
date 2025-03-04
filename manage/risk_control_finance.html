@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 财务风控</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 60px; }
+        .col-status { width: 10%; min-width: 60px; }
+        .col-risk-name { width: 15%; min-width: 100px; }
+        .col-extra-data { width: 15%; min-width: 100px; }
+        .col-check-class { width: 20%; min-width: 120px; }
+        .col-action-class { width: 20%; min-width: 120px; }
+        .col-risk-count { width: 10%; min-width: 60px; }
+        .col-create-time { width: 15%; min-width: 100px; }
+        .col-actions { width: 15%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
+        .modal-content .ant-form-item label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('risk_control_finance.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">财务风控</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <input type="text" id="riskNameFilter" class="ant-input" placeholder="风险名称" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <input type="date" id="startDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <input type="date" id="endDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addRisk()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-risk-name">风险名称</div>
+                                        <div class="col-extra-data">额外数据</div>
+                                        <div class="col-check-class">检查类</div>
+                                        <div class="col-action-class">执行类</div>
+                                        <div class="col-risk-count">风险计数</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="risk-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="riskModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加财务风控</h3>
+            <form id="riskForm">
+                <div id="systemFields" style="display: none;">
+                    <div class="ant-form-item">
+                        <label>ID:</label>
+                        <input type="text" id="modalId" disabled>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>创建时间:</label>
+                        <input type="datetime-local" id="modalCreateTime" disabled>
+                    </div>
+                </div>
+                <div id="editableFields">
+                    <div class="ant-form-item">
+                        <label>状态:</label>
+                        <select id="modalStatus">
+                            <option value="0">禁用</option>
+                            <option value="1">启用</option>
+                        </select>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>风险名称:</label>
+                        <input type="text" id="modalRiskName" maxlength="64">
+                    </div>
+                    <div class="ant-form-item textarea-item">
+                        <label>额外数据:</label>
+                        <textarea id="modalExtraData" rows="5" maxlength="256"></textarea>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>检查类:</label>
+                        <input type="text" id="modalCheckClass" maxlength="128" placeholder="Java 类路径，如 com.xxx.xxx.xxx">
+                    </div>
+                    <div class="ant-form-item">
+                        <label>执行类:</label>
+                        <input type="text" id="modalActionClass" maxlength="128" placeholder="Java 类路径，如 com.xxx.xxx.xxx">
+                    </div>
+                    <div class="ant-form-item">
+                        <label>风险计数:</label>
+                        <input type="number" id="modalRiskCount" min="0">
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveRisk()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let riskData = [];
+    let riskPage = 1, riskPerPage = 20;
+
+    function fetchRiskData() {
+        console.log('Fetching risk data...');
+        riskData = [];
+        for (let i = 1; i <= 200; i++) {
+            const risk = {
+                id: i,
+                status: Math.floor(Math.random() * 2), // 0:禁用, 1:启用
+                risk_name: `Risk ${i}`,
+                extra_data: JSON.stringify({ limit: i * 1000, threshold: Math.random() }),
+                check_class: `com.fast.tech.risk.CheckRisk${i}`,
+                action_class: `com.fast.tech.risk.ActionRisk${i}`,
+                risk_count: Math.floor(Math.random() * 1000),
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
+            };
+            riskData.push(risk);
+        }
+        renderRiskList();
+    }
+
+    function renderRiskList() {
+        const start = (riskPage - 1) * riskPerPage;
+        const end = start + riskPerPage;
+        const paginatedRisks = riskData.slice(start, end);
+        const listContainer = document.getElementById('risk-list');
+        listContainer.innerHTML = '';
+
+        paginatedRisks.forEach(risk => {
+            const statusTag = risk.status === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' :
+                '<span class="ant-tag ant-tag-green">启用</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`;
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${risk.id}"></div>
+                <div class="col-id">${risk.id}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-risk-name">${risk.risk_name}</div>
+                <div class="col-extra-data">${risk.extra_data.substring(0, 50)}${risk.extra_data.length > 50 ? '...' : ''}</div>
+                <div class="col-check-class">${risk.check_class}</div>
+                <div class="col-action-class">${risk.action_class}</div>
+                <div class="col-risk-count">${risk.risk_count}</div>
+                <div class="col-create-time">${moment.unix(risk.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editRisk(${risk.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteRisk(${risk.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(riskData.length / riskPerPage);
+        document.getElementById('page-info').textContent = `第 ${riskPage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const riskName = document.getElementById('riskNameFilter').value.toLowerCase();
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredRisks = riskData;
+        if (riskName) filteredRisks = filteredRisks.filter(item => item.risk_name.toLowerCase().includes(riskName));
+        if (startDate) filteredRisks = filteredRisks.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredRisks = filteredRisks.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+        riskPage = 1;
+        riskData = filteredRisks;
+        renderRiskList();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(riskData.length / riskPerPage);
+        riskPage += delta;
+        if (riskPage < 1) riskPage = 1;
+        if (riskPage > totalPages) riskPage = totalPages;
+        renderRiskList();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(riskData.length / riskPerPage);
+        if (page >= 1 && page <= totalPages) {
+            riskPage = page;
+            renderRiskList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        riskPerPage = parseInt(document.getElementById('perPage').value);
+        riskPage = 1;
+        renderRiskList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    let isEditing = false;
+    let editId = null;
+
+    function addRisk() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加财务风控';
+        document.getElementById('systemFields').style.display = 'none';
+        document.getElementById('editableFields').style.display = 'block';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalRiskName').value = 'max money';
+        document.getElementById('modalExtraData').value = '{}';
+        document.getElementById('modalCheckClass').value = 'com.xxx.xxx.xxx';
+        document.getElementById('modalActionClass').value = 'com.xxx.xxx.xxx';
+        document.getElementById('modalRiskCount').value = '0';
+        document.getElementById('riskModal').style.display = 'block';
+    }
+
+    function editRisk(id) {
+        isEditing = true;
+        editId = id;
+        const risk = riskData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑财务风控';
+        document.getElementById('systemFields').style.display = 'block';
+        document.getElementById('editableFields').style.display = 'block';
+        document.getElementById('modalId').value = risk.id;
+        document.getElementById('modalStatus').value = risk.status;
+        document.getElementById('modalRiskName').value = risk.risk_name;
+        document.getElementById('modalExtraData').value = risk.extra_data;
+        document.getElementById('modalCheckClass').value = risk.check_class;
+        document.getElementById('modalActionClass').value = risk.action_class;
+        document.getElementById('modalRiskCount').value = risk.risk_count;
+        document.getElementById('modalCreateTime').value = moment.unix(risk.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('riskModal').style.display = 'block';
+    }
+
+    function saveRisk() {
+        const newRisk = {
+            id: isEditing ? editId : riskData.length + 1,
+            status: parseInt(document.getElementById('modalStatus').value),
+            risk_name: document.getElementById('modalRiskName').value,
+            extra_data: document.getElementById('modalExtraData').value,
+            check_class: document.getElementById('modalCheckClass').value,
+            action_class: document.getElementById('modalActionClass').value,
+            risk_count: parseInt(document.getElementById('modalRiskCount').value),
+            create_time: isEditing ? riskData.find(item => item.id === editId).create_time : moment().unix()
+        };
+
+        if (isEditing) {
+            const index = riskData.findIndex(item => item.id === editId);
+            riskData[index] = newRisk;
+        } else {
+            riskData.push(newRisk);
+        }
+
+        closeModal();
+        renderRiskList();
+    }
+
+    function deleteRisk(id) {
+        if (confirm('确定要删除此财务风控吗？')) {
+            riskData = riskData.filter(item => item.id !== id);
+            renderRiskList();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的财务风控');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个财务风控吗？`)) {
+            riskData = riskData.filter(item => !selectedIds.includes(item.id));
+            renderRiskList();
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('riskModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchRiskData();
+        });
+    };
+</script>
+</body>
+</html>

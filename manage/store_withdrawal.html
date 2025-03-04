@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 店铺提现记录</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-user-id { width: 8%; min-width: 60px; }
+        .col-store-id { width: 8%; min-width: 60px; }
+        .col-user-wallet-id { width: 8%; min-width: 60px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-current-rate { width: 8%; min-width: 60px; }
+        .col-withdraw-amount { width: 8%; min-width: 60px; }
+        .col-transfer-amount { width: 8%; min-width: 60px; }
+        .col-fee-fixed { width: 8%; min-width: 60px; }
+        .col-fee-percent { width: 8%; min-width: 60px; }
+        .col-create-time { width: 10%; min-width: 80px; }
+        .col-finished-time { width: 10%; min-width: 80px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
+        .modal-content .ant-form-item label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        .ant-tabs-content { min-height: 400px; }
+        .ant-tabs-tabpane { padding: 10px 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('store_withdraw.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">店铺提现记录</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="userIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                            <option value="">全部用户</option>
+                                            <!-- 动态生成用户选项 -->
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="storeIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                            <option value="">全部店铺</option>
+                                            <!-- 动态生成店铺选项 -->
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="userWalletIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                            <option value="">全部钱包</option>
+                                            <!-- 动态生成钱包选项 -->
+                                        </select>
+                                    </div>
+                                    <input type="date" id="startDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <input type="date" id="endDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addWithdraw()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-user-id">用户ID</div>
+                                        <div class="col-store-id">店铺ID</div>
+                                        <div class="col-user-wallet-id">钱包ID</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-current-rate">当前汇率</div>
+                                        <div class="col-withdraw-amount">提现金额</div>
+                                        <div class="col-transfer-amount">转账金额</div>
+                                        <div class="col-fee-fixed">固定手续费</div>
+                                        <div class="col-fee-percent">百分比手续费</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-finished-time">完成时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="withdraw-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加提现记录</h3>
+            <form id="withdrawForm">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="amount">
+                                    <span class="ant-tabs-tab-btn">金额信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="additional">
+                                    <span class="ant-tabs-tab-btn">附加信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="system" id="systemTab">
+                                    <span class="ant-tabs-tab-btn">系统信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>用户ID:</label>
+                                    <select id="modalUserId">
+                                        <!-- 动态生成用户选项 -->
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>店铺ID:</label>
+                                    <select id="modalStoreId">
+                                        <!-- 动态生成店铺选项 -->
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>钱包ID:</label>
+                                    <select id="modalUserWalletId">
+                                        <!-- 动态生成钱包选项 -->
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalStatus">
+                                        <option value="0">待处理</option>
+                                        <option value="1">已完成</option>
+                                        <option value="2">已拒绝</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="amount" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>当前汇率:</label>
+                                    <input type="number" id="modalCurrentRate" step="0.0001" min="0" max="9999.9999">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>提现金额:</label>
+                                    <input type="number" id="modalWithdrawAmount" step="0.01" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>转账金额:</label>
+                                    <input type="number" id="modalTransferAmount" step="0.01" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>固定手续费:</label>
+                                    <input type="number" id="modalFeeFixed" step="0.01" min="0" max="99.99">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>百分比手续费:</label>
+                                    <input type="number" id="modalFeePercent" step="0.0001" min="0" max="9999.9999">
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="additional" style="display: none;">
+                                <div class="ant-form-item textarea-item">
+                                    <label>证明文件:</label>
+                                    <textarea id="modalProofDocument" rows="5" maxlength="256"></textarea>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>支付账单:</label>
+                                    <textarea id="modalPaymentBills" rows="5" maxlength="256"></textarea>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>系统回复:</label>
+                                    <textarea id="modalSystemReply" rows="5" maxlength="256"></textarea>
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="system" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>ID:</label>
+                                    <input type="text" id="modalId" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>完成时间:</label>
+                                    <input type="datetime-local" id="modalFinishedTime" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveWithdraw()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">待处理</option>
+                        <option value="1">已完成</option>
+                        <option value="2">已拒绝</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let withdrawData = [];
+    let withdrawPage = 1, withdrawPerPage = 20;
+
+    function fetchWithdrawData() {
+        console.log('Fetching withdraw data...');
+        withdrawData = [];
+        const users = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `User ${i + 1}` }));
+        const stores = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `Store ${i + 1}` }));
+        const wallets = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `Wallet ${i + 1}` }));
+
+        // 填充筛选和弹窗下拉选项
+        const userSelects = [document.getElementById('userIdFilter'), document.getElementById('modalUserId')];
+        const storeSelects = [document.getElementById('storeIdFilter'), document.getElementById('modalStoreId')];
+        const walletSelects = [document.getElementById('userWalletIdFilter'), document.getElementById('modalUserWalletId')];
+        userSelects.forEach(select => {
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.text = `${user.id} - ${user.name}`;
+                select.appendChild(option);
+            });
+        });
+        storeSelects.forEach(select => {
+            stores.forEach(store => {
+                const option = document.createElement('option');
+                option.value = store.id;
+                option.text = `${store.id} - ${store.name}`;
+                select.appendChild(option);
+            });
+        });
+        walletSelects.forEach(select => {
+            wallets.forEach(wallet => {
+                const option = document.createElement('option');
+                option.value = wallet.id;
+                option.text = `${wallet.id} - ${wallet.name}`;
+                select.appendChild(option);
+            });
+        });
+
+        for (let i = 1; i <= 200; i++) {
+            const withdraw = {
+                id: i,
+                user_id: Math.ceil(Math.random() * 15),
+                store_id: Math.ceil(Math.random() * 15),
+                user_wallet_id: Math.ceil(Math.random() * 15),
+                status: Math.floor(Math.random() * 3), // 0:待处理, 1:已完成, 2:已拒绝
+                current_rate: parseFloat((Math.random() * 2).toFixed(4)),
+                withdraw_amount: parseFloat((Math.random() * 1000).toFixed(2)),
+                transfer_amount: parseFloat((Math.random() * 900).toFixed(2)),
+                fee_fixed: parseFloat((Math.random() * 10).toFixed(2)),
+                fee_percent: parseFloat((Math.random() * 0.05).toFixed(4)),
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix(),
+                proof_document: `https://example.com/proof/${i}.pdf`,
+                payment_bills: JSON.stringify({ bill_id: i, amount: Math.random() * 100 }),
+                system_reply: `Withdraw ${i} processed`,
+                finished_time: Math.random() > 0.5 ? moment().subtract(Math.floor(Math.random() * 30), 'days').unix() : 0
+            };
+            withdrawData.push(withdraw);
+        }
+        renderWithdrawList();
+    }
+
+    function renderWithdrawList() {
+        const start = (withdrawPage - 1) * withdrawPerPage;
+        const end = start + withdrawPerPage;
+        const paginatedWithdraws = withdrawData.slice(start, end);
+        const listContainer = document.getElementById('withdraw-list');
+        listContainer.innerHTML = '';
+
+        paginatedWithdraws.forEach(withdraw => {
+            const statusTag = withdraw.status === 0 ? '<span class="ant-tag ant-tag-blue">待处理</span>' :
+                withdraw.status === 1 ? '<span class="ant-tag ant-tag-green">已完成</span>' :
+                    '<span class="ant-tag ant-tag-red">已拒绝</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`;
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${withdraw.id}"></div>
+                <div class="col-id">${withdraw.id}</div>
+                <div class="col-user-id">${withdraw.user_id}</div>
+                <div class="col-store-id">${withdraw.store_id}</div>
+                <div class="col-user-wallet-id">${withdraw.user_wallet_id}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-current-rate">${withdraw.current_rate.toFixed(4)}</div>
+                <div class="col-withdraw-amount">${withdraw.withdraw_amount.toFixed(2)}</div>
+                <div class="col-transfer-amount">${withdraw.transfer_amount.toFixed(2)}</div>
+                <div class="col-fee-fixed">${withdraw.fee_fixed.toFixed(2)}</div>
+                <div class="col-fee-percent">${withdraw.fee_percent.toFixed(4)}</div>
+                <div class="col-create-time">${moment.unix(withdraw.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div class="col-finished-time">${withdraw.finished_time ? moment.unix(withdraw.finished_time).format('YYYY-MM-DD HH:mm:ss') : '-'}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editWithdraw(${withdraw.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteWithdraw(${withdraw.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(withdrawData.length / withdrawPerPage);
+        document.getElementById('page-info').textContent = `第 ${withdrawPage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const userId = document.getElementById('userIdFilter').value;
+        const storeId = document.getElementById('storeIdFilter').value;
+        const userWalletId = document.getElementById('userWalletIdFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredWithdraws = withdrawData;
+        if (userId) filteredWithdraws = filteredWithdraws.filter(item => item.user_id === parseInt(userId));
+        if (storeId) filteredWithdraws = filteredWithdraws.filter(item => item.store_id === parseInt(storeId));
+        if (userWalletId) filteredWithdraws = filteredWithdraws.filter(item => item.user_wallet_id === parseInt(userWalletId));
+        if (startDate) filteredWithdraws = filteredWithdraws.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredWithdraws = filteredWithdraws.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+        withdrawPage = 1;
+        withdrawData = filteredWithdraws;
+        renderWithdrawList();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(withdrawData.length / withdrawPerPage);
+        withdrawPage += delta;
+        if (withdrawPage < 1) withdrawPage = 1;
+        if (withdrawPage > totalPages) withdrawPage = totalPages;
+        renderWithdrawList();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(withdrawData.length / withdrawPerPage);
+        if (page >= 1 && page <= totalPages) {
+            withdrawPage = page;
+            renderWithdrawList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        withdrawPerPage = parseInt(document.getElementById('perPage').value);
+        withdrawPage = 1;
+        renderWithdrawList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    let isEditing = false;
+    let editId = null;
+
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#withdrawModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#withdrawModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#withdrawModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#withdrawModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+        if (!isEditing) {
+            document.getElementById('systemTab').style.display = 'none';
+        } else {
+            document.getElementById('systemTab').style.display = 'block';
+        }
+    }
+
+    function addWithdraw() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加提现记录';
+        document.getElementById('modalUserId').value = '';
+        document.getElementById('modalStoreId').value = '';
+        document.getElementById('modalUserWalletId').value = '';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalCurrentRate').value = '0.0000';
+        document.getElementById('modalWithdrawAmount').value = '0.00';
+        document.getElementById('modalTransferAmount').value = '0.00';
+        document.getElementById('modalFeeFixed').value = '0.00';
+        document.getElementById('modalFeePercent').value = '0.0000';
+        document.getElementById('modalProofDocument').value = '';
+        document.getElementById('modalPaymentBills').value = '{}';
+        document.getElementById('modalSystemReply').value = '';
+        document.getElementById('withdrawModal').style.display = 'block';
+        setupTabs();
+    }
+
+    function editWithdraw(id) {
+        isEditing = true;
+        editId = id;
+        const withdraw = withdrawData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑提现记录';
+        document.getElementById('modalId').value = withdraw.id;
+        document.getElementById('modalUserId').value = withdraw.user_id;
+        document.getElementById('modalStoreId').value = withdraw.store_id;
+        document.getElementById('modalUserWalletId').value = withdraw.user_wallet_id;
+        document.getElementById('modalStatus').value = withdraw.status;
+        document.getElementById('modalCurrentRate').value = withdraw.current_rate.toFixed(4);
+        document.getElementById('modalWithdrawAmount').value = withdraw.withdraw_amount.toFixed(2);
+        document.getElementById('modalTransferAmount').value = withdraw.transfer_amount.toFixed(2);
+        document.getElementById('modalFeeFixed').value = withdraw.fee_fixed.toFixed(2);
+        document.getElementById('modalFeePercent').value = withdraw.fee_percent.toFixed(4);
+        document.getElementById('modalProofDocument').value = withdraw.proof_document;
+        document.getElementById('modalPaymentBills').value = withdraw.payment_bills;
+        document.getElementById('modalSystemReply').value = withdraw.system_reply;
+        document.getElementById('modalCreateTime').value = moment.unix(withdraw.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalFinishedTime').value = withdraw.finished_time ? moment.unix(withdraw.finished_time).format('YYYY-MM-DDTHH:mm') : '';
+        document.getElementById('withdrawModal').style.display = 'block';
+        setupTabs();
+    }
+
+    function saveWithdraw() {
+        const newWithdraw = {
+            id: isEditing ? editId : withdrawData.length + 1,
+            user_id: parseInt(document.getElementById('modalUserId').value),
+            store_id: parseInt(document.getElementById('modalStoreId').value),
+            user_wallet_id: parseInt(document.getElementById('modalUserWalletId').value),
+            status: parseInt(document.getElementById('modalStatus').value),
+            current_rate: parseFloat(document.getElementById('modalCurrentRate').value),
+            withdraw_amount: parseFloat(document.getElementById('modalWithdrawAmount').value),
+            transfer_amount: parseFloat(document.getElementById('modalTransferAmount').value),
+            fee_fixed: parseFloat(document.getElementById('modalFeeFixed').value),
+            fee_percent: parseFloat(document.getElementById('modalFeePercent').value),
+            create_time: isEditing ? withdrawData.find(item => item.id === editId).create_time : moment().unix(),
+            proof_document: document.getElementById('modalProofDocument').value,
+            payment_bills: document.getElementById('modalPaymentBills').value,
+            system_reply: document.getElementById('modalSystemReply').value,
+            finished_time: isEditing ? withdrawData.find(item => item.id === editId).finished_time : 0
+        };
+
+        if (isEditing) {
+            const index = withdrawData.findIndex(item => item.id === editId);
+            withdrawData[index] = newWithdraw;
+        } else {
+            withdrawData.push(newWithdraw);
+        }
+
+        closeModal();
+        renderWithdrawList();
+    }
+
+    function deleteWithdraw(id) {
+        if (confirm('确定要删除此提现记录吗？')) {
+            withdrawData = withdrawData.filter(item => item.id !== id);
+            renderWithdrawList();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的提现记录');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个提现记录吗？`)) {
+            withdrawData = withdrawData.filter(item => !selectedIds.includes(item.id));
+            renderWithdrawList();
+        }
+    }
+
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的提现记录');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('newStatus').value = '0';
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        withdrawData = withdrawData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus } : item);
+        closeStatusModal();
+        renderWithdrawList();
+    }
+
+    function closeModal() {
+        document.getElementById('withdrawModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchWithdrawData();
+        });
+    };
+</script>
+</body>
+</html>

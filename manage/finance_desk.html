@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 财务工作台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部 -->
+        <div id="header" w3-include-html="_header.html"></div>
+
+        <!-- 内容区域 -->
+        <div class="content-wrapper">
+            <!-- 侧边栏 -->
+            <div id="sidebar" w3-include-html="_sidebar.html"></div>
+
+            <!-- 主内容区域 -->
+            <div class="main-content">
+                <div class="tabs-container">
+                    <div class="ant-tabs ant-tabs-top">
+                        <div class="ant-tabs-nav" role="tablist">
+                            <div class="ant-tabs-nav-wrap">
+                                <div class="ant-tabs-nav-list">
+                                    <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('finance_desk.html')" role="tab" aria-selected="true">
+                                        <span class="ant-tabs-tab-btn">财务工作台</span>
+                                    </div>
+                                    <div class="ant-tabs-tab" onclick="switchTab('payment_record.html')" role="tab" aria-selected="false">
+                                        <span class="ant-tabs-tab-btn">充值记录</span>
+                                    </div>
+                                    <div class="ant-tabs-tab" onclick="switchTab('withdraw_review.html')" role="tab" aria-selected="false">
+                                        <span class="ant-tabs-tab-btn">提现审核</span>
+                                    </div>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ant-tabs-content-holder">
+                            <div class="ant-tabs-content ant-tabs-content-top">
+                                <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                    <h2>提现审核</h2>
+                                    <div class="filter-container" style="margin-bottom: 20px;">
+                                        <select id="statusFilter" class="ant-select" onchange="applyFilters()">
+                                            <option value="">全部状态</option>
+                                            <option value="0">待审核</option>
+                                            <option value="1">已通过</option>
+                                            <option value="2">已拒绝</option>
+                                        </select>
+                                        <input type="number" id="userIdFilter" class="ant-input" placeholder="用户ID" oninput="applyFilters()">
+                                        <input type="number" id="storeIdFilter" class="ant-input" placeholder="店铺ID" oninput="applyFilters()">
+                                        <input type="date" id="startDate" class="ant-input" onchange="applyFilters()">
+                                        <input type="date" id="endDate" class="ant-input" onchange="applyFilters()">
+                                    </div>
+                                    <div class="task-list">
+                                        <div class="table-header" style="display: flex; padding: 10px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                            <div style="flex: 1;">ID</div>
+                                            <div style="flex: 1;">用户ID</div>
+                                            <div style="flex: 1;">店铺ID</div>
+                                            <div style="flex: 1;">钱包ID</div>
+                                            <div style="flex: 1;">提现金额</div>
+                                            <div style="flex: 1;">转账金额</div>
+                                            <div style="flex: 1;">固定手续费</div>
+                                            <div style="flex: 1;">百分比手续费</div>
+                                            <div style="flex: 1;">状态</div>
+                                            <div style="flex: 1;">创建时间</div>
+                                            <div style="flex: 1;">完成时间</div>
+                                            <div style="flex: 1;">操作</div>
+                                        </div>
+                                        <div id="withdraw-list">加载中...</div>
+                                        <div class="pagination" style="margin-top: 20px; text-align: center;">
+                                            <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                            <span id="page-info">第 1 页 / 共 1 页</span>
+                                            <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <div id="footer" w3-include-html="_footer.html"></div>
+    </div>
+
+    <script>
+        // 全局变量
+        let withdrawData = [];
+        let withdrawPage = 1, withdrawPerPage = 10;
+
+        // Tab 切换函数
+        function switchTab(page) {
+            console.log('Switching to:', page);
+            window.location.href = page;
+        }
+
+        // 加载提现数据
+        function fetchWithdrawData() {
+            console.log('Fetching withdraw data...');
+            const sampleData = [];
+            for (let i = 1; i <= 50; i++) {
+                const status = Math.floor(Math.random() * 3);
+                sampleData.push({
+                    id: i,
+                    user_id: Math.floor(Math.random() * 1000) + 1,
+                    store_id: Math.floor(Math.random() * 500) + 1,
+                    user_wallet_id: Math.floor(Math.random() * 200) + 1,
+                    status: status,
+                    current_rate: (Math.random() * 0.1 + 0.95).toFixed(4),
+                    withdraw_amount: (Math.random() * 1000 + 50).toFixed(2),
+                    transfer_amount: (Math.random() * 900 + 40).toFixed(2),
+                    fee_fixed: (Math.random() * 5).toFixed(2),
+                    fee_percent: (Math.random() * 0.05).toFixed(4),
+                    create_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix(),
+                    finished_time: status === 1 ? moment().subtract(Math.floor(Math.random() * 10), 'days').unix() : (status === 2 ? moment().subtract(Math.floor(Math.random() * 15), 'days').unix() : 0),
+                    proof_document: `doc_${i}.pdf`,
+                    payment_bills: `bill_${i}`,
+                    system_reply: status === 1 ? 'Approved' : status === 2 ? 'Rejected due to insufficient funds' : ''
+                });
+            }
+            withdrawData = sampleData;
+            applyFilters();
+        }
+
+        // 渲染提现列表
+        function renderWithdrawList(data) {
+            const start = (withdrawPage - 1) * withdrawPerPage;
+            const end = start + withdrawPerPage;
+            const paginatedData = data.slice(start, end);
+            const listContainer = document.getElementById('withdraw-list');
+            listContainer.innerHTML = '';
+
+            paginatedData.forEach(item => {
+                const statusTag = item.status === 0 ? '<span class="ant-tag ant-tag-blue">待审核</span>' :
+                                  item.status === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' :
+                                  '<span class="ant-tag ant-tag-red">已拒绝</span>';
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'task-item';
+                itemDiv.style = `padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; margin: 5px 0;`;
+                itemDiv.innerHTML = `
+                    <div style="flex: 1;">${item.id}</div>
+                    <div style="flex: 1;">${item.user_id}</div>
+                    <div style="flex: 1;">${item.store_id}</div>
+                    <div style="flex: 1;">${item.user_wallet_id}</div>
+                    <div style="flex: 1;">${item.withdraw_amount}</div>
+                    <div style="flex: 1;">${item.transfer_amount}</div>
+                    <div style="flex: 1;">${item.fee_fixed}</div>
+                    <div style="flex: 1;">${item.fee_percent}</div>
+                    <div style="flex: 1;">${statusTag}</div>
+                    <div style="flex: 1;">${moment.unix(item.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div style="flex: 1;">${item.finished_time ? moment.unix(item.finished_time).format('YYYY-MM-DD HH:mm:ss') : '-'}</div>
+                    <button class="ant-btn ant-btn-primary" style="flex: 1;" onclick="handleWithdraw(${item.id})">处理</button>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+
+            const totalPages = Math.ceil(data.length / withdrawPerPage);
+            document.getElementById('page-info').textContent = `第 ${withdrawPage} 页 / 共 ${totalPages} 页`;
+        }
+
+        // 应用筛选
+        function applyFilters() {
+            const status = document.getElementById('statusFilter').value;
+            const userId = document.getElementById('userIdFilter').value;
+            const storeId = document.getElementById('storeIdFilter').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            let filteredData = withdrawData;
+            if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
+            if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
+            if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
+            if (startDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+            if (endDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+            withdrawPage = 1;
+            renderWithdrawList(filteredData);
+        }
+
+        // 切换页面
+        function changePage(delta) {
+            const totalPages = Math.ceil(withdrawData.length / withdrawPerPage);
+            withdrawPage += delta;
+            if (withdrawPage < 1) withdrawPage = 1;
+            if (withdrawPage > totalPages) withdrawPage = totalPages;
+            applyFilters();
+        }
+
+        // 处理提现
+        function handleWithdraw(id) {
+            console.log('Handling withdraw:', id);
+            alert('处理提现 ID: ' + id);
+        }
+
+        // 初始化
+        window.onload = () => {
+            console.log('Page loaded, initializing...');
+            w3.includeHTML(() => {
+                console.log('External HTML included');
+                initMenus();
+                fetchWithdrawData();
+            });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 规则制裁项</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 60px; }
+        .col-rules-id { width: 15%; min-width: 100px; }
+        .col-status { width: 10%; min-width: 60px; }
+        .col-sanction-type { width: 15%; min-width: 100px; }
+        .col-action-class { width: 20%; min-width: 120px; }
+        .col-sanction-config { width: 20%; min-width: 120px; }
+        .col-create-time { width: 15%; min-width: 100px; }
+        .col-actions { width: 15%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
+        .modal-content .ant-form-item label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('rules_sanctions.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">规则制裁项</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="rulesIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                            <option value="">全部规则</option>
+                                            <!-- 动态生成规则选项 -->
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="sanctionTypeFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                            <option value="">全部制裁类型</option>
+                                            <option value="0">chat</option>
+                                            <option value="1">store</option>
+                                            <option value="2">item</option>
+                                            <option value="3">blog</option>
+                                            <option value="4">demand</option>
+                                            <option value="5">comment</option>
+                                            <option value="6">account</option>
+                                            <option value="7">topup</option>
+                                            <option value="8">withdraw</option>
+                                        </select>
+                                    </div>
+                                    <input type="date" id="startDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <input type="date" id="endDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addSanction()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-rules-id">规则名称</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-sanction-type">制裁类型</div>
+                                        <div class="col-action-class">处理类</div>
+                                        <div class="col-sanction-config">额外配置</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="sanction-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="sanctionModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加规则制裁项</h3>
+            <form id="sanctionForm">
+                <div id="systemFields" style="display: none;">
+                    <div class="ant-form-item">
+                        <label>ID:</label>
+                        <input type="text" id="modalId" disabled>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>创建时间:</label>
+                        <input type="datetime-local" id="modalCreateTime" disabled>
+                    </div>
+                </div>
+                <div id="editableFields">
+                    <div class="ant-form-item">
+                        <label>规则ID:</label>
+                        <select id="modalRulesId">
+                            <!-- 动态生成规则选项 -->
+                        </select>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>状态:</label>
+                        <select id="modalStatus">
+                            <option value="0">禁用</option>
+                            <option value="1">启用</option>
+                        </select>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>制裁类型:</label>
+                        <select id="modalSanctionType">
+                            <option value="0">chat</option>
+                            <option value="1">store</option>
+                            <option value="2">item</option>
+                            <option value="3">blog</option>
+                            <option value="4">demand</option>
+                            <option value="5">comment</option>
+                            <option value="6">account</option>
+                            <option value="7">topup</option>
+                            <option value="8">withdraw</option>
+                        </select>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>处理类:</label>
+                        <input type="text" id="modalActionClass" maxlength="128" placeholder="Java 类路径，如 com.xxx.xxx.xxx">
+                    </div>
+                    <div class="ant-form-item textarea-item">
+                        <label>额外配置:</label>
+                        <textarea id="modalSanctionConfig" rows="5" maxlength="256"></textarea>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveSanction()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">禁用</option>
+                        <option value="1">启用</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let sanctionData = [];
+    let sanctionPage = 1, sanctionPerPage = 20;
+    const sanctionTypes = ['chat', 'store', 'item', 'blog', 'demand', 'comment', 'account', 'topup', 'withdraw'];
+    let rulesData = []; // 模拟 rules 表数据
+
+    function fetchSanctionData() {
+        console.log('Fetching sanction data...');
+        sanctionData = [];
+        rulesData = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `Rule ${i + 1}` }));
+
+        // 填充筛选和弹窗下拉选项
+        const rulesSelects = [document.getElementById('rulesIdFilter'), document.getElementById('modalRulesId')];
+        rulesSelects.forEach(select => {
+            rulesData.forEach(rule => {
+                const option = document.createElement('option');
+                option.value = rule.id;
+                option.text = `${rule.id} - ${rule.name}`;
+                select.appendChild(option);
+            });
+        });
+
+        for (let i = 1; i <= 200; i++) {
+            const sanction = {
+                id: i,
+                rules_id: Math.ceil(Math.random() * 15),
+                status: Math.floor(Math.random() * 2), // 0:禁用, 1:启用
+                sanction_type: Math.floor(Math.random() * 9), // 0-8
+                action_class: `com.fast.tech.sanction.RuleSanction${i}`,
+                sanction_config: JSON.stringify({ ruleId: i, level: Math.floor(Math.random() * 5) }),
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
+            };
+            sanctionData.push(sanction);
+        }
+        renderSanctionList();
+    }
+
+    function getRuleName(ruleId) {
+        const rule = rulesData.find(r => r.id === ruleId);
+        return rule ? rule.name : ruleId; // 如果未找到，返回 ID
+    }
+
+    function renderSanctionList() {
+        const start = (sanctionPage - 1) * sanctionPerPage;
+        const end = start + sanctionPerPage;
+        const paginatedSanctions = sanctionData.slice(start, end);
+        const listContainer = document.getElementById('sanction-list');
+        listContainer.innerHTML = '';
+
+        paginatedSanctions.forEach(sanction => {
+            const statusTag = sanction.status === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' :
+                '<span class="ant-tag ant-tag-green">启用</span>';
+            const ruleName = getRuleName(sanction.rules_id);
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`;
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${sanction.id}"></div>
+                <div class="col-id">${sanction.id}</div>
+                <div class="col-rules-id">${ruleName}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-sanction-type">${sanctionTypes[sanction.sanction_type]}</div>
+                <div class="col-action-class">${sanction.action_class}</div>
+                <div class="col-sanction-config">${sanction.sanction_config.substring(0, 50)}${sanction.sanction_config.length > 50 ? '...' : ''}</div>
+                <div class="col-create-time">${moment.unix(sanction.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editSanction(${sanction.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteSanction(${sanction.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(sanctionData.length / sanctionPerPage);
+        document.getElementById('page-info').textContent = `第 ${sanctionPage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const rulesId = document.getElementById('rulesIdFilter').value;
+        const sanctionType = document.getElementById('sanctionTypeFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredSanctions = sanctionData;
+        if (rulesId) filteredSanctions = filteredSanctions.filter(item => item.rules_id === parseInt(rulesId));
+        if (sanctionType !== '') filteredSanctions = filteredSanctions.filter(item => item.sanction_type === parseInt(sanctionType));
+        if (startDate) filteredSanctions = filteredSanctions.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredSanctions = filteredSanctions.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+        sanctionPage = 1;
+        sanctionData = filteredSanctions;
+        renderSanctionList();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(sanctionData.length / sanctionPerPage);
+        sanctionPage += delta;
+        if (sanctionPage < 1) sanctionPage = 1;
+        if (sanctionPage > totalPages) sanctionPage = totalPages;
+        renderSanctionList();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(sanctionData.length / sanctionPerPage);
+        if (page >= 1 && page <= totalPages) {
+            sanctionPage = page;
+            renderSanctionList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        sanctionPerPage = parseInt(document.getElementById('perPage').value);
+        sanctionPage = 1;
+        renderSanctionList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    let isEditing = false;
+    let editId = null;
+
+    function addSanction() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加规则制裁项';
+        document.getElementById('systemFields').style.display = 'none';
+        document.getElementById('editableFields').style.display = 'block';
+        document.getElementById('modalRulesId').value = '';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalSanctionType').value = '0';
+        document.getElementById('modalActionClass').value = 'com.xxx.xxx.xxx';
+        document.getElementById('modalSanctionConfig').value = '{}';
+        document.getElementById('sanctionModal').style.display = 'block';
+    }
+
+    function editSanction(id) {
+        isEditing = true;
+        editId = id;
+        const sanction = sanctionData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑规则制裁项';
+        document.getElementById('systemFields').style.display = 'block';
+        document.getElementById('editableFields').style.display = 'block';
+        document.getElementById('modalId').value = sanction.id;
+        document.getElementById('modalRulesId').value = sanction.rules_id;
+        document.getElementById('modalStatus').value = sanction.status;
+        document.getElementById('modalSanctionType').value = sanction.sanction_type;
+        document.getElementById('modalActionClass').value = sanction.action_class;
+        document.getElementById('modalSanctionConfig').value = sanction.sanction_config;
+        document.getElementById('modalCreateTime').value = moment.unix(sanction.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('sanctionModal').style.display = 'block';
+    }
+
+    function saveSanction() {
+        const newSanction = {
+            id: isEditing ? editId : sanctionData.length + 1,
+            rules_id: parseInt(document.getElementById('modalRulesId').value),
+            status: parseInt(document.getElementById('modalStatus').value),
+            sanction_type: parseInt(document.getElementById('modalSanctionType').value),
+            action_class: document.getElementById('modalActionClass').value,
+            sanction_config: document.getElementById('modalSanctionConfig').value,
+            create_time: isEditing ? sanctionData.find(item => item.id === editId).create_time : moment().unix()
+        };
+
+        if (isEditing) {
+            const index = sanctionData.findIndex(item => item.id === editId);
+            sanctionData[index] = newSanction;
+        } else {
+            sanctionData.push(newSanction);
+        }
+
+        closeModal();
+        renderSanctionList();
+    }
+
+    function deleteSanction(id) {
+        if (confirm('确定要删除此规则制裁项吗？')) {
+            sanctionData = sanctionData.filter(item => item.id !== id);
+            renderSanctionList();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的规则制裁项');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个规则制裁项吗？`)) {
+            sanctionData = sanctionData.filter(item => !selectedIds.includes(item.id));
+            renderSanctionList();
+        }
+    }
+
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的规则制裁项');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('newStatus').value = '0';
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        sanctionData = sanctionData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus } : item);
+        closeStatusModal();
+        renderSanctionList();
+    }
+
+    function closeModal() {
+        document.getElementById('sanctionModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchSanctionData();
+        });
+    };
+</script>
+</body>
+</html>

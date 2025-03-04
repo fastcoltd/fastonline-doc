@@ -1,0 +1,638 @@
+<!-- 前半部分已在上一回答中提供，以下是完整代码 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 商品库存</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-item-id { width: 8%; min-width: 60px; }
+        .col-batch-id { width: 8%; min-width: 60px; }
+        .col-orders-id { width: 8%; min-width: 60px; }
+        .col-check-status { width: 8%; min-width: 60px; }
+        .col-sold-status { width: 8%; min-width: 60px; }
+        .col-delete-status { width: 8%; min-width: 60px; }
+        .col-replacement-status { width: 8%; min-width: 60px; }
+        .col-create-time { width: 10%; min-width: 80px; }
+        .col-check-time { width: 10%; min-width: 80px; }
+        .col-sold-time { width: 10%; min-width: 80px; }
+        .col-actions { width: 15%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .ant-tabs-content { min-height: 400px; }
+        .ant-tabs-tabpane { padding: 10px 0; }
+        .ant-form-item { margin-bottom: 16px; }
+        .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .ant-form-item:not(.textarea-item) input, .ant-form-item:not(.textarea-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .ant-form-item.textarea-item { display: block; }
+        .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('item_stock.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">商品库存</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="itemIdFilter">
+                                            <option value="">全部商品</option>
+                                            <option value="1">Item 1</option>
+                                            <option value="2">Item 2</option>
+                                            <option value="3">Item 3</option>
+                                            <option value="4">Item 4</option>
+                                            <option value="5">Item 5</option>
+                                            <option value="6">Item 6</option>
+                                            <option value="7">Item 7</option>
+                                            <option value="8">Item 8</option>
+                                            <option value="9">Item 9</option>
+                                            <option value="10">Item 10</option>
+                                            <option value="11">Item 11</option>
+                                            <option value="12">Item 12</option>
+                                            <option value="13">Item 13</option>
+                                            <option value="14">Item 14</option>
+                                            <option value="15">Item 15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="batchIdFilter">
+                                            <option value="">全部批次</option>
+                                            <option value="1">Batch 1</option>
+                                            <option value="2">Batch 2</option>
+                                            <option value="3">Batch 3</option>
+                                            <option value="4">Batch 4</option>
+                                            <option value="5">Batch 5</option>
+                                            <option value="6">Batch 6</option>
+                                            <option value="7">Batch 7</option>
+                                            <option value="8">Batch 8</option>
+                                            <option value="9">Batch 9</option>
+                                            <option value="10">Batch 10</option>
+                                            <option value="11">Batch 11</option>
+                                            <option value="12">Batch 12</option>
+                                            <option value="13">Batch 13</option>
+                                            <option value="14">Batch 14</option>
+                                            <option value="15">Batch 15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="checkStatusFilter">
+                                            <option value="">全部审核状态</option>
+                                            <option value="0">未审核</option>
+                                            <option value="1">已审核</option>
+                                        </select>
+                                    </div>
+                                    <input type="date" id="startDate" class="ant-input">
+                                    <input type="date" id="endDate" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addItem()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditCheckStatus()">批量修改审核状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-item-id">商品ID</div>
+                                        <div class="col-batch-id">批次ID</div>
+                                        <div class="col-orders-id">订单ID</div>
+                                        <div class="col-check-status">审核状态</div>
+                                        <div class="col-sold-status">销售状态</div>
+                                        <div class="col-delete-status">删除状态</div>
+                                        <div class="col-replacement-status">替换状态</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-check-time">审核时间</div>
+                                        <div class="col-sold-time">销售时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="item-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加库存</h3>
+            <form id="itemForm">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="status">
+                                    <span class="ant-tabs-tab-btn">状态信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <!-- 基本信息 Tab -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>ID (自动生成):</label>
+                                    <input type="text" id="modalId" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>商品ID:</label>
+                                    <select id="modalItemId">
+                                        <option value="1">Item 1</option>
+                                        <option value="2">Item 2</option>
+                                        <option value="3">Item 3</option>
+                                        <option value="4">Item 4</option>
+                                        <option value="5">Item 5</option>
+                                        <option value="6">Item 6</option>
+                                        <option value="7">Item 7</option>
+                                        <option value="8">Item 8</option>
+                                        <option value="9">Item 9</option>
+                                        <option value="10">Item 10</option>
+                                        <option value="11">Item 11</option>
+                                        <option value="12">Item 12</option>
+                                        <option value="13">Item 13</option>
+                                        <option value="14">Item 14</option>
+                                        <option value="15">Item 15</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>批次ID:</label>
+                                    <select id="modalBatchId">
+                                        <option value="1">Batch 1</option>
+                                        <option value="2">Batch 2</option>
+                                        <option value="3">Batch 3</option>
+                                        <option value="4">Batch 4</option>
+                                        <option value="5">Batch 5</option>
+                                        <option value="6">Batch 6</option>
+                                        <option value="7">Batch 7</option>
+                                        <option value="8">Batch 8</option>
+                                        <option value="9">Batch 9</option>
+                                        <option value="10">Batch 10</option>
+                                        <option value="11">Batch 11</option>
+                                        <option value="12">Batch 12</option>
+                                        <option value="13">Batch 13</option>
+                                        <option value="14">Batch 14</option>
+                                        <option value="15">Batch 15</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>订单ID:</label>
+                                    <select id="modalOrdersId">
+                                        <option value="0">未关联</option>
+                                        <option value="1">Order 1</option>
+                                        <option value="2">Order 2</option>
+                                        <option value="3">Order 3</option>
+                                        <option value="4">Order 4</option>
+                                        <option value="5">Order 5</option>
+                                        <option value="6">Order 6</option>
+                                        <option value="7">Order 7</option>
+                                        <option value="8">Order 8</option>
+                                        <option value="9">Order 9</option>
+                                        <option value="10">Order 10</option>
+                                        <option value="11">Order 11</option>
+                                        <option value="12">Order 12</option>
+                                        <option value="13">Order 13</option>
+                                        <option value="14">Order 14</option>
+                                        <option value="15">Order 15</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>值列表:</label>
+                                    <textarea id="modalValueList" rows="5"></textarea>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                            </div>
+                            <!-- 状态信息 Tab -->
+                            <div class="ant-tabs-tabpane" id="status" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>审核状态:</label>
+                                    <select id="modalCheckStatus">
+                                        <option value="0">未审核</option>
+                                        <option value="1">已审核</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>销售状态:</label>
+                                    <select id="modalSoldStatus">
+                                        <option value="0">未销售</option>
+                                        <option value="1">已销售</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>删除状态:</label>
+                                    <select id="modalDeleteStatus">
+                                        <option value="0">未删除</option>
+                                        <option value="1">已删除</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>替换状态:</label>
+                                    <select id="modalReplacementStatus">
+                                        <option value="0">未替换</option>
+                                        <option value="1">已替换</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>审核时间:</label>
+                                    <input type="datetime-local" id="modalCheckTime">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>销售时间:</label>
+                                    <input type="datetime-local" id="modalSoldTime">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>删除时间:</label>
+                                    <input type="datetime-local" id="modalDeleteTime">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>替换时间:</label>
+                                    <input type="datetime-local" id="modalReplacementTime">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveItem()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改审核状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改审核状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新审核状态:</label>
+                    <select id="newStatus">
+                        <option value="0">未审核</option>
+                        <option value="1">已审核</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let itemData = [];
+    let itemPage = 1, itemPerPage = 20;
+
+    function fetchItemData() {
+        for (let i = 1; i <= 200; i++) {
+            const checkStatus = Math.floor(Math.random() * 2);
+            const soldStatus = Math.floor(Math.random() * 2);
+            const deleteStatus = Math.floor(Math.random() * 2);
+            const replacementStatus = Math.floor(Math.random() * 2);
+            itemData.push({
+                id: i,
+                item_id: Math.floor(Math.random() * 15) + 1,
+                batch_id: Math.floor(Math.random() * 15) + 1,
+                orders_id: Math.floor(Math.random() * 15) + 1,
+                check_status: checkStatus,
+                sold_status: soldStatus,
+                delete_status: deleteStatus,
+                replacement_status: replacementStatus,
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix(),
+                check_time: checkStatus ? moment().subtract(Math.floor(Math.random() * 50), 'days').unix() : 0,
+                sold_time: soldStatus ? moment().subtract(Math.floor(Math.random() * 40), 'days').unix() : 0,
+                delete_time: deleteStatus ? moment().subtract(Math.floor(Math.random() * 30), 'days').unix() : 0,
+                replacement_time: replacementStatus ? moment().subtract(Math.floor(Math.random() * 20), 'days').unix() : 0,
+                value_list: `Value list for item ${i}`
+            });
+        }
+        renderItemList(itemData);
+    }
+
+    function renderItemList(items) {
+        const start = (itemPage - 1) * itemPerPage;
+        const end = start + itemPerPage;
+        const paginatedItems = items.slice(start, end);
+        const listContainer = document.getElementById('item-list');
+        listContainer.innerHTML = '';
+
+        paginatedItems.forEach(item => {
+            const checkTag = item.check_status === 0 ? '<span class="ant-tag ant-tag-blue">未审核</span>' :
+                '<span class="ant-tag ant-tag-green">已审核</span>';
+            const soldTag = item.sold_status === 0 ? '<span class="ant-tag ant-tag-blue">未销售</span>' :
+                '<span class="ant-tag ant-tag-green">已销售</span>';
+            const deleteTag = item.delete_status === 0 ? '<span class="ant-tag ant-tag-blue">未删除</span>' :
+                '<span class="ant-tag ant-tag-red">已删除</span>';
+            const replaceTag = item.replacement_status === 0 ? '<span class="ant-tag ant-tag-blue">未替换</span>' :
+                '<span class="ant-tag ant-tag-green">已替换</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${item.id}"></div>
+                <div class="col-id">${item.id}</div>
+                <div class="col-item-id">Item ${item.item_id}</div>
+                <div class="col-batch-id">Batch ${item.batch_id}</div>
+                <div class="col-orders-id">${item.orders_id === 0 ? '未关联' : 'Order ' + item.orders_id}</div>
+                <div class="col-check-status">${checkTag}</div>
+                <div class="col-sold-status">${soldTag}</div>
+                <div class="col-delete-status">${deleteTag}</div>
+                <div class="col-replacement-status">${replaceTag}</div>
+                <div class="col-create-time">${moment.unix(item.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div class="col-check-time">${item.check_time ? moment.unix(item.check_time).format('YYYY-MM-DD HH:mm:ss') : '-'}</div>
+                <div class="col-sold-time">${item.sold_time ? moment.unix(item.sold_time).format('YYYY-MM-DD HH:mm:ss') : '-'}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editItem('${item.id}')">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteItem('${item.id}')">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(items.length / itemPerPage);
+        document.getElementById('page-info').textContent = `第 ${itemPage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const itemId = document.getElementById('itemIdFilter').value;
+        const batchId = document.getElementById('batchIdFilter').value;
+        const checkStatus = document.getElementById('checkStatusFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredItems = itemData;
+
+        if (itemId) filteredItems = filteredItems.filter(item => item.item_id === parseInt(itemId));
+        if (batchId) filteredItems = filteredItems.filter(item => item.batch_id === parseInt(batchId));
+        if (checkStatus) filteredItems = filteredItems.filter(item => item.check_status === parseInt(checkStatus));
+        if (startDate) filteredItems = filteredItems.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredItems = filteredItems.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+        itemPage = 1;
+        renderItemList(filteredItems);
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(itemData.length / itemPerPage);
+        itemPage += delta;
+        if (itemPage < 1) itemPage = 1;
+        if (itemPage > totalPages) itemPage = totalPages;
+        applyFilters();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(itemData.length / itemPerPage);
+        if (page >= 1 && page <= totalPages) {
+            itemPage = page;
+            applyFilters();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        itemPerPage = parseInt(document.getElementById('perPage').value);
+        itemPage = 1;
+        applyFilters();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    let isEditing = false;
+    let editId = null;
+
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#itemModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#itemModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#itemModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#itemModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
+
+    function addItem() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加库存';
+        document.getElementById('modalId').value = '';
+        document.getElementById('modalItemId').value = '1';
+        document.getElementById('modalBatchId').value = '1';
+        document.getElementById('modalOrdersId').value = '0';
+        document.getElementById('modalValueList').value = '';
+        document.getElementById('modalCheckStatus').value = '0';
+        document.getElementById('modalSoldStatus').value = '0';
+        document.getElementById('modalDeleteStatus').value = '0';
+        document.getElementById('modalReplacementStatus').value = '0';
+        document.getElementById('modalCreateTime').value = '';
+        document.getElementById('modalCheckTime').value = '';
+        document.getElementById('modalSoldTime').value = '';
+        document.getElementById('modalDeleteTime').value = '';
+        document.getElementById('modalReplacementTime').value = '';
+        setupTabs();
+        document.getElementById('itemModal').style.display = 'block';
+    }
+
+    function editItem(id) {
+        isEditing = true;
+        editId = id;
+        const item = itemData.find(i => i.id === parseInt(id));
+        document.getElementById('modalTitle').textContent = '编辑库存';
+        document.getElementById('modalId').value = item.id;
+        document.getElementById('modalItemId').value = item.item_id;
+        document.getElementById('modalBatchId').value = item.batch_id;
+        document.getElementById('modalOrdersId').value = item.orders_id;
+        document.getElementById('modalValueList').value = item.value_list;
+        document.getElementById('modalCheckStatus').value = item.check_status;
+        document.getElementById('modalSoldStatus').value = item.sold_status;
+        document.getElementById('modalDeleteStatus').value = item.delete_status;
+        document.getElementById('modalReplacementStatus').value = item.replacement_status;
+        document.getElementById('modalCreateTime').value = moment.unix(item.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalCheckTime').value = item.check_time ? moment.unix(item.check_time).format('YYYY-MM-DDTHH:mm') : '';
+        document.getElementById('modalSoldTime').value = item.sold_time ? moment.unix(item.sold_time).format('YYYY-MM-DDTHH:mm') : '';
+        document.getElementById('modalDeleteTime').value = item.delete_time ? moment.unix(item.delete_time).format('YYYY-MM-DDTHH:mm') : '';
+        document.getElementById('modalReplacementTime').value = item.replacement_time ? moment.unix(item.replacement_time).format('YYYY-MM-DDTHH:mm') : '';
+        setupTabs();
+        document.getElementById('itemModal').style.display = 'block';
+    }
+
+    function saveItem() {
+        const itemId = isEditing ? parseInt(document.getElementById('modalId').value) : itemData.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+        let item = itemData.find(i => i.id === itemId);
+        if (!item) {
+            item = {
+                id: itemId,
+                item_id: parseInt(document.getElementById('modalItemId').value),
+                batch_id: parseInt(document.getElementById('modalBatchId').value),
+                orders_id: parseInt(document.getElementById('modalOrdersId').value),
+                check_status: parseInt(document.getElementById('modalCheckStatus').value),
+                sold_status: parseInt(document.getElementById('modalSoldStatus').value),
+                delete_status: parseInt(document.getElementById('modalDeleteStatus').value),
+                replacement_status: parseInt(document.getElementById('modalReplacementStatus').value),
+                create_time: moment().unix(),
+                check_time: document.getElementById('modalCheckTime').value ? moment(document.getElementById('modalCheckTime').value).unix() : 0,
+                sold_time: document.getElementById('modalSoldTime').value ? moment(document.getElementById('modalSoldTime').value).unix() : 0,
+                delete_time: document.getElementById('modalDeleteTime').value ? moment(document.getElementById('modalDeleteTime').value).unix() : 0,
+                replacement_time: document.getElementById('modalReplacementTime').value ? moment(document.getElementById('modalReplacementTime').value).unix() : 0,
+                value_list: document.getElementById('modalValueList').value
+            };
+            itemData.push(item);
+        } else {
+            item.item_id = parseInt(document.getElementById('modalItemId').value);
+            item.batch_id = parseInt(document.getElementById('modalBatchId').value);
+            item.orders_id = parseInt(document.getElementById('modalOrdersId').value);
+            item.check_status = parseInt(document.getElementById('modalCheckStatus').value);
+            item.sold_status = parseInt(document.getElementById('modalSoldStatus').value);
+            item.delete_status = parseInt(document.getElementById('modalDeleteStatus').value);
+            item.replacement_status = parseInt(document.getElementById('modalReplacementStatus').value);
+            item.check_time = document.getElementById('modalCheckTime').value ? moment(document.getElementById('modalCheckTime').value).unix() : item.check_time;
+            item.sold_time = document.getElementById('modalSoldTime').value ? moment(document.getElementById('modalSoldTime').value).unix() : item.sold_time;
+            item.delete_time = document.getElementById('modalDeleteTime').value ? moment(document.getElementById('modalDeleteTime').value).unix() : item.delete_time;
+            item.replacement_time = document.getElementById('modalReplacementTime').value ? moment(document.getElementById('modalReplacementTime').value).unix() : item.replacement_time;
+            item.value_list = document.getElementById('modalValueList').value;
+        }
+        closeModal();
+        applyFilters();
+    }
+
+    function deleteItem(id) {
+        if (confirm('确定要删除此记录吗？')) {
+            itemData = itemData.filter(item => item.id !== parseInt(id));
+            applyFilters();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的记录');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个记录吗？`)) {
+            itemData = itemData.filter(item => !selectedIds.includes(item.id.toString()));
+            applyFilters();
+        }
+    }
+
+    function batchEditCheckStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的记录');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        itemData = itemData.map(item => selectedIds.includes(item.id.toString()) ? { ...item, check_status: newStatus, check_time: newStatus ? moment().unix() : item.check_time } : item);
+        closeStatusModal();
+        applyFilters();
+    }
+
+    function closeModal() {
+        document.getElementById('itemModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            fetchItemData();
+        });
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 支付争议</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 60px; }
+        .col-user-id { width: 10%; min-width: 60px; }
+        .col-payment-record-id { width: 10%; min-width: 60px; }
+        .col-payment-id { width: 10%; min-width: 60px; }
+        .col-dispute-type { width: 10%; min-width: 60px; }
+        .col-status { width: 10%; min-width: 60px; }
+        .col-dispute-time { width: 15%; min-width: 100px; }
+        .col-review-time { width: 15%; min-width: 100px; }
+        .col-actions { width: 15%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .ant-tabs-content { min-height: 400px; }
+        .ant-form-item { margin-bottom: 16px; }
+        .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .ant-form-item:not(.textarea-item) input, .ant-form-item:not(.textarea-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .ant-form-item.textarea-item { display: block; }
+        .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('payment_dispute.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">支付争议</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="userIdFilter">
+                                            <option value="">全部用户</option>
+                                            <option value="1">User A</option>
+                                            <option value="2">User B</option>
+                                            <option value="3">User C</option>
+                                            <option value="4">User D</option>
+                                            <option value="5">User E</option>
+                                            <option value="6">User F</option>
+                                            <option value="7">User G</option>
+                                            <option value="8">User H</option>
+                                            <option value="9">User I</option>
+                                            <option value="10">User J</option>
+                                            <option value="11">User K</option>
+                                            <option value="12">User L</option>
+                                            <option value="13">User M</option>
+                                            <option value="14">User N</option>
+                                            <option value="15">User O</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="paymentIdFilter">
+                                            <option value="">全部支付渠道</option>
+                                            <option value="1">Alipay</option>
+                                            <option value="2">WeChat</option>
+                                            <option value="3">PayPal</option>
+                                            <option value="4">Stripe</option>
+                                            <option value="5">Bank Card</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="disputeTypeFilter">
+                                            <option value="">全部争议类型</option>
+                                            <option value="0">未入账</option>
+                                            <option value="1">金额错误</option>
+                                            <option value="2">重复扣费</option>
+                                            <option value="3">其他</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="statusFilter">
+                                            <option value="">全部状态</option>
+                                            <option value="0">待审核</option>
+                                            <option value="1">已通过</option>
+                                            <option value="2">已拒绝</option>
+                                            <option value="3">已解决</option>
+                                        </select>
+                                    </div>
+                                    <input type="date" id="startDate" class="ant-input">
+                                    <input type="date" id="endDate" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addItem()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-user-id">用户ID</div>
+                                        <div class="col-payment-record-id">支付记录ID</div>
+                                        <div class="col-payment-id">支付渠道</div>
+                                        <div class="col-dispute-type">争议类型</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-dispute-time">提交时间</div>
+                                        <div class="col-review-time">审核时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="item-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加支付争议</h3>
+            <form id="itemForm">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="review">
+                                    <span class="ant-tabs-tab-btn">审核信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <!-- 基本信息 Tab -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>ID (自动生成):</label>
+                                    <input type="text" id="modalId" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>用户ID:</label>
+                                    <select id="modalUserId">
+                                        <option value="0">未关联</option>
+                                        <option value="1">User A</option>
+                                        <option value="2">User B</option>
+                                        <option value="3">User C</option>
+                                        <option value="4">User D</option>
+                                        <option value="5">User E</option>
+                                        <option value="6">User F</option>
+                                        <option value="7">User G</option>
+                                        <option value="8">User H</option>
+                                        <option value="9">User I</option>
+                                        <option value="10">User J</option>
+                                        <option value="11">User K</option>
+                                        <option value="12">User L</option>
+                                        <option value="13">User M</option>
+                                        <option value="14">User N</option>
+                                        <option value="15">User O</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>支付记录ID:</label>
+                                    <input type="number" id="modalPaymentRecordId" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>支付渠道ID:</label>
+                                    <select id="modalPaymentId">
+                                        <option value="">未关联</option>
+                                        <option value="1">Alipay</option>
+                                        <option value="2">WeChat</option>
+                                        <option value="3">PayPal</option>
+                                        <option value="4">Stripe</option>
+                                        <option value="5">Bank Card</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>争议类型:</label>
+                                    <select id="modalDisputeType">
+                                        <option value="0">未入账</option>
+                                        <option value="1">金额错误</option>
+                                        <option value="2">重复扣费</option>
+                                        <option value="3">其他</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>争议描述:</label>
+                                    <textarea id="modalDisputeDescription" rows="5" maxlength="512"></textarea>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalStatus">
+                                        <option value="0">待审核</option>
+                                        <option value="1">已通过</option>
+                                        <option value="2">已拒绝</option>
+                                        <option value="3">已解决</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>提交时间:</label>
+                                    <input type="datetime-local" id="modalDisputeTime">
+                                </div>
+                            </div>
+                            <!-- 审核信息 Tab -->
+                            <div class="ant-tabs-tabpane" id="review" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>管理员ID:</label>
+                                    <select id="modalManageId" disabled>
+                                        <option value="">未分配</option>
+                                        <option value="1">Admin A</option>
+                                        <option value="2">Admin B</option>
+                                        <option value="3">Admin C</option>
+                                        <option value="4">Admin D</option>
+                                        <option value="5">Admin E</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>管理员回复:</label>
+                                    <textarea id="modalManageReply" rows="5" maxlength="512"></textarea>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>审核时间:</label>
+                                    <input type="datetime-local" id="modalReviewTime">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>解决时间:</label>
+                                    <input type="datetime-local" id="modalResolutionTime">
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>额外数据:</label>
+                                    <textarea id="modalExtraData" rows="5" maxlength="1024">{"evidence": "none"}</textarea>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>更新时间:</label>
+                                    <input type="datetime-local" id="modalUpdateTime" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveItem()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">待审核</option>
+                        <option value="1">已通过</option>
+                        <option value="2">已拒绝</option>
+                        <option value="3">已解决</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let itemData = [];
+    let itemPage = 1, itemPerPage = 20;
+
+    function fetchItemData() {
+        for (let i = 1; i <= 200; i++) {
+            const disputeTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            const status = Math.floor(Math.random() * 4);
+            const reviewTime = status > 0 ? moment.unix(disputeTime).add(Math.floor(Math.random() * 10), 'days').unix() : 0;
+            const resolutionTime = status === 3 ? moment.unix(reviewTime).add(Math.floor(Math.random() * 5), 'days').unix() : 0;
+            itemData.push({
+                id: i,
+                user_id: Math.floor(Math.random() * 15) + 1,
+                payment_record_id: Math.floor(Math.random() * 200) + 1,
+                payment_id: Math.floor(Math.random() * 5) + 1,
+                dispute_type: Math.floor(Math.random() * 4),
+                dispute_description: `Dispute description for ${i}`,
+                status: status,
+                manage_id: status > 0 ? Math.floor(Math.random() * 5) + 1 : null,
+                manage_reply: status > 0 ? `Reply for dispute ${i}` : '',
+                dispute_time: disputeTime,
+                review_time: reviewTime,
+                resolution_time: resolutionTime,
+                extra_data: `{"evidence": "upload_${i}"}`,
+                create_time: disputeTime,
+                update_time: resolutionTime || reviewTime || disputeTime
+            });
+        }
+        renderItemList(itemData);
+    }
+
+    function renderItemList(items) {
+        const start = (itemPage - 1) * itemPerPage;
+        const end = start + itemPerPage;
+        const paginatedItems = items.slice(start, end);
+        const listContainer = document.getElementById('item-list');
+        listContainer.innerHTML = '';
+
+        paginatedItems.forEach(item => {
+            const disputeTypes = {0: '未入账', 1: '金额错误', 2: '重复扣费', 3: '其他'};
+            const statusTags = {0: '<span class="ant-tag ant-tag-blue">待审核</span>',
+                1: '<span class="ant-tag ant-tag-green">已通过</span>',
+                2: '<span class="ant-tag ant-tag-red">已拒绝</span>',
+                3: '<span class="ant-tag ant-tag-yellow">已解决</span>'};
+            const paymentNames = {1: 'Alipay', 2: 'WeChat', 3: 'PayPal', 4: 'Stripe', 5: 'Bank Card'};
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${item.id}"></div>
+                <div class="col-id">${item.id}</div>
+                <div class="col-user-id">User ${item.user_id}</div>
+                <div class="col-payment-record-id">${item.payment_record_id || '-'}</div>
+                <div class="col-payment-id">${item.payment_id ? paymentNames[item.payment_id] : '-'}</div>
+                <div class="col-dispute-type">${disputeTypes[item.dispute_type]}</div>
+                <div class="col-status">${statusTags[item.status]}</div>
+                <div class="col-dispute-time">${moment.unix(item.dispute_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div class="col-review-time">${item.review_time ? moment.unix(item.review_time).format('YYYY-MM-DD HH:mm:ss') : '-'}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editItem('${item.id}')">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteItem('${item.id}')">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(items.length / itemPerPage);
+        document.getElementById('page-info').textContent = `第 ${itemPage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const userId = document.getElementById('userIdFilter').value;
+        const paymentId = document.getElementById('paymentIdFilter').value;
+        const disputeType = document.getElementById('disputeTypeFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredItems = itemData;
+
+        if (userId) filteredItems = filteredItems.filter(item => item.user_id === parseInt(userId));
+        if (paymentId) filteredItems = filteredItems.filter(item => item.payment_id === parseInt(paymentId));
+        if (disputeType) filteredItems = filteredItems.filter(item => item.dispute_type === parseInt(disputeType));
+        if (status) filteredItems = filteredItems.filter(item => item.status === parseInt(status));
+        if (startDate) filteredItems = filteredItems.filter(item => moment.unix(item.dispute_time).isSameOrAfter(startDate));
+        if (endDate) filteredItems = filteredItems.filter(item => moment.unix(item.dispute_time).isSameOrBefore(endDate));
+
+        itemPage = 1;
+        renderItemList(filteredItems);
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(itemData.length / itemPerPage);
+        itemPage += delta;
+        if (itemPage < 1) itemPage = 1;
+        if (itemPage > totalPages) itemPage = totalPages;
+        applyFilters();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(itemData.length / itemPerPage);
+        if (page >= 1 && page <= totalPages) {
+            itemPage = page;
+            applyFilters();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        itemPerPage = parseInt(document.getElementById('perPage').value);
+        itemPage = 1;
+        applyFilters();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    let isEditing = false;
+    let editId = null;
+
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#itemModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#itemModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#itemModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#itemModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
+
+    function addItem() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加支付争议';
+        document.getElementById('modalId').value = '';
+        document.getElementById('modalUserId').value = '0';
+        document.getElementById('modalPaymentRecordId').value = '';
+        document.getElementById('modalPaymentId').value = '';
+        document.getElementById('modalDisputeType').value = '0';
+        document.getElementById('modalDisputeDescription').value = '';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalDisputeTime').value = '';
+        document.getElementById('modalManageId').value = '';
+        document.getElementById('modalManageReply').value = '';
+        document.getElementById('modalReviewTime').value = '';
+        document.getElementById('modalResolutionTime').value = '';
+        document.getElementById('modalExtraData').value = '{}';
+        document.getElementById('modalCreateTime').value = '';
+        document.getElementById('modalUpdateTime').value = '';
+        setupTabs();
+        document.getElementById('itemModal').style.display = 'block';
+    }
+
+    function editItem(id) {
+        isEditing = true;
+        editId = id;
+        const item = itemData.find(i => i.id === parseInt(id));
+        document.getElementById('modalTitle').textContent = '编辑支付争议';
+        document.getElementById('modalId').value = item.id;
+        document.getElementById('modalUserId').value = item.user_id;
+        document.getElementById('modalPaymentRecordId').value = item.payment_record_id || '';
+        document.getElementById('modalPaymentId').value = item.payment_id || '';
+        document.getElementById('modalDisputeType').value = item.dispute_type;
+        document.getElementById('modalDisputeDescription').value = item.dispute_description;
+        document.getElementById('modalStatus').value = item.status;
+        document.getElementById('modalDisputeTime').value = moment.unix(item.dispute_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalManageId').value = item.manage_id || '';
+        document.getElementById('modalManageReply').value = item.manage_reply;
+        document.getElementById('modalReviewTime').value = item.review_time ? moment.unix(item.review_time).format('YYYY-MM-DDTHH:mm') : '';
+        document.getElementById('modalResolutionTime').value = item.resolution_time ? moment.unix(item.resolution_time).format('YYYY-MM-DDTHH:mm') : '';
+        document.getElementById('modalExtraData').value = item.extra_data;
+        document.getElementById('modalCreateTime').value = moment.unix(item.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalUpdateTime').value = moment.unix(item.update_time).format('YYYY-MM-DDTHH:mm');
+        setupTabs();
+        document.getElementById('itemModal').style.display = 'block';
+    }
+
+    function saveItem() {
+        const itemId = isEditing ? parseInt(document.getElementById('modalId').value) : itemData.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+        const disputeTime = document.getElementById('modalDisputeTime').value ? moment(document.getElementById('modalDisputeTime').value).unix() : moment().unix();
+        const reviewTime = document.getElementById('modalReviewTime').value ? moment(document.getElementById('modalReviewTime').value).unix() : 0;
+        const resolutionTime = document.getElementById('modalResolutionTime').value ? moment(document.getElementById('modalResolutionTime').value).unix() : 0;
+
+        let item = itemData.find(i => i.id === itemId);
+        if (!item) {
+            item = {
+                id: itemId,
+                user_id: parseInt(document.getElementById('modalUserId').value),
+                payment_record_id: document.getElementById('modalPaymentRecordId').value ? parseInt(document.getElementById('modalPaymentRecordId').value) : null,
+                payment_id: document.getElementById('modalPaymentId').value ? parseInt(document.getElementById('modalPaymentId').value) : null,
+                dispute_type: parseInt(document.getElementById('modalDisputeType').value),
+                dispute_description: document.getElementById('modalDisputeDescription').value,
+                status: parseInt(document.getElementById('modalStatus').value),
+                manage_id: document.getElementById('modalManageId').value ? parseInt(document.getElementById('modalManageId').value) : null,
+                manage_reply: document.getElementById('modalManageReply').value,
+                dispute_time: disputeTime,
+                review_time: reviewTime,
+                resolution_time: resolutionTime,
+                extra_data: document.getElementById('modalExtraData').value,
+                create_time: moment().unix(),
+                update_time: moment().unix()
+            };
+            itemData.push(item);
+        } else {
+            item.user_id = parseInt(document.getElementById('modalUserId').value);
+            item.payment_record_id = document.getElementById('modalPaymentRecordId').value ? parseInt(document.getElementById('modalPaymentRecordId').value) : null;
+            item.payment_id = document.getElementById('modalPaymentId').value ? parseInt(document.getElementById('modalPaymentId').value) : null;
+            item.dispute_type = parseInt(document.getElementById('modalDisputeType').value);
+            item.dispute_description = document.getElementById('modalDisputeDescription').value;
+            item.status = parseInt(document.getElementById('modalStatus').value);
+            item.manage_id = document.getElementById('modalManageId').value ? parseInt(document.getElementById('modalManageId').value) : null;
+            item.manage_reply = document.getElementById('modalManageReply').value;
+            item.dispute_time = disputeTime;
+            item.review_time = reviewTime;
+            item.resolution_time = resolutionTime;
+            item.extra_data = document.getElementById('modalExtraData').value;
+            item.update_time = moment().unix();
+        }
+        closeModal();
+        applyFilters();
+    }
+
+    function deleteItem(id) {
+        if (confirm('确定要删除此记录吗？')) {
+            itemData = itemData.filter(item => item.id !== parseInt(id));
+            applyFilters();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的记录');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个记录吗？`)) {
+            itemData = itemData.filter(item => !selectedIds.includes(item.id.toString()));
+            applyFilters();
+        }
+    }
+
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的记录');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        itemData = itemData.map(item => {
+            if (selectedIds.includes(item.id.toString())) {
+                const updatedItem = { ...item, status: newStatus, update_time: moment().unix() };
+                if (newStatus > 0 && !item.review_time) updatedItem.review_time = moment().unix();
+                if (newStatus === 3 && !item.resolution_time) updatedItem.resolution_time = moment().unix();
+                if (newStatus === 0) {
+                    updatedItem.review_time = 0;
+                    updatedItem.resolution_time = 0;
+                    updatedItem.manage_id = null;
+                    updatedItem.manage_reply = '';
+                }
+                return updatedItem;
+            }
+            return item;
+        });
+        closeStatusModal();
+        applyFilters();
+    }
+
+    function closeModal() {
+        document.getElementById('itemModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchItemData();
+        });
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 商品售后统计</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 15%; min-width: 80px; }
+        .col-aftersales-id { width: 20%; min-width: 100px; }
+        .col-store-id { width: 20%; min-width: 100px; }
+        .col-item-id { width: 20%; min-width: 100px; }
+        .col-hit-count { width: 15%; min-width: 80px; }
+        .col-actions { width: 20%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
+        .ant-form-item label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .ant-form-item input, .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('item_aftersales_stat.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">商品售后统计</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <div class="filter-container">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="storeIdFilter">
+                                            <option value="">全部店铺</option>
+                                            <option value="1">Shop A</option>
+                                            <option value="2">Shop B</option>
+                                            <option value="3">Shop C</option>
+                                            <option value="4">Shop D</option>
+                                            <option value="5">Shop E</option>
+                                            <option value="6">Shop F</option>
+                                            <option value="7">Shop G</option>
+                                            <option value="8">Shop H</option>
+                                            <option value="9">Shop I</option>
+                                            <option value="10">Shop J</option>
+                                            <option value="11">Shop K</option>
+                                            <option value="12">Shop L</option>
+                                            <option value="13">Shop M</option>
+                                            <option value="14">Shop N</option>
+                                            <option value="15">Shop O</option>
+                                        </select>
+                                    </div>
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                </div>
+                                <div class="task-list">
+                                    <div class="table-header" style="background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-aftersales-id">售后ID</div>
+                                        <div class="col-store-id">店铺</div>
+                                        <div class="col-item-id">商品</div>
+                                        <div class="col-hit-count">点击次数</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="item-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3>查看售后统计</h3>
+            <form id="itemForm">
+                <div class="ant-form-item">
+                    <label>ID:</label>
+                    <input type="text" id="modalId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>售后ID:</label>
+                    <input type="text" id="modalAftersalesId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>店铺ID:</label>
+                    <input type="text" id="modalStoreId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>商品ID:</label>
+                    <input type="text" id="modalItemId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>点击次数:</label>
+                    <input type="text" id="modalHitCount" disabled>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    let itemData = [];
+    let itemPage = 1, itemPerPage = 20;
+
+    function fetchItemData() {
+        for (let i = 1; i <= 200; i++) {
+            itemData.push({
+                id: i,
+                aftersales_id: i * 10,
+                store_id: Math.floor(Math.random() * 15) + 1,
+                item_id: i,
+                hit_count: Math.floor(Math.random() * 1000)
+            });
+        }
+        renderItemList(itemData);
+    }
+
+    function renderItemList(items) {
+        const start = (itemPage - 1) * itemPerPage;
+        const end = start + itemPerPage;
+        const paginatedItems = items.slice(start, end);
+        const listContainer = document.getElementById('item-list');
+        listContainer.innerHTML = '';
+
+        paginatedItems.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${item.id}"></div>
+                <div class="col-id">${item.id}</div>
+                <div class="col-aftersales-id">${item.aftersales_id}</div>
+                <div class="col-store-id">Shop ${item.store_id}</div>
+                <div class="col-item-id">${item.item_id}</div>
+                <div class="col-hit-count">${item.hit_count}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="viewItem('${item.id}')">查看</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteItem('${item.id}')">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(items.length / itemPerPage);
+        document.getElementById('page-info').textContent = `第 ${itemPage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const storeId = document.getElementById('storeIdFilter').value;
+        let filteredItems = itemData;
+        if (storeId) filteredItems = filteredItems.filter(item => item.store_id === parseInt(storeId));
+        itemPage = 1;
+        renderItemList(filteredItems);
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(itemData.length / itemPerPage);
+        itemPage += delta;
+        if (itemPage < 1) itemPage = 1;
+        if (itemPage > totalPages) itemPage = totalPages;
+        applyFilters();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(itemData.length / itemPerPage);
+        if (page >= 1 && page <= totalPages) {
+            itemPage = page;
+            applyFilters();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        itemPerPage = parseInt(document.getElementById('perPage').value);
+        itemPage = 1;
+        applyFilters();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    function viewItem(id) {
+        const item = itemData.find(i => i.id === parseInt(id));
+        document.getElementById('modalId').value = item.id;
+        document.getElementById('modalAftersalesId').value = item.aftersales_id;
+        document.getElementById('modalStoreId').value = `Shop ${item.store_id}`;
+        document.getElementById('modalItemId').value = item.item_id;
+        document.getElementById('modalHitCount').value = item.hit_count;
+        document.getElementById('itemModal').style.display = 'block';
+    }
+
+    function deleteItem(id) {
+        if (confirm('确定要删除此记录吗？')) {
+            itemData = itemData.filter(item => item.id !== parseInt(id));
+            applyFilters();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的记录');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个记录吗？`)) {
+            itemData = itemData.filter(item => !selectedIds.includes(item.id.toString()));
+            applyFilters();
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('itemModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            fetchItemData();
+        });
+    };
+</script>
+</body>
+</html>

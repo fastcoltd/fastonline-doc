@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 搜索管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-language { width: 8%; min-width: 60px; }
+        .col-keywords { width: 12%; min-width: 100px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-brand-id { width: 8%; min-width: 60px; }
+        .col-search-type { width: 8%; min-width: 60px; }
+        .col-sort-index { width: 8%; min-width: 60px; }
+        .col-search-count { width: 8%; min-width: 60px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-update-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 100px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('search.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">搜索管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <input type="number" id="brandIdFilter" class="ant-input" placeholder="品牌ID">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="languageFilter">
+                                            <option value="">全部语言</option>
+                                            <option value="zh_CN">中文</option>
+                                            <option value="en_US">English</option>
+                                        </select>
+                                    </div>
+                                    <input type="text" id="keywordsFilter" class="ant-input" placeholder="搜索关键词">
+                                    <input type="date" id="startDate" class="ant-input">
+                                    <input type="date" id="endDate" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addSearch()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                    <button class="ant-btn" onclick="batchEditBrandId()">批量修改品牌</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-language">语言</div>
+                                        <div class="col-keywords">关键词</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-brand-id">品牌ID</div>
+                                        <div class="col-search-type">搜索类型</div>
+                                        <div class="col-sort-index">排序</div>
+                                        <div class="col-search-count">搜索次数</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-update-time">更新时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="search-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20">20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="searchModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加搜索</h3>
+            <form id="searchForm">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="lang">
+                                    <span class="ant-tabs-tab-btn">多语言信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>ID (自动生成):</label>
+                                    <input type="text" id="modalSearchId" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>搜索类型:</label>
+                                    <select id="modalSearchType">
+                                        <option value="0">商品</option>
+                                        <option value="1">店铺</option>
+                                        <option value="2">需求</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>品牌ID:</label>
+                                    <input type="number" id="modalBrandId">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalStatus">
+                                        <option value="0">待审核</option>
+                                        <option value="1">已通过</option>
+                                        <option value="2">已拒绝</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>排序:</label>
+                                    <input type="number" id="modalSortIndex">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>搜索次数:</label>
+                                    <input type="number" id="modalSearchCount">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>更新时间:</label>
+                                    <input type="datetime-local" id="modalUpdateTime" disabled>
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>语言:</label>
+                                    <select id="modalLanguage">
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">English</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>关键词:</label>
+                                    <input type="text" id="modalKeywords">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveSearch()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中ID:</label>
+                    <input type="text" id="selectedIdsStatus" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">待审核</option>
+                        <option value="1">已通过</option>
+                        <option value="2">已拒绝</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改品牌弹窗 -->
+    <div id="brandIdModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeBrandIdModal()">×</button>
+            <h3>批量修改品牌</h3>
+            <form id="brandIdForm">
+                <div class="ant-form-item">
+                    <label>选中ID:</label>
+                    <input type="text" id="selectedIdsBrandId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新品牌ID:</label>
+                    <input type="number" id="newBrandId">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeBrandIdModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchBrandId()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let searchData = [];
+    let searchLangData = [];
+    let page = 1, perPage = 10;
+
+    function fetchSearchData() {
+        searchData = [];
+        searchLangData = [];
+        const languages = ['zh_CN', 'en_US'];
+        for (let i = 1; i <= 200; i++) {
+            const status = Math.floor(Math.random() * 3);
+            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            const updateTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
+            const search = {
+                id: i,
+                search_type: Math.floor(Math.random() * 3),
+                brand_id: Math.floor(Math.random() * 100),
+                status,
+                sort_index: Math.floor(Math.random() * 1000),
+                search_count: Math.floor(Math.random() * 5000),
+                create_time: createTime,
+                update_time: updateTime
+            };
+            searchData.push(search);
+
+            languages.forEach(lang => {
+                const langData = {
+                    id: searchData.length * 2 + (lang === 'zh_CN' ? 0 : 1),
+                    search_id: i,
+                    language: lang,
+                    keywords: lang === 'zh_CN' ? `搜索${i}` : `Search${i}`
+                };
+                searchLangData.push(langData);
+            });
+        }
+        renderSearchList(searchData, searchLangData);
+    }
+
+    function renderSearchList(searchData, searchLangData) {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedSearches = searchData.slice(start, end);
+        const listContainer = document.getElementById('search-list');
+        listContainer.innerHTML = '';
+
+        paginatedSearches.forEach(search => {
+            const langEntries = searchLangData.filter(item => item.search_id === search.id);
+            langEntries.forEach(langEntry => {
+                const statusTag = search.status === 0 ? '<span class="ant-tag ant-tag-blue">待审核</span>' :
+                    search.status === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' :
+                        '<span class="ant-tag ant-tag-red">已拒绝</span>';
+                const searchTypeText = search.search_type === 0 ? '商品' : search.search_type === 1 ? '店铺' : '需求';
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'task-item';
+                itemDiv.style = `border-bottom: 1px solid #ddd;`;
+                itemDiv.innerHTML = `
+                    <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${langEntry.id}"></div>
+                    <div class="col-id">${search.id}</div>
+                    <div class="col-language">${langEntry.language}</div>
+                    <div class="col-keywords">${langEntry.keywords}</div>
+                    <div class="col-status">${statusTag}</div>
+                    <div class="col-brand-id">${search.brand_id}</div>
+                    <div class="col-search-type">${searchTypeText}</div>
+                    <div class="col-sort-index">${search.sort_index}</div>
+                    <div class="col-search-count">${search.search_count}</div>
+                    <div class="col-create-time">${moment.unix(search.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div class="col-update-time">${moment.unix(search.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div class="col-actions">
+                        <button class="ant-btn" onclick="editSearch('${langEntry.id}')">编辑</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteSearch('${langEntry.id}')">删除</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+        });
+
+        const totalPages = Math.ceil(searchData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const brandId = document.getElementById('brandIdFilter').value;
+        const language = document.getElementById('languageFilter').value;
+        const keywords = document.getElementById('keywordsFilter').value.toLowerCase();
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredSearches = searchData;
+        let filteredLangs = searchLangData;
+
+        if (brandId) filteredSearches = filteredSearches.filter(item => item.brand_id === parseInt(brandId));
+        if (startDate) filteredSearches = filteredSearches.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredSearches = filteredSearches.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+        if (language) filteredLangs = filteredLangs.filter(item => item.language === language);
+        if (keywords) filteredLangs = filteredLangs.filter(item => item.keywords.toLowerCase().includes(keywords));
+
+        const searchIds = new Set(filteredSearches.map(search => search.id));
+        const finalLangs = filteredLangs.filter(lang => searchIds.has(lang.search_id));
+
+        page = 1;
+        renderSearchList(filteredSearches, finalLangs);
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(searchData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        applyFilters();
+    }
+
+    function jumpToPage() {
+        const pageNum = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(searchData.length / perPage);
+        if (pageNum >= 1 && pageNum <= totalPages) {
+            page = pageNum;
+            applyFilters();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        applyFilters();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAllRab('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    let isEditing = false;
+    let editId = null;
+
+    function addSearch() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加搜索';
+        document.getElementById('modalSearchId').value = '';
+        document.getElementById('modalSearchType').value = '0';
+        document.getElementById('modalBrandId').value = '';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalSortIndex').value = '0';
+        document.getElementById('modalSearchCount').value = '0';
+        document.getElementById('modalCreateTime').value = moment().format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalCreateTime').disabled = true;
+        document.getElementById('modalUpdateTime').value = moment().format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalUpdateTime').disabled = true;
+        document.getElementById('modalLanguage').value = 'zh_CN';
+        document.getElementById('modalLanguage').disabled = false;
+        document.getElementById('modalKeywords').value = '';
+        setupTabs();
+        document.getElementById('searchModal').style.display = 'block';
+    }
+
+    function editSearch(langId) {
+        isEditing = true;
+        editId = langId;
+        const langEntry = searchLangData.find(item => item.id === parseInt(langId));
+        const search = searchData.find(item => item.id === langEntry.search_id);
+        document.getElementById('modalTitle').textContent = '编辑搜索';
+        document.getElementById('modalSearchId').value = search.id;
+        document.getElementById('modalSearchType').value = search.search_type;
+        document.getElementById('modalBrandId').value = search.brand_id;
+        document.getElementById('modalStatus').value = search.status;
+        document.getElementById('modalSortIndex').value = search.sort_index;
+        document.getElementById('modalSearchCount').value = search.search_count;
+        document.getElementById('modalCreateTime').value = moment.unix(search.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalCreateTime').disabled = true;
+        document.getElementById('modalUpdateTime').value = moment.unix(search.update_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalUpdateTime').disabled = true;
+        document.getElementById('modalLanguage').value = langEntry.language;
+        document.getElementById('modalLanguage').disabled = true;
+        document.getElementById('modalKeywords').value = langEntry.keywords;
+        setupTabs();
+        document.getElementById('searchModal').style.display = 'block';
+    }
+
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#searchModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#searchModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#searchModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#searchModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
+
+    function saveSearch() {
+        const lang = document.getElementById('modalLanguage').value;
+        const searchId = isEditing ? parseInt(document.getElementById('modalSearchId').value) : searchData.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+        const langId = isEditing ? editId : searchLangData.length + 1;
+
+        let search = searchData.find(item => item.id === searchId);
+        if (!search) {
+            search = {
+                id: searchId,
+                search_type: parseInt(document.getElementById('modalSearchType').value),
+                brand_id: parseInt(document.getElementById('modalBrandId').value) || 0,
+                status: parseInt(document.getElementById('modalStatus').value),
+                sort_index: parseInt(document.getElementById('modalSortIndex').value) || 0,
+                search_count: parseInt(document.getElementById('modalSearchCount').value) || 0,
+                create_time: moment().unix(),
+                update_time: moment().unix()
+            };
+            searchData.push(search);
+        } else {
+            search.search_type = parseInt(document.getElementById('modalSearchType').value);
+            search.brand_id = parseInt(document.getElementById('modalBrandId').value) || 0;
+            search.status = parseInt(document.getElementById('modalStatus').value);
+            search.sort_index = parseInt(document.getElementById('modalSortIndex').value) || 0;
+            search.search_count = parseInt(document.getElementById('modalSearchCount').value) || 0;
+            search.update_time = moment().unix();
+        }
+
+        let langEntry = searchLangData.find(item => item.id === parseInt(langId));
+        if (!langEntry) {
+            langEntry = {
+                id: langId,
+                search_id: searchId,
+                language: lang,
+                keywords: document.getElementById('modalKeywords').value
+            };
+            searchLangData.push(langEntry);
+        } else {
+            langEntry.keywords = document.getElementById('modalKeywords').value;
+        }
+
+        closeModal();
+        applyFilters();
+    }
+
+    function deleteSearch(langId) {
+        if (confirm('确定要删除此搜索记录吗？')) {
+            const langEntry = searchLangData.find(item => item.id === parseInt(langId));
+            if (langEntry) {
+                searchLangData = searchLangData.filter(item => item.id !== parseInt(langId));
+                const remainingLangs = searchLangData.filter(item => item.search_id === langEntry.search_id);
+                if (remainingLangs.length === 0) {
+                    searchData = searchData.filter(item => item.id !== langEntry.search_id);
+                }
+            }
+            applyFilters();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的搜索');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个搜索记录吗？`)) {
+            const searchIdsToDelete = new Set();
+            selectedIds.forEach(langId => {
+                const langEntry = searchLangData.find(item => item.id === parseInt(langId));
+                if (langEntry) {
+                    searchIdsToDelete.add(langEntry.search_id);
+                    searchLangData = searchLangData.filter(item => item.id !== parseInt(langId));
+                }
+            });
+            searchData = searchData.filter(item => !searchIdsToDelete.has(item.id));
+            applyFilters();
+        }
+    }
+
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的搜索');
+            return;
+        }
+        document.getElementById('selectedIdsStatus').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        const searchIds = new Set();
+        selectedIds.forEach(langId => {
+            const langEntry = searchLangData.find(item => item.id === parseInt(langId));
+            if (langEntry) searchIds.add(langEntry.search_id);
+        });
+        searchData = searchData.map(item => searchIds.has(item.id) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
+        closeStatusModal();
+        applyFilters();
+    }
+
+    function batchEditBrandId() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改品牌的搜索');
+            return;
+        }
+        document.getElementById('selectedIdsBrandId').value = selectedIds.join(', ');
+        document.getElementById('brandIdModal').style.display = 'block';
+    }
+
+    function saveBatchBrandId() {
+        const newBrandId = parseInt(document.getElementById('newBrandId').value);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        const searchIds = new Set();
+        selectedIds.forEach(langId => {
+            const langEntry = searchLangData.find(item => item.id === parseInt(langId));
+            if (langEntry) searchIds.add(langEntry.search_id);
+        });
+        searchData = searchData.map(item => searchIds.has(item.id) ? { ...item, brand_id: newBrandId, update_time: moment().unix() } : item);
+        closeBrandIdModal();
+        applyFilters();
+    }
+
+    function closeModal() {
+        document.getElementById('searchModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    function closeBrandIdModal() {
+        document.getElementById('brandIdModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            fetchSearchData();
+        });
+    };
+</script>
+</body>
+</html>

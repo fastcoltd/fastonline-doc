@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 用户博客管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-user-id { width: 10%; min-width: 100px; }
+        .col-store-id { width: 10%; min-width: 100px; }
+        .col-author-name { width: 10%; min-width: 100px; }
+        .col-blog-status { width: 8%; min-width: 80px; }
+        .col-blog-url { width: 12%; min-width: 120px; }
+        .col-read-count { width: 8%; min-width: 80px; }
+        .col-posts-count { width: 8%; min-width: 80px; }
+        .col-money-amount { width: 10%; min-width: 100px; }
+        .col-create-time { width: 10%; min-width: 100px; }
+        .col-update-time { width: 10%; min-width: 100px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .ant-tabs-content { min-height: 400px; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">用户博客管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="userIdFilter" class="ant-select">
+                                        <option value="">全部用户</option>
+                                    </select>
+                                    <select id="storeIdFilter" class="ant-select">
+                                        <option value="">全部店铺</option>
+                                    </select>
+                                    <input type="text" id="authorNameFilter" class="ant-input" placeholder="作者姓名">
+                                    <select id="blogStatusFilter" class="ant-select">
+                                        <option value="">全部状态</option>
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                    <input type="text" id="blogUrlFilter" class="ant-input" placeholder="博客URL">
+                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addUserBlog()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-user-id">用户</div>
+                                        <div class="col-store-id">店铺</div>
+                                        <div class="col-author-name">作者姓名</div>
+                                        <div class="col-blog-status">状态</div>
+                                        <div class="col-blog-url">博客URL</div>
+                                        <div class="col-read-count">阅读数</div>
+                                        <div class="col-posts-count">文章数</div>
+                                        <div class="col-money-amount">收入金额</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-update-time">更新时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="user-blog-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="userBlogModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加用户博客</h3>
+            <form id="userBlogForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="seo">
+                                    <span class="ant-tabs-tab-btn">SEO信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="content">
+                                    <span class="ant-tabs-tab-btn">内容信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>用户ID:</label>
+                                    <select id="modalUserId">
+                                        <option value="0">请选择用户</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>店铺ID:</label>
+                                    <select id="modalStoreId">
+                                        <option value="0">请选择店铺</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>作者姓名:</label>
+                                    <input type="text" id="modalAuthorName" maxlength="32">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>博客状态:</label>
+                                    <select id="modalBlogStatus">
+                                        <option value="0">关闭</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>博客URL:</label>
+                                    <input type="text" id="modalBlogUrl" maxlength="32">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>阅读数:</label>
+                                    <input type="number" id="modalReadCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>评分数:</label>
+                                    <input type="number" id="modalRatingCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>收藏数:</label>
+                                    <input type="number" id="modalSaveCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>付费数:</label>
+                                    <input type="number" id="modalPaidCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>文章数:</label>
+                                    <input type="number" id="modalPostsCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>风险文章数:</label>
+                                    <input type="number" id="modalRiskPostCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>付费文章数:</label>
+                                    <input type="number" id="modalMoneyPostsCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>评论数:</label>
+                                    <input type="number" id="modalCommentCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>收入金额:</label>
+                                    <input type="number" id="modalMoneyAmount" step="0.01" min="0">
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="seo" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>SEO关键词:</label>
+                                    <input type="text" id="modalSeoKeywords" maxlength="128">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>SEO描述:</label>
+                                    <input type="text" id="modalSeoDescription" maxlength="256">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>博客摘要:</label>
+                                    <input type="text" id="modalBlogSummary" maxlength="512">
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="content" style="display: none;">
+                                <div class="ant-form-item textarea-item">
+                                    <label>博客信息:</label>
+                                    <textarea id="modalBlogInfo" rows="5"></textarea>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>网站回复:</label>
+                                    <textarea id="modalSiteReply" rows="5"></textarea>
+                                </div>
+                                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                                <div class="ant-form-item" id="updateTimeField" style="display: none;">
+                                    <label>更新时间:</label>
+                                    <input type="datetime-local" id="modalUpdateTime" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveUserBlog()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">关闭</option>
+                        <option value="1">启用</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let userBlogData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        user_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `用户 ${i + 1}` })),
+        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const userSelect = document.getElementById('modalUserId');
+        const userFilter = document.getElementById('userIdFilter');
+        const storeSelect = document.getElementById('modalStoreId');
+        const storeFilter = document.getElementById('storeIdFilter');
+        relationMap.user_id.forEach(item => {
+            userSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            userFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.store_id.forEach(item => {
+            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        userBlogData = [];
+        for (let i = 1; i <= 200; i++) {
+            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            const updateTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
+            userBlogData.push({
+                id: i,
+                user_id: Math.floor(Math.random() * 15) + 1,
+                store_id: Math.floor(Math.random() * 15) + 1,
+                author_name: `Author${i}`,
+                blog_status: Math.floor(Math.random() * 2),
+                blog_url: `blog${i}.com`,
+                read_count: Math.floor(Math.random() * 1000),
+                rating_count: Math.floor(Math.random() * 100),
+                save_count: Math.floor(Math.random() * 200),
+                paid_count: Math.floor(Math.random() * 50),
+                posts_count: Math.floor(Math.random() * 20),
+                risk_post_count: Math.floor(Math.random() * 5),
+                money_posts_count: Math.floor(Math.random() * 10),
+                comment_count: Math.floor(Math.random() * 300),
+                money_amount: (Math.random() * 1000).toFixed(2),
+                seo_keywords: `keyword${i}, blog${i}`,
+                seo_description: `Description for blog ${i}`,
+                blog_summary: `Summary for blog ${i}`,
+                blog_info: `Detailed blog info ${i}`,
+                create_time: createTime,
+                update_time: updateTime,
+                site_reply: i % 2 === 0 ? `Site reply for blog ${i}` : ''
+            });
+        }
+        renderUserBlogList();
+    }
+
+    // 渲染列表
+    function renderUserBlogList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = userBlogData.slice(start, end);
+        const listContainer = document.getElementById('user-blog-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(blog => {
+            const statusTag = blog.blog_status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
+                '<span class="ant-tag ant-tag-green">启用</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${blog.id}"></div>
+                <div class="col-id">${blog.id}</div>
+                <div class="col-user-id">${getRelationName('user_id', blog.user_id)}</div>
+                <div class="col-store-id">${getRelationName('store_id', blog.store_id)}</div>
+                <div class="col-author-name">${blog.author_name}</div>
+                <div class="col-blog-status">${statusTag}</div>
+                <div class="col-blog-url">${blog.blog_url}</div>
+                <div class="col-read-count">${blog.read_count}</div>
+                <div class="col-posts-count">${blog.posts_count}</div>
+                <div class="col-money-amount">${blog.money_amount}</div>
+                <div class="col-create-time">${moment.unix(blog.create_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-update-time">${moment.unix(blog.update_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editUserBlog(${blog.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteUserBlog(${blog.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(userBlogData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...userBlogData];
+        const userId = document.getElementById('userIdFilter').value;
+        const storeId = document.getElementById('storeIdFilter').value;
+        const authorName = document.getElementById('authorNameFilter').value.toLowerCase();
+        const blogStatus = document.getElementById('blogStatusFilter').value;
+        const blogUrl = document.getElementById('blogUrlFilter').value.toLowerCase();
+        const createTimeStart = document.getElementById('createTimeStartFilter').value;
+        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+
+        if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
+        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
+        if (authorName) filteredData = filteredData.filter(item => item.author_name.toLowerCase().includes(authorName));
+        if (blogStatus) filteredData = filteredData.filter(item => item.blog_status === parseInt(blogStatus));
+        if (blogUrl) filteredData = filteredData.filter(item => item.blog_url.toLowerCase().includes(blogUrl));
+        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
+        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+
+        userBlogData = filteredData;
+        page = 1;
+        renderUserBlogList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(userBlogData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderUserBlogList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(userBlogData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderUserBlogList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderUserBlogList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addUserBlog() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加用户博客';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalUserId').value = '0';
+        document.getElementById('modalStoreId').value = '0';
+        document.getElementById('modalAuthorName').value = '';
+        document.getElementById('modalBlogStatus').value = '0';
+        document.getElementById('modalBlogUrl').value = '';
+        document.getElementById('modalReadCount').value = '0';
+        document.getElementById('modalRatingCount').value = '0';
+        document.getElementById('modalSaveCount').value = '0';
+        document.getElementById('modalPaidCount').value = '0';
+        document.getElementById('modalPostsCount').value = '0';
+        document.getElementById('modalRiskPostCount').value = '0';
+        document.getElementById('modalMoneyPostsCount').value = '0';
+        document.getElementById('modalCommentCount').value = '0';
+        document.getElementById('modalMoneyAmount').value = '0.00';
+        document.getElementById('modalSeoKeywords').value = '';
+        document.getElementById('modalSeoDescription').value = '';
+        document.getElementById('modalBlogSummary').value = '';
+        document.getElementById('modalBlogInfo').value = '';
+        document.getElementById('modalSiteReply').value = '';
+        document.getElementById('createTimeField').style.display = 'none';
+        document.getElementById('updateTimeField').style.display = 'none';
+        setupTabs();
+        document.getElementById('userBlogModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editUserBlog(id) {
+        isEditing = true;
+        editId = id;
+        const blog = userBlogData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑用户博客';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = blog.id;
+        document.getElementById('modalUserId').value = blog.user_id;
+        document.getElementById('modalStoreId').value = blog.store_id;
+        document.getElementById('modalAuthorName').value = blog.author_name;
+        document.getElementById('modalBlogStatus').value = blog.blog_status;
+        document.getElementById('modalBlogUrl').value = blog.blog_url;
+        document.getElementById('modalReadCount').value = blog.read_count;
+        document.getElementById('modalRatingCount').value = blog.rating_count;
+        document.getElementById('modalSaveCount').value = blog.save_count;
+        document.getElementById('modalPaidCount').value = blog.paid_count;
+        document.getElementById('modalPostsCount').value = blog.posts_count;
+        document.getElementById('modalRiskPostCount').value = blog.risk_post_count;
+        document.getElementById('modalMoneyPostsCount').value = blog.money_posts_count;
+        document.getElementById('modalCommentCount').value = blog.comment_count;
+        document.getElementById('modalMoneyAmount').value = blog.money_amount;
+        document.getElementById('modalSeoKeywords').value = blog.seo_keywords;
+        document.getElementById('modalSeoDescription').value = blog.seo_description;
+        document.getElementById('modalBlogSummary').value = blog.blog_summary;
+        document.getElementById('modalBlogInfo').value = blog.blog_info;
+        document.getElementById('modalSiteReply').value = blog.site_reply || '';
+        document.getElementById('createTimeField').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment.unix(blog.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('updateTimeField').style.display = 'block';
+        document.getElementById('modalUpdateTime').value = moment.unix(blog.update_time).format('YYYY-MM-DDTHH:mm');
+        setupTabs();
+        document.getElementById('userBlogModal').style.display = 'block';
+    }
+
+    // Tab 设置
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#userBlogModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#userBlogModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#userBlogModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#userBlogModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
+
+    // 保存
+    function saveUserBlog() {
+        const blog = {
+            id: isEditing ? editId : userBlogData.length + 1,
+            user_id: parseInt(document.getElementById('modalUserId').value) || 0,
+            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
+            author_name: document.getElementById('modalAuthorName').value,
+            blog_status: parseInt(document.getElementById('modalBlogStatus').value),
+            blog_url: document.getElementById('modalBlogUrl').value,
+            read_count: parseInt(document.getElementById('modalReadCount').value) || 0,
+            rating_count: parseInt(document.getElementById('modalRatingCount').value) || 0,
+            save_count: parseInt(document.getElementById('modalSaveCount').value) || 0,
+            paid_count: parseInt(document.getElementById('modalPaidCount').value) || 0,
+            posts_count: parseInt(document.getElementById('modalPostsCount').value) || 0,
+            risk_post_count: parseInt(document.getElementById('modalRiskPostCount').value) || 0,
+            money_posts_count: parseInt(document.getElementById('modalMoneyPostsCount').value) || 0,
+            comment_count: parseInt(document.getElementById('modalCommentCount').value) || 0,
+            money_amount: parseFloat(document.getElementById('modalMoneyAmount').value) || 0,
+            seo_keywords: document.getElementById('modalSeoKeywords').value,
+            seo_description: document.getElementById('modalSeoDescription').value,
+            blog_summary: document.getElementById('modalBlogSummary').value,
+            blog_info: document.getElementById('modalBlogInfo').value,
+            create_time: isEditing ? userBlogData.find(item => item.id === editId).create_time : moment().unix(),
+            update_time: isEditing ? moment().unix() : moment().unix(),
+            site_reply: document.getElementById('modalSiteReply').value || null
+        };
+
+        if (isEditing) {
+            const index = userBlogData.findIndex(item => item.id === editId);
+            userBlogData[index] = blog;
+        } else {
+            userBlogData.push(blog);
+        }
+        closeModal();
+        renderUserBlogList();
+    }
+
+    // 删除
+    function deleteUserBlog(id) {
+        if (confirm('确定要删除此用户博客吗？')) {
+            userBlogData = userBlogData.filter(item => item.id !== id);
+            renderUserBlogList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的用户博客');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个用户博客吗？`)) {
+            userBlogData = userBlogData.filter(item => !selectedIds.includes(item.id));
+            renderUserBlogList();
+        }
+    }
+
+    // 批量修改状态
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的用户博客');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
+        userBlogData = userBlogData.map(item => selectedIds.includes(item.id) ? { ...item, blog_status: newStatus, update_time: moment().unix() } : item);
+        closeStatusModal();
+        renderUserBlogList();
+    }
+
+    function closeModal() {
+        document.getElementById('userBlogModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

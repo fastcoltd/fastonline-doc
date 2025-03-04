@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 订单各项评分管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 20%; min-width: 60px; }
+        .col-orders-comment-id { width: 20%; min-width: 100px; }
+        .col-rating-id { width: 20%; min-width: 100px; }
+        .col-score { width: 15%; min-width: 80px; }
+        .col-actions { width: 20%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">订单各项评分管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="ordersCommentIdFilter" class="ant-select">
+                                        <option value="">全部订单评论</option>
+                                    </select>
+                                    <select id="ratingIdFilter" class="ant-select">
+                                        <option value="">全部评分项</option>
+                                    </select>
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addOrdersCommentRating()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-orders-comment-id">订单评论</div>
+                                        <div class="col-rating-id">评分项</div>
+                                        <div class="col-score">分数</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="orders-comment-rating-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="ordersCommentRatingModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加订单各项评分</h3>
+            <form id="ordersCommentRatingForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>订单评论ID:</label>
+                    <select id="modalOrdersCommentId">
+                        <option value="0">请选择订单评论</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>评分项ID:</label>
+                    <select id="modalRatingId">
+                        <option value="0">请选择评分项</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>分数:</label>
+                    <input type="number" id="modalScore" min="0" max="5">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveOrdersCommentRating()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let ordersCommentRatingData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        orders_comment_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `订单评论 ${i + 1}` })),
+        rating_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `评分项 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const commentSelect = document.getElementById('modalOrdersCommentId');
+        const commentFilter = document.getElementById('ordersCommentIdFilter');
+        const ratingSelect = document.getElementById('modalRatingId');
+        const ratingFilter = document.getElementById('ratingIdFilter');
+
+        relationMap.orders_comment_id.forEach(item => {
+            commentSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            commentFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.rating_id.forEach(item => {
+            ratingSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            ratingFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        ordersCommentRatingData = [];
+        for (let i = 1; i <= 200; i++) {
+            ordersCommentRatingData.push({
+                id: i,
+                orders_comment_id: Math.floor(Math.random() * 15) + 1,
+                rating_id: Math.floor(Math.random() * 15) + 1,
+                score: Math.floor(Math.random() * 6) // 0-5 分
+            });
+        }
+        renderOrdersCommentRatingList();
+    }
+
+    // 渲染列表
+    function renderOrdersCommentRatingList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = ordersCommentRatingData.slice(start, end);
+        const listContainer = document.getElementById('orders-comment-rating-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(rating => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${rating.id}"></div>
+                <div class="col-id">${rating.id}</div>
+                <div class="col-orders-comment-id">${getRelationName('orders_comment_id', rating.orders_comment_id)}</div>
+                <div class="col-rating-id">${getRelationName('rating_id', rating.rating_id)}</div>
+                <div class="col-score">${rating.score}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editOrdersCommentRating(${rating.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteOrdersCommentRating(${rating.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(ordersCommentRatingData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...ordersCommentRatingData];
+        const ordersCommentId = document.getElementById('ordersCommentIdFilter').value;
+        const ratingId = document.getElementById('ratingIdFilter').value;
+
+        if (ordersCommentId) filteredData = filteredData.filter(item => item.orders_comment_id === parseInt(ordersCommentId));
+        if (ratingId) filteredData = filteredData.filter(item => item.rating_id === parseInt(ratingId));
+
+        ordersCommentRatingData = filteredData;
+        page = 1;
+        renderOrdersCommentRatingList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(ordersCommentRatingData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderOrdersCommentRatingList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(ordersCommentRatingData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderOrdersCommentRatingList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderOrdersCommentRatingList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addOrdersCommentRating() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加订单各项评分';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalOrdersCommentId').value = '0';
+        document.getElementById('modalRatingId').value = '0';
+        document.getElementById('modalScore').value = '5';
+        document.getElementById('ordersCommentRatingModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editOrdersCommentRating(id) {
+        isEditing = true;
+        editId = id;
+        const rating = ordersCommentRatingData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑订单各项评分';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = rating.id;
+        document.getElementById('modalOrdersCommentId').value = rating.orders_comment_id;
+        document.getElementById('modalRatingId').value = rating.rating_id;
+        document.getElementById('modalScore').value = rating.score;
+        document.getElementById('ordersCommentRatingModal').style.display = 'block';
+    }
+
+    // 保存
+    function saveOrdersCommentRating() {
+        const rating = {
+            id: isEditing ? editId : ordersCommentRatingData.length + 1,
+            orders_comment_id: parseInt(document.getElementById('modalOrdersCommentId').value) || 0,
+            rating_id: parseInt(document.getElementById('modalRatingId').value) || 0,
+            score: parseInt(document.getElementById('modalScore').value) || 0
+        };
+
+        if (isEditing) {
+            const index = ordersCommentRatingData.findIndex(item => item.id === editId);
+            ordersCommentRatingData[index] = rating;
+        } else {
+            ordersCommentRatingData.push(rating);
+        }
+        closeModal();
+        renderOrdersCommentRatingList();
+    }
+
+    // 删除
+    function deleteOrdersCommentRating(id) {
+        if (confirm('确定要删除此订单评分吗？')) {
+            ordersCommentRatingData = ordersCommentRatingData.filter(item => item.id !== id);
+            renderOrdersCommentRatingList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的订单评分');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个订单评分吗？`)) {
+            ordersCommentRatingData = ordersCommentRatingData.filter(item => !selectedIds.includes(item.id));
+            renderOrdersCommentRatingList();
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('ordersCommentRatingModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

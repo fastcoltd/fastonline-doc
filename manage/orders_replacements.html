@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 订单换货记录管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 15%; min-width: 60px; }
+        .col-orders-id { width: 15%; min-width: 100px; }
+        .col-store-id { width: 15%; min-width: 100px; }
+        .col-quantity { width: 10%; min-width: 80px; }
+        .col-source-type { width: 10%; min-width: 80px; }
+        .col-replacement-time { width: 15%; min-width: 120px; }
+        .col-replacement-data { width: 15%; min-width: 120px; }
+        .col-actions { width: 15%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">订单换货记录管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="ordersIdFilter" class="ant-select">
+                                        <option value="">全部订单</option>
+                                    </select>
+                                    <select id="storeIdFilter" class="ant-select">
+                                        <option value="">全部店铺</option>
+                                    </select>
+                                    <input type="datetime-local" id="replacementTimeStartFilter" class="ant-input">
+                                    <input type="datetime-local" id="replacementTimeEndFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addOrdersReplacements()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-orders-id">订单</div>
+                                        <div class="col-store-id">店铺</div>
+                                        <div class="col-quantity">换货数量</div>
+                                        <div class="col-source-type">来源类型</div>
+                                        <div class="col-replacement-time">换货时间</div>
+                                        <div class="col-replacement-data">换货数据</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="orders-replacements-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="ordersReplacementsModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加订单换货记录</h3>
+            <form id="ordersReplacementsForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>订单ID:</label>
+                    <select id="modalOrdersId">
+                        <option value="0">请选择订单</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>店铺ID:</label>
+                    <select id="modalStoreId">
+                        <option value="0">请选择店铺</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>换货数量:</label>
+                    <input type="number" id="modalQuantity" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>来源类型:</label>
+                    <select id="modalSourceType">
+                        <option value="1">库存</option>
+                        <option value="2">已发送</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>换货时间:</label>
+                    <input type="datetime-local" id="modalReplacementTime">
+                </div>
+                <div class="ant-form-item textarea-item">
+                    <label>换货数据:</label>
+                    <textarea id="modalReplacementData" rows="5"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveOrdersReplacements()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let ordersReplacementsData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        orders_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `订单 ${i + 1}` })),
+        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const ordersSelect = document.getElementById('modalOrdersId');
+        const ordersFilter = document.getElementById('ordersIdFilter');
+        const storeSelect = document.getElementById('modalStoreId');
+        const storeFilter = document.getElementById('storeIdFilter');
+
+        relationMap.orders_id.forEach(item => {
+            ordersSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            ordersFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.store_id.forEach(item => {
+            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        ordersReplacementsData = [];
+        for (let i = 1; i <= 200; i++) {
+            const replacementTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            ordersReplacementsData.push({
+                id: i,
+                orders_id: Math.floor(Math.random() * 15) + 1,
+                store_id: Math.floor(Math.random() * 15) + 1,
+                quantity: Math.floor(Math.random() * 5),
+                source_type: Math.floor(Math.random() * 2) + 1,
+                replacement_time: replacementTime,
+                replacement_data: `换货数据 ${i}`
+            });
+        }
+        renderOrdersReplacementsList();
+    }
+
+    // 渲染列表
+    function renderOrdersReplacementsList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = ordersReplacementsData.slice(start, end);
+        const listContainer = document.getElementById('orders-replacements-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(replacement => {
+            const sourceTypeTag = replacement.source_type === 1 ? '<span class="ant-tag ant-tag-blue">库存</span>' :
+                '<span class="ant-tag ant-tag-green">已发送</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${replacement.id}"></div>
+                <div class="col-id">${replacement.id}</div>
+                <div class="col-orders-id">${getRelationName('orders_id', replacement.orders_id)}</div>
+                <div class="col-store-id">${getRelationName('store_id', replacement.store_id)}</div>
+                <div class="col-quantity">${replacement.quantity}</div>
+                <div class="col-source-type">${sourceTypeTag}</div>
+                <div class="col-replacement-time">${moment.unix(replacement.replacement_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-replacement-data">${replacement.replacement_data}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editOrdersReplacements(${replacement.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteOrdersReplacements(${replacement.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(ordersReplacementsData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...ordersReplacementsData];
+        const ordersId = document.getElementById('ordersIdFilter').value;
+        const storeId = document.getElementById('storeIdFilter').value;
+        const replacementTimeStart = document.getElementById('replacementTimeStartFilter').value;
+        const replacementTimeEnd = document.getElementById('replacementTimeEndFilter').value;
+
+        if (ordersId) filteredData = filteredData.filter(item => item.orders_id === parseInt(ordersId));
+        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
+        if (replacementTimeStart) filteredData = filteredData.filter(item => moment.unix(item.replacement_time).isSameOrAfter(replacementTimeStart));
+        if (replacementTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.replacement_time).isSameOrBefore(replacementTimeEnd));
+
+        ordersReplacementsData = filteredData;
+        page = 1;
+        renderOrdersReplacementsList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(ordersReplacementsData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderOrdersReplacementsList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(ordersReplacementsData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderOrdersReplacementsList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderOrdersReplacementsList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addOrdersReplacements() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加订单换货记录';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalOrdersId').value = '0';
+        document.getElementById('modalStoreId').value = '0';
+        document.getElementById('modalQuantity').value = '0';
+        document.getElementById('modalSourceType').value = '1';
+        document.getElementById('modalReplacementTime').value = '';
+        document.getElementById('modalReplacementData').value = '';
+        document.getElementById('ordersReplacementsModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editOrdersReplacements(id) {
+        isEditing = true;
+        editId = id;
+        const replacement = ordersReplacementsData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑订单换货记录';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = replacement.id;
+        document.getElementById('modalOrdersId').value = replacement.orders_id;
+        document.getElementById('modalStoreId').value = replacement.store_id;
+        document.getElementById('modalQuantity').value = replacement.quantity;
+        document.getElementById('modalSourceType').value = replacement.source_type;
+        document.getElementById('modalReplacementTime').value = moment.unix(replacement.replacement_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalReplacementData').value = replacement.replacement_data;
+        document.getElementById('ordersReplacementsModal').style.display = 'block';
+    }
+
+    // 保存
+    function saveOrdersReplacements() {
+        const replacement = {
+            id: isEditing ? editId : ordersReplacementsData.length + 1,
+            orders_id: parseInt(document.getElementById('modalOrdersId').value) || 0,
+            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
+            quantity: parseInt(document.getElementById('modalQuantity').value) || 0,
+            source_type: parseInt(document.getElementById('modalSourceType').value),
+            replacement_time: document.getElementById('modalReplacementTime').value ? moment(document.getElementById('modalReplacementTime').value).unix() : 0,
+            replacement_data: document.getElementById('modalReplacementData').value
+        };
+
+        if (isEditing) {
+            const index = ordersReplacementsData.findIndex(item => item.id === editId);
+            ordersReplacementsData[index] = replacement;
+        } else {
+            ordersReplacementsData.push(replacement);
+        }
+        closeModal();
+        renderOrdersReplacementsList();
+    }
+
+    // 删除
+    function deleteOrdersReplacements(id) {
+        if (confirm('确定要删除此订单换货记录吗？')) {
+            ordersReplacementsData = ordersReplacementsData.filter(item => item.id !== id);
+            renderOrdersReplacementsList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的订单换货记录');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个订单换货记录吗？`)) {
+            ordersReplacementsData = ordersReplacementsData.filter(item => !selectedIds.includes(item.id));
+            renderOrdersReplacementsList();
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('ordersReplacementsModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns();
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

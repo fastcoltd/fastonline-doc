@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - FAQ 管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 7%; min-width: 60px; }
+        .col-language { width: 8%; min-width: 60px; }
+        .col-title { width: 10%; min-width: 80px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-custom-url { width: 10%; min-width: 80px; }
+        .col-manage-id { width: 8%; min-width: 60px; }
+        .col-use-type { width: 8%; min-width: 60px; }
+        .col-read-count { width: 8%; min-width: 60px; }
+        .col-useful-count { width: 8%; min-width: 60px; }
+        .col-useless-count { width: 8%; min-width: 60px; }
+        .col-create-time { width: 10%; min-width: 80px; }
+        .col-update-time { width: 10%; min-width: 80px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 100px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('faq.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">FAQ 管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <input type="number" id="manageIdFilter" class="ant-input" placeholder="管理员ID">
+                                    <input type="text" id="customUrlFilter" class="ant-input" placeholder="自定义URL">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="languageFilter">
+                                            <option value="">全部语言</option>
+                                            <option value="zh_CN">中文</option>
+                                            <option value="en_US">English</option>
+                                        </select>
+                                    </div>
+                                    <input type="text" id="titleFilter" class="ant-input" placeholder="FAQ标题">
+                                    <input type="date" id="startDate" class="ant-input">
+                                    <input type="date" id="endDate" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addFaq()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                    <button class="ant-btn" onclick="batchEditManageId()">批量修改管理员</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-language">语言</div>
+                                        <div class="col-title">标题</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-custom-url">自定义URL</div>
+                                        <div class="col-manage-id">管理员ID</div>
+                                        <div class="col-use-type">用途类型</div>
+                                        <div class="col-read-count">阅读数</div>
+                                        <div class="col-useful-count">有用数</div>
+                                        <div class="col-useless-count">无用数</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-update-time">更新时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="faq-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20">20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="faqModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加FAQ</h3>
+            <form id="faqForm">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="lang">
+                                    <span class="ant-tabs-tab-btn">多语言信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>ID (自动生成):</label>
+                                    <input type="text" id="modalFaqId" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>用途类型:</label>
+                                    <input type="number" id="modalUseType">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>管理员ID:</label>
+                                    <input type="number" id="modalManageId">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalStatus">
+                                        <option value="0">待审核</option>
+                                        <option value="1">已通过</option>
+                                        <option value="2">已拒绝</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>自定义URL:</label>
+                                    <input type="text" id="modalCustomUrl">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>阅读数:</label>
+                                    <input type="number" id="modalReadCount">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>有用数:</label>
+                                    <input type="number" id="modalUsefulCount">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>无用数:</label>
+                                    <input type="number" id="modalUselessCount">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>更新时间:</label>
+                                    <input type="datetime-local" id="modalUpdateTime" disabled>
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>语言:</label>
+                                    <select id="modalLanguage">
+                                        <option value="zh_CN">中文</option>
+                                        <option value="en_US">English</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>SEO关键词:</label>
+                                    <input type="text" id="modalSeoKeywords">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>SEO描述:</label>
+                                    <input type="text" id="modalSeoDescription">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>自定义URL:</label>
+                                    <input type="text" id="modalLangCustomUrl">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>标题:</label>
+                                    <input type="text" id="modalTitle">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>封面图:</label>
+                                    <input type="text" id="modalCoverPic">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>概要:</label>
+                                    <input type="text" id="modalSummary">
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>内容:</label>
+                                    <textarea id="modalContent" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveFaq()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中ID:</label>
+                    <input type="text" id="selectedIdsStatus" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">待审核</option>
+                        <option value="1">已通过</option>
+                        <option value="2">已拒绝</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改管理员弹窗 -->
+    <div id="manageIdModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeManageIdModal()">×</button>
+            <h3>批量修改管理员</h3>
+            <form id="manageIdForm">
+                <div class="ant-form-item">
+                    <label>选中ID:</label>
+                    <input type="text" id="selectedIdsManageId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新管理员ID:</label>
+                    <input type="number" id="newManageId">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeManageIdModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchManageId()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let faqData = [];
+    let faqLangData = [];
+    let page = 1, perPage = 10;
+
+    function fetchFaqData() {
+        faqData = [];
+        faqLangData = [];
+        const languages = ['zh_CN', 'en_US'];
+        for (let i = 1; i <= 200; i++) {
+            const status = Math.floor(Math.random() * 3);
+            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
+            const updateTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
+            const faq = {
+                id: i,
+                use_type: Math.floor(Math.random() * 10),
+                manage_id: Math.floor(Math.random() * 100),
+                status,
+                custom_url: `faq-${i}`,
+                read_count: Math.floor(Math.random() * 1000),
+                useful_count: Math.floor(Math.random() * 500),
+                useless_count: Math.floor(Math.random() * 200),
+                create_time: createTime,
+                update_time: updateTime
+            };
+            faqData.push(faq);
+
+            languages.forEach(lang => {
+                const langData = {
+                    id: faqData.length * 2 + (lang === 'zh_CN' ? 0 : 1),
+                    faq_id: i,
+                    language: lang,
+                    seo_keywords: lang === 'zh_CN' ? `FAQ${i},关键词${i}` : `FAQ${i},Keyword${i}`,
+                    seo_description: lang === 'zh_CN' ? `FAQ${i}的SEO描述` : `SEO description for FAQ ${i}`,
+                    custom_url: `faq-lang-${i}-${lang}`,
+                    title: lang === 'zh_CN' ? `FAQ ${i}` : `FAQ ${i}`,
+                    cover_pic: `https://example.com/cover/faq${i}.png`,
+                    summary: lang === 'zh_CN' ? `FAQ ${i} 的概要` : `Summary for FAQ ${i}`,
+                    content: lang === 'zh_CN' ? `FAQ ${i} 的详细内容` : `Detailed content for FAQ ${i}`
+                };
+                faqLangData.push(langData);
+            });
+        }
+        renderFaqList(faqData, faqLangData);
+    }
+
+    function renderFaqList(faqData, faqLangData) {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedFaqs = faqData.slice(start, end);
+        const listContainer = document.getElementById('faq-list');
+        listContainer.innerHTML = '';
+
+        paginatedFaqs.forEach(faq => {
+            const langEntries = faqLangData.filter(item => item.faq_id === faq.id);
+            langEntries.forEach(langEntry => {
+                const statusTag = faq.status === 0 ? '<span class="ant-tag ant-tag-blue">待审核</span>' :
+                    faq.status === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' :
+                        '<span class="ant-tag ant-tag-red">已拒绝</span>';
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'task-item';
+                itemDiv.style = `border-bottom: 1px solid #ddd;`;
+                itemDiv.innerHTML = `
+                    <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${langEntry.id}"></div>
+                    <div class="col-id">${faq.id}</div>
+                    <div class="col-language">${langEntry.language}</div>
+                    <div class="col-title">${langEntry.title}</div>
+                    <div class="col-status">${statusTag}</div>
+                    <div class="col-custom-url">${faq.custom_url}</div>
+                    <div class="col-manage-id">${faq.manage_id}</div>
+                    <div class="col-use-type">${faq.use_type}</div>
+                    <div class="col-read-count">${faq.read_count}</div>
+                    <div class="col-useful-count">${faq.useful_count}</div>
+                    <div class="col-useless-count">${faq.useless_count}</div>
+                    <div class="col-create-time">${moment.unix(faq.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div class="col-update-time">${moment.unix(faq.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div class="col-actions">
+                        <button class="ant-btn" onclick="editFaq('${langEntry.id}')">编辑</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteFaq('${langEntry.id}')">删除</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+        });
+
+        const totalPages = Math.ceil(faqData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const manageId = document.getElementById('manageIdFilter').value;
+        const customUrl = document.getElementById('customUrlFilter').value.toLowerCase();
+        const language = document.getElementById('languageFilter').value;
+        const title = document.getElementById('titleFilter').value.toLowerCase();
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredFaqs = faqData;
+        let filteredLangs = faqLangData;
+
+        if (manageId) filteredFaqs = filteredFaqs.filter(item => item.manage_id === parseInt(manageId));
+        if (customUrl) filteredFaqs = filteredFaqs.filter(item => item.custom_url.toLowerCase().includes(customUrl));
+        if (startDate) filteredFaqs = filteredFaqs.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredFaqs = filteredFaqs.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+        if (language) filteredLangs = filteredLangs.filter(item => item.language === language);
+        if (title) filteredLangs = filteredLangs.filter(item => item.title.toLowerCase().includes(title));
+
+        const faqIds = new Set(filteredFaqs.map(faq => faq.id));
+        const finalLangs = filteredLangs.filter(lang => faqIds.has(lang.faq_id));
+
+        page = 1;
+        renderFaqList(filteredFaqs, finalLangs);
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(faqData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        applyFilters();
+    }
+
+    function jumpToPage() {
+        const pageNum = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(faqData.length / perPage);
+        if (pageNum >= 1 && pageNum <= totalPages) {
+            page = pageNum;
+            applyFilters();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        applyFilters();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    let isEditing = false;
+    let editId = null;
+
+    function addFaq() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加FAQ';
+        document.getElementById('modalFaqId').value = '';
+        document.getElementById('modalUseType').value = '';
+        document.getElementById('modalManageId').value = '';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalCustomUrl').value = '';
+        document.getElementById('modalReadCount').value = '0';
+        document.getElementById('modalUsefulCount').value = '0';
+        document.getElementById('modalUselessCount').value = '0';
+        document.getElementById('modalCreateTime').value = moment().format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalCreateTime').disabled = true;
+        document.getElementById('modalUpdateTime').value = moment().format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalUpdateTime').disabled = true;
+        document.getElementById('modalLanguage').value = 'zh_CN';
+        document.getElementById('modalLanguage').disabled = false;
+        document.getElementById('modalSeoKeywords').value = '';
+        document.getElementById('modalSeoDescription').value = '';
+        document.getElementById('modalLangCustomUrl').value = '';
+        document.getElementById('modalTitle').value = '';
+        document.getElementById('modalCoverPic').value = '';
+        document.getElementById('modalSummary').value = '';
+        document.getElementById('modalContent').value = '';
+        setupTabs();
+        document.getElementById('faqModal').style.display = 'block';
+    }
+
+    function editFaq(langId) {
+        isEditing = true;
+        editId = langId;
+        const langEntry = faqLangData.find(item => item.id === parseInt(langId));
+        const faq = faqData.find(item => item.id === langEntry.faq_id);
+        document.getElementById('modalTitle').textContent = '编辑FAQ';
+        document.getElementById('modalFaqId').value = faq.id;
+        document.getElementById('modalUseType').value = faq.use_type;
+        document.getElementById('modalManageId').value = faq.manage_id;
+        document.getElementById('modalStatus').value = faq.status;
+        document.getElementById('modalCustomUrl').value = faq.custom_url;
+        document.getElementById('modalReadCount').value = faq.read_count;
+        document.getElementById('modalUsefulCount').value = faq.useful_count;
+        document.getElementById('modalUselessCount').value = faq.useless_count;
+        document.getElementById('modalCreateTime').value = moment.unix(faq.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalCreateTime').disabled = true;
+        document.getElementById('modalUpdateTime').value = moment.unix(faq.update_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalUpdateTime').disabled = true;
+        document.getElementById('modalLanguage').value = langEntry.language;
+        document.getElementById('modalLanguage').disabled = true;
+        document.getElementById('modalSeoKeywords').value = langEntry.seo_keywords;
+        document.getElementById('modalSeoDescription').value = langEntry.seo_description;
+        document.getElementById('modalLangCustomUrl').value = langEntry.custom_url;
+        document.getElementById('modalTitle').value = langEntry.title;
+        document.getElementById('modalCoverPic').value = langEntry.cover_pic;
+        document.getElementById('modalSummary').value = langEntry.summary;
+        document.getElementById('modalContent').value = langEntry.content;
+        setupTabs();
+        document.getElementById('faqModal').style.display = 'block';
+    }
+
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#faqModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#faqModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#faqModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#faqModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
+
+    function saveFaq() {
+        const lang = document.getElementById('modalLanguage').value;
+        const faqId = isEditing ? parseInt(document.getElementById('modalFaqId').value) : faqData.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+        const langId = isEditing ? editId : faqLangData.length + 1;
+
+        let faq = faqData.find(item => item.id === faqId);
+        if (!faq) {
+            faq = {
+                id: faqId,
+                use_type: parseInt(document.getElementById('modalUseType').value) || 0,
+                manage_id: parseInt(document.getElementById('modalManageId').value) || 0,
+                status: parseInt(document.getElementById('modalStatus').value),
+                custom_url: document.getElementById('modalCustomUrl').value,
+                read_count: parseInt(document.getElementById('modalReadCount').value) || 0,
+                useful_count: parseInt(document.getElementById('modalUsefulCount').value) || 0,
+                useless_count: parseInt(document.getElementById('modalUselessCount').value) || 0,
+                create_time: moment().unix(),
+                update_time: moment().unix()
+            };
+            faqData.push(faq);
+        } else {
+            faq.use_type = parseInt(document.getElementById('modalUseType').value) || 0;
+            faq.manage_id = parseInt(document.getElementById('modalManageId').value) || 0;
+            faq.status = parseInt(document.getElementById('modalStatus').value);
+            faq.custom_url = document.getElementById('modalCustomUrl').value;
+            faq.read_count = parseInt(document.getElementById('modalReadCount').value) || 0;
+            faq.useful_count = parseInt(document.getElementById('modalUsefulCount').value) || 0;
+            faq.useless_count = parseInt(document.getElementById('modalUselessCount').value) || 0;
+            faq.update_time = moment().unix();
+        }
+
+        let langEntry = faqLangData.find(item => item.id === parseInt(langId));
+        if (!langEntry) {
+            langEntry = {
+                id: langId,
+                faq_id: faqId,
+                language: lang,
+                seo_keywords: document.getElementById('modalSeoKeywords').value,
+                seo_description: document.getElementById('modalSeoDescription').value,
+                custom_url: document.getElementById('modalLangCustomUrl').value,
+                title: document.getElementById('modalTitle').value,
+                cover_pic: document.getElementById('modalCoverPic').value,
+                summary: document.getElementById('modalSummary').value,
+                content: document.getElementById('modalContent').value
+            };
+            faqLangData.push(langEntry);
+        } else {
+            langEntry.seo_keywords = document.getElementById('modalSeoKeywords').value;
+            langEntry.seo_description = document.getElementById('modalSeoDescription').value;
+            langEntry.custom_url = document.getElementById('modalLangCustomUrl').value;
+            langEntry.title = document.getElementById('modalTitle').value;
+            langEntry.cover_pic = document.getElementById('modalCoverPic').value;
+            langEntry.summary = document.getElementById('modalSummary').value;
+            langEntry.content = document.getElementById('modalContent').value;
+        }
+
+        closeModal();
+        applyFilters();
+    }
+
+    function deleteFaq(langId) {
+        if (confirm('确定要删除此FAQ记录吗？')) {
+            const langEntry = faqLangData.find(item => item.id === parseInt(langId));
+            if (langEntry) {
+                faqLangData = faqLangData.filter(item => item.id !== parseInt(langId));
+                const remainingLangs = faqLangData.filter(item => item.faq_id === langEntry.faq_id);
+                if (remainingLangs.length === 0) {
+                    faqData = faqData.filter(item => item.id !== langEntry.faq_id);
+                }
+            }
+            applyFilters();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的FAQ');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个FAQ记录吗？`)) {
+            const faqIdsToDelete = new Set();
+            selectedIds.forEach(langId => {
+                const langEntry = faqLangData.find(item => item.id === parseInt(langId));
+                if (langEntry) {
+                    faqIdsToDelete.add(langEntry.faq_id);
+                    faqLangData = faqLangData.filter(item => item.id !== parseInt(langId));
+                }
+            });
+            faqData = faqData.filter(item => !faqIdsToDelete.has(item.id));
+            applyFilters();
+        }
+    }
+
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的FAQ');
+            return;
+        }
+        document.getElementById('selectedIdsStatus').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        const faqIds = new Set();
+        selectedIds.forEach(langId => {
+            const langEntry = faqLangData.find(item => item.id === parseInt(langId));
+            if (langEntry) faqIds.add(langEntry.faq_id);
+        });
+        faqData = faqData.map(item => faqIds.has(item.id) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
+        closeStatusModal();
+        applyFilters();
+    }
+
+    function batchEditManageId() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改管理员的FAQ');
+            return;
+        }
+        document.getElementById('selectedIdsManageId').value = selectedIds.join(', ');
+        document.getElementById('manageIdModal').style.display = 'block';
+    }
+
+    function saveBatchManageId() {
+        const newManageId = parseInt(document.getElementById('newManageId').value);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        const faqIds = new Set();
+        selectedIds.forEach(langId => {
+            const langEntry = faqLangData.find(item => item.id === parseInt(langId));
+            if (langEntry) faqIds.add(langEntry.faq_id);
+        });
+        faqData = faqData.map(item => faqIds.has(item.id) ? { ...item, manage_id: newManageId, update_time: moment().unix() } : item);
+        closeManageIdModal();
+        applyFilters();
+    }
+
+    function closeModal() {
+        document.getElementById('faqModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    function closeManageIdModal() {
+        document.getElementById('manageIdModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            fetchFaqData();
+        });
+    };
+</script>
+</body>
+</html>

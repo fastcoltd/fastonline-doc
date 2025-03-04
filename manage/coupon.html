@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 优惠券管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 6%; min-width: 60px; }
+        .col-brand-id { width: 10%; min-width: 100px; }
+        .col-store-id { width: 10%; min-width: 100px; }
+        .col-services-id { width: 10%; min-width: 100px; }
+        .col-item-id { width: 10%; min-width: 100px; }
+        .col-act-name { width: 10%; min-width: 100px; }
+        .col-coupon-status { width: 8%; min-width: 80px; }
+        .col-coupon-code { width: 10%; min-width: 100px; }
+        .col-discount { width: 8%; min-width: 80px; }
+        .col-start-time { width: 12%; min-width: 120px; }
+        .col-end-time { width: 12%; min-width: 120px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
+        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .ant-tabs-content { min-height: 400px; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">优惠券管理</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <select id="brandIdFilter" class="ant-select">
+                                        <option value="">全部品牌</option>
+                                        <!-- 下拉数据在脚本中生成 -->
+                                    </select>
+                                    <select id="storeIdFilter" class="ant-select">
+                                        <option value="">全部店铺</option>
+                                    </select>
+                                    <select id="servicesIdFilter" class="ant-select">
+                                        <option value="">全部服务</option>
+                                    </select>
+                                    <select id="itemIdFilter" class="ant-select">
+                                        <option value="">全部商品</option>
+                                    </select>
+                                    <input type="text" id="actNameFilter" class="ant-input" placeholder="名称">
+                                    <select id="statusFilter" class="ant-select">
+                                        <option value="">全部状态</option>
+                                        <option value="0">禁用</option>
+                                        <option value="1">启用</option>
+                                        <option value="2">已过期</option>
+                                    </select>
+                                    <input type="datetime-local" id="startTimeFilter" class="ant-input">
+                                    <input type="datetime-local" id="endTimeFilter" class="ant-input">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addCoupon()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-brand-id">品牌名称</div>
+                                        <div class="col-store-id">店铺名称</div>
+                                        <div class="col-services-id">服务名称</div>
+                                        <div class="col-item-id">商品名称</div>
+                                        <div class="col-act-name">名称</div>
+                                        <div class="col-coupon-status">状态</div>
+                                        <div class="col-coupon-code">优惠券码</div>
+                                        <div class="col-discount">折扣</div>
+                                        <div class="col-start-time">开始时间</div>
+                                        <div class="col-end-time">结束时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="coupon-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
+                                            <option value="10">10 条/页</option>
+                                            <option value="20" selected>20 条/页</option>
+                                            <option value="50">50 条/页</option>
+                                            <option value="100">100 条/页</option>
+                                        </select>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="couponModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加优惠券</h3>
+            <form id="couponForm">
+                <div class="ant-form-item" id="idField" style="display: none;">
+                    <label>ID:</label>
+                    <input type="number" id="modalId" disabled>
+                </div>
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="limits">
+                                    <span class="ant-tabs-tab-btn">金额与限制</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="time">
+                                    <span class="ant-tabs-tab-btn">时间与统计</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="description">
+                                    <span class="ant-tabs-tab-btn">描述信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>品牌ID:</label>
+                                    <select id="modalBrandId">
+                                        <option value="0">请选择品牌</option>
+                                        <!-- 下拉数据在脚本中生成 -->
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>店铺ID:</label>
+                                    <select id="modalStoreId">
+                                        <option value="0">请选择店铺</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>服务ID:</label>
+                                    <select id="modalServicesId">
+                                        <option value="0">请选择服务</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>商品ID:</label>
+                                    <select id="modalItemId">
+                                        <option value="0">请选择商品</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>名称:</label>
+                                    <input type="text" id="modalActName" maxlength="32">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalCouponStatus">
+                                        <option value="0">禁用</option>
+                                        <option value="1">启用</option>
+                                        <option value="2">已过期</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>优惠券码:</label>
+                                    <input type="text" id="modalCouponCode" maxlength="16">
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="limits" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>折扣:</label>
+                                    <input type="number" id="modalDiscount" step="0.0001" min="0" max="1">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>最低金额:</label>
+                                    <input type="number" id="modalMoneyMin" step="0.01" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>最高金额:</label>
+                                    <input type="number" id="modalMoneyMax" step="0.01" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>数量限制:</label>
+                                    <input type="number" id="modalCountLimit" min="0">
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="time" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>开始时间:</label>
+                                    <input type="datetime-local" id="modalStartTime">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>结束时间:</label>
+                                    <input type="datetime-local" id="modalEndTime">
+                                </div>
+                                <div class="ant-form-item" id="ordersCountField" style="display: none;">
+                                    <label>订单数:</label>
+                                    <input type="number" id="modalOrdersCount" min="0" disabled>
+                                </div>
+                                <div class="ant-form-item" id="ordersTotalField" style="display: none;">
+                                    <label>订单总额:</label>
+                                    <input type="number" id="modalOrdersTotal" step="0.01" min="0" disabled>
+                                </div>
+                                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="description" style="display: none;">
+                                <div class="ant-form-item textarea-item">
+                                    <label>描述:</label>
+                                    <textarea id="modalCouponDescription" maxlength="128" rows="5"></textarea>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>备注:</label>
+                                    <textarea id="modalMark" maxlength="256" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveCoupon()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 批量修改状态弹窗 -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeStatusModal()">×</button>
+            <h3>批量修改状态</h3>
+            <form id="statusForm">
+                <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>新状态:</label>
+                    <select id="newStatus">
+                        <option value="0">禁用</option>
+                        <option value="1">启用</option>
+                        <option value="2">已过期</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let couponData = [];
+    let page = 1, perPage = 20;
+
+    // 定义关联字段的映射
+    const relationMap = {
+        brand_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `品牌 ${i + 1}` })),
+        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` })),
+        services_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `服务 ${i + 1}` })),
+        item_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `商品 ${i + 1}` }))
+    };
+
+    // 生成下拉数据
+    function populateDropdowns() {
+        const brandSelect = document.getElementById('modalBrandId');
+        const storeSelect = document.getElementById('modalStoreId');
+        const servicesSelect = document.getElementById('modalServicesId');
+        const itemSelect = document.getElementById('modalItemId');
+        const brandFilter = document.getElementById('brandIdFilter');
+        const storeFilter = document.getElementById('storeIdFilter');
+        const servicesFilter = document.getElementById('servicesIdFilter');
+        const itemFilter = document.getElementById('itemIdFilter');
+
+        relationMap.brand_id.forEach(item => {
+            brandSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            brandFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.store_id.forEach(item => {
+            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.services_id.forEach(item => {
+            servicesSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            servicesFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+        relationMap.item_id.forEach(item => {
+            itemSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            itemFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+        });
+    }
+
+    // 获取关联字段的名称
+    function getRelationName(field, id) {
+        if (id === 0) return '未关联';
+        const item = relationMap[field].find(item => item.id === id);
+        return item ? item.name : `未知 (${id})`;
+    }
+
+    // 生成样本数据
+    function generateSampleData() {
+        couponData = [];
+        for (let i = 1; i <= 200; i++) {
+            const startTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
+            const endTime = moment.unix(startTime).add(Math.floor(Math.random() * 60), 'days').unix();
+            couponData.push({
+                id: i,
+                brand_id: Math.floor(Math.random() * 15) + 1,
+                store_id: Math.floor(Math.random() * 15) + 1,
+                services_id: Math.floor(Math.random() * 15) + 1,
+                item_id: Math.floor(Math.random() * 15) + 1,
+                act_name: `优惠活动${i}`,
+                coupon_status: Math.floor(Math.random() * 3),
+                coupon_code: `COUPON${String(i).padStart(4, '0')}`,
+                discount: (Math.random() * 0.5 + 0.1).toFixed(4),
+                money_min: (Math.random() * 100).toFixed(2),
+                money_max: (Math.random() * 1000 + 100).toFixed(2),
+                count_limit: Math.floor(Math.random() * 100),
+                start_time: startTime,
+                end_time: endTime,
+                coupon_description: `优惠券${i}描述`,
+                mark: `备注${i}`,
+                orders_count: Math.floor(Math.random() * 50),
+                orders_total: (Math.random() * 10000).toFixed(2),
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
+            });
+        }
+        renderCouponList();
+    }
+
+    // 渲染列表
+    function renderCouponList() {
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const paginatedData = couponData.slice(start, end);
+        const listContainer = document.getElementById('coupon-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(coupon => {
+            const statusTag = coupon.coupon_status === 0 ? '<span class="ant-tag ant-tag-blue">禁用</span>' :
+                coupon.coupon_status === 1 ? '<span class="ant-tag ant-tag-green">启用</span>' :
+                    '<span class="ant-tag ant-tag-red">已过期</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${coupon.id}"></div>
+                <div class="col-id">${coupon.id}</div>
+                <div class="col-brand-id">${getRelationName('brand_id', coupon.brand_id)}</div>
+                <div class="col-store-id">${getRelationName('store_id', coupon.store_id)}</div>
+                <div class="col-services-id">${getRelationName('services_id', coupon.services_id)}</div>
+                <div class="col-item-id">${getRelationName('item_id', coupon.item_id)}</div>
+                <div class="col-act-name">${coupon.act_name}</div>
+                <div class="col-coupon-status">${statusTag}</div>
+                <div class="col-coupon-code">${coupon.coupon_code}</div>
+                <div class="col-discount">${coupon.discount}</div>
+                <div class="col-start-time">${moment.unix(coupon.start_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-end-time">${moment.unix(coupon.end_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editCoupon(${coupon.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteCoupon(${coupon.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(couponData.length / perPage);
+        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    // 筛选
+    function applyFilters() {
+        let filteredData = [...couponData];
+        const brandId = document.getElementById('brandIdFilter').value;
+        const storeId = document.getElementById('storeIdFilter').value;
+        const servicesId = document.getElementById('servicesIdFilter').value;
+        const itemId = document.getElementById('itemIdFilter').value;
+        const actName = document.getElementById('actNameFilter').value.toLowerCase();
+        const status = document.getElementById('statusFilter').value;
+        const startTime = document.getElementById('startTimeFilter').value;
+        const endTime = document.getElementById('endTimeFilter').value;
+
+        if (brandId) filteredData = filteredData.filter(item => item.brand_id === parseInt(brandId));
+        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
+        if (servicesId) filteredData = filteredData.filter(item => item.services_id === parseInt(servicesId));
+        if (itemId) filteredData = filteredData.filter(item => item.item_id === parseInt(itemId));
+        if (actName) filteredData = filteredData.filter(item => item.act_name.toLowerCase().includes(actName));
+        if (status) filteredData = filteredData.filter(item => item.coupon_status === parseInt(status));
+        if (startTime) filteredData = filteredData.filter(item => moment.unix(item.start_time).isSameOrAfter(startTime));
+        if (endTime) filteredData = filteredData.filter(item => moment.unix(item.end_time).isSameOrBefore(endTime));
+
+        couponData = filteredData;
+        page = 1;
+        renderCouponList();
+    }
+
+    // 分页
+    function changePage(delta) {
+        const totalPages = Math.ceil(couponData.length / perPage);
+        page += delta;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        renderCouponList();
+    }
+
+    function jumpToPage() {
+        const newPage = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(couponData.length / perPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            page = newPage;
+            renderCouponList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        perPage = parseInt(document.getElementById('perPage').value);
+        page = 1;
+        renderCouponList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    // 添加
+    function addCoupon() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加优惠券';
+        document.getElementById('idField').style.display = 'none';
+        document.getElementById('modalBrandId').value = '0';
+        document.getElementById('modalStoreId').value = '0';
+        document.getElementById('modalServicesId').value = '0';
+        document.getElementById('modalItemId').value = '0';
+        document.getElementById('modalActName').value = '';
+        document.getElementById('modalCouponStatus').value = '1';
+        document.getElementById('modalCouponCode').value = '';
+        document.getElementById('modalDiscount').value = '0.0000';
+        document.getElementById('modalMoneyMin').value = '0.00';
+        document.getElementById('modalMoneyMax').value = '99999.00';
+        document.getElementById('modalCountLimit').value = '10';
+        document.getElementById('modalStartTime').value = '';
+        document.getElementById('modalEndTime').value = '';
+        document.getElementById('modalCouponDescription').value = '';
+        document.getElementById('modalMark').value = '';
+        document.getElementById('ordersCountField').style.display = 'none';
+        document.getElementById('ordersTotalField').style.display = 'none';
+        document.getElementById('createTimeField').style.display = 'none';
+        setupTabs();
+        document.getElementById('couponModal').style.display = 'block';
+    }
+
+    // 编辑
+    let isEditing = false;
+    let editId = null;
+    function editCoupon(id) {
+        isEditing = true;
+        editId = id;
+        const coupon = couponData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑优惠券';
+        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalId').value = coupon.id;
+        document.getElementById('modalBrandId').value = coupon.brand_id;
+        document.getElementById('modalStoreId').value = coupon.store_id;
+        document.getElementById('modalServicesId').value = coupon.services_id;
+        document.getElementById('modalItemId').value = coupon.item_id;
+        document.getElementById('modalActName').value = coupon.act_name;
+        document.getElementById('modalCouponStatus').value = coupon.coupon_status;
+        document.getElementById('modalCouponCode').value = coupon.coupon_code;
+        document.getElementById('modalDiscount').value = coupon.discount;
+        document.getElementById('modalMoneyMin').value = coupon.money_min;
+        document.getElementById('modalMoneyMax').value = coupon.money_max;
+        document.getElementById('modalCountLimit').value = coupon.count_limit;
+        document.getElementById('modalStartTime').value = moment.unix(coupon.start_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalEndTime').value = moment.unix(coupon.end_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalCouponDescription').value = coupon.coupon_description;
+        document.getElementById('modalMark').value = coupon.mark;
+        document.getElementById('ordersCountField').style.display = 'block';
+        document.getElementById('modalOrdersCount').value = coupon.orders_count;
+        document.getElementById('ordersTotalField').style.display = 'block';
+        document.getElementById('modalOrdersTotal').value = coupon.orders_total;
+        document.getElementById('createTimeField').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment.unix(coupon.create_time).format('YYYY-MM-DDTHH:mm');
+        setupTabs();
+        document.getElementById('couponModal').style.display = 'block';
+    }
+
+    // Tab 设置
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#couponModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#couponModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#couponModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#couponModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
+
+    // 保存
+    function saveCoupon() {
+        const coupon = {
+            id: isEditing ? editId : couponData.length + 1,
+            brand_id: parseInt(document.getElementById('modalBrandId').value) || 0,
+            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
+            services_id: parseInt(document.getElementById('modalServicesId').value) || 0,
+            item_id: parseInt(document.getElementById('modalItemId').value) || 0,
+            act_name: document.getElementById('modalActName').value,
+            coupon_status: parseInt(document.getElementById('modalCouponStatus').value),
+            coupon_code: document.getElementById('modalCouponCode').value,
+            discount: parseFloat(document.getElementById('modalDiscount').value) || 0,
+            money_min: parseFloat(document.getElementById('modalMoneyMin').value) || 0,
+            money_max: parseFloat(document.getElementById('modalMoneyMax').value) || 99999,
+            count_limit: parseInt(document.getElementById('modalCountLimit').value) || 10,
+            start_time: document.getElementById('modalStartTime').value ? moment(document.getElementById('modalStartTime').value).unix() : 0,
+            end_time: document.getElementById('modalEndTime').value ? moment(document.getElementById('modalEndTime').value).unix() : 0,
+            coupon_description: document.getElementById('modalCouponDescription').value || '',
+            mark: document.getElementById('modalMark').value || '',
+            orders_count: isEditing ? parseInt(document.getElementById('modalOrdersCount').value) || 0 : 0,
+            orders_total: isEditing ? parseFloat(document.getElementById('modalOrdersTotal').value) || 0 : 0,
+            create_time: isEditing ? couponData.find(item => item.id === editId).create_time : moment().unix()
+        };
+
+        if (isEditing) {
+            const index = couponData.findIndex(item => item.id === editId);
+            couponData[index] = coupon;
+        } else {
+            couponData.push(coupon);
+        }
+        closeModal();
+        renderCouponList();
+    }
+
+    // 删除
+    function deleteCoupon(id) {
+        if (confirm('确定要删除此优惠券吗？')) {
+            couponData = couponData.filter(item => item.id !== id);
+            renderCouponList();
+        }
+    }
+
+    // 批量删除
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的优惠券');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个优惠券吗？`)) {
+            couponData = couponData.filter(item => !selectedIds.includes(item.id));
+            renderCouponList();
+        }
+    }
+
+    // 批量修改状态
+    function batchEditStatus() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要修改状态的优惠券');
+            return;
+        }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
+        document.getElementById('statusModal').style.display = 'block';
+    }
+
+    function saveBatchStatus() {
+        const newStatus = parseInt(document.getElementById('newStatus').value);
+        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
+        couponData = couponData.map(item => selectedIds.includes(item.id) ? { ...item, coupon_status: newStatus } : item);
+        closeStatusModal();
+        renderCouponList();
+    }
+
+    function closeModal() {
+        document.getElementById('couponModal').style.display = 'none';
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            populateDropdowns(); // 初始化下拉框
+            generateSampleData();
+        });
+    };
+</script>
+</body>
+</html>

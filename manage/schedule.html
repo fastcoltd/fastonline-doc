@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 排班计划</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部 -->
+        <div id="header" w3-include-html="_header.html"></div>
+
+        <!-- 内容区域 -->
+        <div class="content-wrapper">
+            <!-- 侧边栏 -->
+            <div id="sidebar" w3-include-html="_sidebar.html"></div>
+
+            <!-- 主内容区域 -->
+            <div class="main-content">
+                <div class="tabs-container">
+                    <div class="ant-tabs ant-tabs-top">
+                        <div class="ant-tabs-nav" role="tablist">
+                            <div class="ant-tabs-nav-wrap">
+                                <div class="ant-tabs-nav-list">
+                                    <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule.html')" role="tab" aria-selected="true">
+                                        <span class="ant-tabs-tab-btn">排班计划</span>
+                                    </div>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ant-tabs-content-holder">
+                            <div class="ant-tabs-content ant-tabs-content-top">
+                                <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                    <h2>排班计划</h2>
+                                    <div class="filter-container" style="margin-bottom: 20px;">
+                                        <select id="statusFilter" class="ant-select" onchange="applyFilters()">
+                                            <option value="">全部状态</option>
+                                            <option value="0">未开始</option>
+                                            <option value="1">进行中</option>
+                                            <option value="2">已完成</option>
+                                        </select>
+                                        <input type="number" id="staffIdFilter" class="ant-input" placeholder="员工ID" oninput="applyFilters()">
+                                        <input type="number" id="storeIdFilter" class="ant-input" placeholder="店铺ID" oninput="applyFilters()">
+                                        <input type="date" id="startDate" class="ant-input" onchange="applyFilters()">
+                                        <input type="date" id="endDate" class="ant-input" onchange="applyFilters()">
+                                    </div>
+                                    <div class="task-list">
+                                        <div class="table-header" style="display: flex; padding: 10px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                            <div style="flex: 1;">ID</div>
+                                            <div style="flex: 1;">员工ID</div>
+                                            <div style="flex: 1;">店铺ID</div>
+                                            <div style="flex: 1;">开始时间</div>
+                                            <div style="flex: 1;">结束时间</div>
+                                            <div style="flex: 1;">状态</div>
+                                            <div style="flex: 1;">创建时间</div>
+                                            <div style="flex: 1;">更新时间</div>
+                                        </div>
+                                        <div id="schedule-list">加载中...</div>
+                                        <div class="pagination" style="margin-top: 20px; text-align: center;">
+                                            <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                            <span id="page-info">第 1 页 / 共 1 页</span>
+                                            <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <div id="footer" w3-include-html="_footer.html"></div>
+    </div>
+
+    <script>
+        // 全局变量
+        let scheduleData = [];
+        let schedulePage = 1, schedulePerPage = 10;
+
+        // Tab 切换函数（单页无需切换）
+        function switchTab(page) {
+            console.log('Switching to:', page);
+            window.location.href = page;
+        }
+
+        // 加载排班数据
+        function fetchScheduleData() {
+            console.log('Fetching schedule data...');
+            const sampleData = [];
+            for (let i = 1; i <= 50; i++) {
+                const status = Math.floor(Math.random() * 3);
+                const createTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
+                sampleData.push({
+                    id: i,
+                    staff_id: Math.floor(Math.random() * 100) + 1,
+                    store_id: Math.floor(Math.random() * 50) + 1,
+                    start_time: createTime + Math.floor(Math.random() * 86400),
+                    end_time: createTime + Math.floor(Math.random() * 172800) + 86400,
+                    status: status,
+                    create_time: createTime,
+                    update_time: status === 2 ? createTime + Math.floor(Math.random() * 86400) : createTime
+                });
+            }
+            scheduleData = sampleData;
+            applyFilters();
+        }
+
+        // 渲染排班列表
+        function renderScheduleList(data) {
+            const start = (schedulePage - 1) * schedulePerPage;
+            const end = start + schedulePerPage;
+            const paginatedData = data.slice(start, end);
+            const listContainer = document.getElementById('schedule-list');
+            listContainer.innerHTML = '';
+
+            paginatedData.forEach(item => {
+                const statusTag = item.status === 0 ? '<span class="ant-tag ant-tag-blue">未开始</span>' :
+                                  item.status === 1 ? '<span class="ant-tag ant-tag-green">进行中</span>' :
+                                  '<span class="ant-tag ant-tag-red">已完成</span>';
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'task-item';
+                itemDiv.style = `padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; margin: 5px 0;`;
+                itemDiv.innerHTML = `
+                    <div style="flex: 1;">${item.id}</div>
+                    <div style="flex: 1;">${item.staff_id}</div>
+                    <div style="flex: 1;">${item.store_id}</div>
+                    <div style="flex: 1;">${moment.unix(item.start_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div style="flex: 1;">${moment.unix(item.end_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div style="flex: 1;">${statusTag}</div>
+                    <div style="flex: 1;">${moment.unix(item.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                    <div style="flex: 1;">${moment.unix(item.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+
+            const totalPages = Math.ceil(data.length / schedulePerPage);
+            document.getElementById('page-info').textContent = `第 ${schedulePage} 页 / 共 ${totalPages} 页`;
+        }
+
+        // 应用筛选
+        function applyFilters() {
+            const status = document.getElementById('statusFilter').value;
+            const staffId = document.getElementById('staffIdFilter').value;
+            const storeId = document.getElementById('storeIdFilter').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            let filteredData = scheduleData;
+            if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
+            if (staffId) filteredData = filteredData.filter(item => item.staff_id === parseInt(staffId));
+            if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
+            if (startDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+            if (endDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+            schedulePage = 1;
+            renderScheduleList(filteredData);
+        }
+
+        // 切换页面
+        function changePage(delta) {
+            const totalPages = Math.ceil(scheduleData.length / schedulePerPage);
+            schedulePage += delta;
+            if (schedulePage < 1) schedulePage = 1;
+            if (schedulePage > totalPages) schedulePage = totalPages;
+            applyFilters();
+        }
+
+        // 初始化
+        window.onload = () => {
+            console.log('Page loaded, initializing...');
+            w3.includeHTML(() => {
+                console.log('External HTML included');
+                initMenus();
+                fetchScheduleData();
+            });
+        };
+    </script>
+</body>
+</html>

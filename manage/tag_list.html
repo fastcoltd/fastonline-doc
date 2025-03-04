@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 标签管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 800px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 920px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; }
+        .modal-content label { display: block; margin: 10px 0 5px; }
+        .modal-content input, .modal-content select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .task-list { overflow-x: auto; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 10%; min-width: 50px; }
+        .col-id { width: 15%; min-width: 60px; }
+        .col-status { width: 15%; min-width: 80px; }
+        .col-custom-url { width: 15%; min-width: 120px; }
+        .col-language { width: 15%; min-width: 80px; }
+        .col-tag-name { width: 20%; min-width: 120px; }
+        .col-actions { width: 25%; min-width: 150px; }
+        .lang-section { border: 1px solid #ddd; padding: 10px; margin-top: 20px; border-radius: 4px; }
+        .lang-section legend { font-weight: bold; padding: 0 10px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="header" w3-include-html="_header.html"></div>
+        <div class="content-wrapper">
+            <div id="sidebar" w3-include-html="_sidebar.html"></div>
+            <div class="main-content">
+                <div class="tabs-container">
+                    <div class="ant-tabs ant-tabs-top">
+                        <div class="ant-tabs-nav" role="tablist">
+                            <div class="ant-tabs-nav-wrap">
+                                <div class="ant-tabs-nav-list">
+                                    <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('tag_list.html')" role="tab" aria-selected="true">
+                                        <span class="ant-tabs-tab-btn">标签管理</span>
+                                    </div>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ant-tabs-content-holder">
+                            <div class="ant-tabs-content ant-tabs-content-top">
+                                <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                    <div class="filter-container" style="margin-bottom: 20px;">
+                                        <select id="languageFilter" class="ant-select">
+                                            <option value="">全部语言</option>
+                                            <option value="en_US">English</option>
+                                            <option value="zh_CN">中文</option>
+                                        </select>
+                                        <select id="statusFilter" class="ant-select">
+                                            <option value="">全部状态</option>
+                                            <option value="0">禁用</option>
+                                            <option value="1">启用</option>
+                                        </select>
+                                        <input type="text" id="tagNameFilter" class="ant-input" placeholder="标签名称">
+                                        <button class="ant-btn ant-btn-primary" onclick="applyFilters()">搜索</button>
+                                    </div>
+                                    <div class="action-container" style="margin-bottom: 20px;">
+                                        <button class="ant-btn ant-btn-primary" onclick="addTag()">添加</button>
+                                        <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                    </div>
+                                    <div class="task-list">
+                                        <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                            <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                            <div class="col-id">ID</div>
+                                            <div class="col-status">状态</div>
+                                            <div class="col-custom-url">自定义URL</div>
+                                            <div class="col-language">语言</div>
+                                            <div class="col-tag-name">标签名称</div>
+                                            <div class="col-actions">操作</div>
+                                        </div>
+                                        <div id="tag-list">加载中...</div>
+                                        <div class="pagination" style="margin-top: 20px; text-align: center;">
+                                            <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                            <span id="page-info">第 1 页 / 共 1 页</span>
+                                            <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="footer" w3-include-html="_footer.html"></div>
+
+        <!-- 添加/编辑弹窗 -->
+        <div id="tagModal" class="modal">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal()">×</button>
+                <h3 id="modalTitle">添加标签</h3>
+                <form id="tagForm">
+                    <label>ID (自动生成):</label>
+                    <input type="text" id="modalId" disabled>
+                    <label>状态:</label>
+                    <select id="modalStatus">
+                        <option value="0">禁用</option>
+                        <option value="1">启用</option>
+                    </select>
+                    <label>自定义URL:</label>
+                    <input type="text" id="modalCustomUrl">
+                    <fieldset class="lang-section">
+                        <legend>多语言信息</legend>
+                        <label>语言:</label>
+                        <select id="modalLanguage">
+                            <option value="en_US">English</option>
+                            <option value="zh_CN">中文</option>
+                        </select>
+                        <label>标签名称:</label>
+                        <input type="text" id="modalTagName">
+                    </fieldset>
+                    <div class="modal-buttons">
+                        <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                        <button type="button" class="ant-btn ant-btn-primary" onclick="saveTag()">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tagData = [];
+        let tagPage = 1, tagPerPage = 10;
+        let isEditing = false;
+        let editId = null;
+        let currentLanguage = 'en_US';
+
+        function updateLanguage() {
+            currentLanguage = document.getElementById('languageSelect')?.value || 'en_US';
+            document.getElementById('modalLanguage').value = currentLanguage;
+        }
+
+        function fetchTagData() {
+            console.log('Fetching tag data...');
+            const sampleData = [];
+            const languages = ['en_US', 'zh_CN'];
+            for (let i = 1; i <= 50; i++) {
+                const status = Math.floor(Math.random() * 2);
+                languages.forEach(lang => {
+                    sampleData.push({
+                        id: i,
+                        langId: `${i}-${lang}`,
+                        status,
+                        custom_url: `tag_${i}`,
+                        language: lang,
+                        tag_name: lang === 'en_US' ? `Tag ${i}` : `标签 ${i}`
+                    });
+                });
+            }
+            tagData = sampleData;
+            renderTagList(tagData);
+        }
+
+        function renderTagList(data) {
+            const start = (tagPage - 1) * tagPerPage;
+            const end = start + tagPerPage;
+            const paginatedData = data.slice(start, end);
+            const listContainer = document.getElementById('tag-list');
+            listContainer.innerHTML = '';
+
+            paginatedData.forEach(item => {
+                const statusTag = item.status === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' :
+                                  '<span class="ant-tag ant-tag-green">启用</span>';
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'task-item';
+                itemDiv.style = `border-bottom: 1px solid #ddd;`;
+                itemDiv.innerHTML = `
+                    <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${item.langId}"></div>
+                    <div class="col-id">${item.id}</div>
+                    <div class="col-status">${statusTag}</div>
+                    <div class="col-custom-url">${item.custom_url}</div>
+                    <div class="col-language">${item.language}</div>
+                    <div class="col-tag-name">${item.tag_name}</div>
+                    <div class="col-actions">
+                        <button class="ant-btn" onclick="editTag('${item.langId}')">编辑</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteTag('${item.langId}')">删除</button>
+                    </div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+
+            const totalPages = Math.ceil(data.length / tagPerPage);
+            document.getElementById('page-info').textContent = `第 ${tagPage} 页 / 共 ${totalPages} 页`;
+        }
+
+        function applyFilters() {
+            const status = document.getElementById('statusFilter').value;
+            const language = document.getElementById('languageFilter').value;
+            const tagName = document.getElementById('tagNameFilter').value.toLowerCase();
+
+            let filteredData = tagData;
+            if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
+            if (language) filteredData = filteredData.filter(item => item.language === language);
+            if (tagName) filteredData = filteredData.filter(item => item.tag_name.toLowerCase().includes(tagName));
+
+            tagPage = 1;
+            renderTagList(filteredData);
+        }
+
+        function changePage(delta) {
+            const totalPages = Math.ceil(tagData.length / tagPerPage);
+            tagPage += delta;
+            if (tagPage < 1) tagPage = 1;
+            if (tagPage > totalPages) tagPage = totalPages;
+            applyFilters();
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+        }
+
+        function addTag() {
+            isEditing = false;
+            editId = null;
+            document.getElementById('modalTitle').textContent = '添加标签';
+            document.getElementById('modalId').value = '';
+            document.getElementById('modalStatus').value = '0';
+            document.getElementById('modalCustomUrl').value = '';
+            document.getElementById('modalLanguage').value = currentLanguage;
+            document.getElementById('modalLanguage').disabled = false;
+            document.getElementById('modalTagName').value = '';
+            document.getElementById('tagModal').style.display = 'block';
+        }
+
+        function editTag(langId) {
+            isEditing = true;
+            editId = langId;
+            const tag = tagData.find(item => item.langId === langId);
+            document.getElementById('modalTitle').textContent = '编辑标签';
+            document.getElementById('modalId').value = tag.id;
+            document.getElementById('modalStatus').value = tag.status;
+            document.getElementById('modalCustomUrl').value = tag.custom_url;
+            document.getElementById('modalLanguage').value = tag.language;
+            document.getElementById('modalLanguage').disabled = true;
+            document.getElementById('modalTagName').value = tag.tag_name;
+            document.getElementById('tagModal').style.display = 'block';
+        }
+
+        function saveTag() {
+            const lang = document.getElementById('modalLanguage').value;
+            const newTag = {
+                id: isEditing ? parseInt(document.getElementById('modalId').value) : tagData.reduce((max, item) => Math.max(max, item.id), 0) + 1,
+                langId: isEditing ? editId : `${tagData.length + 1}-${lang}`,
+                status: parseInt(document.getElementById('modalStatus').value),
+                custom_url: document.getElementById('modalCustomUrl').value,
+                language: lang,
+                tag_name: document.getElementById('modalTagName').value
+            };
+            if (isEditing) {
+                const index = tagData.findIndex(item => item.langId === editId);
+                tagData[index] = newTag;
+            } else {
+                tagData.push(newTag);
+            }
+            closeModal();
+            applyFilters();
+        }
+
+        function deleteTag(langId) {
+            if (confirm('确定要删除此标签吗？')) {
+                tagData = tagData.filter(item => item.langId !== langId);
+                applyFilters();
+            }
+        }
+
+        function batchDelete() {
+            const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+            if (selectedIds.length === 0) {
+                alert('请先选择要删除的标签');
+                return;
+            }
+            if (confirm(`确定要删除 ${selectedIds.length} 个标签吗？`)) {
+                tagData = tagData.filter(item => !selectedIds.includes(item.langId));
+                applyFilters();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('tagModal').style.display = 'none';
+        }
+
+        window.onload = () => {
+            console.log('Page loaded, initializing...');
+            w3.includeHTML(() => {
+                console.log('External HTML included');
+                initMenus();
+                updateLanguage();
+                fetchTagData();
+            });
+        };
+    </script>
+</body>
+</html>
