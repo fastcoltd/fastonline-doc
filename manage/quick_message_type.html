@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 快捷消息类型</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css"
+          integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .ant-input, .ant-select, .ant-btn {
+            margin-right: 8px;
+        }
+
+        .filter-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-container {
+            margin-bottom: 16px;
+        }
+
+        .task-list {
+            overflow-x: hidden;
+        }
+
+        .table-header, .task-item {
+            display: flex;
+            width: 100%;
+        }
+
+        .table-header div, .task-item div {
+            padding: 10px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+
+        .col-checkbox {
+            width: 5%;
+            min-width: 50px;
+        }
+
+        .col-id {
+            width: 15%;
+            min-width: 60px;
+        }
+
+        .col-status {
+            width: 15%;
+            min-width: 60px;
+        }
+
+        .col-type-name {
+            width: 25%;
+            min-width: 120px;
+        }
+
+        .col-mark {
+            width: 25%;
+            min-width: 120px;
+        }
+
+        .col-create-time {
+            width: 20%;
+            min-width: 100px;
+        }
+
+        .col-actions {
+            width: 15%;
+            min-width: 100px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 1024px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            max-height: 968px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+
+        .modal-buttons {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .modal-content .ant-form-item {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-content .ant-form-item label {
+            margin-right: 8px;
+            width: 120px;
+            text-align: right;
+            color: rgba(0, 0, 0, 0.85);
+            height: 32px;
+            line-height: 32px;
+        }
+
+        .modal-content .ant-form-item input, .modal-content .ant-form-item select {
+            flex: 1;
+            width: auto;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .modal-content .ant-form-item.textarea-item {
+            display: block;
+        }
+
+        .modal-content .ant-form-item.textarea-item label {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .modal-content .ant-form-item.textarea-item textarea {
+            width: 100%;
+            height: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active"
+                                     onclick="switchTab('quick_message_type.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">快捷消息类型</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated"
+                                     style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <input type="text" id="typeNameFilter" class="ant-input" placeholder="类型名称"
+                                           onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <input type="date" id="startDate" class="ant-input"
+                                           onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <input type="date" id="endDate" class="ant-input"
+                                           onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addType()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header"
+                                         style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll"
+                                                                         onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-type-name">类型名称</div>
+                                        <div class="col-mark">备注</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="type-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input"
+                                               style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 添加/编辑弹窗 -->
+    <div id="typeModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h3 id="modalTitle">添加快捷消息类型</h3>
+            <form id="typeForm">
+                <div id="systemFields" style="display: none;">
+                    <div class="ant-form-item">
+                        <label>ID:</label>
+                        <input type="text" id="modalId" disabled>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>创建时间:</label>
+                        <input type="datetime-local" id="modalCreateTime" disabled>
+                    </div>
+                </div>
+                <div id="editableFields">
+                    <div class="ant-form-item">
+                        <label>状态:</label>
+                        <select id="modalStatus">
+                            <option value="0">禁用</option>
+                            <option value="1">启用</option>
+                        </select>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>类型名称:</label>
+                        <input type="text" id="modalTypeName" maxlength="64">
+                    </div>
+                    <div class="ant-form-item textarea-item">
+                        <label>备注:</label>
+                        <textarea id="modalMark" rows="5" maxlength="256"></textarea>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveType()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let typeData = [];
+    let typePage = 1, typePerPage = 20;
+
+    function fetchTypeData() {
+        console.log('Fetching type data...');
+        typeData = [];
+        for (let i = 1; i <= 50; i++) {
+            const type = {
+                id: i,
+                status: Math.floor(Math.random() * 2),
+                type_name: `Type ${i}`,
+                mark: `Usage method for type ${i}`,
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
+            };
+            typeData.push(type);
+        }
+        renderTypeList();
+    }
+
+    function renderTypeList() {
+        const start = (typePage - 1) * typePerPage;
+        const end = start + typePerPage;
+        const paginatedTypes = typeData.slice(start, end);
+        const listContainer = document.getElementById('type-list');
+        listContainer.innerHTML = '';
+
+        paginatedTypes.forEach(type => {
+            const statusTag = type.status === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' :
+                '<span class="ant-tag ant-tag-green">启用</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`
+            itemDiv.innerHTML = `
+<div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${type.id}"></div>
+<div class="col-id">${type.id}</div>
+<div class="col-status">${statusTag}</div>
+<div class="col-type-name">${type.type_name}</div>
+<div class="col-mark">${type.mark ? type.mark.substring(0, 50) + (type.mark.length > 50 ? '...' : '') : ''}</div>
+<div class="col-create-time">${moment.unix(type.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+<div class="col-actions">
+    <button class="ant-btn" onclick="editType(${type.id})">编辑</button>
+    <button class="ant-btn ant-btn-danger" onclick="deleteType(${type.id})">删除</button>
+</div>
+`;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(typeData.length / typePerPage);
+        document.getElementById('page-info').textContent = `第 ${typePage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const typeName = document.getElementById('typeNameFilter').value.toLowerCase();
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredTypes = typeData;
+        if (typeName) filteredTypes = filteredTypes.filter(item => item.type_name.toLowerCase().includes(typeName));
+        if (startDate) filteredTypes = filteredTypes.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredTypes = filteredTypes.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+        typePage = 1;
+        typeData = filteredTypes;
+        renderTypeList();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(typeData.length / typePerPage);
+        typePage += delta;
+        if (typePage < 1) typePage = 1;
+        if (typePage > totalPages) typePage = totalPages;
+        renderTypeList();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(typeData.length / typePerPage);
+        if (page >= 1 && page <= totalPages) {
+            typePage = page;
+            renderTypeList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        typePerPage = parseInt(document.getElementById('perPage').value);
+        typePage = 1;
+        renderTypeList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    let isEditing = false;
+    let editId = null;
+
+    function addType() {
+        isEditing = false;
+        editId = null;
+        document.getElementById('modalTitle').textContent = '添加快捷消息类型';
+        document.getElementById('systemFields').style.display = 'none';
+        document.getElementById('editableFields').style.display = 'block';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalTypeName').value = 'type name';
+        document.getElementById('modalMark').value = '';
+        document.getElementById('typeModal').style.display = 'block';
+    }
+
+    function editType(id) {
+        isEditing = true;
+        editId = id;
+        const type = typeData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑快捷消息类型';
+        document.getElementById('systemFields').style.display = 'block';
+        document.getElementById('editableFields').style.display = 'block';
+        document.getElementById('modalId').value = type.id;
+        document.getElementById('modalStatus').value = type.status;
+        document.getElementById('modalTypeName').value = type.type_name;
+        document.getElementById('modalMark').value = type.mark;
+        document.getElementById('modalCreateTime').value = moment.unix(type.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('typeModal').style.display = 'block';
+    }
+
+    function saveType() {
+        const newType = {
+            id: isEditing ? editId : typeData.length + 1,
+            status: parseInt(document.getElementById('modalStatus').value),
+            type_name: document.getElementById('modalTypeName').value,
+            mark: document.getElementById('modalMark').value,
+            create_time: isEditing ? typeData.find(item => item.id === editId).create_time : moment().unix()
+        };
+
+        if (isEditing) {
+            const index = typeData.findIndex(item => item.id === editId);
+            typeData[index] = newType;
+        } else {
+            typeData.push(newType);
+        }
+
+        closeModal();
+        renderTypeList();
+    }
+
+    function deleteType(id) {
+        if (confirm('确定要删除此快捷消息类型吗？')) {
+            typeData = typeData.filter(item => item.id !== id);
+            renderTypeList();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的快捷消息类型');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个快捷消息类型吗？`)) {
+            typeData = typeData.filter(item => !selectedIds.includes(item.id));
+            renderTypeList();
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('typeModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchTypeData();
+        });
+    };
+</script>
+</body>
+</html>

@@ -3,72 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 请假记录</title>
+    <title>FASTRESP - 排班请假日志</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <style>
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 60px; }
+        .col-schedule-id { width: 10%; min-width: 100px; }
+        .col-manage-id { width: 10%; min-width: 100px; }
+        .col-status { width: 10%; min-width: 60px; }
+        .col-ask-time { width: 15%; min-width: 100px; }
+        .col-leave-time { width: 15%; min-width: 100px; }
+        .col-back-time { width: 15%; min-width: 100px; }
+        .col-reason { width: 10%; min-width: 100px; }
+        .col-mark { width: 15%; min-width: 120px; }
+        .col-create-time { width: 15%; min-width: 100px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1080px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 1440px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
+        .modal-content .ant-form-item label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 顶部 -->
-        <div id="header" w3-include-html="_header.html"></div>
-
-        <!-- 内容区域 -->
-        <div class="content-wrapper">
-            <!-- 侧边栏 -->
-            <div id="sidebar" w3-include-html="_sidebar.html"></div>
-
-            <!-- 主内容区域 -->
-            <div class="main-content">
-                <div class="tabs-container">
-                    <div class="ant-tabs ant-tabs-top">
-                        <div class="ant-tabs-nav" role="tablist">
-                            <div class="ant-tabs-nav-wrap">
-                                <div class="ant-tabs-nav-list">
-                                    <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule_leave_log.html')" role="tab" aria-selected="true">
-                                        <span class="ant-tabs-tab-btn">请假记录</span>
-                                    </div>
-                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule_leave_log.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">排班请假日志</span>
                                 </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
-                        <div class="ant-tabs-content-holder">
-                            <div class="ant-tabs-content ant-tabs-content-top">
-                                <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                    <h2>请假记录</h2>
-                                    <div class="filter-container" style="margin-bottom: 20px;">
-                                        <select id="statusFilter" class="ant-select" onchange="applyFilters()">
-                                            <option value="">全部状态</option>
-                                            <option value="0">待审核</option>
-                                            <option value="1">已通过</option>
-                                            <option value="2">已拒绝</option>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="scheduleIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                            <option value="">全部排班</option>
+                                            <!-- 动态生成 -->
                                         </select>
-                                        <input type="number" id="staffIdFilter" class="ant-input" placeholder="员工ID" oninput="applyFilters()">
-                                        <input type="number" id="storeIdFilter" class="ant-input" placeholder="店铺ID" oninput="applyFilters()">
-                                        <input type="date" id="startDate" class="ant-input" onchange="applyFilters()">
-                                        <input type="date" id="endDate" class="ant-input" onchange="applyFilters()">
                                     </div>
-                                    <div class="task-list">
-                                        <div class="table-header" style="display: flex; padding: 10px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                            <div style="flex: 1;">ID</div>
-                                            <div style="flex: 1;">店铺ID</div>
-                                            <div style="flex: 1;">员工ID</div>
-                                            <div style="flex: 1;">开始时间</div>
-                                            <div style="flex: 1;">结束时间</div>
-                                            <div style="flex: 1;">状态</div>
-                                            <div style="flex: 1;">原因</div>
-                                            <div style="flex: 1;">创建时间</div>
-                                            <div style="flex: 1;">更新时间</div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="manageIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                            <option value="">全部管理员</option>
+                                            <!-- 动态生成 -->
+                                        </select>
+                                    </div>
+                                    <input type="date" id="startDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <input type="date" id="endDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-schedule-id">排班ID</div>
+                                        <div class="col-manage-id">管理员</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-ask-time">申请时间</div>
+                                        <div class="col-leave-time">离开时间</div>
+                                        <div class="col-back-time">返回时间</div>
+                                        <div class="col-reason">原因</div>
+                                        <div class="col-mark">备注</div>
+                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="leave-log-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
                                         </div>
-                                        <div id="leave-list">加载中...</div>
-                                        <div class="pagination" style="margin-top: 20px; text-align: center;">
-                                            <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                            <span id="page-info">第 1 页 / 共 1 页</span>
-                                            <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
                                     </div>
                                 </div>
                             </div>
@@ -77,115 +122,267 @@
                 </div>
             </div>
         </div>
-
-        <!-- 底部 -->
-        <div id="footer" w3-include-html="_footer.html"></div>
     </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
 
-    <script>
-        // 全局变量
-        let leaveData = [];
-        let leavePage = 1, leavePerPage = 10;
+    <!-- 查看弹窗 -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeViewModal()">×</button>
+            <h3>查看排班请假日志</h3>
+            <form id="viewForm">
+                <div class="ant-form-item">
+                    <label>ID:</label>
+                    <input type="text" id="viewId" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>排班ID:</label>
+                    <select id="viewScheduleId" disabled>
+                        <!-- 动态生成 -->
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>管理员ID:</label>
+                    <select id="viewManageId" disabled>
+                        <!-- 动态生成 -->
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>状态:</label>
+                    <select id="viewStatus" disabled>
+                        <option value="0">申请中</option>
+                        <option value="1">已通过</option>
+                        <option value="2">已拒绝</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>申请时间:</label>
+                    <input type="datetime-local" id="viewAskTime" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>离开时间:</label>
+                    <input type="datetime-local" id="viewLeaveTime" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>返回时间:</label>
+                    <input type="datetime-local" id="viewBackTime" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>原因:</label>
+                    <input type="text" id="viewReason" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>备注:</label>
+                    <input type="text" id="viewMark" disabled>
+                </div>
+                <div class="ant-form-item">
+                    <label>创建时间:</label>
+                    <input type="datetime-local" id="viewCreateTime" disabled>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeViewModal()">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-        // Tab 切换函数（单页无需切换）
-        function switchTab(page) {
-            console.log('Switching to:', page);
-            window.location.href = page;
+<script>
+    let leaveLogData = [];
+    let leaveLogPage = 1, leaveLogPerPage = 20;
+    let scheduleData = [];
+    let manageData = [];
+
+    function fetchData() {
+        console.log('Fetching leave log data...');
+        leaveLogData = [];
+        scheduleData = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `排班 ${i + 1}` }));
+        manageData = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `管理员 ${i + 1}` }));
+
+        const scheduleSelects = [document.getElementById('scheduleIdFilter'), document.getElementById('viewScheduleId')];
+        scheduleSelects.forEach(select => {
+            scheduleData.forEach(schedule => {
+                const option = document.createElement('option');
+                option.value = schedule.id;
+                option.text = schedule.name;
+                select.appendChild(option);
+            });
+        });
+
+        const manageSelects = [document.getElementById('manageIdFilter'), document.getElementById('viewManageId')];
+        manageSelects.forEach(select => {
+            manageData.forEach(manage => {
+                const option = document.createElement('option');
+                option.value = manage.id;
+                option.text = manage.name;
+                select.appendChild(option);
+            });
+        });
+
+        for (let i = 1; i <= 200; i++) {
+            const leaveLog = {
+                id: i,
+                schedule_id: Math.ceil(Math.random() * 15),
+                manage_id: Math.ceil(Math.random() * 15),
+                status: Math.floor(Math.random() * 3), // 0: 申请中, 1: 已通过, 2: 已拒绝
+                ask_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix(),
+                leave_time: moment().subtract(Math.floor(Math.random() * 20), 'days').unix(),
+                back_time: moment().subtract(Math.floor(Math.random() * 10), 'days').unix(),
+                reason: `请假原因 ${i}`,
+                mark: `备注信息 ${i}`,
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
+            };
+            leaveLogData.push(leaveLog);
         }
+        renderLeaveLogList();
+    }
 
-        // 加载请假数据
-        function fetchLeaveData() {
-            console.log('Fetching leave data...');
-            const sampleData = [];
-            for (let i = 1; i <= 50; i++) {
-                const status = Math.floor(Math.random() * 3);
-                const createTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
-                sampleData.push({
-                    id: i,
-                    store_id: Math.floor(Math.random() * 50) + 1,
-                    staff_id: Math.floor(Math.random() * 100) + 1,
-                    start_time: createTime + Math.floor(Math.random() * 86400),
-                    end_time: createTime + Math.floor(Math.random() * 172800) + 86400,
-                    status: status,
-                    reason: `Leave reason ${i}`,
-                    create_time: createTime,
-                    update_time: status !== 0 ? createTime + Math.floor(Math.random() * 86400) : createTime
-                });
+    function getScheduleName(id) {
+        const schedule = scheduleData.find(s => s.id === id);
+        return schedule ? schedule.name : id;
+    }
+
+    function getManageName(id) {
+        const manage = manageData.find(m => m.id === id);
+        return manage ? manage.name : id;
+    }
+
+    function renderLeaveLogList() {
+        const start = (leaveLogPage - 1) * leaveLogPerPage;
+        const end = start + leaveLogPerPage;
+        const paginatedData = leaveLogData.slice(start, end);
+        const listContainer = document.getElementById('leave-log-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(log => {
+            let statusTag;
+            switch (log.status) {
+                case 0: statusTag = '<span class="ant-tag ant-tag-blue">申请中</span>'; break;
+                case 1: statusTag = '<span class="ant-tag ant-tag-green">已通过</span>'; break;
+                case 2: statusTag = '<span class="ant-tag ant-tag-red">已拒绝</span>'; break;
+                default: statusTag = '<span class="ant-tag">未知</span>';
             }
-            leaveData = sampleData;
-            applyFilters();
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`;
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${log.id}"></div>
+                <div class="col-id">${log.id}</div>
+                <div class="col-schedule-id">${getScheduleName(log.schedule_id)}</div>
+                <div class="col-manage-id">${getManageName(log.manage_id)}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-ask-time">${moment.unix(log.ask_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-leave-time">${moment.unix(log.leave_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-back-time">${moment.unix(log.back_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-reason">${log.reason}</div>
+                <div class="col-mark">${log.mark.substring(0, 50)}${log.mark.length > 50 ? '...' : ''}</div>
+                <div class="col-create-time">${moment.unix(log.create_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="viewLeaveLog(${log.id})">查看</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteLeaveLog(${log.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(leaveLogData.length / leaveLogPerPage);
+        document.getElementById('page-info').textContent = `第 ${leaveLogPage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const scheduleId = document.getElementById('scheduleIdFilter').value;
+        const manageId = document.getElementById('manageIdFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredData = leaveLogData;
+        if (scheduleId) filteredData = filteredData.filter(item => item.schedule_id === parseInt(scheduleId));
+        if (manageId) filteredData = filteredData.filter(item => item.manage_id === parseInt(manageId));
+        if (startDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+        leaveLogPage = 1;
+        leaveLogData = filteredData;
+        renderLeaveLogList();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(leaveLogData.length / leaveLogPerPage);
+        leaveLogPage += delta;
+        if (leaveLogPage < 1) leaveLogPage = 1;
+        if (leaveLogPage > totalPages) leaveLogPage = totalPages;
+        renderLeaveLogList();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(leaveLogData.length / leaveLogPerPage);
+        if (page >= 1 && page <= totalPages) {
+            leaveLogPage = page;
+            renderLeaveLogList();
+        } else {
+            alert('请输入有效的页码');
         }
+    }
 
-        // 渲染请假列表
-        function renderLeaveList(data) {
-            const start = (leavePage - 1) * leavePerPage;
-            const end = start + leavePerPage;
-            const paginatedData = data.slice(start, end);
-            const listContainer = document.getElementById('leave-list');
-            listContainer.innerHTML = '';
+    function changePerPage() {
+        leaveLogPerPage = parseInt(document.getElementById('perPage').value);
+        leaveLogPage = 1;
+        renderLeaveLogList();
+    }
 
-            paginatedData.forEach(item => {
-                const statusTag = item.status === 0 ? '<span class="ant-tag ant-tag-blue">待审核</span>' :
-                                  item.status === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' :
-                                  '<span class="ant-tag ant-tag-red">已拒绝</span>';
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'task-item';
-                itemDiv.style = `padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; margin: 5px 0;`;
-                itemDiv.innerHTML = `
-                    <div style="flex: 1;">${item.id}</div>
-                    <div style="flex: 1;">${item.store_id}</div>
-                    <div style="flex: 1;">${item.staff_id}</div>
-                    <div style="flex: 1;">${moment.unix(item.start_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                    <div style="flex: 1;">${moment.unix(item.end_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                    <div style="flex: 1;">${statusTag}</div>
-                    <div style="flex: 1;">${item.reason}</div>
-                    <div style="flex: 1;">${moment.unix(item.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                    <div style="flex: 1;">${moment.unix(item.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                `;
-                listContainer.appendChild(itemDiv);
-            });
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
 
-            const totalPages = Math.ceil(data.length / leavePerPage);
-            document.getElementById('page-info').textContent = `第 ${leavePage} 页 / 共 ${totalPages} 页`;
+    function viewLeaveLog(id) {
+        const log = leaveLogData.find(l => l.id === id);
+        document.getElementById('viewId').value = log.id;
+        document.getElementById('viewScheduleId').value = log.schedule_id;
+        document.getElementById('viewManageId').value = log.manage_id;
+        document.getElementById('viewStatus').value = log.status;
+        document.getElementById('viewAskTime').value = moment.unix(log.ask_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('viewLeaveTime').value = moment.unix(log.leave_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('viewBackTime').value = moment.unix(log.back_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('viewReason').value = log.reason;
+        document.getElementById('viewMark').value = log.mark;
+        document.getElementById('viewCreateTime').value = moment.unix(log.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('viewModal').style.display = 'block';
+    }
+
+    function deleteLeaveLog(id) {
+        if (confirm('确定要删除此排班请假日志吗？')) {
+            leaveLogData = leaveLogData.filter(l => l.id !== id);
+            renderLeaveLogList();
         }
+    }
 
-        // 应用筛选
-        function applyFilters() {
-            const status = document.getElementById('statusFilter').value;
-            const staffId = document.getElementById('staffIdFilter').value;
-            const storeId = document.getElementById('storeIdFilter').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            let filteredData = leaveData;
-            if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
-            if (staffId) filteredData = filteredData.filter(item => item.staff_id === parseInt(staffId));
-            if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
-            if (startDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
-            if (endDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
-
-            leavePage = 1;
-            renderLeaveList(filteredData);
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的排班请假日志');
+            return;
         }
-
-        // 切换页面
-        function changePage(delta) {
-            const totalPages = Math.ceil(leaveData.length / leavePerPage);
-            leavePage += delta;
-            if (leavePage < 1) leavePage = 1;
-            if (leavePage > totalPages) leavePage = totalPages;
-            applyFilters();
+        if (confirm(`确定要删除 ${selectedIds.length} 个排班请假日志吗？`)) {
+            leaveLogData = leaveLogData.filter(l => !selectedIds.includes(l.id));
+            renderLeaveLogList();
         }
+    }
 
-        // 初始化
-        window.onload = () => {
-            console.log('Page loaded, initializing...');
-            w3.includeHTML(() => {
-                console.log('External HTML included');
-                initMenus();
-                fetchLeaveData();
-            });
-        };
-    </script>
+    function closeViewModal() {
+        document.getElementById('viewModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchData();
+        });
+    };
+</script>
 </body>
 </html>

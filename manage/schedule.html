@@ -10,64 +10,114 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <style>
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-date { width: 12%; min-width: 100px; }
+        .col-from { width: 8%; min-width: 60px; }
+        .col-to { width: 8%; min-width: 60px; }
+        .col-manage-id { width: 12%; min-width: 100px; }
+        .col-true-manage-id { width: 12%; min-width: 100px; }
+        .col-work-start { width: 12%; min-width: 100px; }
+        .col-work-end { width: 12%; min-width: 100px; }
+        .col-ask-leave-count { width: 8%; min-width: 60px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1080px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 1440px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
+        .modal-content .ant-form-item label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 顶部 -->
-        <div id="header" w3-include-html="_header.html"></div>
-
-        <!-- 内容区域 -->
-        <div class="content-wrapper">
-            <!-- 侧边栏 -->
-            <div id="sidebar" w3-include-html="_sidebar.html"></div>
-
-            <!-- 主内容区域 -->
-            <div class="main-content">
-                <div class="tabs-container">
-                    <div class="ant-tabs ant-tabs-top">
-                        <div class="ant-tabs-nav" role="tablist">
-                            <div class="ant-tabs-nav-wrap">
-                                <div class="ant-tabs-nav-list">
-                                    <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule.html')" role="tab" aria-selected="true">
-                                        <span class="ant-tabs-tab-btn">排班计划</span>
-                                    </div>
-                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">排班计划</span>
                                 </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
-                        <div class="ant-tabs-content-holder">
-                            <div class="ant-tabs-content ant-tabs-content-top">
-                                <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                    <h2>排班计划</h2>
-                                    <div class="filter-container" style="margin-bottom: 20px;">
-                                        <select id="statusFilter" class="ant-select" onchange="applyFilters()">
-                                            <option value="">全部状态</option>
-                                            <option value="0">未开始</option>
-                                            <option value="1">进行中</option>
-                                            <option value="2">已完成</option>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <!-- 条件筛选区域 -->
+                                <div class="filter-container">
+                                    <input type="date" id="dateFilter" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()" placeholder="日期">
+                                    <input type="number" id="fromFilter" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()" placeholder="开始时间">
+                                    <input type="number" id="toFilter" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()" placeholder="结束时间">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="manageIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                            <option value="">全部管理员</option>
+                                            <!-- 动态生成 -->
                                         </select>
-                                        <input type="number" id="staffIdFilter" class="ant-input" placeholder="员工ID" oninput="applyFilters()">
-                                        <input type="number" id="storeIdFilter" class="ant-input" placeholder="店铺ID" oninput="applyFilters()">
-                                        <input type="date" id="startDate" class="ant-input" onchange="applyFilters()">
-                                        <input type="date" id="endDate" class="ant-input" onchange="applyFilters()">
                                     </div>
-                                    <div class="task-list">
-                                        <div class="table-header" style="display: flex; padding: 10px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                            <div style="flex: 1;">ID</div>
-                                            <div style="flex: 1;">员工ID</div>
-                                            <div style="flex: 1;">店铺ID</div>
-                                            <div style="flex: 1;">开始时间</div>
-                                            <div style="flex: 1;">结束时间</div>
-                                            <div style="flex: 1;">状态</div>
-                                            <div style="flex: 1;">创建时间</div>
-                                            <div style="flex: 1;">更新时间</div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="trueManageIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                            <option value="">全部真实管理员</option>
+                                            <!-- 动态生成 -->
+                                        </select>
+                                    </div>
+                                    <input type="date" id="startDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <input type="date" id="endDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
+                                </div>
+                                <!-- 操作区域 -->
+                                <div class="action-container">
+                                    <button class="ant-btn ant-btn-primary" onclick="addSchedule()">添加</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
+                                </div>
+                                <!-- 数据区域 -->
+                                <div class="task-list">
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
+                                        <div class="col-id">ID</div>
+                                        <div class="col-status">状态</div>
+                                        <div class="col-date">日期</div>
+                                        <div class="col-from">开始时间</div>
+                                        <div class="col-to">结束时间</div>
+                                        <div class="col-manage-id">管理员</div>
+                                        <div class="col-true-manage-id">真实管理员</div>
+                                        <div class="col-work-start">工作开始</div>
+                                        <div class="col-work-end">工作结束</div>
+                                        <div class="col-ask-leave-count">请假次数</div>
+                                        <div class="col-actions">操作</div>
+                                    </div>
+                                    <div id="schedule-list">加载中...</div>
+                                    <div class="pagination">
+                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
+                                        <span id="page-info">第 1 页 / 共 1 页</span>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
                                         </div>
-                                        <div id="schedule-list">加载中...</div>
-                                        <div class="pagination" style="margin-top: 20px; text-align: center;">
-                                            <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                            <span id="page-info">第 1 页 / 共 1 页</span>
-                                            <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                        </div>
+                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
                                     </div>
                                 </div>
                             </div>
@@ -76,113 +126,468 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
 
-        <!-- 底部 -->
-        <div id="footer" w3-include-html="_footer.html"></div>
+    <!-- 添加弹窗 -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeAddModal()">×</button>
+            <h3>添加排班计划</h3>
+            <form id="addForm">
+                <div class="ant-form-item">
+                    <label>状态:</label>
+                    <select id="addStatus">
+                        <option value="0">禁用</option>
+                        <option value="1">启用</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>日期:</label>
+                    <input type="date" id="addDate">
+                </div>
+                <div class="ant-form-item">
+                    <label>开始时间:</label>
+                    <input type="number" id="addFrom" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>结束时间:</label>
+                    <input type="number" id="addTo" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>管理员ID:</label>
+                    <select id="addManageId">
+                        <!-- 动态生成 -->
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>真实管理员ID:</label>
+                    <select id="addTrueManageId">
+                        <!-- 动态生成 -->
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>工作开始时间:</label>
+                    <input type="number" id="addWorkStart" min="0">
+                </div>
+                <div class=" gorg-item">
+                    <label>工作结束时间:</label>
+                    <input type="number" id="addWorkEnd" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>请假次数:</label>
+                    <input type="number" id="addAskLeaveCount" min="0" max="255">
+                </div>
+                <div class="ant-form-item">
+                    <label>下班时间:</label>
+                    <input type="number" id="addTimeOffWork" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>签到次数:</label>
+                    <input type="number" id="addSignCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>缺勤次数:</label>
+                    <input type="number" id="addMissCount" min="0">
+                </div>
+                <div class="ant-form-item">
+                    <label>备注:</label>
+                    <input type="text" id="addMark" maxlength="64">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeAddModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveAdd()">保存</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <script>
-        // 全局变量
-        let scheduleData = [];
-        let schedulePage = 1, schedulePerPage = 10;
+    <!-- 编辑弹窗 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeEditModal()">×</button>
+            <h3>编辑排班计划</h3>
+            <form id="editForm">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="system">
+                                    <span class="ant-tabs-tab-btn">系统信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="editStatus">
+                                        <option value="0">禁用</option>
+                                        <option value="1">启用</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>日期:</label>
+                                    <input type="date" id="editDate">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>开始时间:</label>
+                                    <input type="number" id="editFrom" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>结束时间:</label>
+                                    <input type="number" id="editTo" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>管理员ID:</label>
+                                    <select id="editManageId">
+                                        <!-- 动态生成 -->
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>真实管理员ID:</label>
+                                    <select id="editTrueManageId">
+                                        <!-- 动态生成 -->
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>工作开始时间:</label>
+                                    <input type="number" id="editWorkStart" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>工作结束时间:</label>
+                                    <input type="number" id="editWorkEnd" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>请假次数:</label>
+                                    <input type="number" id="editAskLeaveCount" min="0" max="255">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>下班时间:</label>
+                                    <input type="number" id="editTimeOffWork" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>签到次数:</label>
+                                    <input type="number" id="editSignCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>缺勤次数:</label>
+                                    <input type="number" id="editMissCount" min="0">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>备注:</label>
+                                    <input type="text" id="editMark" maxlength="64">
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="system" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>ID:</label>
+                                    <input type="text" id="editId" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>更新时间:</label>
+                                    <input type="datetime-local" id="editUpdateTime" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="editCreateTime" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn" onclick="closeEditModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveEdit()">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-        // Tab 切换函数（单页无需切换）
-        function switchTab(page) {
-            console.log('Switching to:', page);
-            window.location.href = page;
+<script>
+    let scheduleData = [];
+    let schedulePage = 1, schedulePerPage = 20;
+    let manageData = [];
+
+    function fetchData() {
+        console.log('Fetching schedule data...');
+        scheduleData = [];
+        manageData = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `管理员 ${i + 1}` }));
+
+        const manageSelects = [document.getElementById('manageIdFilter'), document.getElementById('trueManageIdFilter'), document.getElementById('addManageId'), document.getElementById('addTrueManageId'), document.getElementById('editManageId'), document.getElementById('editTrueManageId')];
+        manageSelects.forEach(select => {
+            manageData.forEach(manage => {
+                const option = document.createElement('option');
+                option.value = manage.id;
+                option.text = manage.name;
+                select.appendChild(option);
+            });
+        });
+
+        for (let i = 1; i <= 200; i++) {
+            const schedule = {
+                id: i,
+                status: Math.floor(Math.random() * 2),
+                date: moment().subtract(Math.floor(Math.random() * 30), 'days').format('YYYY-MM-DD'),
+                from: Math.floor(Math.random() * 24 * 60 * 60),
+                to: Math.floor(Math.random() * 24 * 60 * 60) + 24 * 60 * 60,
+                manage_id: Math.ceil(Math.random() * 15),
+                true_manage_id: Math.ceil(Math.random() * 15),
+                work_start: Math.floor(Math.random() * 24 * 60 * 60),
+                work_end: Math.floor(Math.random() * 24 * 60 * 60) + 24 * 60 * 60,
+                ask_leave_count: Math.floor(Math.random() * 10),
+                time_off_work: Math.floor(Math.random() * 24 * 60 * 60),
+                sign_count: Math.floor(Math.random() * 5),
+                miss_count: Math.floor(Math.random() * 5),
+                mark: `排班备注 ${i}`,
+                update_time: moment().subtract(Math.floor(Math.random() * 20), 'days').unix(),
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
+            };
+            scheduleData.push(schedule);
         }
+        renderScheduleList();
+    }
 
-        // 加载排班数据
-        function fetchScheduleData() {
-            console.log('Fetching schedule data...');
-            const sampleData = [];
-            for (let i = 1; i <= 50; i++) {
-                const status = Math.floor(Math.random() * 3);
-                const createTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
-                sampleData.push({
-                    id: i,
-                    staff_id: Math.floor(Math.random() * 100) + 1,
-                    store_id: Math.floor(Math.random() * 50) + 1,
-                    start_time: createTime + Math.floor(Math.random() * 86400),
-                    end_time: createTime + Math.floor(Math.random() * 172800) + 86400,
-                    status: status,
-                    create_time: createTime,
-                    update_time: status === 2 ? createTime + Math.floor(Math.random() * 86400) : createTime
+    function getManageName(id) {
+        const manage = manageData.find(m => m.id === id);
+        return manage ? manage.name : id;
+    }
+
+    function renderScheduleList() {
+        const start = (schedulePage - 1) * schedulePerPage;
+        const end = start + schedulePerPage;
+        const paginatedData = scheduleData.slice(start, end);
+        const listContainer = document.getElementById('schedule-list');
+        listContainer.innerHTML = '';
+
+        paginatedData.forEach(schedule => {
+            const statusTag = schedule.status === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' :
+                '<span class="ant-tag ant-tag-green">启用</span>';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`;
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${schedule.id}"></div>
+                <div class="col-id">${schedule.id}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-date">${schedule.date}</div>
+                <div class="col-from">${Math.floor(schedule.from / 3600)}:${Math.floor((schedule.from % 3600) / 60)}</div>
+                <div class="col-to">${Math.floor(schedule.to / 3600)}:${Math.floor((schedule.to % 3600) / 60)}</div>
+                <div class="col-manage-id">${getManageName(schedule.manage_id)}</div>
+                <div class="col-true-manage-id">${getManageName(schedule.true_manage_id)}</div>
+                <div class="col-work-start">${moment.unix(schedule.work_start).format('HH:mm')}</div>
+                <div class="col-work-end">${moment.unix(schedule.work_end).format('HH:mm')}</div>
+                <div class="col-ask-leave-count">${schedule.ask_leave_count}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editSchedule(${schedule.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteSchedule(${schedule.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        const totalPages = Math.ceil(scheduleData.length / schedulePerPage);
+        document.getElementById('page-info').textContent = `第 ${schedulePage} 页 / 共 ${totalPages} 页`;
+        document.getElementById('pageJump').max = totalPages;
+    }
+
+    function applyFilters() {
+        const date = document.getElementById('dateFilter').value;
+        const from = document.getElementById('fromFilter').value;
+        const to = document.getElementById('toFilter').value;
+        const manageId = document.getElementById('manageIdFilter').value;
+        const trueManageId = document.getElementById('trueManageIdFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredData = scheduleData;
+        if (date) filteredData = filteredData.filter(item => item.date === date);
+        if (from) filteredData = filteredData.filter(item => item.from >= parseInt(from));
+        if (to) filteredData = filteredData.filter(item => item.to <= parseInt(to));
+        if (manageId) filteredData = filteredData.filter(item => item.manage_id === parseInt(manageId));
+        if (trueManageId) filteredData = filteredData.filter(item => item.true_manage_id === parseInt(trueManageId));
+        if (startDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+
+        schedulePage = 1;
+        scheduleData = filteredData;
+        renderScheduleList();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(scheduleData.length / schedulePerPage);
+        schedulePage += delta;
+        if (schedulePage < 1) schedulePage = 1;
+        if (schedulePage > totalPages) schedulePage = totalPages;
+        renderScheduleList();
+    }
+
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(scheduleData.length / schedulePerPage);
+        if (page >= 1 && page <= totalPages) {
+            schedulePage = page;
+            renderScheduleList();
+        } else {
+            alert('请输入有效的页码');
+        }
+    }
+
+    function changePerPage() {
+        schedulePerPage = parseInt(document.getElementById('perPage').value);
+        schedulePage = 1;
+        renderScheduleList();
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
+    }
+
+    function setupTabs(modalId) {
+        const tabButtons = document.querySelectorAll(`#${modalId} .ant-tabs-tab`);
+        const tabPanes = document.querySelectorAll(`#${modalId} .ant-tabs-tabpane`);
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
                 });
-            }
-            scheduleData = sampleData;
-            applyFilters();
-        }
-
-        // 渲染排班列表
-        function renderScheduleList(data) {
-            const start = (schedulePage - 1) * schedulePerPage;
-            const end = start + schedulePerPage;
-            const paginatedData = data.slice(start, end);
-            const listContainer = document.getElementById('schedule-list');
-            listContainer.innerHTML = '';
-
-            paginatedData.forEach(item => {
-                const statusTag = item.status === 0 ? '<span class="ant-tag ant-tag-blue">未开始</span>' :
-                                  item.status === 1 ? '<span class="ant-tag ant-tag-green">进行中</span>' :
-                                  '<span class="ant-tag ant-tag-red">已完成</span>';
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'task-item';
-                itemDiv.style = `padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; margin: 5px 0;`;
-                itemDiv.innerHTML = `
-                    <div style="flex: 1;">${item.id}</div>
-                    <div style="flex: 1;">${item.staff_id}</div>
-                    <div style="flex: 1;">${item.store_id}</div>
-                    <div style="flex: 1;">${moment.unix(item.start_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                    <div style="flex: 1;">${moment.unix(item.end_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                    <div style="flex: 1;">${statusTag}</div>
-                    <div style="flex: 1;">${moment.unix(item.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                    <div style="flex: 1;">${moment.unix(item.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                `;
-                listContainer.appendChild(itemDiv);
+                document.querySelector(`#${modalId} .ant-tabs-ink-bar`).style.left = `${button.offsetLeft}px`;
+                document.querySelector(`#${modalId} .ant-tabs-ink-bar`).style.width = `${button.offsetWidth}px`;
             });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
 
-            const totalPages = Math.ceil(data.length / schedulePerPage);
-            document.getElementById('page-info').textContent = `第 ${schedulePage} 页 / 共 ${totalPages} 页`;
-        }
+    function addSchedule() {
+        document.getElementById('addStatus').value = '0';
+        document.getElementById('addDate').value = '';
+        document.getElementById('addFrom').value = '';
+        document.getElementById('addTo').value = '';
+        document.getElementById('addManageId').value = '';
+        document.getElementById('addTrueManageId').value = '';
+        document.getElementById('addWorkStart').value = '';
+        document.getElementById('addWorkEnd').value = '';
+        document.getElementById('addAskLeaveCount').value = '0';
+        document.getElementById('addTimeOffWork').value = '0';
+        document.getElementById('addSignCount').value = '0';
+        document.getElementById('addMissCount').value = '0';
+        document.getElementById('addMark').value = '';
+        document.getElementById('addModal').style.display = 'block';
+    }
 
-        // 应用筛选
-        function applyFilters() {
-            const status = document.getElementById('statusFilter').value;
-            const staffId = document.getElementById('staffIdFilter').value;
-            const storeId = document.getElementById('storeIdFilter').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
+    function editSchedule(id) {
+        const schedule = scheduleData.find(s => s.id === id);
+        document.getElementById('editId').value = schedule.id;
+        document.getElementById('editStatus').value = schedule.status;
+        document.getElementById('editDate').value = schedule.date;
+        document.getElementById('editFrom').value = schedule.from;
+        document.getElementById('editTo').value = schedule.to;
+        document.getElementById('editManageId').value = schedule.manage_id;
+        document.getElementById('editTrueManageId').value = schedule.true_manage_id;
+        document.getElementById('editWorkStart').value = schedule.work_start;
+        document.getElementById('editWorkEnd').value = schedule.work_end;
+        document.getElementById('editAskLeaveCount').value = schedule.ask_leave_count;
+        document.getElementById('editTimeOffWork').value = schedule.time_off_work;
+        document.getElementById('editSignCount').value = schedule.sign_count;
+        document.getElementById('editMissCount').value = schedule.miss_count;
+        document.getElementById('editMark').value = schedule.mark;
+        document.getElementById('editUpdateTime').value = moment.unix(schedule.update_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('editCreateTime').value = moment.unix(schedule.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('editModal').style.display = 'block';
+        setupTabs('editModal');
+    }
 
-            let filteredData = scheduleData;
-            if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
-            if (staffId) filteredData = filteredData.filter(item => item.staff_id === parseInt(staffId));
-            if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
-            if (startDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
-            if (endDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
-
-            schedulePage = 1;
-            renderScheduleList(filteredData);
-        }
-
-        // 切换页面
-        function changePage(delta) {
-            const totalPages = Math.ceil(scheduleData.length / schedulePerPage);
-            schedulePage += delta;
-            if (schedulePage < 1) schedulePage = 1;
-            if (schedulePage > totalPages) schedulePage = totalPages;
-            applyFilters();
-        }
-
-        // 初始化
-        window.onload = () => {
-            console.log('Page loaded, initializing...');
-            w3.includeHTML(() => {
-                console.log('External HTML included');
-                initMenus();
-                fetchScheduleData();
-            });
+    function saveAdd() {
+        const newSchedule = {
+            id: scheduleData.length + 1,
+            status: parseInt(document.getElementById('addStatus').value),
+            date: document.getElementById('addDate').value,
+            from: parseInt(document.getElementById('addFrom').value) || 0,
+            to: parseInt(document.getElementById('addTo').value) || 0,
+            manage_id: parseInt(document.getElementById('addManageId').value),
+            true_manage_id: parseInt(document.getElementById('addTrueManageId').value),
+            work_start: parseInt(document.getElementById('addWorkStart').value) || 0,
+            work_end: parseInt(document.getElementById('addWorkEnd').value) || 0,
+            ask_leave_count: parseInt(document.getElementById('addAskLeaveCount').value),
+            time_off_work: parseInt(document.getElementById('addTimeOffWork').value),
+            sign_count: parseInt(document.getElementById('addSignCount').value),
+            miss_count: parseInt(document.getElementById('addMissCount').value),
+            mark: document.getElementById('addMark').value,
+            update_time: moment().unix(),
+            create_time: moment().unix()
         };
-    </script>
+        scheduleData.push(newSchedule);
+        closeAddModal();
+        renderScheduleList();
+    }
+
+    function saveEdit() {
+        const schedule = scheduleData.find(s => s.id === parseInt(document.getElementById('editId').value));
+        schedule.status = parseInt(document.getElementById('editStatus').value);
+        schedule.date = document.getElementById('editDate').value;
+        schedule.from = parseInt(document.getElementById('editFrom').value) || 0;
+        schedule.to = parseInt(document.getElementById('editTo').value) || 0;
+        schedule.manage_id = parseInt(document.getElementById('editManageId').value);
+        schedule.true_manage_id = parseInt(document.getElementById('editTrueManageId').value);
+        schedule.work_start = parseInt(document.getElementById('editWorkStart').value) || 0;
+        schedule.work_end = parseInt(document.getElementById('editWorkEnd').value) || 0;
+        schedule.ask_leave_count = parseInt(document.getElementById('editAskLeaveCount').value);
+        schedule.time_off_work = parseInt(document.getElementById('editTimeOffWork').value);
+        schedule.sign_count = parseInt(document.getElementById('editSignCount').value);
+        schedule.miss_count = parseInt(document.getElementById('editMissCount').value);
+        schedule.mark = document.getElementById('editMark').value;
+        schedule.update_time = moment().unix();
+        closeEditModal();
+        renderScheduleList();
+    }
+
+    function deleteSchedule(id) {
+        if (confirm('确定要删除此排班计划吗？')) {
+            scheduleData = scheduleData.filter(s => s.id !== id);
+            renderScheduleList();
+        }
+    }
+
+    function batchDelete() {
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的排班计划');
+            return;
+        }
+        if (confirm(`确定要删除 ${selectedIds.length} 个排班计划吗？`)) {
+            scheduleData = scheduleData.filter(s => !selectedIds.includes(s.id));
+            renderScheduleList();
+        }
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchData();
+        });
+    };
+</script>
 </body>
 </html>
