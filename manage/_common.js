@@ -1,6 +1,5 @@
 // _common.js
 
-// 初始化顶部菜单和侧边栏
 function initMenus() {
     const topMenuItems = document.querySelectorAll('.top-menu-item');
     topMenuItems.forEach(item => {
@@ -19,23 +18,50 @@ function initMenus() {
             });
         });
     });
-    // 初始化顶部菜单激活状态
-    const activeTopMenu = document.querySelector('.top-menu-item.active');
+
+    const currentUrl = window.location.pathname.split('/').pop() || 'dashboard.html';
+    let activeTopMenu = null;
+
+    document.querySelectorAll('.sidebar-submenu-item a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentUrl) {
+            const parentSidebarMenu = link.closest('.sidebar-menu');
+            if (parentSidebarMenu) {
+                const menuId = parentSidebarMenu.id.replace('-menu', '');
+                activeTopMenu = document.querySelector(`.top-menu-item[data-menu="${menuId}"]`);
+            }
+        }
+    });
+
     if (activeTopMenu) {
+        topMenuItems.forEach(item => item.classList.remove('active'));
+        activeTopMenu.classList.add('active');
         const menuId = activeTopMenu.getAttribute('data-menu') + '-menu';
         document.querySelectorAll('.sidebar-menu').forEach(menu => {
-            menu.classList.toggle('active', menu.id === menuId);
-            // if (menu.id === menuId) {
+            const isActive = menu.id === menuId;
+            menu.classList.toggle('active', isActive);
+            if (isActive) {
                 menu.querySelectorAll('.sidebar-menu-item').forEach(item => item.classList.add('expand'));
-            // }
+            } else {
+                menu.querySelectorAll('.sidebar-menu-item').forEach(item => item.classList.remove('expand'));
+            }
         });
-
-        document.querySelectorAll('.sidebar-menu').forEach(item => {
-            item.classList.remove('active')
-        });
+    } else {
+        const defaultTopMenu = document.querySelector('.top-menu-item[data-menu="dashboard"]');
+        if (defaultTopMenu) {
+            topMenuItems.forEach(item => item.classList.remove('active'));
+            defaultTopMenu.classList.add('active');
+            document.querySelectorAll('.sidebar-menu').forEach(menu => {
+                menu.classList.toggle('active', menu.id === 'dashboard-menu');
+                if (menu.id === 'dashboard-menu') {
+                    menu.querySelectorAll('.sidebar-menu-item').forEach(item => item.classList.add('expand'));
+                } else {
+                    menu.querySelectorAll('.sidebar-menu-item').forEach(item => item.classList.remove('expand'));
+                }
+            });
+        }
     }
 
-    // 多语言切换
     const langSelect = document.getElementById('languageSelect');
     if (langSelect) {
         langSelect.addEventListener('change', (e) => {
@@ -43,7 +69,6 @@ function initMenus() {
         });
     }
 
-    // 二级菜单点击折叠/展开三级菜单
     document.querySelectorAll('.sidebar-menu-item > a').forEach(item => {
         item.addEventListener('click', (e) => {
             const submenu = item.nextElementSibling;
@@ -54,15 +79,34 @@ function initMenus() {
         });
     });
 
-    // 更新时间
     updateTime();
     setInterval(updateTime, 1000);
-
-    // 动态标记当前页面菜单为选中状态
     highlightCurrentMenu();
 }
 
-// 更新时间
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const contentWrapper = document.querySelector('.content-wrapper');
+
+    sidebar.classList.toggle('collapsed');
+    sidebar.classList.toggle('active');
+
+    if (window.innerWidth > 768) {
+        if (sidebar.classList.contains('collapsed')) {
+            contentWrapper.style.marginLeft = '0';
+        } else {
+            contentWrapper.style.marginLeft = '256px';
+        }
+    } else {
+        contentWrapper.style.marginLeft = '0';
+        if (sidebar.classList.contains('active')) {
+            sidebar.style.transform = 'translateX(0)';
+        } else {
+            sidebar.style.transform = 'translateX(-100%)';
+        }
+    }
+}
+
 function updateTime() {
     const now = moment();
     const timezone = moment.tz.guess();
@@ -73,25 +117,24 @@ function updateTime() {
     }
 }
 
-// 高亮当前页面菜单
 function highlightCurrentMenu() {
-    const currentUrl = window.location.pathname.split('/').pop() || 'dashboard.html'; // 获取当前页面文件名
+    const currentUrl = window.location.pathname.split('/').pop() || 'dashboard.html';
     document.querySelectorAll('.sidebar-submenu-item a').forEach(link => {
         const href = link.getAttribute('href');
         if (href === currentUrl) {
-            link.parentElement.classList.add('active'); // 高亮三级菜单项
+            link.parentElement.classList.add('active');
             const parentMenuItem = link.closest('.sidebar-menu-item');
             if (parentMenuItem) {
-                parentMenuItem.classList.add('expand'); // 展开二级菜单
+                parentMenuItem.classList.add('expand');
             }
             const parentSidebarMenu = link.closest('.sidebar-menu');
             if (parentSidebarMenu) {
-                parentSidebarMenu.classList.add('active'); // 显示对应一级菜单
+                parentSidebarMenu.classList.add('active');
                 const menuId = parentSidebarMenu.id.replace('-menu', '');
                 const topMenuItem = document.querySelector(`.top-menu-item[data-menu="${menuId}"]`);
                 if (topMenuItem) {
                     document.querySelectorAll('.top-menu-item').forEach(item => item.classList.remove('active'));
-                    topMenuItem.classList.add('active'); // 高亮顶部菜单
+                    topMenuItem.classList.add('active');
                 }
             }
         }
