@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 需求竞标管理</title>
+    <title>FASTRESP - 需求竞标</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -11,33 +11,52 @@
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
     <style>
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
         .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
         .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
         .table-header, .task-item { display: flex; width: 100%; }
         .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 10%; min-width: 60px; }
+        .col-id { width: 10%; min-width: 80px; }
         .col-demand-id { width: 10%; min-width: 80px; }
         .col-user-id { width: 10%; min-width: 80px; }
         .col-store-id { width: 10%; min-width: 80px; }
-        .col-status { width: 8%; min-width: 80px; }
-        .col-bid-price { width: 8%; min-width: 80px; }
-        .col-bid-information { width: 10%; min-width: 100px; }
-        .col-bid-time { width: 10%; min-width: 100px; }
+        .col-status { width: 10%; min-width: 80px; }
+        .col-bid-time { width: 15%; min-width: 120px; }
+        .col-bid-price { width: 10%; min-width: 80px; }
+        .col-bid-info { width: 15%; min-width: 120px; }
+        .col-bid-pics { width: 15%; min-width: 120px; }
         .col-actions { width: 10%; min-width: 100px; }
         .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
-        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
         .modal-buttons { text-align: right; margin-top: 20px; }
         .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
         .modal-content .ant-form-item { margin-bottom: 16px; }
-        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
-        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item:not(.textarea-item):not(.image-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item):not(.image-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item):not(.image-item) input, .modal-content .ant-form-item:not(.textarea-item):not(.image-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
         .modal-content .ant-form-item.textarea-item { display: block; }
         .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
         .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        .modal-content .ant-form-item.image-item { display: block; }
+        .modal-content .ant-form-item.image-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.image-item input[type="file"] { display: block; margin-bottom: 8px; }
+        .modal-content .image-preview { display: flex; flex-wrap: wrap; gap: 8px; }
+        .modal-content .image-preview .image-wrapper { position: relative; display: inline-block; }
+        .modal-content .image-preview img { max-width: 100px; max-height: 100px; object-fit: cover; cursor: pointer; }
+        .modal-content .image-preview .delete-btn { position: absolute; top: 0; right: 0; background: rgba(255, 0, 0, 0.7); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; line-height: 20px; text-align: center; cursor: pointer; }
+        .bid-pics-preview { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; position: relative; }
+        .bid-pics-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
+        .bid-pics-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
+        .bid-pics-preview .carousel { display: flex; align-items: center; }
+        .bid-pics-preview .carousel-btn { background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 5px; cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); }
+        .bid-pics-preview .carousel-btn.left { left: 0; }
+        .bid-pics-preview .carousel-btn.right { right: 0; }
+        #imageModal .modal-content { width: 90%; max-width: 800px; text-align: center; }
+        #imageModal .modal-content img { max-width: 100%; max-height: 80vh; }
     </style>
 </head>
 <body>
@@ -51,8 +70,8 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">需求竞标管理</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('demand_bid.html')">
+                                    <span class="ant-tabs-tab-btn">需求竞标</span>
                                 </div>
                                 <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
@@ -60,30 +79,54 @@
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
                                 <!-- 条件筛选区域 -->
                                 <div class="filter-container">
-                                    <select id="demandIdFilter" class="ant-select">
-                                        <option value="">全部需求</option>
-                                    </select>
-                                    <select id="userIdFilter" class="ant-select">
-                                        <option value="">全部用户</option>
-                                    </select>
-                                    <select id="storeIdFilter" class="ant-select">
-                                        <option value="">全部店铺</option>
-                                    </select>
-                                    <select id="statusFilter" class="ant-select">
-                                        <option value="">全部状态</option>
-                                        <option value="0">未处理</option>
-                                        <option value="1">处理中</option>
-                                    </select>
-                                    <input type="datetime-local" id="bidTimeStartFilter" class="ant-input">
-                                    <input type="datetime-local" id="bidTimeEndFilter" class="ant-input">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="userIdFilter">
+                                            <option value="">全部用户</option>
+                                            <option value="1">用户1</option><option value="2">用户2</option><option value="3">用户3</option>
+                                            <option value="4">用户4</option><option value="5">用户5</option><option value="6">用户6</option>
+                                            <option value="7">用户7</option><option value="8">用户8</option><option value="9">用户9</option>
+                                            <option value="10">用户10</option><option value="11">用户11</option><option value="12">用户12</option>
+                                            <option value="13">用户13</option><option value="14">用户14</option><option value="15">用户15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="demandIdFilter">
+                                            <option value="">全部需求</option>
+                                            <option value="1">需求1</option><option value="2">需求2</option><option value="3">需求3</option>
+                                            <option value="4">需求4</option><option value="5">需求5</option><option value="6">需求6</option>
+                                            <option value="7">需求7</option><option value="8">需求8</option><option value="9">需求9</option>
+                                            <option value="10">需求10</option><option value="11">需求11</option><option value="12">需求12</option>
+                                            <option value="13">需求13</option><option value="14">需求14</option><option value="15">需求15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="storeIdFilter">
+                                            <option value="">全部店铺</option>
+                                            <option value="1">店铺1</option><option value="2">店铺2</option><option value="3">店铺3</option>
+                                            <option value="4">店铺4</option><option value="5">店铺5</option><option value="6">店铺6</option>
+                                            <option value="7">店铺7</option><option value="8">店铺8</option><option value="9">店铺9</option>
+                                            <option value="10">店铺10</option><option value="11">店铺11</option><option value="12">店铺12</option>
+                                            <option value="13">店铺13</option><option value="14">店铺14</option><option value="15">店铺15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="statusFilter">
+                                            <option value="">全部状态</option>
+                                            <option value="0">待审核</option>
+                                            <option value="1">已通过</option>
+                                            <option value="2">已拒绝</option>
+                                        </select>
+                                    </div>
+                                    <input type="date" id="startDate" class="ant-input">
+                                    <input type="date" id="endDate" class="ant-input">
                                     <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
                                 </div>
                                 <!-- 操作区域 -->
                                 <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addDemandBid()">添加</button>
+                                    <button class="ant-btn ant-btn-primary" onclick="addBid()">添加</button>
                                     <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
                                     <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
                                 </div>
@@ -92,27 +135,30 @@
                                     <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
                                         <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
                                         <div class="col-id">ID</div>
-                                        <div class="col-demand-id">需求</div>
+                                        <div class="col-demand-id">需求ID</div>
                                         <div class="col-user-id">用户</div>
                                         <div class="col-store-id">店铺</div>
                                         <div class="col-status">状态</div>
-                                        <div class="col-bid-price">竞标价格</div>
-                                        <div class="col-bid-information">竞标信息</div>
                                         <div class="col-bid-time">竞标时间</div>
+                                        <div class="col-bid-price">竞标价格</div>
+                                        <div class="col-bid-info">竞标信息</div>
+                                        <div class="col-bid-pics">竞标图片</div>
                                         <div class="col-actions">操作</div>
                                     </div>
-                                    <div id="demand-bid-list">加载中...</div>
+                                    <div id="bid-list">加载中...</div>
                                     <div class="pagination">
                                         <button class="ant-btn" onclick="changePage(-1)">上一页</button>
                                         <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
                                         <button class="ant-btn" onclick="jumpToPage()">跳转</button>
                                         <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
-                                            <option value="10">10 条/页</option>
-                                            <option value="20" selected>20 条/页</option>
-                                            <option value="50">50 条/页</option>
-                                            <option value="100">100 条/页</option>
-                                        </select>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
                                         <button class="ant-btn" onclick="changePage(1)">下一页</button>
                                     </div>
                                 </div>
@@ -126,79 +172,108 @@
     <div id="footer" w3-include-html="_footer.html"></div>
 
     <!-- 添加/编辑弹窗 -->
-    <div id="demandBidModal" class="modal">
+    <div id="bidModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加需求竞标</h3>
-            <form id="demandBidForm">
-                <div class="ant-form-item" id="idField" style="display: none;">
-                    <label>ID:</label>
-                    <input type="number" id="modalId" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>需求ID:</label>
-                    <select id="modalDemandId">
-                        <option value="0">请选择需求</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>用户ID:</label>
-                    <select id="modalUserId">
-                        <option value="0">请选择用户</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>店铺ID:</label>
-                    <select id="modalStoreId">
-                        <option value="0">请选择店铺</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>状态:</label>
-                    <select id="modalStatus">
-                        <option value="0">未处理</option>
-                        <option value="1">处理中</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>竞标时间:</label>
-                    <input type="datetime-local" id="modalBidTime">
-                </div>
-                <div class="ant-form-item">
-                    <label>竞标价格:</label>
-                    <input type="number" id="modalBidPrice" step="0.01" min="0">
-                </div>
-                <div class="ant-form-item">
-                    <label>竞标信息:</label>
-                    <input type="text" id="modalBidInformation" maxlength="256">
-                </div>
-                <div class="ant-form-item">
-                    <label>竞标图片:</label>
-                    <input type="text" id="modalBidPics" maxlength="1024">
-                </div>
-                <div class="ant-form-item">
-                    <label>中标时间:</label>
-                    <input type="datetime-local" id="modalBidWinTime">
-                </div>
-                <div class="ant-form-item">
-                    <label>分隔符:</label>
-                    <input type="text" id="modalSplitStr" maxlength="4">
-                </div>
-                <div class="ant-form-item">
-                    <label>字段列表:</label>
-                    <input type="text" id="modalFieldList" maxlength="256">
-                </div>
-                <div class="ant-form-item textarea-item">
-                    <label>样品列表:</label>
-                    <textarea id="modalSampleList" rows="5"></textarea>
-                </div>
-                <div class="ant-form-item textarea-item">
-                    <label>数据:</label>
-                    <textarea id="modalData" rows="5"></textarea>
+            <h3 id="modalTitle">添加竞标</h3>
+            <form id="bidForm">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
+                                    <span class="ant-tabs-tab-btn">基本信息</span>
+                                </div>
+                                <div class="ant-tabs-tab" data-tab="extra">
+                                    <span class="ant-tabs-tab-btn">附加信息</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
+                                <div class="ant-form-item">
+                                    <label>ID (自动生成):</label>
+                                    <input type="text" id="modalId" disabled>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>需求ID:</label>
+                                    <select id="modalDemandId">
+                                        <option value="1">需求1</option><option value="2">需求2</option><option value="3">需求3</option>
+                                        <option value="4">需求4</option><option value="5">需求5</option><option value="6">需求6</option>
+                                        <option value="7">需求7</option><option value="8">需求8</option><option value="9">需求9</option>
+                                        <option value="10">需求10</option><option value="11">需求11</option><option value="12">需求12</option>
+                                        <option value="13">需求13</option><option value="14">需求14</option><option value="15">需求15</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>用户:</label>
+                                    <select id="modalUserId">
+                                        <option value="1">用户1</option><option value="2">用户2</option><option value="3">用户3</option>
+                                        <option value="4">用户4</option><option value="5">用户5</option><option value="6">用户6</option>
+                                        <option value="7">用户7</option><option value="8">用户8</option><option value="9">用户9</option>
+                                        <option value="10">用户10</option><option value="11">用户11</option><option value="12">用户12</option>
+                                        <option value="13">用户13</option><option value="14">用户14</option><option value="15">用户15</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>店铺:</label>
+                                    <select id="modalStoreId">
+                                        <option value="1">店铺1</option><option value="2">店铺2</option><option value="3">店铺3</option>
+                                        <option value="4">店铺4</option><option value="5">店铺5</option><option value="6">店铺6</option>
+                                        <option value="7">店铺7</option><option value="8">店铺8</option><option value="9">店铺9</option>
+                                        <option value="10">店铺10</option><option value="11">店铺11</option><option value="12">店铺12</option>
+                                        <option value="13">店铺13</option><option value="14">店铺14</option><option value="15">店铺15</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>状态:</label>
+                                    <select id="modalStatus">
+                                        <option value="0">待审核</option>
+                                        <option value="1">已通过</option>
+                                        <option value="2">已拒绝</option>
+                                    </select>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>竞标时间:</label>
+                                    <input type="datetime-local" id="modalBidTime">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>竞标价格:</label>
+                                    <input type="number" id="modalBidPrice" step="0.01" min="0">
+                                </div>
+                            </div>
+                            <div class="ant-tabs-tabpane" id="extra" style="display: none;">
+                                <div class="ant-form-item">
+                                    <label>竞标信息:</label>
+                                    <input type="text" id="modalBidInformation">
+                                </div>
+                                <div class="ant-form-item image-item">
+                                    <label>竞标图片:</label>
+                                    <input type="file" id="modalBidPics" accept="image/*" multiple onchange="previewImages(this)">
+                                    <div class="image-preview" id="modalBidPicsPreview"></div>
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>中标时间:</label>
+                                    <input type="datetime-local" id="modalBidWinTime">
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>样本列表:</label>
+                                    <textarea id="modalSampleList" rows="5"></textarea>
+                                </div>
+                                <div class="ant-form-item textarea-item">
+                                    <label>数据:</label>
+                                    <textarea id="modalData" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-buttons">
                     <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveDemandBid()">保存</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBid()">保存</button>
                 </div>
             </form>
         </div>
@@ -217,8 +292,9 @@
                 <div class="ant-form-item">
                     <label>新状态:</label>
                     <select id="newStatus">
-                        <option value="0">未处理</option>
-                        <option value="1">处理中</option>
+                        <option value="0">待审核</option>
+                        <option value="1">已通过</option>
+                        <option value="2">已拒绝</option>
                     </select>
                 </div>
                 <div class="modal-buttons">
@@ -228,158 +304,165 @@
             </form>
         </div>
     </div>
+
+    <!-- 图片放大弹窗 -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <img id="enlargedImage" src="" alt="放大图片">
+        </div>
+    </div>
 </div>
 
 <script>
-    let demandBidData = [];
-    let page = 1, perPage = 20;
+    let bidData = [];
+    let bidPage = 1, bidPerPage = 20;
+    let currentPics = []; // 用于存储编辑弹窗中的图片URL
+    let currentCarouselIndex = 0; // 当前轮播图索引
 
-    // 定义关联字段的映射
-    const relationMap = {
-        demand_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `需求 ${i + 1}` })),
-        user_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `用户 ${i + 1}` })),
-        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` }))
-    };
+    function fetchBidData() {
+        console.log('Fetching bid data...');
+        bidData = [];
+        const imagePool = [
+            'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0',
+            'https://images.unsplash.com/photo-1519125323398-675f398f6978',
+            'https://images.unsplash.com/photo-1521747116048-5a69d91532d8',
+            'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b',
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'
+        ];
 
-    // 生成下拉数据
-    function populateDropdowns() {
-        const demandSelect = document.getElementById('modalDemandId');
-        const demandFilter = document.getElementById('demandIdFilter');
-        const userSelect = document.getElementById('modalUserId');
-        const userFilter = document.getElementById('userIdFilter');
-        const storeSelect = document.getElementById('modalStoreId');
-        const storeFilter = document.getElementById('storeIdFilter');
-
-        relationMap.demand_id.forEach(item => {
-            demandSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            demandFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.user_id.forEach(item => {
-            userSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            userFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.store_id.forEach(item => {
-            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-    }
-
-    // 获取关联字段的名称
-    function getRelationName(field, id) {
-        if (id === 0) return '未关联';
-        const item = relationMap[field].find(item => item.id === id);
-        return item ? item.name : `未知 (${id})`;
-    }
-
-    // 生成样本数据
-    function generateSampleData() {
-        demandBidData = [];
         for (let i = 1; i <= 200; i++) {
-            const bidTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            const bidWinTime = i % 2 === 0 ? moment().subtract(Math.floor(Math.random() * 50), 'days').unix() : 0;
-            demandBidData.push({
+            const picCount = Math.floor(Math.random() * 3); // 0, 1, or 2 pics
+            const pics = picCount > 0 ? Array.from({ length: picCount }, () => imagePool[Math.floor(Math.random() * imagePool.length)]) : [];
+            const bid = {
                 id: i,
                 demand_id: Math.floor(Math.random() * 15) + 1,
                 user_id: Math.floor(Math.random() * 15) + 1,
                 store_id: Math.floor(Math.random() * 15) + 1,
-                status: Math.floor(Math.random() * 2),
-                bid_time: bidTime,
-                bid_price: (Math.random() * 100).toFixed(2),
+                status: Math.floor(Math.random() * 3),
+                bid_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix(),
+                bid_price: (Math.random() * 1000).toFixed(2),
                 bid_information: `竞标信息 ${i}`,
-                bid_pics: `["pic${i}_1.jpg", "pic${i}_2.jpg"]`,
-                bid_win_time: bidWinTime,
+                bid_pics: JSON.stringify(pics),
+                bid_win_time: Math.random() > 0.5 ? moment().subtract(Math.floor(Math.random() * 30), 'days').unix() : 0,
                 split_str: ':',
-                field_list: `["field${i}_1", "field${i}_2"]`,
-                sample_list: `样品列表 ${i}`,
-                data: `数据 ${i}`
-            });
+                field_list: JSON.stringify(['field1', 'field2']),
+                sample_list: `样本 ${i} - 描述`,
+                data: `数据 ${i} - 详情`
+            };
+            bidData.push(bid);
         }
-        renderDemandBidList();
+        renderBidList();
     }
 
-    // 渲染列表
-    function renderDemandBidList() {
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const paginatedData = demandBidData.slice(start, end);
-        const listContainer = document.getElementById('demand-bid-list');
+    function renderBidList() {
+        const start = (bidPage - 1) * bidPerPage;
+        const end = start + bidPerPage;
+        const paginatedBids = bidData.slice(start, end);
+        const listContainer = document.getElementById('bid-list');
         listContainer.innerHTML = '';
 
-        paginatedData.forEach(bid => {
-            const statusTag = bid.status === 0 ? '<span class="ant-tag ant-tag-blue">未处理</span>' :
-                '<span class="ant-tag ant-tag-green">处理中</span>';
+        paginatedBids.forEach(bid => {
+            const statusTag = bid.status === 0 ? '<span class="ant-tag ant-tag-blue">待审核</span>' :
+                bid.status === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' :
+                    '<span class="ant-tag ant-tag-red">已拒绝</span>';
+            const pics = JSON.parse(bid.bid_pics);
+            let picsHtml = '';
+            if (pics.length === 0) {
+                picsHtml = '<span class="placeholder" onclick="alert(\'图片不存在\')">无</span>';
+            } else if (pics.length === 1) {
+                picsHtml = `<img src="${pics[0]}" alt="竞标图片" onclick="enlargeImage('${pics[0]}')">`;
+            } else {
+                picsHtml = `
+                    <div class="carousel">
+                        <button class="carousel-btn left" onclick="shiftCarousel(${bid.id}, -1, event)">◄</button>
+                        <img src="${pics[0]}" alt="竞标图片" onclick="enlargeImage('${pics[0]}')" data-index="0" data-bid="${bid.id}">
+                        <button class="carousel-btn right" onclick="shiftCarousel(${bid.id}, 1, event)">►</button>
+                    </div>`;
+            }
             const itemDiv = document.createElement('div');
             itemDiv.className = 'task-item';
-            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`;
             itemDiv.innerHTML = `
                 <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${bid.id}"></div>
                 <div class="col-id">${bid.id}</div>
-                <div class="col-demand-id">${getRelationName('demand_id', bid.demand_id)}</div>
-                <div class="col-user-id">${getRelationName('user_id', bid.user_id)}</div>
-                <div class="col-store-id">${getRelationName('store_id', bid.store_id)}</div>
+                <div class="col-demand-id">需求${bid.demand_id}</div>
+                <div class="col-user-id">用户${bid.user_id}</div>
+                <div class="col-store-id">店铺${bid.store_id}</div>
                 <div class="col-status">${statusTag}</div>
+                <div class="col-bid-time">${moment.unix(bid.bid_time).format('YYYY-MM-DD HH:mm:ss')}</div>
                 <div class="col-bid-price">${bid.bid_price}</div>
-                <div class="col-bid-information">${bid.bid_information || '无'}</div>
-                <div class="col-bid-time">${moment.unix(bid.bid_time).format('YYYY-MM-DD HH:mm')}</div>
+                <div class="col-bid-info">${bid.bid_information}</div>
+                <div class="col-bid-pics"><div class="bid-pics-preview">${picsHtml}</div></div>
                 <div class="col-actions">
-                    <button class="ant-btn" onclick="editDemandBid(${bid.id})">编辑</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteDemandBid(${bid.id})">删除</button>
+                    <button class="ant-btn" onclick="editBid(${bid.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteBid(${bid.id})">删除</button>
                 </div>
             `;
             listContainer.appendChild(itemDiv);
         });
 
-        const totalPages = Math.ceil(demandBidData.length / perPage);
-        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        const totalPages = Math.ceil(bidData.length / bidPerPage);
+        document.getElementById('page-info').textContent = `第 ${bidPage} 页 / 共 ${totalPages} 页`;
         document.getElementById('pageJump').max = totalPages;
     }
 
-    // 筛选
-    function applyFilters() {
-        let filteredData = [...demandBidData];
-        const demandId = document.getElementById('demandIdFilter').value;
-        const userId = document.getElementById('userIdFilter').value;
-        const storeId = document.getElementById('storeIdFilter').value;
-        const status = document.getElementById('statusFilter').value;
-        const bidTimeStart = document.getElementById('bidTimeStartFilter').value;
-        const bidTimeEnd = document.getElementById('bidTimeEndFilter').value;
-
-        if (demandId) filteredData = filteredData.filter(item => item.demand_id === parseInt(demandId));
-        if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
-        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
-        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
-        if (bidTimeStart) filteredData = filteredData.filter(item => moment.unix(item.bid_time).isSameOrAfter(bidTimeStart));
-        if (bidTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.bid_time).isSameOrBefore(bidTimeEnd));
-
-        demandBidData = filteredData;
-        page = 1;
-        renderDemandBidList();
+    function shiftCarousel(bidId, direction, event) {
+        event.stopPropagation();
+        const bid = bidData.find(item => item.id === bidId);
+        const pics = JSON.parse(bid.bid_pics);
+        const imgElement = document.querySelector(`.bid-pics-preview img[data-bid="${bidId}"]`);
+        let currentIndex = parseInt(imgElement.dataset.index);
+        currentIndex = (currentIndex + direction + pics.length) % pics.length;
+        imgElement.src = pics[currentIndex];
+        imgElement.dataset.index = currentIndex;
+        imgElement.onclick = () => enlargeImage(pics[currentIndex]);
     }
 
-    // 分页
+    function applyFilters() {
+        const userId = document.getElementById('userIdFilter').value;
+        const demandId = document.getElementById('demandIdFilter').value;
+        const storeId = document.getElementById('storeIdFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        let filteredBids = bidData;
+        if (userId) filteredBids = filteredBids.filter(bid => bid.user_id === parseInt(userId));
+        if (demandId) filteredBids = filteredBids.filter(bid => bid.demand_id === parseInt(demandId));
+        if (storeId) filteredBids = filteredBids.filter(bid => bid.store_id === parseInt(storeId));
+        if (status) filteredBids = filteredBids.filter(bid => bid.status === parseInt(status));
+        if (startDate) filteredBids = filteredBids.filter(bid => moment.unix(bid.bid_time).isSameOrAfter(startDate));
+        if (endDate) filteredBids = filteredBids.filter(bid => moment.unix(bid.bid_time).isSameOrBefore(endDate));
+
+        bidPage = 1;
+        bidData = filteredBids;
+        renderBidList();
+    }
+
     function changePage(delta) {
-        const totalPages = Math.ceil(demandBidData.length / perPage);
-        page += delta;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        renderDemandBidList();
+        const totalPages = Math.ceil(bidData.length / bidPerPage);
+        bidPage += delta;
+        if (bidPage < 1) bidPage = 1;
+        if (bidPage > totalPages) bidPage = totalPages;
+        renderBidList();
     }
 
     function jumpToPage() {
-        const newPage = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(demandBidData.length / perPage);
-        if (newPage >= 1 && newPage <= totalPages) {
-            page = newPage;
-            renderDemandBidList();
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(bidData.length / bidPerPage);
+        if (page >= 1 && page <= totalPages) {
+            bidPage = page;
+            renderBidList();
         } else {
             alert('请输入有效的页码');
         }
     }
 
     function changePerPage() {
-        perPage = parseInt(document.getElementById('perPage').value);
-        page = 1;
-        renderDemandBidList();
+        bidPerPage = parseInt(document.getElementById('perPage').value);
+        bidPage = 1;
+        renderBidList();
     }
 
     function toggleSelectAll() {
@@ -387,37 +470,37 @@
         document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
     }
 
-    // 添加
-    function addDemandBid() {
-        isEditing = false;
-        editId = null;
-        document.getElementById('modalTitle').textContent = '添加需求竞标';
-        document.getElementById('idField').style.display = 'none';
-        document.getElementById('modalDemandId').value = '0';
-        document.getElementById('modalUserId').value = '0';
-        document.getElementById('modalStoreId').value = '0';
-        document.getElementById('modalStatus').value = '0';
-        document.getElementById('modalBidTime').value = '';
-        document.getElementById('modalBidPrice').value = '0.00';
-        document.getElementById('modalBidInformation').value = '';
-        document.getElementById('modalBidPics').value = '[]';
-        document.getElementById('modalBidWinTime').value = '';
-        document.getElementById('modalSplitStr').value = ':';
-        document.getElementById('modalFieldList').value = '[]';
-        document.getElementById('modalSampleList').value = '';
-        document.getElementById('modalData').value = '';
-        document.getElementById('demandBidModal').style.display = 'block';
-    }
-
-    // 编辑
     let isEditing = false;
     let editId = null;
-    function editDemandBid(id) {
+
+    function addBid() {
+        isEditing = false;
+        editId = null;
+        currentPics = [];
+        document.getElementById('modalTitle').textContent = '添加竞标';
+        document.getElementById('modalId').value = '';
+        document.getElementById('modalDemandId').value = '1';
+        document.getElementById('modalUserId').value = '1';
+        document.getElementById('modalStoreId').value = '1';
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalBidTime').value = moment().format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalBidPrice').value = '0.00';
+        document.getElementById('modalBidInformation').value = '';
+        document.getElementById('modalBidPics').value = '';
+        document.getElementById('modalBidPicsPreview').innerHTML = '';
+        document.getElementById('modalBidWinTime').value = '';
+        document.getElementById('modalSampleList').value = '';
+        document.getElementById('modalData').value = '';
+        setupTabs();
+        document.getElementById('bidModal').style.display = 'block';
+    }
+
+    function editBid(id) {
         isEditing = true;
         editId = id;
-        const bid = demandBidData.find(item => item.id === id);
-        document.getElementById('modalTitle').textContent = '编辑需求竞标';
-        document.getElementById('idField').style.display = 'block';
+        const bid = bidData.find(item => item.id === id);
+        currentPics = JSON.parse(bid.bid_pics);
+        document.getElementById('modalTitle').textContent = '编辑竞标';
         document.getElementById('modalId').value = bid.id;
         document.getElementById('modalDemandId').value = bid.demand_id;
         document.getElementById('modalUserId').value = bid.user_id;
@@ -425,71 +508,124 @@
         document.getElementById('modalStatus').value = bid.status;
         document.getElementById('modalBidTime').value = moment.unix(bid.bid_time).format('YYYY-MM-DDTHH:mm');
         document.getElementById('modalBidPrice').value = bid.bid_price;
-        document.getElementById('modalBidInformation').value = bid.bid_information;
-        document.getElementById('modalBidPics').value = bid.bid_pics;
+        document.getElementById('modalBidInformation').value = bid.bid_information || '';
+        document.getElementById('modalBidPics').value = '';
+        renderImagePreview(currentPics);
         document.getElementById('modalBidWinTime').value = bid.bid_win_time ? moment.unix(bid.bid_win_time).format('YYYY-MM-DDTHH:mm') : '';
-        document.getElementById('modalSplitStr').value = bid.split_str;
-        document.getElementById('modalFieldList').value = bid.field_list;
         document.getElementById('modalSampleList').value = bid.sample_list;
-        document.getElementById('modalData').value = bid.data;
-        document.getElementById('demandBidModal').style.display = 'block';
+        document.getElementById('modalData').value = bid.data || '';
+        setupTabs();
+        document.getElementById('bidModal').style.display = 'block';
     }
 
-    // 保存
-    function saveDemandBid() {
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('#bidModal .ant-tabs-tab');
+        const tabPanes = document.querySelectorAll('#bidModal .ant-tabs-tabpane');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
+                button.classList.add('ant-tabs-tab-active');
+                const tabId = button.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.style.display = pane.id === tabId ? 'block' : 'none';
+                });
+                document.querySelector('#bidModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
+                document.querySelector('#bidModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
+            });
+        });
+        tabButtons[0].classList.add('ant-tabs-tab-active');
+        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
+    }
+
+    function previewImages(input) {
+        const files = input.files;
+        if (files) {
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentPics.push(e.target.result);
+                    renderImagePreview(currentPics);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+
+    function renderImagePreview(pics) {
+        const preview = document.getElementById('modalBidPicsPreview');
+        preview.innerHTML = '';
+        pics.forEach((url, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'image-wrapper';
+            const img = document.createElement('img');
+            img.src = url;
+            img.onclick = () => enlargeImage(url);
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '×';
+            deleteBtn.onclick = () => deleteImage(index);
+            wrapper.appendChild(img);
+            wrapper.appendChild(deleteBtn);
+            preview.appendChild(wrapper);
+        });
+    }
+
+    function deleteImage(index) {
+        currentPics.splice(index, 1);
+        renderImagePreview(currentPics);
+    }
+
+    function saveBid() {
         const bid = {
-            id: isEditing ? editId : demandBidData.length + 1,
-            demand_id: parseInt(document.getElementById('modalDemandId').value) || 0,
-            user_id: parseInt(document.getElementById('modalUserId').value) || 0,
-            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
+            id: isEditing ? editId : bidData.length + 1,
+            demand_id: parseInt(document.getElementById('modalDemandId').value),
+            user_id: parseInt(document.getElementById('modalUserId').value),
+            store_id: parseInt(document.getElementById('modalStoreId').value),
             status: parseInt(document.getElementById('modalStatus').value),
-            bid_time: document.getElementById('modalBidTime').value ? moment(document.getElementById('modalBidTime').value).unix() : 0,
-            bid_price: parseFloat(document.getElementById('modalBidPrice').value) || 0,
+            bid_time: moment(document.getElementById('modalBidTime').value).unix(),
+            bid_price: parseFloat(document.getElementById('modalBidPrice').value).toFixed(2),
             bid_information: document.getElementById('modalBidInformation').value,
-            bid_pics: document.getElementById('modalBidPics').value,
+            bid_pics: JSON.stringify(currentPics),
             bid_win_time: document.getElementById('modalBidWinTime').value ? moment(document.getElementById('modalBidWinTime').value).unix() : 0,
-            split_str: document.getElementById('modalSplitStr').value,
-            field_list: document.getElementById('modalFieldList').value,
+            split_str: ':',
+            field_list: JSON.stringify(['field1', 'field2']),
             sample_list: document.getElementById('modalSampleList').value,
             data: document.getElementById('modalData').value
         };
 
         if (isEditing) {
-            const index = demandBidData.findIndex(item => item.id === editId);
-            demandBidData[index] = bid;
+            const index = bidData.findIndex(item => item.id === editId);
+            bidData[index] = bid;
         } else {
-            demandBidData.push(bid);
+            bidData.push(bid);
         }
         closeModal();
-        renderDemandBidList();
+        renderBidList();
     }
 
-    // 删除
-    function deleteDemandBid(id) {
-        if (confirm('确定要删除此需求竞标吗？')) {
-            demandBidData = demandBidData.filter(item => item.id !== id);
-            renderDemandBidList();
+    function deleteBid(id) {
+        if (confirm('确定要删除此竞标记录吗？')) {
+            bidData = bidData.filter(item => item.id !== id);
+            renderBidList();
         }
     }
 
-    // 批量删除
     function batchDelete() {
         const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
         if (selectedIds.length === 0) {
-            alert('请先选择要删除的需求竞标');
+            alert('请先选择要删除的竞标');
             return;
         }
-        if (confirm(`确定要删除 ${selectedIds.length} 个需求竞标吗？`)) {
-            demandBidData = demandBidData.filter(item => !selectedIds.includes(item.id));
-            renderDemandBidList();
+        if (confirm(`确定要删除 ${selectedIds.length} 个竞标记录吗？`)) {
+            bidData = bidData.filter(bid => !selectedIds.includes(bid.id));
+            renderBidList();
         }
     }
 
-    // 批量修改状态
     function batchEditStatus() {
         const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
         if (selectedIds.length === 0) {
-            alert('请先选择要修改状态的需求竞标');
+            alert('请先选择要修改状态的竞标');
             return;
         }
         document.getElementById('selectedIds').value = selectedIds.join(', ');
@@ -498,25 +634,37 @@
 
     function saveBatchStatus() {
         const newStatus = parseInt(document.getElementById('newStatus').value);
-        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
-        demandBidData = demandBidData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus } : item);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        bidData = bidData.map(bid => selectedIds.includes(bid.id) ? { ...bid, status: newStatus } : bid);
         closeStatusModal();
-        renderDemandBidList();
+        renderBidList();
     }
 
     function closeModal() {
-        document.getElementById('demandBidModal').style.display = 'none';
+        document.getElementById('bidModal').style.display = 'none';
     }
 
     function closeStatusModal() {
         document.getElementById('statusModal').style.display = 'none';
     }
 
+    function enlargeImage(url) {
+        document.getElementById('enlargedImage').src = url;
+        document.getElementById('imageModal').style.display = 'block';
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').style.display = 'none';
+    }
+
+    document.getElementById('filter-container')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') applyFilters();
+    });
+
     window.onload = () => {
         w3.includeHTML(() => {
             initMenus();
-            populateDropdowns();
-            generateSampleData();
+            fetchBidData();
         });
     };
 </script>

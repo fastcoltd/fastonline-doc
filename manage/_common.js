@@ -86,6 +86,9 @@ function initMenus() {
     // 初始化移动端侧边栏并监听窗口大小变化
     handleMobileSidebar();
     window.addEventListener('resize', handleMobileSidebar);
+
+    // 添加弹窗关闭逻辑
+    initModalClose();
 }
 
 function toggleSidebar() {
@@ -145,17 +148,14 @@ function highlightCurrentMenu() {
     });
 }
 
-// 处理移动端侧边栏的生成和移除
 function handleMobileSidebar() {
     const isMobile = window.innerWidth <= 768;
 
     if (isMobile) {
-        // 移动模式：如果尚未生成，则生成侧边栏和悬浮按钮
         if (!document.querySelector('.mobile-sidebar')) {
             createMobileSidebar();
         }
     } else {
-        // PC 模式：移除移动端侧边栏和悬浮按钮
         const mobileSidebar = document.querySelector('.mobile-sidebar');
         const floatingToggle = document.querySelector('.floating-toggle');
         if (mobileSidebar) mobileSidebar.remove();
@@ -163,14 +163,12 @@ function handleMobileSidebar() {
     }
 }
 
-// 移动端侧边栏创建函数
 function createMobileSidebar() {
     const mobileSidebar = document.createElement('div');
     mobileSidebar.className = 'mobile-sidebar';
     const menuList = document.createElement('ul');
     menuList.className = 'mobile-menu';
 
-    // 获取一级菜单（header中的top-menu）
     const topMenuItems = document.querySelectorAll('.top-menu-item');
     topMenuItems.forEach(topItem => {
         const menuText = topItem.textContent;
@@ -180,7 +178,7 @@ function createMobileSidebar() {
 
         const menuLink = document.createElement('a');
         menuLink.textContent = menuText;
-        menuLink.href = '#'; // 可根据需要调整跳转逻辑
+        menuLink.href = '#';
         menuLink.addEventListener('click', (e) => {
             e.preventDefault();
             menuItem.classList.toggle('expanded');
@@ -191,12 +189,11 @@ function createMobileSidebar() {
         });
         menuItem.appendChild(menuLink);
 
-        // 获取对应的二级和三级菜单
         const sidebarMenu = document.getElementById(`${menuId}-menu`);
         if (sidebarMenu) {
             const submenuList = document.createElement('ul');
             submenuList.className = 'mobile-submenu';
-            submenuList.style.display = 'none'; // 默认折叠
+            submenuList.style.display = 'none';
 
             const sidebarItems = sidebarMenu.querySelectorAll('.sidebar-menu-item');
             sidebarItems.forEach(sidebarItem => {
@@ -214,12 +211,11 @@ function createMobileSidebar() {
                 });
                 submenuItem.appendChild(submenuLink);
 
-                // 三级菜单
                 const sidebarSubmenu = sidebarItem.querySelector('.sidebar-submenu');
                 if (sidebarSubmenu) {
                     const subSubmenuList = document.createElement('ul');
                     subSubmenuList.className = 'mobile-submenu';
-                    subSubmenuList.style.display = 'none'; // 默认折叠
+                    subSubmenuList.style.display = 'none';
 
                     const subItems = sidebarSubmenu.querySelectorAll('.sidebar-submenu-item');
                     subItems.forEach(subItem => {
@@ -245,23 +241,19 @@ function createMobileSidebar() {
     mobileSidebar.appendChild(menuList);
     document.body.appendChild(mobileSidebar);
 
-    // 添加悬浮按钮
     const floatingToggle = document.createElement('div');
     floatingToggle.className = 'floating-toggle';
     floatingToggle.addEventListener('click', toggleMobileSidebar);
     document.body.appendChild(floatingToggle);
 
-    // 高亮当前页面
     highlightMobileMenu();
 }
 
-// 切换移动端侧边栏
 function toggleMobileSidebar() {
     const mobileSidebar = document.querySelector('.mobile-sidebar');
     mobileSidebar.classList.toggle('open');
 }
 
-// 高亮移动端当前菜单
 function highlightMobileMenu() {
     const currentUrl = window.location.pathname.split('/').pop() || 'dashboard.html';
     document.querySelectorAll('.mobile-submenu-item a').forEach(link => {
@@ -281,5 +273,17 @@ function highlightMobileMenu() {
                 if (subSubmenu) subSubmenu.style.display = 'block';
             }
         }
+    });
+}
+
+// 新增函数：初始化弹窗关闭逻辑
+function initModalClose() {
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            // 如果点击的是modal本身（空白区域），而不是modal-content或其子元素
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
     });
 }
