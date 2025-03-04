@@ -48,15 +48,15 @@
         .modal-content .image-preview .image-wrapper { position: relative; display: inline-block; }
         .modal-content .image-preview img { max-width: 100px; max-height: 100px; object-fit: cover; cursor: pointer; }
         .modal-content .image-preview .delete-btn { position: absolute; top: 0; right: 0; background: rgba(255, 0, 0, 0.7); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; line-height: 20px; text-align: center; cursor: pointer; }
-        .bid-pics-preview { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; position: relative; }
+        .bid-pics-preview { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
         .bid-pics-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
         .bid-pics-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
-        .bid-pics-preview .carousel { display: flex; align-items: center; }
-        .bid-pics-preview .carousel-btn { background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 5px; cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); }
-        .bid-pics-preview .carousel-btn.left { left: 0; }
-        .bid-pics-preview .carousel-btn.right { right: 0; }
         #imageModal .modal-content { width: 90%; max-width: 800px; text-align: center; }
+        #imageModal .modal-content .carousel { display: flex; align-items: center; justify-content: center; position: relative; }
         #imageModal .modal-content img { max-width: 100%; max-height: 80vh; }
+        #imageModal .modal-content .carousel-btn { background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); }
+        #imageModal .modal-content .carousel-btn.left { left: 10px; }
+        #imageModal .modal-content .carousel-btn.right { right: 10px; }
     </style>
 </head>
 <body>
@@ -309,7 +309,11 @@
     <div id="imageModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeImageModal()">×</button>
-            <img id="enlargedImage" src="" alt="放大图片">
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
         </div>
     </div>
 </div>
@@ -317,8 +321,9 @@
 <script>
     let bidData = [];
     let bidPage = 1, bidPerPage = 20;
-    let currentPics = []; // 用于存储编辑弹窗中的图片URL
-    let currentCarouselIndex = 0; // 当前轮播图索引
+    let currentPics = []; // 用于编辑弹窗中的图片URL
+    let currentImageBid = null; // 当前放大图片的bid
+    let currentImageIndex = 0; // 当前放大图片的索引
 
     function fetchBidData() {
         console.log('Fetching bid data...');
@@ -367,19 +372,7 @@
                 bid.status === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' :
                     '<span class="ant-tag ant-tag-red">已拒绝</span>';
             const pics = JSON.parse(bid.bid_pics);
-            let picsHtml = '';
-            if (pics.length === 0) {
-                picsHtml = '<span class="placeholder" onclick="alert(\'图片不存在\')">无</span>';
-            } else if (pics.length === 1) {
-                picsHtml = `<img src="${pics[0]}" alt="竞标图片" onclick="enlargeImage('${pics[0]}')">`;
-            } else {
-                picsHtml = `
-                    <div class="carousel">
-                        <button class="carousel-btn left" onclick="shiftCarousel(${bid.id}, -1, event)">◄</button>
-                        <img src="${pics[0]}" alt="竞标图片" onclick="enlargeImage('${pics[0]}')" data-index="0" data-bid="${bid.id}">
-                        <button class="carousel-btn right" onclick="shiftCarousel(${bid.id}, 1, event)">►</button>
-                    </div>`;
-            }
+            const picsHtml = pics.length > 0 ? pics.map((url, index) => `<img src="${url}" alt="竞标图片" onclick="enlargeImage(${bid.id}, ${index})">`).join('') : '<span class="placeholder" onclick="alert(\'图片不存在\')">无</span>';
             const itemDiv = document.createElement('div');
             itemDiv.className = 'task-item';
             itemDiv.style = `border-bottom: 1px solid #ddd;`;
@@ -405,18 +398,6 @@
         const totalPages = Math.ceil(bidData.length / bidPerPage);
         document.getElementById('page-info').textContent = `第 ${bidPage} 页 / 共 ${totalPages} 页`;
         document.getElementById('pageJump').max = totalPages;
-    }
-
-    function shiftCarousel(bidId, direction, event) {
-        event.stopPropagation();
-        const bid = bidData.find(item => item.id === bidId);
-        const pics = JSON.parse(bid.bid_pics);
-        const imgElement = document.querySelector(`.bid-pics-preview img[data-bid="${bidId}"]`);
-        let currentIndex = parseInt(imgElement.dataset.index);
-        currentIndex = (currentIndex + direction + pics.length) % pics.length;
-        imgElement.src = pics[currentIndex];
-        imgElement.dataset.index = currentIndex;
-        imgElement.onclick = () => enlargeImage(pics[currentIndex]);
     }
 
     function applyFilters() {
@@ -559,7 +540,7 @@
             wrapper.className = 'image-wrapper';
             const img = document.createElement('img');
             img.src = url;
-            img.onclick = () => enlargeImage(url);
+            img.onclick = () => enlargeImage(null, index, currentPics); // 使用当前编辑的图片数组
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = '×';
@@ -648,13 +629,34 @@
         document.getElementById('statusModal').style.display = 'none';
     }
 
-    function enlargeImage(url) {
-        document.getElementById('enlargedImage').src = url;
-        document.getElementById('imageModal').style.display = 'block';
+    function enlargeImage(bidId, index, picsArray = null) {
+        currentImageBid = bidId;
+        currentImageIndex = index;
+        const pics = picsArray || JSON.parse(bidData.find(bid => bid.id === bidId).bid_pics);
+        document.getElementById('enlargedImage').src = pics[currentImageIndex];
+        const modal = document.getElementById('imageModal');
+        const leftBtn = modal.querySelector('.carousel-btn.left');
+        const rightBtn = modal.querySelector('.carousel-btn.right');
+        if (pics.length > 1) {
+            leftBtn.style.display = 'block';
+            rightBtn.style.display = 'block';
+        } else {
+            leftBtn.style.display = 'none';
+            rightBtn.style.display = 'none';
+        }
+        modal.style.display = 'block';
+    }
+
+    function shiftImage(direction) {
+        const pics = currentImageBid ? JSON.parse(bidData.find(bid => bid.id === currentImageBid).bid_pics) : currentPics;
+        currentImageIndex = (currentImageIndex + direction + pics.length) % pics.length;
+        document.getElementById('enlargedImage').src = pics[currentImageIndex];
     }
 
     function closeImageModal() {
         document.getElementById('imageModal').style.display = 'none';
+        currentImageBid = null;
+        currentImageIndex = 0;
     }
 
     document.getElementById('filter-container')?.addEventListener('keypress', (e) => {
