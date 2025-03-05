@@ -11,40 +11,18 @@
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
     <style>
-        /* 自定义样式，确保与 Ant Design 一致 */
-        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
-        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
-        .action-container { margin-bottom: 16px; } /* 防止横向滚动 */
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
-        .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 10%; min-width: 80px; }
-        .col-language { width: 10%; min-width: 80px; }
-        .col-name { width: 15%; min-width: 120px; }
-        .col-status { width: 10%; min-width: 80px; }
-        .col-create-time { width: 15%; min-width: 120px; }
-        .col-update-time { width: 15%; min-width: 120px; }
-        .col-custom-url { width: 15%; min-width: 120px; }
-        .col-brand-logo { width: 15%; min-width: 120px; }
+        .col-id { width: 8%; min-width: 60px; }
         .col-parent-id { width: 10%; min-width: 80px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-brand-logo { width: 10%; min-width: 80px; }
+        .col-custom-url { width: 12%; min-width: 100px; }
+        .col-language { width: 10%; min-width: 80px; }
+        .col-name { width: 10%; min-width: 80px; }
+        .col-company { width: 12%; min-width: 100px; }
+        .col-create-time { width: 15%; min-width: 120px; }
         .col-actions { width: 10%; min-width: 100px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
-        /* 弹窗样式 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
-        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
-        .ant-tabs-content { min-height: 400px; }
-        .ant-tabs-tabpane { padding: 10px 0; }
-        /* 弹窗表单布局：input/select 在一行，textarea 换行 */
-        .modal-content .ant-form-item { margin-bottom: 16px; }
-        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
-        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 100px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .modal-content .ant-form-item.textarea-item { display: block; }
-        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
-        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        .brand-logo-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
+        .brand-logo-preview img .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -58,7 +36,7 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('brand.html')" role="tab" aria-selected="true">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('brand.html')">
                                     <span class="ant-tabs-tab-btn">品牌管理</span>
                                 </div>
                                 <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
@@ -67,31 +45,45 @@
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
                                 <!-- 条件筛选区域 -->
-                                <div class="filter-container" style="margin-bottom: 20px;">
+                                <div class="filter-container">
                                     <div class="ant-select ant-select-single ant-select-show-arrow">
-                                        <select id="languageFilter">
-                                            <option value="">全部语言</option>
-                                            <option value="zh_CN">中文</option>
-                                            <option value="en_US">English</option>
+                                        <select id="parentIdFilter">
+                                            <option value="">全部父品牌</option>
+                                            <option value="0">无</option>
+                                            <option value="1">品牌1</option><option value="2">品牌2</option><option value="3">品牌3</option>
+                                            <option value="4">品牌4</option><option value="5">品牌5</option><option value="6">品牌6</option>
+                                            <option value="7">品牌7</option><option value="8">品牌8</option><option value="9">品牌9</option>
+                                            <option value="10">品牌10</option><option value="11">品牌11</option><option value="12">品牌12</option>
+                                            <option value="13">品牌13</option><option value="14">品牌14</option><option value="15">品牌15</option>
                                         </select>
                                     </div>
-                                    <input type="text" id="nameFilter" class="ant-input" placeholder="品牌名称">
                                     <div class="ant-select ant-select-single ant-select-show-arrow">
                                         <select id="statusFilter">
                                             <option value="">全部状态</option>
-                                            <option value="0">待审核</option>
-                                            <option value="1">已通过</option>
-                                            <option value="2">已拒绝</option>
+                                            <option value="0">禁用</option>
+                                            <option value="1">启用</option>
                                         </select>
                                     </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="languageFilter">
+                                            <option value="">全部语言</option>
+                                            <option value="en_US">英语</option>
+                                            <option value="zh_CN">中文</option>
+                                            <option value="fr_FR">法语</option>
+                                            <option value="es_ES">西班牙语</option>
+                                            <option value="vi_VN">越南语</option>
+                                            <option value="ru_RU">俄语</option>
+                                        </select>
+                                    </div>
+                                    <input type="text" id="nameFilter" class="ant-input" placeholder="搜索名称">
                                     <input type="date" id="startDate" class="ant-input">
                                     <input type="date" id="endDate" class="ant-input">
                                     <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
                                 </div>
                                 <!-- 操作区域 -->
-                                <div class="action-container" style="margin-bottom: 20px;">
+                                <div class="action-container">
                                     <button class="ant-btn ant-btn-primary" onclick="addBrand()">添加</button>
                                     <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
                                     <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
@@ -101,15 +93,14 @@
                                     <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
                                         <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
                                         <div class="col-id">ID</div>
-                                        <div class="col-language">语言</div>
-                                        <div class="col-name">品牌名称</div>
+                                        <div class="col-parent-id">父品牌</div>
                                         <div class="col-status">状态</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-update-time">更新时间</div>
-                                        <div class="col-custom-url">自定义URL</div>
                                         <div class="col-brand-logo">品牌Logo</div>
-                                        <div class="col-parent-id">父ID</div>
+                                        <div class="col-custom-url">自定义URL</div>
+                                        <div class="col-language">语言</div>
+                                        <div class="col-name">名称</div>
                                         <div class="col-company">公司</div>
+                                        <div class="col-create-time">创建时间</div>
                                         <div class="col-actions">操作</div>
                                     </div>
                                     <div id="brand-list">加载中...</div>
@@ -121,7 +112,7 @@
                                         <div class="ant-select ant-select-single ant-select-show-arrow">
                                             <select id="perPage" onchange="changePerPage()">
                                                 <option value="10">10 条/页</option>
-                                                <option value="20">20 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
                                                 <option value="50">50 条/页</option>
                                                 <option value="100">100 条/页</option>
                                             </select>
@@ -162,69 +153,80 @@
                         <div class="ant-tabs-content">
                             <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
                                 <div class="ant-form-item">
-                                    <label>ID (自动生成):</label>
-                                    <input type="text" id="modalBrandId" disabled>
+                                    <label>父品牌:</label>
+                                    <select id="modalParentId">
+                                        <option value="0">无</option>
+                                        <option value="1">品牌1</option><option value="2">品牌2</option><option value="3">品牌3</option>
+                                        <option value="4">品牌4</option><option value="5">品牌5</option><option value="6">品牌6</option>
+                                        <option value="7">品牌7</option><option value="8">品牌8</option><option value="9">品牌9</option>
+                                        <option value="10">品牌10</option><option value="11">品牌11</option><option value="12">品牌12</option>
+                                        <option value="13">品牌13</option><option value="14">品牌14</option><option value="15">品牌15</option>
+                                    </select>
                                 </div>
                                 <div class="ant-form-item">
                                     <label>状态:</label>
                                     <select id="modalStatus">
-                                        <option value="0">待审核</option>
-                                        <option value="1">已通过</option>
-                                        <option value="2">已拒绝</option>
+                                        <option value="0">禁用</option>
+                                        <option value="1">启用</option>
                                     </select>
                                 </div>
-                                <div class="ant-form-item">
-                                    <label>创建时间:</label>
-                                    <input type="datetime-local" id="modalCreateTime" disabled>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>更新时间:</label>
-                                    <input type="datetime-local" id="modalUpdateTime" disabled>
+                                <div class="ant-form-item image-item">
+                                    <label>品牌Logo:</label>
+                                    <input type="file" id="modalBrandLogo" accept="image/*" onchange="previewImage('brandLogo', this)">
+                                    <div class="image-preview" id="modalBrandLogoPreview"></div>
                                 </div>
                                 <div class="ant-form-item">
                                     <label>自定义URL:</label>
                                     <input type="text" id="modalCustomUrl">
                                 </div>
-                                <div class="ant-form-item">
-                                    <label>品牌Logo:</label>
-                                    <input type="text" id="modalBrandLogo">
+                                <div class="ant-form-item" style="display: none;" id="modalIdItem">
+                                    <label>ID:</label>
+                                    <input type="text" id="modalId" disabled>
                                 </div>
-                                <div class="ant-form-item">
-                                    <label>父ID:</label>
-                                    <input type="number" id="modalParentId" placeholder="0">
+                                <div class="ant-form-item" id="modalCreateTimeItem">
+                                    <label>创建时间:</label>
+                                    <input type="datetime-local" id="modalCreateTime" disabled>
+                                </div>
+                                <div class="ant-form-item" id="modalUpdateTimeItem">
+                                    <label>更新时间:</label>
+                                    <input type="datetime-local" id="modalUpdateTime" disabled>
                                 </div>
                             </div>
                             <div class="ant-tabs-tabpane" id="lang" style="display: none;">
                                 <div class="ant-form-item">
                                     <label>语言:</label>
                                     <select id="modalLanguage">
+                                        <option value="en_US">英语</option>
                                         <option value="zh_CN">中文</option>
-                                        <option value="en_US">English</option>
+                                        <option value="fr_FR">法语</option>
+                                        <option value="es_ES">西班牙语</option>
+                                        <option value="vi_VN">越南语</option>
+                                        <option value="ru_RU">俄语</option>
                                     </select>
                                 </div>
                                 <div class="ant-form-item">
-                                    <label>品牌名称:</label>
+                                    <label>SEO关键词:</label>
+                                    <input type="text" id="modalSeoKeywords">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>SEO描述:</label>
+                                    <input type="text" id="modalSeoDescription">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>名称:</label>
                                     <input type="text" id="modalName">
-                                </div>
-                                <div class="ant-form-item textarea-item">
-                                    <label>概述:</label>
-                                    <textarea id="modalSummary" rows="5"></textarea>
-                                </div>
-                                <div class="ant-form-item textarea-item">
-                                    <label>品牌信息:</label>
-                                    <textarea id="modalBrandInformation" rows="5"></textarea>
                                 </div>
                                 <div class="ant-form-item">
                                     <label>公司:</label>
                                     <input type="text" id="modalCompany">
                                 </div>
                                 <div class="ant-form-item">
-                                    <label>SEO 关键词:</label>
-                                    <input type="text" id="modalSeoKeywords">
+                                    <label>简介:</label>
+                                    <input type="text" id="modalSummary">
                                 </div>
                                 <div class="ant-form-item textarea-item">
-                                    <label>SEO 描述:</label>
-                                    <textarea id="modalSeoDescription" rows="5"></textarea>
+                                    <label>品牌信息:</label>
+                                    <textarea id="modalBrandInformation" rows="5"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -245,11 +247,14 @@
             <h3>批量修改状态</h3>
             <form id="statusForm">
                 <div class="ant-form-item">
+                    <label>选中的ID:</label>
+                    <input type="text" id="selectedIds" disabled>
+                </div>
+                <div class="ant-form-item">
                     <label>新状态:</label>
                     <select id="newStatus">
-                        <option value="0">待审核</option>
-                        <option value="1">已通过</option>
-                        <option value="2">已拒绝</option>
+                        <option value="0">禁用</option>
+                        <option value="1">启用</option>
                     </select>
                 </div>
                 <div class="modal-buttons">
@@ -259,88 +264,103 @@
             </form>
         </div>
     </div>
+
+    <!-- 图片放大弹窗 -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    let brandData = []; // 存储非多语言字段（brand 表）
-    let brandLangData = []; // 存储多语言字段（brand_lang 表）
-    let brandPage = 1, brandPerPage = 10;
+    let brandData = [];
+    let brandLangData = [];
+    let brandPage = 1, brandPerPage = 20;
+    let currentBrandLogo = '';
+    let currentImageBrandId = null;
+    let currentImageIndex = 0;
 
     function fetchBrandData() {
         console.log('Fetching brand data...');
         brandData = [];
         brandLangData = [];
-        const languages = ['zh_CN', 'en_US'];
+        const imagePool = [
+            'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0',
+            'https://images.unsplash.com/photo-1519125323398-675f398f6978',
+            'https://images.unsplash.com/photo-1521747116048-5a69d91532d8',
+            'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b',
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'
+        ];
+        const languages = ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'];
+
         for (let i = 1; i <= 200; i++) {
-            // 生成非多语言字段（brand 表）
-            const status = Math.floor(Math.random() * 3);
-            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            const updateTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
             const brand = {
                 id: i,
-                parent_id: Math.floor(Math.random() * i) || 0, // 随机生成父ID或0
-                status,
-                brand_logo: `https://example.com/logo/brand${i}.png`,
-                custom_url: `brand-${i}`,
-                create_time: createTime,
-                update_time: updateTime
+                parent_id: Math.random() > 0.8 ? Math.floor(Math.random() * 15) + 1 : 0,
+                status: Math.floor(Math.random() * 2),
+                brand_logo: Math.random() > 0.2 ? imagePool[Math.floor(Math.random() * imagePool.length)] : '',
+                custom_url: `/brand/${i}`,
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix(),
+                update_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix()
             };
             brandData.push(brand);
 
-            // 为每种语言生成多语言字段（brand_lang 表）
-            languages.forEach(lang => {
-                const langData = {
-                    id: brandData.length * 2 + (lang === 'zh_CN' ? 0 : 1), // 模拟自增ID
+            languages.forEach((lang, index) => {
+                const brandLang = {
+                    id: i * languages.length + index + 1,
                     brand_id: i,
                     language: lang,
-                    name: lang === 'zh_CN' ? `品牌 ${i}` : `Brand ${i}`,
-                    company: lang === 'zh_CN' ? `公司 ${i}` : `Company ${i}`,
-                    summary: lang === 'zh_CN' ? `品牌 ${i} 的概述` : `Summary for Brand ${i}`,
-                    brand_information: lang === 'zh_CN' ? `品牌 ${i} 的详细信息` : `Detailed information for Brand ${i}`,
-                    seo_keywords: lang === 'zh_CN' ? `品牌${i},关键词${i}` : `Brand${i},Keyword${i}`,
-                    seo_description: lang === 'zh_CN' ? `品牌${i}的SEO描述` : `SEO description for Brand ${i}`
+                    seo_keywords: lang === 'en_US' ? `brand${i}, product` : `${lang}_品牌${i}, 产品`,
+                    seo_description: lang === 'en_US' ? `Description of Brand ${i}` : `${lang}_品牌${i}描述`,
+                    name: lang === 'en_US' ? `Brand${i}` : `${lang}_品牌${i}`,
+                    company: lang === 'en_US' ? `Company${i}` : `${lang}_公司${i}`,
+                    summary: lang === 'en_US' ? `Summary of Brand ${i}` : `${lang}_品牌${i}简介`,
+                    brand_information: lang === 'en_US' ? `Information about Brand ${i}` : `${lang}_关于品牌${i}的信息`
                 };
-                brandLangData.push(langData);
+                brandLangData.push(brandLang);
             });
         }
-        renderBrandList(brandData, brandLangData);
+        renderBrandList();
     }
 
-    function renderBrandList(brandData, brandLangData) {
+    function renderBrandList() {
         const start = (brandPage - 1) * brandPerPage;
         const end = start + brandPerPage;
         const paginatedBrands = brandData.slice(start, end);
         const listContainer = document.getElementById('brand-list');
         listContainer.innerHTML = '';
+        const langFilter = document.getElementById('languageFilter').value || 'en_US';
 
         paginatedBrands.forEach(brand => {
-            const langEntries = brandLangData.filter(item => item.brand_id === brand.id);
-            langEntries.forEach(langEntry => {
-                const statusTag = brand.status === 0 ? '<span class="ant-tag ant-tag-blue">待审核</span>' :
-                    brand.status === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' :
-                        '<span class="ant-tag ant-tag-red">已拒绝</span>';
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'task-item';
-                itemDiv.style = `border-bottom: 1px solid #ddd;`;
-                itemDiv.innerHTML = `
-                        <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${langEntry.id}"></div>
-                        <div class="col-id">${brand.id}</div>
-                        <div class="col-language">${langEntry.language}</div>
-                        <div class="col-name">${langEntry.name}</div>
-                        <div class="col-status">${statusTag}</div>
-                        <div class="col-create-time">${moment.unix(brand.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                        <div class="col-update-time">${moment.unix(brand.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                        <div class="col-custom-url">${brand.custom_url}</div>
-                        <div class="col-brand-logo">${brand.brand_logo}</div>
-                        <div class="col-parent-id">${brand.parent_id}</div>
-                        <div class="col-company">${langEntry.company}</div>
-                        <div class="col-actions">
-                            <button class="ant-btn" onclick="editBrand('${langEntry.id}')">编辑</button>
-                            <button class="ant-btn ant-btn-danger" onclick="deleteBrand('${langEntry.id}')">删除</button>
-                        </div>
-                    `;
-                listContainer.appendChild(itemDiv);
-            });
+            const statusTag = brand.status === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>';
+            const logoHtml = brand.brand_logo ? `<img src="${brand.brand_logo}" alt="品牌Logo" onclick="enlargeImage(${brand.id}, 0)">` : '<span class="placeholder" onclick="alert(\'图片不存在\')">无</span>';
+            const lang = brandLangData.find(l => l.brand_id === brand.id && l.language === langFilter) || {};
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`;
+            itemDiv.innerHTML = `
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${brand.id}"></div>
+                <div class="col-id">${brand.id}</div>
+                <div class="col-parent-id">${brand.parent_id === 0 ? '无' : `品牌${brand.parent_id}`}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-brand-logo"><div class="brand-logo-preview">${logoHtml}</div></div>
+                <div class="col-custom-url">${brand.custom_url}</div>
+                <div class="col-language">${lang.language || 'en_US'}</div>
+                <div class="col-name">${lang.name || ''}</div>
+                <div class="col-company">${lang.company || ''}</div>
+                <div class="col-create-time">${moment.unix(brand.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editBrand(${brand.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteBrand(${brand.id})">删除</button>
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
         });
 
         const totalPages = Math.ceil(brandData.length / brandPerPage);
@@ -349,6 +369,7 @@
     }
 
     function applyFilters() {
+        const parentId = document.getElementById('parentIdFilter').value;
         const status = document.getElementById('statusFilter').value;
         const language = document.getElementById('languageFilter').value;
         const name = document.getElementById('nameFilter').value.toLowerCase();
@@ -356,20 +377,20 @@
         const endDate = document.getElementById('endDate').value;
 
         let filteredBrands = brandData;
-        let filteredLangs = brandLangData;
-
-        if (status) filteredBrands = filteredBrands.filter(item => item.status === parseInt(status));
-        if (startDate) filteredBrands = filteredBrands.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
-        if (endDate) filteredBrands = filteredBrands.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
-
-        if (language) filteredLangs = filteredLangs.filter(item => item.language === language);
-        if (name) filteredLangs = filteredLangs.filter(item => item.name.toLowerCase().includes(name));
-
-        const brandIds = new Set(filteredBrands.map(brand => brand.id));
-        const finalLangs = filteredLangs.filter(lang => brandIds.has(lang.brand_id));
+        if (parentId) filteredBrands = filteredBrands.filter(brand => brand.parent_id === parseInt(parentId));
+        if (status) filteredBrands = filteredBrands.filter(brand => brand.status === parseInt(status));
+        if (startDate) filteredBrands = filteredBrands.filter(brand => moment.unix(brand.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredBrands = filteredBrands.filter(brand => moment.unix(brand.create_time).isSameOrBefore(endDate));
+        if (language || name) {
+            filteredBrands = filteredBrands.filter(brand => {
+                const lang = brandLangData.find(l => l.brand_id === brand.id && (!language || l.language === language));
+                return lang && (!name || lang.name.toLowerCase().includes(name));
+            });
+        }
 
         brandPage = 1;
-        renderBrandList(filteredBrands, finalLangs);
+        brandData = filteredBrands;
+        renderBrandList();
     }
 
     function changePage(delta) {
@@ -377,7 +398,7 @@
         brandPage += delta;
         if (brandPage < 1) brandPage = 1;
         if (brandPage > totalPages) brandPage = totalPages;
-        applyFilters();
+        renderBrandList();
     }
 
     function jumpToPage() {
@@ -385,7 +406,7 @@
         const totalPages = Math.ceil(brandData.length / brandPerPage);
         if (page >= 1 && page <= totalPages) {
             brandPage = page;
-            applyFilters();
+            renderBrandList();
         } else {
             alert('请输入有效的页码');
         }
@@ -394,7 +415,7 @@
     function changePerPage() {
         brandPerPage = parseInt(document.getElementById('perPage').value);
         brandPage = 1;
-        applyFilters();
+        renderBrandList();
     }
 
     function toggleSelectAll() {
@@ -404,61 +425,58 @@
 
     let isEditing = false;
     let editId = null;
-    let currentLanguage = 'zh_CN';
-
-    function updateLanguage() {
-        currentLanguage = document.getElementById('languageSelect')?.value || 'zh_CN';
-        document.getElementById('modalLanguage').value = currentLanguage;
-    }
 
     function addBrand() {
         isEditing = false;
         editId = null;
+        currentBrandLogo = '';
         document.getElementById('modalTitle').textContent = '添加品牌';
-        document.getElementById('modalBrandId').value = '';
-        document.getElementById('modalStatus').value = '0';
-        document.getElementById('modalCreateTime').value = moment().format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalCreateTime').disabled = true;
-        document.getElementById('modalUpdateTime').value = moment().format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalUpdateTime').disabled = true;
-        document.getElementById('modalCustomUrl').value = '';
-        document.getElementById('modalBrandLogo').value = '';
         document.getElementById('modalParentId').value = '0';
-        document.getElementById('modalLanguage').value = currentLanguage;
+        document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalBrandLogo').value = '';
+        document.getElementById('modalBrandLogoPreview').innerHTML = '';
+        document.getElementById('modalCustomUrl').value = '';
+        document.getElementById('modalIdItem').style.display = 'none';
+        document.getElementById('modalCreateTimeItem').style.display = 'none';
+        document.getElementById('modalUpdateTimeItem').style.display = 'none';
+        document.getElementById('modalLanguage').value = 'en_US';
         document.getElementById('modalLanguage').disabled = false;
-        document.getElementById('modalName').value = '';
-        document.getElementById('modalSummary').value = '';
-        document.getElementById('modalBrandInformation').value = '';
-        document.getElementById('modalCompany').value = '';
         document.getElementById('modalSeoKeywords').value = '';
         document.getElementById('modalSeoDescription').value = '';
+        document.getElementById('modalName').value = '';
+        document.getElementById('modalCompany').value = '';
+        document.getElementById('modalSummary').value = '';
+        document.getElementById('modalBrandInformation').value = '';
         setupTabs();
         document.getElementById('brandModal').style.display = 'block';
     }
 
-    function editBrand(langId) {
+    function editBrand(id) {
         isEditing = true;
-        editId = langId;
-        const langEntry = brandLangData.find(item => item.id === parseInt(langId));
-        const brand = brandData.find(item => item.id === langEntry.brand_id);
+        editId = id;
+        const brand = brandData.find(item => item.id === id);
+        const lang = brandLangData.find(l => l.brand_id === id && l.language === 'en_US') || {};
+        currentBrandLogo = brand.brand_logo;
         document.getElementById('modalTitle').textContent = '编辑品牌';
-        document.getElementById('modalBrandId').value = brand.id;
-        document.getElementById('modalStatus').value = brand.status;
-        document.getElementById('modalCreateTime').value = moment.unix(brand.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalCreateTime').disabled = true;
-        document.getElementById('modalUpdateTime').value = moment.unix(brand.update_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalUpdateTime').disabled = true;
-        document.getElementById('modalCustomUrl').value = brand.custom_url;
-        document.getElementById('modalBrandLogo').value = brand.brand_logo;
         document.getElementById('modalParentId').value = brand.parent_id;
-        document.getElementById('modalLanguage').value = langEntry.language;
+        document.getElementById('modalStatus').value = brand.status;
+        document.getElementById('modalBrandLogo').value = '';
+        renderImagePreview('brandLogo', brand.brand_logo);
+        document.getElementById('modalCustomUrl').value = brand.custom_url;
+        document.getElementById('modalIdItem').style.display = 'flex';
+        document.getElementById('modalId').value = brand.id;
+        document.getElementById('modalCreateTimeItem').style.display = 'flex';
+        document.getElementById('modalCreateTime').value = moment.unix(brand.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalUpdateTimeItem').style.display = 'flex';
+        document.getElementById('modalUpdateTime').value = moment.unix(brand.update_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalLanguage').value = lang.language || 'en_US';
         document.getElementById('modalLanguage').disabled = true;
-        document.getElementById('modalName').value = langEntry.name;
-        document.getElementById('modalSummary').value = langEntry.summary;
-        document.getElementById('modalBrandInformation').value = langEntry.brand_information;
-        document.getElementById('modalCompany').value = langEntry.company;
-        document.getElementById('modalSeoKeywords').value = langEntry.seo_keywords;
-        document.getElementById('modalSeoDescription').value = langEntry.seo_description;
+        document.getElementById('modalSeoKeywords').value = lang.seo_keywords || '';
+        document.getElementById('modalSeoDescription').value = lang.seo_description || '';
+        document.getElementById('modalName').value = lang.name || '';
+        document.getElementById('modalCompany').value = lang.company || '';
+        document.getElementById('modalSummary').value = lang.summary || '';
+        document.getElementById('modalBrandInformation').value = lang.brand_information || '';
         setupTabs();
         document.getElementById('brandModal').style.display = 'block';
     }
@@ -482,116 +500,113 @@
         tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
     }
 
-    function saveBrand() {
-        const lang = document.getElementById('modalLanguage').value;
-        const brandId = isEditing ? parseInt(document.getElementById('modalBrandId').value) : brandData.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-        const langId = isEditing ? editId : brandLangData.length + 1; // 使用自增 ID 模拟
-
-        // 更新或添加 non-lang 数据（brand 表）
-        let brand = brandData.find(item => item.id === brandId);
-        if (!brand) {
-            brand = {
-                id: brandId,
-                parent_id: parseInt(document.getElementById('modalParentId').value) || 0,
-                status: parseInt(document.getElementById('modalStatus').value),
-                brand_logo: document.getElementById('modalBrandLogo').value,
-                custom_url: document.getElementById('modalCustomUrl').value,
-                create_time: moment().unix(),
-                update_time: moment().unix()
+    function previewImage(field, input) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentBrandLogo = e.target.result;
+                renderImagePreview(field, e.target.result);
             };
-            brandData.push(brand);
-        } else {
-            brand.parent_id = parseInt(document.getElementById('modalParentId').value) || 0;
-            brand.status = parseInt(document.getElementById('modalStatus').value);
-            brand.brand_logo = document.getElementById('modalBrandLogo').value;
-            brand.custom_url = document.getElementById('modalCustomUrl').value;
-            brand.update_time = moment().unix(); // 更新时间
+            reader.readAsDataURL(file);
         }
-
-        // 更新或添加 lang 数据（brand_lang 表）
-        let langEntry = brandLangData.find(item => item.id === parseInt(langId));
-        if (!langEntry) {
-            langEntry = {
-                id: langId,
-                brand_id: brandId,
-                language: lang,
-                name: document.getElementById('modalName').value,
-                company: document.getElementById('modalCompany').value,
-                summary: document.getElementById('modalSummary').value,
-                brand_information: document.getElementById('modalBrandInformation').value,
-                seo_keywords: document.getElementById('modalSeoKeywords').value,
-                seo_description: document.getElementById('modalSeoDescription').value
-            };
-            brandLangData.push(langEntry);
-        } else {
-            langEntry.language = lang;
-            langEntry.name = document.getElementById('modalName').value;
-            langEntry.company = document.getElementById('modalCompany').value;
-            langEntry.summary = document.getElementById('modalSummary').value;
-            langEntry.brand_information = document.getElementById('modalBrandInformation').value;
-            langEntry.seo_keywords = document.getElementById('modalSeoKeywords').value;
-            langEntry.seo_description = document.getElementById('modalSeoDescription').value;
-        }
-
-        closeModal();
-        applyFilters();
     }
 
-    function deleteBrand(langId) {
+    function renderImagePreview(field, url) {
+        const preview = document.getElementById(`modal${field.charAt(0).toUpperCase() + field.slice(1)}Preview`);
+        preview.innerHTML = '';
+        if (url) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'image-wrapper';
+            const img = document.createElement('img');
+            img.src = url;
+            img.onclick = () => enlargeImage(null, 0, [url]);
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '×';
+            deleteBtn.onclick = () => {
+                currentBrandLogo = '';
+                preview.innerHTML = '';
+            };
+            wrapper.appendChild(img);
+            wrapper.appendChild(deleteBtn);
+            preview.appendChild(wrapper);
+        }
+    }
+
+    function saveBrand() {
+        const brand = {
+            id: isEditing ? editId : brandData.length + 1,
+            parent_id: parseInt(document.getElementById('modalParentId').value),
+            status: parseInt(document.getElementById('modalStatus').value),
+            brand_logo: currentBrandLogo,
+            custom_url: document.getElementById('modalCustomUrl').value,
+            create_time: isEditing ? brandData.find(b => b.id === editId).create_time : moment().unix(),
+            update_time: moment().unix()
+        };
+        const lang = {
+            id: isEditing ? brandLangData.find(l => l.brand_id === editId && l.language === document.getElementById('modalLanguage').value)?.id || (brandLangData.length + 1) : (brandLangData.length + 1),
+            brand_id: brand.id,
+            language: document.getElementById('modalLanguage').value,
+            seo_keywords: document.getElementById('modalSeoKeywords').value,
+            seo_description: document.getElementById('modalSeoDescription').value,
+            name: document.getElementById('modalName').value,
+            company: document.getElementById('modalCompany').value,
+            summary: document.getElementById('modalSummary').value,
+            brand_information: document.getElementById('modalBrandInformation').value
+        };
+
+        if (isEditing) {
+            const brandIndex = brandData.findIndex(item => item.id === editId);
+            brandData[brandIndex] = brand;
+            const langIndex = brandLangData.findIndex(l => l.brand_id === editId && l.language === lang.language);
+            if (langIndex !== -1) brandLangData[langIndex] = lang;
+            else brandLangData.push(lang);
+        } else {
+            brandData.push(brand);
+            brandLangData.push(lang);
+        }
+        closeModal();
+        renderBrandList();
+    }
+
+    function deleteBrand(id) {
         if (confirm('确定要删除此品牌记录吗？')) {
-            const langEntry = brandLangData.find(item => item.id === parseInt(langId));
-            if (langEntry) {
-                brandLangData = brandLangData.filter(item => item.id !== parseInt(langId));
-                // 检查是否还有其他语言记录，如果没有，则删除品牌记录
-                const remainingLangs = brandLangData.filter(item => item.brand_id === langEntry.brand_id);
-                if (remainingLangs.length === 0) {
-                    brandData = brandData.filter(item => item.id !== langEntry.brand_id);
-                }
-            }
-            applyFilters();
+            brandData = brandData.filter(item => item.id !== id);
+            brandLangData = brandLangData.filter(lang => lang.brand_id !== id);
+            renderBrandList();
         }
     }
 
     function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
         if (selectedIds.length === 0) {
             alert('请先选择要删除的品牌');
             return;
         }
         if (confirm(`确定要删除 ${selectedIds.length} 个品牌记录吗？`)) {
-            const brandIdsToDelete = new Set();
-            selectedIds.forEach(langId => {
-                const langEntry = brandLangData.find(item => item.id === parseInt(langId));
-                if (langEntry) {
-                    brandIdsToDelete.add(langEntry.brand_id);
-                    brandLangData = brandLangData.filter(item => item.id !== parseInt(langId));
-                }
-            });
-            brandData = brandData.filter(item => !brandIdsToDelete.has(item.id));
-            applyFilters();
+            brandData = brandData.filter(brand => !selectedIds.includes(brand.id));
+            brandLangData = brandLangData.filter(lang => !selectedIds.includes(lang.brand_id));
+            renderBrandList();
         }
     }
 
     function batchEditStatus() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
         if (selectedIds.length === 0) {
             alert('请先选择要修改状态的品牌');
             return;
         }
+        document.getElementById('selectedIds').value = selectedIds.join(', ');
         document.getElementById('statusModal').style.display = 'block';
     }
 
     function saveBatchStatus() {
         const newStatus = parseInt(document.getElementById('newStatus').value);
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
-        const brandIds = new Set();
-        selectedIds.forEach(langId => {
-            const langEntry = brandLangData.find(item => item.id === parseInt(langId));
-            if (langEntry) brandIds.add(langEntry.brand_id);
-        });
-        brandData = brandData.map(item => brandIds.has(item.id) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        brandData = brandData.map(brand => selectedIds.includes(brand.id) ? { ...brand, status: newStatus, update_time: moment().unix() } : brand);
         closeStatusModal();
-        applyFilters();
+        renderBrandList();
     }
 
     function closeModal() {
@@ -602,12 +617,43 @@
         document.getElementById('statusModal').style.display = 'none';
     }
 
+    function enlargeImage(brandId, index, picsArray = null) {
+        currentImageBrandId = brandId;
+        currentImageIndex = index;
+        const pics = picsArray || [brandData.find(brand => brand.id === brandId).brand_logo].filter(Boolean);
+        document.getElementById('enlargedImage').src = pics[currentImageIndex];
+        const modal = document.getElementById('imageModal');
+        const leftBtn = modal.querySelector('.carousel-btn.left');
+        const rightBtn = modal.querySelector('.carousel-btn.right');
+        if (pics.length > 1) {
+            leftBtn.style.display = 'block';
+            rightBtn.style.display = 'block';
+        } else {
+            leftBtn.style.display = 'none';
+            rightBtn.style.display = 'none';
+        }
+        modal.style.display = 'block';
+    }
+
+    function shiftImage(direction) {
+        const pics = currentImageBrandId ? [brandData.find(brand => brand.id === currentImageBrandId).brand_logo].filter(Boolean) : [currentBrandLogo].filter(Boolean);
+        currentImageIndex = (currentImageIndex + direction + pics.length) % pics.length;
+        document.getElementById('enlargedImage').src = pics[currentImageIndex];
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').style.display = 'none';
+        currentImageBrandId = null;
+        currentImageIndex = 0;
+    }
+
+    document.getElementById('filter-container')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') applyFilters();
+    });
+
     window.onload = () => {
-        console.log('Page loaded, initializing...');
         w3.includeHTML(() => {
-            console.log('External HTML included');
             initMenus();
-            updateLanguage();
             fetchBrandData();
         });
     };

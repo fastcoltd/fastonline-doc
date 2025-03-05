@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 客户投诉管理</title>
+    <title>FASTRESP - 客户投诉</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -11,33 +11,40 @@
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
     <style>
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
         .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
         .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
         .table-header, .task-item { display: flex; width: 100%; }
         .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 10%; min-width: 60px; }
+        .col-id { width: 10%; min-width: 80px; }
         .col-report-user-id { width: 10%; min-width: 80px; }
         .col-store-id { width: 10%; min-width: 80px; }
         .col-item-id { width: 10%; min-width: 80px; }
-        .col-status { width: 8%; min-width: 80px; }
-        .col-complaint-content { width: 15%; min-width: 120px; }
-        .col-store-reply { width: 10%; min-width: 100px; }
-        .col-create-time { width: 10%; min-width: 100px; }
+        .col-status { width: 10%; min-width: 80px; }
+        .col-create-time { width: 15%; min-width: 120px; }
+        .col-complaint-content { width: 20%; min-width: 150px; }
         .col-actions { width: 10%; min-width: 100px; }
         .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
-        .modal-content h3 { margin: 0 0 16px 0; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
         .modal-buttons { text-align: right; margin-top: 20px; }
         .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
         .modal-content .ant-form-item { margin-bottom: 16px; }
         .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
         .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
         .modal-content .ant-form-item.textarea-item { display: block; }
         .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
         .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        #imageModal .modal-content { width: 90%; max-width: 800px; text-align: center; }
+        #imageModal .modal-content .carousel { display: flex; align-items: center; justify-content: center; position: relative; }
+        #imageModal .modal-content img { max-width: 100%; max-height: 80vh; }
+        #imageModal .modal-content .carousel-btn { background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); }
+        #imageModal .modal-content .carousel-btn.left { left: 10px; }
+        #imageModal .modal-content .carousel-btn.right { right: 10px; }
     </style>
 </head>
 <body>
@@ -51,8 +58,8 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">客户投诉管理</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('complaint.html')">
+                                    <span class="ant-tabs-tab-btn">客户投诉</span>
                                 </div>
                                 <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
@@ -60,25 +67,89 @@
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
                                 <!-- 条件筛选区域 -->
                                 <div class="filter-container">
-                                    <select id="reportUserIdFilter" class="ant-select">
-                                        <option value="">全部用户</option>
-                                    </select>
-                                    <select id="storeIdFilter" class="ant-select">
-                                        <option value="">全部店铺</option>
-                                    </select>
-                                    <select id="itemIdFilter" class="ant-select">
-                                        <option value="">全部商品</option>
-                                    </select>
-                                    <select id="statusFilter" class="ant-select">
-                                        <option value="">全部状态</option>
-                                        <option value="0">未处理</option>
-                                        <option value="1">处理中</option>
-                                    </select>
-                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
-                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="reportUserIdFilter">
+                                            <option value="">全部投诉用户</option>
+                                            <option value="1">用户1</option><option value="2">用户2</option><option value="3">用户3</option>
+                                            <option value="4">用户4</option><option value="5">用户5</option><option value="6">用户6</option>
+                                            <option value="7">用户7</option><option value="8">用户8</option><option value="9">用户9</option>
+                                            <option value="10">用户10</option><option value="11">用户11</option><option value="12">用户12</option>
+                                            <option value="13">用户13</option><option value="14">用户14</option><option value="15">用户15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="storeIdFilter">
+                                            <option value="">全部店铺</option>
+                                            <option value="1">店铺1</option><option value="2">店铺2</option><option value="3">店铺3</option>
+                                            <option value="4">店铺4</option><option value="5">店铺5</option><option value="6">店铺6</option>
+                                            <option value="7">店铺7</option><option value="8">店铺8</option><option value="9">店铺9</option>
+                                            <option value="10">店铺10</option><option value="11">店铺11</option><option value="12">店铺12</option>
+                                            <option value="13">店铺13</option><option value="14">店铺14</option><option value="15">店铺15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="itemIdFilter">
+                                            <option value="">全部商品</option>
+                                            <option value="1">商品1</option><option value="2">商品2</option><option value="3">商品3</option>
+                                            <option value="4">商品4</option><option value="5">商品5</option><option value="6">商品6</option>
+                                            <option value="7">商品7</option><option value="8">商品8</option><option value="9">商品9</option>
+                                            <option value="10">商品10</option><option value="11">商品11</option><option value="12">商品12</option>
+                                            <option value="13">商品13</option><option value="14">商品14</option><option value="15">商品15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="demandIdFilter">
+                                            <option value="">全部需求</option>
+                                            <option value="1">需求1</option><option value="2">需求2</option><option value="3">需求3</option>
+                                            <option value="4">需求4</option><option value="5">需求5</option><option value="6">需求6</option>
+                                            <option value="7">需求7</option><option value="8">需求8</option><option value="9">需求9</option>
+                                            <option value="10">需求10</option><option value="11">需求11</option><option value="12">需求12</option>
+                                            <option value="13">需求13</option><option value="14">需求14</option><option value="15">需求15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="postsIdFilter">
+                                            <option value="">全部帖子</option>
+                                            <option value="1">帖子1</option><option value="2">帖子2</option><option value="3">帖子3</option>
+                                            <option value="4">帖子4</option><option value="5">帖子5</option><option value="6">帖子6</option>
+                                            <option value="7">帖子7</option><option value="8">帖子8</option><option value="9">帖子9</option>
+                                            <option value="10">帖子10</option><option value="11">帖子11</option><option value="12">帖子12</option>
+                                            <option value="13">帖子13</option><option value="14">帖子14</option><option value="15">帖子15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="rulesIdFilter">
+                                            <option value="">全部规则</option>
+                                            <option value="1">规则1</option><option value="2">规则2</option><option value="3">规则3</option>
+                                            <option value="4">规则4</option><option value="5">规则5</option><option value="6">规则6</option>
+                                            <option value="7">规则7</option><option value="8">规则8</option><option value="9">规则9</option>
+                                            <option value="10">规则10</option><option value="11">规则11</option><option value="12">规则12</option>
+                                            <option value="13">规则13</option><option value="14">规则14</option><option value="15">规则15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="manageIdFilter">
+                                            <option value="">全部管理员</option>
+                                            <option value="1">管理员1</option><option value="2">管理员2</option><option value="3">管理员3</option>
+                                            <option value="4">管理员4</option><option value="5">管理员5</option><option value="6">管理员6</option>
+                                            <option value="7">管理员7</option><option value="8">管理员8</option><option value="9">管理员9</option>
+                                            <option value="10">管理员10</option><option value="11">管理员11</option><option value="12">管理员12</option>
+                                            <option value="13">管理员13</option><option value="14">管理员14</option><option value="15">管理员15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="statusFilter">
+                                            <option value="">全部状态</option>
+                                            <option value="0">待处理</option>
+                                            <option value="1">处理中</option>
+                                            <option value="2">已完成</option>
+                                        </select>
+                                    </div>
+                                    <input type="date" id="startDate" class="ant-input">
+                                    <input type="date" id="endDate" class="ant-input">
                                     <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
                                 </div>
                                 <!-- 操作区域 -->
@@ -96,9 +167,8 @@
                                         <div class="col-store-id">店铺</div>
                                         <div class="col-item-id">商品</div>
                                         <div class="col-status">状态</div>
-                                        <div class="col-complaint-content">投诉内容</div>
-                                        <div class="col-store-reply">店铺回复</div>
                                         <div class="col-create-time">创建时间</div>
+                                        <div class="col-complaint-content">投诉内容</div>
                                         <div class="col-actions">操作</div>
                                     </div>
                                     <div id="complaint-list">加载中...</div>
@@ -107,12 +177,14 @@
                                         <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
                                         <button class="ant-btn" onclick="jumpToPage()">跳转</button>
                                         <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
-                                            <option value="10">10 条/页</option>
-                                            <option value="20" selected>20 条/页</option>
-                                            <option value="50">50 条/页</option>
-                                            <option value="100">100 条/页</option>
-                                        </select>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
                                         <button class="ant-btn" onclick="changePage(1)">下一页</button>
                                     </div>
                                 </div>
@@ -129,60 +201,104 @@
     <div id="complaintModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加客户投诉</h3>
+            <h3 id="modalTitle">添加投诉</h3>
             <form id="complaintForm">
-                <div class="ant-form-item" id="idField" style="display: none;">
-                    <label>ID:</label>
-                    <input type="number" id="modalId" disabled>
+                <div class="ant-form-item">
+                    <label>ID (自动生成):</label>
+                    <input type="text" id="modalId" disabled>
                 </div>
                 <div class="ant-form-item">
-                    <label>投诉用户ID:</label>
+                    <label>投诉用户:</label>
                     <select id="modalReportUserId">
-                        <option value="0">请选择用户</option>
+                        <option value="1">用户1</option><option value="2">用户2</option><option value="3">用户3</option>
+                        <option value="4">用户4</option><option value="5">用户5</option><option value="6">用户6</option>
+                        <option value="7">用户7</option><option value="8">用户8</option><option value="9">用户9</option>
+                        <option value="10">用户10</option><option value="11">用户11</option><option value="12">用户12</option>
+                        <option value="13">用户13</option><option value="14">用户14</option><option value="15">用户15</option>
                     </select>
                 </div>
                 <div class="ant-form-item">
-                    <label>店铺ID:</label>
+                    <label>店铺:</label>
                     <select id="modalStoreId">
-                        <option value="0">请选择店铺</option>
+                        <option value="1">店铺1</option><option value="2">店铺2</option><option value="3">店铺3</option>
+                        <option value="4">店铺4</option><option value="5">店铺5</option><option value="6">店铺6</option>
+                        <option value="7">店铺7</option><option value="8">店铺8</option><option value="9">店铺9</option>
+                        <option value="10">店铺10</option><option value="11">店铺11</option><option value="12">店铺12</option>
+                        <option value="13">店铺13</option><option value="14">店铺14</option><option value="15">店铺15</option>
                     </select>
                 </div>
                 <div class="ant-form-item">
-                    <label>商品ID:</label>
+                    <label>商品:</label>
                     <select id="modalItemId">
-                        <option value="0">请选择商品</option>
+                        <option value="1">商品1</option><option value="2">商品2</option><option value="3">商品3</option>
+                        <option value="4">商品4</option><option value="5">商品5</option><option value="6">商品6</option>
+                        <option value="7">商品7</option><option value="8">商品8</option><option value="9">商品9</option>
+                        <option value="10">商品10</option><option value="11">商品11</option><option value="12">商品12</option>
+                        <option value="13">商品13</option><option value="14">商品14</option><option value="15">商品15</option>
                     </select>
                 </div>
                 <div class="ant-form-item">
-                    <label>管理员ID:</label>
+                    <label>管理员:</label>
                     <select id="modalManageId">
-                        <option value="0">请选择管理员</option>
+                        <option value="0">无</option>
+                        <option value="1">管理员1</option><option value="2">管理员2</option><option value="3">管理员3</option>
+                        <option value="4">管理员4</option><option value="5">管理员5</option><option value="6">管理员6</option>
+                        <option value="7">管理员7</option><option value="8">管理员8</option><option value="9">管理员9</option>
+                        <option value="10">管理员10</option><option value="11">管理员11</option><option value="12">管理员12</option>
+                        <option value="13">管理员13</option><option value="14">管理员14</option><option value="15">管理员15</option>
                     </select>
                 </div>
                 <div class="ant-form-item">
-                    <label>文章ID:</label>
+                    <label>帖子:</label>
                     <select id="modalPostsId">
-                        <option value="0">请选择文章</option>
+                        <option value="0">无</option>
+                        <option value="1">帖子1</option><option value="2">帖子2</option><option value="3">帖子3</option>
+                        <option value="4">帖子4</option><option value="5">帖子5</option><option value="6">帖子6</option>
+                        <option value="7">帖子7</option><option value="8">帖子8</option><option value="9">帖子9</option>
+                        <option value="10">帖子10</option><option value="11">帖子11</option><option value="12">帖子12</option>
+                        <option value="13">帖子13</option><option value="14">帖子14</option><option value="15">帖子15</option>
                     </select>
                 </div>
                 <div class="ant-form-item">
-                    <label>需求ID:</label>
+                    <label>需求:</label>
                     <select id="modalDemandId">
-                        <option value="0">请选择需求</option>
+                        <option value="0">无</option>
+                        <option value="1">需求1</option><option value="2">需求2</option><option value="3">需求3</option>
+                        <option value="4">需求4</option><option value="5">需求5</option><option value="6">需求6</option>
+                        <option value="7">需求7</option><option value="8">需求8</option><option value="9">需求9</option>
+                        <option value="10">需求10</option><option value="11">需求11</option><option value="12">需求12</option>
+                        <option value="13">需求13</option><option value="14">需求14</option><option value="15">需求15</option>
                     </select>
                 </div>
                 <div class="ant-form-item">
-                    <label>规则ID:</label>
+                    <label>规则:</label>
                     <select id="modalRulesId">
-                        <option value="0">请选择规则</option>
+                        <option value="1">规则1</option><option value="2">规则2</option><option value="3">规则3</option>
+                        <option value="4">规则4</option><option value="5">规则5</option><option value="6">规则6</option>
+                        <option value="7">规则7</option><option value="8">规则8</option><option value="9">规则9</option>
+                        <option value="10">规则10</option><option value="11">规则11</option><option value="12">规则12</option>
+                        <option value="13">规则13</option><option value="14">规则14</option><option value="15">规则15</option>
                     </select>
                 </div>
                 <div class="ant-form-item">
                     <label>状态:</label>
                     <select id="modalStatus">
-                        <option value="0">未处理</option>
+                        <option value="0">待处理</option>
                         <option value="1">处理中</option>
+                        <option value="2">已完成</option>
                     </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>创建时间:</label>
+                    <input type="datetime-local" id="modalCreateTime">
+                </div>
+                <div class="ant-form-item">
+                    <label>店铺回复时间:</label>
+                    <input type="datetime-local" id="modalStoreReplyTime">
+                </div>
+                <div class="ant-form-item">
+                    <label>系统回复时间:</label>
+                    <input type="datetime-local" id="modalSystemReplyTime">
                 </div>
                 <div class="ant-form-item textarea-item">
                     <label>投诉内容:</label>
@@ -195,18 +311,6 @@
                 <div class="ant-form-item textarea-item">
                     <label>系统回复:</label>
                     <textarea id="modalSiteReply" rows="5"></textarea>
-                </div>
-                <div class="ant-form-item" id="createTimeField" style="display: none;">
-                    <label>创建时间:</label>
-                    <input type="datetime-local" id="modalCreateTime" disabled>
-                </div>
-                <div class="ant-form-item" id="storeReplyTimeField" style="display: none;">
-                    <label>店铺回复时间:</label>
-                    <input type="datetime-local" id="modalStoreReplyTime" disabled>
-                </div>
-                <div class="ant-form-item" id="systemReplyTimeField" style="display: none;">
-                    <label>系统回复时间:</label>
-                    <input type="datetime-local" id="modalSystemReplyTime" disabled>
                 </div>
                 <div class="modal-buttons">
                     <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
@@ -229,8 +333,9 @@
                 <div class="ant-form-item">
                     <label>新状态:</label>
                     <select id="newStatus">
-                        <option value="0">未处理</option>
+                        <option value="0">待处理</option>
                         <option value="1">处理中</option>
+                        <option value="2">已完成</option>
                     </select>
                 </div>
                 <div class="modal-buttons">
@@ -240,121 +345,73 @@
             </form>
         </div>
     </div>
+
+    <!-- 图片放大弹窗（无图片字段，此处仅占位） -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     let complaintData = [];
-    let page = 1, perPage = 20;
+    let complaintPage = 1, complaintPerPage = 20;
 
-    // 定义关联字段的映射
-    const relationMap = {
-        report_user_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `用户 ${i + 1}` })),
-        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` })),
-        item_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `商品 ${i + 1}` })),
-        manage_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `管理员 ${i + 1}` })),
-        posts_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `文章 ${i + 1}` })),
-        demand_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `需求 ${i + 1}` })),
-        rules_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `规则 ${i + 1}` }))
-    };
-
-    // 生成下拉数据
-    function populateDropdowns() {
-        const userSelect = document.getElementById('modalReportUserId');
-        const userFilter = document.getElementById('reportUserIdFilter');
-        const storeSelect = document.getElementById('modalStoreId');
-        const storeFilter = document.getElementById('storeIdFilter');
-        const itemSelect = document.getElementById('modalItemId');
-        const itemFilter = document.getElementById('itemIdFilter');
-        const manageSelect = document.getElementById('modalManageId');
-        const postsSelect = document.getElementById('modalPostsId');
-        const demandSelect = document.getElementById('modalDemandId');
-        const rulesSelect = document.getElementById('modalRulesId');
-
-        relationMap.report_user_id.forEach(item => {
-            userSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            userFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.store_id.forEach(item => {
-            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.item_id.forEach(item => {
-            itemSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            itemFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.manage_id.forEach(item => {
-            manageSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.posts_id.forEach(item => {
-            postsSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.demand_id.forEach(item => {
-            demandSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.rules_id.forEach(item => {
-            rulesSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-    }
-
-    // 获取关联字段的名称
-    function getRelationName(field, id) {
-        if (id === 0) return '未关联';
-        const item = relationMap[field].find(item => item.id === id);
-        return item ? item.name : `未知 (${id})`;
-    }
-
-    // 生成样本数据
-    function generateSampleData() {
+    function fetchComplaintData() {
+        console.log('Fetching complaint data...');
         complaintData = [];
         for (let i = 1; i <= 200; i++) {
-            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            const storeReplyTime = i % 2 === 0 ? moment().subtract(Math.floor(Math.random() * 50), 'days').unix() : 0;
-            const systemReplyTime = i % 3 === 0 ? moment().subtract(Math.floor(Math.random() * 40), 'days').unix() : 0;
-            complaintData.push({
+            const complaint = {
                 id: i,
                 report_user_id: Math.floor(Math.random() * 15) + 1,
                 store_id: Math.floor(Math.random() * 15) + 1,
                 item_id: Math.floor(Math.random() * 15) + 1,
-                manage_id: Math.floor(Math.random() * 15) + 1,
-                posts_id: Math.floor(Math.random() * 15) + 1,
-                demand_id: Math.floor(Math.random() * 15) + 1,
+                manage_id: Math.random() > 0.5 ? Math.floor(Math.random() * 15) + 1 : 0,
+                posts_id: Math.random() > 0.5 ? Math.floor(Math.random() * 15) + 1 : 0,
+                demand_id: Math.random() > 0.5 ? Math.floor(Math.random() * 15) + 1 : 0,
                 rules_id: Math.floor(Math.random() * 15) + 1,
-                status: Math.floor(Math.random() * 2),
-                create_time: createTime,
-                store_reply_time: storeReplyTime,
-                system_reply_time: systemReplyTime,
-                complaint_content: `投诉内容 ${i}`,
-                store_reply: storeReplyTime ? `店铺回复 ${i}` : '',
-                site_reply: systemReplyTime ? `系统回复 ${i}` : ''
-            });
+                status: Math.floor(Math.random() * 3),
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix(),
+                store_reply_time: Math.random() > 0.5 ? moment().subtract(Math.floor(Math.random() * 30), 'days').unix() : 0,
+                system_reply_time: Math.random() > 0.5 ? moment().subtract(Math.floor(Math.random() * 30), 'days').unix() : 0,
+                complaint_content: `投诉内容 ${i} - 用户对商品或服务不满`,
+                store_reply: Math.random() > 0.5 ? `店铺回复 ${i} - 已处理` : '',
+                site_reply: Math.random() > 0.5 ? `系统回复 ${i} - 已核实` : ''
+            };
+            complaintData.push(complaint);
         }
         renderComplaintList();
     }
 
-    // 渲染列表
     function renderComplaintList() {
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const paginatedData = complaintData.slice(start, end);
+        const start = (complaintPage - 1) * complaintPerPage;
+        const end = start + complaintPerPage;
+        const paginatedComplaints = complaintData.slice(start, end);
         const listContainer = document.getElementById('complaint-list');
         listContainer.innerHTML = '';
 
-        paginatedData.forEach(complaint => {
-            const statusTag = complaint.status === 0 ? '<span class="ant-tag ant-tag-blue">未处理</span>' :
-                '<span class="ant-tag ant-tag-green">处理中</span>';
+        paginatedComplaints.forEach(complaint => {
+            const statusTag = complaint.status === 0 ? '<span class="ant-tag ant-tag-blue">待处理</span>' :
+                complaint.status === 1 ? '<span class="ant-tag ant-tag-orange">处理中</span>' :
+                    '<span class="ant-tag ant-tag-green">已完成</span>';
             const itemDiv = document.createElement('div');
             itemDiv.className = 'task-item';
-            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`;
             itemDiv.innerHTML = `
                 <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${complaint.id}"></div>
                 <div class="col-id">${complaint.id}</div>
-                <div class="col-report-user-id">${getRelationName('report_user_id', complaint.report_user_id)}</div>
-                <div class="col-store-id">${getRelationName('store_id', complaint.store_id)}</div>
-                <div class="col-item-id">${getRelationName('item_id', complaint.item_id)}</div>
+                <div class="col-report-user-id">用户${complaint.report_user_id}</div>
+                <div class="col-store-id">店铺${complaint.store_id}</div>
+                <div class="col-item-id">商品${complaint.item_id}</div>
                 <div class="col-status">${statusTag}</div>
+                <div class="col-create-time">${moment.unix(complaint.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
                 <div class="col-complaint-content">${complaint.complaint_content}</div>
-                <div class="col-store-reply">${complaint.store_reply || '无'}</div>
-                <div class="col-create-time">${moment.unix(complaint.create_time).format('YYYY-MM-DD HH:mm')}</div>
                 <div class="col-actions">
                     <button class="ant-btn" onclick="editComplaint(${complaint.id})">编辑</button>
                     <button class="ant-btn ant-btn-danger" onclick="deleteComplaint(${complaint.id})">删除</button>
@@ -363,47 +420,53 @@
             listContainer.appendChild(itemDiv);
         });
 
-        const totalPages = Math.ceil(complaintData.length / perPage);
-        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        const totalPages = Math.ceil(complaintData.length / complaintPerPage);
+        document.getElementById('page-info').textContent = `第 ${complaintPage} 页 / 共 ${totalPages} 页`;
         document.getElementById('pageJump').max = totalPages;
     }
 
-    // 筛选
     function applyFilters() {
-        let filteredData = [...complaintData];
         const reportUserId = document.getElementById('reportUserIdFilter').value;
         const storeId = document.getElementById('storeIdFilter').value;
         const itemId = document.getElementById('itemIdFilter').value;
+        const demandId = document.getElementById('demandIdFilter').value;
+        const postsId = document.getElementById('postsIdFilter').value;
+        const rulesId = document.getElementById('rulesIdFilter').value;
+        const manageId = document.getElementById('manageIdFilter').value;
         const status = document.getElementById('statusFilter').value;
-        const createTimeStart = document.getElementById('createTimeStartFilter').value;
-        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
 
-        if (reportUserId) filteredData = filteredData.filter(item => item.report_user_id === parseInt(reportUserId));
-        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
-        if (itemId) filteredData = filteredData.filter(item => item.item_id === parseInt(itemId));
-        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
-        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
-        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+        let filteredComplaints = complaintData;
+        if (reportUserId) filteredComplaints = filteredComplaints.filter(complaint => complaint.report_user_id === parseInt(reportUserId));
+        if (storeId) filteredComplaints = filteredComplaints.filter(complaint => complaint.store_id === parseInt(storeId));
+        if (itemId) filteredComplaints = filteredComplaints.filter(complaint => complaint.item_id === parseInt(itemId));
+        if (demandId) filteredComplaints = filteredComplaints.filter(complaint => complaint.demand_id === parseInt(demandId));
+        if (postsId) filteredComplaints = filteredComplaints.filter(complaint => complaint.posts_id === parseInt(postsId));
+        if (rulesId) filteredComplaints = filteredComplaints.filter(complaint => complaint.rules_id === parseInt(rulesId));
+        if (manageId) filteredComplaints = filteredComplaints.filter(complaint => complaint.manage_id === parseInt(manageId));
+        if (status) filteredComplaints = filteredComplaints.filter(complaint => complaint.status === parseInt(status));
+        if (startDate) filteredComplaints = filteredComplaints.filter(complaint => moment.unix(complaint.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredComplaints = filteredComplaints.filter(complaint => moment.unix(complaint.create_time).isSameOrBefore(endDate));
 
-        complaintData = filteredData;
-        page = 1;
+        complaintPage = 1;
+        complaintData = filteredComplaints;
         renderComplaintList();
     }
 
-    // 分页
     function changePage(delta) {
-        const totalPages = Math.ceil(complaintData.length / perPage);
-        page += delta;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
+        const totalPages = Math.ceil(complaintData.length / complaintPerPage);
+        complaintPage += delta;
+        if (complaintPage < 1) complaintPage = 1;
+        if (complaintPage > totalPages) complaintPage = totalPages;
         renderComplaintList();
     }
 
     function jumpToPage() {
-        const newPage = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(complaintData.length / perPage);
-        if (newPage >= 1 && newPage <= totalPages) {
-            page = newPage;
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(complaintData.length / complaintPerPage);
+        if (page >= 1 && page <= totalPages) {
+            complaintPage = page;
             renderComplaintList();
         } else {
             alert('请输入有效的页码');
@@ -411,8 +474,8 @@
     }
 
     function changePerPage() {
-        perPage = parseInt(document.getElementById('perPage').value);
-        page = 1;
+        complaintPerPage = parseInt(document.getElementById('perPage').value);
+        complaintPage = 1;
         renderComplaintList();
     }
 
@@ -421,38 +484,36 @@
         document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
     }
 
-    // 添加
+    let isEditing = false;
+    let editId = null;
+
     function addComplaint() {
         isEditing = false;
         editId = null;
-        document.getElementById('modalTitle').textContent = '添加客户投诉';
-        document.getElementById('idField').style.display = 'none';
-        document.getElementById('modalReportUserId').value = '0';
-        document.getElementById('modalStoreId').value = '0';
-        document.getElementById('modalItemId').value = '0';
+        document.getElementById('modalTitle').textContent = '添加投诉';
+        document.getElementById('modalId').value = '';
+        document.getElementById('modalReportUserId').value = '1';
+        document.getElementById('modalStoreId').value = '1';
+        document.getElementById('modalItemId').value = '1';
         document.getElementById('modalManageId').value = '0';
         document.getElementById('modalPostsId').value = '0';
         document.getElementById('modalDemandId').value = '0';
-        document.getElementById('modalRulesId').value = '0';
+        document.getElementById('modalRulesId').value = '1';
         document.getElementById('modalStatus').value = '0';
+        document.getElementById('modalCreateTime').value = moment().format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalStoreReplyTime').value = '';
+        document.getElementById('modalSystemReplyTime').value = '';
         document.getElementById('modalComplaintContent').value = '';
         document.getElementById('modalStoreReply').value = '';
         document.getElementById('modalSiteReply').value = '';
-        document.getElementById('createTimeField').style.display = 'none';
-        document.getElementById('storeReplyTimeField').style.display = 'none';
-        document.getElementById('systemReplyTimeField').style.display = 'none';
         document.getElementById('complaintModal').style.display = 'block';
     }
 
-    // 编辑
-    let isEditing = false;
-    let editId = null;
     function editComplaint(id) {
         isEditing = true;
         editId = id;
         const complaint = complaintData.find(item => item.id === id);
-        document.getElementById('modalTitle').textContent = '编辑客户投诉';
-        document.getElementById('idField').style.display = 'block';
+        document.getElementById('modalTitle').textContent = '编辑投诉';
         document.getElementById('modalId').value = complaint.id;
         document.getElementById('modalReportUserId').value = complaint.report_user_id;
         document.getElementById('modalStoreId').value = complaint.store_id;
@@ -462,33 +523,29 @@
         document.getElementById('modalDemandId').value = complaint.demand_id;
         document.getElementById('modalRulesId').value = complaint.rules_id;
         document.getElementById('modalStatus').value = complaint.status;
-        document.getElementById('modalComplaintContent').value = complaint.complaint_content;
-        document.getElementById('modalStoreReply').value = complaint.store_reply;
-        document.getElementById('modalSiteReply').value = complaint.site_reply;
-        document.getElementById('createTimeField').style.display = 'block';
         document.getElementById('modalCreateTime').value = moment.unix(complaint.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('storeReplyTimeField').style.display = 'block';
         document.getElementById('modalStoreReplyTime').value = complaint.store_reply_time ? moment.unix(complaint.store_reply_time).format('YYYY-MM-DDTHH:mm') : '';
-        document.getElementById('systemReplyTimeField').style.display = 'block';
         document.getElementById('modalSystemReplyTime').value = complaint.system_reply_time ? moment.unix(complaint.system_reply_time).format('YYYY-MM-DDTHH:mm') : '';
+        document.getElementById('modalComplaintContent').value = complaint.complaint_content;
+        document.getElementById('modalStoreReply').value = complaint.store_reply || '';
+        document.getElementById('modalSiteReply').value = complaint.site_reply || '';
         document.getElementById('complaintModal').style.display = 'block';
     }
 
-    // 保存
     function saveComplaint() {
         const complaint = {
             id: isEditing ? editId : complaintData.length + 1,
-            report_user_id: parseInt(document.getElementById('modalReportUserId').value) || 0,
-            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
-            item_id: parseInt(document.getElementById('modalItemId').value) || 0,
-            manage_id: parseInt(document.getElementById('modalManageId').value) || 0,
-            posts_id: parseInt(document.getElementById('modalPostsId').value) || 0,
-            demand_id: parseInt(document.getElementById('modalDemandId').value) || 0,
-            rules_id: parseInt(document.getElementById('modalRulesId').value) || 0,
+            report_user_id: parseInt(document.getElementById('modalReportUserId').value),
+            store_id: parseInt(document.getElementById('modalStoreId').value),
+            item_id: parseInt(document.getElementById('modalItemId').value),
+            manage_id: parseInt(document.getElementById('modalManageId').value),
+            posts_id: parseInt(document.getElementById('modalPostsId').value),
+            demand_id: parseInt(document.getElementById('modalDemandId').value),
+            rules_id: parseInt(document.getElementById('modalRulesId').value),
             status: parseInt(document.getElementById('modalStatus').value),
-            create_time: isEditing ? complaintData.find(item => item.id === editId).create_time : moment().unix(),
-            store_reply_time: isEditing ? complaintData.find(item => item.id === editId).store_reply_time : 0,
-            system_reply_time: isEditing ? complaintData.find(item => item.id === editId).system_reply_time : 0,
+            create_time: moment(document.getElementById('modalCreateTime').value).unix(),
+            store_reply_time: document.getElementById('modalStoreReplyTime').value ? moment(document.getElementById('modalStoreReplyTime').value).unix() : 0,
+            system_reply_time: document.getElementById('modalSystemReplyTime').value ? moment(document.getElementById('modalSystemReplyTime').value).unix() : 0,
             complaint_content: document.getElementById('modalComplaintContent').value,
             store_reply: document.getElementById('modalStoreReply').value,
             site_reply: document.getElementById('modalSiteReply').value
@@ -504,32 +561,29 @@
         renderComplaintList();
     }
 
-    // 删除
     function deleteComplaint(id) {
-        if (confirm('确定要删除此客户投诉吗？')) {
+        if (confirm('确定要删除此投诉记录吗？')) {
             complaintData = complaintData.filter(item => item.id !== id);
             renderComplaintList();
         }
     }
 
-    // 批量删除
     function batchDelete() {
         const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
         if (selectedIds.length === 0) {
-            alert('请先选择要删除的客户投诉');
+            alert('请先选择要删除的投诉');
             return;
         }
-        if (confirm(`确定要删除 ${selectedIds.length} 个客户投诉吗？`)) {
-            complaintData = complaintData.filter(item => !selectedIds.includes(item.id));
+        if (confirm(`确定要删除 ${selectedIds.length} 个投诉记录吗？`)) {
+            complaintData = complaintData.filter(complaint => !selectedIds.includes(complaint.id));
             renderComplaintList();
         }
     }
 
-    // 批量修改状态
     function batchEditStatus() {
         const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
         if (selectedIds.length === 0) {
-            alert('请先选择要修改状态的客户投诉');
+            alert('请先选择要修改状态的投诉');
             return;
         }
         document.getElementById('selectedIds').value = selectedIds.join(', ');
@@ -538,8 +592,8 @@
 
     function saveBatchStatus() {
         const newStatus = parseInt(document.getElementById('newStatus').value);
-        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
-        complaintData = complaintData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus } : item);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        complaintData = complaintData.map(complaint => selectedIds.includes(complaint.id) ? { ...complaint, status: newStatus } : complaint);
         closeStatusModal();
         renderComplaintList();
     }
@@ -552,11 +606,18 @@
         document.getElementById('statusModal').style.display = 'none';
     }
 
+    function closeImageModal() {
+        document.getElementById('imageModal').style.display = 'none';
+    }
+
+    document.getElementById('filter-container')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') applyFilters();
+    });
+
     window.onload = () => {
         w3.includeHTML(() => {
             initMenus();
-            populateDropdowns();
-            generateSampleData();
+            fetchComplaintData();
         });
     };
 </script>

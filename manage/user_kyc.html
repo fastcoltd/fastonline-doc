@@ -3,195 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 用户KYC管理</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css"
-          integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <title>FASTRESP - 用户KYC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
     <style>
-        .filter-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .action-container {
-            margin-bottom: 16px;
-        }
-
-        .table-header, .task-item {
-            display: flex;
-            width: 100%;
-        }
-
-        .table-header div, .task-item div {
-            padding: 10px;
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            box-sizing: border-box;
-        }
-
-        .col-checkbox {
-            width: 5%;
-            min-width: 50px;
-        }
-
-        .col-id {
-            width: 10%;
-            min-width: 60px;
-        }
-
-        .col-status {
-            width: 8%;
-            min-width: 80px;
-        }
-
-        .col-user-id {
-            width: 10%;
-            min-width: 100px;
-        }
-
-        .col-kyc-type {
-            width: 10%;
-            min-width: 100px;
-        }
-
-        .col-country {
-            width: 10%;
-            min-width: 100px;
-        }
-
-        .col-first-name {
-            width: 10%;
-            min-width: 100px;
-        }
-
-        .col-id-number {
-            width: 12%;
-            min-width: 120px;
-        }
-
-        .col-birth-date {
-            width: 10%;
-            min-width: 100px;
-        }
-
-        .col-create-time {
-            width: 10%;
-            min-width: 120px;
-        }
-
-        .col-actions {
-            width: 10%;
-            min-width: 100px;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 1024px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            max-height: 968px;
-            overflow-y: auto;
-        }
-
-        .modal-content h3 {
-            margin: 0 0 16px 0;
-        }
-
-        .modal-buttons {
-            text-align: right;
-            margin-top: 20px;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 20px;
-            cursor: pointer;
-            border: none;
-            background: none;
-        }
-
-        .modal-content .ant-form-item {
-            margin-bottom: 16px;
-        }
-
-        .modal-content .ant-form-item:not(.textarea-item) {
-            display: flex;
-            align-items: center;
-        }
-
-        .modal-content .ant-form-item:not(.textarea-item) label {
-            margin-right: 8px;
-            width: 120px;
-            text-align: right;
-            color: rgba(0, 0, 0, 0.85);
-            height: 32px;
-            line-height: 32px;
-        }
-
-        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .modal-content .ant-form-item.textarea-item {
-            display: block;
-        }
-
-        .modal-content .ant-form-item.textarea-item label {
-            display: block;
-            margin-bottom: 4px;
-            color: rgba(0, 0, 0, 0.85);
-        }
-
-        .modal-content .ant-form-item.textarea-item textarea {
-            width: 100%;
-            height: 100px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            resize: vertical;
-        }
+        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
+        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
+        .action-container { margin-bottom: 16px; }
+        .task-list { overflow-x: hidden; }
+        .table-header, .task-item { display: flex; width: 100%; }
+        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 80px; }
+        .col-user-id { width: 10%; min-width: 80px; }
+        .col-kyc-type { width: 10%; min-width: 80px; }
+        .col-status { width: 10%; min-width: 80px; }
+        .col-first-name { width: 10%; min-width: 80px; }
+        .col-last-name { width: 10%; min-width: 80px; }
+        .col-id-number { width: 15%; min-width: 120px; }
+        .col-id-pic { width: 10%; min-width: 80px; }
+        .col-hands-pic { width: 10%; min-width: 80px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .modal-content .ant-form-item { margin-bottom: 16px; }
+        .modal-content .ant-form-item:not(.textarea-item):not(.image-item) { display: flex; align-items: center; }
+        .modal-content .ant-form-item:not(.textarea-item):not(.image-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
+        .modal-content .ant-form-item:not(.textarea-item):not(.image-item) input, .modal-content .ant-form-item:not(.textarea-item):not(.image-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item.textarea-item { display: block; }
+        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        .modal-content .ant-form-item.image-item { display: block; }
+        .modal-content .ant-form-item.image-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
+        .modal-content .ant-form-item.image-item input[type="file"] { display: block; margin-bottom: 8px; }
+        .modal-content .image-preview { display: flex; flex-wrap: wrap; gap: 8px; }
+        .modal-content .image-preview .image-wrapper { position: relative; display: inline-block; }
+        .modal-content .image-preview img { max-width: 100px; max-height: 100px; object-fit: cover; cursor: pointer; }
+        .modal-content .image-preview .delete-btn { position: absolute; top: 0; right: 0; background: rgba(255, 0, 0, 0.7); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; line-height: 20px; text-align: center; cursor: pointer; }
+        .kyc-pics-preview { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+        .kyc-pics-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
+        .kyc-pics-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
+        #imageModal .modal-content { width: 90%; max-width: 800px; text-align: center; }
+        #imageModal .modal-content .carousel { display: flex; align-items: center; justify-content: center; position: relative; }
+        #imageModal .modal-content img { max-width: 100%; max-height: 80vh; }
+        #imageModal .modal-content .carousel-btn { background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); }
+        #imageModal .modal-content .carousel-btn.left { left: 10px; }
+        #imageModal .modal-content .carousel-btn.right { right: 10px; }
     </style>
 </head>
 <body>
@@ -205,75 +70,83 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">用户KYC管理</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('user_kyc.html')">
+                                    <span class="ant-tabs-tab-btn">用户KYC</span>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated"
-                                     style="left: 0; width: 80px;"></div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
                                 <!-- 条件筛选区域 -->
                                 <div class="filter-container">
-                                    <select id="userIdFilter" class="ant-select">
-                                        <option value="">全部用户</option>
-                                    </select>
-                                    <select id="statusFilter" class="ant-select">
-                                        <option value="">全部状态</option>
-                                        <option value="0">未审核</option>
-                                        <option value="1">已通过</option>
-                                        <option value="2">已拒绝</option>
-                                    </select>
-                                    <select id="kycTypeFilter" class="ant-select">
-                                        <option value="">全部类型</option>
-                                        <option value="0">身份证</option>
-                                        <option value="1">护照</option>
-                                        <option value="2">驾驶证</option>
-                                    </select>
-                                    <input type="text" id="idNumberFilter" class="ant-input" placeholder="证件号码">
-                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
-                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="userIdFilter">
+                                            <option value="">全部用户</option>
+                                            <option value="1">用户1</option><option value="2">用户2</option><option value="3">用户3</option>
+                                            <option value="4">用户4</option><option value="5">用户5</option><option value="6">用户6</option>
+                                            <option value="7">用户7</option><option value="8">用户8</option><option value="9">用户9</option>
+                                            <option value="10">用户10</option><option value="11">用户11</option><option value="12">用户12</option>
+                                            <option value="13">用户13</option><option value="14">用户14</option><option value="15">用户15</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="kycTypeFilter">
+                                            <option value="">全部类型</option>
+                                            <option value="0">身份证</option>
+                                            <option value="1">护照</option>
+                                            <option value="2">驾驶证</option>
+                                        </select>
+                                    </div>
+                                    <div class="ant-select ant-select-single ant-select-show-arrow">
+                                        <select id="statusFilter">
+                                            <option value="">全部状态</option>
+                                            <option value="0">待审核</option>
+                                            <option value="1">已通过</option>
+                                            <option value="2">已拒绝</option>
+                                        </select>
+                                    </div>
+                                    <input type="date" id="startDate" class="ant-input">
+                                    <input type="date" id="endDate" class="ant-input">
                                     <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
                                 </div>
                                 <!-- 操作区域 -->
                                 <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addUserKyc()">添加</button>
+                                    <button class="ant-btn ant-btn-primary" onclick="addKyc()">添加</button>
                                     <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
                                     <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
                                 </div>
                                 <!-- 数据区域 -->
                                 <div class="task-list">
-                                    <div class="table-header"
-                                         style="padding: 10px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll"
-                                                                         onclick="toggleSelectAll()"></div>
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
+                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
                                         <div class="col-id">ID</div>
+                                        <div class="col-user-id">用户</div>
+                                        <div class="col-kyc-type">类型</div>
                                         <div class="col-status">状态</div>
-                                        <div class="col-user-id">用户名称</div>
-                                        <div class="col-kyc-type">KYC类型</div>
-                                        <div class="col-country">国家</div>
                                         <div class="col-first-name">名</div>
-                                        <div class="col-id-number">证件号码</div>
-                                        <div class="col-birth-date">出生日期</div>
-                                        <div class="col-create-time">创建时间</div>
+                                        <div class="col-last-name">姓</div>
+                                        <div class="col-id-number">证件号</div>
+                                        <div class="col-id-pic">证件照片</div>
+                                        <div class="col-hands-pic">手持照片</div>
                                         <div class="col-actions">操作</div>
                                     </div>
-                                    <div id="user-kyc-list">加载中...</div>
+                                    <div id="kyc-list">加载中...</div>
                                     <div class="pagination">
                                         <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input"
-                                               style="width: 60px; padding: 4px;" placeholder="页码">
+                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
                                         <button class="ant-btn" onclick="jumpToPage()">跳转</button>
                                         <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
-                                            <option value="10">10 条/页</option>
-                                            <option value="20" selected>20 条/页</option>
-                                            <option value="50">50 条/页</option>
-                                            <option value="100">100 条/页</option>
-                                        </select>
+                                        <div class="ant-select ant-select-single ant-select-show-arrow">
+                                            <select id="perPage" onchange="changePerPage()">
+                                                <option value="10">10 条/页</option>
+                                                <option value="20" selected>20 条/页</option>
+                                                <option value="50">50 条/页</option>
+                                                <option value="100">100 条/页</option>
+                                            </select>
+                                        </div>
                                         <button class="ant-btn" onclick="changePage(1)">下一页</button>
                                     </div>
                                 </div>
@@ -287,27 +160,31 @@
     <div id="footer" w3-include-html="_footer.html"></div>
 
     <!-- 添加/编辑弹窗 -->
-    <div id="userKycModal" class="modal">
+    <div id="kycModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加用户KYC</h3>
-            <form id="userKycForm">
-                <div class="ant-form-item" id="idField" style="display: none;">
-                    <label>ID:</label>
-                    <input type="number" id="modalId" disabled>
+            <h3 id="modalTitle">添加KYC</h3>
+            <form id="kycForm">
+                <div class="ant-form-item">
+                    <label>ID (自动生成):</label>
+                    <input type="text" id="modalId" disabled>
                 </div>
                 <div class="ant-form-item">
                     <label>状态:</label>
                     <select id="modalStatus">
-                        <option value="0">未审核</option>
+                        <option value="0">待审核</option>
                         <option value="1">已通过</option>
                         <option value="2">已拒绝</option>
                     </select>
                 </div>
                 <div class="ant-form-item">
-                    <label>用户ID:</label>
+                    <label>用户:</label>
                     <select id="modalUserId">
-                        <option value="0">请选择用户</option>
+                        <option value="1">用户1</option><option value="2">用户2</option><option value="3">用户3</option>
+                        <option value="4">用户4</option><option value="5">用户5</option><option value="6">用户6</option>
+                        <option value="7">用户7</option><option value="8">用户8</option><option value="9">用户9</option>
+                        <option value="10">用户10</option><option value="11">用户11</option><option value="12">用户12</option>
+                        <option value="13">用户13</option><option value="14">用户14</option><option value="15">用户15</option>
                     </select>
                 </div>
                 <div class="ant-form-item">
@@ -320,23 +197,23 @@
                 </div>
                 <div class="ant-form-item">
                     <label>国家:</label>
-                    <input type="text" id="modalCountry" maxlength="64">
+                    <input type="text" id="modalCountry">
                 </div>
                 <div class="ant-form-item">
                     <label>名:</label>
-                    <input type="text" id="modalFirstName" maxlength="64">
+                    <input type="text" id="modalFirstName">
                 </div>
                 <div class="ant-form-item">
                     <label>中间名:</label>
-                    <input type="text" id="modalMiddleName" maxlength="64">
+                    <input type="text" id="modalMiddleName">
                 </div>
                 <div class="ant-form-item">
                     <label>姓:</label>
-                    <input type="text" id="modalLastName" maxlength="64">
+                    <input type="text" id="modalLastName">
                 </div>
                 <div class="ant-form-item">
-                    <label>证件号码:</label>
-                    <input type="text" id="modalIdNumber" maxlength="64">
+                    <label>证件号:</label>
+                    <input type="text" id="modalIdNumber">
                 </div>
                 <div class="ant-form-item">
                     <label>出生日期:</label>
@@ -350,25 +227,27 @@
                     <label>到期日期:</label>
                     <input type="date" id="modalExpireDate">
                 </div>
-                <div class="ant-form-item">
+                <div class="ant-form-item image-item">
                     <label>证件照片:</label>
-                    <input type="text" id="modalIdPic" maxlength="256">
+                    <input type="file" id="modalIdPic" accept="image/*" onchange="previewImage('idPic', this)">
+                    <div class="image-preview" id="modalIdPicPreview"></div>
                 </div>
-                <div class="ant-form-item">
+                <div class="ant-form-item image-item">
                     <label>手持照片:</label>
-                    <input type="text" id="modalHandsPic" maxlength="256">
+                    <input type="file" id="modalHandsPic" accept="image/*" onchange="previewImage('handsPic', this)">
+                    <div class="image-preview" id="modalHandsPicPreview"></div>
                 </div>
                 <div class="ant-form-item textarea-item">
                     <label>回复消息:</label>
-                    <textarea id="modalReplyMessage" maxlength="512" rows="5"></textarea>
+                    <textarea id="modalReplyMessage" rows="5"></textarea>
                 </div>
-                <div class="ant-form-item" id="createTimeField" style="display: none;">
+                <div class="ant-form-item">
                     <label>创建时间:</label>
-                    <input type="datetime-local" id="modalCreateTime" disabled>
+                    <input type="datetime-local" id="modalCreateTime">
                 </div>
                 <div class="modal-buttons">
                     <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveUserKyc()">保存</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveKyc()">保存</button>
                 </div>
             </form>
         </div>
@@ -387,7 +266,7 @@
                 <div class="ant-form-item">
                     <label>新状态:</label>
                     <select id="newStatus">
-                        <option value="0">未审核</option>
+                        <option value="0">待审核</option>
                         <option value="1">已通过</option>
                         <option value="2">已拒绝</option>
                     </select>
@@ -399,147 +278,146 @@
             </form>
         </div>
     </div>
+
+    <!-- 图片放大弹窗 -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    let userKycData = [];
-    let page = 1, perPage = 20;
+    let kycData = [];
+    let kycPage = 1, kycPerPage = 20;
+    let currentIdPic = '';
+    let currentHandsPic = '';
+    let currentImageKycId = null;
+    let currentImageIndex = 0;
 
-    // 定义关联字段的映射
-    const relationMap = {
-        user_id: Array.from({length: 15}, (_, i) => ({id: i, name: `用户 ${i + 1}`}))
-    };
+    function fetchKycData() {
+        console.log('Fetching KYC data...');
+        kycData = [];
+        const imagePool = [
+            'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0',
+            'https://images.unsplash.com/photo-1519125323398-675f398f6978',
+            'https://images.unsplash.com/photo-1521747116048-5a69d91532d8',
+            'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b',
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'
+        ];
 
-    // 生成下拉数据
-    function populateDropdowns() {
-        const userSelect = document.getElementById('modalUserId');
-        const userFilter = document.getElementById('userIdFilter');
-        relationMap.user_id.forEach(item => {
-            userSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            userFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-    }
-
-    // 获取关联字段的名称
-    function getRelationName(field, id) {
-        if (id === 0) return '未关联';
-        const item = relationMap[field].find(item => item.id === id);
-        return item ? item.name : `未知 (${id})`;
-    }
-
-    // 生成样本数据
-    function generateSampleData() {
-        userKycData = [];
         for (let i = 1; i <= 200; i++) {
-            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            userKycData.push({
+            const kyc = {
                 id: i,
                 status: Math.floor(Math.random() * 3),
                 user_id: Math.floor(Math.random() * 15) + 1,
                 kyc_type: Math.floor(Math.random() * 3),
-                country: `Country${i}`,
+                country: `国家${Math.floor(Math.random() * 10) + 1}`,
                 first_name: `First${i}`,
-                middle_name: i % 2 === 0 ? `Middle${i}` : '',
+                middle_name: Math.random() > 0.5 ? `Middle${i}` : '',
                 last_name: `Last${i}`,
-                id_number: `ID${i}`,
-                birth_date: moment().subtract(Math.floor(Math.random() * 10000), 'days').format('YYYY-MM-DD'),
-                start_date: moment().subtract(Math.floor(Math.random() * 1000), 'days').format('YYYY-MM-DD'),
-                expire_date: moment().add(Math.floor(Math.random() * 1000), 'days').format('YYYY-MM-DD'),
-                id_pic: `id_pic${i}.png`,
-                hands_pic: `hands_pic${i}.png`,
-                reply_message: i % 2 === 0 ? `Reply for ${i}` : '',
-                create_time: createTime
-            });
+                id_number: `ID${i}${Math.floor(Math.random() * 10000)}`,
+                birth_date: moment().subtract(Math.floor(Math.random() * 30) + 20, 'years').format('YYYY-MM-DD'),
+                start_date: moment().subtract(Math.floor(Math.random() * 5), 'years').format('YYYY-MM-DD'),
+                expire_date: moment().add(Math.floor(Math.random() * 5), 'years').format('YYYY-MM-DD'),
+                id_pic: imagePool[Math.floor(Math.random() * imagePool.length)],
+                hands_pic: Math.random() > 0.2 ? imagePool[Math.floor(Math.random() * imagePool.length)] : '',
+                reply_message: Math.random() > 0.5 ? `审核回复 ${i}` : '',
+                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
+            };
+            kycData.push(kyc);
         }
-        renderUserKycList();
+        renderKycList();
     }
 
-    // 渲染列表
-    function renderUserKycList() {
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const paginatedData = userKycData.slice(start, end);
-        const listContainer = document.getElementById('user-kyc-list');
+    function renderKycList() {
+        const start = (kycPage - 1) * kycPerPage;
+        const end = start + kycPerPage;
+        const paginatedKycs = kycData.slice(start, end);
+        const listContainer = document.getElementById('kyc-list');
         listContainer.innerHTML = '';
 
-        paginatedData.forEach(kyc => {
-            const statusTag = kyc.status === 0 ? '<span class="ant-tag ant-tag-blue">未审核</span>' :
+        paginatedKycs.forEach(kyc => {
+            const statusTag = kyc.status === 0 ? '<span class="ant-tag ant-tag-blue">待审核</span>' :
                 kyc.status === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' :
                     '<span class="ant-tag ant-tag-red">已拒绝</span>';
             const kycTypeText = kyc.kyc_type === 0 ? '身份证' : kyc.kyc_type === 1 ? '护照' : '驾驶证';
+            const idPicHtml = kyc.id_pic ? `<img src="${kyc.id_pic}" alt="证件照片" onclick="enlargeImage(${kyc.id}, 0)">` : '<span class="placeholder" onclick="alert(\'图片不存在\')">无</span>';
+            const handsPicHtml = kyc.hands_pic ? `<img src="${kyc.hands_pic}" alt="手持照片" onclick="enlargeImage(${kyc.id}, 1)">` : '<span class="placeholder" onclick="alert(\'图片不存在\')">无</span>';
             const itemDiv = document.createElement('div');
             itemDiv.className = 'task-item';
-            itemDiv.style = 'border-bottom: 1px solid #ddd;';
+            itemDiv.style = `border-bottom: 1px solid #ddd;`;
             itemDiv.innerHTML = `
-<div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${kyc.id}"></div>
-<div class="col-id">${kyc.id}</div>
-<div class="col-status">${statusTag}</div>
-<div class="col-user-id">${getRelationName('user_id', kyc.user_id)}</div>
-<div class="col-kyc-type">${kycTypeText}</div>
-<div class="col-country">${kyc.country}</div>
-<div class="col-first-name">${kyc.first_name}</div>
-<div class="col-id-number">${kyc.id_number}</div>
-<div class="col-birth-date">${kyc.birth_date}</div>
-<div class="col-create-time">${moment.unix(kyc.create_time).format('YYYY-MM-DD HH:mm')}</div>
-<div class="col-actions">
-    <button class="ant-btn" onclick="editUserKyc(${kyc.id})">编辑</button>
-    <button class="ant-btn ant-btn-danger" onclick="deleteUserKyc(${kyc.id})">删除</button>
-</div>
-`;
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${kyc.id}"></div>
+                <div class="col-id">${kyc.id}</div>
+                <div class="col-user-id">用户${kyc.user_id}</div>
+                <div class="col-kyc-type">${kycTypeText}</div>
+                <div class="col-status">${statusTag}</div>
+                <div class="col-first-name">${kyc.first_name}</div>
+                <div class="col-last-name">${kyc.last_name}</div>
+                <div class="col-id-number">${kyc.id_number}</div>
+                <div class="col-id-pic"><div class="kyc-pics-preview">${idPicHtml}</div></div>
+                <div class="col-hands-pic"><div class="kyc-pics-preview">${handsPicHtml}</div></div>
+                <div class="col-actions">
+                    <button class="ant-btn" onclick="editKyc(${kyc.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteKyc(${kyc.id})">删除</button>
+                </div>
+            `;
             listContainer.appendChild(itemDiv);
         });
 
-        const totalPages = Math.ceil(userKycData.length / perPage);
-        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
+        const totalPages = Math.ceil(kycData.length / kycPerPage);
+        document.getElementById('page-info').textContent = `第 ${kycPage} 页 / 共 ${totalPages} 页`;
         document.getElementById('pageJump').max = totalPages;
     }
 
-    // 筛选
     function applyFilters() {
-        let filteredData = [...userKycData];
         const userId = document.getElementById('userIdFilter').value;
-        const status = document.getElementById('statusFilter').value;
         const kycType = document.getElementById('kycTypeFilter').value;
-        const idNumber = document.getElementById('idNumberFilter').value.toLowerCase();
-        const createTimeStart = document.getElementById('createTimeStartFilter').value;
-        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
 
-        if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
-        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
-        if (kycType) filteredData = filteredData.filter(item => item.kyc_type === parseInt(kycType));
-        if (idNumber) filteredData = filteredData.filter(item => item.id_number.toLowerCase().includes(idNumber));
-        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
-        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
+        let filteredKycs = kycData;
+        if (userId) filteredKycs = filteredKycs.filter(kyc => kyc.user_id === parseInt(userId));
+        if (kycType) filteredKycs = filteredKycs.filter(kyc => kyc.kyc_type === parseInt(kycType));
+        if (status) filteredKycs = filteredKycs.filter(kyc => kyc.status === parseInt(status));
+        if (startDate) filteredKycs = filteredKycs.filter(kyc => moment.unix(kyc.create_time).isSameOrAfter(startDate));
+        if (endDate) filteredKycs = filteredKycs.filter(kyc => moment.unix(kyc.create_time).isSameOrBefore(endDate));
 
-        userKycData = filteredData;
-        page = 1;
-        renderUserKycList();
+        kycPage = 1;
+        kycData = filteredKycs;
+        renderKycList();
     }
 
-    // 分页
     function changePage(delta) {
-        const totalPages = Math.ceil(userKycData.length / perPage);
-        page += delta;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        renderUserKycList();
+        const totalPages = Math.ceil(kycData.length / kycPerPage);
+        kycPage += delta;
+        if (kycPage < 1) kycPage = 1;
+        if (kycPage > totalPages) kycPage = totalPages;
+        renderKycList();
     }
 
     function jumpToPage() {
-        const newPage = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(userKycData.length / perPage);
-        if (newPage >= 1 && newPage <= totalPages) {
-            page = newPage;
-            renderUserKycList();
+        const page = parseInt(document.getElementById('pageJump').value);
+        const totalPages = Math.ceil(kycData.length / kycPerPage);
+        if (page >= 1 && page <= totalPages) {
+            kycPage = page;
+            renderKycList();
         } else {
             alert('请输入有效的页码');
         }
     }
 
     function changePerPage() {
-        perPage = parseInt(document.getElementById('perPage').value);
-        page = 1;
-        renderUserKycList();
+        kycPerPage = parseInt(document.getElementById('perPage').value);
+        kycPage = 1;
+        renderKycList();
     }
 
     function toggleSelectAll() {
@@ -547,14 +425,18 @@
         document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
     }
 
-    // 添加
-    function addUserKyc() {
+    let isEditing = false;
+    let editId = null;
+
+    function addKyc() {
         isEditing = false;
         editId = null;
-        document.getElementById('modalTitle').textContent = '添加用户KYC';
-        document.getElementById('idField').style.display = 'none';
+        currentIdPic = '';
+        currentHandsPic = '';
+        document.getElementById('modalTitle').textContent = '添加KYC';
+        document.getElementById('modalId').value = '';
         document.getElementById('modalStatus').value = '0';
-        document.getElementById('modalUserId').value = '0';
+        document.getElementById('modalUserId').value = '1';
         document.getElementById('modalKycType').value = '0';
         document.getElementById('modalCountry').value = '';
         document.getElementById('modalFirstName').value = '';
@@ -565,22 +447,21 @@
         document.getElementById('modalStartDate').value = '';
         document.getElementById('modalExpireDate').value = '';
         document.getElementById('modalIdPic').value = '';
+        document.getElementById('modalIdPicPreview').innerHTML = '';
         document.getElementById('modalHandsPic').value = '';
+        document.getElementById('modalHandsPicPreview').innerHTML = '';
         document.getElementById('modalReplyMessage').value = '';
-        document.getElementById('createTimeField').style.display = 'none';
-        document.getElementById('userKycModal').style.display = 'block';
+        document.getElementById('modalCreateTime').value = moment().format('YYYY-MM-DDTHH:mm');
+        document.getElementById('kycModal').style.display = 'block';
     }
 
-    // 编辑
-    let isEditing = false;
-    let editId = null;
-
-    function editUserKyc(id) {
+    function editKyc(id) {
         isEditing = true;
         editId = id;
-        const kyc = userKycData.find(item => item.id === id);
-        document.getElementById('modalTitle').textContent = '编辑用户KYC';
-        document.getElementById('idField').style.display = 'block';
+        const kyc = kycData.find(item => item.id === id);
+        currentIdPic = kyc.id_pic;
+        currentHandsPic = kyc.hands_pic;
+        document.getElementById('modalTitle').textContent = '编辑KYC';
         document.getElementById('modalId').value = kyc.id;
         document.getElementById('modalStatus').value = kyc.status;
         document.getElementById('modalUserId').value = kyc.user_id;
@@ -593,20 +474,56 @@
         document.getElementById('modalBirthDate').value = kyc.birth_date;
         document.getElementById('modalStartDate').value = kyc.start_date;
         document.getElementById('modalExpireDate').value = kyc.expire_date;
-        document.getElementById('modalIdPic').value = kyc.id_pic;
-        document.getElementById('modalHandsPic').value = kyc.hands_pic;
+        document.getElementById('modalIdPic').value = '';
+        renderImagePreview('idPic', kyc.id_pic);
+        document.getElementById('modalHandsPic').value = '';
+        renderImagePreview('handsPic', kyc.hands_pic);
         document.getElementById('modalReplyMessage').value = kyc.reply_message;
-        document.getElementById('createTimeField').style.display = 'block';
         document.getElementById('modalCreateTime').value = moment.unix(kyc.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('userKycModal').style.display = 'block';
+        document.getElementById('kycModal').style.display = 'block';
     }
 
-    // 保存
-    function saveUserKyc() {
+    function previewImage(field, input) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (field === 'idPic') currentIdPic = e.target.result;
+                else if (field === 'handsPic') currentHandsPic = e.target.result;
+                renderImagePreview(field, e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function renderImagePreview(field, url) {
+        const preview = document.getElementById(`modal${field.charAt(0).toUpperCase() + field.slice(1)}Preview`);
+        preview.innerHTML = '';
+        if (url) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'image-wrapper';
+            const img = document.createElement('img');
+            img.src = url;
+            img.onclick = () => enlargeImage(null, 0, [url]);
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '×';
+            deleteBtn.onclick = () => {
+                if (field === 'idPic') currentIdPic = '';
+                else if (field === 'handsPic') currentHandsPic = '';
+                preview.innerHTML = '';
+            };
+            wrapper.appendChild(img);
+            wrapper.appendChild(deleteBtn);
+            preview.appendChild(wrapper);
+        }
+    }
+
+    function saveKyc() {
         const kyc = {
-            id: isEditing ? editId : userKycData.length + 1,
+            id: isEditing ? editId : kycData.length + 1,
             status: parseInt(document.getElementById('modalStatus').value),
-            user_id: parseInt(document.getElementById('modalUserId').value) || 0,
+            user_id: parseInt(document.getElementById('modalUserId').value),
             kyc_type: parseInt(document.getElementById('modalKycType').value),
             country: document.getElementById('modalCountry').value,
             first_name: document.getElementById('modalFirstName').value,
@@ -616,48 +533,45 @@
             birth_date: document.getElementById('modalBirthDate').value,
             start_date: document.getElementById('modalStartDate').value,
             expire_date: document.getElementById('modalExpireDate').value,
-            id_pic: document.getElementById('modalIdPic').value,
-            hands_pic: document.getElementById('modalHandsPic').value,
+            id_pic: currentIdPic,
+            hands_pic: currentHandsPic,
             reply_message: document.getElementById('modalReplyMessage').value,
-            create_time: isEditing ? userKycData.find(item => item.id === editId).create_time : moment().unix()
+            create_time: moment(document.getElementById('modalCreateTime').value).unix()
         };
 
         if (isEditing) {
-            const index = userKycData.findIndex(item => item.id === editId);
-            userKycData[index] = kyc;
+            const index = kycData.findIndex(item => item.id === editId);
+            kycData[index] = kyc;
         } else {
-            userKycData.push(kyc);
+            kycData.push(kyc);
         }
         closeModal();
-        renderUserKycList();
+        renderKycList();
     }
 
-    // 删除
-    function deleteUserKyc(id) {
-        if (confirm('确定要删除此用户KYC吗？')) {
-            userKycData = userKycData.filter(item => item.id !== id);
-            renderUserKycList();
+    function deleteKyc(id) {
+        if (confirm('确定要删除此KYC记录吗？')) {
+            kycData = kycData.filter(item => item.id !== id);
+            renderKycList();
         }
     }
 
-    // 批量删除
     function batchDelete() {
         const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
         if (selectedIds.length === 0) {
-            alert('请先选择要删除的用户KYC');
+            alert('请先选择要删除的KYC记录');
             return;
         }
-        if (confirm(`确定要删除 ${selectedIds.length} 个用户KYC吗？`)) {
-            userKycData = userKycData.filter(item => !selectedIds.includes(item.id));
-            renderUserKycList();
+        if (confirm(`确定要删除 ${selectedIds.length} 个KYC记录吗？`)) {
+            kycData = kycData.filter(kyc => !selectedIds.includes(kyc.id));
+            renderKycList();
         }
     }
 
-    // 批量修改状态
     function batchEditStatus() {
         const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
         if (selectedIds.length === 0) {
-            alert('请先选择要修改状态的用户KYC');
+            alert('请先选择要修改状态的KYC记录');
             return;
         }
         document.getElementById('selectedIds').value = selectedIds.join(', ');
@@ -666,25 +580,58 @@
 
     function saveBatchStatus() {
         const newStatus = parseInt(document.getElementById('newStatus').value);
-        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
-        userKycData = userKycData.map(item => selectedIds.includes(item.id) ? {...item, status: newStatus} : item);
+        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+        kycData = kycData.map(kyc => selectedIds.includes(kyc.id) ? { ...kyc, status: newStatus } : kyc);
         closeStatusModal();
-        renderUserKycList();
+        renderKycList();
     }
 
     function closeModal() {
-        document.getElementById('userKycModal').style.display = 'none';
+        document.getElementById('kycModal').style.display = 'none';
     }
 
     function closeStatusModal() {
         document.getElementById('statusModal').style.display = 'none';
     }
 
+    function enlargeImage(kycId, index, picsArray = null) {
+        currentImageKycId = kycId;
+        currentImageIndex = index;
+        const pics = picsArray || [kycData.find(kyc => kyc.id === kycId).id_pic, kycData.find(kyc => kyc.id === kycId).hands_pic].filter(Boolean);
+        document.getElementById('enlargedImage').src = pics[currentImageIndex];
+        const modal = document.getElementById('imageModal');
+        const leftBtn = modal.querySelector('.carousel-btn.left');
+        const rightBtn = modal.querySelector('.carousel-btn.right');
+        if (pics.length > 1) {
+            leftBtn.style.display = 'block';
+            rightBtn.style.display = 'block';
+        } else {
+            leftBtn.style.display = 'none';
+            rightBtn.style.display = 'none';
+        }
+        modal.style.display = 'block';
+    }
+
+    function shiftImage(direction) {
+        const pics = currentImageKycId ? [kycData.find(kyc => kyc.id === currentImageKycId).id_pic, kycData.find(kyc => kyc.id === currentImageKycId).hands_pic].filter(Boolean) : [currentIdPic, currentHandsPic].filter(Boolean);
+        currentImageIndex = (currentImageIndex + direction + pics.length) % pics.length;
+        document.getElementById('enlargedImage').src = pics[currentImageIndex];
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').style.display = 'none';
+        currentImageKycId = null;
+        currentImageIndex = 0;
+    }
+
+    document.getElementById('filter-container')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') applyFilters();
+    });
+
     window.onload = () => {
         w3.includeHTML(() => {
             initMenus();
-            populateDropdowns();
-            generateSampleData();
+            fetchKycData();
         });
     };
 </script>
