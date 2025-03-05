@@ -60,7 +60,7 @@ function renderFilterArea() {
 function renderTableHeader() {
     const tableHeader = document.querySelector('.table-header');
     tableHeader.innerHTML = '';
-    tableHeader.style = 'padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;';
+    tableHeader.style = 'padding: 10px;padding-left: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;';
 
     const checkboxDiv = document.createElement('div');
     checkboxDiv.className = 'col-checkbox';

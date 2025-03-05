@@ -51,11 +51,8 @@
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
                             <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
-                                <!-- 条件筛选区域（由_opt.js动态生成） -->
                                 <div class="filter-container"></div>
-                                <!-- 操作区域（由_opt.js动态生成） -->
                                 <div class="action-container"></div>
-                                <!-- 数据区域（由_opt.js动态生成） -->
                                 <div class="task-list">
                                     <div class="table-header"></div>
                                     <div id="item-list">加载中...</div>
@@ -82,6 +79,22 @@
 </div>
 
 <script>
+    // 辅助函数：生成随机名称
+    const productNames = [
+        "Smartphone", "Laptop", "Headphones", "Smartwatch", "Camera", "Tablet", "Speaker", "Monitor", "Keyboard", "Mouse",
+        "T-shirt", "Jeans", "Jacket", "Shoes", "Backpack", "Sunglasses", "Wallet", "Hat", "Scarf", "Belt"
+    ];
+    const brands = ["TechTrend", "FashionPeak", "GadgetPro", "StyleVibe", "InnoGear"];
+    const stores = ["Downtown Store", "Mall Outlet", "Online Shop", "City Branch", "Suburban Plaza"];
+    const services = ["Express Delivery", "Standard Shipping", "In-Store Pickup", "Gift Wrapping", "Extended Warranty"];
+    const users = ["Alice Smith", "Bob Johnson", "Charlie Brown", "Diana Lee", "Eve White"];
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     window.tableConfig = {
         tableName: 'item',
         tableTitle: '商品信息',
@@ -89,54 +102,56 @@
         defaultPerPage: 20,
         fields: [
             { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'user_id', generator: () => Math.floor(Math.random() * 15) + 1 },
-            { name: 'store_id', generator: () => Math.floor(Math.random() * 15) + 1 },
-            { name: 'brand_id', generator: () => Math.floor(Math.random() * 15) + 1 },
-            { name: 'services_id', generator: () => Math.floor(Math.random() * 15) + 1 },
-            { name: 'status', generator: () => Math.floor(Math.random() * 2) },
-            { name: 'delivery_type', generator: () => Math.floor(Math.random() * 3) },
-            { name: 'sort_index', generator: () => Math.floor(Math.random() * 100) },
-            { name: 'stock_quantity', generator: () => Math.floor(Math.random() * 1000) },
-            { name: 'lower_notice_quantity', generator: () => Math.floor(Math.random() * 50) },
-            { name: 'shelf_life', generator: () => Math.floor(Math.random() * 5) + 1 },
-            { name: 'after_sales_time', generator: () => Math.floor(Math.random() * 30) },
-            { name: 'price', generator: () => (Math.random() * 1000).toFixed(2) },
-            { name: 'original_price', generator: () => (Math.random() * 1500).toFixed(2) },
-            { name: 'custom_url', generator: id => `/item/${id}` },
-            { name: 'cover_pic', generator: () => Math.random() > 0.2 ? getRandomImage('sexy') : '' },
-            { name: 'field_list', generator: () => '[]' },
-            { name: 'choose_field_index', generator: () => Math.floor(Math.random() * 5) },
-            { name: 'last_restock_time', isSystemField: true, generator: () => moment().subtract(Math.floor(Math.random() * 30), 'days').unix() },
-            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(Math.floor(Math.random() * 60), 'days').unix() },
-            { name: 'update_time', isSystemField: true, generator: () => moment().subtract(Math.floor(Math.random() * 30), 'days').unix() },
-            { name: 'status', isLangField: true, generator: () => Math.floor(Math.random() * 2) },
-            { name: 'version', isLangField: true, generator: () => Math.floor(Math.random() * 10) },
+            { name: 'user_id', generator: () => randomInt(1, 5) }, // 关联 5 个用户
+            { name: 'store_id', generator: () => randomInt(1, 5) }, // 关联 5 个店铺
+            { name: 'brand_id', generator: () => randomInt(1, 5) }, // 关联 5 个品牌
+            { name: 'services_id', generator: () => randomInt(1, 5) }, // 关联 5 个服务
+            { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
+            { name: 'delivery_type', generator: () => randomInt(0, 2) }, // 0:自提, 1:快递, 2:同城
+            { name: 'sort_index', generator: () => randomInt(1, 100) }, // 排序 1-100
+            { name: 'stock_quantity', generator: () => randomInt(0, 500) }, // 库存 0-500
+            { name: 'lower_notice_quantity', generator: () => randomInt(5, 50) }, // 低库存提醒 5-50
+            { name: 'shelf_life', generator: () => randomInt(1, 5) }, // 保质期 1-5 年
+            { name: 'after_sales_time', generator: () => randomInt(7, 365) }, // 售后时间 7-365 天
+            { name: 'price', generator: () => (randomInt(50, 999) + randomInt(0, 99) / 100).toFixed(2) }, // 价格 50.00-999.99
+            { name: 'original_price', generator: id => (parseFloat(tableConfig.fields.find(f => f.name === 'price').generator(id)) * randomInt(120, 150) / 100).toFixed(2) }, // 原价 = 现价 * 1.2-1.5
+            { name: 'custom_url', generator: id => `/products/${getRandomItem(productNames).toLowerCase().replace(' ', '-')}-${id}` }, // 自定义URL
+            { name: 'cover_pic', generator: () => getRandomImage('sexy') }, // 封面图
+            { name: 'field_list', generator: () => JSON.stringify(['color', 'size']) }, // 固定字段列表
+            { name: 'choose_field_index', generator: () => randomInt(0, 1) }, // 选择字段索引 0-1
+            { name: 'last_restock_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 30), 'days').unix() }, // 最近补货时间
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }, // 创建时间
+            { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() }, // 更新时间
+            // 多语言字段（移除多语言文字生成）
+            { name: 'status', isLangField: true, generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
+            { name: 'version', isLangField: true, generator: () => randomInt(1, 5) }, // 版本 1-5
             { name: 'language', isLangField: true, generator: (id, lang) => lang },
-            { name: 'seo_keywords', isLangField: true, generator: (id, lang) => lang === 'en_US' ? `item${id}, product` : `${lang}_商品${id}, 产品` },
-            { name: 'seo_description', isLangField: true, generator: (id, lang) => lang === 'en_US' ? `Item ${id} Description` : `${lang}_商品${id}描述` },
-            { name: 'name', isLangField: true, generator: (id, lang) => lang === 'en_US' ? `Item ${id}` : `${lang}_商品${id}` },
-            { name: 'after_sales_rules', isLangField: true, generator: (id, lang) => lang === 'en_US' ? `After-sales rules for Item ${id}` : `${lang}_商品${id}售后规则` },
-            { name: 'sample_pics', isLangField: true, generator: () => JSON.stringify([getRandomImage('sexy'), getRandomImage('sexy')].filter(Boolean)) },
-            { name: 'content', isLangField: true, generator: (id, lang) => lang === 'en_US' ? `Content of Item ${id}` : `${lang}_商品${id}内容` },
-            { name: 'create_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(Math.floor(Math.random() * 60), 'days').unix() },
-            { name: 'update_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(Math.floor(Math.random() * 30), 'days').unix() },
-            { name: 'site_reply', isLangField: true, generator: (id, lang) => lang === 'en_US' ? `Reply for Item ${id}` : `${lang}_商品${id}回复` }
+            { name: 'seo_keywords', isLangField: true, generator: (id) => `${getRandomItem(productNames)}, product ${id}, buy online` }, // 简单关键词
+            { name: 'seo_description', isLangField: true, generator: (id) => `Description for product ${id}, great quality and price.` }, // 简单描述
+            { name: 'name', isLangField: true, generator: (id) => `${getRandomItem(brands)} ${getRandomItem(productNames)} ${id}` }, // 简单商品名称
+            { name: 'after_sales_rules', isLangField: true, generator: (id) => `Returns accepted within 30 days for product ${id}.` }, // 简单售后规则
+            { name: 'sample_pics', isLangField: true, generator: () => JSON.stringify([getRandomImage('sexy'), getRandomImage('sexy')]) }, // 2 张示例图片
+            { name: 'content', isLangField: true, generator: (id) => `Features of product ${id}, suitable for daily use.` }, // 简单内容
+            { name: 'create_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
+            { name: 'update_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
+            { name: 'site_reply', isLangField: true, generator: (id) => `Thank you for your interest in product ${id}!` } // 简单回复
         ],
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
-            { label: '批量修改店铺', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'store_id', label: '店铺', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `店铺${i + 1}` }))] } },
-            { label: '批量修改用户', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'user_id', label: '用户', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `用户${i + 1}` }))] } },
-            { label: '批量修改品牌', className: 'ant-btn ant-btn-default', color: '#722ed1', field: { name: 'brand_id', label: '品牌', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `品牌${i + 1}` }))] } },
-            { label: '批量修改服务', className: 'ant-btn ant-btn-default', color: '#eb2f96', field: { name: 'services_id', label: '服务', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `服务${i + 1}` }))] } }
+            { label: '批量修改店铺', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'store_id', label: '店铺', type: 'select', options: stores.map((s, i) => ({ value: i + 1, label: s })) } },
+            { label: '批量修改用户', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'user_id', label: '用户', type: 'select', options: users.map((u, i) => ({ value: i + 1, label: u })) } },
+            { label: '批量修改品牌', className: 'ant-btn ant-btn-default', color: '#722ed1', field: { name: 'brand_id', label: '品牌', type: 'select', options: brands.map((b, i) => ({ value: i + 1, label: b })) } },
+            { label: '批量修改服务', className: 'ant-btn ant-btn-default', color: '#eb2f96', field: { name: 'services_id', label: '服务', type: 'select', options: services.map((s, i) => ({ value: i + 1, label: s })) } },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'user_id', label: '用户', className: 'col-user-id', formatter: v => `用户${v}` },
-            { name: 'store_id', label: '店铺', className: 'col-store-id', formatter: v => `店铺${v}` },
-            { name: 'brand_id', label: '品牌', className: 'col-brand-id', formatter: v => `品牌${v}` },
-            { name: 'services_id', label: '服务', className: 'col-services-id', formatter: v => `服务${v}` },
+            { name: 'user_id', label: '用户', className: 'col-user-id', formatter: v => users[v - 1] || `用户${v}` },
+            { name: 'store_id', label: '店铺', className: 'col-store-id', formatter: v => stores[v - 1] || `店铺${v}` },
+            { name: 'brand_id', label: '品牌', className: 'col-brand-id', formatter: v => brands[v - 1] || `品牌${v}` },
+            { name: 'services_id', label: '服务', className: 'col-services-id', formatter: v => services[v - 1] || `服务${v}` },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'name', label: '商品名称', className: 'col-name', isLangField: true },
@@ -168,10 +183,11 @@
             languages: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
         },
         filterFields: [
-            { id: 'storeId', type: 'select', options: [{ value: '', label: '全部店铺' }, ...Array.from({ length: 15 }, (_, i) => ({ value: `${i + 1}`, label: `店铺${i + 1}` }))], filter: (data, value) => value ? data.filter(d => d.store_id === parseInt(value)) : data },
-            { id: 'userId', type: 'select', options: [{ value: '', label: '全部用户' }, ...Array.from({ length: 15 }, (_, i) => ({ value: `${i + 1}`, label: `用户${i + 1}` }))], filter: (data, value) => value ? data.filter(d => d.user_id === parseInt(value)) : data },
-            { id: 'brandId', type: 'select', options: [{ value: '', label: '全部品牌' }, ...Array.from({ length: 15 }, (_, i) => ({ value: `${i + 1}`, label: `品牌${i + 1}` }))], filter: (data, value) => value ? data.filter(d => d.brand_id === parseInt(value)) : data },
-            { id: 'servicesId', type: 'select', options: [{ value: '', label: '全部服务' }, ...Array.from({ length: 15 }, (_, i) => ({ value: `${i + 1}`, label: `服务${i + 1}` }))], filter: (data, value) => value ? data.filter(d => d.services_id === parseInt(value)) : data },
+            { id: 'storeId', type: 'select', options: [{ value: '', label: '全部店铺' }, ...stores.map((s, i) => ({ value: `${i + 1}`, label: s }))], filter: (data, value) => value ? data.filter(d => d.store_id === parseInt(value)) : data },
+            { id: 'userId', type: 'select', options: [{ value: '', label: '全部用户' }, ...users.map((u, i) => ({ value: `${i + 1}`, label: u }))], filter: (data, value) => value ? data.filter(d => d.user_id === parseInt(value)) : data },
+            { id: 'brandId', type: 'select', options: [{ value: '', label: '全部品牌' }, ...brands.map((b, i) => ({ value: `${i + 1}`, label: b }))], filter: (data, value) => value ? data.filter(d => d.brand_id === parseInt(value)) : data },
+            { id: 'servicesId', type: 'select', options: [{ value: '', label: '全部服务' }, ...services.map((s, i) => ({ value: `${i + 1}`, label: s }))], filter: (data, value) => value ? data.filter(d => d.services_id === parseInt(value)) : data },
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
             { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'en_US', label: '英语' }, { value: 'zh_CN', label: '中文' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.item_id === d.id && l.language === value)) : data },
             { id: 'name', type: 'text', placeholder: '搜索商品名称', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.item_id === d.id && l.name.toLowerCase().includes(value.toLowerCase()))) : data },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
@@ -182,12 +198,12 @@
                 id: 'basic',
                 title: '基本信息',
                 fields: [
-                    { name: 'user_id', label: '用户', type: 'select', options: Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `用户${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'store_id', label: '店铺', type: 'select', options: Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `店铺${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'brand_id', label: '品牌', type: 'select', options: Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `品牌${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'services_id', label: '服务', type: 'select', options: Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `服务${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'user_id', label: '用户', type: 'select', options: users.map((u, i) => ({ value: i + 1, label: u })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'store_id', label: '店铺', type: 'select', options: stores.map((s, i) => ({ value: i + 1, label: s })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'brand_id', label: '品牌', type: 'select', options: brands.map((b, i) => ({ value: i + 1, label: b })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'services_id', label: '服务', type: 'select', options: services.map((s, i) => ({ value: i + 1, label: s })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'delivery_type', label: '配送类型', type: 'select', options: [{ value: 0, label: '类型0' }, { value: 1, label: '类型1' }, { value: 2, label: '类型2' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'delivery_type', label: '配送类型', type: 'select', options: [{ value: 0, label: '自提' }, { value: 1, label: '快递' }, { value: 2, label: '同城' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'sort_index', label: '排序索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'cover_pic', label: '封面图', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },

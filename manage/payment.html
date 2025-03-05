@@ -10,40 +10,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
-        .action-container { margin-bottom: 16px; }
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 10%; min-width: 60px; }
-        .col-status { width: 10%; min-width: 60px; }
-        .col-payment-key { width: 15%; min-width: 100px; }
-        .col-payment-name { width: 15%; min-width: 100px; }
-        .col-payment-type { width: 15%; min-width: 100px; }
-        .col-day-amount { width: 10%; min-width: 60px; }
-        .col-month-amount { width: 10%; min-width: 60px; }
-        .col-create-time { width: 15%; min-width: 100px; }
-        .col-actions { width: 15%; min-width: 100px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
-        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
-        .ant-tabs-content { min-height: 400px; }
-        .ant-form-item { margin-bottom: 16px; }
-        .ant-form-item:not(.textarea-item, .image-item) { display: flex; align-items: center; }
-        .ant-form-item:not(.textarea-item, .image-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .ant-form-item:not(.textarea-item, .image-item) input, .ant-form-item:not(.textarea-item, .image-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .ant-form-item.textarea-item { display: block; }
-        .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
-        .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
-        .ant-form-item.image-item { display: block; }
-        .ant-form-item.image-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
-        .ant-form-item.image-item input[type="file"] { display: block; margin-bottom: 8px; }
-        .ant-form-item.image-item .image-preview { display: flex; flex-wrap: wrap; gap: 8px; }
-        .ant-form-item.image-item .image-preview img { max-width: 100px; max-height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-payment-name { width: 12%; min-width: 100px; }
+        .col-payment-type { width: 10%; min-width: 80px; }
+        .col-payment-logo { width: 10%; min-width: 80px; }
+        .col-day-amount { width: 10%; min-width: 80px; }
+        .col-month-amount { width: 10%; min-width: 80px; }
+        .col-commission-percent { width: 10%; min-width: 80px; }
+        .col-create-time { width: 15%; min-width: 120px; }
+        .col-actions { width: 10%; min-width: 100px; }
+        .payment-logo-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
+        .payment-logo-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -57,67 +39,22 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('payment.html')" role="tab" aria-selected="true">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('payment.html')">
                                     <span class="ant-tabs-tab-btn">支付渠道</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <input type="text" id="paymentKeyFilter" class="ant-input" placeholder="支付键">
-                                    <input type="text" id="paymentNameFilter" class="ant-input" placeholder="支付名称">
-                                    <div class="ant-select ant-select-single ant-select-show-arrow">
-                                        <select id="statusFilter">
-                                            <option value="">全部状态</option>
-                                            <option value="0">未启用</option>
-                                            <option value="1">启用</option>
-                                        </select>
-                                    </div>
-                                    <input type="date" id="startDate" class="ant-input">
-                                    <input type="date" id="endDate" class="ant-input">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addItem()">添加</button>
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
-                                </div>
-                                <!-- 数据区域 -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header" style="background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-status">状态</div>
-                                        <div class="col-payment-key">支付键</div>
-                                        <div class="col-payment-name">支付名称</div>
-                                        <div class="col-payment-type">支付类型</div>
-                                        <div class="col-day-amount">日总额</div>
-                                        <div class="col-month-amount">月总额</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
-                                    <div id="item-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <div class="ant-select ant-select-single ant-select-show-arrow">
-                                            <select id="perPage" onchange="changePerPage()">
-                                                <option value="10">10 条/页</option>
-                                                <option value="20" selected>20 条/页</option>
-                                                <option value="50">50 条/页</option>
-                                                <option value="100">100 条/页</option>
-                                            </select>
-                                        </div>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="table-header"></div>
+                                    <div id="payment-list">加载中...</div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -127,504 +64,140 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-
-    <!-- 添加/编辑弹窗 -->
-    <div id="itemModal" class="modal">
+    <div id="imageModal" class="modal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加支付渠道</h3>
-            <form id="itemForm">
-                <div class="ant-tabs ant-tabs-top">
-                    <div class="ant-tabs-nav">
-                        <div class="ant-tabs-nav-wrap">
-                            <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
-                                    <span class="ant-tabs-tab-btn">基本信息</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="limits">
-                                    <span class="ant-tabs-tab-btn">限额信息</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="settings">
-                                    <span class="ant-tabs-tab-btn">设置信息</span>
-                                </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ant-tabs-content-holder">
-                        <div class="ant-tabs-content">
-                            <!-- 基本信息 Tab -->
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
-                                <div class="ant-form-item">
-                                    <label>ID (自动生成):</label>
-                                    <input type="text" id="modalId" disabled>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>状态:</label>
-                                    <select id="modalStatus">
-                                        <option value="0">未启用</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>排序索引:</label>
-                                    <input type="number" id="modalSortIndex" min="0" max="255" value="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>支付键:</label>
-                                    <input type="text" id="modalPaymentKey" maxlength="32">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>支付类型:</label>
-                                    <input type="text" id="modalPaymentType" maxlength="32">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>支付名称:</label>
-                                    <input type="text" id="modalPaymentName" maxlength="32">
-                                </div>
-                                <div class="ant-form-item image-item">
-                                    <label>支付LOGO:</label>
-                                    <input type="file" id="modalPaymentLogo" accept="image/*" onchange="previewLogo()">
-                                    <div id="logoPreview" class="image-preview"></div>
-                                </div>
-                            </div>
-                            <!-- 限额信息 Tab -->
-                            <div class="ant-tabs-tabpane" id="limits" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>日总额:</label>
-                                    <input type="number" id="modalDayAmount" step="0.01" min="0" value="0.00">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>日限制次数:</label>
-                                    <input type="number" id="modalDayLimitCount" min="0" value="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>日限制金额:</label>
-                                    <input type="number" id="modalDayLimitAmount" min="0" value="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>月总额:</label>
-                                    <input type="number" id="modalMonthAmount" step="0.01" min="0" value="0.00">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>月限制次数:</label>
-                                    <input type="number" id="modalMonthLimitCount" min="0" value="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>月限制金额:</label>
-                                    <input type="number" id="modalMonthLimitAmount" min="0" value="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>最小金额:</label>
-                                    <input type="number" id="modalMinimum" step="0.01" min="0" value="0.00">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>最大金额:</label>
-                                    <input type="number" id="modalMaxmum" step="0.01" min="0" value="9999.00">
-                                </div>
-                            </div>
-                            <!-- 设置信息 Tab -->
-                            <div class="ant-tabs-tabpane" id="settings" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>佣金百分比:</label>
-                                    <input type="number" id="modalCommissionPercent" step="0.01" min="0" value="0.02">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>固定佣金:</label>
-                                    <input type="number" id="modalCommissionFixConst" step="0.01" min="0" value="0.00">
-                                </div>
-                                <div class="ant-form-item textarea-item">
-                                    <label>备注:</label>
-                                    <textarea id="modalMark" rows="5" maxlength="256"></textarea>
-                                </div>
-                                <div class="ant-form-item textarea-item">
-                                    <label>描述:</label>
-                                    <textarea id="modalDescription" rows="5" maxlength="512"></textarea>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>支付类:</label>
-                                    <input type="text" id="modalPaymentClass" maxlength="128">
-                                </div>
-                                <div class="ant-form-item textarea-item">
-                                    <label>支付设置:</label>
-                                    <textarea id="modalPaymentSetting" rows="5"></textarea>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>创建时间:</label>
-                                    <input type="datetime-local" id="modalCreateTime" disabled>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>更新时间:</label>
-                                    <input type="datetime-local" id="modalUpdateTime" disabled>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveItem()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 批量修改状态弹窗 -->
-    <div id="statusModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeStatusModal()">×</button>
-            <h3>批量修改状态</h3>
-            <form id="statusForm">
-                <div class="ant-form-item">
-                    <label>选中的ID:</label>
-                    <input type="text" id="selectedIds" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>新状态:</label>
-                    <select id="newStatus">
-                        <option value="0">未启用</option>
-                        <option value="1">启用</option>
-                    </select>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
-                </div>
-            </form>
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    let itemData = [];
-    let itemPage = 1, itemPerPage = 20;
-
-    function fetchItemData() {
-        for (let i = 1; i <= 200; i++) {
-            itemData.push({
-                id: i,
-                status: Math.floor(Math.random() * 2),
-                sort_index: Math.floor(Math.random() * 100),
-                payment_key: `PAY${i}`,
-                payment_type: `Type${i}`,
-                payment_name: `Payment ${i}`,
-                payment_logo: `https://example.com/logo${i}.png`,
-                day_amount: (Math.random() * 10000).toFixed(2),
-                day_limit_count: Math.floor(Math.random() * 100),
-                day_limit_amount: Math.floor(Math.random() * 10000),
-                month_amount: (Math.random() * 50000).toFixed(2),
-                month_limit_count: Math.floor(Math.random() * 500),
-                month_limit_amount: Math.floor(Math.random() * 50000),
-                minimum: (Math.random() * 100).toFixed(2),
-                maxmum: (Math.random() * 9999).toFixed(2),
-                commission_percent: (Math.random() * 0.1).toFixed(2),
-                commission_fix_const: (Math.random() * 10).toFixed(2),
-                mark: `Mark for payment ${i}`,
-                description: `Description for payment ${i}`,
-                payment_class: `Class${i}`,
-                payment_setting: `{"setting${i}": "value${i}"}`,
-                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix(),
-                update_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix()
-            });
-        }
-        renderItemList(itemData);
+    // 辅助函数
+    const paymentTypes = ["Credit Card", "Mobile Payment", "Bank Transfer", "Cryptocurrency", "Cash"];
+    const paymentNames = ["Visa", "MasterCard", "Alipay", "WeChat Pay", "PayPal", "Bitcoin", "UnionPay"];
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    function randomDecimal(min, max, decimals = 2) {
+        return (Math.random() * (max - min) + min).toFixed(decimals);
     }
 
-    function renderItemList(items) {
-        const start = (itemPage - 1) * itemPerPage;
-        const end = start + itemPerPage;
-        const paginatedItems = items.slice(start, end);
-        const listContainer = document.getElementById('item-list');
-        listContainer.innerHTML = '';
-
-        paginatedItems.forEach(item => {
-            const statusTag = item.status === 0 ? '<span class="ant-tag ant-tag-blue">未启用</span>' :
-                '<span class="ant-tag ant-tag-green">启用</span>';
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            itemDiv.style = 'border-bottom: 1px solid #ddd;';
-            itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${item.id}"></div>
-                <div class="col-id">${item.id}</div>
-                <div class="col-status">${statusTag}</div>
-                <div class="col-payment-key">${item.payment_key}</div>
-                <div class="col-payment-name">${item.payment_name}</div>
-                <div class="col-payment-type">${item.payment_type}</div>
-                <div class="col-day-amount">${item.day_amount}</div>
-                <div class="col-month-amount">${item.month_amount}</div>
-                <div class="col-create-time">${moment.unix(item.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                <div class="col-actions">
-                    <button class="ant-btn" onclick="editItem('${item.id}')">编辑</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteItem('${item.id}')">删除</button>
-                </div>
-            `;
-            listContainer.appendChild(itemDiv);
-        });
-
-        const totalPages = Math.ceil(items.length / itemPerPage);
-        document.getElementById('page-info').textContent = `第 ${itemPage} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
-    }
-
-    function applyFilters() {
-        const paymentKey = document.getElementById('paymentKeyFilter').value.toLowerCase();
-        const paymentName = document.getElementById('paymentNameFilter').value.toLowerCase();
-        const status = document.getElementById('statusFilter').value;
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
-        let filteredItems = itemData;
-
-        if (paymentKey) filteredItems = filteredItems.filter(item => item.payment_key.toLowerCase().includes(paymentKey));
-        if (paymentName) filteredItems = filteredItems.filter(item => item.payment_name.toLowerCase().includes(paymentName));
-        if (status) filteredItems = filteredItems.filter(item => item.status === parseInt(status));
-        if (startDate) filteredItems = filteredItems.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
-        if (endDate) filteredItems = filteredItems.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
-
-        itemPage = 1;
-        renderItemList(filteredItems);
-    }
-
-    function changePage(delta) {
-        const totalPages = Math.ceil(itemData.length / itemPerPage);
-        itemPage += delta;
-        if (itemPage < 1) itemPage = 1;
-        if (itemPage > totalPages) itemPage = totalPages;
-        applyFilters();
-    }
-
-    function jumpToPage() {
-        const page = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(itemData.length / itemPerPage);
-        if (page >= 1 && page <= totalPages) {
-            itemPage = page;
-            applyFilters();
-        } else {
-            alert('请输入有效的页码');
-        }
-    }
-
-    function changePerPage() {
-        itemPerPage = parseInt(document.getElementById('perPage').value);
-        itemPage = 1;
-        applyFilters();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    function previewLogo() {
-        const file = document.getElementById('modalPaymentLogo').files[0];
-        const preview = document.getElementById('logoPreview');
-        preview.innerHTML = '';
-        if (file) {
-            const img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            preview.appendChild(img);
-        }
-    }
-
-    let isEditing = false;
-    let editId = null;
-
-    function addItem() {
-        isEditing = false;
-        editId = null;
-        document.getElementById('modalTitle').textContent = '添加支付渠道';
-        document.getElementById('modalId').value = '';
-        document.getElementById('modalStatus').value = '0';
-        document.getElementById('modalSortIndex').value = '0';
-        document.getElementById('modalPaymentKey').value = '';
-        document.getElementById('modalPaymentType').value = '';
-        document.getElementById('modalPaymentName').value = '';
-        document.getElementById('modalPaymentLogo').value = '';
-        document.getElementById('logoPreview').innerHTML = '';
-        document.getElementById('modalDayAmount').value = '0.00';
-        document.getElementById('modalDayLimitCount').value = '0';
-        document.getElementById('modalDayLimitAmount').value = '0';
-        document.getElementById('modalMonthAmount').value = '0.00';
-        document.getElementById('modalMonthLimitCount').value = '0';
-        document.getElementById('modalMonthLimitAmount').value = '0';
-        document.getElementById('modalMinimum').value = '0.00';
-        document.getElementById('modalMaxmum').value = '9999.00';
-        document.getElementById('modalCommissionPercent').value = '0.02';
-        document.getElementById('modalCommissionFixConst').value = '0.00';
-        document.getElementById('modalMark').value = '';
-        document.getElementById('modalDescription').value = '';
-        document.getElementById('modalPaymentClass').value = '';
-        document.getElementById('modalPaymentSetting').value = '';
-        document.getElementById('modalCreateTime').value = '';
-        document.getElementById('modalUpdateTime').value = '';
-        setupTabs();
-        document.getElementById('itemModal').style.display = 'block';
-    }
-
-    function editItem(id) {
-        isEditing = true;
-        editId = id;
-        const item = itemData.find(i => i.id === parseInt(id));
-        document.getElementById('modalTitle').textContent = '编辑支付渠道';
-        document.getElementById('modalId').value = item.id;
-        document.getElementById('modalStatus').value = item.status;
-        document.getElementById('modalSortIndex').value = item.sort_index;
-        document.getElementById('modalPaymentKey').value = item.payment_key;
-        document.getElementById('modalPaymentType').value = item.payment_type;
-        document.getElementById('modalPaymentName').value = item.payment_name;
-        document.getElementById('modalPaymentLogo').value = '';
-        document.getElementById('logoPreview').innerHTML = `<img src="${item.payment_logo}">`;
-        document.getElementById('modalDayAmount').value = item.day_amount;
-        document.getElementById('modalDayLimitCount').value = item.day_limit_count;
-        document.getElementById('modalDayLimitAmount').value = item.day_limit_amount;
-        document.getElementById('modalMonthAmount').value = item.month_amount;
-        document.getElementById('modalMonthLimitCount').value = item.month_limit_count;
-        document.getElementById('modalMonthLimitAmount').value = item.month_limit_amount;
-        document.getElementById('modalMinimum').value = item.minimum;
-        document.getElementById('modalMaxmum').value = item.maxmum;
-        document.getElementById('modalCommissionPercent').value = item.commission_percent;
-        document.getElementById('modalCommissionFixConst').value = item.commission_fix_const;
-        document.getElementById('modalMark').value = item.mark;
-        document.getElementById('modalDescription').value = item.description;
-        document.getElementById('modalPaymentClass').value = item.payment_class;
-        document.getElementById('modalPaymentSetting').value = item.payment_setting;
-        document.getElementById('modalCreateTime').value = moment.unix(item.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalUpdateTime').value = moment.unix(item.update_time).format('YYYY-MM-DDTHH:mm');
-        setupTabs();
-        document.getElementById('itemModal').style.display = 'block';
-    }
-
-    function setupTabs() {
-        const tabButtons = document.querySelectorAll('#itemModal .ant-tabs-tab');
-        const tabPanes = document.querySelectorAll('#itemModal .ant-tabs-tabpane');
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
-                button.classList.add('ant-tabs-tab-active');
-                const tabId = button.getAttribute('data-tab');
-                tabPanes.forEach(pane => {
-                    pane.style.display = pane.id === tabId ? 'block' : 'none';
-                });
-                document.querySelector('#itemModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
-                document.querySelector('#itemModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
-            });
-        });
-        tabButtons[0].classList.add('ant-tabs-tab-active');
-        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
-    }
-
-    function saveItem() {
-        const itemId = isEditing ? parseInt(document.getElementById('modalId').value) : itemData.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-        const logoFile = document.getElementById('modalPaymentLogo').files[0];
-        const paymentLogo = logoFile ? URL.createObjectURL(logoFile) : (isEditing ? itemData.find(i => i.id === itemId).payment_logo : '');
-
-        let item = itemData.find(i => i.id === itemId);
-        if (!item) {
-            item = {
-                id: itemId,
-                status: parseInt(document.getElementById('modalStatus').value),
-                sort_index: parseInt(document.getElementById('modalSortIndex').value),
-                payment_key: document.getElementById('modalPaymentKey').value,
-                payment_type: document.getElementById('modalPaymentType').value,
-                payment_name: document.getElementById('modalPaymentName').value,
-                payment_logo: paymentLogo,
-                day_amount: parseFloat(document.getElementById('modalDayAmount').value),
-                day_limit_count: parseInt(document.getElementById('modalDayLimitCount').value),
-                day_limit_amount: parseInt(document.getElementById('modalDayLimitAmount').value),
-                month_amount: parseFloat(document.getElementById('modalMonthAmount').value),
-                month_limit_count: parseInt(document.getElementById('modalMonthLimitCount').value),
-                month_limit_amount: parseInt(document.getElementById('modalMonthLimitAmount').value),
-                minimum: parseFloat(document.getElementById('modalMinimum').value),
-                maxmum: parseFloat(document.getElementById('modalMaxmum').value),
-                commission_percent: parseFloat(document.getElementById('modalCommissionPercent').value),
-                commission_fix_const: parseFloat(document.getElementById('modalCommissionFixConst').value),
-                mark: document.getElementById('modalMark').value,
-                description: document.getElementById('modalDescription').value,
-                payment_class: document.getElementById('modalPaymentClass').value,
-                payment_setting: document.getElementById('modalPaymentSetting').value,
-                create_time: moment().unix(),
-                update_time: moment().unix()
-            };
-            itemData.push(item);
-        } else {
-            item.status = parseInt(document.getElementById('modalStatus').value);
-            item.sort_index = parseInt(document.getElementById('modalSortIndex').value);
-            item.payment_key = document.getElementById('modalPaymentKey').value;
-            item.payment_type = document.getElementById('modalPaymentType').value;
-            item.payment_name = document.getElementById('modalPaymentName').value;
-            item.payment_logo = paymentLogo;
-            item.day_amount = parseFloat(document.getElementById('modalDayAmount').value);
-            item.day_limit_count = parseInt(document.getElementById('modalDayLimitCount').value);
-            item.day_limit_amount = parseInt(document.getElementById('modalDayLimitAmount').value);
-            item.month_amount = parseFloat(document.getElementById('modalMonthAmount').value);
-            item.month_limit_count = parseInt(document.getElementById('modalMonthLimitCount').value);
-            item.month_limit_amount = parseInt(document.getElementById('modalMonthLimitAmount').value);
-            item.minimum = parseFloat(document.getElementById('modalMinimum').value);
-            item.maxmum = parseFloat(document.getElementById('modalMaxmum').value);
-            item.commission_percent = parseFloat(document.getElementById('modalCommissionPercent').value);
-            item.commission_fix_const = parseFloat(document.getElementById('modalCommissionFixConst').value);
-            item.mark = document.getElementById('modalMark').value;
-            item.description = document.getElementById('modalDescription').value;
-            item.payment_class = document.getElementById('modalPaymentClass').value;
-            item.payment_setting = document.getElementById('modalPaymentSetting').value;
-            item.update_time = moment().unix();
-        }
-        closeModal();
-        applyFilters();
-    }
-
-    function deleteItem(id) {
-        if (confirm('确定要删除此记录吗？')) {
-            itemData = itemData.filter(item => item.id !== parseInt(id));
-            applyFilters();
-        }
-    }
-
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的记录');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个记录吗？`)) {
-            itemData = itemData.filter(item => !selectedIds.includes(item.id.toString()));
-            applyFilters();
-        }
-    }
-
-    function batchEditStatus() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
-        if (selectedIds.length === 0) {
-            alert('请先选择要修改状态的记录');
-            return;
-        }
-        document.getElementById('selectedIds').value = selectedIds.join(', ');
-        document.getElementById('statusModal').style.display = 'block';
-    }
-
-    function saveBatchStatus() {
-        const newStatus = parseInt(document.getElementById('newStatus').value);
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
-        itemData = itemData.map(item => selectedIds.includes(item.id.toString()) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
-        closeStatusModal();
-        applyFilters();
-    }
-
-    function closeModal() {
-        document.getElementById('itemModal').style.display = 'none';
-    }
-
-    function closeStatusModal() {
-        document.getElementById('statusModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        console.log('Page loaded, initializing...');
-        w3.includeHTML(() => {
-            console.log('External HTML included');
-            initMenus();
-            fetchItemData();
-        });
+    window.tableConfig = {
+        tableName: 'payment',
+        tableTitle: '支付渠道',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
+            { name: 'sort_index', generator: () => randomInt(0, 10) }, // 排序 0-10
+            { name: 'payment_key', generator: id => `PAY_${getRandomItem(paymentNames).toUpperCase()}_${id}` }, // 唯一支付键
+            { name: 'payment_type', generator: () => getRandomItem(paymentTypes) }, // 支付类型
+            { name: 'payment_name', generator: () => getRandomItem(paymentNames) }, // 支付名称
+            { name: 'payment_logo', generator: () => getRandomImage('sexy') }, // 支付标志
+            { name: 'day_amount', generator: () => randomDecimal(0, 10000, 2) }, // 日交易额 0-10000
+            { name: 'day_limit_count', generator: () => randomInt(0, 1000) }, // 日限次数 0-1000
+            { name: 'day_limit_amount', generator: () => randomInt(0, 50000) }, // 日限额 0-50000
+            { name: 'month_amount', generator: () => randomDecimal(0, 300000, 2) }, // 月交易额 0-300000
+            { name: 'month_limit_count', generator: () => randomInt(0, 30000) }, // 月限次数 0-30000
+            { name: 'month_limit_amount', generator: () => randomInt(0, 1000000) }, // 月限额 0-1000000
+            { name: 'minimum', generator: () => randomDecimal(0, 10, 2) }, // 最小金额 0-10
+            { name: 'maxmum', generator: () => randomDecimal(1000, 9999, 2) }, // 最大金额 1000-9999
+            { name: 'commission_percent', generator: () => randomDecimal(0.01, 0.05, 2) }, // 佣金百分比 1%-5%
+            { name: 'commission_fix_const', generator: () => randomDecimal(0, 5, 2) }, // 固定佣金 0-5
+            { name: 'mark', generator: () => `Note for payment ${getRandomItem(paymentNames)}` }, // 备注
+            { name: 'description', generator: () => `Description of ${getRandomItem(paymentNames)} payment channel.` }, // 描述
+            { name: 'payment_class', generator: () => `com.example.payment.${getRandomItem(paymentNames).toLowerCase()}` }, // 支付类
+            { name: 'payment_setting', generator: () => JSON.stringify({ apiKey: `KEY_${randomInt(1000, 9999)}`, enabled: true }) }, // 支付设置
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
+            { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
+            { label: '批量修改支付类型', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'payment_type', label: '支付类型', type: 'select', options: paymentTypes.map(t => ({ value: t, label: t })) } },
+            { label: '批量修改支付名称', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'payment_name', label: '支付名称', type: 'select', options: paymentNames.map(n => ({ value: n, label: n })) } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
+            { name: 'payment_name', label: '支付名称', className: 'col-payment-name' },
+            { name: 'payment_type', label: '支付类型', className: 'col-payment-type' },
+            { name: 'payment_logo', label: '支付标志', className: 'col-payment-logo', formatter: v => v ? `<div class="payment-logo-preview"><img src="${v}" alt="标志" onclick="enlargeImage(${v}, 0, ['${v}'])"></div>` : '<div class="payment-logo-preview"><span class="placeholder" onclick="alert(\'标志不存在\')">无</span></div>' },
+            { name: 'day_amount', label: '日交易额', className: 'col-day-amount' },
+            { name: 'month_amount', label: '月交易额', className: 'col-month-amount' },
+            { name: 'commission_percent', label: '佣金百分比', className: 'col-commission-percent', formatter: v => `${v}%` },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'paymentType', type: 'select', options: [{ value: '', label: '全部类型' }, ...paymentTypes.map(t => ({ value: t, label: t }))], filter: (data, value) => value ? data.filter(d => d.payment_type === value) : data },
+            { id: 'paymentName', type: 'select', options: [{ value: '', label: '全部名称' }, ...paymentNames.map(n => ({ value: n, label: n }))], filter: (data, value) => value ? data.filter(d => d.payment_name === value) : data },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'sort_index', label: '排序索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'payment_key', label: '支付键', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'payment_type', label: '支付类型', type: 'select', options: paymentTypes.map(t => ({ value: t, label: t })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'payment_name', label: '支付名称', type: 'select', options: paymentNames.map(n => ({ value: n, label: n })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'payment_logo', label: '支付标志', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            },
+            {
+                id: 'limits',
+                title: '交易限制',
+                fields: [
+                    { name: 'day_amount', label: '日交易额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'day_limit_count', label: '日限次数', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'day_limit_amount', label: '日限额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'month_amount', label: '月交易额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'month_limit_count', label: '月限次数', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'month_limit_amount', label: '月限额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'minimum', label: '最小金额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'maxmum', label: '最大金额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            },
+            {
+                id: 'commission',
+                title: '佣金信息',
+                fields: [
+                    { name: 'commission_percent', label: '佣金百分比', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'commission_fix_const', label: '固定佣金', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            },
+            {
+                id: 'details',
+                title: '详细信息',
+                fields: [
+                    { name: 'mark', label: '备注', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'description', label: '描述', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'payment_class', label: '支付类', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'payment_setting', label: '支付设置', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            }
+        ]
     };
 </script>
 </body>

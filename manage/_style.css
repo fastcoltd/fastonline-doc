@@ -19,19 +19,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-fami
 .logout-btn:hover { color: #dbeafe; }
 
 /* 侧边栏样式（PC 端保持不变） */
-.sidebar {
-    width: 16em;
-    height: calc(100vh - 4em);
-    background: #eef2ff;
-    color: #1e3a8a;
-    position: fixed;
-    top: 4em;
-    left: 0;
-    transition: width 0.3s ease, transform 0.3s ease;
-    overflow: hidden;
-    z-index: 999;
-    box-shadow: 0.125em 0 0.5em rgba(0, 0, 0, 0.05);
-}
+.sidebar { width: 16em; height: calc(100vh - 4em); background: #eef2ff; color: #1e3a8a; position: fixed; top: 4em; left: 0; transition: width 0.3s ease, transform 0.3s ease; overflow: hidden; z-index: 999; box-shadow: 0.125em 0 0.5em rgba(0, 0, 0, 0.05); }
 .sidebar-menu { list-style: none; padding: 0; margin: 0; display: none; }
 .sidebar-menu.active { display: block; }
 .sidebar-menu-item { margin-bottom: 0.25em; position: relative; }
@@ -50,23 +38,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-fami
 .sidebar.collapsed .sidebar-content { display: none; }
 
 /* 触发器样式（PC 端保持不变） */
-.trigger {
-    position: fixed;
-    top: 40%;
-    left: 0.25em;
-    width: 2.5em;
-    height: 2.5em;
-    background: #1e3a8a;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    transform: translateY(-50%);
-    z-index: 2000;
-}
+.trigger { position: fixed; top: 40%; left: 0.25em; width: 2.5em; height: 2.5em; background: #1e3a8a; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.15); cursor: pointer; transition: all 0.3s ease; transform: translateY(-50%); z-index: 2000; }
 .sidebar:not(.collapsed) .trigger { left: 14.625em; }
 .trigger:hover { background: #3b82f6; transform: translateY(-50%) scale(1.1); }
 .trigger::before { content: "≡"; font-size: 1.125em; color: #fff; }
@@ -116,9 +88,11 @@ input[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-a
 select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-allowed; border-color: #d9d9d9; }
 
 /* 表格和列表样式 */
-.table-header, .task-item { display: flex; width: 100%; }
-.table-header div, .task-item div { padding: 0.2em; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
-.task-list { overflow-x: scroll !important; background: #fff; padding: 0; border-radius: 0.5em; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.1); overflow-x: auto; }
+.table-header { display: flex; width: 100%; }
+.task-item { display: flex; width: 100%; }
+.table-header div { padding: 0.2em; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+.task-item div { padding: 0.2em; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
+.task-list { overflow-x: scroll !important; scrollbar-width: none;background: #fff; padding: 0; border-radius: 0.5em; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.1); overflow-x: auto; }
 .task-item { display: flex; justify-content: space-between; align-items: center; white-space: nowrap; }
 .task-item:hover { background: #fafafa; }
 .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5em, 1fr)); gap: 0.625em; margin-bottom: 1.25em; }
@@ -126,7 +100,7 @@ select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-
 .summary-item.selected { background: #f97316; color: #fff; border-color: #f97316; }
 
 /* 分页样式 */
-.pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 1em !important; margin-bottom: 1em !important; }
 .pagination .ant-btn { box-sizing: border-box; height: 2em; line-height: 2em; padding: 0 0.75em; border-radius: 0.25em; font-size: 0.875em; background: #fff; border: 0.0625em solid #d9d9d9; color: rgba(0, 0, 0, 0.85); transition: all 0.3s; display: flex; align-items: center; justify-content: center; margin-top: 0; }
 .pagination .ant-btn:hover { background: #f5f5f5; border-color: #f97316; color: #f97316; }
 .pagination .ant-input { box-sizing: border-box; width: 3.75em; height: 2em; padding: 0 0.5em; border: 0.0625em solid #d9d9d9; border-radius: 0.25em; text-align: center; font-size: 0.875em; line-height: 2em; color: rgba(0, 0, 0, 0.85); transition: all 0.3s; display: flex; align-items: center; }
@@ -142,7 +116,8 @@ select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-
 .ant-form-item label { color: rgba(0, 0, 0, 0.85); font-size: 0.875em; }
 .ant-form-item:not(.textarea-item):not(.image-item) { display: flex; align-items: center; }
 .ant-form-item:not(.textarea-item):not(.image-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-.ant-form-item:not(.textarea-item):not(.image-item) input, .ant-form-item:not(.textarea-item):not(.image-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+.ant-form-item:not(.textarea-item):not(.image-item) input { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+.ant-form-item:not(.textarea-item):not(.image-item) select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
 .ant-form-item.textarea-item { display: block; }
 .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
 .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
@@ -160,9 +135,8 @@ select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-
 .image-preview { display: flex; flex-wrap: wrap; gap: 8px; }
 .image-preview .image-wrapper { position: relative; display: inline-block; }
 .image-preview img { max-width: 100px; max-height: 100px; object-fit: cover; cursor: pointer; }
-
 .image-preview .delete-btn { position: absolute; top: 0; right: 0; background: rgba(255, 0, 0, 0.7); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; line-height: 20px; text-align: center; cursor: pointer; }
-#imageModal .modal-content { width: 90%; max-width: 800px; text-align: center;z-index: 1000 }
+#imageModal .modal-content { width: 90%; max-width: 800px; text-align: center; z-index: 1000; }
 #imageModal .modal-content .carousel { display: flex; align-items: center; justify-content: center; position: relative; }
 #imageModal .modal-content img { max-width: 100%; max-height: 80vh; }
 #imageModal .modal-content .carousel-btn { background: rgba(0, 0, 0, 0.5); color: white; border: none; padding: 10px; cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); }
@@ -187,174 +161,41 @@ canvas { max-width: 100%; height: auto; }
 .footer { text-align: center; padding: 1.25em 0; color: #888; font-size: 0.75em; background: #fff; border-top: 0.0625em solid #e8e8e8; flex-shrink: 0; width: 100%; }
 
 /* 移动端悬浮按钮样式 */
-.floating-toggle {
-    display: none; /* 默认隐藏，移动端显示 */
-    position: fixed;
-    bottom: 1em;
-    right: 1em;
-    width: 3em;
-    height: 3em;
-    background: #1e3a8a;
-    border-radius: 50%;
-    box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 2001;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.floating-toggle:hover {
-    background: #3b82f6;
-    transform: scale(1.1);
-}
-.floating-toggle::before {
-    content: "≡";
-    font-size: 1.5em;
-    color: #fff;
-}
-.mobile-sidebar.open + .floating-toggle::before {
-    content: "×";
-}
+.floating-toggle { display: none; position: fixed; bottom: 1em; right: 1em; width: 3em; height: 3em; background: #1e3a8a; border-radius: 50%; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.15); cursor: pointer; transition: all 0.3s ease; z-index: 2001; display: flex; align-items: center; justify-content: center; }
+.floating-toggle:hover { background: #3b82f6; transform: scale(1.1); }
+.floating-toggle::before { content: "≡"; font-size: 1.5em; color: #fff; }
+.mobile-sidebar.open + .floating-toggle::before { content: "×"; }
 
 /* 移动端侧边栏菜单样式 - 与 PC 配色一致，仅调整三角图标 */
-.mobile-sidebar {
-    display: none; /* 默认隐藏 */
-    position: fixed;
-    top: 4em; /* 从 header 下方开始，不遮挡 logo */
-    left: -100%; /* 从左侧弹出 */
-    width: 16em;
-    height: calc(100vh - 4em);
-    background: #eef2ff;
-    color: #1e3a8a;
-    transition: left 0.3s ease;
-    z-index: 999;
-    overflow-y: auto;
-    box-shadow: 0.125em 0 0.5em rgba(0, 0, 0, 0.05);
-}
-.mobile-sidebar.open {
-    left: 0;
-}
-.mobile-menu {
-    list-style: none;
-    padding: 0.75em;
-    margin: 0;
-}
-.mobile-menu-item {
-    margin-bottom: 0.25em;
-    position: relative;
-}
-.mobile-menu-item > a {
-    display: block;
-    padding: 0.625em 1em;
-    color: #1e3a8a;
-    text-decoration: none;
-    font-size: 1em;
-    font-weight: 500;
-    transition: all 0.3s;
-    position: relative;
-}
-.mobile-menu-item > a:hover {
-    background: #dbeafe;
-    color: #f97316;
-    border-radius: 0.25em;
-}
-.mobile-menu-item.active > a {
-    color: #f97316;
-    font-weight: 700;
-}
-.mobile-menu-item > a::after {
-    content: '▼';
-    position: absolute;
-    right: 0.75em;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.625em;
-    color: #64748b;
-}
-.mobile-menu-item.expanded > a::after {
-    content: '▲';
-}
-.mobile-submenu {
-    list-style: none;
-    padding-left: 1.5em;
-    margin: 0;
-    display: none;
-    background: #f7f9ff;
-    border-radius: 0 0 0.25em 0.25em;
-}
-.mobile-menu-item.expanded .mobile-submenu {
-    display: block;
-}
-.mobile-submenu-item {
-    margin-bottom: 0.25em;
-    position: relative;
-}
-.mobile-submenu-item > a {
-    display: block;
-    padding: 0.5em 1em;
-    color: #1e3a8a;
-    text-decoration: none;
-    font-size: 0.9375em;
-    font-weight: 400;
-    transition: all 0.3s;
-    position: relative;
-}
-.mobile-submenu-item > a:hover {
-    background: #dbeafe;
-    color: #f97316;
-    border-radius: 0.25em;
-}
-.mobile-submenu-item.active > a {
-    color: #f97316;
-    font-weight: 700;
-}
-.mobile-submenu-item:not(.expanded) > a::after {
-    content: '▼';
-    position: absolute;
-    right: 0.75em;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.625em;
-    color: #64748b;
-}
-.mobile-submenu-item.expanded > a::after {
-    content: '▲';
-    position: absolute;
-    right: 0.75em;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.625em;
-    color: #64748b;
-}
-.mobile-submenu .mobile-submenu {
-    padding-left: 1.5em;
-    background: #f7f9ff;
-}
-.mobile-submenu .mobile-submenu .mobile-submenu-item > a::after {
-    content: none; /* 三级菜单无三角图标 */
-}
+.mobile-sidebar { display: none; position: fixed; top: 4em; left: -100%; width: 16em; height: calc(100vh - 4em); background: #eef2ff; color: #1e3a8a; transition: left 0.3s ease; z-index: 999; overflow-y: auto; box-shadow: 0.125em 0 0.5em rgba(0, 0, 0, 0.05); }
+.mobile-sidebar.open { left: 0; }
+.mobile-menu { list-style: none; padding: 0.75em; margin: 0; }
+.mobile-menu-item { margin-bottom: 0.25em; position: relative; }
+.mobile-menu-item > a { display: block; padding: 0.625em 1em; color: #1e3a8a; text-decoration: none; font-size: 1em; font-weight: 500; transition: all 0.3s; position: relative; }
+.mobile-menu-item > a:hover { background: #dbeafe; color: #f97316; border-radius: 0.25em; }
+.mobile-menu-item.active > a { color: #f97316; font-weight: 700; }
+.mobile-menu-item > a::after { content: '▼'; position: absolute; right: 0.75em; top: 50%; transform: translateY(-50%); font-size: 0.625em; color: #64748b; }
+.mobile-menu-item.expanded > a::after { content: '▲'; }
+.mobile-submenu { list-style: none; padding-left: 1.5em; margin: 0; display: none; background: #f7f9ff; border-radius: 0 0 0.25em 0.25em; }
+.mobile-menu-item.expanded .mobile-submenu { display: block; }
+.mobile-submenu-item { margin-bottom: 0.25em; position: relative; }
+.mobile-submenu-item > a { display: block; padding: 0.5em 1em; color: #1e3a8a; text-decoration: none; font-size: 0.9375em; font-weight: 400; transition: all 0.3s; position: relative; }
+.mobile-submenu-item > a:hover { background: #dbeafe; color: #f97316; border-radius: 0.25em; }
+.mobile-submenu-item.active > a { color: #f97316; font-weight: 700; }
+.mobile-submenu-item:not(.expanded) > a::after { content: '▼'; position: absolute; right: 0.75em; top: 50%; transform: translateY(-50%); font-size: 0.625em; color: #64748b; }
+.mobile-submenu-item.expanded > a::after { content: '▲'; position: absolute; right: 0.75em; top: 50%; transform: translateY(-50%); font-size: 0.625em; color: #64748b; }
+.mobile-submenu .mobile-submenu { padding-left: 1.5em; background: #f7f9ff; }
+.mobile-submenu .mobile-submenu .mobile-submenu-item > a::after { content: none; }
 
-/* 响应式设计 */
-@media (max-width: 48em) { /* 768px = 48em */
-    .header {
-        padding: 0 0.625em;
-        height: 4em; /* 固定高度为一行 */
-        flex-wrap: nowrap; /* 禁止换行 */
-        overflow: hidden; /* 超出隐藏 */
-    }
+/* 响应式设计 - 移动端 (max-width: 48em = 768px) */
+@media (max-width: 48em) {
+    .header { padding: 0 0.625em; height: 4em; flex-wrap: nowrap; overflow: hidden; }
     .header-toggle { display: block; margin-right: 0.625em; }
     .brand-logo { width: auto; font-size: 1.25em; margin: 0; flex-shrink: 1; }
     .top-menu { display: none; }
-    .user-info {
-        margin-left: 0;
-        flex-wrap: nowrap; /* 保持一行 */
-        justify-content: flex-end;
-        padding: 0;
-        overflow: hidden; /* 超出隐藏 */
-    }
+    .user-info { margin-left: 0; flex-wrap: nowrap; justify-content: flex-end; padding: 0; overflow: hidden; }
     .language-select { margin: 0 0.3125em; }
-    .timezone { display: none; } /* 移动端隐藏时区以节省空间 */
+    .timezone { display: none; }
     .sidebar { display: none; }
     .trigger { display: none; }
     .content-wrapper { margin-left: 0; margin-top: 4em; transition: none; }
@@ -364,7 +205,8 @@ canvas { max-width: 100%; height: auto; }
     .mobile-sidebar { display: block; }
 }
 
-@media (min-width: 48.0625em) { /* 769px = 48.0625em */
+/* 响应式设计 - PC 端 (min-width: 48.0625em = 769px) */
+@media (min-width: 48.0625em) {
     .content-wrapper { margin-left: 16em; }
     .sidebar.collapsed + .content-wrapper { margin-left: 0; }
 }
