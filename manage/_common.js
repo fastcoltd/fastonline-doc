@@ -102,7 +102,7 @@ function toggleSidebar() {
         if (sidebar.classList.contains('collapsed')) {
             contentWrapper.style.marginLeft = '0';
         } else {
-            contentWrapper.style.marginLeft = '256px';
+            contentWrapper.style.marginLeft = '14em';
         }
     } else {
         contentWrapper.style.marginLeft = '0';
