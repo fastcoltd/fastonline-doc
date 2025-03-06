@@ -129,7 +129,7 @@ function renderModal(isEditingMode) {
             if (!isEditingMode && tabField.showInAdd === false) return;
 
             const formItem = document.createElement('div');
-            formItem.className = 'ant-form-item' + (tabField.type === 'textarea' ? ' textarea-item' : tabField.type === 'file' ? ' image-item' : '');
+            formItem.className = 'ant-form-item' + (tabField.type === 'textarea' ? ' textarea-item' : tabField.type === 'file' ? ' image-item' : tabField.type === 'tree' ? ' tree-item' : '');
             formItem.dataset.fieldName = field.name;
 
             const label = document.createElement('label');
@@ -142,7 +142,7 @@ function renderModal(isEditingMode) {
                 input.id = `modal${field.name}`;
                 tabField.options.forEach(opt => {
                     const option = document.createElement('option');
-                    option.value = String(opt.value); // 统一为字符串
+                    option.value = String(opt.value);
                     option.textContent = opt.label;
                     input.appendChild(option);
                 });
@@ -160,6 +160,32 @@ function renderModal(isEditingMode) {
                 previewDiv.className = 'image-preview';
                 previewDiv.id = `modal${field.name}Preview`;
                 formItem.appendChild(previewDiv);
+            } else if (tabField.type === 'tag') {
+                input = document.createElement('div');
+                input.id = `modal${field.name}`;
+                const tags = isEditingMode ? JSON.parse((tableData.find(item => item.id === editId) || {})[field.name] || '[]') : [];
+                tags.forEach(tag => {
+                    input.innerHTML += `<span class="ant-tag ant-tag-${tabField.color || 'blue'}" data-value="${tag}">${tag} <span class="tag-close" onclick="removeTag(this)">×</span></span>`;
+                });
+                if (isEditingMode ? tabField.editableInEdit : tabField.editableInAdd) {
+                    const select = document.createElement('select');
+                    select.onchange = () => addTag(select, field.name);
+                    select.innerHTML = `<option value="">添加标签</option>` + tabField.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                    input.appendChild(select);
+                    if (tabField.allowCustom) {
+                        const customInput = document.createElement('input');
+                        customInput.type = 'text';
+                        customInput.placeholder = '自定义标签';
+                        customInput.onkeydown = (e) => { if (e.key === 'Enter') addCustomTag(customInput, field.name); };
+                        input.appendChild(customInput);
+                    }
+                }
+            } else if (tabField.type === 'tree') {
+                input = document.createElement('div');
+                input.id = `modal${field.name}`;
+                input.className = 'tree-container';
+                const tree = renderTree(tabField.treeData, isEditingMode ? tableLangData.filter(p => p.role_id === editId).map(p => p.resource_id.toString()) : [], field.name, isEditingMode ? tabField.editableInEdit : tabField.editableInAdd);
+                input.appendChild(tree);
             } else {
                 input = document.createElement('input');
                 input.type = tabField.type || 'text';
@@ -180,6 +206,101 @@ function renderModal(isEditingMode) {
     navList.appendChild(inkBar);
 
     setupTabs();
+
+    if (isEditingMode) {
+        const record = tableData.find(item => item.id === editId);
+        config.modalTabs.forEach(tab => {
+            tab.fields.forEach(tabField => {
+                const field = config.fields.find(f => f.name === tabField.name) || tabField;
+                const element = document.getElementById(`modal${field.name}`);
+                if (!element || tabField.type === 'tree' || tabField.type === 'file' || tabField.type === 'tag') return;
+                const value = record[field.name];
+                element.value = value !== undefined && value !== null ? String(value) : '';
+            });
+        });
+    }
+}
+
+// 渲染树状结构
+function renderTree(treeData, checkedKeys, fieldName, editable) {
+    const container = document.createElement('div');
+    container.className = 'ant-tree';
+
+    function renderNode(nodes, level = 0) {
+        const ul = document.createElement('ul');
+        ul.className = 'ant-tree-list';
+        nodes.forEach(node => {
+            const li = document.createElement('li');
+            li.className = 'ant-tree-treenode';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = node.key;
+            checkbox.checked = checkedKeys.includes(node.key);
+            checkbox.disabled = !editable;
+            checkbox.dataset.fieldName = fieldName;
+            checkbox.onchange = () => updateTreeSelection(fieldName);
+            li.appendChild(checkbox);
+            const title = document.createElement('span');
+            title.textContent = node.title;
+            title.style.marginLeft = `${level * 0.05}em`;
+            li.appendChild(title);
+            if (node.children) {
+                li.appendChild(renderNode(node.children, level + 1));
+            }
+            ul.appendChild(li);
+        });
+        return ul;
+    }
+
+    container.appendChild(renderNode(treeData));
+    return container;
+}
+
+// 更新树的选择状态
+function updateTreeSelection(fieldName) {
+    const checkboxes = document.querySelectorAll(`#modal${fieldName} .ant-tree input[type="checkbox"]`);
+    checkboxes.forEach(checkbox => {
+        const parent = checkbox.closest('.ant-tree-treenode');
+        const children = parent.querySelectorAll('.ant-tree-treenode input[type="checkbox"]');
+        if (checkbox.checked) {
+            children.forEach(child => child.checked = true);
+        }
+        const siblings = parent.parentElement.querySelectorAll(':scope > .ant-tree-treenode > input[type="checkbox"]');
+        const allChecked = Array.from(siblings).every(sib => sib.checked);
+        const parentCheckbox = parent.parentElement.closest('.ant-tree-treenode')?.querySelector('input[type="checkbox"]');
+        if (parentCheckbox) parentCheckbox.checked = allChecked;
+    });
+}
+
+// 添加标签
+function addTag(select, fieldName) {
+    const value = select.value;
+    if (!value) return;
+    const container = document.getElementById(`modal${fieldName}`);
+    const tags = Array.from(container.querySelectorAll('.ant-tag')).map(tag => tag.dataset.value);
+    if (!tags.includes(value)) {
+        const color = container.closest('.ant-form-item').querySelector('label').nextElementSibling.className.includes('ant-tag-') ? container.closest('.ant-form-item').querySelector('.ant-tag').className.match(/ant-tag-\w+/)[0].replace('ant-tag-', '') : 'blue';
+        container.insertBefore(document.createRange().createContextualFragment(`<span class="ant-tag ant-tag-${color}" data-value="${value}">${value} <span class="tag-close" onclick="removeTag(this)">×</span></span>`), select);
+    }
+    select.value = '';
+}
+
+// 添加自定义标签
+function addCustomTag(input, fieldName) {
+    const value = input.value.trim();
+    if (!value) return;
+    const container = document.getElementById(`modal${fieldName}`);
+    const tags = Array.from(container.querySelectorAll('.ant-tag')).map(tag => tag.dataset.value);
+    if (!tags.includes(value)) {
+        const color = container.closest('.ant-form-item').querySelector('label').nextElementSibling.className.includes('ant-tag-') ? container.closest('.ant-form-item').querySelector('.ant-tag').className.match(/ant-tag-\w+/)[0].replace('ant-tag-', '') : 'orange';
+        container.insertBefore(document.createRange().createContextualFragment(`<span class="ant-tag ant-tag-${color}" data-value="${value}">${value} <span class="tag-close" onclick="removeTag(this)">×</span></span>`), container.querySelector('select'));
+    }
+    input.value = '';
+}
+
+// 删除标签
+function removeTag(closeBtn) {
+    closeBtn.parentElement.remove();
 }
 
 // 生成样本数据
@@ -231,7 +352,7 @@ async function fetchTableData(sampleCount) {
 
 // 生成主表记录
 function generateRecord(id) {
-    const record = { id };
+    const record = {id};
     config.fields.forEach(field => {
         if (field.isSystemField) {
             record[field.name] = field.generator ? field.generator(id) : moment().unix();
@@ -420,8 +541,12 @@ function editRecord(id, isViewOnly = false) {
 
 // 保存记录
 function saveRecord() {
-    const record = { id: isEditing ? editId : tableData.length + 1 };
-    const langRecord = config.langFields ? { id: tableLangData.length + 1, [config.langFields.foreignKey]: record.id, language: document.getElementById('modallanguage')?.value || config.langFields.languages[0] } : null;
+    const record = {id: isEditing ? editId : tableData.length + 1};
+    const langRecord = config.langFields ? {
+        id: tableLangData.length + 1,
+        [config.langFields.foreignKey]: record.id,
+        language: document.getElementById('modallanguage')?.value || config.langFields.languages[0]
+    } : null;
 
     config.modalTabs.forEach(tab => {
         tab.fields.forEach(tabField => {
@@ -437,6 +562,20 @@ function saveRecord() {
                     // 保留数字 0，不转换为空字符串
                     langRecord[field.name] = value === '' ? '' : (tabField.type === 'number' ? parseInt(value) : value);
                 }
+            } else if (tabField.type === 'tag') {
+                const tags = Array.from(element.querySelectorAll('.ant-tag')).map(tag => tag.dataset.value);
+                record[field.name] = JSON.stringify(tags);
+            } else if (tabField.type === 'tree') {
+                const checkedKeys = Array.from(element.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+                const resourceIds = checkedKeys.filter(key => !key.includes('-')).map(key => parseInt(key));
+                record[field.name] = JSON.stringify(resourceIds);
+                resourceIds.forEach((resourceId, index) => {
+                    langRecords.push({
+                        id: isEditing ? tableLangData.find(l => l.role_id === editId && l.resource_id === resourceId)?.id || (tableLangData.length + index + 1) : (tableLangData.length + index + 1),
+                        role_id: record.id,
+                        resource_id: resourceId
+                    });
+                });
             } else if (!field.isSystemField) {
                 // 保留数字 0，不转换为空字符串
                 record[field.name] = value === '' ? '' : (tabField.type === 'number' ? parseInt(value) : value);
@@ -446,10 +585,10 @@ function saveRecord() {
 
     if (isEditing) {
         const index = tableData.findIndex(item => item.id === editId);
-        tableData[index] = { ...tableData[index], ...record, update_time: moment().unix() };
+        tableData[index] = {...tableData[index], ...record, update_time: moment().unix()};
         if (langRecord) {
             const langIndex = tableLangData.findIndex(l => l[config.langFields.foreignKey] === editId && l.language === langRecord.language);
-            if (langIndex !== -1) tableLangData[langIndex] = { ...tableLangData[langIndex], ...langRecord };
+            if (langIndex !== -1) tableLangData[langIndex] = {...tableLangData[langIndex], ...langRecord};
             else tableLangData.push(langRecord);
         }
     } else {
@@ -585,7 +724,11 @@ function saveBatchField(fieldConfig) {
         ? parseInt(document.getElementById(`new${fieldConfig.name}`).value)
         : document.getElementById(`new${fieldConfig.name}`).value;
     const selectedIds = getSelectedIds();
-    tableData = tableData.map(item => selectedIds.includes(item.id) ? { ...item, [fieldConfig.name]: newValue, update_time: moment().unix() } : item);
+    tableData = tableData.map(item => selectedIds.includes(item.id) ? {
+        ...item,
+        [fieldConfig.name]: newValue,
+        update_time: moment().unix()
+    } : item);
     closeFieldModal(fieldConfig.name);
     renderTableList();
 }
@@ -652,9 +795,9 @@ function renderImagePreview(field, url) {
     preview.innerHTML = '';
     if (url) {
         let urls = [];
-        if (url.indexOf("[") !== -1){
+        if (url.indexOf("[") !== -1) {
             urls = JSON.parse(url)
-        }else{
+        } else {
             urls = [url]
         }
         urls.forEach(url => {

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 角色权限</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
+    <style>
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 60px; }
+        .col-role-id { width: 15%; min-width: 80px; }
+        .col-resource-id { width: 15%; min-width: 80px; }
+        .col-buttons { width: 20%; min-width: 120px; }
+        .col-fields { width: 15%; min-width: 100px; }
+        .col-urls { width: 20%; min-width: 120px; }
+        .col-actions { width: 15%; min-width: 100px; }
+        .ant-tag { margin: 2px; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid #d9d9d9; border-radius: 4px; }
+        .tag-container select, .tag-container input { margin-top: 4px; }
+        .tag-container .ant-tag { cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('role_permissions.html')">
+                                    <span class="ant-tabs-tab-btn">角色权限</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
+                                <div class="task-list">
+                                    <div class="table-header"></div>
+                                    <div id="role_permissions-list">加载中...</div>
+                                    <div class="pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+</div>
+
+<script>
+    const roleNames = ["超级管理员", "运营经理", "客服专员", "财务人员", "仓库管理员"];
+    const resources = ["用户管理", "店铺管理", "商品管理", "订单管理", "财务管理"];
+    const buttonsOptions = ["查看", "创建", "编辑", "删除", "审核"];
+    const fieldsOptions = ["id", "name", "status", "price", "description"];
+    const urlsOptions = ["/api/resource", "/admin/resource", "/view/resource", "/edit/resource"];
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    function randomSubset(arr, min, max) {
+        const count = randomInt(min, max);
+        const shuffled = arr.slice().sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+    }
+
+    window.tableConfig = {
+        tableName: 'role_permissions',
+        tableTitle: '角色权限',
+        sampleCount: 150,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'role_id', generator: () => randomInt(1, 50) },
+            { name: 'resource_id', generator: () => randomInt(1, 5) },
+            { name: 'buttons', generator: () => JSON.stringify(randomSubset(buttonsOptions, 1, 3)) },
+            { name: 'fields', generator: () => JSON.stringify(randomSubset(fieldsOptions, 1, 2)) },
+            { name: 'urls', generator: id => JSON.stringify(randomSubset(urlsOptions, 1, 2).map(u => `${u}/${id}`)) }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'role_id', label: '角色ID', className: 'col-role-id', formatter: v => `${v} (${roleNames[(v - 1) % 5]})` },
+            { name: 'resource_id', label: '资源ID', className: 'col-resource-id', formatter: v => `${v} (${resources[v - 1]})` },
+            { name: 'buttons', label: '按钮权限', className: 'col-buttons', formatter: v => JSON.parse(v || '[]').map(btn => `<span class="ant-tag ant-tag-blue">${btn}</span>`).join('') },
+            { name: 'fields', label: '字段权限', className: 'col-fields', formatter: v => JSON.parse(v || '[]').map(fld => `<span class="ant-tag ant-tag-green">${fld}</span>`).join('') },
+            { name: 'urls', label: 'URL权限', className: 'col-urls', formatter: v => JSON.parse(v || '[]').map(url => `<span class="ant-tag ant-tag-orange">${url}</span>`).join('') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'roleId', type: 'text', placeholder: '搜索角色ID', filter: (data, value) => value ? data.filter(d => String(d.role_id).includes(value)) : data },
+            { id: 'resourceId', type: 'select', options: [{ value: '', label: '全部资源' }, ...resources.map((r, i) => ({ value: `${i + 1}`, label: r }))], filter: (data, value) => value ? data.filter(d => d.resource_id === parseInt(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'role_id', label: '角色ID', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'resource_id', label: '资源ID', type: 'select', options: resources.map((r, i) => ({ value: i + 1, label: r })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'buttons', label: '按钮权限', type: 'tag', options: buttonsOptions, color: 'blue', allowCustom: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'fields', label: '字段权限', type: 'tag', options: fieldsOptions, color: 'green', allowCustom: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'urls', label: 'URL权限', type: 'tag', options: urlsOptions, color: 'orange', allowCustom: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            }
+        ]
+    };
+</script>
+</body>
+</html>
