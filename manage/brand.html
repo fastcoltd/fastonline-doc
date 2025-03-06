@@ -15,14 +15,14 @@
     <style>
         .col-checkbox { width: 5%; min-width: 50px; }
         .col-id { width: 8%; min-width: 60px; }
-        .col-parent-id { width: 10%; min-width: 80px; }
         .col-status { width: 8%; min-width: 60px; }
         .col-language { width: 10%; min-width: 80px; }
         .col-name { width: 12%; min-width: 100px; }
+        .col-custom-url { width: 12%; min-width: 100px; }
         .col-brand-logo { width: 10%; min-width: 80px; }
-        .col-custom-url { width: 15%; min-width: 120px; }
-        .col-create-time { width: 15%; min-width: 120px; }
-        .col-actions { width: 10%; min-width: 100px; }
+        .col-services-id { width: 15%; min-width: 120px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 12%; min-width: 100px; }
         .brand-logo-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
         .brand-logo-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
     </style>
@@ -76,14 +76,78 @@
 </div>
 
 <script>
-    // 辅助函数
-    const brandNames = ["TechTrend", "FashionPeak", "GadgetPro", "StyleVibe", "InnoGear"];
-    const companies = ["TechTrend Inc.", "FashionPeak Ltd.", "GadgetPro Co.", "StyleVibe Group", "InnoGear Corp."];
     function getRandomItem(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
     function randomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 模拟品牌名称
+    const brandNames = {
+        'zh_CN': [
+            '谷歌搜索', '亚马逊购物', '脸书', 'Instagram', 'X平台', 'YouTube', '网飞', 'WhatsApp', 'LINE', '乐天市场',
+            '雅虎日本', 'Flipkart', 'Telegram', 'Yandex搜索', 'eBay', 'LinkedIn', 'Spotify', 'Twitch', 'Reddit', 'PayPal',
+            'TikTok', 'ChatGPT', 'Google Bard', 'Midjourney', 'Hugging Face', 'AWS', 'Azure', 'Coursera', 'Udemy', 'Steam',
+            'Epic Games Store', 'Pinterest', 'Snapchat', 'Vimeo', 'SoundCloud', 'Zalando', 'Naver', 'KakaoTalk', 'Discord', 'Trello'
+        ],
+        'en_US': [
+            'Google Search', 'Amazon Shopping', 'Facebook', 'Instagram', 'X', 'YouTube', 'Netflix', 'WhatsApp', 'LINE', 'Rakuten Market',
+            'Yahoo Japan', 'Flipkart', 'Telegram', 'Yandex Search', 'eBay', 'LinkedIn', 'Spotify', 'Twitch', 'Reddit', 'PayPal',
+            'TikTok', 'ChatGPT', 'Google Bard', 'Midjourney', 'Hugging Face', 'AWS', 'Azure', 'Coursera', 'Udemy', 'Steam',
+            'Epic Games Store', 'Pinterest', 'Snapchat', 'Vimeo', 'SoundCloud', 'Zalando', 'Naver', 'KakaoTalk', 'Discord', 'Trello'
+        ],
+        'fr_FR': [
+            'Recherche Google', 'Amazon France', 'Facebook France', 'Instagram France', 'X France', 'YouTube France', 'Netflix France',
+            'WhatsApp France', 'LINE France', 'Rakuten France', 'Yahoo Japon', 'Flipkart France', 'Telegram France', 'Yandex France',
+            'eBay France', 'LinkedIn France', 'Spotify France', 'Twitch France', 'Reddit France', 'PayPal France',
+            'TikTok France', 'ChatGPT France', 'Google Bard France', 'Midjourney France', 'Hugging Face France', 'AWS France', 'Azure France',
+            'Coursera France', 'Udemy France', 'Steam France', 'Epic Games Store France', 'Pinterest France', 'Snapchat France', 'Vimeo France',
+            'SoundCloud France', 'Zalando France', 'Naver France', 'KakaoTalk France', 'Discord France', 'Trello France'
+        ],
+        'es_ES': [
+            'Búsqueda Google', 'Amazon España', 'Facebook España', 'Instagram España', 'X España', 'YouTube España', 'Netflix España',
+            'WhatsApp España', 'LINE España', 'Rakuten España', 'Yahoo Japón', 'Flipkart España', 'Telegram España', 'Yandex España',
+            'eBay España', 'LinkedIn España', 'Spotify España', 'Twitch España', 'Reddit España', 'PayPal España',
+            'TikTok España', 'ChatGPT España', 'Google Bard España', 'Midjourney España', 'Hugging Face España', 'AWS España', 'Azure España',
+            'Coursera España', 'Udemy España', 'Steam España', 'Epic Games Store España', 'Pinterest España', 'Snapchat España', 'Vimeo España',
+            'SoundCloud España', 'Zalando España', 'Naver España', 'KakaoTalk España', 'Discord España', 'Trello España'
+        ],
+        'vi_VN': [
+            'Tìm kiếm Google', 'Amazon Việt Nam', 'Facebook Việt Nam', 'Instagram Việt Nam', 'X Việt Nam', 'YouTube Việt Nam',
+            'Netflix Việt Nam', 'WhatsApp Việt Nam', 'LINE Việt Nam', 'Rakuten Việt Nam', 'Yahoo Japan Việt Nam', 'Flipkart Việt Nam',
+            'Telegram Việt Nam', 'Yandex Việt Nam', 'eBay Việt Nam', 'LinkedIn Việt Nam', 'Spotify Việt Nam', 'Twitch Việt Nam',
+            'Reddit Việt Nam', 'PayPal Việt Nam', 'TikTok Việt Nam', 'ChatGPT Việt Nam', 'Google Bard Việt Nam', 'Midjourney Việt Nam',
+            'Hugging Face Việt Nam', 'AWS Việt Nam', 'Azure Việt Nam', 'Coursera Việt Nam', 'Udemy Việt Nam', 'Steam Việt Nam',
+            'Epic Games Store Việt Nam', 'Pinterest Việt Nam', 'Snapchat Việt Nam', 'Vimeo Việt Nam', 'SoundCloud Việt Nam', 'Zalando Việt Nam',
+            'Naver Việt Nam', 'KakaoTalk Việt Nam', 'Discord Việt Nam', 'Trello Việt Nam'
+        ],
+        'ru_RU': [
+            'Поиск Яндекс', 'ВКонтакте', 'Mail.ru', 'Ozon', 'Telegram', 'Поиск Google Россия', 'Amazon Россия', 'Facebook Россия',
+            'Instagram Россия', 'X Россия', 'YouTube Россия', 'Netflix Россия', 'WhatsApp Россия', 'LINE Россия', 'Rakuten Россия',
+            'eBay Россия', 'LinkedIn Россия', 'Spotify Россия', 'Twitch Россия', 'Reddit Россия', 'PayPal Россия', 'TikTok Россия',
+            'ChatGPT Россия', 'Google Bard Россия', 'Midjourney Россия', 'Hugging Face Россия', 'AWS Россия', 'Azure Россия',
+            'Coursera Россия', 'Udemy Россия', 'Steam Россия', 'Epic Games Store Россия', 'Pinterest Россия', 'Snapchat Россия',
+            'Vimeo Россия', 'SoundCloud Россия', 'Zalando Россия', 'Naver Россия', 'KakaoTalk Россия', 'Discord Россия', 'Trello Россия'
+        ]
+    };
+
+    // 模拟 services 表数据
+    const servicesData = [
+        '技术支持', '物流服务', '客户咨询', '售后维修', '支付支持',
+        '在线咨询', '上门送货', '定制方案', '快速响应', '安全保障',
+        '产品培训', '保修服务', '安装帮助', '反馈收集', 'VIP支持',
+        '内容管理', '实时聊天', '数据分析', '广告服务', '云存储',
+        '视频流服务', '音乐流服务', '社交互动', '即时通讯', '游戏分发',
+        '在线学习', '搜索优化', '直播支持', 'AI对话', '图像生成',
+        '社区管理', '订单跟踪', '多语言支持', '隐私保护', '优惠促销',
+        '订阅服务', '文件共享', '项目协作', '代码托管', '短视频分享',
+        '购物推荐', '地图导航', '客户评价', '在线支付', '虚拟活动',
+        '个性化推荐', '账户管理', '退货服务', '消息加密', '实时通知'
+    ];
+
+    function getServicesOptions() {
+        return servicesData;
     }
 
     window.tableConfig = {
@@ -92,65 +156,70 @@
         sampleCount: 200,
         defaultPerPage: 20,
         fields: [
+            // 主表 brand 字段
             { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'parent_id', generator: () => randomInt(0, 5) }, // 0 表示无父品牌，1-5 表示父品牌ID
+            { name: 'parent_id', generator: () => randomInt(0, 5) }, // 0 表示无父品牌
             { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
-            { name: 'brand_logo', generator: () => getRandomImage('sexy') }, // 品牌标志
-            { name: 'custom_url', generator: id => `/brands/${getRandomItem(brandNames).toLowerCase()}-${id}` }, // 自定义URL
+            { name: 'brand_logo', generator: () => getRandomImage('brand') },
+            { name: 'custom_url', generator: id => `/brand/${id}-${randomInt(1000, 9999)}` },
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
-            // 多语言字段
-            { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) }, // 多语言表ID
+            // 多语言表 brand_lang 字段
+            { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) },
             { name: 'brand_id', isLangField: true, generator: id => id },
             { name: 'language', isLangField: true, generator: (id, lang) => lang },
-            { name: 'seo_keywords', isLangField: true, generator: id => `${getRandomItem(brandNames)}, brand ${id}, products` },
-            { name: 'seo_description', isLangField: true, generator: id => `Discover brand ${id} and its products.` },
-            { name: 'name', isLangField: true, generator: id => `${getRandomItem(brandNames)} Brand ${id}` },
-            { name: 'company', isLangField: true, generator: id => `${getRandomItem(companies)}` },
-            { name: 'summary', isLangField: true, generator: id => `Summary of brand ${id}, key highlights.` },
-            { name: 'brand_information', isLangField: true, generator: id => `<p>Information about brand ${id}, history and products.</p>` }
+            { name: 'seo_keywords', isLangField: true, generator: (id, lang) => `${getRandomItem(brandNames[lang])}, brand ${id}` },
+            { name: 'seo_description', isLangField: true, generator: (id, lang) => `Discover ${getRandomItem(brandNames[lang])} products and services.` },
+            { name: 'name', isLangField: true, generator: (id, lang) => getRandomItem(brandNames[lang]) + (id % 10) },
+            { name: 'company', isLangField: true, generator: (id, lang) => `${getRandomItem(brandNames[lang])} Co., Ltd.` },
+            { name: 'summary', isLangField: true, generator: (id, lang) => `Overview of ${getRandomItem(brandNames[lang])} brand.` },
+            { name: 'brand_information', isLangField: true, generator: (id, lang) => `<p>Detailed info about ${getRandomItem(brandNames[lang])}, including history and products.</p>` },
+            // brand_services_list 字段 (一对多关系)
+            { name: 'services_id', generator: id => JSON.stringify(getServicesOptions().sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 3) + 1)) }
         ],
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
-            { label: '批量修改父品牌', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'parent_id', label: '父品牌', type: 'select', options: [{ value: 0, label: '无' }, ...brandNames.map((b, i) => ({ value: i + 1, label: `${b} Parent` }))] } }
+            { label: '批量修改父品牌', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'parent_id', label: '父品牌', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 5 }, (_, i) => ({ value: i + 1, label: `品牌 ${i + 1}` }))] } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'parent_id', label: '父品牌', className: 'col-parent-id', formatter: v => v === 0 ? '无' : `${brandNames[v - 1] || 'Brand'} Parent` },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'name', label: '品牌名称', className: 'col-name', isLangField: true },
-            { name: 'brand_logo', label: '品牌标志', className: 'col-brand-logo', formatter: v => v ? `<div class="brand-logo-preview"><img src="${v}" alt="标志" onclick="enlargeImage(${v}, 0, ['${v}'])"></div>` : '<div class="brand-logo-preview"><span class="placeholder" onclick="alert(\'标志不存在\')">无</span></div>' },
             { name: 'custom_url', label: '自定义URL', className: 'col-custom-url' },
+            { name: 'brand_logo', label: '品牌标志', className: 'col-brand-logo', formatter: v => v ? `<div class="brand-logo-preview"><img src="${v}" alt="标志" onclick="enlargeImage(${v}, 0, ['${v}'])"></div>` : '<div class="brand-logo-preview"><span class="placeholder" onclick="alert(\'标志不存在\')">无</span></div>' },
+            { name: 'services_id', label: '服务', className: 'col-services-id',  formatter: v => v ? JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-blue">${tag}</span>`).join('') : ''},
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
                 <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
                 <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
             ` }
         ],
-        langFields: {
-            foreignKey: 'brand_id',
-            languages: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
-        },
         filterFields: [
             { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
-            { id: 'parentId', type: 'select', options: [{ value: '', label: '全部父品牌' }, { value: '0', label: '无' }, ...brandNames.map((b, i) => ({ value: `${i + 1}`, label: `${b} Parent` }))], filter: (data, value) => value === '' ? data : data.filter(d => d.parent_id === parseInt(value)) },
-            { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'en_US', label: '英语' }, { value: 'zh_CN', label: '中文' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.brand_id === d.id && l.language === value)) : data },
+            { id: 'parent_id', type: 'select', options: [{ value: '', label: '全部父品牌' }, { value: '0', label: '无' }, ...Array.from({ length: 5 }, (_, i) => ({ value: `${i + 1}`, label: `品牌 ${i + 1}` }))], filter: (data, value) => value === '' ? data : data.filter(d => d.parent_id === parseInt(value)) },
+            { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'zh_CN', label: '中文' }, { value: 'en_US', label: '英语' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.brand_id === d.id && l.language === value)) : data },
+            { id: 'services_id', type: 'select', options: [{ value: '', label: '全部服务' }, ...getServicesOptions()], filter: (data, value) => value === '' ? data : data.filter(d => JSON.parse(d.services_id).includes(parseInt(value))) },
             { id: 'name', type: 'text', placeholder: '搜索品牌名称', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.brand_id === d.id && l.name.toLowerCase().includes(value.toLowerCase()))) : data },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
             { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
         ],
+        langFields: {
+            foreignKey: 'brand_id',
+            languages: ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
+        },
         modalTabs: [
             {
                 id: 'basic',
                 title: '基本信息',
                 fields: [
-                    { name: 'parent_id', label: '父品牌', type: 'select', options: [{ value: 0, label: '无' }, ...brandNames.map((b, i) => ({ value: i + 1, label: `${b} Parent` }))], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'parent_id', label: '父品牌', type: 'select', options: () => [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `品牌 ${i + 1}` }))], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'brand_logo', label: '品牌标志', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'services_id', label: '服务', type: 'tag', options: getServicesOptions, color: 'blue', allowCustom: false, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
                     { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
                     { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
@@ -160,7 +229,7 @@
                 id: 'lang',
                 title: '多语言信息',
                 fields: [
-                    { name: 'language', label: '语言', type: 'select', options: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                    { name: 'language', label: '语言', type: 'select', options: ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
                     { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'name', label: '品牌名称', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
@@ -172,37 +241,12 @@
         ]
     };
 
-    // 临时修复：覆盖_opt.js的editRecord，确保brand_logo预览
-    window.editRecord = function(id, isViewOnly = false) {
-        isEditing = true;
-        editId = id;
-        const record = tableData.find(item => item.id === id);
-        const lang = config.langFields ? tableLangData.find(l => l[config.langFields.foreignKey] === id && l.language === config.langFields.languages[0]) : {};
-
-        resetModal();
-        renderModal(true);
-        document.getElementById('modalTitle').textContent = `${isViewOnly ? '查看' : '编辑'}${config.tableTitle}`;
-
-        config.modalTabs.forEach(tab => {
-            tab.fields.forEach(tabField => {
-                const field = config.fields.find(f => f.name === tabField.name) || tabField;
-                const element = document.getElementById(`modal${field.name}`);
-                if (!element) return;
-
-                if (tabField.type === 'file') {
-                    const value = field.isLangField ? lang[field.name] : record[field.name];
-                    if (value) {
-                        renderImagePreview(field.name, value);
-                    }
-                } else {
-                    const value = field.isLangField ? lang[field.name] : (tabField.formatter ? tabField.formatter(record[field.name]) : record[field.name]);
-                    element.value = value !== undefined && value !== null ? String(value) : '';
-                }
-            });
-        });
-
-        document.getElementById(`${config.tableName}Modal`).style.display = 'block';
-    };
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
 </script>
 </body>
 </html>

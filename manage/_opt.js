@@ -37,11 +37,19 @@ function renderFilterArea() {
                 let options = field.options();
                 field.options = options
             }
+            let optIndex = 1
             field.options.forEach(opt => {
-                const option = document.createElement('option');
-                option.value = opt.value;
-                option.textContent = opt.label;
-                input.appendChild(option);
+                if (typeof opt == 'object'){
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    input.appendChild(option);
+                }else{
+                    const option = document.createElement('option');
+                    option.value = String(optIndex++);
+                    option.textContent = opt;
+                    input.appendChild(option)
+                }
             });
         } else {
             input = document.createElement('input');

@@ -96,20 +96,12 @@
 
     // 模拟 attr 表数据
     const attrData = [
-        { id: 1, attr_name: '快速响应' },
-        { id: 2, attr_name: '24小时服务' },
-        { id: 3, attr_name: '多语言支持' },
-        { id: 4, attr_name: '专业团队' },
-        { id: 5, attr_name: '免费咨询' },
-        { id: 6, attr_name: '在线支持' },
-        { id: 7, attr_name: '上门服务' },
-        { id: 8, attr_name: '定制化方案' },
-        { id: 9, attr_name: '高效处理' },
-        { id: 10, attr_name: '安全保障' }
+        '快速响应', '24小时服务', '多语言支持', '专业团队', '免费咨询',
+        '在线支持', '上门服务', '定制化方案', '高效处理', '安全保障'
     ];
 
     function getAttrOptions() {
-        return attrData.map(item => item.attr_name);
+        return attrData;
     }
 
     window.tableConfig = {
@@ -137,7 +129,7 @@
             { name: 'summary', isLangField: true, generator: (id, lang) => `Brief summary of ${getRandomItem(serviceNames[lang])}.` },
             { name: 'services_information', isLangField: true, generator: (id, lang) => `<p>Detailed info about ${getRandomItem(serviceNames[lang])}, including features and benefits.</p>` },
             // services_attr_list 字段 (一对多关系)
-            { name: 'attr_id', generator: id => JSON.stringify([randomInt(1, 10), randomInt(1, 10)].filter((v, i, a) => a.indexOf(v) === i)) }
+            { name: 'attr_id', generator: id => JSON.stringify(getAttrOptions().sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 3) + 1)) }
         ],
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
@@ -153,7 +145,7 @@
             { name: 'custom_url', label: '自定义URL', className: 'col-custom-url' },
             { name: 'services_key', label: '服务标识', className: 'col-services-key' },
             { name: 'services_logo', label: '服务标志', className: 'col-services-logo', formatter: v => v ? `<div class="services-logo-preview"><img src="${v}" alt="标志" onclick="enlargeImage(${v}, 0, ['${v}'])"></div>` : '<div class="services-logo-preview"><span class="placeholder" onclick="alert(\'标志不存在\')">无</span></div>' },
-            { name: 'attr_id', label: '服务属性', className: 'col-attr-id', formatter: v => JSON.parse(v).map(id => `<span class="ant-tag ant-tag-blue">${attrData.find(a => a.id === id)?.attr_name || '未知'}</span>`).join(' ') },
+            { name: 'attr_id', label: '服务属性', className: 'col-attr-id', formatter: v => JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-blue">${tag}</span>`).join('')},
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
                 <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
