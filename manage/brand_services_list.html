@@ -3,75 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 品牌服务</title>
+    <title>FASTRESP - 品牌服务列表</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 800px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 920px; overflow-y: auto; }
-        .modal-content h3 { margin-top: 0; }
-        .modal-content label { display: block; margin: 10px 0 5px; }
-        .modal-content input { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .task-list { overflow-x: auto; }
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
-        .col-checkbox { width: 10%; min-width: 50px; }
-        .col-id { width: 20%; min-width: 60px; }
-        .col-brand-id { width: 25%; min-width: 80px; }
-        .col-services-id { width: 25%; min-width: 80px; }
-        .col-actions { width: 20%; min-width: 120px; }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 80px; }
+        .col-brand-id { width: 15%; min-width: 120px; }
+        .col-services-id { width: 15%; min-width: 120px; }
+        .col-create-time { width: 20%; min-width: 150px; }
+        .col-actions { width: 15%; min-width: 120px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="header" w3-include-html="_header.html"></div>
-        <div class="content-wrapper">
-            <div id="sidebar" w3-include-html="_sidebar.html"></div>
-            <div class="main-content">
-                <div class="tabs-container">
-                    <div class="ant-tabs ant-tabs-top">
-                        <div class="ant-tabs-nav" role="tablist">
-                            <div class="ant-tabs-nav-wrap">
-                                <div class="ant-tabs-nav-list">
-                                    <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('brand_services_list.html')" role="tab" aria-selected="true">
-                                        <span class="ant-tabs-tab-btn">品牌服务</span>
-                                    </div>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('brand_services_list.html')">
+                                    <span class="ant-tabs-tab-btn">品牌服务列表</span>
                                     <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
                             </div>
                         </div>
-                        <div class="ant-tabs-content-holder">
-                            <div class="ant-tabs-content ant-tabs-content-top">
-                                <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                    <div class="filter-container" style="margin-bottom: 20px;">
-                                        <input type="number" id="brandIdFilter" class="ant-input" placeholder="品牌ID">
-                                        <input type="number" id="servicesIdFilter" class="ant-input" placeholder="服务ID">
-                                        <button class="ant-btn ant-btn-primary" onclick="applyFilters()">搜索</button>
-                                    </div>
-                                    <div class="action-container" style="margin-bottom: 20px;">
-                                        <button class="ant-btn ant-btn-primary" onclick="addService()">添加</button>
-                                        <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                    </div>
-                                    <div class="task-list">
-                                        <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                            <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                            <div class="col-id">ID</div>
-                                            <div class="col-brand-id">品牌ID</div>
-                                            <div class="col-services-id">服务ID</div>
-                                            <div class="col-actions">操作</div>
-                                        </div>
-                                        <div id="service-list">加载中...</div>
-                                        <div class="pagination" style="margin-top: 20px; text-align: center;">
-                                            <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                            <span id="page-info">第 1 页 / 共 1 页</span>
-                                            <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                        </div>
-                                    </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
+                                <div class="task-list">
+                                    <div class="table-header"></div>
+                                    <div id="brand_services_list-list">加载中...</div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -79,169 +55,127 @@
                 </div>
             </div>
         </div>
-        <div id="footer" w3-include-html="_footer.html"></div>
-
-        <!-- 添加/编辑弹窗 -->
-        <div id="serviceModal" class="modal">
-            <div class="modal-content">
-                <h3 id="modalTitle">添加品牌服务</h3>
-                <form id="serviceForm">
-                    <label>ID (自动生成):</label>
-                    <input type="text" id="modalId" disabled>
-                    <label>品牌ID:</label>
-                    <input type="number" id="modalBrandId">
-                    <label>服务ID:</label>
-                    <input type="number" id="modalServicesId">
-                    <div class="modal-buttons">
-                        <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                        <button type="button" class="ant-btn ant-btn-primary" onclick="saveService()">保存</button>
-                    </div>
-                </form>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        let serviceData = [];
-        let servicePage = 1, servicePerPage = 10;
-        let isEditing = false;
-        let editId = null;
+<script>
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-        function fetchServiceData() {
-            console.log('Fetching service data...');
-            const sampleData = [];
-            for (let i = 1; i <= 50; i++) {
-                sampleData.push({
-                    id: i,
-                    brand_id: Math.floor(Math.random() * 10) + 1,
-                    services_id: Math.floor(Math.random() * 20) + 1
-                });
+    // 模拟 brand 表数据
+    const brandData = [
+        { id: 1, brand_name: 'TechTrend' },
+        { id: 2, brand_name: 'FashionPeak' },
+        { id: 3, brand_name: 'GadgetPro' },
+        { id: 4, brand_name: 'StyleVibe' },
+        { id: 5, brand_name: 'InnoGear' },
+        { id: 6, brand_name: 'EcoLife' },
+        { id: 7, brand_name: 'SmartTech' },
+        { id: 8, brand_name: 'LuxuryWear' },
+        { id: 9, brand_name: 'HealthPlus' },
+        { id: 10, brand_name: 'TrendyHome' },
+        { id: 11, brand_name: 'FastMove' },
+        { id: 12, brand_name: 'PureNature' },
+        { id: 13, brand_name: 'BrightFuture' },
+        { id: 14, brand_name: 'EliteGear' },
+        { id: 15, brand_name: 'VitalEnergy' }
+    ];
+
+    // 模拟 services 表数据
+    const servicesData = [
+        { id: 1, services_name: 'Technical Support' },
+        { id: 2, services_name: 'Logistics Service' },
+        { id: 3, services_name: 'Customer Inquiry' },
+        { id: 4, services_name: 'After-Sales Repair' },
+        { id: 5, services_name: 'Payment Support' },
+        { id: 6, services_name: 'Online Consulting' },
+        { id: 7, services_name: 'Home Delivery' },
+        { id: 8, services_name: 'Custom Solutions' },
+        { id: 9, services_name: 'Fast Response' },
+        { id: 10, services_name: 'Security Assurance' },
+        { id: 11, services_name: 'Product Training' },
+        { id: 12, services_name: 'Warranty Service' },
+        { id: 13, services_name: 'Installation Help' },
+        { id: 14, services_name: 'Feedback Collection' },
+        { id: 15, services_name: 'VIP Support' }
+    ];
+
+    function getBrandOptions() {
+        return brandData.map(item => ({ value: item.id, label: item.brand_name }));
+    }
+
+    function getServicesOptions() {
+        return servicesData.map(item => ({ value: item.id, label: item.services_name }));
+    }
+
+    window.tableConfig = {
+        tableName: 'brand_services_list',
+        tableTitle: '品牌服务列表',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'brand_id', generator: () => randomInt(1, 15) }, // 关联 brand 表
+            { name: 'services_id', generator: () => randomInt(1, 15) }, // 关联 services 表
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改品牌', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'brand_id', label: '品牌', type: 'select', options: getBrandOptions } },
+            { label: '批量修改服务', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'services_id', label: '服务', type: 'select', options: getServicesOptions } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'brand_id', label: '品牌', className: 'col-brand-id', formatter: v => brandData.find(b => b.id === v)?.brand_name || '未知' },
+            { name: 'services_id', label: '服务', className: 'col-services-id', formatter: v => servicesData.find(s => s.id === v)?.services_name || '未知' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'brand_id', type: 'select', options: getBrandOptions, filter: (data, value) => value === '' ? data : data.filter(d => d.brand_id === parseInt(value)) },
+            { id: 'services_id', type: 'select', options: getServicesOptions, filter: (data, value) => value === '' ? data : data.filter(d => d.services_id === parseInt(value)) },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'brand_id', label: '品牌', type: 'select', options: getBrandOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'services_id', label: '服务', type: 'select', options: getServicesOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
             }
-            serviceData = sampleData;
-            renderServiceList(serviceData);
-        }
+        ]
+    };
 
-        function renderServiceList(data) {
-            const start = (servicePage - 1) * servicePerPage;
-            const end = start + servicePerPage;
-            const paginatedData = data.slice(start, end);
-            const listContainer = document.getElementById('service-list');
-            listContainer.innerHTML = '';
-
-            paginatedData.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'task-item';
-                itemDiv.style = `border-bottom: 1px solid #ddd;`;
-                itemDiv.innerHTML = `
-                    <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${item.id}"></div>
-                    <div class="col-id">${item.id}</div>
-                    <div class="col-brand-id">${item.brand_id}</div>
-                    <div class="col-services-id">${item.services_id}</div>
-                    <div class="col-actions">
-                        <button class="ant-btn" onclick="editService(${item.id})">编辑</button>
-                        <button class="ant-btn ant-btn-danger" onclick="deleteService(${item.id})">删除</button>
-                    </div>
-                `;
-                listContainer.appendChild(itemDiv);
-            });
-
-            const totalPages = Math.ceil(data.length / servicePerPage);
-            document.getElementById('page-info').textContent = `第 ${servicePage} 页 / 共 ${totalPages} 页`;
-        }
-
-        function applyFilters() {
-            const brandId = document.getElementById('brandIdFilter').value;
-            const servicesId = document.getElementById('servicesIdFilter').value;
-
-            let filteredData = serviceData;
-            if (brandId) filteredData = filteredData.filter(item => item.brand_id === parseInt(brandId));
-            if (servicesId) filteredData = filteredData.filter(item => item.services_id === parseInt(servicesId));
-
-            servicePage = 1;
-            renderServiceList(filteredData);
-        }
-
-        function changePage(delta) {
-            const totalPages = Math.ceil(serviceData.length / servicePerPage);
-            servicePage += delta;
-            if (servicePage < 1) servicePage = 1;
-            if (servicePage > totalPages) servicePage = totalPages;
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
             applyFilters();
         }
-
-        function toggleSelectAll() {
-            const selectAll = document.getElementById('selectAll').checked;
-            document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-        }
-
-        function addService() {
-            isEditing = false;
-            editId = null;
-            document.getElementById('modalTitle').textContent = '添加品牌服务';
-            document.getElementById('modalId').value = '';
-            document.getElementById('modalBrandId').value = '';
-            document.getElementById('modalServicesId').value = '';
-            document.getElementById('serviceModal').style.display = 'block';
-        }
-
-        function editService(id) {
-            isEditing = true;
-            editId = id;
-            const service = serviceData.find(item => item.id === id);
-            document.getElementById('modalTitle').textContent = '编辑品牌服务';
-            document.getElementById('modalId').value = service.id;
-            document.getElementById('modalBrandId').value = service.brand_id;
-            document.getElementById('modalServicesId').value = service.services_id;
-            document.getElementById('serviceModal').style.display = 'block';
-        }
-
-        function saveService() {
-            const newService = {
-                id: isEditing ? parseInt(document.getElementById('modalId').value) : serviceData.reduce((max, item) => Math.max(max, item.id), 0) + 1,
-                brand_id: parseInt(document.getElementById('modalBrandId').value) || 0,
-                services_id: parseInt(document.getElementById('modalServicesId').value) || 0
-            };
-            if (isEditing) {
-                const index = serviceData.findIndex(item => item.id === editId);
-                serviceData[index] = newService;
-            } else {
-                serviceData.push(newService);
-            }
-            closeModal();
-            applyFilters();
-        }
-
-        function deleteService(id) {
-            if (confirm('确定要删除此品牌服务吗？')) {
-                serviceData = serviceData.filter(item => item.id !== id);
-                applyFilters();
-            }
-        }
-
-        function batchDelete() {
-            const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-            if (selectedIds.length === 0) {
-                alert('请先选择要删除的品牌服务');
-                return;
-            }
-            if (confirm(`确定要删除 ${selectedIds.length} 个品牌服务吗？`)) {
-                serviceData = serviceData.filter(item => !selectedIds.includes(item.id));
-                applyFilters();
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('serviceModal').style.display = 'none';
-        }
-
-        window.onload = () => {
-            console.log('Page loaded, initializing...');
-            w3.includeHTML(() => {
-                console.log('External HTML included');
-                initMenus();
-                fetchServiceData();
-            });
-        };
-    </script>
+    });
+</script>
 </body>
 </html>
