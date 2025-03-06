@@ -15,6 +15,7 @@
     <style>
         .col-checkbox { width: 5%; min-width: 50px; }
         .col-id { width: 10%; min-width: 60px; }
+        .col-language { width: 10%; min-width: 80px; }
         .col-status { width: 10%; min-width: 60px; }
         .col-custom-url { width: 20%; min-width: 120px; }
         .col-title { width: 20%; min-width: 120px; }
@@ -100,7 +101,7 @@
             // campaign_lang 表字段
             { name: 'id', isLangField: true, isSystemField: true, generator: id => id * languages.length + randomInt(1, languages.length) },
             { name: 'campaign_id', isLangField: true, generator: id => id },
-            { name: 'language', isLangField: true, generator: id => getRandomItem(languages) },
+            { name: 'language', isLangField: true, generator: (id, lang) => lang },
             { name: 'title', isLangField: true, generator: id => `Campaign Title ${id}` },
             { name: 'summary', isLangField: true, generator: id => `Summary for campaign ${id}` },
             { name: 'seo_keywords', isLangField: true, generator: id => `keyword${id}, test, campaign` },
@@ -122,6 +123,7 @@
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">未激活</span>' : '<span class="ant-tag ant-tag-green">激活</span>' },
             { name: 'custom_url', label: '自定义URL', className: 'col-custom-url' },
+            { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'title', label: '标题', className: 'col-title', formatter: (_, item) => {
                     const langData = tableLangData.find(l => l.campaign_id === item.id && l.language === languages[0]);
                     return langData ? langData.title : '';

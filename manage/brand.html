@@ -189,8 +189,8 @@
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'name', label: '品牌名称', className: 'col-name', isLangField: true },
             { name: 'custom_url', label: '自定义URL', className: 'col-custom-url' },
-            { name: 'brand_logo', label: '品牌标志', className: 'col-brand-logo', formatter: v => v ? `<div class="brand-logo-preview"><img src="${v}" alt="标志" onclick="enlargeImage(${v}, 0, ['${v}'])"></div>` : '<div class="brand-logo-preview"><span class="placeholder" onclick="alert(\'标志不存在\')">无</span></div>' },
-            { name: 'services_id', label: '服务', className: 'col-services-id',  formatter: v => v ? JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-blue">${tag}</span>`).join('') : ''},
+            { name: 'brand_logo', label: '品牌标志', className: 'col-brand-logo', formatter: v => v ? `<div class="brand-logo-preview"><img src="${v}" alt="标志" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="brand-logo-preview"><span class="placeholder" onclick="alert(\'标志不存在\')">无</span></div>' },
+            { name: 'services_id', label: '服务', className: 'col-services-id', formatter: v => v ? JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-blue">${servicesData.includes(tag) ? tag : '未知'}</span>`).join('') : '' },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
                 <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
@@ -201,7 +201,7 @@
             { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
             { id: 'parent_id', type: 'select', options: [{ value: '', label: '全部父品牌' }, { value: '0', label: '无' }, ...Array.from({ length: 5 }, (_, i) => ({ value: `${i + 1}`, label: `品牌 ${i + 1}` }))], filter: (data, value) => value === '' ? data : data.filter(d => d.parent_id === parseInt(value)) },
             { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'zh_CN', label: '中文' }, { value: 'en_US', label: '英语' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.brand_id === d.id && l.language === value)) : data },
-            { id: 'services_id', type: 'select', options: [{ value: '', label: '全部服务' }, ...getServicesOptions()], filter: (data, value) => value === '' ? data : data.filter(d => JSON.parse(d.services_id).includes(parseInt(value))) },
+            { id: 'services_id', type: 'select', options: [{ value: '', label: '全部服务' }, ...getServicesOptions()], filter: (data, value) => value === '' ? data : data.filter(d => JSON.parse(d.services_id).includes(servicesData[parseInt(value) - 1])) },
             { id: 'name', type: 'text', placeholder: '搜索品牌名称', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.brand_id === d.id && l.name.toLowerCase().includes(value.toLowerCase()))) : data },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
             { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }

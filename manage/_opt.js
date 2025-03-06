@@ -541,6 +541,9 @@ function editRecord(id, isViewOnly = false) {
     renderModal(true);
     document.getElementById('modalTitle').textContent = `${isViewOnly ? '查看' : '编辑'}${config.tableTitle}`;
 
+    // 初始化 currentImageContext 为当前记录的图片 URL
+    currentImageContext = record.brand_logo;
+
     config.modalTabs.forEach(tab => {
         tab.fields.forEach(tabField => {
             const field = config.fields.find(f => f.name === tabField.name) || tabField;
@@ -582,7 +585,6 @@ function saveRecord() {
                 if (tabField.type === 'file') {
                     langRecord[field.name] = currentImageContext || (isEditing ? tableLangData.find(l => l[config.langFields.foreignKey] === editId && l.language === langRecord.language)?.[field.name] : '');
                 } else {
-                    // 保留数字 0，不转换为空字符串
                     langRecord[field.name] = value === '' ? '' : (tabField.type === 'number' ? parseInt(value) : value);
                 }
             } else if (tabField.type === 'tag') {
@@ -600,8 +602,12 @@ function saveRecord() {
                     });
                 });
             } else if (!field.isSystemField) {
-                // 保留数字 0，不转换为空字符串
-                record[field.name] = value === '' ? '' : (tabField.type === 'number' ? parseInt(value) : value);
+                if (tabField.type === 'file') {
+                    // 如果是编辑模式且未上传新图片，保留原有图片值
+                    record[field.name] = isEditing && !currentImageContext ? tableData.find(item => item.id === editId)[field.name] : currentImageContext;
+                } else {
+                    record[field.name] = value === '' ? '' : (tabField.type === 'number' ? parseInt(value) : value);
+                }
             }
         });
     });
