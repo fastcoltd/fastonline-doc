@@ -3,33 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 店铺标签列表管理</title>
+    <title>FASTRESP - 店铺标签列表</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
-        .action-container { margin-bottom: 16px; }
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-store-id { width: 15%; min-width: 80px; }
-        .col-tag-id { width: 15%; min-width: 80px; }
-        .col-create-time { width: 15%; min-width: 100px; }
+        .col-id { width: 15%; min-width: 100px; }
+        .col-store-id { width: 25%; min-width: 150px; }
+        .col-tag-id { width: 25%; min-width: 150px; }
+        .col-create-time { width: 20%; min-width: 120px; }
         .col-actions { width: 15%; min-width: 100px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
-        .modal-content h3 { margin: 0 0 16px 0; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
-        .modal-content .ant-form-item { margin-bottom: 16px; }
-        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
-        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -43,56 +32,22 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">店铺标签列表管理</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('store_tag_list.html')">
+                                    <span class="ant-tabs-tab-btn">店铺标签列表</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <select id="storeIdFilter" class="ant-select">
-                                        <option value="">全部店铺</option>
-                                    </select>
-                                    <select id="tagIdFilter" class="ant-select">
-                                        <option value="">全部标签</option>
-                                    </select>
-                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
-                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addStoreTagList()">添加</button>
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                </div>
-                                <!-- 数据区域 -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-store-id">店铺</div>
-                                        <div class="col-tag-id">标签</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
-                                    <div id="store-tag-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
-                                            <option value="10">10 条/页</option>
-                                            <option value="20" selected>20 条/页</option>
-                                            <option value="50">50 条/页</option>
-                                            <option value="100">100 条/页</option>
-                                        </select>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="table-header"></div>
+                                    <div id="store_tag_list-list">加载中...</div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -102,250 +57,131 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-
-    <!-- 添加/编辑弹窗 -->
-    <div id="storeTagListModal" class="modal">
+    <div id="imageModal" class="modal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加店铺标签</h3>
-            <form id="storeTagListForm">
-                <div class="ant-form-item" id="idField" style="display: none;">
-                    <label>ID:</label>
-                    <input type="number" id="modalId" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>店铺ID:</label>
-                    <select id="modalStoreId">
-                        <option value="0">请选择店铺</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>标签ID:</label>
-                    <select id="modalTagId">
-                        <option value="0">请选择标签</option>
-                    </select>
-                </div>
-                <div class="ant-form-item" id="createTimeField" style="display: none;">
-                    <label>创建时间:</label>
-                    <input type="datetime-local" id="modalCreateTime" disabled>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveStoreTagList()">保存</button>
-                </div>
-            </form>
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    let storeTagListData = [];
-    let page = 1, perPage = 20;
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-    // 定义关联字段的映射
-    const relationMap = {
-        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` })),
-        tag_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `标签 ${i + 1}` }))
+    // 模拟 store 表数据
+    const storeData = [
+        { id: 1, store_name: 'Walmart Flagship Store' },
+        { id: 2, store_name: 'Target New York Branch' },
+        { id: 3, store_name: 'Best Buy Los Angeles' },
+        { id: 4, store_name: 'Costco Seattle Outlet' },
+        { id: 5, store_name: 'Whole Foods San Francisco' },
+        { id: 6, store_name: 'Home Depot Chicago' },
+        { id: 7, store_name: 'IKEA Miami Store' },
+        { id: 8, store_name: 'Macy\'s Boston Branch' },
+        { id: 9, store_name: 'Nordstrom Houston' },
+        { id: 10, store_name: 'Lowe\'s Denver Outlet' },
+        { id: 11, store_name: 'Trader Joe\'s Portland' },
+        { id: 12, store_name: 'Safeway Phoenix' },
+        { id: 13, store_name: 'Kroger Dallas' },
+        { id: 14, store_name: 'Staples Atlanta' },
+        { id: 15, store_name: 'PetSmart Austin' }
+    ];
+
+    // 模拟 tag 表数据
+    const tagData = [
+        { id: 1, tag_name: 'Electronics' },
+        { id: 2, tag_name: 'Groceries' },
+        { id: 3, tag_name: 'Furniture' },
+        { id: 4, tag_name: 'Clothing' },
+        { id: 5, tag_name: 'Hardware' },
+        { id: 6, tag_name: 'Pets' },
+        { id: 7, tag_name: 'Books' },
+        { id: 8, tag_name: 'Sports' },
+        { id: 9, tag_name: 'Pharmacy' },
+        { id: 10, tag_name: 'Auto Parts' },
+        { id: 11, tag_name: 'Coffee' },
+        { id: 12, tag_name: 'Discount' },
+        { id: 13, tag_name: 'Office Supplies' },
+        { id: 14, tag_name: 'Outdoor' },
+        { id: 15, tag_name: 'Specialty' }
+    ];
+
+    function getStoreOptions() {
+        return storeData.map(item => ({ value: item.id, label: item.store_name }));
+    }
+
+    function getTagOptions() {
+        return tagData.map(item => ({ value: item.id, label: item.tag_name }));
+    }
+
+    window.tableConfig = {
+        tableName: 'store_tag_list',
+        tableTitle: '店铺标签列表',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'store_id', generator: () => randomInt(1, 15) },
+            { name: 'tag_id', generator: () => randomInt(1, 15) },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改店铺', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'store_id', label: '店铺', type: 'select', options: getStoreOptions } },
+            { label: '批量修改标签', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'tag_id', label: '标签', type: 'select', options: getTagOptions } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'store_id', label: '店铺', className: 'col-store-id', formatter: v => storeData.find(s => s.id === v)?.store_name || '未知' },
+            { name: 'tag_id', label: '标签', className: 'col-tag-id', formatter: v => tagData.find(t => t.id === v)?.tag_name || '未知' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'store_id', type: 'select', options: [{ value: '', label: '全部店铺' }, ...getStoreOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.store_id === parseInt(value)) },
+            { id: 'tag_id', type: 'select', options: [{ value: '', label: '全部标签' }, ...getTagOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.tag_id === parseInt(value)) },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'store_id', label: '店铺', type: 'select', options: getStoreOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'tag_id', label: '标签', type: 'select', options: getTagOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            },
+            {
+                id: 'system',
+                title: '系统信息',
+                fields: [
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            }
+        ]
     };
 
-    // 生成下拉数据
-    function populateDropdowns() {
-        const storeSelect = document.getElementById('modalStoreId');
-        const storeFilter = document.getElementById('storeIdFilter');
-        const tagSelect = document.getElementById('modalTagId');
-        const tagFilter = document.getElementById('tagIdFilter');
-
-        relationMap.store_id.forEach(item => {
-            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.tag_id.forEach(item => {
-            tagSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            tagFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-    }
-
-    // 获取关联字段的名称
-    function getRelationName(field, id) {
-        if (id === 0) return '未关联';
-        const item = relationMap[field].find(item => item.id === id);
-        return item ? item.name : `未知 (${id})`;
-    }
-
-    // 生成样本数据
-    function generateSampleData() {
-        storeTagListData = [];
-        for (let i = 1; i <= 200; i++) {
-            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            storeTagListData.push({
-                id: i,
-                store_id: Math.floor(Math.random() * 15) + 1,
-                tag_id: Math.floor(Math.random() * 15) + 1,
-                create_time: createTime
-            });
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
         }
-        renderStoreTagList();
-    }
-
-    // 渲染列表
-    function renderStoreTagList() {
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const paginatedData = storeTagListData.slice(start, end);
-        const listContainer = document.getElementById('store-tag-list');
-        listContainer.innerHTML = '';
-
-        paginatedData.forEach(tag => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            itemDiv.style = 'border-bottom: 1px solid #ddd;';
-            itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${tag.id}"></div>
-                <div class="col-store-id">${getRelationName('store_id', tag.store_id)}</div>
-                <div class="col-tag-id">${getRelationName('tag_id', tag.tag_id)}</div>
-                <div class="col-create-time">${moment.unix(tag.create_time).format('YYYY-MM-DD HH:mm')}</div>
-                <div class="col-actions">
-                    <button class="ant-btn" onclick="editStoreTagList(${tag.id})">编辑</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteStoreTagList(${tag.id})">删除</button>
-                </div>
-            `;
-            listContainer.appendChild(itemDiv);
-        });
-
-        const totalPages = Math.ceil(storeTagListData.length / perPage);
-        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
-    }
-
-    // 筛选
-    function applyFilters() {
-        let filteredData = [...storeTagListData];
-        const storeId = document.getElementById('storeIdFilter').value;
-        const tagId = document.getElementById('tagIdFilter').value;
-        const createTimeStart = document.getElementById('createTimeStartFilter').value;
-        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
-
-        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
-        if (tagId) filteredData = filteredData.filter(item => item.tag_id === parseInt(tagId));
-        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
-        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
-
-        storeTagListData = filteredData;
-        page = 1;
-        renderStoreTagList();
-    }
-
-    // 分页
-    function changePage(delta) {
-        const totalPages = Math.ceil(storeTagListData.length / perPage);
-        page += delta;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        renderStoreTagList();
-    }
-
-    function jumpToPage() {
-        const newPage = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(storeTagListData.length / perPage);
-        if (newPage >= 1 && newPage <= totalPages) {
-            page = newPage;
-            renderStoreTagList();
-        } else {
-            alert('请输入有效的页码');
-        }
-    }
-
-    function changePerPage() {
-        perPage = parseInt(document.getElementById('perPage').value);
-        page = 1;
-        renderStoreTagList();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    // 添加
-    function addStoreTagList() {
-        isEditing = false;
-        editId = null;
-        document.getElementById('modalTitle').textContent = '添加店铺标签';
-        document.getElementById('idField').style.display = 'none';
-        document.getElementById('modalStoreId').value = '0';
-        document.getElementById('modalTagId').value = '0';
-        document.getElementById('createTimeField').style.display = 'none';
-        document.getElementById('storeTagListModal').style.display = 'block';
-    }
-
-    // 编辑
-    let isEditing = false;
-    let editId = null;
-    function editStoreTagList(id) {
-        isEditing = true;
-        editId = id;
-        const tag = storeTagListData.find(item => item.id === id);
-        document.getElementById('modalTitle').textContent = '编辑店铺标签';
-        document.getElementById('idField').style.display = 'block';
-        document.getElementById('modalId').value = tag.id;
-        document.getElementById('modalStoreId').value = tag.store_id;
-        document.getElementById('modalTagId').value = tag.tag_id;
-        document.getElementById('createTimeField').style.display = 'block';
-        document.getElementById('modalCreateTime').value = moment.unix(tag.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('storeTagListModal').style.display = 'block';
-    }
-
-    // 保存
-    function saveStoreTagList() {
-        const tag = {
-            id: isEditing ? editId : storeTagListData.length + 1,
-            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
-            tag_id: parseInt(document.getElementById('modalTagId').value) || 0,
-            create_time: isEditing ? storeTagListData.find(item => item.id === editId).create_time : moment().unix()
-        };
-
-        if (isEditing) {
-            const index = storeTagListData.findIndex(item => item.id === editId);
-            storeTagListData[index] = tag;
-        } else {
-            storeTagListData.push(tag);
-        }
-        closeModal();
-        renderStoreTagList();
-    }
-
-    // 删除
-    function deleteStoreTagList(id) {
-        if (confirm('确定要删除此店铺标签吗？')) {
-            storeTagListData = storeTagListData.filter(item => item.id !== id);
-            renderStoreTagList();
-        }
-    }
-
-    // 批量删除
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的店铺标签');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个店铺标签吗？`)) {
-            storeTagListData = storeTagListData.filter(item => !selectedIds.includes(item.id));
-            renderStoreTagList();
-        }
-    }
-
-    function closeModal() {
-        document.getElementById('storeTagListModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        w3.includeHTML(() => {
-            initMenus();
-            populateDropdowns();
-            generateSampleData();
-        });
-    };
+    });
 </script>
 </body>
 </html>

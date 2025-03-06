@@ -82,6 +82,25 @@
     const users = ["Alice Smith", "Bob Johnson", "Charlie Brown", "Diana Lee", "Eve White"];
     const countries = ["USA", "China", "France", "Spain", "Vietnam"];
     const languages = ["English", "Chinese", "French", "Spanish", "Vietnamese"];
+    const languageOptions = ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'];
+    const countryOptions = [
+        { value: 'US', label: 'United States' },
+        { value: 'CN', label: 'China' },
+        { value: 'UK', label: 'United Kingdom' },
+        { value: 'JP', label: 'Japan' },
+        { value: 'FR', label: 'France' },
+        { value: 'DE', label: 'Germany' },
+        { value: 'IN', label: 'India' },
+        { value: 'BR', label: 'Brazil' },
+        { value: 'CA', label: 'Canada' },
+        { value: 'AU', label: 'Australia' },
+        { value: 'RU', label: 'Russia' },
+        { value: 'KR', label: 'South Korea' },
+        { value: 'IT', label: 'Italy' },
+        { value: 'ES', label: 'Spain' },
+        { value: 'MX', label: 'Mexico' }
+    ];
+    const userData = Array.from({ length: 15 }, (_, i) => ({ id: i + 1, username: `user${i + 1}` }));
     function getRandomItem(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
@@ -91,7 +110,12 @@
     function randomDecimal(min, max, decimals = 2) {
         return (Math.random() * (max - min) + min).toFixed(decimals);
     }
-
+    function getUserOptions() {
+        return userData.map(item => ({ value: item.id, label: item.username }));
+    }
+    function getCountryOptions() {
+        return countryOptions;
+    }
     window.tableConfig = {
         tableName: 'store',
         tableTitle: '店铺信息',
@@ -171,45 +195,53 @@
         ],
         modalTabs: [
             {
-                id: 'basic',
-                title: '基本信息',
+                id: 'account',
+                title: '账户信息',
                 fields: [
-                    { name: 'user_id', label: '用户', type: 'select', options: users.map((u, i) => ({ value: i + 1, label: u })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'user_id', label: '用户', type: 'select', options: getUserOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'level', label: '等级', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'margin', label: '保证金', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'commission', label: '佣金率', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'commission_profit', label: '额外利润率', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'country', label: '国家', type: 'select', options: countries.map(c => ({ value: c, label: c })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'timezone', label: '时区', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'native_language', label: '本地语言', type: 'select', options: languages.map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'logo', label: '店铺标志', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'store_password', label: '店铺密码', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'two_factors', label: '双重认证', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                    { name: 'commission', label: '默认佣金', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'commission_profit', label: '额外佣金', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'store_password', label: '店铺密码', type: 'password', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'two_factors', label: '双重认证', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
                 ]
             },
             {
-                id: 'lang',
-                title: '多语言信息',
+                id: 'store_details',
+                title: '店铺详情',
                 fields: [
-                    { name: 'language', label: '语言', type: 'select', options: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'version', label: '版本', type: 'number', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'name', label: '店铺名称', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'work_time', label: '工作时间', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'slogan', label: '口号', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'summary', label: '摘要', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'about_me', label: '关于我们', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'contacts', label: '联系方式', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'after_sales_rules', label: '售后规则', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'description', label: '描述', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'site_reply', label: '站点回复', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'country', label: '国家', type: 'select', options: getCountryOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'timezone', label: '时区', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'native_language', label: '母语', type: 'select', options: languageOptions.map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'logo', label: '标志', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    // 多语言表字段（部分）
+                    { name: 'name', label: '店铺名称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'language', label: '语言', type: 'select', options: languageOptions.map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false, isLangField: true },
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true }
+                ]
+            },
+            {
+                id: 'lang_content',
+                title: '多语言内容',
+                fields: [
+                    { name: 'id', label: '语言ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false, isLangField: true },
+                    { name: 'version', label: '版本', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'seo_keywords', label: 'SEO关键词', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'seo_description', label: 'SEO描述', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'work_time', label: '工作时间', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'slogan', label: '口号', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'summary', label: '摘要', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'about_me', label: '关于我们', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'contacts', label: '联系方式', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'after_sales_rules', label: '售后规则', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'description', label: '描述', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
+                    { name: 'site_reply', label: '站点回复', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
                 ]
             }
         ]

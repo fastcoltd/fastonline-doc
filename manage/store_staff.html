@@ -17,12 +17,13 @@
         .col-id { width: 8%; min-width: 60px; }
         .col-store-id { width: 10%; min-width: 80px; }
         .col-status { width: 8%; min-width: 60px; }
-        .col-title { width: 10%; min-width: 80px; }
         .col-username { width: 12%; min-width: 100px; }
         .col-nick-name { width: 12%; min-width: 100px; }
         .col-avatar { width: 10%; min-width: 80px; }
+        .col-phone { width: 10%; min-width: 80px; }
+        .col-permissions { width: 15%; min-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .col-create-time { width: 15%; min-width: 120px; }
-        .col-actions { width: 10%; min-width: 100px; }
+        .col-actions { width: 12%; min-width: 100px; }
         .avatar-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
         .avatar-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
     </style>
@@ -76,17 +77,59 @@
 </div>
 
 <script>
-    // 辅助函数
-    const stores = ["Downtown Store", "Mall Outlet", "Online Shop", "City Branch", "Suburban Plaza"];
-    const titles = ["Manager", "Sales", "Support", "Admin", "Clerk"];
     function getRandomItem(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
     function randomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    function randomIp() {
-        return randomInt(0, 255) * 16777216 + randomInt(0, 255) * 65536 + randomInt(0, 255) * 256 + randomInt(0, 255);
+
+    // 模拟 store 表数据
+    const storeData = [
+        { id: 1, store_name: 'Walmart Flagship Store' },
+        { id: 2, store_name: 'Target New York Branch' },
+        { id: 3, store_name: 'Best Buy Los Angeles' },
+        { id: 4, store_name: 'Costco Seattle Outlet' },
+        { id: 5, store_name: 'Whole Foods San Francisco' },
+        { id: 6, store_name: 'Home Depot Chicago' },
+        { id: 7, store_name: 'IKEA Miami Store' },
+        { id: 8, store_name: 'Macy\'s Boston Branch' },
+        { id: 9, store_name: 'Nordstrom Houston' },
+        { id: 10, store_name: 'Lowe\'s Denver Outlet' },
+        { id: 11, store_name: 'Trader Joe\'s Portland' },
+        { id: 12, store_name: 'Safeway Phoenix' },
+        { id: 13, store_name: 'Kroger Dallas' },
+        { id: 14, store_name: 'Staples Atlanta' },
+        { id: 15, store_name: 'PetSmart Austin' },
+        { id: 16, store_name: 'GameStop Orlando' },
+        { id: 17, store_name: 'Barnes & Noble San Diego' },
+        { id: 18, store_name: 'REI Salt Lake City' },
+        { id: 19, store_name: 'Dick\'s Sporting Goods Las Vegas' },
+        { id: 20, store_name: 'Office Depot Minneapolis' },
+        { id: 21, store_name: 'Aldi Charlotte' },
+        { id: 22, store_name: 'Dollar General Nashville' },
+        { id: 23, store_name: 'CVS Pharmacy Baltimore' },
+        { id: 24, store_name: 'Walgreens Philadelphia' },
+        { id: 25, store_name: 'Rite Aid Detroit' },
+        { id: 26, store_name: 'AutoZone St. Louis' },
+        { id: 27, store_name: 'Pep Boys Cleveland' },
+        { id: 28, store_name: 'Advance Auto Parts Raleigh' },
+        { id: 29, store_name: 'Starbucks Reserve Seattle' },
+        { id: 30, store_name: 'Dunkin\' Donuts Pittsburgh' }
+    ];
+
+    // 模拟权限选项
+    const permissionsOptions = [
+        'view_orders', 'manage_orders', 'view_products', 'edit_products', 'view_customers',
+        'manage_customers', 'view_reports', 'manage_staff', 'edit_settings', 'process_payments'
+    ];
+
+    function getStoreOptions() {
+        return storeData.map(item => ({ value: item.id, label: item.store_name }));
+    }
+
+    function getPermissionsOptions() {
+        return permissionsOptions;
     }
 
     window.tableConfig = {
@@ -96,84 +139,87 @@
         defaultPerPage: 20,
         fields: [
             { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'store_id', generator: () => randomInt(1, 5) }, // 关联 5 个店铺
-            { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
-            { name: 'title', generator: () => getRandomItem(titles) }, // 职位
-            { name: 'username', generator: id => `staff${id}@store.com` }, // 用户名
-            { name: 'password', generator: () => `pass${randomInt(1000, 9999)}` }, // 随机密码
-            { name: 'salt', generator: () => `salt${randomInt(1000, 9999)}` }, // 随机盐值
-            { name: 'nick_name', generator: id => `Staff ${id}` }, // 昵称
-            { name: 'avatar', generator: () => getRandomImage('sexy') }, // 头像
-            { name: 'phone', generator: () => `+${randomInt(100, 999)}-${randomInt(1000000, 9999999)}` }, // 随机电话
-            { name: 'telegram', generator: () => `@staff${randomInt(1000, 9999)}` }, // 随机Telegram
+            { name: 'store_id', generator: () => randomInt(1, 5) },
+            { name: 'status', generator: () => randomInt(0, 1) },
+            { name: 'title', generator: () => getRandomItem(['店长', '员工', '客服', '管理员']) },
+            { name: 'username', generator: id => `staff${id}` },
+            { name: 'password', generator: () => 'hashed_password_' + randomInt(1000, 9999) },
+            { name: 'salt', generator: () => Math.random().toString(36).substring(2, 10) },
+            { name: 'nick_name', generator: id => `员工${id}` },
+            { name: 'avatar', generator: () => getRandomImage('avatar') },
+            { name: 'phone', generator: () => `13${randomInt(0, 9)}${randomInt(10000000, 99999999)}` },
+            { name: 'telegram', generator: () => `@staff${randomInt(1000, 9999)}` },
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
-            { name: 'last_login_ip', generator: () => randomIp() }, // 随机IP地址
-            { name: 'last_login_time', generator: () => moment().subtract(randomInt(1, 90), 'days').unix() }, // 最后登录时间
-            { name: 'permissions', generator: () => JSON.stringify(['view', 'edit', 'delete'].slice(0, randomInt(1, 3))) } // 随机权限列表
+            { name: 'last_login_ip', generator: () => randomInt(0, 255) * 256 * 256 * 256 + randomInt(0, 255) * 256 * 256 + randomInt(0, 255) * 256 + randomInt(0, 255) },
+            { name: 'last_login_time', generator: () => moment().subtract(randomInt(1, 30), 'days').unix() },
+            { name: 'permissions', generator: () => JSON.stringify(getPermissionsOptions().sort(() => 0.5 - Math.random()).slice(0, randomInt(1, 5))) }
         ],
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
-            { label: '批量修改店铺', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'store_id', label: '店铺', type: 'select', options: stores.map((s, i) => ({ value: i + 1, label: s })) } }
+            { label: '批量修改店铺', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'store_id', label: '店铺', type: 'select', options: getStoreOptions } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'store_id', label: '店铺', className: 'col-store-id', formatter: v => stores[v - 1] || `Store ${v}` },
+            { name: 'store_id', label: '店铺', className: 'col-store-id', formatter: v => storeData.find(s => s.id === v)?.store_name || '未知' },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
-            { name: 'title', label: '职位', className: 'col-title' },
             { name: 'username', label: '用户名', className: 'col-username' },
             { name: 'nick_name', label: '昵称', className: 'col-nick-name' },
             { name: 'avatar', label: '头像', className: 'col-avatar', formatter: v => v ? `<div class="avatar-preview"><img src="${v}" alt="头像" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="avatar-preview"><span class="placeholder" onclick="alert(\'头像不存在\')">无</span></div>' },
+            { name: 'phone', label: '电话', className: 'col-phone' },
+            { name: 'permissions', label: '权限', className: 'col-permissions', formatter: v => v ? JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-blue">${permissionsOptions.includes(tag) ? tag : '未知'}</span>`).join('') : '' },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
-                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
-                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
-            ` }
+        <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+        <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+    ` }
         ],
         filterFields: [
+            { id: 'store_id', type: 'select', options: [{ value: '', label: '全部店铺' }, ...getStoreOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.store_id === parseInt(value)) },
             { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
-            { id: 'storeId', type: 'select', options: [{ value: '', label: '全部店铺' }, ...stores.map((s, i) => ({ value: `${i + 1}`, label: s }))], filter: (data, value) => value ? data.filter(d => d.store_id === parseInt(value)) : data },
             { id: 'username', type: 'text', placeholder: '搜索用户名', filter: (data, value) => value ? data.filter(d => d.username.toLowerCase().includes(value.toLowerCase())) : data },
+            { id: 'nick_name', type: 'text', placeholder: '搜索昵称', filter: (data, value) => value ? data.filter(d => d.nick_name.toLowerCase().includes(value.toLowerCase())) : data },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
             { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
         ],
         modalTabs: [
             {
-                id: 'basic',
-                title: '基本信息',
+                id: 'account',
+                title: '账户信息',
                 fields: [
-                    { name: 'store_id', label: '店铺', type: 'select', options: stores.map((s, i) => ({ value: i + 1, label: s })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'store_id', label: '店铺', type: 'select', options: getStoreOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'title', label: '职位', type: 'select', options: titles.map(t => ({ value: t, label: t })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'title', label: '职位', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'username', label: '用户名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'password', label: '密码', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'salt', label: '盐值', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'nick_name', label: '昵称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'avatar', label: '头像', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                    { name: 'password', label: '密码', type: 'password', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'nick_name', label: '昵称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
                 ]
             },
             {
-                id: 'contact',
-                title: '联系信息',
+                id: 'contact_permissions',
+                title: '联系与权限',
                 fields: [
                     { name: 'phone', label: '电话', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'telegram', label: 'Telegram', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
-                ]
-            },
-            {
-                id: 'login',
-                title: '登录信息',
-                fields: [
-                    { name: 'last_login_ip', label: '最后登录IP', type: 'text', formatter: v => v ? `${(v >>> 24) & 255}.${(v >>> 16) & 255}.${(v >>> 8) & 255}.${v & 255}` : '', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'last_login_time', label: '最后登录时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'permissions', label: '权限', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                    { name: 'telegram', label: 'Telegram', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'avatar', label: '头像', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'permissions', label: '权限', type: 'tag', options: getPermissionsOptions, color: 'blue', allowCustom: false, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'last_login_ip', label: '最后登录IP', type: 'text', formatter: v => v ? `${Math.floor(v / (256 * 256 * 256))}.${Math.floor(v / (256 * 256) % 256)}.${Math.floor(v / 256 % 256)}.${v % 256}` : '0.0.0.0', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'last_login_time', label: '最后登录时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
                 ]
             }
         ]
     };
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
 </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91c506a2adc65293',t:'MTc0MTI5NzM3Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

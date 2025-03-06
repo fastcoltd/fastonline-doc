@@ -10,27 +10,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
-        .action-container { margin-bottom: 16px; }
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 15%; min-width: 80px; }
-        .col-aftersales-id { width: 20%; min-width: 100px; }
-        .col-store-id { width: 20%; min-width: 100px; }
-        .col-item-id { width: 20%; min-width: 100px; }
-        .col-hit-count { width: 15%; min-width: 80px; }
-        .col-actions { width: 20%; min-width: 100px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
-        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
-        .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
-        .ant-form-item label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .ant-form-item input, .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .col-id { width: 15%; min-width: 100px; }
+        .col-aftersales-id { width: 20%; min-width: 120px; }
+        .col-store-id { width: 25%; min-width: 150px; }
+        .col-item-id { width: 20%; min-width: 120px; }
+        .col-hit-count { width: 15%; min-width: 100px; }
+        .col-actions { width: 15%; min-width: 100px; }
     </style>
 </head>
 <body>
@@ -44,68 +33,22 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('item_aftersales_stat.html')" role="tab" aria-selected="true">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('item_aftersales_stat.html')">
                                     <span class="ant-tabs-tab-btn">商品售后统计</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <div class="filter-container">
-                                    <div class="ant-select ant-select-single ant-select-show-arrow">
-                                        <select id="storeIdFilter">
-                                            <option value="">全部店铺</option>
-                                            <option value="1">Shop A</option>
-                                            <option value="2">Shop B</option>
-                                            <option value="3">Shop C</option>
-                                            <option value="4">Shop D</option>
-                                            <option value="5">Shop E</option>
-                                            <option value="6">Shop F</option>
-                                            <option value="7">Shop G</option>
-                                            <option value="8">Shop H</option>
-                                            <option value="9">Shop I</option>
-                                            <option value="10">Shop J</option>
-                                            <option value="11">Shop K</option>
-                                            <option value="12">Shop L</option>
-                                            <option value="13">Shop M</option>
-                                            <option value="14">Shop N</option>
-                                            <option value="15">Shop O</option>
-                                        </select>
-                                    </div>
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                </div>
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header" style="background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-aftersales-id">售后ID</div>
-                                        <div class="col-store-id">店铺</div>
-                                        <div class="col-item-id">商品</div>
-                                        <div class="col-hit-count">点击次数</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
-                                    <div id="item-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <div class="ant-select ant-select-single ant-select-show-arrow">
-                                            <select id="perPage" onchange="changePerPage()">
-                                                <option value="10">10 条/页</option>
-                                                <option value="20" selected>20 条/页</option>
-                                                <option value="50">50 条/页</option>
-                                                <option value="100">100 条/页</option>
-                                            </select>
-                                        </div>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="table-header"></div>
+                                    <div id="item_aftersales_stat-list">加载中...</div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -115,163 +58,131 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-    <div id="itemModal" class="modal">
+    <div id="imageModal" class="modal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <h3>查看售后统计</h3>
-            <form id="itemForm">
-                <div class="ant-form-item">
-                    <label>ID:</label>
-                    <input type="text" id="modalId" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>售后ID:</label>
-                    <input type="text" id="modalAftersalesId" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>店铺ID:</label>
-                    <input type="text" id="modalStoreId" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>商品ID:</label>
-                    <input type="text" id="modalItemId" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>点击次数:</label>
-                    <input type="text" id="modalHitCount" disabled>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeModal()">关闭</button>
-                </div>
-            </form>
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
         </div>
     </div>
 </div>
+
 <script>
-    let itemData = [];
-    let itemPage = 1, itemPerPage = 20;
-
-    function fetchItemData() {
-        for (let i = 1; i <= 200; i++) {
-            itemData.push({
-                id: i,
-                aftersales_id: i * 10,
-                store_id: Math.floor(Math.random() * 15) + 1,
-                item_id: i,
-                hit_count: Math.floor(Math.random() * 1000)
-            });
-        }
-        renderItemList(itemData);
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function renderItemList(items) {
-        const start = (itemPage - 1) * itemPerPage;
-        const end = start + itemPerPage;
-        const paginatedItems = items.slice(start, end);
-        const listContainer = document.getElementById('item-list');
-        listContainer.innerHTML = '';
+    // 模拟 store 表数据
+    const storeData = [
+        { id: 1, store_name: 'Tech Store' },
+        { id: 2, store_name: 'Fashion Hub' },
+        { id: 3, store_name: 'Gadget Shop' },
+        { id: 4, store_name: 'Style Outlet' },
+        { id: 5, store_name: 'Inno Mart' },
+        { id: 6, store_name: 'Trendy Boutique' },
+        { id: 7, store_name: 'Smart Retail' },
+        { id: 8, store_name: 'Eco Market' },
+        { id: 9, store_name: 'Urban Store' },
+        { id: 10, store_name: 'Elite Goods' },
+        { id: 11, store_name: 'Nova Shop' },
+        { id: 12, store_name: 'Prime Outlet' },
+        { id: 13, store_name: 'Vogue Mart' },
+        { id: 14, store_name: 'Tech Haven' },
+        { id: 15, store_name: 'Chic Corner' }
+    ];
 
-        paginatedItems.forEach(item => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            itemDiv.style = 'border-bottom: 1px solid #ddd;';
-            itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${item.id}"></div>
-                <div class="col-id">${item.id}</div>
-                <div class="col-aftersales-id">${item.aftersales_id}</div>
-                <div class="col-store-id">Shop ${item.store_id}</div>
-                <div class="col-item-id">${item.item_id}</div>
-                <div class="col-hit-count">${item.hit_count}</div>
-                <div class="col-actions">
-                    <button class="ant-btn" onclick="viewItem('${item.id}')">查看</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteItem('${item.id}')">删除</button>
-                </div>
-            `;
-            listContainer.appendChild(itemDiv);
-        });
+    // 模拟 item 表数据
+    const itemData = [
+        { id: 1, item_name: 'Smartphone X' },
+        { id: 2, item_name: 'Laptop Pro' },
+        { id: 3, item_name: 'Wireless Earbuds' },
+        { id: 4, item_name: 'Designer Jacket' },
+        { id: 5, item_name: 'LED TV 55"' },
+        { id: 6, item_name: 'Gaming Console' },
+        { id: 7, item_name: 'Leather Bag' },
+        { id: 8, item_name: 'Smart Watch' },
+        { id: 9, item_name: 'Running Shoes' },
+        { id: 10, item_name: 'Bluetooth Speaker' },
+        { id: 11, item_name: 'Tablet Mini' },
+        { id: 12, item_name: 'Winter Coat' },
+        { id: 13, item_name: 'Fitness Tracker' },
+        { id: 14, item_name: 'Camera DSLR' },
+        { id: 15, item_name: 'Headphones Noise-Cancel' }
+    ];
 
-        const totalPages = Math.ceil(items.length / itemPerPage);
-        document.getElementById('page-info').textContent = `第 ${itemPage} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
+    function getStoreOptions() {
+        return storeData.map(item => ({ value: item.id, label: item.store_name }));
     }
 
-    function applyFilters() {
-        const storeId = document.getElementById('storeIdFilter').value;
-        let filteredItems = itemData;
-        if (storeId) filteredItems = filteredItems.filter(item => item.store_id === parseInt(storeId));
-        itemPage = 1;
-        renderItemList(filteredItems);
+    function getItemOptions() {
+        return itemData.map(item => ({ value: item.id, label: item.item_name }));
     }
 
-    function changePage(delta) {
-        const totalPages = Math.ceil(itemData.length / itemPerPage);
-        itemPage += delta;
-        if (itemPage < 1) itemPage = 1;
-        if (itemPage > totalPages) itemPage = totalPages;
-        applyFilters();
-    }
-
-    function jumpToPage() {
-        const page = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(itemData.length / itemPerPage);
-        if (page >= 1 && page <= totalPages) {
-            itemPage = page;
-            applyFilters();
-        } else {
-            alert('请输入有效的页码');
-        }
-    }
-
-    function changePerPage() {
-        itemPerPage = parseInt(document.getElementById('perPage').value);
-        itemPage = 1;
-        applyFilters();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    function viewItem(id) {
-        const item = itemData.find(i => i.id === parseInt(id));
-        document.getElementById('modalId').value = item.id;
-        document.getElementById('modalAftersalesId').value = item.aftersales_id;
-        document.getElementById('modalStoreId').value = `Shop ${item.store_id}`;
-        document.getElementById('modalItemId').value = item.item_id;
-        document.getElementById('modalHitCount').value = item.hit_count;
-        document.getElementById('itemModal').style.display = 'block';
-    }
-
-    function deleteItem(id) {
-        if (confirm('确定要删除此记录吗？')) {
-            itemData = itemData.filter(item => item.id !== parseInt(id));
-            applyFilters();
-        }
-    }
-
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.dataset.id);
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的记录');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个记录吗？`)) {
-            itemData = itemData.filter(item => !selectedIds.includes(item.id.toString()));
-            applyFilters();
-        }
-    }
-
-    function closeModal() {
-        document.getElementById('itemModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        w3.includeHTML(() => {
-            initMenus();
-            fetchItemData();
-        });
+    window.tableConfig = {
+        tableName: 'item_aftersales_stat',
+        tableTitle: '商品售后统计',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'aftersales_id', generator: id => id + 1000 }, // 假设售后ID从1000开始
+            { name: 'store_id', generator: () => randomInt(1, 15) },
+            { name: 'item_id', generator: () => randomInt(1, 15) },
+            { name: 'hit_count', generator: () => randomInt(0, 100) }
+        ],
+        actionButtons: [
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改店铺', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'store_id', label: '店铺', type: 'select', options: getStoreOptions } },
+            { label: '批量修改商品', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'item_id', label: '商品', type: 'select', options: getItemOptions } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'aftersales_id', label: '售后ID', className: 'col-aftersales-id' },
+            { name: 'store_id', label: '店铺', className: 'col-store-id', formatter: v => storeData.find(s => s.id === v)?.store_name || '未知' },
+            { name: 'item_id', label: '商品', className: 'col-item-id', formatter: v => itemData.find(i => i.id === v)?.item_name || '未知' },
+            { name: 'hit_count', label: '点击次数', className: 'col-hit-count' },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id}, true)">查看</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'aftersales_id', type: 'number', placeholder: '售后ID', filter: (data, value) => value ? data.filter(d => d.aftersales_id === parseInt(value)) : data },
+            { id: 'store_id', type: 'select', options: [{ value: '', label: '全部店铺' }, ...getStoreOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.store_id === parseInt(value)) },
+            { id: 'item_id', type: 'select', options: [{ value: '', label: '全部商品' }, ...getItemOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.item_id === parseInt(value)) }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'aftersales_id', label: '售后ID', type: 'number', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'store_id', label: '店铺', type: 'select', options: getStoreOptions, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'item_id', label: '商品', type: 'select', options: getItemOptions, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'hit_count', label: '点击次数', type: 'number', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            },
+            {
+                id: 'system',
+                title: '系统信息',
+                fields: [
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            }
+        ]
     };
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
 </script>
 </body>
 </html>
