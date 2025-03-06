@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 系统资源</title>
+    <title>FASTRESP - 资源权限</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -15,12 +15,11 @@
     <style>
         .col-checkbox { width: 5%; min-width: 50px; }
         .col-id { width: 10%; min-width: 60px; }
-        .col-parent-name { width: 15%; min-width: 100px; }
-        .col-level { width: 10%; min-width: 60px; }
-        .col-status { width: 10%; min-width: 60px; }
-        .col-menu-name { width: 15%; min-width: 100px; }
-        .col-menu-path { width: 15%; min-width: 100px; }
-        .col-resources-key { width: 15%; min-width: 100px; }
+        .col-resource-name { width: 15%; min-width: 100px; }
+        .col-permission-name { width: 15%; min-width: 100px; }
+        .col-fields { width: 15%; min-width: 100px; }
+        .col-buttons { width: 15%; min-width: 100px; }
+        .col-urls { width: 20%; min-width: 120px; }
         .col-create-time { width: 15%; min-width: 120px; }
         .col-actions { width: 15%; min-width: 100px; }
     </style>
@@ -36,8 +35,8 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('resources.html')">
-                                    <span class="ant-tabs-tab-btn">系统资源</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('resources_permissions.html')">
+                                    <span class="ant-tabs-tab-btn">资源权限</span>
                                     <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
                             </div>
@@ -50,7 +49,7 @@
                                 <div class="action-container"></div>
                                 <div class="task-list">
                                     <div class="table-header"></div>
-                                    <div id="resources-list">加载中...</div>
+                                    <div id="resources_permissions-list">加载中...</div>
                                     <div class="pagination"></div>
                                 </div>
                             </div>
@@ -80,44 +79,72 @@
     function randomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    function generateResourcesKey(id, level) {
-        return `${level}-${randomInt(0, 9)}-${randomInt(0, 9)}-${id}`;
-    }
+
+    // 模拟 resources 表数据
+    const resourcesData = Array.from({ length: 50 }, (_, i) => ({
+        id: i + 1,
+        menu_name: `菜单 ${i + 1}`
+    }));
+
+    // 获取所有资源作为下拉选项
     const resourcesParents = ["Resources A", "Resources B", "Resources C", "Resources D", "Resources E"];
 
     window.tableConfig = {
-        tableName: 'resources',
-        tableTitle: '系统资源',
+        tableName: 'resources_permissions',
+        tableTitle: '资源权限',
         sampleCount: 50,
         defaultPerPage: 20,
         fields: [
             { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'parent_id', generator: id => id > 1 ? randomInt(1, Math.min(id - 1, 10)) : 0 }, // 父ID从0到10或当前ID-1
-            { name: 'level', generator: () => randomInt(0, 3) }, // 0:menu, 1:module, 2:page, 3:tab
-            { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
+            { name: 'resources_id', generator: () => randomInt(1, 50) }, // 关联 resources 表的 ID
             { name: 'sort_index', generator: () => randomInt(0, 100) },
             { name: 'show_status', generator: () => randomInt(0, 1) }, // 0:隐藏, 1:显示
-            { name: 'resources_key', generator: id => generateResourcesKey(id, randomInt(0, 3)) },
-            { name: 'menu_name', generator: id => `菜单 ${id}` },
-            { name: 'menu_path', generator: id => `/path/to/menu${id}` },
+            { name: 'permission_name', generator: id => `权限 ${id}` },
+            {
+                name: 'fields',
+                generator: () => JSON.stringify(['field1', 'field2', `field${randomInt(3, 5)}`])
+            },
+            {
+                name: 'buttons',
+                generator: () => JSON.stringify(['btn1', 'btn2', `btn${randomInt(3, 5)}`])
+            },
+            {
+                name: 'urls',
+                generator: () => JSON.stringify(['/url1', '/url2', `/url${randomInt(3, 5)}`])
+            },
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
         ],
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
-            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
-            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } }
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'parent_id', label: '父名称', className: 'col-parent-name', formatter: (v, item) => {
-                    const parent = tableData.find(r => r.id === v);
-                    return parent ? parent.menu_name : '无';
-                }},
-            { name: 'level', label: '层级', className: 'col-level', formatter: v => ['菜单', '模块', '页面', '标签'][v] || '未知' },
-            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
-            { name: 'menu_name', label: '菜单名称', className: 'col-menu-name' },
-            { name: 'menu_path', label: '菜单路径', className: 'col-menu-path' },
-            { name: 'resources_key', label: '资源键', className: 'col-resources-key' },
+            {
+                name: 'resources_id',
+                label: '资源名称',
+                className: 'col-resource-name',
+                formatter: v => resourcesData.find(r => r.id === v)?.menu_name || '未知'
+            },
+            { name: 'permission_name', label: '权限名称', className: 'col-permission-name' },
+            {
+                name: 'fields',
+                label: '字段',
+                className: 'col-fields',
+                formatter: v => JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-red">${tag}</span>`).join('')
+            },
+            {
+                name: 'buttons',
+                label: '按钮',
+                className: 'col-buttons',
+                formatter: v => JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-blue">${tag}</span>`).join('')
+            },
+            {
+                name: 'urls',
+                label: 'URL',
+                className: 'col-urls',
+                formatter: v => JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-green">${tag}</span>`).join('')
+            },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
                 <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
@@ -125,9 +152,7 @@
             ` }
         ],
         filterFields: [
-            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
-            { id: 'level', type: 'select', options: [{ value: '', label: '全部层级' }, { value: '0', label: '菜单' }, { value: '1', label: '模块' }, { value: '2', label: '页面' }, { value: '3', label: '标签' }], filter: (data, value) => value === '' ? data : data.filter(d => d.level === parseInt(value)) },
-            { id: 'menuName', type: 'text', placeholder: '搜索菜单名称', filter: (data, value) => value ? data.filter(d => d.menu_name.toLowerCase().includes(value.toLowerCase())) : data },
+            { id: 'permissionName', type: 'text', placeholder: '搜索权限名称', filter: (data, value) => value ? data.filter(d => d.permission_name.toLowerCase().includes(value.toLowerCase())) : data },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data }
         ],
         modalTabs: [
@@ -136,8 +161,8 @@
                 title: '基本信息',
                 fields: [
                     {
-                        name: 'parent_id',
-                        label: '父资源',
+                        name: 'resources_id',
+                        label: '关联资源',
                         type: 'select',
                         options: resourcesParents.map((m, i) => ({ value: i + 1, label: m })), // 动态生成选项
                         showInAdd: true,
@@ -145,13 +170,45 @@
                         editableInAdd: true,
                         editableInEdit: true
                     },
-                    { name: 'level', label: '层级', type: 'select', options: [{ value: 0, label: '菜单' }, { value: 1, label: '模块' }, { value: 2, label: '页面' }, { value: 3, label: '标签' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'sort_index', label: '排序索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'show_status', label: '显示状态', type: 'select', options: [{ value: 0, label: '隐藏' }, { value: 1, label: '显示' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'resources_key', label: '资源键', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'menu_name', label: '菜单名称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'menu_path', label: '菜单路径', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'permission_name', label: '权限名称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    {
+                        name: 'fields',
+                        label: 'red',
+                        type: 'tag',
+                        options: ['field1', 'field2', 'field3', 'field4', 'field5'],
+                        color: 'red',
+                        allowCustom: true,
+                        showInAdd: true,
+                        showInEdit: true,
+                        editableInAdd: true,
+                        editableInEdit: true
+                    },
+                    {
+                        name: 'buttons',
+                        label: '按钮',
+                        type: 'tag',
+                        options: ['btn1', 'btn2', 'btn3', 'btn4', 'btn5'],
+                        color: 'red',
+                        allowCustom: true,
+                        showInAdd: true,
+                        showInEdit: true,
+                        editableInAdd: true,
+                        editableInEdit: true
+                    },
+                    {
+                        name: 'urls',
+                        label: 'URL',
+                        type: 'tag',
+                        options: ['/url1', '/url2', '/url3', '/url4', '/url5'],
+                        color: 'blue',
+                        allowCustom: true,
+                        showInAdd: true,
+                        showInEdit: true,
+                        editableInAdd: true,
+                        editableInEdit: true
+                    },
                     { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
                     { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
                 ]

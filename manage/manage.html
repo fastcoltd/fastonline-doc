@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 管理员</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
+    <style>
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-role-id { width: 10%; min-width: 80px; }
+        .col-username { width: 12%; min-width: 100px; }
+        .col-full-name { width: 15%; min-width: 120px; }
+        .col-email { width: 15%; min-width: 120px; }
+        .col-phone { width: 10%; min-width: 80px; }
+        .col-join-time { width: 15%; min-width: 120px; }
+        .col-actions { width: 12%; min-width: 100px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('manage.html')">
+                                    <span class="ant-tabs-tab-btn">管理员</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
+                                <div class="task-list">
+                                    <div class="table-header"></div>
+                                    <div id="manage-list">加载中...</div>
+                                    <div class="pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 模拟 role 表数据，使用更有意义的角色名称
+    const roleData = [
+        { id: 1, role_name: '超级管理员' },
+        { id: 2, role_name: '财务' },
+        { id: 3, role_name: '客服经理' },
+        { id: 4, role_name: '客服' },
+        { id: 5, role_name: '客服' }
+    ];
+
+    // 获取所有角色作为下拉选项
+    function getRoleOptions() {
+        return roleData.map(item => ({ value: item.id, label: item.role_name }));
+    }
+
+    // 定义国家选项
+    const countryOptions = [
+        { value: '中国', label: '中国' },
+        { value: '美国', label: '美国' },
+        { value: '英国', label: '英国' },
+        { value: '日本', label: '日本' },
+        { value: '德国', label: '德国' },
+        { value: '法国', label: '法国' },
+        { value: '加拿大', label: '加拿大' },
+        { value: '澳大利亚', label: '澳大利亚' },
+        { value: '印度', label: '印度' },
+        { value: '俄罗斯', label: '俄罗斯' }
+    ];
+
+    // 获取国家选项
+    function getCountryOptions() {
+        return countryOptions;
+    }
+
+    // 模拟用户名和邮箱的生成
+    const firstNames = ['John', 'Emma', 'Li', 'Sophie', 'Hiro', 'Anna', 'Mark', 'Priya', 'Alex', 'Zhang'];
+    const lastNames = ['Smith', 'Wang', 'Tanaka', 'Brown', 'Kumar', 'Chen', 'Jones', 'Lee', 'Patel', 'Davis'];
+    const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'example.com', 'qq.com'];
+
+    function generateUsername(id) {
+        const first = getRandomItem(firstNames);
+        const last = getRandomItem(lastNames);
+        return `${first.toLowerCase()}${last.toLowerCase()}${id}`;
+    }
+
+    function generateEmail(id) {
+        const first = getRandomItem(firstNames);
+        const last = getRandomItem(lastNames);
+        const domain = getRandomItem(domains);
+        return `${first.toLowerCase()}.${last.toLowerCase()}${id}@${domain}`;
+    }
+
+    window.tableConfig = {
+        tableName: 'manage',
+        tableTitle: '管理员',
+        sampleCount: 50,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'status', generator: () => randomInt(0, 1) }, // 0:离职, 1:在职
+            { name: 'role_id', generator: () => randomInt(1, 5) }, // 关联 role 表的 ID
+            { name: 'country', generator: () => getRandomItem(countryOptions.map(opt => opt.value)) },
+            { name: 'username', generator: id => generateUsername(id) },
+            { name: 'password', generator: () => 'hashed_password' }, // 模拟加密密码
+            { name: 'salt', generator: () => Math.random().toString(36).substring(2, 10) },
+            { name: 'first_name', generator: () => getRandomItem(firstNames) },
+            { name: 'middle_name', generator: () => getRandomItem(['', 'Middle', 'M']) },
+            { name: 'last_name', generator: () => getRandomItem(lastNames) },
+            { name: 'avatar', generator: () => getRandomImage('avatar') },
+            { name: 'phone', generator: () => `+${randomInt(100, 999)}${randomInt(10000000, 99999999)}` },
+            { name: 'email', generator: id => generateEmail(id) },
+            { name: 'telegram', generator: id => `@${generateUsername(id)}` },
+            { name: 'mark', generator: () => getRandomItem(['优秀', '良好', '一般', '']) },
+            { name: 'join_time', generator: () => moment().subtract(randomInt(30, 730), 'days').unix() },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '离职' }, { value: 1, label: '在职' }] } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">离职</span>' : '<span class="ant-tag ant-tag-green">在职</span>' },
+            { name: 'role_id', label: '角色', className: 'col-role-id', formatter: v => roleData.find(r => r.id === v)?.role_name || '未知' },
+            { name: 'username', label: '用户名', className: 'col-username' },
+            { name: 'full_name', label: '姓名', className: 'col-full-name', formatter: (_, item) => `${item.first_name} ${item.middle_name} ${item.last_name}`.trim() },
+            { name: 'email', label: '邮箱', className: 'col-email' },
+            { name: 'phone', label: '电话', className: 'col-phone' },
+            { name: 'join_time', label: '入职时间', className: 'col-join-time', formatter: v => moment.unix(v).format('YYYY-MM-DD') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '离职' }, { value: '1', label: '在职' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'role_id', type: 'select', options: getRoleOptions, filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'username', type: 'text', placeholder: '搜索用户名', filter: (data, value) => value ? data.filter(d => d.username.toLowerCase().includes(value.toLowerCase())) : data },
+            { id: 'email', type: 'text', placeholder: '搜索邮箱', filter: (data, value) => value ? data.filter(d => d.email.toLowerCase().includes(value.toLowerCase())) : data },
+            { id: 'joinStartDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.join_time).isSameOrAfter(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '离职' }, { value: 1, label: '在职' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'role_id', label: '角色', type: 'select', options: getRoleOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'country', label: '国家', type: 'select', options: getCountryOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'join_time', label: '入职时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            },
+            {
+                id: 'personal',
+                title: '个人信息',
+                fields: [
+                    { name: 'email', label: '邮箱', type: 'email', showInAdd: true, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'first_name', label: '名字', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'middle_name', label: '中间名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'last_name', label: '姓氏', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'avatar', label: '头像', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'mark', label: '备注', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'phone', label: '电话', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'telegram', label: 'Telegram', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            },
+            {
+                id: 'password',
+                title: '登录信息',
+                fields: [
+                    { name: 'username', label: '用户名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                    { name: 'password', label: '密码', type: 'password', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                ]
+            }
+        ]
+    };
+
+    // 重写 renderModal 以动态更新 role_id 和 country 选项
+    const originalRenderModal = renderModal;
+    renderModal = function(isEditingMode) {
+        originalRenderModal(isEditingMode);
+
+        // 更新 role_id 下拉
+        const roleSelect = document.getElementById('modalrole_id');
+        if (roleSelect) {
+            roleSelect.innerHTML = '';
+            const roleOptions = getRoleOptions();
+            roleOptions.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = String(opt.value);
+                option.textContent = opt.label;
+                roleSelect.appendChild(option);
+            });
+            if (isEditingMode) {
+                const record = tableData.find(item => item.id === editId);
+                roleSelect.value = String(record.role_id);
+            }
+        }
+
+        // 更新 country 下拉
+        const countrySelect = document.getElementById('modalcountry');
+        if (countrySelect) {
+            countrySelect.innerHTML = '';
+            const countryOpts = getCountryOptions();
+            countryOpts.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                countrySelect.appendChild(option);
+            });
+            if (isEditingMode) {
+                const record = tableData.find(item => item.id === editId);
+                countrySelect.value = record.country;
+            }
+        }
+    };
+</script>
+</body>
+</html>

@@ -33,6 +33,10 @@ function renderFilterArea() {
         if (field.type === 'select') {
             input = document.createElement('select');
             input.id = `${field.id}Filter`;
+            if (typeof field.options == 'function'){
+                let options = field.options();
+                field.options = options
+            }
             field.options.forEach(opt => {
                 const option = document.createElement('option');
                 option.value = opt.value;
@@ -140,6 +144,11 @@ function renderModal(isEditingMode) {
             if (tabField.type === 'select') {
                 input = document.createElement('select');
                 input.id = `modal${field.name}`;
+                console.log(tabField.options)
+                if (typeof tabField.options == 'function'){
+                    let options = tabField.options();
+                    tabField.options = options
+                }
                 tabField.options.forEach(opt => {
                     const option = document.createElement('option');
                     option.value = String(opt.value);

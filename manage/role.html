@@ -20,7 +20,7 @@
         .col-permissions { width: 25%; min-width: 150px; }
         .col-create-time { width: 15%; min-width: 120px; }
         .col-actions { width: 15%; min-width: 100px; }
-        .tree-container { padding: 1em; max-height: 50em; overflow-y: auto; border: 1px solid #d9d9d9; border-radius: 4px; }
+        .tree-container { padding: 1em; max-height: 30em; overflow-y: auto; border: 1px solid #d9d9d9; border-radius: 4px; }
         .tree-container ul li { list-style: none }
     </style>
 </head>
@@ -249,11 +249,12 @@
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'role_name', label: '角色名称', className: 'col-role-name' },
-            { name: 'mark', label: '备注', className: 'col-mark' },
+            { name: 'mark', label: '角色备注', className: 'col-mark' },
             { name: 'permissions', label: '权限', className: 'col-permissions', formatter: (_, item) => {
                     const perms = tableLangData.filter(p => p.role_id === item.id);
                     return perms.length ? perms.map(p => resources[p.resource_id - 1]).join('; ') : '无';
                 }},
+            { name: 'resource_id', label: '资源权限', className: 'col-permissions', formatter: ()=>{return randomInt(10, 200)} },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
                 <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
@@ -270,17 +271,11 @@
                 id: 'basic',
                 title: '基本信息',
                 fields: [
-                    { name: 'role_name', label: '角色名称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'mark', label: '备注', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
-                ]
-            },
-            {
-                id: 'permissions',
-                title: '角色权限',
-                fields: [
+                    { name: 'role_name', label: '角色名称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'mark', label: '角色备注', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'resource_ids', label: '权限列表', type: 'tree', treeData: treeData, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+
                 ]
             }
         ]

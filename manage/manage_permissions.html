@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 自定义权限</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
+    <style>
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-manage-name { width: 12%; min-width: 100px; }
+        .col-resource-name { width: 15%; min-width: 120px; }
+        .col-add-buttons { width: 10%; min-width: 80px; }
+        .col-add-fields { width: 10%; min-width: 80px; }
+        .col-add-urls { width: 10%; min-width: 80px; }
+        .col-remove-buttons { width: 10%; min-width: 80px; }
+        .col-remove-fields { width: 10%; min-width: 80px; }
+        .col-remove-urls { width: 10%; min-width: 80px; }
+        .col-actions { width: 10%; min-width: 80px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('manage_permissions.html')">
+                                    <span class="ant-tabs-tab-btn">自定义权限</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
+                                <div class="task-list">
+                                    <div class="table-header"></div>
+                                    <div id="manage_permissions-list">加载中...</div>
+                                    <div class="pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 模拟 manage 表数据
+    const manageData = Array.from({ length: 50 }, (_, i) => ({
+        id: i + 1,
+        username: `user${i + 1}`,
+        full_name: `Admin ${i + 1}`
+    }));
+
+    // 扩展的 resources 表数据（4级：菜单 > 模块 > 页面 > 页签）
+    const resourcesData = [
+        {
+            key: '1',
+            title: '系统管理',
+            level: 0,
+            children: [
+                { key: '1-1', title: '用户管理', level: 1, children: [
+                        { key: '1-1-1', title: '用户列表', level: 2, children: [
+                                { key: '1-1-1-1', title: '基本信息', level: 3 },
+                                { key: '1-1-1-2', title: '权限设置', level: 3 }
+                            ]},
+                        { key: '1-1-2', title: '用户详情', level: 2, children: [
+                                { key: '1-1-2-1', title: '个人信息', level: 3 },
+                                { key: '1-1-2-2', title: '订单记录', level: 3 }
+                            ]}
+                    ]},
+                { key: '1-2', title: '角色管理', level: 1, children: [
+                        { key: '1-2-1', title: '角色列表', level: 2, children: [
+                                { key: '1-2-1-1', title: '角色信息', level: 3 },
+                                { key: '1-2-1-2', title: '权限分配', level: 3 }
+                            ]}
+                    ]}
+            ]
+        },
+        {
+            key: '2',
+            title: '订单管理',
+            level: 0,
+            children: [
+                { key: '2-1', title: '订单处理', level: 1, children: [
+                        { key: '2-1-1', title: '订单列表', level: 2, children: [
+                                { key: '2-1-1-1', title: '订单概览', level: 3 },
+                                { key: '2-1-1-2', title: '订单详情', level: 3 }
+                            ]},
+                        { key: '2-1-2', title: '退款管理', level: 2, children: [
+                                { key: '2-1-2-1', title: '退款申请', level: 3 },
+                                { key: '2-1-2-2', title: '退款审核', level: 3 }
+                            ]}
+                    ]},
+                { key: '2-2', title: '支付管理', level: 1, children: [
+                        { key: '2-2-1', title: '支付记录', level: 2, children: [
+                                { key: '2-2-1-1', title: '支付明细', level: 3 }
+                            ]}
+                    ]}
+            ]
+        },
+        {
+            key: '3',
+            title: '店铺管理',
+            level: 0,
+            children: [
+                { key: '3-1', title: '店铺设置', level: 1, children: [
+                        { key: '3-1-1', title: '基本设置', level: 2, children: [
+                                { key: '3-1-1-1', title: '店铺信息', level: 3 },
+                                { key: '3-1-1-2', title: '店铺Logo', level: 3 }
+                            ]}
+                    ]},
+                { key: '3-2', title: '商品管理', level: 1, children: [
+                        { key: '3-2-1', title: '商品列表', level: 2, children: [
+                                { key: '3-2-1-1', title: '商品概览', level: 3 },
+                                { key: '3-2-1-2', title: '库存管理', level: 3 }
+                            ]},
+                        { key: '3-2-2', title: '商品分类', level: 2, children: [
+                                { key: '3-2-2-1', title: '分类列表', level: 3 }
+                            ]}
+                    ]}
+            ]
+        }
+    ];
+
+    // 获取所有管理员选项
+    function getManageOptions() {
+        return manageData.map(item => ({ value: item.id, label: item.full_name }));
+    }
+
+    // 获取所有资源选项（扁平化，仅3级和4级可选）
+    function getResourceOptions() {
+        const flattenResources = [];
+        function flatten(data, prefix = '') {
+            data.forEach(item => {
+                const label = prefix ? `${prefix} > ${item.title}` : item.title;
+                if (item.level >= 2) { // 只包含3级和4级 (level: 2, 3)
+                    flattenResources.push({ value: item.key, label });
+                }
+                if (item.children) flatten(item.children, label);
+            });
+        }
+        flatten(resourcesData);
+        return flattenResources;
+    }
+
+    // 获取所有可选资源ID（仅3级和4级，用于随机生成）
+    function getSelectableResourceIds() {
+        const ids = [];
+        function collectIds(data) {
+            data.forEach(item => {
+                if (item.level >= 2) { // 只包含3级和4级
+                    ids.push(item.key);
+                }
+                if (item.children) collectIds(item.children);
+            });
+        }
+        collectIds(resourcesData);
+        return ids;
+    }
+
+    window.tableConfig = {
+        tableName: 'manage_permissions',
+        tableTitle: '自定义权限',
+        sampleCount: 50,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'manage_id', generator: () => randomInt(1, 50) }, // 关联 manage 表的 ID
+            { name: 'resource_id', generator: () => getRandomItem(getSelectableResourceIds()) },
+            { name: 'add_buttons', generator: () => JSON.stringify(['btn_add', 'btn_save']) },
+            { name: 'add_fields', generator: () => JSON.stringify(['field_name', 'field_desc']) },
+            { name: 'add_urls', generator: () => JSON.stringify(['/api/add', '/api/save']) },
+            { name: 'remove_buttons', generator: () => JSON.stringify(['btn_delete']) },
+            { name: 'remove_fields', generator: () => JSON.stringify(['field_status']) },
+            { name: 'remove_urls', generator: () => JSON.stringify(['/api/delete']) }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'manage_id', label: '管理员', className: 'col-manage-name', formatter: v => manageData.find(m => m.id === v)?.full_name || '未知' },
+            { name: 'resource_id', label: '资源', className: 'col-resource-name', formatter: v => {
+                    const flat = getResourceOptions();
+                    return flat.find(r => r.value === v)?.label || '未知';
+                }},
+            { name: 'add_buttons', label: '新增按钮', className: 'col-add-buttons', formatter: v => v ? JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-green">${tag}</span>`).join('') : '' },
+            { name: 'add_fields', label: '新增字段', className: 'col-add-fields', formatter: v => v ? JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-blue">${tag}</span>`).join('') : '' },
+            { name: 'add_urls', label: '新增URL', className: 'col-add-urls', formatter: v => v ? JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-orange">${tag}</span>`).join('') : '' },
+            { name: 'remove_buttons', label: '移除按钮', className: 'col-remove-buttons', formatter: v => v ? JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-red">${tag}</span>`).join('') : '' },
+            { name: 'remove_fields', label: '移除字段', className: 'col-remove-fields', formatter: v => v ? JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-purple">${tag}</span>`).join('') : '' },
+            { name: 'remove_urls', label: '移除URL', className: 'col-remove-urls', formatter: v => v ? JSON.parse(v).map(tag => `<span class="ant-tag ant-tag-magenta">${tag}</span>`).join('') : '' },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'manageId', type: 'select', options: [{ value: '', label: '全部管理员' }, ...getManageOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.manage_id === parseInt(value)) },
+            { id: 'resourceId', type: 'select', options: [{ value: '', label: '全部资源' }, ...getResourceOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.resource_id === value) }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'manage_id', label: '管理员', type: 'select', options: getManageOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'resource_id', label: '资源', type: 'select', options: getResourceOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false }
+                ]
+            },
+            {
+                id: 'add_permissions',
+                title: '新增权限',
+                fields: [
+                    { name: 'add_buttons', label: '新增按钮', type: 'tag', options: ['btn_add', 'btn_save', 'btn_submit'], color: 'green', allowCustom: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'add_fields', label: '新增字段', type: 'tag', options: ['field_name', 'field_desc', 'field_status'], color: 'blue', allowCustom: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'add_urls', label: '新增URL', type: 'tag', options: ['/api/add', '/api/save', '/api/submit'], color: 'orange', allowCustom: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            },
+            {
+                id: 'remove_permissions',
+                title: '移除权限',
+                fields: [
+                    { name: 'remove_buttons', label: '移除按钮', type: 'tag', options: ['btn_delete', 'btn_cancel'], color: 'red', allowCustom: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'remove_fields', label: '移除字段', type: 'tag', options: ['field_id', 'field_status'], color: 'purple', allowCustom: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'remove_urls', label: '移除URL', type: 'tag', options: ['/api/delete', '/api/cancel'], color: 'magenta', allowCustom: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            }
+        ]
+    };
+
+    // 重写 renderModal 以动态更新 manage_id 和 resource_id 选项，并控制 resource_id 的编辑状态
+    const originalRenderModal = renderModal;
+    renderModal = function(isEditingMode) {
+        originalRenderModal(isEditingMode);
+
+        // 更新 manage_id 下拉
+        const manageSelect = document.getElementById('modalmanage_id');
+        if (manageSelect) {
+            manageSelect.innerHTML = '';
+            const manageOptions = getManageOptions();
+            manageOptions.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = String(opt.value);
+                option.textContent = opt.label;
+                manageSelect.appendChild(option);
+            });
+            if (isEditingMode) {
+                const record = tableData.find(item => item.id === editId);
+                manageSelect.value = String(record.manage_id);
+            }
+        }
+
+        // 更新 resource_id 下拉
+        const resourceSelect = document.getElementById('modalresource_id');
+        if (resourceSelect) {
+            resourceSelect.innerHTML = '';
+            const resourceOptions = getResourceOptions();
+            resourceOptions.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                resourceSelect.appendChild(option);
+            });
+            if (isEditingMode) {
+                const record = tableData.find(item => item.id === editId);
+                resourceSelect.value = record.resource_id;
+                resourceSelect.disabled = true; // 编辑模式禁用
+            }
+        }
+    };
+</script>
+</body>
+</html>
