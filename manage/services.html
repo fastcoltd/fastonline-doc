@@ -15,14 +15,15 @@
     <style>
         .col-checkbox { width: 5%; min-width: 50px; }
         .col-id { width: 8%; min-width: 60px; }
-        .col-parent-id { width: 10%; min-width: 80px; }
         .col-status { width: 8%; min-width: 60px; }
         .col-language { width: 10%; min-width: 80px; }
         .col-services-name { width: 12%; min-width: 100px; }
+        .col-custom-url { width: 12%; min-width: 100px; }
+        .col-services-key { width: 10%; min-width: 80px; }
         .col-services-logo { width: 10%; min-width: 80px; }
-        .col-custom-url { width: 15%; min-width: 120px; }
-        .col-create-time { width: 15%; min-width: 120px; }
-        .col-actions { width: 10%; min-width: 100px; }
+        .col-attr-id { width: 15%; min-width: 120px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 12%; min-width: 100px; }
         .services-logo-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
         .services-logo-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
     </style>
@@ -76,13 +77,39 @@
 </div>
 
 <script>
-    // 辅助函数
-    const serviceNames = ["Express Delivery", "Standard Shipping", "In-Store Pickup", "Gift Wrapping", "Extended Warranty"];
     function getRandomItem(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
     function randomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 模拟服务名称
+    const serviceNames = {
+        'zh_CN': ['技术支持', '物流服务', '客户咨询', '售后维修', '支付支持'],
+        'en_US': ['Technical Support', 'Logistics Service', 'Customer Inquiry', 'After-Sales Repair', 'Payment Support'],
+        'fr_FR': ['Support Technique', 'Service Logistique', 'Consultation Client', 'Réparation Après-Vente', 'Support Paiement'],
+        'es_ES': ['Soporte Técnico', 'Servicio Logístico', 'Consulta al Cliente', 'Reparación Postventa', 'Soporte de Pago'],
+        'vi_VN': ['Hỗ trợ Kỹ thuật', 'Dịch vụ Vận chuyển', 'Tư vấn Khách hàng', 'Sửa chữa Sau bán', 'Hỗ trợ Thanh toán'],
+        'ru_RU': ['Техническая поддержка', 'Логистическая служба', 'Запрос клиента', 'Ремонт после продажи', 'Поддержка платежей']
+    };
+
+    // 模拟 attr 表数据
+    const attrData = [
+        { id: 1, attr_name: '快速响应' },
+        { id: 2, attr_name: '24小时服务' },
+        { id: 3, attr_name: '多语言支持' },
+        { id: 4, attr_name: '专业团队' },
+        { id: 5, attr_name: '免费咨询' },
+        { id: 6, attr_name: '在线支持' },
+        { id: 7, attr_name: '上门服务' },
+        { id: 8, attr_name: '定制化方案' },
+        { id: 9, attr_name: '高效处理' },
+        { id: 10, attr_name: '安全保障' }
+    ];
+
+    function getAttrOptions() {
+        return attrData.map(item => item.attr_name);
     }
 
     window.tableConfig = {
@@ -91,66 +118,71 @@
         sampleCount: 200,
         defaultPerPage: 20,
         fields: [
+            // 主表 services 字段
             { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'parent_id', generator: () => randomInt(0, 5) }, // 0 表示无父服务，1-5 表示父服务ID
+            { name: 'parent_id', generator: () => randomInt(0, 5) }, // 0 表示无父服务
             { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
-            { name: 'custom_url', generator: id => `/services/${getRandomItem(serviceNames).toLowerCase().replace(' ', '-')}-${id}` }, // 自定义URL
-            { name: 'services_key', generator: id => `SRV_${getRandomItem(serviceNames).toUpperCase().replace(' ', '_')}_${id}` }, // 服务键
-            { name: 'services_logo', generator: () => getRandomImage('sexy') }, // 服务标志
+            { name: 'custom_url', generator: id => `/services/${id}-${randomInt(1000, 9999)}` },
+            { name: 'services_key', generator: id => `svc_${id}_${randomInt(100, 999)}` },
+            { name: 'services_logo', generator: () => getRandomImage('services') },
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
-            // 多语言字段
-            { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) }, // 多语言表ID
+            // 多语言表 services_lang 字段
+            { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) },
             { name: 'services_id', isLangField: true, generator: id => id },
             { name: 'language', isLangField: true, generator: (id, lang) => lang },
-            { name: 'seo_keywords', isLangField: true, generator: id => `${getRandomItem(serviceNames)}, service ${id}, support` },
-            { name: 'seo_description', isLangField: true, generator: id => `Learn about service ${id} on our platform.` },
-            { name: 'services_name', isLangField: true, generator: id => `${getRandomItem(serviceNames)} Service ${id}` },
-            { name: 'summary', isLangField: true, generator: id => `Summary of service ${id}, key features.` },
-            { name: 'services_information', isLangField: true, generator: id => `<p>Details about service ${id}, benefits and usage.</p>` }
+            { name: 'seo_keywords', isLangField: true, generator: (id, lang) => `${getRandomItem(serviceNames[lang])}, service ${id}` },
+            { name: 'seo_description', isLangField: true, generator: (id, lang) => `Explore ${getRandomItem(serviceNames[lang])} for your needs.` },
+            { name: 'services_name', isLangField: true, generator: (id, lang) => getRandomItem(serviceNames[lang]) },
+            { name: 'summary', isLangField: true, generator: (id, lang) => `Brief summary of ${getRandomItem(serviceNames[lang])}.` },
+            { name: 'services_information', isLangField: true, generator: (id, lang) => `<p>Detailed info about ${getRandomItem(serviceNames[lang])}, including features and benefits.</p>` },
+            // services_attr_list 字段 (一对多关系)
+            { name: 'attr_id', generator: id => JSON.stringify([randomInt(1, 10), randomInt(1, 10)].filter((v, i, a) => a.indexOf(v) === i)) }
         ],
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
-            { label: '批量修改父服务', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'parent_id', label: '父服务', type: 'select', options: [{ value: 0, label: '无' }, ...serviceNames.map((s, i) => ({ value: i + 1, label: `${s} Parent` }))] } }
+            { label: '批量修改父服务', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'parent_id', label: '父服务', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 5 }, (_, i) => ({ value: i + 1, label: `服务 ${i + 1}` }))] } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'parent_id', label: '父服务', className: 'col-parent-id', formatter: v => v === 0 ? '无' : `${serviceNames[v - 1] || 'Service'} Parent` },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'services_name', label: '服务名称', className: 'col-services-name', isLangField: true },
-            { name: 'services_logo', label: '服务标志', className: 'col-services-logo', formatter: v => v ? `<div class="services-logo-preview"><img src="${v}" alt="标志" onclick="enlargeImage(${v}, 0, ['${v}'])"></div>` : '<div class="services-logo-preview"><span class="placeholder" onclick="alert(\'标志不存在\')">无</span></div>' },
             { name: 'custom_url', label: '自定义URL', className: 'col-custom-url' },
+            { name: 'services_key', label: '服务标识', className: 'col-services-key' },
+            { name: 'services_logo', label: '服务标志', className: 'col-services-logo', formatter: v => v ? `<div class="services-logo-preview"><img src="${v}" alt="标志" onclick="enlargeImage(${v}, 0, ['${v}'])"></div>` : '<div class="services-logo-preview"><span class="placeholder" onclick="alert(\'标志不存在\')">无</span></div>' },
+            { name: 'attr_id', label: '服务属性', className: 'col-attr-id', formatter: v => JSON.parse(v).map(id => `<span class="ant-tag ant-tag-blue">${attrData.find(a => a.id === id)?.attr_name || '未知'}</span>`).join(' ') },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
                 <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
                 <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
             ` }
         ],
-        langFields: {
-            foreignKey: 'services_id',
-            languages: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
-        },
         filterFields: [
             { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
-            { id: 'parentId', type: 'select', options: [{ value: '', label: '全部父服务' }, { value: '0', label: '无' }, ...serviceNames.map((s, i) => ({ value: `${i + 1}`, label: `${s} Parent` }))], filter: (data, value) => value === '' ? data : data.filter(d => d.parent_id === parseInt(value)) },
-            { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'en_US', label: '英语' }, { value: 'zh_CN', label: '中文' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.services_id === d.id && l.language === value)) : data },
-            { id: 'servicesName', type: 'text', placeholder: '搜索服务名称', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.services_id === d.id && l.services_name.toLowerCase().includes(value.toLowerCase()))) : data },
+            { id: 'parent_id', type: 'select', options: [{ value: '', label: '全部父服务' }, { value: '0', label: '无' }, ...Array.from({ length: 5 }, (_, i) => ({ value: `${i + 1}`, label: `服务 ${i + 1}` }))], filter: (data, value) => value === '' ? data : data.filter(d => d.parent_id === parseInt(value)) },
+            { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'zh_CN', label: '中文' }, { value: 'en_US', label: '英语' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.services_id === d.id && l.language === value)) : data },
+            { id: 'services_name', type: 'text', placeholder: '搜索服务名称', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.services_id === d.id && l.services_name.toLowerCase().includes(value.toLowerCase()))) : data },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
             { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
         ],
+        langFields: {
+            foreignKey: 'services_id',
+            languages: ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
+        },
         modalTabs: [
             {
                 id: 'basic',
                 title: '基本信息',
                 fields: [
-                    { name: 'parent_id', label: '父服务', type: 'select', options: [{ value: 0, label: '无' }, ...serviceNames.map((s, i) => ({ value: i + 1, label: `${s} Parent` }))], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'parent_id', label: '父服务', type: 'select', options: () => [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `服务 ${i + 1}` }))], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'services_key', label: '服务键', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'services_key', label: '服务标识', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'services_logo', label: '服务标志', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'attr_id', label: '服务属性', type: 'tag', options: getAttrOptions, color: 'blue', allowCustom: false, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
                     { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
                     { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
@@ -160,7 +192,7 @@
                 id: 'lang',
                 title: '多语言信息',
                 fields: [
-                    { name: 'language', label: '语言', type: 'select', options: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                    { name: 'language', label: '语言', type: 'select', options: ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
                     { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'services_name', label: '服务名称', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
@@ -171,37 +203,12 @@
         ]
     };
 
-    // 临时修复：覆盖_opt.js的editRecord，确保services_logo预览
-    window.editRecord = function(id, isViewOnly = false) {
-        isEditing = true;
-        editId = id;
-        const record = tableData.find(item => item.id === id);
-        const lang = config.langFields ? tableLangData.find(l => l[config.langFields.foreignKey] === id && l.language === config.langFields.languages[0]) : {};
-
-        resetModal();
-        renderModal(true);
-        document.getElementById('modalTitle').textContent = `${isViewOnly ? '查看' : '编辑'}${config.tableTitle}`;
-
-        config.modalTabs.forEach(tab => {
-            tab.fields.forEach(tabField => {
-                const field = config.fields.find(f => f.name === tabField.name) || tabField;
-                const element = document.getElementById(`modal${field.name}`);
-                if (!element) return;
-
-                if (tabField.type === 'file') {
-                    const value = field.isLangField ? lang[field.name] : record[field.name];
-                    if (value) {
-                        renderImagePreview(field.name, value);
-                    }
-                } else {
-                    const value = field.isLangField ? lang[field.name] : (tabField.formatter ? tabField.formatter(record[field.name]) : record[field.name]);
-                    element.value = value !== undefined && value !== null ? String(value) : '';
-                }
-            });
-        });
-
-        document.getElementById(`${config.tableName}Modal`).style.display = 'block';
-    };
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
 </script>
 </body>
 </html>

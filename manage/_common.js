@@ -193,7 +193,7 @@ function createMobileSidebar() {
         if (sidebarMenu) {
             const submenuList = document.createElement('ul');
             submenuList.className = 'mobile-submenu';
-            submenuList.style.display = 'none';
+            submenuList.style.display = 'none'; // 默认隐藏
 
             const sidebarItems = sidebarMenu.querySelectorAll('.sidebar-menu-item');
             sidebarItems.forEach(sidebarItem => {
@@ -215,7 +215,7 @@ function createMobileSidebar() {
                 if (sidebarSubmenu) {
                     const subSubmenuList = document.createElement('ul');
                     subSubmenuList.className = 'mobile-submenu';
-                    subSubmenuList.style.display = 'none';
+                    subSubmenuList.style.display = 'none'; // 默认隐藏三级菜单
 
                     const subItems = sidebarSubmenu.querySelectorAll('.sidebar-submenu-item');
                     subItems.forEach(subItem => {
@@ -224,6 +224,15 @@ function createMobileSidebar() {
                         const subSubmenuLink = subItem.querySelector('a').cloneNode(true);
                         subSubmenuItem.appendChild(subSubmenuLink);
                         subSubmenuList.appendChild(subSubmenuItem);
+
+                        // 检查当前页面是否为三级菜单项，若是则展开二级菜单
+                        const currentUrl = window.location.pathname.split('/').pop() || 'dashboard.html';
+                        if (subSubmenuLink.getAttribute('href') === currentUrl) {
+                            submenuItem.classList.add('expanded');
+                            subSubmenuList.style.display = 'block'; // 展开三级菜单
+                            menuItem.classList.add('expanded');
+                            submenuList.style.display = 'block'; // 展开二级菜单
+                        }
                     });
 
                     submenuItem.appendChild(subSubmenuList);

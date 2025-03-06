@@ -144,7 +144,6 @@ function renderModal(isEditingMode) {
             if (tabField.type === 'select') {
                 input = document.createElement('select');
                 input.id = `modal${field.name}`;
-                console.log(tabField.options)
                 if (typeof tabField.options == 'function'){
                     let options = tabField.options();
                     tabField.options = options
@@ -170,10 +169,17 @@ function renderModal(isEditingMode) {
                 previewDiv.id = `modal${field.name}Preview`;
                 formItem.appendChild(previewDiv);
             } else if (tabField.type === 'tag') {
+                if (typeof tabField.options == 'function'){
+                    let options = tabField.options();
+                    tabField.options = options;
+                }
                 input = document.createElement('div');
                 input.id = `modal${field.name}`;
                 const tags = isEditingMode ? JSON.parse((tableData.find(item => item.id === editId) || {})[field.name] || '[]') : [];
                 tags.forEach(tag => {
+                    if (typeof tag == 'number'){
+                        tag = tabField.options[tag]
+                    }
                     input.innerHTML += `<span class="ant-tag ant-tag-${tabField.color || 'blue'}" data-value="${tag}">${tag} <span class="tag-close" onclick="removeTag(this)">×</span></span>`;
                 });
                 if (isEditingMode ? tabField.editableInEdit : tabField.editableInAdd) {
@@ -833,7 +839,6 @@ function enlargeImage(id, index, picsArray = null) {
     currentImageContext = id ? tableLangData.find(lang => lang[config.langFields.foreignKey] === id && lang.language === config.langFields.languages[0]).cover_pic : picsArray[0];
     currentImageIndex = index;
     const pics = picsArray || [currentImageContext].filter(Boolean);
-    console.log(pics, currentImageIndex)
     document.getElementById('enlargedImage').src = pics[currentImageIndex];
     const modal = document.getElementById('imageModal');
     modal.style.zIndex = '1001'; // 确保图片预览弹窗在添加/编辑弹窗之上
