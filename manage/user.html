@@ -3,44 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 用户管理</title>
+    <title>FASTRESP - 用户</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
-        .action-container { margin-bottom: 16px; }
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
         .col-id { width: 8%; min-width: 60px; }
-        .col-username { width: 10%; min-width: 100px; }
-        .col-email { width: 12%; min-width: 120px; }
-        .col-level { width: 8%; min-width: 80px; }
-        .col-amount { width: 10%; min-width: 100px; }
-        .col-status { width: 8%; min-width: 80px; }
-        .col-verified { width: 8%; min-width: 80px; }
-        .col-nickname { width: 10%; min-width: 100px; }
-        .col-create-time { width: 12%; min-width: 120px; }
-        .col-last-login-time { width: 12%; min-width: 120px; }
+        .col-username { width: 12%; min-width: 100px; }
+        .col-email { width: 15%; min-width: 120px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-verified { width: 8%; min-width: 60px; }
+        .col-level { width: 8%; min-width: 60px; }
+        .col-avatar { width: 10%; min-width: 80px; }
+        .col-create-time { width: 15%; min-width: 120px; }
         .col-actions { width: 10%; min-width: 100px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
-        .modal-content h3 { margin: 0 0 16px 0; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
-        .ant-tabs-content { min-height: 400px; }
-        .modal-content .ant-form-item { margin-bottom: 16px; }
-        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
-        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .modal-content .ant-form-item.textarea-item { display: block; }
-        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
-        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        .avatar-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
+        .avatar-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -54,72 +38,22 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">用户管理</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('user.html')">
+                                    <span class="ant-tabs-tab-btn">用户</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <input type="text" id="usernameFilter" class="ant-input" placeholder="用户名">
-                                    <input type="text" id="emailFilter" class="ant-input" placeholder="邮箱">
-                                    <input type="number" id="levelFilter" class="ant-input" placeholder="等级" min="0" max="255">
-                                    <select id="statusFilter" class="ant-select">
-                                        <option value="">全部状态</option>
-                                        <option value="0">关闭</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                    <select id="verifiedFilter" class="ant-select">
-                                        <option value="">全部验证状态</option>
-                                        <option value="0">未验证</option>
-                                        <option value="1">已验证</option>
-                                    </select>
-                                    <input type="text" id="nicknameFilter" class="ant-input" placeholder="昵称">
-                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
-                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addUser()">添加</button>
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
-                                </div>
-                                <!-- 数据区域 -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-username">用户名</div>
-                                        <div class="col-email">邮箱</div>
-                                        <div class="col-level">等级</div>
-                                        <div class="col-amount">金额</div>
-                                        <div class="col-status">状态</div>
-                                        <div class="col-verified">验证状态</div>
-                                        <div class="col-nickname">昵称</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-last-login-time">最后登录</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
+                                    <div class="table-header"></div>
                                     <div id="user-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
-                                            <option value="10">10 条/页</option>
-                                            <option value="20" selected>20 条/页</option>
-                                            <option value="50">50 条/页</option>
-                                            <option value="100">100 条/页</option>
-                                        </select>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -129,530 +63,154 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-
-    <!-- 添加/编辑弹窗 -->
-    <div id="userModal" class="modal">
+    <div id="imageModal" class="modal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加用户</h3>
-            <form id="userForm">
-                <div class="ant-form-item" id="idField" style="display: none;">
-                    <label>ID:</label>
-                    <input type="number" id="modalId" disabled>
-                </div>
-                <div class="ant-tabs ant-tabs-top">
-                    <div class="ant-tabs-nav">
-                        <div class="ant-tabs-nav-wrap">
-                            <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
-                                    <span class="ant-tabs-tab-btn">基本信息</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="personal">
-                                    <span class="ant-tabs-tab-btn">个人信息</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="settings">
-                                    <span class="ant-tabs-tab-btn">设置</span>
-                                </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ant-tabs-content-holder">
-                        <div class="ant-tabs-content">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
-                                <div class="ant-form-item">
-                                    <label>用户名:</label>
-                                    <input type="text" id="modalUsername" maxlength="64">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>邮箱:</label>
-                                    <input type="email" id="modalEmail" maxlength="128">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>密码:</label>
-                                    <input type="text" id="modalPassword" maxlength="32">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>盐值:</label>
-                                    <input type="text" id="modalSalt" maxlength="16">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>等级:</label>
-                                    <input type="number" id="modalLevel" min="0" max="127">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>金额:</label>
-                                    <input type="number" id="modalAmount" step="0.01" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>待处理金额:</label>
-                                    <input type="number" id="modalPendingAmount" step="0.01" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>冻结金额:</label>
-                                    <input type="number" id="modalFreezeAmount" step="0.01" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>状态:</label>
-                                    <select id="modalStatus">
-                                        <option value="0">关闭</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>验证状态:</label>
-                                    <select id="modalVerified">
-                                        <option value="0">未验证</option>
-                                        <option value="1">已验证</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="ant-tabs-tabpane" id="personal" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>昵称:</label>
-                                    <input type="text" id="modalNickname" maxlength="64">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>名:</label>
-                                    <input type="text" id="modalFirstName" maxlength="32">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>姓:</label>
-                                    <input type="text" id="modalLastName" maxlength="32">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>头像:</label>
-                                    <input type="text" id="modalAvatar" maxlength="256">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>出生日期:</label>
-                                    <input type="date" id="modalBirthDate">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>性别:</label>
-                                    <select id="modalGender">
-                                        <option value="0">未知</option>
-                                        <option value="1">男</option>
-                                        <option value="2">女</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>国家:</label>
-                                    <input type="number" id="modalCountry" min="0" max="255">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>关于我:</label>
-                                    <textarea id="modalAboutMe" maxlength="512" rows="5"></textarea>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>Telegram:</label>
-                                    <input type="text" id="modalTelegram" maxlength="32">
-                                </div>
-                            </div>
-                            <div class="ant-tabs-tabpane" id="settings" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>货币:</label>
-                                    <input type="text" id="modalCurrency" maxlength="3">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>语言:</label>
-                                    <select id="modalLanguage">
-                                        <option value="zh_CN">中文</option>
-                                        <option value="en_US">English</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>时区:</label>
-                                    <input type="number" id="modalTimezone" min="-12" max="14">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>API密钥:</label>
-                                    <input type="text" id="modalApiKey" maxlength="128">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>双重验证:</label>
-                                    <input type="text" id="modalTwoFactors" maxlength="16">
-                                </div>
-                                <div class="ant-form-item" id="createTimeField" style="display: none;">
-                                    <label>创建时间:</label>
-                                    <input type="datetime-local" id="modalCreateTime" disabled>
-                                </div>
-                                <div class="ant-form-item" id="lastLoginTimeField" style="display: none;">
-                                    <label>最后登录:</label>
-                                    <input type="datetime-local" id="modalLastLoginTime" disabled>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveUser()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 批量修改状态弹窗 -->
-    <div id="statusModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeStatusModal()">×</button>
-            <h3>批量修改状态</h3>
-            <form id="statusForm">
-                <div class="ant-form-item">
-                    <label>选中的ID:</label>
-                    <input type="text" id="selectedIds" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>新状态:</label>
-                    <select id="newStatus">
-                        <option value="0">关闭</option>
-                        <option value="1">启用</option>
-                    </select>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
-                </div>
-            </form>
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    let userData = [];
-    let page = 1, perPage = 20;
-
-    // 生成样本数据
-    function generateSampleData() {
-        userData = [];
-        for (let i = 1; i <= 200; i++) {
-            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            const lastLoginTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
-            userData.push({
-                id: i,
-                username: `user${i}`,
-                email: `user${i}@example.com`,
-                password: `pass${i}`,
-                salt: `salt${i}`,
-                level: Math.floor(Math.random() * 10),
-                amount: (Math.random() * 10000).toFixed(2),
-                pending_amount: (Math.random() * 5000).toFixed(2),
-                freeze_amount: (Math.random() * 2000).toFixed(2),
-                status: Math.floor(Math.random() * 2),
-                verified: Math.floor(Math.random() * 2),
-                nickname: `nick${i}`,
-                first_name: `First${i}`,
-                last_name: `Last${i}`,
-                avatar: `avatar${i}.png`,
-                birth_date: moment().subtract(Math.floor(Math.random() * 10000), 'days').format('YYYY-MM-DD'),
-                gender: Math.floor(Math.random() * 3),
-                country: Math.floor(Math.random() * 256),
-                currency: 'USD',
-                language: Math.random() > 0.5 ? 'zh_CN' : 'en_US',
-                timezone: 8,
-                api_key: `key${i}`,
-                two_factors: `2fa${i}`,
-                about_me: `About user ${i}`,
-                telegram: `telegram${i}`,
-                create_time: createTime,
-                last_login_time: lastLoginTime
-            });
-        }
-        renderUserList();
+    // 辅助函数
+    const firstNames = ["Alice", "Bob", "Charlie", "Diana", "Eve"];
+    const lastNames = ["Smith", "Johnson", "Brown", "Lee", "White"];
+    const countries = ["USA", "China", "France", "Spain", "Vietnam"];
+    const currencies = ["USD", "CNY", "EUR"];
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    function randomDecimal(min, max, decimals = 2) {
+        return (Math.random() * (max - min) + min).toFixed(decimals);
+    }
+    function randomDate(start, end) {
+        return moment(start).add(randomInt(0, moment(end).diff(start, 'days')), 'days').format('YYYY-MM-DD');
     }
 
-    // 渲染列表
-    function renderUserList() {
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const paginatedData = userData.slice(start, end);
-        const listContainer = document.getElementById('user-list');
-        listContainer.innerHTML = '';
-
-        paginatedData.forEach(user => {
-            const statusTag = user.status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
-                '<span class="ant-tag ant-tag-green">启用</span>';
-            const verifiedTag = user.verified === 0 ? '<span class="ant-tag ant-tag-blue">未验证</span>' :
-                '<span class="ant-tag ant-tag-green">已验证</span>';
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            itemDiv.style = 'border-bottom: 1px solid #ddd;';
-            itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${user.id}"></div>
-                <div class="col-id">${user.id}</div>
-                <div class="col-username">${user.username}</div>
-                <div class="col-email">${user.email}</div>
-                <div class="col-level">${user.level}</div>
-                <div class="col-amount">${user.amount}</div>
-                <div class="col-status">${statusTag}</div>
-                <div class="col-verified">${verifiedTag}</div>
-                <div class="col-nickname">${user.nickname || ''}</div>
-                <div class="col-create-time">${moment.unix(user.create_time).format('YYYY-MM-DD HH:mm')}</div>
-                <div class="col-last-login-time">${moment.unix(user.last_login_time).format('YYYY-MM-DD HH:mm')}</div>
-                <div class="col-actions">
-                    <button class="ant-btn" onclick="editUser(${user.id})">编辑</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteUser(${user.id})">删除</button>
-                </div>
-            `;
-            listContainer.appendChild(itemDiv);
-        });
-
-        const totalPages = Math.ceil(userData.length / perPage);
-        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
-    }
-
-    // 筛选
-    function applyFilters() {
-        let filteredData = [...userData];
-        const username = document.getElementById('usernameFilter').value.toLowerCase();
-        const email = document.getElementById('emailFilter').value.toLowerCase();
-        const level = document.getElementById('levelFilter').value;
-        const status = document.getElementById('statusFilter').value;
-        const verified = document.getElementById('verifiedFilter').value;
-        const nickname = document.getElementById('nicknameFilter').value.toLowerCase();
-        const createTimeStart = document.getElementById('createTimeStartFilter').value;
-        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
-
-        if (username) filteredData = filteredData.filter(item => item.username.toLowerCase().includes(username));
-        if (email) filteredData = filteredData.filter(item => item.email.toLowerCase().includes(email));
-        if (level) filteredData = filteredData.filter(item => item.level === parseInt(level));
-        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
-        if (verified) filteredData = filteredData.filter(item => item.verified === parseInt(verified));
-        if (nickname) filteredData = filteredData.filter(item => (item.nickname || '').toLowerCase().includes(nickname));
-        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
-        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
-
-        userData = filteredData;
-        page = 1;
-        renderUserList();
-    }
-
-    // 分页
-    function changePage(delta) {
-        const totalPages = Math.ceil(userData.length / perPage);
-        page += delta;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        renderUserList();
-    }
-
-    function jumpToPage() {
-        const newPage = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(userData.length / perPage);
-        if (newPage >= 1 && newPage <= totalPages) {
-            page = newPage;
-            renderUserList();
-        } else {
-            alert('请输入有效的页码');
-        }
-    }
-
-    function changePerPage() {
-        perPage = parseInt(document.getElementById('perPage').value);
-        page = 1;
-        renderUserList();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    // 添加
-    function addUser() {
-        isEditing = false;
-        editId = null;
-        document.getElementById('modalTitle').textContent = '添加用户';
-        document.getElementById('idField').style.display = 'none';
-        document.getElementById('modalUsername').value = '';
-        document.getElementById('modalEmail').value = '';
-        document.getElementById('modalPassword').value = '';
-        document.getElementById('modalSalt').value = '';
-        document.getElementById('modalLevel').value = '0';
-        document.getElementById('modalAmount').value = '0.00';
-        document.getElementById('modalPendingAmount').value = '0.00';
-        document.getElementById('modalFreezeAmount').value = '0.00';
-        document.getElementById('modalStatus').value = '0';
-        document.getElementById('modalVerified').value = '0';
-        document.getElementById('modalNickname').value = '';
-        document.getElementById('modalFirstName').value = '';
-        document.getElementById('modalLastName').value = '';
-        document.getElementById('modalAvatar').value = '';
-        document.getElementById('modalBirthDate').value = '';
-        document.getElementById('modalGender').value = '0';
-        document.getElementById('modalCountry').value = '0';
-        document.getElementById('modalCurrency').value = 'USD';
-        document.getElementById('modalLanguage').value = 'en_US';
-        document.getElementById('modalTimezone').value = '8';
-        document.getElementById('modalApiKey').value = '';
-        document.getElementById('modalTwoFactors').value = '';
-        document.getElementById('modalAboutMe').value = '';
-        document.getElementById('modalTelegram').value = '';
-        document.getElementById('createTimeField').style.display = 'none';
-        document.getElementById('lastLoginTimeField').style.display = 'none';
-        setupTabs();
-        document.getElementById('userModal').style.display = 'block';
-    }
-
-    // 编辑
-    let isEditing = false;
-    let editId = null;
-    function editUser(id) {
-        isEditing = true;
-        editId = id;
-        const user = userData.find(item => item.id === id);
-        document.getElementById('modalTitle').textContent = '编辑用户';
-        document.getElementById('idField').style.display = 'block';
-        document.getElementById('modalId').value = user.id;
-        document.getElementById('modalUsername').value = user.username;
-        document.getElementById('modalEmail').value = user.email;
-        document.getElementById('modalPassword').value = user.password;
-        document.getElementById('modalSalt').value = user.salt;
-        document.getElementById('modalLevel').value = user.level;
-        document.getElementById('modalAmount').value = user.amount;
-        document.getElementById('modalPendingAmount').value = user.pending_amount;
-        document.getElementById('modalFreezeAmount').value = user.freeze_amount;
-        document.getElementById('modalStatus').value = user.status;
-        document.getElementById('modalVerified').value = user.verified;
-        document.getElementById('modalNickname').value = user.nickname || '';
-        document.getElementById('modalFirstName').value = user.first_name || '';
-        document.getElementById('modalLastName').value = user.last_name || '';
-        document.getElementById('modalAvatar').value = user.avatar || '';
-        document.getElementById('modalBirthDate').value = user.birth_date || '';
-        document.getElementById('modalGender').value = user.gender;
-        document.getElementById('modalCountry').value = user.country;
-        document.getElementById('modalCurrency').value = user.currency;
-        document.getElementById('modalLanguage').value = user.language;
-        document.getElementById('modalTimezone').value = user.timezone;
-        document.getElementById('modalApiKey').value = user.api_key || '';
-        document.getElementById('modalTwoFactors').value = user.two_factors || '';
-        document.getElementById('modalAboutMe').value = user.about_me || '';
-        document.getElementById('modalTelegram').value = user.telegram || '';
-        document.getElementById('createTimeField').style.display = 'block';
-        document.getElementById('modalCreateTime').value = moment.unix(user.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('lastLoginTimeField').style.display = 'block';
-        document.getElementById('modalLastLoginTime').value = moment.unix(user.last_login_time).format('YYYY-MM-DDTHH:mm');
-        setupTabs();
-        document.getElementById('userModal').style.display = 'block';
-    }
-
-    // Tab 设置
-    function setupTabs() {
-        const tabButtons = document.querySelectorAll('#userModal .ant-tabs-tab');
-        const tabPanes = document.querySelectorAll('#userModal .ant-tabs-tabpane');
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
-                button.classList.add('ant-tabs-tab-active');
-                const tabId = button.getAttribute('data-tab');
-                tabPanes.forEach(pane => {
-                    pane.style.display = pane.id === tabId ? 'block' : 'none';
-                });
-                document.querySelector('#userModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
-                document.querySelector('#userModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
-            });
-        });
-        tabButtons[0].classList.add('ant-tabs-tab-active');
-        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
-    }
-
-    // 保存
-    function saveUser() {
-        const user = {
-            id: isEditing ? editId : userData.length + 1,
-            username: document.getElementById('modalUsername').value,
-            email: document.getElementById('modalEmail').value,
-            password: document.getElementById('modalPassword').value,
-            salt: document.getElementById('modalSalt').value,
-            level: parseInt(document.getElementById('modalLevel').value) || 0,
-            amount: parseFloat(document.getElementById('modalAmount').value) || 0,
-            pending_amount: parseFloat(document.getElementById('modalPendingAmount').value) || 0,
-            freeze_amount: parseFloat(document.getElementById('modalFreezeAmount').value) || 0,
-            status: parseInt(document.getElementById('modalStatus').value),
-            verified: parseInt(document.getElementById('modalVerified').value),
-            nickname: document.getElementById('modalNickname').value || null,
-            first_name: document.getElementById('modalFirstName').value || null,
-            last_name: document.getElementById('modalLastName').value || null,
-            avatar: document.getElementById('modalAvatar').value || null,
-            birth_date: document.getElementById('modalBirthDate').value || null,
-            gender: parseInt(document.getElementById('modalGender').value),
-            country: parseInt(document.getElementById('modalCountry').value) || 0,
-            currency: document.getElementById('modalCurrency').value,
-            language: document.getElementById('modalLanguage').value,
-            timezone: parseInt(document.getElementById('modalTimezone').value) || 8,
-            api_key: document.getElementById('modalApiKey').value || null,
-            two_factors: document.getElementById('modalTwoFactors').value || null,
-            about_me: document.getElementById('modalAboutMe').value || null,
-            telegram: document.getElementById('modalTelegram').value || null,
-            create_time: isEditing ? userData.find(item => item.id === editId).create_time : moment().unix(),
-            last_login_time: isEditing ? userData.find(item => item.id === editId).last_login_time : moment().unix()
-        };
-
-        if (isEditing) {
-            const index = userData.findIndex(item => item.id === editId);
-            userData[index] = user;
-        } else {
-            userData.push(user);
-        }
-        closeModal();
-        renderUserList();
-    }
-
-    // 删除
-    function deleteUser(id) {
-        if (confirm('确定要删除此用户吗？')) {
-            userData = userData.filter(item => item.id !== id);
-            renderUserList();
-        }
-    }
-
-    // 批量删除
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的用户');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个用户吗？`)) {
-            userData = userData.filter(item => !selectedIds.includes(item.id));
-            renderUserList();
-        }
-    }
-
-    // 批量修改状态
-    function batchEditStatus() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要修改状态的用户');
-            return;
-        }
-        document.getElementById('selectedIds').value = selectedIds.join(', ');
-        document.getElementById('statusModal').style.display = 'block';
-    }
-
-    function saveBatchStatus() {
-        const newStatus = parseInt(document.getElementById('newStatus').value);
-        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
-        userData = userData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus } : item);
-        closeStatusModal();
-        renderUserList();
-    }
-
-    function closeModal() {
-        document.getElementById('userModal').style.display = 'none';
-    }
-
-    function closeStatusModal() {
-        document.getElementById('statusModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        w3.includeHTML(() => {
-            initMenus();
-            generateSampleData();
-        });
+    window.tableConfig = {
+        tableName: 'user',
+        tableTitle: '用户',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'username', generator: id => `user${id}` }, // 唯一用户名
+            { name: 'email', generator: id => `user${id}@example.com` }, // 唯一邮箱
+            { name: 'password', generator: () => `pass${randomInt(1000, 9999)}` }, // 随机密码
+            { name: 'salt', generator: () => `salt${randomInt(1000, 9999)}` }, // 随机盐值
+            { name: 'level', generator: () => randomInt(0, 5) }, // 用户等级 0-5
+            { name: 'amount', generator: () => randomDecimal(0, 10000, 2) }, // 账户余额 0-10000
+            { name: 'pending_amount', generator: () => randomDecimal(0, 5000, 2) }, // 待处理金额 0-5000
+            { name: 'freeze_amount', generator: () => randomDecimal(0, 2000, 2) }, // 冻结金额 0-2000
+            { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
+            { name: 'verified', generator: () => randomInt(0, 1) }, // 0:未验证, 1:已验证
+            { name: 'nickname', generator: id => `Nick${id}` },
+            { name: 'first_name', generator: () => getRandomItem(firstNames) },
+            { name: 'last_name', generator: () => getRandomItem(lastNames) },
+            { name: 'avatar', generator: () => getRandomImage('sexy') }, // 随机头像
+            { name: 'birth_date', generator: () => randomDate('1980-01-01', '2000-12-31') }, // 随机出生日期
+            { name: 'gender', generator: () => randomInt(0, 2) }, // 0:未知, 1:男, 2:女
+            { name: 'country', generator: () => randomInt(0, 4) }, // 0-4，对应 5 个国家
+            { name: 'currency', generator: () => getRandomItem(currencies) }, // 货币
+            { name: 'language', generator: () => getRandomItem(['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN']) },
+            { name: 'timezone', generator: () => randomInt(-12, 12) }, // 时区 -12 到 12
+            { name: 'api_key', generator: () => `API_${randomInt(1000, 9999)}-${randomInt(1000, 9999)}` }, // 随机API密钥
+            { name: 'two_factors', generator: () => `2FA_${randomInt(1000, 9999)}` }, // 随机双重认证码
+            { name: 'about_me', generator: id => `About user ${id}, a passionate shopper.` },
+            { name: 'telegram', generator: id => `@user${id}` }, // 唯一Telegram
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
+            { name: 'last_login_time', generator: () => moment().subtract(randomInt(1, 90), 'days').unix() } // 最后登录时间
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
+            { label: '批量修改验证', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'verified', label: '验证状态', type: 'select', options: [{ value: 0, label: '未验证' }, { value: 1, label: '已验证' }] } },
+            { label: '批量修改等级', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'level', label: '等级', type: 'select', options: [0, 1, 2, 3, 4, 5].map(l => ({ value: l, label: `Level ${l}` })) } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'username', label: '用户名', className: 'col-username' },
+            { name: 'email', label: '邮箱', className: 'col-email' },
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
+            { name: 'verified', label: '验证', className: 'col-verified', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-blue">未验证</span>' : '<span class="ant-tag ant-tag-green">已验证</span>' },
+            { name: 'level', label: '等级', className: 'col-level', formatter: v => `Level ${v}` },
+            { name: 'avatar', label: '头像', className: 'col-avatar', formatter: v => v ? `<div class="avatar-preview"><img src="${v}" alt="头像" onclick="enlargeImage(${v}, 0, ['${v}'])"></div>` : '<div class="avatar-preview"><span class="placeholder" onclick="alert(\'头像不存在\')">无</span></div>' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'verified', type: 'select', options: [{ value: '', label: '全部验证状态' }, { value: '0', label: '未验证' }, { value: '1', label: '已验证' }], filter: (data, value) => value === '' ? data : data.filter(d => d.verified === parseInt(value)) },
+            { id: 'level', type: 'select', options: [{ value: '', label: '全部等级' }, ...[0, 1, 2, 3, 4, 5].map(l => ({ value: `${l}`, label: `Level ${l}` }))], filter: (data, value) => value === '' ? data : data.filter(d => d.level === parseInt(value)) },
+            { id: 'username', type: 'text', placeholder: '搜索用户名', filter: (data, value) => value ? data.filter(d => d.username.toLowerCase().includes(value.toLowerCase())) : data },
+            { id: 'email', type: 'text', placeholder: '搜索邮箱', filter: (data, value) => value ? data.filter(d => d.email.toLowerCase().includes(value.toLowerCase())) : data },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'username', label: '用户名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'email', label: '邮箱', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'password', label: '密码', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'salt', label: '盐值', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'level', label: '等级', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'amount', label: '余额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'pending_amount', label: '待处理金额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'freeze_amount', label: '冻结金额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'verified', label: '验证', type: 'select', options: [{ value: 0, label: '未验证' }, { value: 1, label: '已验证' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            },
+            {
+                id: 'personal',
+                title: '个人信息',
+                fields: [
+                    { name: 'nickname', label: '昵称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'first_name', label: '名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'last_name', label: '姓', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'avatar', label: '头像', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'birth_date', label: '出生日期', type: 'date', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'gender', label: '性别', type: 'select', options: [{ value: 0, label: '未知' }, { value: 1, label: '男' }, { value: 2, label: '女' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'country', label: '国家', type: 'select', options: countries.map((c, i) => ({ value: i, label: c })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'currency', label: '货币', type: 'select', options: currencies.map(c => ({ value: c, label: c })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'language', label: '语言', type: 'select', options: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'timezone', label: '时区', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            },
+            {
+                id: 'security',
+                title: '安全信息',
+                fields: [
+                    { name: 'api_key', label: 'API密钥', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'two_factors', label: '双重认证', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'last_login_time', label: '最后登录时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            },
+            {
+                id: 'about',
+                title: '关于我',
+                fields: [
+                    { name: 'about_me', label: '关于我', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'telegram', label: 'Telegram', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            }
+        ]
     };
 </script>
 </body>
