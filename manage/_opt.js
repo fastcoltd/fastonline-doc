@@ -714,7 +714,9 @@ function batchEditField(fieldConfig) {
         modal.className = 'modal';
         document.body.appendChild(modal);
     }
-
+    if (typeof fieldConfig.options == 'function'){
+        fieldConfig.options = fieldConfig.options()
+    }
     modal.innerHTML = `
         <div class="modal-content">
             <button class="close-btn" onclick="closeFieldModal('${fieldConfig.name}')">×</button>
