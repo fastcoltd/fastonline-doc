@@ -3,42 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 用户日志管理</title>
+    <title>FASTRESP - 用户日志</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
-        .action-container { margin-bottom: 16px; }
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 10%; min-width: 60px; }
-        .col-user-id { width: 10%; min-width: 100px; }
-        .col-method { width: 8%; min-width: 80px; }
-        .col-module { width: 10%; min-width: 100px; }
-        .col-action { width: 10%; min-width: 100px; }
-        .col-code { width: 8%; min-width: 80px; }
-        .col-ip { width: 10%; min-width: 100px; }
-        .col-ua { width: 15%; min-width: 120px; }
-        .col-create-time { width: 12%; min-width: 120px; }
+        .col-id { width: 10%; min-width: 80px; }
+        .col-user-id { width: 15%; min-width: 100px; }
+        .col-method { width: 10%; min-width: 80px; }
+        .col-module { width: 15%; min-width: 100px; }
+        .col-action { width: 15%; min-width: 100px; }
+        .col-ip { width: 15%; min-width: 120px; }
+        .col-create-time { width: 15%; min-width: 120px; }
         .col-actions { width: 10%; min-width: 100px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
-        .modal-content h3 { margin: 0 0 16px 0; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
-        .modal-content .ant-form-item { margin-bottom: 16px; }
-        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
-        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .modal-content .ant-form-item.textarea-item { display: block; }
-        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
-        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
     </style>
 </head>
 <body>
@@ -52,64 +35,22 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">用户日志管理</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('user_logs.html')">
+                                    <span class="ant-tabs-tab-btn">用户日志</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <select id="userIdFilter" class="ant-select">
-                                        <option value="">全部用户</option>
-                                    </select>
-                                    <input type="text" id="methodFilter" class="ant-input" placeholder="方法">
-                                    <input type="text" id="moduleFilter" class="ant-input" placeholder="模块">
-                                    <input type="text" id="actionFilter" class="ant-input" placeholder="动作">
-                                    <input type="number" id="codeFilter" class="ant-input" placeholder="状态码" min="0">
-                                    <input type="text" id="ipFilter" class="ant-input" placeholder="IP">
-                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
-                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addUserLog()">添加</button>
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                </div>
-                                <!-- 数据区域 -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-user-id">用户</div>
-                                        <div class="col-method">方法</div>
-                                        <div class="col-module">模块</div>
-                                        <div class="col-action">动作</div>
-                                        <div class="col-code">状态码</div>
-                                        <div class="col-ip">IP</div>
-                                        <div class="col-ua">用户代理</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
-                                    <div id="user-logs-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
-                                            <option value="10">10 条/页</option>
-                                            <option value="20" selected>20 条/页</option>
-                                            <option value="50">50 条/页</option>
-                                            <option value="100">100 条/页</option>
-                                        </select>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="table-header"></div>
+                                    <div id="user_logs-list">加载中...</div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -119,310 +60,144 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-
-    <!-- 添加/编辑弹窗 -->
-    <div id="userLogModal" class="modal">
+    <div id="imageModal" class="modal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加用户日志</h3>
-            <form id="userLogForm">
-                <div class="ant-form-item" id="idField" style="display: none;">
-                    <label>ID:</label>
-                    <input type="number" id="modalId" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>用户ID:</label>
-                    <select id="modalUserId">
-                        <option value="0">请选择用户</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>方法:</label>
-                    <input type="text" id="modalMethod" maxlength="8">
-                </div>
-                <div class="ant-form-item">
-                    <label>模块:</label>
-                    <input type="text" id="modalModule" maxlength="32">
-                </div>
-                <div class="ant-form-item">
-                    <label>动作:</label>
-                    <input type="text" id="modalAction" maxlength="32">
-                </div>
-                <div class="ant-form-item">
-                    <label>状态码:</label>
-                    <input type="number" id="modalCode" min="0">
-                </div>
-                <div class="ant-form-item">
-                    <label>IP:</label>
-                    <input type="text" id="modalIp" maxlength="15">
-                </div>
-                <div class="ant-form-item">
-                    <label>用户代理:</label>
-                    <input type="text" id="modalUa" maxlength="256">
-                </div>
-                <div class="ant-form-item textarea-item">
-                    <label>参数:</label>
-                    <textarea id="modalParams" rows="5"></textarea>
-                </div>
-                <div class="ant-form-item textarea-item">
-                    <label>响应:</label>
-                    <textarea id="modalResponse" rows="5"></textarea>
-                </div>
-                <div class="ant-form-item" id="createTimeField" style="display: none;">
-                    <label>创建时间:</label>
-                    <input type="datetime-local" id="modalCreateTime" disabled>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveUserLog()">保存</button>
-                </div>
-            </form>
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    let userLogsData = [];
-    let page = 1, perPage = 20;
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-    // 定义关联字段的映射
-    const relationMap = {
-        user_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `用户 ${i + 1}` }))
+    // 模拟 user 表数据
+    const userData = [
+        { id: 1, username: 'Alice Smith' },
+        { id: 2, username: 'Bob Johnson' },
+        { id: 3, username: 'Charlie Brown' },
+        { id: 4, username: 'Diana Lee' },
+        { id: 5, username: 'Eve White' },
+        { id: 6, username: 'Frank Green' },
+        { id: 7, username: 'Grace Kim' },
+        { id: 8, username: 'Henry Park' },
+        { id: 9, username: 'Ivy Chen' },
+        { id: 10, username: 'Jack Wong' },
+        { id: 11, username: 'Kelly Liu' },
+        { id: 12, username: 'Liam Zhang' },
+        { id: 13, username: 'Mia Yang' },
+        { id: 14, username: 'Noah Xu' },
+        { id: 15, username: 'Olivia Zhao' }
+    ];
+
+    // 可筛选选项（与 store_logs 一致）
+    const methodOptions = ['GET', 'POST', 'PUT', 'DELETE'];
+    const moduleOptions = ['order', 'product', 'customer', 'user', 'settings'];
+    const actionOptions = ['create', 'update', 'delete', 'view', 'list'];
+    const codeOptions = [200, 201, 400, 401, 403, 404, 500];
+
+    function getUserOptions() {
+        return userData.map(item => ({ value: item.id, label: item.username }));
+    }
+
+    window.tableConfig = {
+        tableName: 'user_logs',
+        tableTitle: '用户日志',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'user_id', generator: () => randomInt(1, 15) },
+            { name: 'method', generator: () => getRandomItem(methodOptions) },
+            { name: 'module', generator: () => getRandomItem(moduleOptions) },
+            { name: 'action', generator: () => getRandomItem(actionOptions) },
+            { name: 'code', generator: () => getRandomItem(codeOptions) },
+            { name: 'ip', generator: () => randomInt(0, 255) * 256 * 256 * 256 + randomInt(0, 255) * 256 * 256 + randomInt(0, 255) * 256 + randomInt(0, 255) },
+            { name: 'ua', generator: () => `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/${randomInt(500, 600)}.36 (KHTML, like Gecko) Chrome/${randomInt(90, 120)}.0.${randomInt(4000, 5000)}.${randomInt(100, 200)} Safari/${randomInt(500, 600)}.36` },
+            { name: 'params', generator: () => JSON.stringify({ id: randomInt(1, 100), action: getRandomItem(actionOptions) }) },
+            { name: 'response', generator: () => JSON.stringify({ status: 'success', code: 200, message: 'Operation completed' }) },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改用户', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'user_id', label: '用户', type: 'select', options: getUserOptions } },
+            { label: '批量修改方法', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'method', label: '方法', type: 'select', options: methodOptions.map(m => ({ value: m, label: m })) } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'user_id', label: '用户', className: 'col-user-id', formatter: v => userData.find(u => u.id === v)?.username || '未知' },
+            { name: 'method', label: '方法', className: 'col-method' },
+            { name: 'module', label: '模块', className: 'col-module' },
+            { name: 'action', label: '操作', className: 'col-action' },
+            { name: 'ip', label: 'IP', className: 'col-ip', formatter: v => v ? `${Math.floor(v / (256 * 256 * 256))}.${Math.floor(v / (256 * 256) % 256)}.${Math.floor(v / 256 % 256)}.${v % 256}` : '0.0.0.0' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'user_id', type: 'select', options: [{ value: '', label: '全部用户' }, ...getUserOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.user_id === parseInt(value)) },
+            { id: 'method', type: 'select', options: [{ value: '', label: '全部方法' }, ...methodOptions.map(m => ({ value: m, label: m }))], filter: (data, value) => value === '' ? data : data.filter(d => d.method === value) },
+            { id: 'module', type: 'select', options: [{ value: '', label: '全部模块' }, ...moduleOptions.map(m => ({ value: m, label: m }))], filter: (data, value) => value === '' ? data : data.filter(d => d.module === value) },
+            { id: 'action', type: 'select', options: [{ value: '', label: '全部操作' }, ...actionOptions.map(a => ({ value: a, label: a }))], filter: (data, value) => value === '' ? data : data.filter(d => d.action === value) },
+            { id: 'code', type: 'select', options: [{ value: '', label: '全部状态码' }, ...codeOptions.map(c => ({ value: c, label: c }))], filter: (data, value) => value === '' ? data : data.filter(d => d.code === parseInt(value)) },
+            { id: 'ip', type: 'text', placeholder: '搜索IP', filter: (data, value) => value ? data.filter(d => {
+                    const ipStr = `${Math.floor(d.ip / (256 * 256 * 256))}.${Math.floor(d.ip / (256 * 256) % 256)}.${Math.floor(d.ip / 256 % 256)}.${d.ip % 256}`;
+                    return ipStr.includes(value);
+                }) : data },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'user_id', label: '用户', type: 'select', options: getUserOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'method', label: '方法', type: 'select', options: methodOptions.map(m => ({ value: m, label: m })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'module', label: '模块', type: 'select', options: moduleOptions.map(m => ({ value: m, label: m })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'action', label: '操作', type: 'select', options: actionOptions.map(a => ({ value: a, label: a })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            },
+            {
+                id: 'details',
+                title: '日志详情',
+                fields: [
+                    { name: 'code', label: '状态码', type: 'select', options: codeOptions.map(c => ({ value: c, label: c })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'ip', label: 'IP', type: 'text', formatter: v => v ? `${Math.floor(v / (256 * 256 * 256))}.${Math.floor(v / (256 * 256) % 256)}.${Math.floor(v / 256 % 256)}.${v % 256}` : '0.0.0.0', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'ua', label: '用户代理', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'params', label: '参数', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'response', label: '响应', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            },
+            {
+                id: 'system',
+                title: '系统信息',
+                fields: [
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            }
+        ]
     };
 
-    // 生成下拉数据
-    function populateDropdowns() {
-        const userSelect = document.getElementById('modalUserId');
-        const userFilter = document.getElementById('userIdFilter');
-        relationMap.user_id.forEach(item => {
-            userSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            userFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-    }
-
-    // 获取关联字段的名称
-    function getRelationName(field, id) {
-        if (id === 0) return '未关联';
-        const item = relationMap[field].find(item => item.id === id);
-        return item ? item.name : `未知 (${id})`;
-    }
-
-    // 生成样本数据
-    function generateSampleData() {
-        userLogsData = [];
-        for (let i = 1; i <= 200; i++) {
-            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            userLogsData.push({
-                id: i,
-                user_id: Math.floor(Math.random() * 15) + 1,
-                method: i % 2 === 0 ? 'GET' : 'POST',
-                module: `Module${i % 10}`,
-                action: `Action${i % 5}`,
-                code: 200 + (i % 5) * 100,
-                ip: `192.168.1.${i % 255}`,
-                ua: `Mozilla/5.0 (Log ${i})`,
-                params: JSON.stringify({ param: `value${i}` }),
-                response: JSON.stringify({ result: `success${i}` }),
-                create_time: createTime
-            });
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
         }
-        renderUserLogsList();
-    }
-
-    // 渲染列表
-    function renderUserLogsList() {
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const paginatedData = userLogsData.slice(start, end);
-        const listContainer = document.getElementById('user-logs-list');
-        listContainer.innerHTML = '';
-
-        paginatedData.forEach(log => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            itemDiv.style = 'border-bottom: 1px solid #ddd;';
-            itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${log.id}"></div>
-                <div class="col-id">${log.id}</div>
-                <div class="col-user-id">${getRelationName('user_id', log.user_id)}</div>
-                <div class="col-method">${log.method}</div>
-                <div class="col-module">${log.module}</div>
-                <div class="col-action">${log.action}</div>
-                <div class="col-code">${log.code}</div>
-                <div class="col-ip">${log.ip}</div>
-                <div class="col-ua">${log.ua}</div>
-                <div class="col-create-time">${moment.unix(log.create_time).format('YYYY-MM-DD HH:mm')}</div>
-                <div class="col-actions">
-                    <button class="ant-btn" onclick="editUserLog(${log.id})">编辑</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteUserLog(${log.id})">删除</button>
-                </div>
-            `;
-            listContainer.appendChild(itemDiv);
-        });
-
-        const totalPages = Math.ceil(userLogsData.length / perPage);
-        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
-    }
-
-    // 筛选
-    function applyFilters() {
-        let filteredData = [...userLogsData];
-        const userId = document.getElementById('userIdFilter').value;
-        const method = document.getElementById('methodFilter').value.toUpperCase();
-        const module = document.getElementById('moduleFilter').value.toLowerCase();
-        const action = document.getElementById('actionFilter').value.toLowerCase();
-        const code = document.getElementById('codeFilter').value;
-        const ip = document.getElementById('ipFilter').value.toLowerCase();
-        const createTimeStart = document.getElementById('createTimeStartFilter').value;
-        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
-
-        if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
-        if (method) filteredData = filteredData.filter(item => item.method.includes(method));
-        if (module) filteredData = filteredData.filter(item => item.module.toLowerCase().includes(module));
-        if (action) filteredData = filteredData.filter(item => item.action.toLowerCase().includes(action));
-        if (code) filteredData = filteredData.filter(item => item.code === parseInt(code));
-        if (ip) filteredData = filteredData.filter(item => item.ip.toLowerCase().includes(ip));
-        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
-        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
-
-        userLogsData = filteredData;
-        page = 1;
-        renderUserLogsList();
-    }
-
-    // 分页
-    function changePage(delta) {
-        const totalPages = Math.ceil(userLogsData.length / perPage);
-        page += delta;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        renderUserLogsList();
-    }
-
-    function jumpToPage() {
-        const newPage = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(userLogsData.length / perPage);
-        if (newPage >= 1 && newPage <= totalPages) {
-            page = newPage;
-            renderUserLogsList();
-        } else {
-            alert('请输入有效的页码');
-        }
-    }
-
-    function changePerPage() {
-        perPage = parseInt(document.getElementById('perPage').value);
-        page = 1;
-        renderUserLogsList();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    // 添加
-    function addUserLog() {
-        isEditing = false;
-        editId = null;
-        document.getElementById('modalTitle').textContent = '添加用户日志';
-        document.getElementById('idField').style.display = 'none';
-        document.getElementById('modalUserId').value = '0';
-        document.getElementById('modalMethod').value = 'GET';
-        document.getElementById('modalModule').value = '';
-        document.getElementById('modalAction').value = '';
-        document.getElementById('modalCode').value = '200';
-        document.getElementById('modalIp').value = '';
-        document.getElementById('modalUa').value = '';
-        document.getElementById('modalParams').value = '';
-        document.getElementById('modalResponse').value = '';
-        document.getElementById('createTimeField').style.display = 'none';
-        document.getElementById('userLogModal').style.display = 'block';
-    }
-
-    // 编辑
-    let isEditing = false;
-    let editId = null;
-    function editUserLog(id) {
-        isEditing = true;
-        editId = id;
-        const log = userLogsData.find(item => item.id === id);
-        document.getElementById('modalTitle').textContent = '编辑用户日志';
-        document.getElementById('idField').style.display = 'block';
-        document.getElementById('modalId').value = log.id;
-        document.getElementById('modalUserId').value = log.user_id;
-        document.getElementById('modalMethod').value = log.method;
-        document.getElementById('modalModule').value = log.module;
-        document.getElementById('modalAction').value = log.action;
-        document.getElementById('modalCode').value = log.code;
-        document.getElementById('modalIp').value = log.ip;
-        document.getElementById('modalUa').value = log.ua;
-        document.getElementById('modalParams').value = log.params;
-        document.getElementById('modalResponse').value = log.response;
-        document.getElementById('createTimeField').style.display = 'block';
-        document.getElementById('modalCreateTime').value = moment.unix(log.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('userLogModal').style.display = 'block';
-    }
-
-    // 保存
-    function saveUserLog() {
-        const log = {
-            id: isEditing ? editId : userLogsData.length + 1,
-            user_id: parseInt(document.getElementById('modalUserId').value) || 0,
-            method: document.getElementById('modalMethod').value,
-            module: document.getElementById('modalModule').value,
-            action: document.getElementById('modalAction').value,
-            code: parseInt(document.getElementById('modalCode').value) || 200,
-            ip: document.getElementById('modalIp').value,
-            ua: document.getElementById('modalUa').value,
-            params: document.getElementById('modalParams').value,
-            response: document.getElementById('modalResponse').value,
-            create_time: isEditing ? userLogsData.find(item => item.id === editId).create_time : moment().unix()
-        };
-
-        if (isEditing) {
-            const index = userLogsData.findIndex(item => item.id === editId);
-            userLogsData[index] = log;
-        } else {
-            userLogsData.push(log);
-        }
-        closeModal();
-        renderUserLogsList();
-    }
-
-    // 删除
-    function deleteUserLog(id) {
-        if (confirm('确定要删除此用户日志吗？')) {
-            userLogsData = userLogsData.filter(item => item.id !== id);
-            renderUserLogsList();
-        }
-    }
-
-    // 批量删除
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的用户日志');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个用户日志吗？`)) {
-            userLogsData = userLogsData.filter(item => !selectedIds.includes(item.id));
-            renderUserLogsList();
-        }
-    }
-
-    function closeModal() {
-        document.getElementById('userLogModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        w3.includeHTML(() => {
-            initMenus();
-            populateDropdowns();
-            generateSampleData();
-        });
-    };
+    });
 </script>
 </body>
 </html>
