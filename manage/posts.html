@@ -100,25 +100,25 @@
         defaultPerPage: 20,
         fields: [
             { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'posts_type', generator: () => randomInt(1, 5) }, // 关联 5 种文章类型
-            { name: 'blog_id', generator: () => randomInt(1, 5) }, // 关联 5 个博客
-            { name: 'user_id', generator: () => randomInt(1, 5) }, // 关联 5 个用户
-            { name: 'store_id', generator: () => randomInt(1, 5) }, // 关联 5 个店铺
-            { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
-            { name: 'money', generator: () => randomDecimal(0, 50, 2) }, // 付费金额 0-50
-            { name: 'custom_url', generator: id => `/posts/${getRandomItem(postTypes).toLowerCase()}-${id}` }, // 自定义URL
-            { name: 'read_count', generator: () => randomInt(0, 10000) }, // 阅读数 0-10000
-            { name: 'paid_count', generator: () => randomInt(0, 500) }, // 付费数 0-500
-            { name: 'comment_count', generator: () => randomInt(0, 1000) }, // 评论数 0-1000
-            { name: 'rating_count', generator: () => randomInt(0, 500) }, // 评分数 0-500
-            { name: 'save_count', generator: () => randomInt(0, 2000) }, // 保存数 0-2000
+            { name: 'posts_type', generator: () => randomInt(1, 5) },
+            { name: 'blog_id', generator: () => randomInt(1, 5) },
+            { name: 'user_id', generator: () => randomInt(1, 5) },
+            { name: 'store_id', generator: () => randomInt(1, 5) },
+            { name: 'status', generator: (id) => id % 2 === 0 ? 1 : randomInt(0, 3) }, // 0:待审核, 1:已发布, 2:已屏蔽, 3:已废弃
+            { name: 'money', generator: () => randomDecimal(0, 50, 2) },
+            { name: 'custom_url', generator: id => `/posts/${getRandomItem(postTypes).toLowerCase()}-${id}` },
+            { name: 'read_count', generator: () => randomInt(0, 10000) },
+            { name: 'paid_count', generator: () => randomInt(0, 500) },
+            { name: 'comment_count', generator: () => randomInt(0, 1000) },
+            { name: 'rating_count', generator: () => randomInt(0, 500) },
+            { name: 'save_count', generator: () => randomInt(0, 2000) },
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
             // 多语言字段
-            { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) }, // 多语言表ID
+            { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) },
             { name: 'posts_id', isLangField: true, generator: id => id },
-            { name: 'status', isLangField: true, generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
-            { name: 'version', isLangField: true, generator: () => randomInt(1, 5) }, // 版本 1-5
+            { name: 'status', isLangField: true, generator: (id) => id % 2 === 0 ? 1 : 0 }, // 0:待审核, 1:已发布
+            { name: 'version', isLangField: true, generator: () => randomInt(1, 5) },
             { name: 'language', isLangField: true, generator: (id, lang) => lang },
             { name: 'seo_keywords', isLangField: true, generator: id => `${getRandomItem(postTypes)}, post ${id}, blog` },
             { name: 'seo_description', isLangField: true, generator: id => `Read post ${id} on our blog, great content awaits.` },
@@ -134,7 +134,7 @@
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
-            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '已发布' }, { value: 2, label: '已屏蔽' }, { value: 3, label: '已废弃' }] } },
             { label: '批量修改文章类型', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'posts_type', label: '文章类型', type: 'select', options: postTypes.map((t, i) => ({ value: i + 1, label: t })) } },
             { label: '批量修改用户', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'user_id', label: '用户', type: 'select', options: users.map((u, i) => ({ value: i + 1, label: u })) } },
             { label: '批量修改店铺', className: 'ant-btn ant-btn-default', color: '#722ed1', field: { name: 'store_id', label: '店铺', type: 'select', options: stores.map((s, i) => ({ value: i + 1, label: s })) } }
@@ -144,21 +144,45 @@
             { name: 'posts_type', label: '文章类型', className: 'col-posts-type', formatter: v => postTypes[v - 1] || `Type ${v}` },
             { name: 'user_id', label: '用户', className: 'col-user-id', formatter: v => users[v - 1] || `User ${v}` },
             { name: 'store_id', label: '店铺', className: 'col-store-id', formatter: v => stores[v - 1] || `Store ${v}` },
-            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
+            {
+                name: 'status',
+                label: '状态',
+                className: 'col-status',
+                formatter: v => {
+                    switch (v) {
+                        case 0: return '<span class="ant-tag ant-tag-orange">待审核</span>';
+                        case 1: return '<span class="ant-tag ant-tag-green">已发布</span>';
+                        case 2: return '<span class="ant-tag ant-tag-red">已屏蔽</span>';
+                        case 3: return '<span class="ant-tag ant-tag-gray">已废弃</span>';
+                        default: return '<span class="ant-tag">未知</span>';
+                    }
+                }
+            },
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'title', label: '标题', className: 'col-title', isLangField: true },
             { name: 'money', label: '金额', className: 'col-money' },
-            { name: 'cover_pic', label: '封面图', className: 'col-cover-pic', isLangField: true, formatter: (v, item) => {
+            {
+                name: 'cover_pic',
+                label: '封面图',
+                className: 'col-cover-pic',
+                isLangField: true,
+                formatter: (v, item) => {
                     const langFilter = document.querySelector('#languageFilter')?.value || 'en_US';
                     const langData = tableLangData.find(l => l.posts_id === item.id && l.language === langFilter);
                     const coverPic = v || (langData && langData.cover_pic) || '';
                     return coverPic ? `<div class="cover-pic-preview"><img src="${coverPic}" alt="封面图" onclick="enlargeImage(${item.id}, 0, ['${coverPic}'])"></div>` : '<div class="cover-pic-preview"><span class="placeholder" onclick="alert(\'图片不存在\')">无</span></div>';
-                }},
+                }
+            },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
-            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
-                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
-                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
-            ` }
+            {
+                name: 'actions',
+                label: '操作',
+                className: 'col-actions',
+                formatter: (_, item) => `
+                    <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                    ${item.status === 0 ? `<button class="ant-btn ant-btn-primary" onclick="showReviewModal(${item.id})">审核</button>` : `<button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>`}
+                `
+            }
         ],
         langFields: {
             foreignKey: 'posts_id',
@@ -168,7 +192,7 @@
             { id: 'postsType', type: 'select', options: [{ value: '', label: '全部类型' }, ...postTypes.map((t, i) => ({ value: `${i + 1}`, label: t }))], filter: (data, value) => value ? data.filter(d => d.posts_type === parseInt(value)) : data },
             { id: 'userId', type: 'select', options: [{ value: '', label: '全部用户' }, ...users.map((u, i) => ({ value: `${i + 1}`, label: u }))], filter: (data, value) => value ? data.filter(d => d.user_id === parseInt(value)) : data },
             { id: 'storeId', type: 'select', options: [{ value: '', label: '全部店铺' }, ...stores.map((s, i) => ({ value: `${i + 1}`, label: s }))], filter: (data, value) => value ? data.filter(d => d.store_id === parseInt(value)) : data },
-            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '待审核' }, { value: '1', label: '已发布' }, { value: '2', label: '已屏蔽' }, { value: '3', label: '已废弃' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
             { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'en_US', label: '英语' }, { value: 'zh_CN', label: '中文' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.posts_id === d.id && l.language === value)) : data },
             { id: 'title', type: 'text', placeholder: '搜索标题', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.posts_id === d.id && l.title.toLowerCase().includes(value.toLowerCase()))) : data },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
@@ -183,7 +207,7 @@
                     { name: 'blog_id', label: '博客', type: 'select', options: blogs.map((b, i) => ({ value: i + 1, label: b })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'user_id', label: '用户', type: 'select', options: users.map((u, i) => ({ value: i + 1, label: u })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'store_id', label: '店铺', type: 'select', options: stores.map((s, i) => ({ value: i + 1, label: s })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '已发布' }, { value: 2, label: '已屏蔽' }, { value: 3, label: '已废弃' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'money', label: '金额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
@@ -207,7 +231,7 @@
                 title: '多语言信息',
                 fields: [
                     { name: 'language', label: '语言', type: 'select', options: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '已发布' }, { value: 2, label: '已屏蔽' }, { value: 3, label: '已废弃' }], isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'version', label: '版本', type: 'number', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
@@ -221,6 +245,176 @@
             }
         ]
     };
+
+    // 显示审核弹窗
+    function showReviewModal(postId) {
+        const post = tableData.find(i => i.id === postId);
+        if (!post) return;
+
+        const modal = document.createElement('div');
+        modal.id = 'reviewModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+
+        const langFilter = document.querySelector('#languageFilter')?.value || 'en_US';
+        const currentLangData = tableLangData.find(l => l.posts_id === postId && l.language === langFilter) || {};
+        const onlineLangData = tableLangData.find(l => l.posts_id === postId && l.language === langFilter && l.status === 1) || null;
+
+        const langFields = window.tableConfig.modalTabs.find(tab => tab.id === 'lang').fields.filter(f => f.isLangField && !['status', 'site_reply'].includes(f.name));
+        const comparisonHTML = langFields.map(field => {
+            let onlineValue = onlineLangData ? onlineLangData[field.name] || 'N/A' : '初次提交';
+            let currentValue = currentLangData[field.name] || 'N/A';
+
+            // 为 free_content 生成更长内容
+            if (field.name === 'free_content') {
+                onlineValue = onlineLangData ?
+                    `<p>Free content for post ${postId}, available to all readers.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p><p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p><p>Additional paragraph to ensure scrollbar appears. This is a longer text block to simulate real-world content that requires scrolling.</p>` :
+                    '初次提交';
+                currentValue = `<p>Updated free content for post ${postId}. Now with more details!</p><p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p><p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p><p>More content added here to make it lengthy and trigger scrolling in the preview modal. This ensures we can see the scrollbar in action.</p>`;
+            }
+
+            const isDifferent = randomInt(0, 1) === 1;
+            const isImageField = field.name === 'cover_pic';
+            const isLongText = !isImageField && String(currentValue).length > 100;
+
+            let onlineDisplay = onlineValue;
+            let currentDisplay = currentValue;
+            if (isImageField) {
+                onlineDisplay = onlineValue === 'N/A' || onlineValue === '初次提交' ?
+                    '<div class="cover-pic-preview"><span class="placeholder">无</span></div>' :
+                    `<div class="cover-pic-preview"><img src="${onlineValue}" alt="${field.label}" onclick="enlargeImage(${postId}, 0, ['${onlineValue}'])"></div>`;
+                currentDisplay = currentValue === 'N/A' ?
+                    '<div class="cover-pic-preview"><span class="placeholder">无</span></div>' :
+                    `<div class="cover-pic-preview"><img src="${currentValue}" alt="${field.label}" onclick="enlargeImage(${postId}, 0, ['${currentValue}'])"></div>`;
+            } else if (isLongText) {
+                // 固定高度为 6 行
+                onlineDisplay = `<textarea readonly class="ant-input" rows="6" style="width: 100%; height: 144px; resize: none;">${onlineValue}</textarea>`;
+                currentDisplay = `<textarea readonly class="ant-input" rows="6" style="width: 100%; height: 144px; resize: none;">${currentValue}</textarea>`;
+            }
+
+            return `
+            <div style="display: flex; padding: 12px; border-bottom: 1px solid #eee; align-items: center; ${isDifferent ? 'background: #fff7e6;' : ''}">
+                <div style="width: 15%; padding-right: 12px; font-weight: bold; color: #555;">${field.label}</div>
+                <div style="flex: 1; padding-right: 12px;">${onlineDisplay}</div>
+                <div style="flex: 1; padding-right: 12px; ${isDifferent ? 'color: red;' : 'color: green;'}">${currentDisplay}</div>
+                <div style="width: 10%; text-align: center;">
+                    <button class="ant-btn ant-btn-link" style="${isDifferent ? 'color: red;' : 'color: green;'}" onclick="showPreviewModal('${field.name}', '${escapeHtml(String(onlineValue))}', '${escapeHtml(String(currentValue))}', ${isImageField})">对比</button>
+                </div>
+            </div>
+        `;
+        }).join('');
+
+        // 其余代码保持不变，包括状态选项
+        modal.innerHTML = `
+        <div class="modal-content" style="width: 80%; max-height: 90vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <button class="close-btn" onclick="closeReviewModal()">×</button>
+            <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">审核文章 (ID: ${postId})</h3>
+            <div class="review-comparison" style="padding: 16px;">
+                <h4 style="margin-bottom: 12px; color: #333;">版本对比</h4>
+                <div style="display: flex; background: #fafafa; padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">
+                    <div style="width: 15%;">字段</div>
+                    <div style="flex: 1;">线上版本</div>
+                    <div style="flex: 1;">审核版本</div>
+                    <div style="width: 10%; text-align: center;">操作</div>
+                </div>
+                <div style="border: 1px solid #eee; border-top: none; background: #fff;">${comparisonHTML}</div>
+            </div>
+            <div class="review-action" style="padding: 16px; border-top: 1px solid #eee;">
+                <h4 style="margin-bottom: 12px; color: #333;">审核操作</h4>
+                <div style="margin-bottom: 16px;">
+                    <label style="font-weight: bold;">状态:</label>
+                    <select id="reviewStatus" class="ant-select" style="width: 200px; margin-left: 8px;">
+                        <option value="1">通过 (发布)</option>
+                        <option value="2">拒绝</option>
+                        <option value="3">屏蔽</option>
+                        <option value="4">废弃</option>
+                    </select>
+                </div>
+                <div id="reviewReply" style="display: none; margin-bottom: 16px;">
+                    <label style="font-weight: bold;">回复:</label>
+                    <textarea id="reviewSiteReply" class="ant-input" rows="4" style="width: 100%; margin-top: 8px;"></textarea>
+                </div>
+                <div style="text-align: right;">
+                    <button class="ant-btn" onclick="closeReviewModal()" style="margin-right: 8px;">取消</button>
+                    <button class="ant-btn ant-btn-primary" onclick="submitReview(${postId})">审核</button>
+                </div>
+            </div>
+        </div>
+    `;
+        modal.style.display = 'block';
+
+        document.getElementById('reviewStatus').addEventListener('change', (e) => {
+            document.getElementById('reviewReply').style.display = e.target.value !== '1' ? 'block' : 'none';
+        });
+    }
+
+    // 关闭审核弹窗
+    function closeReviewModal() {
+        const modal = document.getElementById('reviewModal');
+        if (modal) modal.remove();
+    }
+
+    // 提交审核
+    function submitReview(postId) {
+        const status = parseInt(document.getElementById('reviewStatus').value);
+        const siteReply = document.getElementById('reviewSiteReply')?.value || '';
+        const post = tableData.find(i => i.id === postId);
+        const langFilter = document.querySelector('#languageFilter')?.value || 'en_US';
+        const langData = tableLangData.find(l => l.posts_id === postId && l.language === langFilter);
+
+        if (post) post.status = status;
+        if (langData) {
+            langData.status = status;
+            if (status !== 1 && siteReply) langData.site_reply = siteReply;
+        }
+
+        closeReviewModal();
+        renderTable();
+    }
+
+    // 显示预览弹窗
+    function showPreviewModal(fieldName, oldValue, newValue, isImageField = false) {
+        const modal = document.createElement('div');
+        modal.id = 'previewModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+
+        const contentHeight = Math.min(Math.max(oldValue.length, newValue.length) * 20, window.innerHeight * 0.8);
+        let oldDisplay = unescapeHtml(oldValue);
+        let newDisplay = unescapeHtml(newValue);
+
+        modal.innerHTML = `
+            <div class="modal-content" style="width: 70%; height: ${contentHeight}px; max-height: 80vh; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <button class="close-btn" onclick="closePreviewModal()">×</button>
+                <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">${fieldName} 预览</h3>
+                <div style="display: flex; height: calc(100% - 40px);">
+                    <div style="flex: 1; padding: 12px; overflow-y: auto; border-right: 1px solid #ddd; background: #fafafa;">
+                        <strong style="color: #555;">旧版本:</strong>
+                        <div style="margin-top: 8px;">${oldDisplay}</div>
+                    </div>
+                    <div style="flex: 1; padding: 12px; overflow-y: auto; background: #fff;">
+                        <strong style="color: #555;">新版本:</strong>
+                        <div style="margin-top: 8px;">${newDisplay}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        modal.style.display = 'block';
+    }
+
+    // 关闭预览弹窗
+    function closePreviewModal() {
+        const modal = document.getElementById('previewModal');
+        if (modal) modal.remove();
+    }
+
+    // HTML 转义和反转义
+    function escapeHtml(text) {
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+    function unescapeHtml(html) {
+        return html.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#039;/g, "'");
+    }
 
     // 临时修复：覆盖_opt.js的editRecord，确保cover_pic预览
     window.editRecord = function(id, isViewOnly = false) {
@@ -254,5 +448,6 @@
         document.getElementById(`${config.tableName}Modal`).style.display = 'block';
     };
 </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91ca3874ef5b0709',t:'MTc0MTM1MTg0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

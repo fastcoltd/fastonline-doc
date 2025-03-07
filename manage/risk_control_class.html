@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 风控函数</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="_prism.css"> <!-- 本地 Prism.js 样式 -->
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_prism.js"></script> <!-- 本地 Prism.js 核心库 -->
+    <script src="_prism-json.js"></script> <!-- 本地 Prism.js JSON 支持 -->
+    <script src="_common.js"></script>
+    <script src="_opt.js"></script>
+    <style>
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-status { width: 10%; min-width: 80px; }
+        .col-class-name { width: 15%; min-width: 120px; }
+        .col-risk-init { width: 20%; min-width: 160px; }
+        .col-risk-execute-class { width: 20%; min-width: 160px; }
+        .col-mark { width: 12%; min-width: 100px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 12%; min-width: 100px; }
+        .risk-init-preview { margin-top: 8px; padding: 8px; background: #f5f5f5; border-radius: 4px; max-height: 200px; overflow-y: auto; font-family: monospace; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('risk_control_class.html')">
+                                    <span class="ant-tabs-tab-btn">风控函数</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
+                                <div class="task-list">
+                                    <div class="table-header"></div>
+                                    <div id="risk_control_class-list">加载中...</div>
+                                    <div class="pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 模拟风控函数相关数据
+    const classNames = [
+        'UserRiskCheck', 'PostRiskCheck', 'OrderRiskCheck', 'PaymentRiskCheck', 'ContentRiskCheck',
+        'LoginRiskCheck', 'TransactionRiskCheck', 'CommentRiskCheck', 'ProfileRiskCheck', 'AdRiskCheck'
+    ];
+    const riskInits = [
+        '{"per":100, "level":3, "round":"posts"}',
+        '{"per":50, "level":2, "round":"users"}',
+        '{"per":75, "level":4, "round":"orders"}',
+        '{"per":25, "level":1, "round":"payments"}',
+        '{"per":90, "level":5, "round":"comments"}'
+    ];
+    const riskExecuteClasses = [
+        'com.xx.tech.risk.UserRiskCheck',
+        'com.xx.tech.risk.PostRiskCheck',
+        'com.xx.tech.risk.OrderRiskCheck',
+        'com.xx.tech.risk.PaymentRiskCheck',
+        'com.xx.tech.risk.ContentRiskCheck'
+    ];
+    const marks = [
+        '用户行为检测', '帖子内容审核', '订单异常监控', '支付风险评估', '内容违规检测',
+        '登录安全检查', '交易风险分析', '评论过滤', '账户风险评估', '广告合规检查'
+    ];
+
+    // 格式化 JSON 并返回字符串
+    function formatJson(jsonString) {
+        try {
+            const cleanedJson = jsonString.trim();
+            const jsonObj = JSON.parse(cleanedJson);
+            return JSON.stringify(jsonObj, null, 2);
+        } catch (e) {
+            console.error('JSON 解析错误:', e.message, '输入:', jsonString);
+            return jsonString; // 如果解析失败，返回原始输入
+        }
+    }
+
+    // 高亮 JSON 用于预览
+    function highlightJson(jsonString) {
+        if (!window.Prism || !Prism.languages.json) {
+            return '<span style="color: red;">Prism.js 未正确加载或 JSON 支持不可用</span>';
+        }
+        try {
+            const cleanedJson = jsonString.trim();
+            const jsonObj = JSON.parse(cleanedJson);
+            const formattedJson = JSON.stringify(jsonObj, null, 2);
+            return Prism.highlight(formattedJson, Prism.languages.json, 'json');
+        } catch (e) {
+            return '<span style="color: red;">无效的 JSON 格式: ' + e.message + '</span>';
+        }
+    }
+
+    // 更新 risk_init textarea 和预览
+    function updateRiskInitFormatAndPreview() {
+        const textarea = document.getElementById('modalrisk_init');
+        const preview = document.getElementById('riskInitPreview');
+        if (textarea) {
+            const formattedJson = formatJson(textarea.value);
+            textarea.value = formattedJson; // 实时格式化 textarea
+            if (preview) {
+                preview.innerHTML = highlightJson(formattedJson); // 更新预览
+            }
+        }
+    }
+
+    // 重写 renderModal 以支持实时格式化
+    window.onload = function() {
+        w3.includeHTML(() => {
+            initMenus();
+            initTable(window.tableConfig);
+
+            const originalRenderModal = renderModal;
+            renderModal = function(isEditingMode) {
+                originalRenderModal(isEditingMode);
+                setTimeout(() => {
+                    const riskInitFormItem = document.querySelector('#risk_control_classModal .ant-form-item[data-field-name="risk_init"]');
+                    if (riskInitFormItem && !document.getElementById('riskInitPreview')) {
+                        const previewDiv = document.createElement('div');
+                        previewDiv.id = 'riskInitPreview';
+                        previewDiv.className = 'risk-init-preview';
+                        riskInitFormItem.appendChild(previewDiv);
+
+                        const textarea = document.getElementById('modalrisk_init');
+                        if (textarea) {
+                            textarea.addEventListener('input', updateRiskInitFormatAndPreview);
+                            updateRiskInitFormatAndPreview(); // 初始加载时格式化
+                        }
+                    }
+                }, 0);
+            };
+        });
+    };
+
+    window.tableConfig = {
+        tableName: 'risk_control_class',
+        tableTitle: '风控函数',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'status', generator: () => randomInt(0, 2) },
+            { name: 'class_name', generator: () => getRandomItem(classNames) + randomInt(1, 100) },
+            { name: 'risk_init', generator: () => getRandomItem(riskInits) },
+            { name: 'risk_execute_class', generator: () => getRandomItem(riskExecuteClasses) },
+            { name: 'mark', generator: () => getRandomItem(marks) },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '停止' }, { value: 1, label: '执行中' }, { value: 2, label: '保存记录' }] } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">停止</span>' : v === 1 ? '<span class="ant-tag ant-tag-green">执行中</span>' : '<span class="ant-tag ant-tag-blue">保存记录</span>' },
+            { name: 'class_name', label: '类名', className: 'col-class-name' },
+            { name: 'risk_init', label: '风控参数', className: 'col-risk-init' },
+            { name: 'risk_execute_class', label: '执行类', className: 'col-risk-execute-class' },
+            { name: 'mark', label: '备注', className: 'col-mark' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '停止' }, { value: '1', label: '执行中' }, { value: '2', label: '保存记录' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'class_name', type: 'text', placeholder: '搜索类名', filter: (data, value) => value ? data.filter(d => d.class_name.toLowerCase().includes(value.toLowerCase())) : data },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '停止' }, { value: 1, label: '执行中' }, { value: 2, label: '保存记录' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'class_name', label: '类名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'risk_init', label: '风控参数', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'risk_execute_class', label: '执行类', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'mark', label: '备注', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            }
+        ]
+    };
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
+</script>
+</body>
+</html>
