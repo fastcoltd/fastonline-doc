@@ -24,7 +24,7 @@
         .col-price-to { width: 10%; min-width: 80px; }
         .col-quantity { width: 8%; min-width: 60px; }
         .col-create-time { width: 12%; min-width: 100px; }
-        .col-actions { width: 12%; min-width: 100px; }
+        .col-actions { width: 18%; min-width: 100px; }
     </style>
 </head>
 <body>
@@ -92,7 +92,7 @@
                     <textarea id="reviewSiteReply" class="ant-input" rows="4" style="width: 100%; margin-top: 8px;"></textarea>
                 </div>
                 <div style="text-align: right;">
-                    <button class="ant-btn" onclick="closeReviewModal()" style="margin-right: 8px;">取消</button>
+                    <button class="ant-btn ant-btn-blue" onclick="closeReviewModal()" style="margin-right: 8px;">取消</button>
                     <button class="ant-btn ant-btn-primary" onclick="submitReview()">审核</button>
                 </div>
             </div>
@@ -243,6 +243,7 @@
                 label: '操作',
                 className: 'col-actions',
                 formatter: (_, item) => `
+                    <button class="ant-btn ant-btn-primary" onclick="window.location.href='demand_bid.html'" style="margin-right: 8px;">竞标者</button>
                     <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
                     ${item.status === 0 ? `<button class="ant-btn ant-btn-primary" onclick="showReviewModal(${item.id})">审核</button>` : `<button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>`}
                 `
