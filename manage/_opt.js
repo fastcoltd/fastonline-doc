@@ -332,7 +332,7 @@ async function fetchTableData(sampleCount) {
     tableData = [];
     tableLangData = [];
 
-    const batchSize = 50; // 每批生成 50 条数据
+    const batchSize = 100; // 每批生成 50 条数据
     const languages = config.langFields?.languages || ['en_US'];
     const totalBatches = Math.ceil(sampleCount / batchSize);
 
@@ -394,7 +394,7 @@ function generateLangRecord(id, lang, index) {
         language: lang
     };
     config.fields.filter(f => f.isLangField).forEach(field => {
-        if (field.name.indexOf("pic") !== -1 || field.name.indexOf("logo") !== -1 || field.name.indexOf("avatar") || field.indexOf("show_data") != -1) {
+        if (/(pic|logo|avatar|show_data|extra_data)/i.test(field.name)) {
             langRecord[field.name] = field.generator ? field.generator(id, lang) : getRandomImage('sexy');
         } else {
             langRecord[field.name] = field.generator ? field.generator(id, lang) : `${lang}_${field.name}_${id}`;
@@ -415,8 +415,8 @@ function renderTableList() {
         const end = Math.min(start + perPage, tableData.length);
         const paginatedData = tableData.slice(start, end);
 
-        const langFilter = document.querySelector(`#languageFilter`)?.value || (config.langFields?.languages[0] || '');
-
+        let randomLang = randomInt(0, config.langFields?.languages.length-1) ?? 0;
+        const langFilter = document.querySelector(`#languageFilter`)?.value || (config.langFields?.languages[randomLang] || '');
         paginatedData.forEach(item => {
             const row = document.createElement('div');
             row.className = 'task-item';
@@ -426,7 +426,7 @@ function renderTableList() {
             config.listFields.forEach(field => {
                 let value;
                 if (field.isLangField && langFilter) {
-                    const langData = tableLangData.find(l => l[config.langFields.foreignKey] === item.id && l.language === langFilter);
+                    const langData = tableLangData.find(l => l.language === langFilter);
                     value = langData ? langData[field.name] : '';
                 } else {
                     value = item[field.name];
