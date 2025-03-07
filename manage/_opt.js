@@ -426,7 +426,7 @@ function renderTableList() {
             config.listFields.forEach(field => {
                 let value;
                 if (field.isLangField && langFilter) {
-                    const langData = tableLangData.find(l => l.language === langFilter);
+                    const langData = tableLangData.find(l => l[config.langFields.foreignKey] === item.id && l.language === langFilter);
                     value = langData ? langData[field.name] : '';
                 } else {
                     value = item[field.name];

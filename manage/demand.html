@@ -3,204 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 需求信息管理</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css"
-          integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <title>FASTRESP - 需求信息</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .filter-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .action-container {
-            margin-bottom: 16px;
-        }
-
-        .table-header, .task-item {
-            display: flex;
-            width: 100%;
-        }
-
-        .table-header div, .task-item div {
-            padding: 10px;
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            box-sizing: border-box;
-        }
-
-        .col-checkbox {
-            width: 5%;
-            min-width: 50px;
-        }
-
-        .col-id {
-            width: 8%;
-            min-width: 60px;
-        }
-
-        .col-status {
-            width: 8%;
-            min-width: 80px;
-        }
-
-        .col-user-id {
-            width: 8%;
-            min-width: 80px;
-        }
-
-        .col-brand-id {
-            width: 8%;
-            min-width: 80px;
-        }
-
-        .col-services-id {
-            width: 8%;
-            min-width: 80px;
-        }
-
-        .col-price-from {
-            width: 8%;
-            min-width: 80px;
-        }
-
-        .col-price-to {
-            width: 8%;
-            min-width: 80px;
-        }
-
-        .col-quantity {
-            width: 8%;
-            min-width: 80px;
-        }
-
-        .col-demand-name {
-            width: 10%;
-            min-width: 100px;
-        }
-
-        .col-create-time {
-            width: 10%;
-            min-width: 100px;
-        }
-
-        .col-actions {
-            width: 10%;
-            min-width: 100px;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 1024px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            max-height: 968px;
-            overflow-y: auto;
-        }
-
-        .modal-content h3 {
-            margin: 0 0 16px 0;
-        }
-
-        .modal-buttons {
-            text-align: right;
-            margin-top: 20px;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 20px;
-            cursor: pointer;
-            border: none;
-            background: none;
-        }
-
-        .ant-tabs-content {
-            min-height: 400px;
-        }
-
-        .modal-content .ant-form-item {
-            margin-bottom: 16px;
-        }
-
-        .modal-content .ant-form-item:not(.textarea-item) {
-            display: flex;
-            align-items: center;
-        }
-
-        .modal-content .ant-form-item:not(.textarea-item) label {
-            margin-right: 8px;
-            width: 120px;
-            text-align: right;
-            color: rgba(0, 0, 0, 0.85);
-            height: 32px;
-            line-height: 32px;
-        }
-
-        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .modal-content .ant-form-item.textarea-item {
-            display: block;
-        }
-
-        .modal-content .ant-form-item.textarea-item label {
-            display: block;
-            margin-bottom: 4px;
-            color: rgba(0, 0, 0, 0.85);
-        }
-
-        .modal-content .ant-form-item.textarea-item textarea {
-            width: 100%;
-            height: 100px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            resize: vertical;
-        }
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-user-id { width: 10%; min-width: 80px; }
+        .col-brand-id { width: 10%; min-width: 80px; }
+        .col-services-id { width: 10%; min-width: 80px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-language { width: 8%; min-width: 60px; }
+        .col-demand-name { width: 12%; min-width: 100px; }
+        .col-price-from { width: 10%; min-width: 80px; }
+        .col-price-to { width: 10%; min-width: 80px; }
+        .col-quantity { width: 8%; min-width: 60px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 12%; min-width: 100px; }
     </style>
 </head>
 <body>
@@ -214,76 +38,22 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">需求信息管理</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('demand.html')">
+                                    <span class="ant-tabs-tab-btn">需求信息</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated"
-                                     style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <select id="userIdFilter" class="ant-select">
-                                        <option value="">全部用户</option>
-                                    </select>
-                                    <select id="brandIdFilter" class="ant-select">
-                                        <option value="">全部品牌</option>
-                                    </select>
-                                    <select id="servicesIdFilter" class="ant-select">
-                                        <option value="">全部服务</option>
-                                    </select>
-                                    <select id="statusFilter" class="ant-select">
-                                        <option value="">全部状态</option>
-                                        <option value="0">未处理</option>
-                                        <option value="1">处理中</option>
-                                    </select>
-                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
-                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addDemand()">添加</button>
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
-                                </div>
-                                <!-- 数据区域 -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header"
-                                         style="padding: 10px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll"
-                                                                         onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-status">状态</div>
-                                        <div class="col-user-id">用户</div>
-                                        <div class="col-brand-id">品牌</div>
-                                        <div class="col-services-id">服务</div>
-                                        <div class="col-price-from">价格起</div>
-                                        <div class="col-price-to">价格止</div>
-                                        <div class="col-quantity">数量</div>
-                                        <div class="col-demand-name">需求名称</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
+                                    <div class="table-header"></div>
                                     <div id="demand-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input"
-                                               style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
-                                            <option value="10">10 条/页</option>
-                                            <option value="20" selected>20 条/页</option>
-                                            <option value="50">50 条/页</option>
-                                            <option value="100">100 条/页</option>
-                                        </select>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -293,614 +63,399 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-
-    <!-- 添加/编辑弹窗 -->
-    <div id="demandModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加需求信息</h3>
-            <form id="demandForm">
-                <div class="ant-form-item" id="idField" style="display: none;">
-                    <label>ID:</label>
-                    <input type="number" id="modalId" disabled>
+    <!-- 审核弹窗 -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content" style="width: 80%; max-height: 90vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <button class="close-btn" onclick="closeReviewModal()">×</button>
+            <h3 id="reviewModalTitle">审核需求信息</h3>
+            <div class="review-comparison" style="padding: 16px;">
+                <h4 style="margin-bottom: 12px; color: #333;">版本对比</h4>
+                <div style="display: flex; background: #fafafa; padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">
+                    <div style="width: 15%;">字段</div>
+                    <div style="flex: 1;">线上版本</div>
+                    <div style="flex: 1;">审核版本</div>
+                    <div style="width: 10%; text-align: center;">操作</div>
                 </div>
-                <div class="ant-tabs ant-tabs-top">
-                    <div class="ant-tabs-nav">
-                        <div class="ant-tabs-nav-wrap">
-                            <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
-                                    <span class="ant-tabs-tab-btn">基本信息</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="pricing">
-                                    <span class="ant-tabs-tab-btn">价格信息</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="lang">
-                                    <span class="ant-tabs-tab-btn">多语言信息</span>
-                                </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated"
-                                     style="left: 0; width: 80px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ant-tabs-content-holder">
-                        <div class="ant-tabs-content">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
-                                <div class="ant-form-item">
-                                    <label>状态:</label>
-                                    <select id="modalStatus">
-                                        <option value="0">未处理</option>
-                                        <option value="1">处理中</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>用户ID:</label>
-                                    <select id="modalUserId">
-                                        <option value="0">请选择用户</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>品牌ID:</label>
-                                    <select id="modalBrandId">
-                                        <option value="0">请选择品牌</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>服务ID:</label>
-                                    <select id="modalServicesId">
-                                        <option value="0">请选择服务</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>数量:</label>
-                                    <input type="number" id="modalQuantity" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>需要样品:</label>
-                                    <select id="modalSamplesNeed">
-                                        <option value="0">否</option>
-                                        <option value="1">是</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>售后时间:</label>
-                                    <input type="datetime-local" id="modalAfterSalesTime">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>开始时间:</label>
-                                    <input type="datetime-local" id="modalStartTime">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>结束时间:</label>
-                                    <input type="datetime-local" id="modalEndTime">
-                                </div>
-                            </div>
-                            <div class="ant-tabs-tabpane" id="pricing" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>价格起:</label>
-                                    <input type="number" id="modalPriceFrom" step="0.01" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>价格止:</label>
-                                    <input type="number" id="modalPriceTo" step="0.01" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>押金:</label>
-                                    <input type="number" id="modalDeposit" step="0.01" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>剩余支付金额:</label>
-                                    <input type="number" id="modalPaidRestMoney" step="0.01" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>支付时间:</label>
-                                    <input type="datetime-local" id="modalPaidTime">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>选择店铺ID:</label>
-                                    <select id="modalChooseStoreId">
-                                        <option value="0">请选择店铺</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>选择单价:</label>
-                                    <input type="number" id="modalChooseUnitPrice" step="0.01" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>选择时间:</label>
-                                    <input type="datetime-local" id="modalChooseTime">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>总金额:</label>
-                                    <input type="number" id="modalAmount" step="0.01" min="0">
-                                </div>
-                            </div>
-                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>语言:</label>
-                                    <select id="modalLanguage" ${isEditing ? 'disabled' : ''}>
-                                    <option value="zh_CN">中文</option>
-                                    <option value="en_US">英文</option>
-                                    <option value="fr_FR">法文</option>
-                                    <option value="es_ES">西班牙文</option>
-                                    <option value="vi_VN">越南文</option>
-                                    <option value="ru_RU">俄文</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>版本:</label>
-                                    <input type="number" id="modalVersion" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>SEO关键词:</label>
-                                    <input type="text" id="modalSeoKeywords" maxlength="256">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>SEO描述:</label>
-                                    <input type="text" id="modalSeoDescription" maxlength="256">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>售后规则:</label>
-                                    <input type="text" id="modalAfterSalesRules" maxlength="1024">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>需求名称:</label>
-                                    <input type="text" id="modalDemandName" maxlength="256">
-                                </div>
-                                <div class="ant-form-item textarea-item">
-                                    <label>需求信息:</label>
-                                    <textarea id="modalDemandInformation" rows="5"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="ant-form-item" id="createTimeField" style="display: none;">
-                    <label>创建时间:</label>
-                    <input type="datetime-local" id="modalCreateTime" disabled>
-                </div>
-                <div class="ant-form-item" id="confirmTimeField" style="display: none;">
-                    <label>确认时间:</label>
-                    <input type="datetime-local" id="modalConfirmTime" disabled>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveDemand()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 批量修改状态弹窗 -->
-    <div id="statusModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeStatusModal()">×</button>
-            <h3>批量修改状态</h3>
-            <form id="statusForm">
-                <div class="ant-form-item">
-                    <label>选中的ID:</label>
-                    <input type="text" id="selectedIds" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>新状态:</label>
-                    <select id="newStatus">
-                        <option value="0">未处理</option>
-                        <option value="1">处理中</option>
+                <div id="comparisonContent" style="border: 1px solid #eee; border-top: none; background: #fff;"></div>
+            </div>
+            <div class="review-action" style="padding: 16px; border-top: 1px solid #eee;">
+                <h4 style="margin-bottom: 12px; color: #333;">审核操作</h4>
+                <div style="margin-bottom: 16px;">
+                    <label style="font-weight: bold;">状态:</label>
+                    <select id="reviewStatus" class="ant-select" style="width: 200px; margin-left: 8px;">
+                        <option value="1">通过审核</option>
+                        <option value="2">已拒绝</option>
                     </select>
                 </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                <div id="reviewReply" style="display: none; margin-bottom: 16px;">
+                    <label style="font-weight: bold;">站点回复:</label>
+                    <textarea id="reviewSiteReply" class="ant-input" rows="4" style="width: 100%; margin-top: 8px;"></textarea>
                 </div>
-            </form>
+                <div style="text-align: right;">
+                    <button class="ant-btn" onclick="closeReviewModal()" style="margin-right: 8px;">取消</button>
+                    <button class="ant-btn ant-btn-primary" onclick="submitReview()">审核</button>
+                </div>
+            </div>
         </div>
     </div>
+    <!-- 预览弹窗 -->
+    <div id="previewModal" class="modal"></div>
 </div>
 
 <script>
-    let demandData = [];
-    let demandLangData = [];
-    let page = 1, perPage = 20;
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    function randomDecimal(min, max, precision) {
+        return parseFloat((Math.random() * (max - min) + min).toFixed(precision));
+    }
 
-    // 定义关联字段的映射
-    const relationMap = {
-        user_id: Array.from({length: 15}, (_, i) => ({id: i + 1, name: `用户 ${i + 1}`})),
-        brand_id: Array.from({length: 15}, (_, i) => ({id: i + 1, name: `品牌 ${i + 1}`})),
-        services_id: Array.from({length: 15}, (_, i) => ({id: i + 1, name: `服务 ${i + 1}`})),
-        choose_store_id: Array.from({length: 15}, (_, i) => ({id: i + 1, name: `店铺 ${i + 1}`}))
+    // 模拟用户、品牌、服务、店铺名称
+    const userNames = ['张三', '李四', '王五', '赵六', '钱七'];
+    const brandNames = ['Nike', 'Adidas', 'Apple', 'Samsung', 'Sony'];
+    const serviceNames = ['技术支持', '物流服务', '客户咨询', '售后维修', '支付支持'];
+    const storeNames = ['时尚服饰店', '电子产品店', '美食天地', '家居生活馆', '运动装备店'];
+    let i = 0
+    const statusList = [
+        {value: i++, label: '待审核'},
+        {value: i++, label: '通过审核'},
+        {value: i++, label: '已拒绝'},
+        {value: i++, label: '已交定金'},
+        {value: i++, label: '暂未开始'},
+        {value: i++, label: '竞标中'},
+        {value: i++, label: '已中标'},
+        {value: i++, label: '已付尾款'},
+        {value: i++, label: '已交付'},
+        {value: i++, label: '需求完成'},
+        {value: i++, label: '评价完成'},
+        {value: i++, label: '需求过期'},
+        {value: i++, label: '已退款'},
+        {value: i++, label: '客户关闭'},
+        {value: i++, label: '已废弃'}
+    ];
+
+    function getStatusMap(){
+        let statusMap = {};
+        statusList.forEach(i =>{
+            statusMap[i.value] = i.label
+        })
+        return statusMap
+    }
+
+    // 多语言样本数据
+    const demandData = {
+        'zh_CN': {
+            names: ['运动鞋需求', '手机配件需求', '美食配送需求', '家具定制需求', '电子产品需求'],
+            info: ['需要高质量的运动鞋，数量1000双。', '手机配件需支持最新型号。', '美食配送需当日到达。', '家具需定制尺寸和颜色。', '电子产品需保修两年。']
+        },
+        'en_US': {
+            names: ['Sports Shoes Demand', 'Phone Accessories Demand', 'Food Delivery Demand', 'Furniture Customization Demand', 'Electronics Demand'],
+            info: ['Need high-quality sports shoes, 1000 pairs.', 'Phone accessories for latest models.', 'Food delivery same-day.', 'Furniture with custom size and color.', 'Electronics with 2-year warranty.']
+        },
+        'fr_FR': {
+            names: ['Demande de chaussures de sport', 'Demande d’accessoires téléphoniques', 'Demande de livraison de nourriture', 'Demande de personnalisation de meubles', 'Demande d’électronique'],
+            info: ['Besoin de chaussures de sport de haute qualité, 1000 paires.', 'Accessoires pour les derniers modèles de téléphones.', 'Livraison de nourriture le jour même.', 'Meubles avec taille et couleur personnalisées.', 'Électronique avec garantie de 2 ans.']
+        },
+        'es_ES': {
+            names: ['Demanda de zapatillas deportivas', 'Demanda de accesorios telefónicos', 'Demanda de entrega de comida', 'Demanda de personalización de muebles', 'Demanda de electrónica'],
+            info: ['Necesitamos zapatillas deportivas de alta calidad, 1000 pares.', 'Accesorios para los últimos modelos de teléfonos.', 'Entrega de comida el mismo día.', 'Muebles con tamaño y color personalizados.', 'Electrónica con garantía de 2 años.']
+        },
+        'vi_VN': {
+            names: ['Nhu cầu giày thể thao', 'Nhu cầu phụ kiện điện thoại', 'Nhu cầu giao đồ ăn', 'Nhu cầu tùy chỉnh nội thất', 'Nhu cầu điện tử'],
+            info: ['Cần giày thể thao chất lượng cao, 1000 đôi.', 'Phụ kiện cho các mẫu điện thoại mới nhất.', 'Giao đồ ăn trong ngày.', 'Nội thất tùy chỉnh kích thước và màu sắc.', 'Điện tử có bảo hành 2 năm.']
+        },
+        'ru_RU': {
+            names: ['Спрос на спортивную обувь', 'Спрос на аксессуары для телефонов', 'Спрос на доставку еды', 'Спрос на кастомизацию мебели', 'Спрос на электронику'],
+            info: ['Нужна качественная спортивная обувь, 1000 пар.', 'Аксессуары для последних моделей телефонов.', 'Доставка еды в тот же день.', 'Мебель с индивидуальными размерами и цветом.', 'Электроника с гарантией 2 года.']
+        }
     };
 
-    // 生成下拉数据
-    function populateDropdowns() {
-        const userSelect = document.getElementById('modalUserId');
-        const userFilter = document.getElementById('userIdFilter');
-        const brandSelect = document.getElementById('modalBrandId');
-        const brandFilter = document.getElementById('brandIdFilter');
-        const servicesSelect = document.getElementById('modalServicesId');
-        const servicesFilter = document.getElementById('servicesIdFilter');
-        const storeSelect = document.getElementById('modalChooseStoreId');
+    window.tableConfig = {
+        tableName: 'demand',
+        tableTitle: '需求信息',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            // 主表字段
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'status', generator: () => randomInt(0, statusList.length - 1) },
+            { name: 'user_id', generator: () => randomInt(1, 50) },
+            { name: 'brand_id', generator: () => randomInt(1, 20) },
+            { name: 'services_id', generator: () => randomInt(1, 30) },
+            { name: 'price_from', generator: () => randomDecimal(10, 500, 2) },
+            { name: 'price_to', generator: () => randomDecimal(50, 1000, 2) },
+            { name: 'quantity', generator: () => randomInt(1, 1000) },
+            { name: 'deposit', generator: () => randomDecimal(0, 200, 2) },
+            { name: 'samples_need', generator: () => randomInt(0, 1) },
+            { name: 'after_sales_time', generator: () => randomInt(30, 365) },
+            { name: 'start_time', generator: () => moment().subtract(randomInt(30, 180), 'days').unix() },
+            { name: 'end_time', generator: () => moment().add(randomInt(30, 180), 'days').unix() },
+            { name: 'paid_rest_money', generator: () => randomInt(0, 1) ? randomDecimal(0, 800, 2) : 0 },
+            { name: 'paid_time', isSystemField: true, generator: () => randomInt(0, 1) ? moment().subtract(randomInt(1, 90), 'days').unix() : 0 },
+            { name: 'choose_store_id', generator: () => randomInt(0, 1) ? randomInt(1, 15) : 0 },
+            { name: 'choose_unit_price', generator: () => randomInt(0, 1) ? randomDecimal(10, 900, 2) : 0 },
+            { name: 'choose_time', isSystemField: true, generator: () => randomInt(0, 1) ? moment().subtract(randomInt(1, 60), 'days').unix() : 0 },
+            { name: 'amount', generator: () => randomInt(0, 1) ? randomDecimal(50, 1000, 2) : 0 },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
+            { name: 'confirm_time', isSystemField: true, generator: () => randomInt(0, 1) ? moment().subtract(randomInt(1, 300), 'days').unix() : 0 },
+            // 多语言表字段
+            { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) },
+            { name: 'demand_id', isLangField: true, generator: id => id },
+            { name: 'language', isLangField: true, generator: (id, lang) => lang },
+            { name: 'version', isLangField: true, generator: () => randomInt(1, 5) },
+            { name: 'seo_keywords', isLangField: true, generator: (id, lang) => `${demandData[lang].names[id % 5]}, Demand ${id}` },
+            { name: 'seo_description', isLangField: true, generator: (id, lang) => `Details about ${demandData[lang].names[id % 5]}` },
+            { name: 'after_sales_rules', isLangField: true, generator: (id, lang) => `售后规则 #${id}: 退货需在30天内。` },
+            { name: 'demand_name', isLangField: true, generator: (id, lang) => `${demandData[lang].names[id % 5]} #${id}` },
+            { name: 'demand_information', isLangField: true, generator: (id, lang) => `${demandData[lang].info[id % 5]} (ID: ${id})` },
+            { name: 'site_reply', isLangField: true, generator: id => randomInt(0, 1) ? `回复 #${id}: 已处理` : '' }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: statusList } },
+            { label: '批量修改用户', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'user_id', label: '用户', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${userNames[i % userNames.length]} ${i + 1}` })) } },
+            { label: '批量修改品牌', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'brand_id', label: '品牌', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${brandNames[i % brandNames.length]} ${i + 1}` })) } },
+            { label: '批量修改服务', className: 'ant-btn ant-btn-default', color: '#722ed1', field: { name: 'services_id', label: '服务', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${serviceNames[i % serviceNames.length]} ${i + 1}` })) } },
+            { label: '批量修改选择店铺', className: 'ant-btn ant-btn-default', color: '#eb2f96', field: { name: 'choose_store_id', label: '选择店铺', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${storeNames[i % storeNames.length]} ${i + 1}` })) } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'user_id', label: '用户', className: 'col-user-id', formatter: v => `${userNames[v % userNames.length]} (${v})` },
+            { name: 'brand_id', label: '品牌', className: 'col-brand-id', formatter: v => `${brandNames[v % brandNames.length]} (${v})` },
+            { name: 'services_id', label: '服务', className: 'col-services-id', formatter: v => `${serviceNames[v % serviceNames.length]} (${v})` },
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => {
+                    const statusMap = getStatusMap();
+                    const colorMap = { 0: 'orange', 1: 'green', 2: 'red', 3: 'blue', 4: 'purple', 5: 'green', 6: 'gray', 7: 'gray', 8: 'red' };
+                    return `<span class="ant-tag ant-tag-${colorMap[v]}">${statusMap[v]}</span>`;
+                }},
+            { name: 'language', label: '语言', className: 'col-language', isLangField: true },
+            { name: 'demand_name', label: '需求名称', className: 'col-demand-name', isLangField: true },
+            { name: 'price_from', label: '价格下限', className: 'col-price-from' },
+            { name: 'price_to', label: '价格上限', className: 'col-price-to' },
+            { name: 'quantity', label: '数量', className: 'col-quantity' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            {
+                name: 'actions',
+                label: '操作',
+                className: 'col-actions',
+                formatter: (_, item) => `
+                    <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                    ${item.status === 0 ? `<button class="ant-btn ant-btn-primary" onclick="showReviewModal(${item.id})">审核</button>` : `<button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>`}
+                `
+            }
+        ],
+        filterFields: [
+            { id: 'user_id', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${userNames[i % userNames.length]} ${i + 1}` })), filter: (data, value) => value === '' ? data : data.filter(d => d.user_id === parseInt(value)) },
+            { id: 'brand_id', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${brandNames[i % brandNames.length]} ${i + 1}` })), filter: (data, value) => value === '' ? data : data.filter(d => d.brand_id === parseInt(value)) },
+            { id: 'services_id', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${serviceNames[i % serviceNames.length]} ${i + 1}` })), filter: (data, value) => value === '' ? data : data.filter(d => d.services_id === parseInt(value)) },
+            { id: 'choose_store_id', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${storeNames[i % storeNames.length]} ${i + 1}` })), filter: (data, value) => value === '' ? data : data.filter(d => d.choose_store_id === parseInt(value)) },
+            { id: 'status', type: 'select', options: statusList, filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'zh_CN', label: '中文' }, { value: 'en_US', label: '英语' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.demand_id === d.id && l.language === value)) : data },
+            { id: 'demand_name', type: 'text', placeholder: '搜索需求名称', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.demand_id === d.id && l.demand_name.toLowerCase().includes(value.toLowerCase()))) : data },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        langFields: {
+            foreignKey: 'demand_id',
+            languages: ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
+        },
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'user_id', label: '用户', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${userNames[i % userNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'brand_id', label: '品牌', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${brandNames[i % brandNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'services_id', label: '服务', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${serviceNames[i % serviceNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'status', label: '状态', type: 'select', options: statusList, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'price_from', label: '价格下限', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'price_to', label: '价格上限', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'quantity', label: '数量', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'deposit', label: '定金', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'samples_need', label: '需要样品', type: 'select', options: [{ value: 0, label: '否' }, { value: 1, label: '是' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'after_sales_time', label: '售后时间(天)', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            },
+            {
+                id: 'details',
+                title: '详细信息',
+                fields: [
+                    { name: 'start_time', label: '开始时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'end_time', label: '结束时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'paid_rest_money', label: '已付余款', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'paid_time', label: '支付时间', type: 'datetime-local', formatter: v => v ? moment.unix(v).format('YYYY-MM-DDTHH:mm') : '', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'choose_store_id', label: '选择店铺', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${storeNames[i % storeNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'choose_unit_price', label: '选择单价', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'choose_time', label: '选择时间', type: 'datetime-local', formatter: v => v ? moment.unix(v).format('YYYY-MM-DDTHH:mm') : '', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'amount', label: '总金额', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'confirm_time', label: '确认时间', type: 'datetime-local', formatter: v => v ? moment.unix(v).format('YYYY-MM-DDTHH:mm') : '', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            },
+            {
+                id: 'lang',
+                title: '多语言信息',
+                fields: [
+                    { name: 'language', label: '语言', type: 'select', options: ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                    { name: 'version', label: '版本', type: 'number', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'after_sales_rules', label: '售后规则', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'demand_name', label: '需求名称', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'demand_information', label: '需求信息', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'site_reply', label: '站点回复', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            }
+        ]
+    };
 
-        relationMap.user_id.forEach(item => {
-            userSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            userFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.brand_id.forEach(item => {
-            brandSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            brandFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.services_id.forEach(item => {
-            servicesSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            servicesFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.choose_store_id.forEach(item => {
-            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-    }
-
-    // 获取关联字段的名称
-    function getRelationName(field, id) {
-        if (id === 0) return '未关联';
-        const item = relationMap[field].find(item => item.id === id);
-        return item ? item.name : `未知 (${id})`;
-    }
-
-    // 生成样本数据
-    function generateSampleData() {
-        demandData = [];
-        demandLangData = [];
-        const languages = ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'];
-
-        for (let i = 1; i <= 200; i++) {
-            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            const confirmTime = i % 2 === 0 ? moment().subtract(Math.floor(Math.random() * 50), 'days').unix() : 0;
-            demandData.push({
-                id: i,
-                status: Math.floor(Math.random() * 2),
-                user_id: Math.floor(Math.random() * 15) + 1,
-                brand_id: Math.floor(Math.random() * 15) + 1,
-                services_id: Math.floor(Math.random() * 15) + 1,
-                price_from: (Math.random() * 50).toFixed(2),
-                price_to: (Math.random() * 100 + 50).toFixed(2),
-                quantity: Math.floor(Math.random() * 10) + 1,
-                deposit: (Math.random() * 20).toFixed(2),
-                samples_need: Math.floor(Math.random() * 2),
-                after_sales_time: moment().add(Math.floor(Math.random() * 30), 'days').unix(),
-                start_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix(),
-                end_time: moment().add(Math.floor(Math.random() * 30), 'days').unix(),
-                paid_rest_money: i % 3 === 0 ? (Math.random() * 50).toFixed(2) : '0.00',
-                paid_time: i % 3 === 0 ? moment().subtract(Math.floor(Math.random() * 40), 'days').unix() : 0,
-                choose_store_id: i % 4 === 0 ? Math.floor(Math.random() * 15) + 1 : 0,
-                choose_unit_price: i % 4 === 0 ? (Math.random() * 80).toFixed(2) : '0.00',
-                choose_time: i % 4 === 0 ? moment().subtract(Math.floor(Math.random() * 30), 'days').unix() : 0,
-                amount: i % 4 === 0 ? (Math.random() * 100).toFixed(2) : '0.00',
-                create_time: createTime,
-                confirm_time: confirmTime
-            });
-
-            languages.forEach(lang => {
-                demandLangData.push({
-                    id: demandLangData.length + 1,
-                    demand_id: i,
-                    language: lang,
-                    version: 1,
-                    seo_keywords: `关键词 ${i} ${lang}`,
-                    seo_description: `描述 ${i} ${lang}`,
-                    after_sales_rules: `售后规则 ${i} ${lang}`,
-                    demand_name: `需求 ${i} (${lang})`,
-                    demand_information: `需求信息 ${i} ${lang}`
-                });
-            });
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
         }
-        renderDemandList();
-    }
+    });
 
-    // 渲染列表
-    function renderDemandList() {
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const paginatedData = demandData.slice(start, end);
-        const listContainer = document.getElementById('demand-list');
-        listContainer.innerHTML = '';
+    // 显示审核弹窗
+    let currentReviewId = null;
+    function showReviewModal(id) {
+        const demand = tableData.find(item => item.id === id);
+        if (!demand) return;
 
-        paginatedData.forEach(demand => {
-            const statusTag = demand.status === 0 ? '<span class="ant-tag ant-tag-blue">未处理</span>' :
-                '<span class="ant-tag ant-tag-green">处理中</span>';
-            const langData = demandLangData.find(lang => lang.demand_id === demand.id && lang.language === 'en_US') || {};
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            itemDiv.style = 'border-bottom: 1px solid #ddd;';
-            itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${demand.id}"></div>
-                <div class="col-id">${demand.id}</div>
-                <div class="col-status">${statusTag}</div>
-                <div class="col-user-id">${getRelationName('user_id', demand.user_id)}</div>
-                <div class="col-brand-id">${getRelationName('brand_id', demand.brand_id)}</div>
-                <div class="col-services-id">${getRelationName('services_id', demand.services_id)}</div>
-                <div class="col-price-from">${demand.price_from}</div>
-                <div class="col-price-to">${demand.price_to}</div>
-                <div class="col-quantity">${demand.quantity}</div>
-                <div class="col-demand-name">${langData.demand_name || '未定义'}</div>
-                <div class="col-create-time">${moment.unix(demand.create_time).format('YYYY-MM-DD HH:mm')}</div>
-                <div class="col-actions">
-                    <button class="ant-btn" onclick="editDemand(${demand.id})">编辑</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteDemand(${demand.id})">删除</button>
+        currentReviewId = id;
+        document.getElementById('reviewModalTitle').textContent = `审核需求信息 (ID: ${id})`;
+        const modal = document.getElementById('reviewModal');
+        const comparisonContent = document.getElementById('comparisonContent');
+
+        // 获取当前语言版本（以 zh_CN 为例）
+        const currentLang = tableLangData.find(lang => lang.demand_id === id && lang.language === 'zh_CN') || {};
+
+        // 查找线上版本（状态为“通过审核”的最高版本）
+        const onlineLang = tableLangData
+            .filter(lang => lang.demand_id === id && tableData.find(d => d.id === lang.demand_id).status === 1)
+            .sort((a, b) => b.version - a.version)[0] || null;
+
+        // 定义对比字段
+        const reviewFields = [
+            { name: 'user_id', label: '用户', formatter: v => `${userNames[v % userNames.length]} (${v})` },
+            { name: 'brand_id', label: '品牌', formatter: v => `${brandNames[v % brandNames.length]} (${v})` },
+            { name: 'services_id', label: '服务', formatter: v => `${serviceNames[v % serviceNames.length]} (${v})` },
+            { name: 'price_from', label: '价格下限', formatter: v => new Number(v).toFixed(2) },
+            { name: 'price_to', label: '价格上限', formatter: v => new Number(v).toFixed(2) },
+            { name: 'deposit', label: '定金', formatter: v => new Number(v).toFixed(2) },
+            { name: 'samples_need', label: '需要样品', formatter: v => v == 1 ? "需要" : "无需" },
+            { name: 'quantity', label: '数量' },
+            { name: 'version', label: '版本' },
+            { name: 'demand_name', label: '需求名称', isLangField: true },
+            { name: 'demand_information', label: '需求信息', isLangField: true },
+            { name: 'seo_keywords', label: 'SEO关键词', isLangField: true },
+            { name: 'seo_description', label: 'SEO描述', isLangField: true }
+        ];
+
+        const comparisonHTML = reviewFields.map(field => {
+            const onlineValue = onlineLang ? (field.isLangField ? onlineLang[field.name] : demand[field.name]) || 'N/A' : '初次提交';
+            const currentValue = field.isLangField ? currentLang[field.name] || 'N/A' : demand[field.name] || 'N/A';
+            const formattedOnline = field.formatter ? field.formatter(onlineValue) : onlineValue;
+            const formattedCurrent = field.formatter ? field.formatter(currentValue) : currentValue;
+            const isDifferent = formattedOnline !== formattedCurrent;
+
+            return `
+                <div style="display: flex; padding: 12px; border-bottom: 1px solid #eee; align-items: center; ${isDifferent ? 'background: #fff7e6;' : ''}">
+                    <div style="width: 15%; padding-right: 12px; font-weight: bold; color: #555;">${field.label}</div>
+                    <div style="flex: 1; padding-right: 12px;">${formattedOnline}</div>
+                    <div style="flex: 1; padding-right: 12px; ${isDifferent ? 'color: red;' : 'color: green;'}">${formattedCurrent}</div>
+                    <div style="width: 10%; text-align: center;">
+                        <button class="ant-btn ant-btn-link" style="${isDifferent ? 'color: red;' : 'color: green;'}" onclick="showPreviewModal('${field.name}', '${escapeHtml(String(formattedOnline))}', '${escapeHtml(String(formattedCurrent))}', false)">对比</button>
+                    </div>
                 </div>
             `;
-            listContainer.appendChild(itemDiv);
+        }).join('');
+
+        comparisonContent.innerHTML = comparisonHTML;
+        document.getElementById('reviewStatus').value = '1';
+        document.getElementById('reviewSiteReply').value = '';
+        document.getElementById('reviewReply').style.display = 'none';
+        modal.style.display = 'block';
+
+        document.getElementById('reviewStatus').addEventListener('change', (e) => {
+            document.getElementById('reviewReply').style.display = e.target.value === '2' ? 'block' : 'none';
         });
-
-        const totalPages = Math.ceil(demandData.length / perPage);
-        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
     }
 
-    // 筛选
-    function applyFilters() {
-        let filteredData = [...demandData];
-        const userId = document.getElementById('userIdFilter').value;
-        const brandId = document.getElementById('brandIdFilter').value;
-        const servicesId = document.getElementById('servicesIdFilter').value;
-        const status = document.getElementById('statusFilter').value;
-        const createTimeStart = document.getElementById('createTimeStartFilter').value;
-        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
-
-        if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
-        if (brandId) filteredData = filteredData.filter(item => item.brand_id === parseInt(brandId));
-        if (servicesId) filteredData = filteredData.filter(item => item.services_id === parseInt(servicesId));
-        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
-        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
-        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
-
-        demandData = filteredData;
-        page = 1;
-        renderDemandList();
+    // 关闭审核弹窗
+    function closeReviewModal() {
+        const modal = document.getElementById('reviewModal');
+        if (modal) modal.style.display = 'none';
     }
 
-    // 分页
-    function changePage(delta) {
-        const totalPages = Math.ceil(demandData.length / perPage);
-        page += delta;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        renderDemandList();
-    }
+    // 提交审核
+    function submitReview() {
+        const status = parseInt(document.getElementById('reviewStatus').value);
+        const siteReply = document.getElementById('reviewSiteReply').value || '';
+        const demand = tableData.find(item => item.id === currentReviewId);
+        const langEntry = tableLangData.find(lang => lang.demand_id === currentReviewId && lang.language === 'zh_CN');
 
-    function jumpToPage() {
-        const newPage = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(demandData.length / perPage);
-        if (newPage >= 1 && newPage <= totalPages) {
-            page = newPage;
-            renderDemandList();
-        } else {
-            alert('请输入有效的页码');
-        }
-    }
-
-    function changePerPage() {
-        perPage = parseInt(document.getElementById('perPage').value);
-        page = 1;
-        renderDemandList();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    // 添加
-    function addDemand() {
-        isEditing = false;
-        editId = null;
-        document.getElementById('modalTitle').textContent = '添加需求信息';
-        document.getElementById('idField').style.display = 'none';
-        document.getElementById('modalStatus').value = '0';
-        document.getElementById('modalUserId').value = '0';
-        document.getElementById('modalBrandId').value = '0';
-        document.getElementById('modalServicesId').value = '0';
-        document.getElementById('modalPriceFrom').value = '0.00';
-        document.getElementById('modalPriceTo').value = '0.00';
-        document.getElementById('modalQuantity').value = '0';
-        document.getElementById('modalDeposit').value = '0.00';
-        document.getElementById('modalSamplesNeed').value = '0';
-        document.getElementById('modalAfterSalesTime').value = '';
-        document.getElementById('modalStartTime').value = '';
-        document.getElementById('modalEndTime').value = '';
-        document.getElementById('modalPaidRestMoney').value = '0.00';
-        document.getElementById('modalPaidTime').value = '';
-        document.getElementById('modalChooseStoreId').value = '0';
-        document.getElementById('modalChooseUnitPrice').value = '0.00';
-        document.getElementById('modalChooseTime').value = '';
-        document.getElementById('modalAmount').value = '0.00';
-        document.getElementById('modalLanguage').value = 'en_US';
-        document.getElementById('modalLanguage').disabled = false;
-        document.getElementById('modalVersion').value = '1';
-        document.getElementById('modalSeoKeywords').value = '';
-        document.getElementById('modalSeoDescription').value = '';
-        document.getElementById('modalAfterSalesRules').value = '';
-        document.getElementById('modalDemandName').value = '';
-        document.getElementById('modalDemandInformation').value = '';
-        document.getElementById('createTimeField').style.display = 'none';
-        document.getElementById('confirmTimeField').style.display = 'none';
-        setupTabs();
-        document.getElementById('demandModal').style.display = 'block';
-    }
-
-    // 编辑
-    let isEditing = false;
-    let editId = null;
-
-    function editDemand(id) {
-        isEditing = true;
-        editId = id;
-        const demand = demandData.find(item => item.id === id);
-        const langData = demandLangData.find(lang => lang.demand_id === id && lang.language === 'en_US') || {};
-        document.getElementById('modalTitle').textContent = '编辑需求信息';
-        document.getElementById('idField').style.display = 'block';
-        document.getElementById('modalId').value = demand.id;
-        document.getElementById('modalStatus').value = demand.status;
-        document.getElementById('modalUserId').value = demand.user_id;
-        document.getElementById('modalBrandId').value = demand.brand_id;
-        document.getElementById('modalServicesId').value = demand.services_id;
-        document.getElementById('modalPriceFrom').value = demand.price_from;
-        document.getElementById('modalPriceTo').value = demand.price_to;
-        document.getElementById('modalQuantity').value = demand.quantity;
-        document.getElementById('modalDeposit').value = demand.deposit;
-        document.getElementById('modalSamplesNeed').value = demand.samples_need;
-        document.getElementById('modalAfterSalesTime').value = moment.unix(demand.after_sales_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalStartTime').value = moment.unix(demand.start_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalEndTime').value = moment.unix(demand.end_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalPaidRestMoney').value = demand.paid_rest_money;
-        document.getElementById('modalPaidTime').value = demand.paid_time ? moment.unix(demand.paid_time).format('YYYY-MM-DDTHH:mm') : '';
-        document.getElementById('modalChooseStoreId').value = demand.choose_store_id;
-        document.getElementById('modalChooseUnitPrice').value = demand.choose_unit_price;
-        document.getElementById('modalChooseTime').value = demand.choose_time ? moment.unix(demand.choose_time).format('YYYY-MM-DDTHH:mm') : '';
-        document.getElementById('modalAmount').value = demand.amount;
-        document.getElementById('modalLanguage').value = langData.language || 'en_US';
-        document.getElementById('modalLanguage').disabled = true;
-        document.getElementById('modalVersion').value = langData.version || '1';
-        document.getElementById('modalSeoKeywords').value = langData.seo_keywords || '';
-        document.getElementById('modalSeoDescription').value = langData.seo_description || '';
-        document.getElementById('modalAfterSalesRules').value = langData.after_sales_rules || '';
-        document.getElementById('modalDemandName').value = langData.demand_name || '';
-        document.getElementById('modalDemandInformation').value = langData.demand_information || '';
-        document.getElementById('createTimeField').style.display = 'block';
-        document.getElementById('modalCreateTime').value = moment.unix(demand.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('confirmTimeField').style.display = 'block';
-        document.getElementById('modalConfirmTime').value = demand.confirm_time ? moment.unix(demand.confirm_time).format('YYYY-MM-DDTHH:mm') : '';
-        setupTabs();
-        document.getElementById('demandModal').style.display = 'block';
-    }
-
-    // 设置 Tab
-    function setupTabs() {
-        const tabButtons = document.querySelectorAll('#demandModal .ant-tabs-tab');
-        const tabPanes = document.querySelectorAll('#demandModal .ant-tabs-tabpane');
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
-                button.classList.add('ant-tabs-tab-active');
-                const tabId = button.getAttribute('data-tab');
-                tabPanes.forEach(pane => {
-                    pane.style.display = pane.id === tabId ? 'block' : 'none';
-                });
-                document.querySelector('#demandModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
-                document.querySelector('#demandModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
-            });
-        });
-        tabButtons[0].click(); // 默认激活第一个 Tab
-    }
-
-    // 保存
-    function saveDemand() {
-        const demand = {
-            id: isEditing ? editId : demandData.length + 1,
-            status: parseInt(document.getElementById('modalStatus').value),
-            user_id: parseInt(document.getElementById('modalUserId').value) || 0,
-            brand_id: parseInt(document.getElementById('modalBrandId').value) || 0,
-            services_id: parseInt(document.getElementById('modalServicesId').value) || 0,
-            price_from: parseFloat(document.getElementById('modalPriceFrom').value) || 0,
-            price_to: parseFloat(document.getElementById('modalPriceTo').value) || 0,
-            quantity: parseInt(document.getElementById('modalQuantity').value) || 0,
-            deposit: parseFloat(document.getElementById('modalDeposit').value) || 0,
-            samples_need: parseInt(document.getElementById('modalSamplesNeed').value),
-            after_sales_time: document.getElementById('modalAfterSalesTime').value ? moment(document.getElementById('modalAfterSalesTime').value).unix() : 0,
-            start_time: document.getElementById('modalStartTime').value ? moment(document.getElementById('modalStartTime').value).unix() : 0,
-            end_time: document.getElementById('modalEndTime').value ? moment(document.getElementById('modalEndTime').value).unix() : 0,
-            paid_rest_money: parseFloat(document.getElementById('modalPaidRestMoney').value) || 0,
-            paid_time: document.getElementById('modalPaidTime').value ? moment(document.getElementById('modalPaidTime').value).unix() : 0,
-            choose_store_id: parseInt(document.getElementById('modalChooseStoreId').value) || 0,
-            choose_unit_price: parseFloat(document.getElementById('modalChooseUnitPrice').value) || 0,
-            choose_time: document.getElementById('modalChooseTime').value ? moment(document.getElementById('modalChooseTime').value).unix() : 0,
-            amount: parseFloat(document.getElementById('modalAmount').value) || 0,
-            create_time: isEditing ? demandData.find(item => item.id === editId).create_time : moment().unix(),
-            confirm_time: isEditing ? demandData.find(item => item.id === editId).confirm_time : 0
-        };
-
-        const lang = {
-            id: isEditing ? demandLangData.find(lang => lang.demand_id === editId && lang.language === document.getElementById('modalLanguage').value)?.id || demandLangData.length + 1 : demandLangData.length + 1,
-            demand_id: demand.id,
-            language: document.getElementById('modalLanguage').value,
-            version: parseInt(document.getElementById('modalVersion').value) || 1,
-            seo_keywords: document.getElementById('modalSeoKeywords').value,
-            seo_description: document.getElementById('modalSeoDescription').value,
-            after_sales_rules: document.getElementById('modalAfterSalesRules').value,
-            demand_name: document.getElementById('modalDemandName').value,
-            demand_information: document.getElementById('modalDemandInformation').value
-        };
-
-        if (isEditing) {
-            const demandIndex = demandData.findIndex(item => item.id === editId);
-            demandData[demandIndex] = demand;
-            const langIndex = demandLangData.findIndex(item => item.demand_id === editId && item.language === lang.language);
-            if (langIndex >= 0) {
-                demandLangData[langIndex] = lang;
-            } else {
-                demandLangData.push(lang);
+        if (demand && langEntry) {
+            if (status === 2 && !siteReply) {
+                alert('请填写拒绝原因');
+                return;
             }
-        } else {
-            demandData.push(demand);
-            demandLangData.push(lang);
+
+            demand.status = status;
+            if (status === 2 && siteReply) {
+                langEntry.site_reply = siteReply; // 拒绝时保存回复
+            }
+            langEntry.update_time = moment().unix();
         }
-        closeModal();
-        renderDemandList();
+
+        closeReviewModal();
+        renderTable();
     }
 
-    // 删除
-    function deleteDemand(id) {
-        if (confirm('确定要删除此需求信息吗？')) {
-            demandData = demandData.filter(item => item.id !== id);
-            demandLangData = demandLangData.filter(item => item.demand_id !== id);
-            renderDemandList();
-        }
+    // 显示预览弹窗
+    function showPreviewModal(fieldName, oldValue, newValue, isImageField = false) {
+        const modal = document.getElementById('previewModal');
+        const contentHeight = Math.min(Math.max(oldValue.length, newValue.length) * 20, window.innerHeight * 0.8);
+        let oldDisplay = unescapeHtml(oldValue);
+        let newDisplay = unescapeHtml(newValue);
+
+        modal.innerHTML = `
+            <div class="modal-content" style="width: 70%; height: ${contentHeight}px; min-height: 20vh; max-height: 80vh; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <button class="close-btn" onclick="closePreviewModal()">×</button>
+                <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">${fieldName} 预览</h3>
+                <div style="display: flex; height: calc(100% - 40px);">
+                    <div style="flex: 1; padding: 12px; overflow-y: auto; border-right: 1px solid #ddd; background: #fafafa;">
+                        <strong style="color: #555;">旧版本:</strong>
+                        <div style="margin-top: 8px;">${oldDisplay}</div>
+                    </div>
+                    <div style="flex: 1; padding: 12px; overflow-y: auto; background: #fff;">
+                        <strong style="color: #555;">新版本:</strong>
+                        <div style="margin-top: 8px;">${newDisplay}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        modal.style.display = 'block';
     }
 
-    // 批量删除
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的需求信息');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个需求信息吗？`)) {
-            demandData = demandData.filter(item => !selectedIds.includes(item.id));
-            demandLangData = demandLangData.filter(item => !selectedIds.includes(item.demand_id));
-            renderDemandList();
-        }
+    // 关闭预览弹窗
+    function closePreviewModal() {
+        const modal = document.getElementById('previewModal');
+        if (modal) modal.style.display = 'none';
     }
 
-    // 批量修改状态
-    function batchEditStatus() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要修改状态的需求信息');
-            return;
-        }
-        document.getElementById('selectedIds').value = selectedIds.join(', ');
-        document.getElementById('statusModal').style.display = 'block';
+    // HTML 转义和反转义
+    function escapeHtml(text) {
+        return text.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, '\'');
     }
-
-    function saveBatchStatus() {
-        const newStatus = parseInt(document.getElementById('newStatus').value);
-        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
-        demandData = demandData.map(item => selectedIds.includes(item.id) ? {...item, status: newStatus} : item);
-        closeStatusModal();
-        renderDemandList();
+    function unescapeHtml(html) {
+        return html.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, "'");
     }
-
-    function closeModal() {
-        document.getElementById('demandModal').style.display = 'none';
-    }
-
-    function closeStatusModal() {
-        document.getElementById('statusModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        w3.includeHTML(() => {
-            initMenus();
-            populateDropdowns();
-            generateSampleData();
-        });
-    };
 </script>
 </body>
 </html>
