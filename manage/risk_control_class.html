@@ -25,6 +25,8 @@
         .col-create-time { width: 12%; min-width: 100px; }
         .col-actions { width: 12%; min-width: 100px; }
         .risk-init-preview { margin-top: 8px; padding: 8px; background: #f5f5f5; border-radius: 4px; max-height: 200px; overflow-y: auto; font-family: monospace; }
+        .risk-init-preview pre { margin: 0; padding: 0; background: none; border: none; }
+        .risk-init-preview code { padding: 0; }
     </style>
 </head>
 <body>
@@ -107,7 +109,7 @@
         '登录安全检查', '交易风险分析', '评论过滤', '账户风险评估', '广告合规检查'
     ];
 
-    // 格式化 JSON 并返回字符串
+    // 格式化 JSON 并返回字符串（用于 textarea）
     function formatJson(jsonString) {
         try {
             const cleanedJson = jsonString.trim();
@@ -115,11 +117,11 @@
             return JSON.stringify(jsonObj, null, 2);
         } catch (e) {
             console.error('JSON 解析错误:', e.message, '输入:', jsonString);
-            return jsonString; // 如果解析失败，返回原始输入
+            return jsonString; // 解析失败时返回原输入
         }
     }
 
-    // 高亮 JSON 用于预览
+    // 高亮 JSON 用于预览（返回 HTML）
     function highlightJson(jsonString) {
         if (!window.Prism || !Prism.languages.json) {
             return '<span style="color: red;">Prism.js 未正确加载或 JSON 支持不可用</span>';
@@ -128,9 +130,9 @@
             const cleanedJson = jsonString.trim();
             const jsonObj = JSON.parse(cleanedJson);
             const formattedJson = JSON.stringify(jsonObj, null, 2);
-            return Prism.highlight(formattedJson, Prism.languages.json, 'json');
+            return '<pre><code class="language-json">' + Prism.highlight(formattedJson, Prism.languages.json, 'json') + '</code></pre>';
         } catch (e) {
-            return '<span style="color: red;">无效的 JSON 格式: ' + e.message + '</span>';
+            return '<pre><code><span style="color: red;">无效的 JSON 格式: ' + e.message + '</span></code></pre>';
         }
     }
 
@@ -140,14 +142,14 @@
         const preview = document.getElementById('riskInitPreview');
         if (textarea) {
             const formattedJson = formatJson(textarea.value);
-            textarea.value = formattedJson; // 实时格式化 textarea
+            textarea.value = formattedJson; // 格式化 textarea
             if (preview) {
-                preview.innerHTML = highlightJson(formattedJson); // 更新预览
+                preview.innerHTML = highlightJson(formattedJson); // 更新预览并高亮
             }
         }
     }
 
-    // 重写 renderModal 以支持实时格式化
+    // 重写 renderModal 以支持格式化和高亮
     window.onload = function() {
         w3.includeHTML(() => {
             initMenus();
@@ -167,7 +169,7 @@
                         const textarea = document.getElementById('modalrisk_init');
                         if (textarea) {
                             textarea.addEventListener('input', updateRiskInitFormatAndPreview);
-                            updateRiskInitFormatAndPreview(); // 初始加载时格式化
+                            updateRiskInitFormatAndPreview(); // 初始加载时格式化并高亮
                         }
                     }
                 }, 0);
