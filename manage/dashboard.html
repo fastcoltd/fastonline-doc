@@ -39,14 +39,15 @@
                         <option value="50">Top 50</option>
                         <option value="100">Top 100</option>
                     </select>
-                    <select class="ant-select" id="hotTimeRangeSelect" onchange="updateHotSection()">
-                        <option value="today" selected>今天</option>
-                        <option value="7">最近1周</option>
-                        <option value="30">最近30天</option>
-                        <option value="60">最近60天</option>
-                        <option value="90">最近90天</option>
-                        <option value="custom">自定义</option>
-                    </select>
+                    <div class="time-btn-group">
+                        <button class="time-btn" data-range="today" onclick="updateHotSection('today')">今天</button>
+                        <button class="time-btn" data-range="3" onclick="updateHotSection('3')">最近3天</button>
+                        <button class="time-btn" data-range="7" onclick="updateHotSection('7')">最近1周</button>
+                        <button class="time-btn" data-range="30" onclick="updateHotSection('30')">最近30天</button>
+                        <button class="time-btn" data-range="60" onclick="updateHotSection('60')">最近60天</button>
+                        <button class="time-btn" data-range="90" onclick="updateHotSection('90')">最近90天</button>
+                        <button class="time-btn" data-range="custom" onclick="toggleHotCustomRange()">自定义</button>
+                    </div>
                     <input type="date" class="ant-input" id="hotStartDate" onchange="updateHotCustomRange()" value="2025-03-07" style="display: none;">
                     <input type="date" class="ant-input" id="hotEndDate" onchange="updateHotCustomRange()" value="2025-03-07" style="display: none;">
                 </div>
@@ -56,42 +57,45 @@
             <!-- 趋势统计 -->
             <div class="charts-section">
                 <h2 style="font-size: 20px; margin-bottom: 24px;">趋势统计</h2>
-                <div class="time-filter">
-                    <select class="ant-select" id="timeRangeSelect" onchange="updateTimeRange(this.value)">
-                        <option value="7">最近1周</option>
-                        <option value="30">最近30天</option>
-                        <option value="60">最近60天</option>
-                        <option value="90">最近90天</option>
-                        <option value="custom">自定义</option>
-                    </select>
-                    <input type="date" class="ant-input" id="startDate" onchange="updateCustomRange()" value="2025-02-28">
-                    <input type="date" class="ant-input" id="endDate" onchange="updateCustomRange()" value="2025-03-07">
-                </div>
-                <div class="brand-service-filter">
-                    <select class="ant-select" id="brandSelect">
-                        <option value="">全部品牌</option>
-                        <option value="apple">苹果</option>
-                        <option value="google">谷歌</option>
-                        <option value="microsoft">微软</option>
-                        <option value="yahoo">雅虎</option>
-                        <option value="tiktok">TikTok</option>
-                        <option value="facebook">Facebook</option>
-                    </select>
-                    <select class="ant-select" id="serviceSelect">
-                        <option value="">全部服务</option>
-                        <option value="account">账号</option>
-                        <option value="pointcard">点卡</option>
-                        <option value="equipment">装备</option>
-                        <option value="article">软文</option>
-                        <option value="software">软件</option>
-                        <option value="membership">会员</option>
-                        <option value="giftcard">礼品卡</option>
-                        <option value="virtualgoods">虚拟商品</option>
-                        <option value="advertising">广告</option>
-                        <option value="consulting">咨询</option>
-                        <option value="training">培训</option>
-                        <option value="data">数据服务</option>
-                    </select>
+                <div class="filter-row">
+                    <div class="brand-service-filter">
+                        <select class="ant-select" id="brandSelect">
+                            <option value="">全部品牌</option>
+                            <option value="apple">苹果</option>
+                            <option value="google">谷歌</option>
+                            <option value="microsoft">微软</option>
+                            <option value="yahoo">雅虎</option>
+                            <option value="tiktok">TikTok</option>
+                            <option value="facebook">Facebook</option>
+                        </select>
+                        <select class="ant-select" id="serviceSelect">
+                            <option value="">全部服务</option>
+                            <option value="account">账号</option>
+                            <option value="pointcard">点卡</option>
+                            <option value="equipment">装备</option>
+                            <option value="article">软文</option>
+                            <option value="software">软件</option>
+                            <option value="membership">会员</option>
+                            <option value="giftcard">礼品卡</option>
+                            <option value="virtualgoods">虚拟商品</option>
+                            <option value="advertising">广告</option>
+                            <option value="consulting">咨询</option>
+                            <option value="training">培训</option>
+                            <option value="data">数据服务</option>
+                        </select>
+                    </div>
+                    <div class="time-filter">
+                        <div class="time-btn-group">
+                            <button class="time-btn" data-range="3" onclick="updateTimeRange('3')">最近3天</button>
+                            <button class="time-btn" data-range="7" onclick="updateTimeRange('7')">最近1周</button>
+                            <button class="time-btn" data-range="30" onclick="updateTimeRange('30')">最近30天</button>
+                            <button class="time-btn" data-range="60" onclick="updateTimeRange('60')">最近60天</button>
+                            <button class="time-btn" data-range="90" onclick="updateTimeRange('90')">最近90天</button>
+                            <button class="time-btn" data-range="custom" onclick="toggleCustomRange()">自定义</button>
+                        </div>
+                        <input type="date" class="ant-input" id="startDate" onchange="updateCustomRange()" value="2025-02-28" style="display: none;">
+                        <input type="date" class="ant-input" id="endDate" onchange="updateCustomRange()" value="2025-03-07" style="display: none;">
+                    </div>
                 </div>
                 <div class="charts-container">
                     <div class="chart-card">
@@ -344,26 +348,31 @@
     }
 
     // 更新平台热门數據
-    function updateHotSection() {
-        const timeRange = document.getElementById('hotTimeRangeSelect').value;
+    function updateHotSection(value) {
         const startDateInput = document.getElementById('hotStartDate');
         const endDateInput = document.getElementById('hotEndDate');
+        const today = moment('2025-03-07');
 
-        if (timeRange === 'custom') {
+        // 移除所有按钮的 active 状态
+        document.querySelectorAll('.hot-filter .time-btn').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.querySelectorAll(`.hot-filter .time-btn[data-range="${value || 'today'}"]`);
+        if (activeBtn) activeBtn.forEach(item =>{
+            item.classList.add('active')
+        });
+
+        if (value === 'custom') {
             startDateInput.style.display = 'inline-block';
             endDateInput.style.display = 'inline-block';
         } else {
             startDateInput.style.display = 'none';
             endDateInput.style.display = 'none';
-            const today = moment('2025-03-07');
-            const days = timeRanges[timeRange] || 1;
+            const days = value === 'today' ? 1 : (timeRanges[value] || 1);
             const startDate = today.clone().subtract(days - 1, 'days');
             startDateInput.value = startDate.format('YYYY-MM-DD');
             endDateInput.value = today.format('YYYY-MM-DD');
             generateHotStats();
         }
     }
-
     // 自定义时间范围更新
     function updateHotCustomRange() {
         const startDate = moment(document.getElementById('hotStartDate').value);
@@ -478,10 +487,20 @@
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
         const today = moment('2025-03-07');
+
+        // 移除所有按钮的 active 状态
+        document.querySelectorAll('.time-btn-group .time-btn').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.querySelectorAll(`.time-btn[data-range="${value}"]`);
+        if (activeBtn) activeBtn.forEach(item =>{
+            item.classList.add('active')
+        });
+
         if (value === 'custom') {
             startDateInput.style.display = 'inline-block';
             endDateInput.style.display = 'inline-block';
         } else {
+            startDateInput.style.display = 'none';
+            endDateInput.style.display = 'none';
             const days = parseInt(value);
             const endDate = today;
             const startDate = today.clone().subtract(days - 1, 'days');
@@ -514,7 +533,16 @@
         }
     }
 
-    // 初始化
+    // 切换自定义时间范围（趋势统计）
+    function toggleCustomRange() {
+        updateTimeRange('custom');
+    }
+
+    function toggleHotCustomRange() {
+        updateHotSection('custom');
+    }
+
+    // 初始化时默认选中“最近1周”和“今天”
     window.onload = () => {
         console.log('Page loaded, initializing...');
         w3.includeHTML(() => {
@@ -523,7 +551,8 @@
             generateDashboardStats();
             generateHotStats();
             initCharts();
-            updateTimeRange('7');
+            updateTimeRange('7');  // 默认选中“最近1周”
+            updateHotSection('today');  // 默认选中“今天”
         });
     };
 </script>
