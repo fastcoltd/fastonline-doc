@@ -3,36 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 排班交接事项</title>
+    <title>FASTRESP - 班次交接</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
-        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
-        .action-container { margin-bottom: 16px; }
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 15%; min-width: 60px; }
-        .col-status { width: 15%; min-width: 60px; }
-        .col-work-sort { width: 20%; min-width: 100px; }
-        .col-handover-type { width: 20%; min-width: 100px; }
-        .col-relation-id { width: 20%; min-width: 100px; }
-        .col-create-time { width: 20%; min-width: 100px; }
-        .col-actions { width: 15%; min-width: 100px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1080px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 1440px; overflow-y: auto; position: relative; }
-        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
-        .modal-content .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
-        .modal-content .ant-form-item label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-work-sort { width: 10%; min-width: 80px; }
+        .col-handover-type { width: 10%; min-width: 80px; }
+        .col-relation-id { width: 12%; min-width: 100px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 15%; min-width: 120px; }
+        .handover-modal { max-width: 1080px; height: 80vh; overflow-y: auto; }
+        .handover-section { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .log-table { width: 100%; border-collapse: collapse; }
+        .log-table th, .log-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        .handover-info span { display: inline-block; margin-right: 20px; }
+        .submit-section { text-align: right; }
+        .modal-buttons { margin-top: 20px; text-align: right; }
     </style>
 </head>
 <body>
@@ -46,57 +40,22 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule_handover.html')" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">排班交接事项</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule_handover.html')">
+                                    <span class="ant-tabs-tab-btn">班次交接</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <input type="number" id="workSortFilter" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()" placeholder="工作排序">
-                                    <input type="number" id="relationIdFilter" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()" placeholder="关联ID">
-                                    <input type="date" id="startDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                    <input type="date" id="endDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addHandover()">添加</button>
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                </div>
-                                <!-- 数据区域 -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-status">状态</div>
-                                        <div class="col-work-sort">工作排序</div>
-                                        <div class="col-handover-type">交接类型</div>
-                                        <div class="col-relation-id">关联ID</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
-                                    <div id="handover-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <div class="ant-select ant-select-single ant-select-show-arrow">
-                                            <select id="perPage" onchange="changePerPage()">
-                                                <option value="10">10 条/页</option>
-                                                <option value="20" selected>20 条/页</option>
-                                                <option value="50">50 条/页</option>
-                                                <option value="100">100 条/页</option>
-                                            </select>
-                                        </div>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="table-header"></div>
+                                    <div id="schedule_handover-list">加载中...</div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -106,283 +65,370 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-
-    <!-- 添加弹窗 -->
-    <div id="addModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeAddModal()">×</button>
-            <h3>添加排班交接事项</h3>
-            <form id="addForm">
-                <div class="ant-form-item">
-                    <label>状态:</label>
-                    <select id="addStatus">
-                        <option value="0">交接中</option>
-                        <option value="1">已完结</option>
-                        <option value="2">超时</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>工作排序:</label>
-                    <input type="number" id="addWorkSort">
-                </div>
-                <div class="ant-form-item">
-                    <label>交接类型:</label>
-                    <select id="addHandoverType">
-                        <option value="0">全部工作类型</option>
-                        <option value="1">类型 1</option>
-                        <option value="2">类型 2</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>关联ID:</label>
-                    <input type="number" id="addRelationId" min="0">
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeAddModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveAdd()">保存</button>
-                </div>
-            </form>
+    <div id="mainModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="close-btn" onclick="closeModal('mainModal')">×</button>
+            <div id="mainModalContent"></div>
         </div>
     </div>
-
-    <!-- 编辑弹窗 -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeEditModal()">×</button>
-            <h3>编辑排班交接事项</h3>
-            <form id="editForm">
-                <div class="ant-form-item">
-                    <label>ID:</label>
-                    <input type="text" id="editId" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>状态:</label>
-                    <select id="editStatus">
-                        <option value="0">交接中</option>
-                        <option value="1">已完结</option>
-                        <option value="2">超时</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>工作排序:</label>
-                    <input type="number" id="editWorkSort">
-                </div>
-                <div class="ant-form-item">
-                    <label>交接类型:</label>
-                    <select id="editHandoverType">
-                        <option value="0">全部工作类型</option>
-                        <option value="1">类型 1</option>
-                        <option value="2">类型 2</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>关联ID:</label>
-                    <input type="number" id="editRelationId" min="0">
-                </div>
-                <div class="ant-form-item">
-                    <label>创建时间:</label>
-                    <input type="datetime-local" id="editCreateTime" disabled>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeEditModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveEdit()">保存</button>
-                </div>
-            </form>
+    <div id="handoverModal" class="modal">
+        <div class="modal-content handover-modal">
+            <button class="close-btn" onclick="closeModal('handoverModal')">×</button>
+            <div id="handoverDetails"></div>
+        </div>
+    </div>
+    <div id="editLogModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="close-btn" onclick="closeModal('editLogModal')">×</button>
+            <div id="editLogForm"></div>
         </div>
     </div>
 </div>
 
 <script>
-    let handoverData = [];
-    let handoverPage = 1, handoverPerPage = 20;
-
-    function fetchData() {
-        console.log('Fetching handover data...');
-        handoverData = [];
-        for (let i = 1; i <= 200; i++) {
-            const handover = {
-                id: i,
-                status: Math.floor(Math.random() * 3), // 0: 交接中, 1: 已完结, 2: 超时
-                work_sort: Math.floor(Math.random() * 100),
-                handover_type: Math.floor(Math.random() * 3), // 0: 全部, 1: 类型 1, 2: 类型 2
-                relation_id: i * 1000 + Math.floor(Math.random() * 100),
-                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
-            };
-            handoverData.push(handover);
-        }
-        renderHandoverList();
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function getStatusText(status) {
-        switch (status) {
-            case 0: return '<span class="ant-tag ant-tag-blue">交接中</span>';
-            case 1: return '<span class="ant-tag ant-tag-green">已完结</span>';
-            case 2: return '<span class="ant-tag ant-tag-red">超时</span>';
-            default: return status;
-        }
-    }
+    // 模拟数据
+    const scheduleNames = ['早班', '中班', '晚班', '夜班', '全天班'];
+    const managerNames = ['张经理', '李经理', '王经理', '赵经理', '钱经理'];
+    const handoverTypes = [
+        { value: 0, label: '文章审核' },
+        { value: 1, label: '店铺审核' },
+        { value: 2, label: 'KYC审核' },
+        { value: 3, label: '商品审核' },
+        { value: 4, label: '商品退款' },
+        { value: 5, label: '店铺提现' },
+        { value: 6, label: '订单审核' },
+        { value: 7, label: '支付审核' },
+        { value: 8, label: '物流跟踪' },
+        { value: 9, label: '客服支持' },
+        { value: 10, label: '促销审批' },
+        { value: 11, label: '库存调整' }
+    ];
+    const priorityOptions = [
+        { value: 1, label: '低' },
+        { value: 2, label: '中' },
+        { value: 3, label: '高' },
+        { value: 4, label: '紧急' }
+    ];
 
-    function getHandoverTypeText(type) {
-        return type === 0 ? '全部工作类型' : `类型 ${type}`;
-    }
+    // 日志表数据（模拟）
+    let handoverLogData = [];
 
-    function renderHandoverList() {
-        const start = (handoverPage - 1) * handoverPerPage;
-        const end = start + handoverPerPage;
-        const paginatedData = handoverData.slice(start, end);
-        const listContainer = document.getElementById('handover-list');
-        listContainer.innerHTML = '';
-
-        paginatedData.forEach(handover => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            itemDiv.style = `border-bottom: 1px solid #ddd;`;
-            itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${handover.id}"></div>
-                <div class="col-id">${handover.id}</div>
-                <div class="col-status">${getStatusText(handover.status)}</div>
-                <div class="col-work-sort">${handover.work_sort}</div>
-                <div class="col-handover-type">${getHandoverTypeText(handover.handover_type)}</div>
-                <div class="col-relation-id">${handover.relation_id}</div>
-                <div class="col-create-time">${moment.unix(handover.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                <div class="col-actions">
-                    <button class="ant-btn" onclick="editHandover(${handover.id})">编辑</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteHandover(${handover.id})">删除</button>
-                </div>
-            `;
-            listContainer.appendChild(itemDiv);
-        });
-
-        const totalPages = Math.ceil(handoverData.length / handoverPerPage);
-        document.getElementById('page-info').textContent = `第 ${handoverPage} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
-    }
-
-    function applyFilters() {
-        const workSort = document.getElementById('workSortFilter').value;
-        const relationId = document.getElementById('relationIdFilter').value;
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
-        let filteredData = handoverData;
-        if (workSort) filteredData = filteredData.filter(item => item.work_sort === parseInt(workSort));
-        if (relationId) filteredData = filteredData.filter(item => item.relation_id === parseInt(relationId));
-        if (startDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
-        if (endDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
-
-        handoverPage = 1;
-        handoverData = filteredData;
-        renderHandoverList();
-    }
-
-    function changePage(delta) {
-        const totalPages = Math.ceil(handoverData.length / handoverPerPage);
-        handoverPage += delta;
-        if (handoverPage < 1) handoverPage = 1;
-        if (handoverPage > totalPages) handoverPage = totalPages;
-        renderHandoverList();
-    }
-
-    function jumpToPage() {
-        const page = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(handoverData.length / handoverPerPage);
-        if (page >= 1 && page <= totalPages) {
-            handoverPage = page;
-            renderHandoverList();
-        } else {
-            alert('请输入有效的页码');
-        }
-    }
-
-    function changePerPage() {
-        handoverPerPage = parseInt(document.getElementById('perPage').value);
-        handoverPage = 1;
-        renderHandoverList();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    function addHandover() {
-        document.getElementById('addStatus').value = '0';
-        document.getElementById('addWorkSort').value = '';
-        document.getElementById('addHandoverType').value = '0';
-        document.getElementById('addRelationId').value = '';
-        document.getElementById('addModal').style.display = 'block';
-    }
-
-    function editHandover(id) {
-        const handover = handoverData.find(h => h.id === id);
-        document.getElementById('editId').value = handover.id;
-        document.getElementById('editStatus').value = handover.status;
-        document.getElementById('editWorkSort').value = handover.work_sort;
-        document.getElementById('editHandoverType').value = handover.handover_type;
-        document.getElementById('editRelationId').value = handover.relation_id;
-        document.getElementById('editCreateTime').value = moment.unix(handover.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('editModal').style.display = 'block';
-    }
-
-    function saveAdd() {
-        const newHandover = {
-            id: handoverData.length + 1,
-            status: parseInt(document.getElementById('addStatus').value),
-            work_sort: parseInt(document.getElementById('addWorkSort').value) || 0,
-            handover_type: parseInt(document.getElementById('addHandoverType').value),
-            relation_id: parseInt(document.getElementById('addRelationId').value) || 0,
-            create_time: moment().unix()
-        };
-        handoverData.push(newHandover);
-        closeAddModal();
-        renderHandoverList();
-    }
-
-    function saveEdit() {
-        const handover = handoverData.find(h => h.id === parseInt(document.getElementById('editId').value));
-        handover.status = parseInt(document.getElementById('editStatus').value);
-        handover.work_sort = parseInt(document.getElementById('editWorkSort').value) || 0;
-        handover.handover_type = parseInt(document.getElementById('editHandoverType').value);
-        handover.relation_id = parseInt(document.getElementById('editRelationId').value) || 0;
-        closeEditModal();
-        renderHandoverList();
-    }
-
-    function deleteHandover(id) {
-        if (confirm('确定要删除此排班交接事项吗？')) {
-            handoverData = handoverData.filter(h => h.id !== id);
-            renderHandoverList();
-        }
-    }
-
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的排班交接事项');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个排班交接事项吗？`)) {
-            handoverData = handoverData.filter(h => !selectedIds.includes(h.id));
-            renderHandoverList();
-        }
-    }
-
-    function closeAddModal() {
-        document.getElementById('addModal').style.display = 'none';
-    }
-
-    function closeEditModal() {
-        document.getElementById('editModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        console.log('Page loaded, initializing...');
-        w3.includeHTML(() => {
-            console.log('External HTML included');
-            initMenus();
-            fetchData();
-        });
+    window.tableConfig = {
+        tableName: 'schedule_handover',
+        tableTitle: '班次交接',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'status', generator: () => randomInt(0, 2) },
+            { name: 'work_sort', generator: () => randomInt(1, 4) },
+            { name: 'handover_type', generator: () => randomInt(0, 11) },
+            { name: 'relation_id', generator: () => randomInt(1, 1000) },
+            { name: 'mark', generator: id => `初始备注 #${id}` },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '交接中' }, { value: 1, label: '已完结' }, { value: 2, label: '超时' }] } },
+            { label: '交接', className: 'ant-btn ant-btn-primary', action: 'addRecord' }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-orange">交接中</span>' : v === 1 ? '<span class="ant-tag ant-tag-green">已完结</span>' : '<span class="ant-tag ant-tag-red">超时</span>' },
+            { name: 'work_sort', label: '优先级', className: 'col-work-sort', formatter: v => priorityOptions.find(p => p.value === v)?.label || v },
+            { name: 'handover_type', label: '交接类型', className: 'col-handover-type', formatter: v => handoverTypes.find(t => t.value === v)?.label || v },
+            { name: 'relation_id', label: '关联ID', className: 'col-relation-id' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="customEditRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})" style="margin-right: 8px;">删除</button>
+                <button class="ant-btn ant-btn-default" onclick="showHandoverDetails(${item.id})" style="background-color: #722ed1; color: white;">详情</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '交接中' }, { value: '1', label: '已完结' }, { value: '2', label: '超时' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'work_sort', type: 'select', options: priorityOptions, filter: (data, value) => value === '' ? data : data.filter(d => d.work_sort === parseInt(value)) },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '交接中' }, { value: 1, label: '已完结' }, { value: 2, label: '超时' }], showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: true },
+                    { name: 'work_sort', label: '优先级', type: 'select', options: priorityOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'handover_type', label: '交接类型', type: 'select', options: handoverTypes, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'relation_id', label: '关联ID', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'mark', label: '备注', type: 'textarea', showInAdd: true, showInEdit: false, editableInAdd: true, editableInEdit: false },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            }
+        ]
     };
+
+    // 自定义添加记录
+    function customAddRecord() {
+        const fields = window.tableConfig.modalTabs[0].fields.filter(f => f.showInAdd);
+        const html = `
+            <h3>添加班次交接</h3>
+            ${fields.map(field => `
+                <div style="margin-bottom: 10px;">
+                    <label>${field.label}:</label>
+                    ${field.type === 'select' ? `
+                        <select id="${field.name}" style="width: 100%;">
+                            ${field.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}
+                        </select>
+                    ` : field.type === 'textarea' ? `
+                        <textarea id="${field.name}" rows="5" style="width: 100%;"></textarea>
+                    ` : `
+                        <input type="${field.type}" id="${field.name}" style="width: 100%;">
+                    `}
+                </div>
+            `).join('')}
+            <div class="modal-buttons">
+                <button class="ant-btn ant-btn-primary" onclick="saveRecordWithLog(false)" style="margin-right: 8px;">保存</button>
+                <button class="ant-btn" onclick="closeModal('mainModal')">取消</button>
+            </div>
+        `;
+        document.getElementById('mainModalContent').innerHTML = html;
+        document.getElementById('mainModal').style.display = 'block';
+    }
+
+    // 自定义编辑记录
+    function customEditRecord(id) {
+        const record = tableData.find(d => d.id === id);
+        const fields = window.tableConfig.modalTabs[0].fields.filter(f => f.showInEdit);
+        const html = `
+            <h3>编辑班次交接</h3>
+            ${fields.map(field => `
+                <div style="margin-bottom: 10px;">
+                    <label>${field.label}:</label>
+                    ${field.type === 'select' ? `
+                        <select id="${field.name}" style="width: 100%;">
+                            ${field.options.map(opt => `<option value="${opt.value}" ${record[field.name] === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}
+                        </select>
+                    ` : field.type === 'textarea' ? `
+                        <textarea id="${field.name}" rows="5" style="width: 100%;">${record[field.name] || ''}</textarea>
+                    ` : `
+                        <input type="${field.type}" id="${field.name}" value="${record[field.name] || ''}" style="width: 100%;" ${field.editableInEdit ? '' : 'disabled'}>
+                    `}
+                </div>
+            `).join('')}
+            <div class="modal-buttons">
+                <button class="ant-btn ant-btn-primary" onclick="saveRecordWithLog(true)" style="margin-right: 8px;">保存</button>
+                <button class="ant-btn" onclick="closeModal('mainModal')">取消</button>
+            </div>
+        `;
+        document.getElementById('mainModalContent').innerHTML = html;
+        document.getElementById('mainModal').style.display = 'block';
+    }
+
+    // 生成日志样本数据
+    function generateLogData(handoverId, mark) {
+        return [{
+            id: handoverId * 10 + 1,
+            schedule_handover_id: handoverId,
+            schedule_id: randomInt(1, 20),
+            manage_id: randomInt(1, 10),
+            status: 0,
+            mark: mark || `初始备注 #${handoverId}`,
+            create_time: moment().unix()
+        }];
+    }
+
+    // 自定义保存逻辑
+    function saveRecordWithLog(isEdit) {
+        const formData = {};
+        window.tableConfig.modalTabs[0].fields.forEach(field => {
+            const element = document.getElementById(field.name);
+            if (element) formData[field.name] = element.value;
+        });
+        if (!isEdit) {
+            const newId = Math.max(...tableData.map(d => d.id), 0) + 1;
+            const newRecord = {
+                id: newId,
+                status: 0,
+                work_sort: parseInt(formData.work_sort),
+                handover_type: parseInt(formData.handover_type),
+                relation_id: parseInt(formData.relation_id),
+                mark: formData.mark,
+                create_time: moment().unix()
+            };
+            tableData.push(newRecord);
+            handoverLogData = handoverLogData.concat(generateLogData(newId, formData.mark));
+        } else {
+            const id = parseInt(formData.id);
+            const index = tableData.findIndex(d => d.id === id);
+            tableData[index] = {
+                ...tableData[index],
+                status: parseInt(formData.status),
+                work_sort: parseInt(formData.work_sort),
+                handover_type: parseInt(formData.handover_type),
+                relation_id: parseInt(formData.relation_id)
+            };
+        }
+        closeModal('mainModal');
+        initTable();
+    }
+
+    // 显示详情弹窗
+    function showHandoverDetails(id) {
+        const handover = tableData.find(d => d.id === id);
+        const logs = handoverLogData.filter(log => log.schedule_handover_id === id);
+        if (logs.length === 0) {
+            handoverLogData = handoverLogData.concat(generateLogData(id, handover.mark));
+        }
+        const logList = handoverLogData.filter(log => log.schedule_handover_id === id);
+
+        const html = `
+            <div class="handover-section">
+                <h3>班次交接信息</h3>
+                <div class="handover-info">
+                    <span>ID: ${handover.id}</span>
+                    <span>状态: ${handover.status === 0 ? '交接中' : handover.status === 1 ? '已完结' : '超时'}</span>
+                    <span>优先级: ${priorityOptions.find(p => p.value === handover.work_sort)?.label || handover.work_sort}</span>
+                    <span>交接类型: ${handoverTypes.find(t => t.value === handover.handover_type)?.label || handover.handover_type}</span>
+                    <span>关联ID: ${handover.relation_id}</span>
+                    <span>创建时间: ${moment.unix(handover.create_time).format('YYYY-MM-DD HH:mm:ss')}</span>
+                </div>
+            </div>
+            <div class="handover-section">
+                <h3>交接记录</h3>
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>排班</th>
+                            <th>管理员</th>
+                            <th>状态</th>
+                            <th>备注</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${logList.map(log => `
+                            <tr>
+                                <td>${log.id}</td>
+                                <td>${scheduleNames[log.schedule_id % scheduleNames.length]} (${log.schedule_id})</td>
+                                <td>${managerNames[log.manage_id % managerNames.length]} (${log.manage_id})</td>
+                                <td>${log.status === 0 ? '<span class="ant-tag ant-tag-green">显示</span>' : '<span class="ant-tag ant-tag-red">隐藏</span>'}</td>
+                                <td>${log.mark || '无'}</td>
+                                <td>${moment.unix(log.create_time).format('YYYY-MM-DD HH:mm:ss')}</td>
+                                <td>
+                                    <button class="ant-btn" onclick="editLog(${log.id})" style="margin-right: 8px;">编辑</button>
+                                    <button class="ant-btn ant-btn-danger" onclick="deleteLog(${log.id})">删除</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <div class="handover-section">
+                <h3>添加备注</h3>
+                <textarea id="newMark" rows="5" style="width: 100%;" placeholder="输入本次日志信息"></textarea>
+            </div>
+            <div class="handover-section submit-section">
+                <button class="ant-btn ant-btn-primary" onclick="saveHandoverLog(${id})" style="margin-right: 8px;">提交保存</button>
+                <button class="ant-btn ant-btn-success" onclick="completeHandover(${id})">完成交接</button>
+            </div>
+        `;
+        document.getElementById('handoverDetails').innerHTML = html;
+        document.getElementById('handoverModal').style.display = 'block';
+    }
+
+    // 编辑日志
+    function editLog(logId) {
+        const log = handoverLogData.find(l => l.id === logId);
+        const html = `
+            <h3>编辑日志</h3>
+            <div style="margin-bottom: 10px;">
+                <label>状态:</label>
+                <select id="editStatus" style="width: 100%;">
+                    <option value="0" ${log.status === 0 ? 'selected' : ''}>显示</option>
+                    <option value="1" ${log.status === 1 ? 'selected' : ''}>隐藏</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>备注:</label>
+                <textarea id="editMark" rows="5" style="width: 100%;">${log.mark || ''}</textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="ant-btn ant-btn-primary" onclick="saveEditedLog(${logId})" style="margin-right: 8px;">保存</button>
+                <button class="ant-btn" onclick="closeModal('editLogModal')">取消</button>
+            </div>
+        `;
+        document.getElementById('editLogForm').innerHTML = html;
+        document.getElementById('editLogModal').style.display = 'block';
+    }
+
+    // 保存编辑的日志
+    function saveEditedLog(logId) {
+        const status = parseInt(document.getElementById('editStatus').value);
+        const mark = document.getElementById('editMark').value;
+        const logIndex = handoverLogData.findIndex(l => l.id === logId);
+        handoverLogData[logIndex] = { ...handoverLogData[logIndex], status, mark };
+        closeModal('editLogModal');
+        showHandoverDetails(handoverLogData[logIndex].schedule_handover_id);
+    }
+
+    // 删除日志
+    function deleteLog(logId) {
+        handoverLogData = handoverLogData.filter(l => l.id !== logId);
+        showHandoverDetails(handoverLogData.find(l => l.id > logId)?.schedule_handover_id || tableData[0].id);
+    }
+
+    // 保存新增日志
+    function saveHandoverLog(handoverId) {
+        const mark = document.getElementById('newMark').value;
+        if (mark.trim()) {
+            const newLog = {
+                id: Math.max(...handoverLogData.map(l => l.id), 0) + 1,
+                schedule_handover_id: handoverId,
+                schedule_id: randomInt(1, 20),
+                manage_id: randomInt(1, 10),
+                status: 0,
+                mark,
+                create_time: moment().unix()
+            };
+            handoverLogData.push(newLog);
+            document.getElementById('newMark').value = '';
+        }
+        showHandoverDetails(handoverId);
+    }
+
+    // 完成交接
+    function completeHandover(handoverId) {
+        const index = tableData.findIndex(d => d.id === handoverId);
+        tableData[index].status = 1;
+        closeModal('handoverModal');
+        initTable();
+    }
+
+    // 关闭弹窗
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // 重写 addRecord 和 editRecord
+    window.addRecord = customAddRecord;
+    window.customEditRecord = customEditRecord;
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
 </script>
 </body>
 </html>
