@@ -22,6 +22,7 @@
         .col-last-name { width: 10%; min-width: 80px; }
         .col-id-pic { width: 10%; min-width: 80px; }
         .col-hands-pic { width: 10%; min-width: 80px; }
+        .col-version { width: 8%; min-width: 80px; }
         .col-create-time { width: 15%; min-width: 120px; }
         .col-actions { width: 10%; min-width: 100px; }
         .pic-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; margin-right: 4px; }
@@ -115,6 +116,7 @@
             { name: 'id_pic', generator: () => getRandomImage('sexy') }, // 证件照片
             { name: 'hands_pic', generator: () => getRandomImage('sexy') }, // 手持证件照片
             { name: 'reply_message', generator: id => `KYC review for user ${id}: ${randomInt(0, 1) ? 'Approved' : 'Needs more info'}` }, // 回复消息
+            { name: 'version', generator: () => randomInt(1, 5) }, // 添加 version 字段，初始 1-5
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() } // 创建时间
         ],
         actionButtons: [
@@ -123,60 +125,243 @@
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '通过' }, { value: 2, label: '拒绝' }] } },
             { label: '批量修改KYC类型', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'kyc_type', label: 'KYC类型', type: 'select', options: [{ value: 0, label: '身份证' }, { value: 1, label: '护照' }, { value: 2, label: '驾照' }] } },
             { label: '批量修改用户', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'user_id', label: '用户ID', type: 'number' } }
-        ],
-        listFields: [
-            { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'user_id', label: '用户ID', className: 'col-user-id' },
-            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-blue">待审核</span>' : v === 1 ? '<span class="ant-tag ant-tag-green">通过</span>' : '<span class="ant-tag ant-tag-red">拒绝</span>' },
-            { name: 'kyc_type', label: 'KYC类型', className: 'col-kyc-type', formatter: v => v === 0 ? '身份证' : v === 1 ? '护照' : '驾照' },
-            { name: 'first_name', label: '名', className: 'col-first-name' },
-            { name: 'last_name', label: '姓', className: 'col-last-name' },
-            { name: 'id_pic', label: '证件照片', className: 'col-id-pic', formatter: v => v ? `<div class="pic-preview"><img src="${v}" alt="证件照片" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="pic-preview"><span class="placeholder" onclick="alert(\'照片不存在\')">无</span></div>' },
-            { name: 'hands_pic', label: '手持照片', className: 'col-hands-pic', formatter: v => v ? `<div class="pic-preview"><img src="${v}" alt="手持照片" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="pic-preview"><span class="placeholder" onclick="alert(\'照片不存在\')">无</span></div>' },
-            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
-            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
-                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
-                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
-            ` }
-        ],
+    ],
+    listFields: [
+        { name: 'id', label: 'ID', className: 'col-id' },
+        { name: 'user_id', label: '用户ID', className: 'col-user-id' },
+        {
+            name: 'status',
+            label: '状态',
+            className: 'col-status',
+            formatter: v => v === 0 ? '<span class="ant-tag ant-tag-orange">待审核</span>' : v === 1 ? '<span class="ant-tag ant-tag-green">通过</span>' : '<span class="ant-tag ant-tag-red">拒绝</span>'
+        },
+        { name: 'kyc_type', label: 'KYC类型', className: 'col-kyc-type', formatter: v => v === 0 ? '身份证' : v === 1 ? '护照' : '驾照' },
+        { name: 'first_name', label: '名', className: 'col-first-name' },
+        { name: 'last_name', label: '姓', className: 'col-last-name' },
+        { name: 'id_pic', label: '证件照片', className: 'col-id-pic', formatter: v => v ? `<div class="pic-preview"><img src="${v}" alt="证件照片" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="pic-preview"><span class="placeholder" onclick="alert(\'照片不存在\')">无</span></div>' },
+        { name: 'hands_pic', label: '手持照片', className: 'col-hands-pic', formatter: v => v ? `<div class="pic-preview"><img src="${v}" alt="手持照片" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="pic-preview"><span class="placeholder" onclick="alert(\'照片不存在\')">无</span></div>' },
+        { name: 'version', label: '版本', className: 'col-version', formatter: v => v },
+        { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+        {
+            name: 'actions',
+            label: '操作',
+            className: 'col-actions',
+            formatter: (_, item) => `
+                    <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                    ${item.status === 0 ? `<button class="ant-btn ant-btn-primary" onclick="showReviewModal(${item.id})">审核</button>` : `<button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>`}
+                `
+        }
+    ],
         filterFields: [
-            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '待审核' }, { value: '1', label: '通过' }, { value: '2', label: '拒绝' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
-            { id: 'kycType', type: 'select', options: [{ value: '', label: '全部类型' }, { value: '0', label: '身份证' }, { value: '1', label: '护照' }, { value: '2', label: '驾照' }], filter: (data, value) => value === '' ? data : data.filter(d => d.kyc_type === parseInt(value)) },
-            { id: 'userId', type: 'text', placeholder: '搜索用户ID', filter: (data, value) => value ? data.filter(d => String(d.user_id).includes(value)) : data },
-            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
-            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
-        ],
+        { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '待审核' }, { value: '1', label: '通过' }, { value: '2', label: '拒绝' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+        { id: 'kycType', type: 'select', options: [{ value: '', label: '全部类型' }, { value: '0', label: '身份证' }, { value: '1', label: '护照' }, { value: '2', label: '驾照' }], filter: (data, value) => value === '' ? data : data.filter(d => d.kyc_type === parseInt(value)) },
+        { id: 'userId', type: 'text', placeholder: '搜索用户ID', filter: (data, value) => value ? data.filter(d => String(d.user_id).includes(value)) : data },
+        { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+        { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+    ],
         modalTabs: [
-            {
-                id: 'basic',
-                title: '基本信息',
-                fields: [
-                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '通过' }, { value: 2, label: '拒绝' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'user_id', label: '用户ID', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'kyc_type', label: 'KYC类型', type: 'select', options: [{ value: 0, label: '身份证' }, { value: 1, label: '护照' }, { value: 2, label: '驾照' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'country', label: '国家', type: 'select', options: countries.map(c => ({ value: c, label: c })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'first_name', label: '名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'middle_name', label: '中间名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'last_name', label: '姓', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
-                ]
-            },
-            {
-                id: 'details',
-                title: '证件信息',
-                fields: [
-                    { name: 'id_number', label: '证件号码', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'birth_date', label: '出生日期', type: 'date', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'start_date', label: '开始日期', type: 'date', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'expire_date', label: '到期日期', type: 'date', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'id_pic', label: '证件照片', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'hands_pic', label: '手持照片', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'reply_message', label: '回复消息', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
-                ]
-            }
-        ]
+        {
+            id: 'basic',
+            title: '基本信息',
+            fields: [
+                { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '通过' }, { value: 2, label: '拒绝' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'user_id', label: '用户ID', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'last_name', label: '姓', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'version', label: '版本', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'kyc_type', label: 'KYC类型', type: 'select', options: [{ value: 0, label: '身份证' }, { value: 1, label: '护照' }, { value: 2, label: '驾照' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'country', label: '国家', type: 'select', options: countries.map(c => ({ value: c, label: c })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'first_name', label: '名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'middle_name', label: '中间名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+            ]
+        },
+        {
+            id: 'details',
+            title: '证件信息',
+            fields: [
+                { name: 'id_number', label: '证件号码', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'birth_date', label: '出生日期', type: 'date', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'start_date', label: '开始日期', type: 'date', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'expire_date', label: '到期日期', type: 'date', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'id_pic', label: '证件照片', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'hands_pic', label: '手持照片', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'reply_message', label: '回复消息', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+            ]
+        }
+    ]
     };
+
+    // 显示审核弹窗
+    function showReviewModal(kycId) {
+        const kyc = tableData.find(i => i.id === kycId);
+        if (!kyc) return;
+
+        const modal = document.createElement('div');
+        modal.id = 'reviewModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+
+        // 文本字段用于对比
+        const textFields = [
+            { name: 'first_name', label: '名' },
+            { name: 'middle_name', label: '中间名' },
+            { name: 'last_name', label: '姓' },
+            { name: 'id_number', label: '证件号码' },
+            { name: 'birth_date', label: '出生日期' },
+            { name: 'start_date', label: '开始日期' },
+            { name: 'expire_date', label: '到期日期' },
+            { name: 'country', label: '国家' },
+            { name: 'id_pic', label: '证件照片', isImage: true },
+            { name: 'hands_pic', label: '手持照片', isImage: true }
+        ];
+
+        // 模拟线上版本（假设已通过的数据为 version - 1）
+        const onlineKyc = kyc.version > 1 ? { ...kyc, version: kyc.version - 1 } : null;
+        const comparisonHTML = textFields.map(field => {
+            const onlineValue = onlineKyc ? onlineKyc[field.name] || 'N/A' : '初次提交';
+            const currentValue = kyc[field.name] || 'N/A';
+            const isDifferent = Math.random() < 0.5; // 随机差异作为示例
+            const isImageField = field.isImage;
+
+            let onlineDisplay = onlineValue;
+            let currentDisplay = currentValue;
+            if (isImageField) {
+                onlineDisplay = onlineValue === 'N/A' || onlineValue === '初次提交' ?
+                    '<div class="pic-preview"><span class="placeholder">无</span></div>' :
+                    `<div class="pic-preview"><img src="${onlineValue}" alt="${field.label}" onclick="enlargeImage(null, 0, ['${onlineValue}'])"></div>`;
+                currentDisplay = currentValue === 'N/A' ?
+                    '<div class="pic-preview"><span class="placeholder">无</span></div>' :
+                    `<div class="pic-preview"><img src="${currentValue}" alt="${field.label}" onclick="enlargeImage(null, 0, ['${currentValue}'])"></div>`;
+            }
+
+            return `
+                <div style="display: flex; padding: 12px; border-bottom: 1px solid #eee; align-items: center; ${isDifferent ? 'background: #fff7e6;' : ''}">
+                    <div style="width: 15%; padding-right: 12px; font-weight: bold; color: #555;">${field.label}</div>
+                    <div style="flex: 1; padding-right: 12px;">${onlineDisplay}</div>
+                    <div style="flex: 1; padding-right: 12px; ${isDifferent ? 'color: red;' : 'color: green;'}">${currentDisplay}</div>
+                    <div style="width: 10%; text-align: center;">
+                        <button class="ant-btn ant-btn-link" style="${isDifferent ? 'color: red;' : 'color: green;'}" onclick="showPreviewModal('${field.name}', '${escapeHtml(String(onlineValue))}', '${escapeHtml(String(currentValue))}', ${isImageField})">对比</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        modal.innerHTML = `
+            <div class="modal-content" style="width: 80%; max-height: 90vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <button class="close-btn" onclick="closeReviewModal()">×</button>
+                <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">审核KYC (ID: ${kycId})</h3>
+                <div class="review-comparison" style="padding: 16px;">
+                    <h4 style="margin-bottom: 12px; color: #333;">版本对比 (当前版本: ${kyc.version})</h4>
+                    <div style="display: flex; background: #fafafa; padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">
+                        <div style="width: 15%;">字段</div>
+                        <div style="flex: 1;">线上版本</div>
+                        <div style="flex: 1;">审核版本</div>
+                        <div style="width: 10%; text-align: center;">操作</div>
+                    </div>
+                    <div style="border: 1px solid #eee; border-top: none; background: #fff;">${comparisonHTML}</div>
+                </div>
+                <div class="review-action" style="padding: 16px; border-top: 1px solid #eee;">
+                    <h4 style="margin-bottom: 12px; color: #333;">审核操作</h4>
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-weight: bold;">状态:</label>
+                        <select id="reviewStatus" class="ant-select" style="width: 200px; margin-left: 8px;">
+                            <option value="1">通过</option>
+                            <option value="2">拒绝</option>
+                        </select>
+                    </div>
+                    <div id="reviewReply" style="display: none; margin-bottom: 16px;">
+                        <label style="font-weight: bold;">回复:</label>
+                        <textarea id="reviewSiteReply" class="ant-input" rows="4" style="width: 100%; margin-top: 8px;"></textarea>
+                    </div>
+                    <div style="text-align: right;">
+                        <button class="ant-btn" onclick="closeReviewModal()" style="margin-right: 8px;">取消</button>
+                        <button class="ant-btn ant-btn-primary" onclick="submitReview(${kycId})">审核</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        modal.style.display = 'block';
+
+        document.getElementById('reviewStatus').addEventListener('change', (e) => {
+            document.getElementById('reviewReply').style.display = e.target.value === '2' ? 'block' : 'none';
+        });
+    }
+
+    // 关闭审核弹窗
+    function closeReviewModal() {
+        const modal = document.getElementById('reviewModal');
+        if (modal) modal.remove();
+    }
+
+    // 提交审核
+    function submitReview(kycId) {
+        const status = parseInt(document.getElementById('reviewStatus').value);
+        const siteReply = document.getElementById('reviewSiteReply')?.value || '';
+        const kyc = tableData.find(i => i.id === kycId);
+
+        if (kyc) {
+            kyc.status = status;
+            if (status === 2 && siteReply) kyc.reply_message = siteReply;
+            kyc.update_time = moment().unix();
+            if (status === 1) kyc.version += 1; // 通过时版本号加1
+        }
+
+        closeReviewModal();
+        renderTable();
+    }
+
+    // 显示预览弹窗
+    function showPreviewModal(fieldName, oldValue, newValue, isImageField = false) {
+        const modal = document.createElement('div');
+        modal.id = 'previewModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+
+        const contentHeight = Math.min(Math.max(oldValue.length, newValue.length) * 20, window.innerHeight * 0.8);
+        let oldDisplay = unescapeHtml(oldValue);
+        let newDisplay = unescapeHtml(newValue);
+        if (isImageField) {
+            oldDisplay = oldValue === 'N/A' || oldValue === '初次提交' ?
+                '<div class="pic-preview"><span class="placeholder">无</span></div>' :
+                `<div class="pic-preview"><img src="${oldValue}" alt="${fieldName}" style="max-width: 100%; max-height: 80vh;"></div>`;
+            newDisplay = newValue === 'N/A' ?
+                '<div class="pic-preview"><span class="placeholder">无</span></div>' :
+                `<div class="pic-preview"><img src="${newValue}" alt="${fieldName}" style="max-width: 100%; max-height: 80vh;"></div>`;
+        }
+
+        modal.innerHTML = `
+            <div class="modal-content" style="width: 70%; height: ${contentHeight}px;min-height: 20vh; max-height: 80vh; border-radius: 8px;  box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <button class="close-btn" onclick="closePreviewModal()">×</button>
+                <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">${fieldName} 预览</h3>
+                <div style="display: flex; height: calc(100% - 40px);">
+                    <div style="flex: 1; padding: 12px; overflow-y: auto; border-right: 1px solid #ddd; background: #fafafa;">
+                        <strong style="color: #555;">旧版本:</strong>
+                        <div style="margin-top: 8px;">${oldDisplay}</div>
+                    </div>
+                    <div style="flex: 1; padding: 12px; overflow-y: auto; background: #fff;">
+                        <strong style="color: #555;">新版本:</strong>
+                        <div style="margin-top: 8px;">${newDisplay}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        modal.style.display = 'block';
+    }
+
+    // 关闭预览弹窗
+    function closePreviewModal() {
+        const modal = document.getElementById('previewModal');
+        if (modal) modal.remove();
+    }
+
+    // HTML 转义和反转义
+    function escapeHtml(text) {
+        return text.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, '\'');
+    }
+    function unescapeHtml(html) {
+        return html.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, "'");
+    }
 </script>
 </body>
 </html>
