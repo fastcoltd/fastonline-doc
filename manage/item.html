@@ -24,8 +24,9 @@
         .col-name { width: 12%; min-width: 100px; }
         .col-cover-pic { width: 10%; min-width: 80px; }
         .col-price { width: 10%; min-width: 80px; }
+        .col-version { width: 8%; min-width: 60px; }
         .col-create-time { width: 15%; min-width: 120px; }
-        .col-actions { width: 10%; min-width: 100px; }
+        .col-actions { width: 15%; min-width: 120px; }
         .cover-pic-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
         .cover-pic-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
     </style>
@@ -98,14 +99,14 @@
     function generateWholesaleData(itemId, basePrice) {
         const wholesaleTiers = [];
         const tiers = [
-            { min: 1, max: 10, discount: 0.98, color: '#1890ff' }, // 蓝色
-            { min: 11, max: 50, discount: 0.95, color: '#52c41a' }, // 绿色
-            { min: 51, max: 100, discount: 0.90, color: '#722ed1' } // 紫色
+            { min: 1, max: 10, discount: 0.98, color: '#1890ff' },
+            { min: 11, max: 50, discount: 0.95, color: '#52c41a' },
+            { min: 51, max: 100, discount: 0.90, color: '#722ed1' }
         ];
         tiers.forEach(tier => {
             wholesaleTiers.push({
                 range: `${tier.min} ~ ${tier.max}件`,
-                status: randomInt(0, 1), // 0:禁用, 1:启用
+                status: randomInt(0, 1),
                 discount: tier.discount,
                 price: (basePrice * tier.discount).toFixed(2),
                 color: tier.color
@@ -166,9 +167,198 @@
     // 关闭批发优惠弹窗
     function closeWholesaleModal() {
         const modal = document.getElementById('wholesaleModal');
-        if (modal) {
-            modal.remove();
+        if (modal) modal.remove();
+    }
+
+    // 显示审核弹窗
+    function showReviewModal(itemId) {
+        const item = tableData.find(i => i.id === itemId);
+        if (!item) return;
+
+        const modal = document.createElement('div');
+        modal.id = 'reviewModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+
+        const langFilter = document.querySelector('#languageFilter')?.value || 'en_US';
+        const currentLangData = tableLangData.find(l => l.item_id === itemId && l.language === langFilter) || {};
+        const onlineLangData = tableLangData.find(l => l.item_id === itemId && l.language === langFilter && l.status === 1) || null;
+
+        const langFields = window.tableConfig.modalTabs.find(tab => tab.id === 'lang').fields.filter(f => f.isLangField && /^(?!.*(?:status|time)).*$/.test(f.name));
+        const comparisonHTML = langFields.map(field => {
+            let onlineValue = onlineLangData ? onlineLangData[field.name] || 'N/A' : '初次提交';
+            let currentValue = currentLangData[field.name] || 'N/A';
+            // 确保比较时处理对象类型（如 sample_pics 的 JSON 字符串）
+            const isDifferent = randomInt(0,1) == 1 ;
+            const isImageField = field.type === 'file';
+            const isLongText = !isImageField && String(currentValue).length > 100;
+
+            let onlineDisplay = onlineValue;
+            let currentDisplay = currentValue;
+            if (isImageField) {
+                if (typeof onlineValue === 'string' && onlineValue.startsWith("[")) {
+                    onlineValue = JSON.parse(onlineValue);
+                }
+                if (typeof currentValue === 'string' && currentValue.startsWith("[")) {
+                    currentValue = JSON.parse(currentValue);
+                }
+                onlineDisplay = '<div class="cover-pic-preview"><span class="placeholder">无</span></div>';
+                if (onlineValue !== 'N/A' && onlineValue !== '初次提交') {
+                    if (Array.isArray(onlineValue)) {
+                        onlineDisplay = `<div class="cover-pic-preview">`;
+                        onlineValue.forEach(url => {
+                            onlineDisplay += `<img src="${url}" alt="${field.label}" onclick="enlargeImage(${itemId}, 0, ['${url}'])">`;
+                        });
+                        onlineDisplay += `</div>`;
+                    } else {
+                        onlineDisplay = `<div class="cover-pic-preview"><img src="${onlineValue}" alt="${field.label}" onclick="enlargeImage(${itemId}, 0, ['${onlineValue}'])"></div>`;
+                    }
+                }
+                currentDisplay = '<div class="cover-pic-preview"><span class="placeholder">无</span></div>';
+                if (currentValue !== 'N/A') {
+                    if (Array.isArray(currentValue)) {
+                        currentDisplay = `<div class="cover-pic-preview">`;
+                        currentValue.forEach(url => {
+                            currentDisplay += `<img src="${url}" alt="${field.label}" onclick="enlargeImage(${itemId}, 0, ['${url}'])">`;
+                        });
+                        currentDisplay += `</div>`;
+                    } else {
+                        currentDisplay = `<div class="cover-pic-preview"><img src="${currentValue}" alt="${field.label}" onclick="enlargeImage(${itemId}, 0, ['${currentValue}'])"></div>`;
+                    }
+                }
+            } else if (isLongText) {
+                onlineDisplay = `<textarea readonly class="ant-input" rows="6" style="width: 100%; resize: none;">${onlineValue}</textarea>`;
+                currentDisplay = `<textarea readonly class="ant-input" rows="6" style="width: 100%; resize: none;">${currentValue}</textarea>`;
+            }
+
+            return `
+            <div style="display: flex; padding: 12px; border-bottom: 1px solid #eee; align-items: center; ">
+                <div style="width: 10%; padding-right: 12px; font-weight: bold; color: #555;">${field.label}</div>
+                <div style="flex: 1; padding-right: 12px;">${onlineDisplay}</div>
+                <div style="flex: 1; padding-right: 12px;${isDifferent ? 'color: red;' : 'color: green;'}">${currentDisplay}</div>
+                <div style="width: 5%; text-align: center;">
+                    <button class="ant-btn ant-btn-link" style="${isDifferent ? 'color: red;' : 'color: green;'}" onclick="showPreviewModal('${field.name}', '${escapeHtml(String(onlineValue))}', '${escapeHtml(String(currentValue))}', ${isImageField})">对比</button>
+                </div>
+            </div>
+        `;
+        }).join('');
+
+        modal.innerHTML = `
+        <div class="modal-content" style="width: 80%; max-height: 90vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <button class="close-btn" onclick="closeReviewModal()">×</button>
+            <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">审核商品 (ID: ${itemId})</h3>
+            <div class="review-comparison" style="padding: 16px;">
+                <h4 style="margin-bottom: 12px; color: #333;">版本对比</h4>
+                <div style="display: flex; background: #fafafa; padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">
+                    <div style="width: 10%;">字段</div>
+                    <div style="flex: 1;">线上版本</div>
+                    <div style="flex: 1;">审核版本</div>
+                    <div style="width: 5%; text-align: center;">操作</div>
+                </div>
+                <div style="border: 1px solid #eee; border-top: none; background: #fff;">${comparisonHTML}</div>
+            </div>
+            <div class="review-action" style="padding: 16px; border-top: 1px solid #eee;">
+                <h4 style="margin-bottom: 12px; color: #333;">审核操作</h4>
+                <div style="margin-bottom: 16px;">
+                    <label style="font-weight: bold;">状态:</label>
+                    <select id="reviewStatus" class="ant-select" style="width: 200px; margin-left: 8px;">
+                        <option value="1">通过 (上线)</option>
+                        <option value="2">驳回</option>
+                    </select>
+                </div>
+                <div id="reviewReply" style="display: none; margin-bottom: 16px;">
+                    <label style="font-weight: bold;">回复:</label>
+                    <textarea id="reviewSiteReply" class="ant-input" rows="4" style="width: 100%; margin-top: 8px;"></textarea>
+                </div>
+                <div style="text-align: right;">
+                    <button class="ant-btn" onclick="closeReviewModal()" style="margin-right: 8px;">取消</button>
+                    <button class="ant-btn ant-btn-primary" onclick="submitReview(${itemId})">审核</button>
+                </div>
+            </div>
+        </div>
+    `;
+        modal.style.display = 'block';
+
+        document.getElementById('reviewStatus').addEventListener('change', (e) => {
+            document.getElementById('reviewReply').style.display = e.target.value === '2' ? 'block' : 'none';
+        });
+    }
+
+    // 关闭审核弹窗
+    function closeReviewModal() {
+        const modal = document.getElementById('reviewModal');
+        if (modal) modal.remove();
+    }
+
+    // 提交审核
+    function submitReview(itemId) {
+        const status = parseInt(document.getElementById('reviewStatus').value);
+        const siteReply = document.getElementById('reviewSiteReply')?.value || '';
+        const item = tableData.find(i => i.id === itemId);
+        const langFilter = document.querySelector('#languageFilter')?.value || 'en_US';
+        const langData = tableLangData.find(l => l.item_id === itemId && l.language === langFilter);
+
+        if (item) item.status = status;
+        if (langData) {
+            langData.status = status;
+            if (status === 2 && siteReply) langData.site_reply = siteReply;
         }
+
+        closeReviewModal();
+        renderTable();
+    }
+
+    // 显示预览弹窗
+    function showPreviewModal(fieldName, oldValue, newValue, isImageField = false) {
+        const modal = document.createElement('div');
+        modal.id = 'previewModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+
+        const contentHeight = Math.min(Math.max(oldValue.length, newValue.length) * 20, window.innerHeight * 0.8);
+        let oldDisplay = unescapeHtml(oldValue);
+        let newDisplay = unescapeHtml(newValue);
+
+        if (isImageField) {
+            oldDisplay = oldValue === 'N/A' || oldValue === '初次提交' ?
+                '<div class="cover-pic-preview"><span class="placeholder">无</span></div>' :
+                `<div class="cover-pic-preview"><img src="${oldValue}" alt="${fieldName}" onclick="enlargeImage(0, 0, ['${oldValue}'])"></div>`;
+            newDisplay = newValue === 'N/A' ?
+                '<div class="cover-pic-preview"><span class="placeholder">无</span></div>' :
+                `<div class="cover-pic-preview"><img src="${newValue}" alt="${fieldName}" onclick="enlargeImage(0, 0, ['${newValue}'])"></div>`;
+        }
+
+        modal.innerHTML = `
+            <div class="modal-content" style="width: 70%; height: ${contentHeight}px; max-height: 80vh; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <button class="close-btn" onclick="closePreviewModal()">×</button>
+                <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">${fieldName} 预览</h3>
+                <div style="display: flex; height: calc(100% - 40px);">
+                    <div style="flex: 1; padding: 12px; overflow-y: auto; border-right: 1px solid #ddd; background: #fafafa;">
+                        <strong style="color: #555;">旧版本:</strong>
+                        <div style="margin-top: 8px;">${oldDisplay}</div>
+                    </div>
+                    <div style="flex: 1; padding: 12px; overflow-y: auto; background: #fff;">
+                        <strong style="color: #555;">新版本:</strong>
+                        <div style="margin-top: 8px;">${newDisplay}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        modal.style.display = 'block';
+    }
+
+    // 关闭预览弹窗
+    function closePreviewModal() {
+        const modal = document.getElementById('previewModal');
+        if (modal) modal.remove();
+    }
+
+    // HTML 转义和反转义
+    function escapeHtml(text) {
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+    function unescapeHtml(html) {
+        return html.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#039;/g, "'");
     }
 
     window.tableConfig = {
@@ -182,7 +372,7 @@
             { name: 'store_id', generator: () => randomInt(1, 5) },
             { name: 'brand_id', generator: () => randomInt(1, 5) },
             { name: 'services_id', generator: () => randomInt(1, 5) },
-            { name: 'status', generator: () => randomInt(0, 1) },
+            { name: 'status', generator: () => randomInt(0, 2) },
             { name: 'delivery_type', generator: () => randomInt(0, 2) },
             { name: 'sort_index', generator: () => randomInt(1, 100) },
             { name: 'stock_quantity', generator: () => randomInt(0, 500) },
@@ -198,15 +388,15 @@
             { name: 'last_restock_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 30), 'days').unix() },
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
-            { name: 'status', isLangField: true, generator: () => randomInt(0, 1) },
+            { name: 'status', isLangField: true, generator: (id) => id % 2 === 0 ? 1 : 0 }, // 偶数ID为已上线，奇数ID为待审核
             { name: 'version', isLangField: true, generator: () => randomInt(1, 5) },
             { name: 'language', isLangField: true, generator: (id, lang) => lang },
             { name: 'seo_keywords', isLangField: true, generator: (id) => `${getRandomItem(productNames)}, product ${id}, buy online` },
-            { name: 'seo_description', isLangField: true, generator: (id) => `Description for product ${id}, great quality and price.` },
-            { name: 'name', isLangField: true, generator: (id) => `${getRandomItem(brands)} ${getRandomItem(productNames)} ${id}` },
-            { name: 'after_sales_rules', isLangField: true, generator: (id) => `Returns accepted within 30 days for product ${id}.` },
-            { name: 'sample_pics', isLangField: true, generator: () => JSON.stringify([getRandomImage('sexy'), getRandomImage('sexy')]) },
-            { name: 'content', isLangField: true, generator: (id) => `Features of product ${id}, suitable for daily use.` },
+            { name: 'seo_description', isLangField: true, generator: (id) => id % 2 === 0 ? `Description for product ${id}, great quality.` : `Updated description for product ${id}, improved quality.` },
+            { name: 'name', isLangField: true, generator: (id) => id % 2 === 0 ? `${getRandomItem(brands)} ${getRandomItem(productNames)} ${id}` : `${getRandomItem(brands)} Updated ${getRandomItem(productNames)} ${id}` },
+            { name: 'after_sales_rules', isLangField: true, generator: (id) => `Returns accepted within ${id % 2 === 0 ? 30 : 60} days for product ${id}.` },
+            { name: 'sample_pics', isLangField: true, generator: (id) => JSON.stringify(id % 2 === 0 ? [getRandomImage('sexy')] : [getRandomImage('sexy'), getRandomImage('sexy')]) },
+            { name: 'content', isLangField: true, generator: (id) => id % 2 === 0 ? `Features of product ${id}, suitable for daily use.` : `Enhanced features of product ${id}, perfect for daily use with new upgrades.` },
             { name: 'create_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'update_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
             { name: 'site_reply', isLangField: true, generator: (id) => `Thank you for your interest in product ${id}!` }
@@ -214,12 +404,11 @@
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
-            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '已上线' }, { value: 2, label: '已驳回' }] } },
             { label: '批量修改店铺', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'store_id', label: '店铺', type: 'select', options: stores.map((s, i) => ({ value: i + 1, label: s })) } },
             { label: '批量修改用户', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'user_id', label: '用户', type: 'select', options: users.map((u, i) => ({ value: i + 1, label: u })) } },
             { label: '批量修改品牌', className: 'ant-btn ant-btn-default', color: '#722ed1', field: { name: 'brand_id', label: '品牌', type: 'select', options: brands.map((b, i) => ({ value: i + 1, label: b })) } },
-            { label: '批量修改服务', className: 'ant-btn ant-btn-default', color: '#eb2f96', field: { name: 'services_id', label: '服务', type: 'select', options: services.map((s, i) => ({ value: i + 1, label: s })) } },
-            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } }
+            { label: '批量修改服务', className: 'ant-btn ant-btn-default', color: '#eb2f96', field: { name: 'services_id', label: '服务', type: 'select', options: services.map((s, i) => ({ value: i + 1, label: s })) } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
@@ -227,7 +416,19 @@
             { name: 'store_id', label: '店铺', className: 'col-store-id', formatter: v => stores[v - 1] || `店铺${v}` },
             { name: 'brand_id', label: '品牌', className: 'col-brand-id', formatter: v => brands[v - 1] || `品牌${v}` },
             { name: 'services_id', label: '服务', className: 'col-services-id', formatter: v => services[v - 1] || `服务${v}` },
-            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
+            {
+                name: 'status',
+                label: '状态',
+                className: 'col-status',
+                formatter: v => {
+                    switch (v) {
+                        case 0: return '<span class="ant-tag ant-tag-orange">待审核</span>';
+                        case 1: return '<span class="ant-tag ant-tag-green">已上线</span>';
+                        case 2: return '<span class="ant-tag ant-tag-red">已驳回</span>';
+                        default: return '<span class="ant-tag">未知</span>';
+                    }
+                }
+            },
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'name', label: '商品名称', className: 'col-name', isLangField: true },
             {
@@ -247,15 +448,27 @@
                 className: 'col-price',
                 formatter: (v, item) => `<span style="cursor: pointer; color: #f97316;" onclick="showWholesaleModal(${item.id})">${v}</span>`
             },
+            {
+                name: 'version',
+                label: '版本',
+                className: 'col-version',
+                isLangField: true,
+                formatter: (v, item) => {
+                    const langFilter = document.querySelector('#languageFilter')?.value || 'en_US';
+                    const langData = tableLangData.find(l => l.item_id === item.id && l.language === langFilter);
+                    return langData ? langData.version : 'N/A';
+                }
+            },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             {
                 name: 'actions',
                 label: '操作',
                 className: 'col-actions',
                 formatter: (_, item) => `
-                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
-                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
-            `
+        <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+        ${item.status !== 0 ? `<button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})" style="margin-right: 8px;">删除</button>` : ''}
+        ${item.status === 0 ? `<button class="ant-btn ant-btn-primary" onclick="showReviewModal(${item.id})">审核</button>` : ''}
+    `
             }
         ],
         langFields: {
@@ -267,71 +480,71 @@
             { id: 'userId', type: 'select', options: [{ value: '', label: '全部用户' }, ...users.map((u, i) => ({ value: `${i + 1}`, label: u }))], filter: (data, value) => value ? data.filter(d => d.user_id === parseInt(value)) : data },
             { id: 'brandId', type: 'select', options: [{ value: '', label: '全部品牌' }, ...brands.map((b, i) => ({ value: `${i + 1}`, label: b }))], filter: (data, value) => value ? data.filter(d => d.brand_id === parseInt(value)) : data },
             { id: 'servicesId', type: 'select', options: [{ value: '', label: '全部服务' }, ...services.map((s, i) => ({ value: `${i + 1}`, label: s }))], filter: (data, value) => value ? data.filter(d => d.services_id === parseInt(value)) : data },
-            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '待审核' }, { value: '1', label: '已上线' }, { value: '2', label: '已驳回' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
             { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'en_US', label: '英语' }, { value: 'zh_CN', label: '中文' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.item_id === d.id && l.language === value)) : data },
             { id: 'name', type: 'text', placeholder: '搜索商品名称', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.item_id === d.id && l.name.toLowerCase().includes(value.toLowerCase()))) : data },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
             { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
         ],
-        modalTabs: [
-            {
-                id: 'basic',
-                title: '基本信息',
-                fields: [
-                    { name: 'user_id', label: '用户', type: 'select', options: users.map((u, i) => ({ value: i + 1, label: u })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'store_id', label: '店铺', type: 'select', options: stores.map((s, i) => ({ value: i + 1, label: s })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'brand_id', label: '品牌', type: 'select', options: brands.map((b, i) => ({ value: i + 1, label: b })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'services_id', label: '服务', type: 'select', options: services.map((s, i) => ({ value: i + 1, label: s })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'delivery_type', label: '配送类型', type: 'select', options: [{ value: 0, label: '自提' }, { value: 1, label: '快递' }, { value: 2, label: '同城' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'sort_index', label: '排序索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'cover_pic', label: '封面图', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
-                ]
-            },
-            {
-                id: 'stock',
-                title: '库存信息',
-                fields: [
-                    { name: 'stock_quantity', label: '库存数量', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'lower_notice_quantity', label: '低库存提醒', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'shelf_life', label: '保质期（年）', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'after_sales_time', label: '售后时长（天）', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'last_restock_time', label: '最后补货时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
-                ]
-            },
-            {
-                id: 'price',
-                title: '价格信息',
-                fields: [
-                    { name: 'price', label: '价格', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'original_price', label: '原价', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'field_list', label: '字段列表', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'choose_field_index', label: '选择字段索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
-                ]
-            },
-            {
-                id: 'lang',
-                title: '多语言信息',
-                fields: [
-                    { name: 'language', label: '语言', type: 'select', options: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'version', label: '版本', type: 'number', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'name', label: '商品名称', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'after_sales_rules', label: '售后规则', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'sample_pics', label: '示例图片', type: 'file', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, multiple: true },
-                    { name: 'content', label: '内容', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'site_reply', label: '站点回复', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), isLangField: true, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), isLangField: true, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
-                ]
-            }
-        ]
+    modalTabs: [
+        {
+            id: 'basic',
+            title: '基本信息',
+            fields: [
+                { name: 'user_id', label: '用户', type: 'select', options: users.map((u, i) => ({ value: i + 1, label: u })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'store_id', label: '店铺', type: 'select', options: stores.map((s, i) => ({ value: i + 1, label: s })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'brand_id', label: '品牌', type: 'select', options: brands.map((b, i) => ({ value: i + 1, label: b })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'services_id', label: '服务', type: 'select', options: services.map((s, i) => ({ value: i + 1, label: s })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '已上线' }, { value: 2, label: '已驳回' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'delivery_type', label: '配送类型', type: 'select', options: [{ value: 0, label: '自提' }, { value: 1, label: '快递' }, { value: 2, label: '同城' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'sort_index', label: '排序索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'cover_pic', label: '封面图', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+            ]
+        },
+        {
+            id: 'stock',
+            title: '库存信息',
+            fields: [
+                { name: 'stock_quantity', label: '库存数量', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'lower_notice_quantity', label: '低库存提醒', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'shelf_life', label: '保质期（年）', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'after_sales_time', label: '售后时长（天）', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'last_restock_time', label: '最后补货时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+            ]
+        },
+        {
+            id: 'price',
+            title: '价格信息',
+            fields: [
+                { name: 'price', label: '价格', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'original_price', label: '原价', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'field_list', label: '字段列表', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                { name: 'choose_field_index', label: '选择字段索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+            ]
+        },
+        {
+            id: 'lang',
+            title: '多语言信息',
+            fields: [
+                { name: 'language', label: '语言', type: 'select', options: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '已上线' }, { value: 2, label: '已驳回' }], isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'version', label: '版本', type: 'number', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'name', label: '商品名称', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'after_sales_rules', label: '售后规则', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'sample_pics', label: '示例图片', type: 'file', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, multiple: true },
+                { name: 'content', label: '内容', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'site_reply', label: '站点回复', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), isLangField: true, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), isLangField: true, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+            ]
+        }
+    ]
     };
 
     // 临时修复：覆盖_opt.js的editRecord，确保cover_pic预览
