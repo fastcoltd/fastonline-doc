@@ -10,33 +10,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
-        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
-        .action-container { margin-bottom: 16px; }
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 10%; min-width: 60px; }
-        .col-schedule-id { width: 10%; min-width: 100px; }
-        .col-manage-id { width: 10%; min-width: 100px; }
-        .col-status { width: 10%; min-width: 60px; }
-        .col-ask-time { width: 15%; min-width: 100px; }
-        .col-leave-time { width: 15%; min-width: 100px; }
-        .col-back-time { width: 15%; min-width: 100px; }
-        .col-reason { width: 10%; min-width: 100px; }
-        .col-mark { width: 15%; min-width: 120px; }
-        .col-create-time { width: 15%; min-width: 100px; }
-        .col-actions { width: 10%; min-width: 100px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1080px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 1440px; overflow-y: auto; position: relative; }
-        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
-        .modal-content .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
-        .modal-content .ant-form-item label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-schedule-id { width: 10%; min-width: 80px; }
+        .col-manage-id { width: 10%; min-width: 80px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-ask-time { width: 12%; min-width: 100px; }
+        .col-leave-time { width: 12%; min-width: 100px; }
+        .col-back-time { width: 12%; min-width: 100px; }
+        .col-reason { width: 10%; min-width: 80px; }
+        .col-mark { width: 12%; min-width: 100px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 16%; min-width: 100px; }
     </style>
 </head>
 <body>
@@ -50,70 +37,22 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule_leave_log.html')" role="tab" aria-selected="true">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule_leave_log.html')">
                                     <span class="ant-tabs-tab-btn">排班请假日志</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <div class="ant-select ant-select-single ant-select-show-arrow">
-                                        <select id="scheduleIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                            <option value="">全部排班</option>
-                                            <!-- 动态生成 -->
-                                        </select>
-                                    </div>
-                                    <div class="ant-select ant-select-single ant-select-show-arrow">
-                                        <select id="manageIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                            <option value="">全部管理员</option>
-                                            <!-- 动态生成 -->
-                                        </select>
-                                    </div>
-                                    <input type="date" id="startDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                    <input type="date" id="endDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                </div>
-                                <!-- 数据区域 -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-schedule-id">排班ID</div>
-                                        <div class="col-manage-id">管理员</div>
-                                        <div class="col-status">状态</div>
-                                        <div class="col-ask-time">申请时间</div>
-                                        <div class="col-leave-time">离开时间</div>
-                                        <div class="col-back-time">返回时间</div>
-                                        <div class="col-reason">原因</div>
-                                        <div class="col-mark">备注</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
-                                    <div id="leave-log-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <div class="ant-select ant-select-single ant-select-show-arrow">
-                                            <select id="perPage" onchange="changePerPage()">
-                                                <option value="10">10 条/页</option>
-                                                <option value="20" selected>20 条/页</option>
-                                                <option value="50">50 条/页</option>
-                                                <option value="100">100 条/页</option>
-                                            </select>
-                                        </div>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="table-header"></div>
+                                    <div id="schedule_leave_log-list">加载中...</div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -124,264 +63,200 @@
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
 
-    <!-- 查看弹窗 -->
-    <div id="viewModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeViewModal()">×</button>
-            <h3>查看排班请假日志</h3>
-            <form id="viewForm">
-                <div class="ant-form-item">
-                    <label>ID:</label>
-                    <input type="text" id="viewId" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>排班ID:</label>
-                    <select id="viewScheduleId" disabled>
-                        <!-- 动态生成 -->
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>管理员ID:</label>
-                    <select id="viewManageId" disabled>
-                        <!-- 动态生成 -->
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>状态:</label>
-                    <select id="viewStatus" disabled>
-                        <option value="0">申请中</option>
+    <!-- 审核弹窗 -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content" style="width: 80%; max-height: 90vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <button class="close-btn" onclick="closeReviewModal()">×</button>
+            <h3 id="reviewModalTitle">审核排班请假日志</h3>
+            <div class="review-info" style="padding: 16px;">
+                <h4 style="margin-bottom: 12px; color: #333;">请假信息</h4>
+                <div id="reviewInfoContent" style="border: 1px solid #eee; background: #fff;"></div>
+            </div>
+            <div class="review-action" style="padding: 16px; border-top: 1px solid #eee;">
+                <h4 style="margin-bottom: 12px; color: #333;">审核操作</h4>
+                <div style="margin-bottom: 16px;">
+                    <label style="font-weight: bold;">状态:</label>
+                    <select id="reviewStatus" class="ant-select" style="width: 200px; margin-left: 8px;">
                         <option value="1">已通过</option>
                         <option value="2">已拒绝</option>
                     </select>
                 </div>
-                <div class="ant-form-item">
-                    <label>申请时间:</label>
-                    <input type="datetime-local" id="viewAskTime" disabled>
+                <div id="reviewMark" style="display: none; margin-bottom: 16px;">
+                    <label style="font-weight: bold;">备注:</label>
+                    <textarea id="reviewMarkText" class="ant-input" rows="4" style="width: 100%; margin-top: 8px;"></textarea>
                 </div>
-                <div class="ant-form-item">
-                    <label>离开时间:</label>
-                    <input type="datetime-local" id="viewLeaveTime" disabled>
+                <div style="text-align: right;">
+                    <button class="ant-btn" onclick="closeReviewModal()" style="margin-right: 8px;">取消</button>
+                    <button class="ant-btn ant-btn-primary" onclick="submitReview()">审核</button>
                 </div>
-                <div class="ant-form-item">
-                    <label>返回时间:</label>
-                    <input type="datetime-local" id="viewBackTime" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>原因:</label>
-                    <input type="text" id="viewReason" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>备注:</label>
-                    <input type="text" id="viewMark" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>创建时间:</label>
-                    <input type="datetime-local" id="viewCreateTime" disabled>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeViewModal()">关闭</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    let leaveLogData = [];
-    let leaveLogPage = 1, leaveLogPerPage = 20;
-    let scheduleData = [];
-    let manageData = [];
-
-    function fetchData() {
-        console.log('Fetching leave log data...');
-        leaveLogData = [];
-        scheduleData = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `排班 ${i + 1}` }));
-        manageData = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `管理员 ${i + 1}` }));
-
-        const scheduleSelects = [document.getElementById('scheduleIdFilter'), document.getElementById('viewScheduleId')];
-        scheduleSelects.forEach(select => {
-            scheduleData.forEach(schedule => {
-                const option = document.createElement('option');
-                option.value = schedule.id;
-                option.text = schedule.name;
-                select.appendChild(option);
-            });
-        });
-
-        const manageSelects = [document.getElementById('manageIdFilter'), document.getElementById('viewManageId')];
-        manageSelects.forEach(select => {
-            manageData.forEach(manage => {
-                const option = document.createElement('option');
-                option.value = manage.id;
-                option.text = manage.name;
-                select.appendChild(option);
-            });
-        });
-
-        for (let i = 1; i <= 200; i++) {
-            const leaveLog = {
-                id: i,
-                schedule_id: Math.ceil(Math.random() * 15),
-                manage_id: Math.ceil(Math.random() * 15),
-                status: Math.floor(Math.random() * 3), // 0: 申请中, 1: 已通过, 2: 已拒绝
-                ask_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix(),
-                leave_time: moment().subtract(Math.floor(Math.random() * 20), 'days').unix(),
-                back_time: moment().subtract(Math.floor(Math.random() * 10), 'days').unix(),
-                reason: `请假原因 ${i}`,
-                mark: `备注信息 ${i}`,
-                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
-            };
-            leaveLogData.push(leaveLog);
-        }
-        renderLeaveLogList();
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function getScheduleName(id) {
-        const schedule = scheduleData.find(s => s.id === id);
-        return schedule ? schedule.name : id;
-    }
+    // 模拟排班和管理员名称
+    const scheduleNames = ['早班', '中班', '晚班', '夜班', '全天班'];
+    const managerNames = ['张经理', '李经理', '王经理', '赵经理', '钱经理'];
+    const reasons = ['个人事务', '家庭紧急情况', '健康原因', '其他安排', '临时出行'];
 
-    function getManageName(id) {
-        const manage = manageData.find(m => m.id === id);
-        return manage ? manage.name : id;
-    }
-
-    function renderLeaveLogList() {
-        const start = (leaveLogPage - 1) * leaveLogPerPage;
-        const end = start + leaveLogPerPage;
-        const paginatedData = leaveLogData.slice(start, end);
-        const listContainer = document.getElementById('leave-log-list');
-        listContainer.innerHTML = '';
-
-        paginatedData.forEach(log => {
-            let statusTag;
-            switch (log.status) {
-                case 0: statusTag = '<span class="ant-tag ant-tag-blue">申请中</span>'; break;
-                case 1: statusTag = '<span class="ant-tag ant-tag-green">已通过</span>'; break;
-                case 2: statusTag = '<span class="ant-tag ant-tag-red">已拒绝</span>'; break;
-                default: statusTag = '<span class="ant-tag">未知</span>';
+    window.tableConfig = {
+        tableName: 'schedule_leave_log',
+        tableTitle: '排班请假日志',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'schedule_id', generator: () => randomInt(1, 20) },
+            { name: 'manage_id', generator: () => randomInt(1, 10) },
+            { name: 'status', generator: () => randomInt(0, 2) }, // 0:申请中, 1:已通过, 2:已拒绝
+            { name: 'ask_time', generator: () => moment().subtract(randomInt(1, 60), 'days').unix() },
+            { name: 'leave_time', generator: () => moment().add(randomInt(1, 30), 'days').unix() },
+            { name: 'back_time', generator: () => moment().add(randomInt(31, 60), 'days').unix() },
+            { name: 'reason', generator: () => getRandomItem(reasons) },
+            { name: 'mark', generator: id => randomInt(0, 1) ? `请假备注 #${id}: ${getRandomItem(reasons)}` : '' },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '申请中' }, { value: 1, label: '已通过' }, { value: 2, label: '已拒绝' }] } },
+            { label: '批量修改排班', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'schedule_id', label: '排班', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${scheduleNames[i % scheduleNames.length]} ${i + 1}` })) } },
+            { label: '批量修改管理员', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'manage_id', label: '管理员', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })) } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'schedule_id', label: '排班', className: 'col-schedule-id', formatter: v => `${scheduleNames[v % scheduleNames.length]} (${v})` },
+            { name: 'manage_id', label: '管理员', className: 'col-manage-id', formatter: v => `${managerNames[v % managerNames.length]} (${v})` },
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-orange">申请中</span>' : v === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' : '<span class="ant-tag ant-tag-red">已拒绝</span>' },
+            { name: 'ask_time', label: '申请时间', className: 'col-ask-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'leave_time', label: '请假时间', className: 'col-leave-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'back_time', label: '返回时间', className: 'col-back-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'reason', label: '请假原因', className: 'col-reason' },
+            { name: 'mark', label: '备注', className: 'col-mark' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            {
+                name: 'actions',
+                label: '操作',
+                className: 'col-actions',
+                formatter: (_, item) => `
+                    <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                    ${item.status === 0 ? `<button class="ant-btn ant-btn-primary" onclick="showReviewModal(${item.id})" style="margin-right: 8px;">审核</button>` : ''}
+                    <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+                `
             }
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            itemDiv.style = `border-bottom: 1px solid #ddd;`;
-            itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${log.id}"></div>
-                <div class="col-id">${log.id}</div>
-                <div class="col-schedule-id">${getScheduleName(log.schedule_id)}</div>
-                <div class="col-manage-id">${getManageName(log.manage_id)}</div>
-                <div class="col-status">${statusTag}</div>
-                <div class="col-ask-time">${moment.unix(log.ask_time).format('YYYY-MM-DD HH:mm')}</div>
-                <div class="col-leave-time">${moment.unix(log.leave_time).format('YYYY-MM-DD HH:mm')}</div>
-                <div class="col-back-time">${moment.unix(log.back_time).format('YYYY-MM-DD HH:mm')}</div>
-                <div class="col-reason">${log.reason}</div>
-                <div class="col-mark">${log.mark.substring(0, 50)}${log.mark.length > 50 ? '...' : ''}</div>
-                <div class="col-create-time">${moment.unix(log.create_time).format('YYYY-MM-DD HH:mm')}</div>
-                <div class="col-actions">
-                    <button class="ant-btn" onclick="viewLeaveLog(${log.id})">查看</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteLeaveLog(${log.id})">删除</button>
+        ],
+        filterFields: [
+            { id: 'schedule_id', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${scheduleNames[i % scheduleNames.length]} ${i + 1}` })), filter: (data, value) => value === '' ? data : data.filter(d => d.schedule_id === parseInt(value)) },
+            { id: 'manage_id', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })), filter: (data, value) => value === '' ? data : data.filter(d => d.manage_id === parseInt(value)) },
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '申请中' }, { value: '1', label: '已通过' }, { value: '2', label: '已拒绝' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'schedule_id', label: '排班', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${scheduleNames[i % scheduleNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'manage_id', label: '管理员', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '申请中' }, { value: 1, label: '已通过' }, { value: 2, label: '已拒绝' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'ask_time', label: '申请时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'leave_time', label: '请假时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'back_time', label: '返回时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'reason', label: '请假原因', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'mark', label: '备注', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            }
+        ]
+    };
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
+
+    // 显示审核弹窗
+    let currentReviewId = null;
+    function showReviewModal(id) {
+        const log = tableData.find(item => item.id === id);
+        if (!log) return;
+
+        currentReviewId = id;
+        document.getElementById('reviewModalTitle').textContent = `审核排班请假日志 (ID: ${id})`;
+        const modal = document.getElementById('reviewModal');
+        const infoContent = document.getElementById('reviewInfoContent');
+
+        // 定义展示字段
+        const reviewFields = [
+            { name: 'schedule_id', label: '排班', formatter: v => `${scheduleNames[v % scheduleNames.length]} (${v})` },
+            { name: 'manage_id', label: '管理员', formatter: v => `${managerNames[v % managerNames.length]} (${v})` },
+            { name: 'ask_time', label: '申请时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'leave_time', label: '请假时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'back_time', label: '返回时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'reason', label: '请假原因' },
+            { name: 'create_time', label: '创建时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') }
+        ];
+
+        const infoHTML = reviewFields.map(field => {
+            const value = field.formatter ? field.formatter(log[field.name]) : log[field.name] || 'N/A';
+            return `
+                <div style="display: flex; padding: 12px; border-bottom: 1px solid #eee; align-items: center;">
+                    <div style="width: 20%; padding-right: 12px; font-weight: bold; color: #555;">${field.label}</div>
+                    <div style="flex: 1;">${value}</div>
                 </div>
             `;
-            listContainer.appendChild(itemDiv);
+        }).join('');
+
+        infoContent.innerHTML = infoHTML;
+        document.getElementById('reviewStatus').value = '1';
+        document.getElementById('reviewMarkText').value = '';
+        document.getElementById('reviewMark').style.display = 'none';
+        modal.style.display = 'block';
+
+        document.getElementById('reviewStatus').addEventListener('change', (e) => {
+            document.getElementById('reviewMark').style.display = e.target.value === '2' ? 'block' : 'none';
         });
-
-        const totalPages = Math.ceil(leaveLogData.length / leaveLogPerPage);
-        document.getElementById('page-info').textContent = `第 ${leaveLogPage} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
     }
 
-    function applyFilters() {
-        const scheduleId = document.getElementById('scheduleIdFilter').value;
-        const manageId = document.getElementById('manageIdFilter').value;
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
-        let filteredData = leaveLogData;
-        if (scheduleId) filteredData = filteredData.filter(item => item.schedule_id === parseInt(scheduleId));
-        if (manageId) filteredData = filteredData.filter(item => item.manage_id === parseInt(manageId));
-        if (startDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
-        if (endDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
-
-        leaveLogPage = 1;
-        leaveLogData = filteredData;
-        renderLeaveLogList();
+    // 关闭审核弹窗
+    function closeReviewModal() {
+        const modal = document.getElementById('reviewModal');
+        if (modal) modal.style.display = 'none';
     }
 
-    function changePage(delta) {
-        const totalPages = Math.ceil(leaveLogData.length / leaveLogPerPage);
-        leaveLogPage += delta;
-        if (leaveLogPage < 1) leaveLogPage = 1;
-        if (leaveLogPage > totalPages) leaveLogPage = totalPages;
-        renderLeaveLogList();
-    }
+    // 提交审核
+    function submitReview() {
+        const status = parseInt(document.getElementById('reviewStatus').value);
+        const mark = document.getElementById('reviewMarkText').value || '';
+        const log = tableData.find(item => item.id === currentReviewId);
 
-    function jumpToPage() {
-        const page = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(leaveLogData.length / leaveLogPerPage);
-        if (page >= 1 && page <= totalPages) {
-            leaveLogPage = page;
-            renderLeaveLogList();
-        } else {
-            alert('请输入有效的页码');
+        if (log) {
+            if (status === 2 && !mark) {
+                alert('请填写拒绝原因');
+                return;
+            }
+
+            log.status = status;
+            if (status === 2) {
+                log.mark = mark; // 拒绝时保存备注
+            }
         }
-    }
 
-    function changePerPage() {
-        leaveLogPerPage = parseInt(document.getElementById('perPage').value);
-        leaveLogPage = 1;
-        renderLeaveLogList();
+        closeReviewModal();
+        renderTable(); // 假设 _opt.js 中有此函数用于刷新表格
     }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    function viewLeaveLog(id) {
-        const log = leaveLogData.find(l => l.id === id);
-        document.getElementById('viewId').value = log.id;
-        document.getElementById('viewScheduleId').value = log.schedule_id;
-        document.getElementById('viewManageId').value = log.manage_id;
-        document.getElementById('viewStatus').value = log.status;
-        document.getElementById('viewAskTime').value = moment.unix(log.ask_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('viewLeaveTime').value = moment.unix(log.leave_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('viewBackTime').value = moment.unix(log.back_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('viewReason').value = log.reason;
-        document.getElementById('viewMark').value = log.mark;
-        document.getElementById('viewCreateTime').value = moment.unix(log.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('viewModal').style.display = 'block';
-    }
-
-    function deleteLeaveLog(id) {
-        if (confirm('确定要删除此排班请假日志吗？')) {
-            leaveLogData = leaveLogData.filter(l => l.id !== id);
-            renderLeaveLogList();
-        }
-    }
-
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的排班请假日志');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个排班请假日志吗？`)) {
-            leaveLogData = leaveLogData.filter(l => !selectedIds.includes(l.id));
-            renderLeaveLogList();
-        }
-    }
-
-    function closeViewModal() {
-        document.getElementById('viewModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        console.log('Page loaded, initializing...');
-        w3.includeHTML(() => {
-            console.log('External HTML included');
-            initMenus();
-            fetchData();
-        });
-    };
 </script>
 </body>
 </html>
