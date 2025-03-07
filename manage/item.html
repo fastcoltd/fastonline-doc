@@ -186,7 +186,7 @@
 
         const langFields = window.tableConfig.modalTabs.find(tab => tab.id === 'lang').fields.filter(f => f.isLangField && /^(?!.*(?:status|time)).*$/.test(f.name));
         const comparisonHTML = langFields.map(field => {
-            let onlineValue = onlineLangData ? onlineLangData[field.name] || 'N/A' : '初次提交';
+            let onlineValue = onlineLangData ? onlineLangData[field.name] || 'N/A' : '暂无线版本';
             let currentValue = currentLangData[field.name] || 'N/A';
             // 确保比较时处理对象类型（如 sample_pics 的 JSON 字符串）
             const isDifferent = randomInt(0,1) == 1 ;
@@ -203,7 +203,7 @@
                     currentValue = JSON.parse(currentValue);
                 }
                 onlineDisplay = '<div class="cover-pic-preview"><span class="placeholder">无</span></div>';
-                if (onlineValue !== 'N/A' && onlineValue !== '初次提交') {
+                if (onlineValue !== 'N/A' && onlineValue !== '暂无线版本') {
                     if (Array.isArray(onlineValue)) {
                         onlineDisplay = `<div class="cover-pic-preview">`;
                         onlineValue.forEach(url => {
@@ -320,7 +320,7 @@
         let newDisplay = unescapeHtml(newValue);
 
         if (isImageField) {
-            oldDisplay = oldValue === 'N/A' || oldValue === '初次提交' ?
+            oldDisplay = oldValue === 'N/A' || oldValue === '暂无线版本' ?
                 '<div class="cover-pic-preview"><span class="placeholder">无</span></div>' :
                 `<div class="cover-pic-preview"><img src="${oldValue}" alt="${fieldName}" onclick="enlargeImage(0, 0, ['${oldValue}'])"></div>`;
             newDisplay = newValue === 'N/A' ?
