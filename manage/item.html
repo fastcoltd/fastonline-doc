@@ -77,7 +77,6 @@
         </div>
     </div>
 </div>
-
 <script>
     // 辅助函数：生成随机名称
     const productNames = [
@@ -95,6 +94,83 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    // 生成批发优惠数据的函数
+    function generateWholesaleData(itemId, basePrice) {
+        const wholesaleTiers = [];
+        const tiers = [
+            { min: 1, max: 10, discount: 0.98, color: '#1890ff' }, // 蓝色
+            { min: 11, max: 50, discount: 0.95, color: '#52c41a' }, // 绿色
+            { min: 51, max: 100, discount: 0.90, color: '#722ed1' } // 紫色
+        ];
+        tiers.forEach(tier => {
+            wholesaleTiers.push({
+                range: `${tier.min} ~ ${tier.max}件`,
+                status: randomInt(0, 1), // 0:禁用, 1:启用
+                discount: tier.discount,
+                price: (basePrice * tier.discount).toFixed(2),
+                color: tier.color
+            });
+        });
+        return wholesaleTiers;
+    }
+
+    // 显示批发优惠弹窗
+    function showWholesaleModal(itemId) {
+        const item = tableData.find(i => i.id === itemId);
+        if (!item) return;
+
+        const modal = document.createElement('div');
+        modal.id = 'wholesaleModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+
+        const wholesaleData = generateWholesaleData(itemId, parseFloat(item.price));
+        const storeName = stores[item.store_id - 1] || `店铺${item.store_id}`;
+        const brandName = brands[item.brand_id - 1] || `品牌${item.brand_id}`;
+        const serviceName = services[item.services_id - 1] || `服务${item.services_id}`;
+
+        modal.innerHTML = `
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeWholesaleModal()">×</button>
+                <h3>批发优惠信息</h3>
+                <div class="wholesale-info" style="margin-bottom: 16px; padding: 8px; border-bottom: 1px solid #ddd;">
+                    <span style="color: #000000;">ID:</span> <span style="color: #f97316;">${item.id}</span> |
+                    <span style="color: #000000;">店铺:</span> <span style="color: #f97316;">${storeName}</span> |
+                    <span style="color: #000000;">品牌:</span> <span style="color: #f97316;">${brandName}</span> |
+                    <span style="color: #000000;">服务:</span> <span style="color: #f97316;">${serviceName}</span> |
+                    <span style="color: #000000;">原价:</span> <span style="color: #f97316;">${item.original_price}</span>
+                </div>
+                <div class="wholesale-list">
+                    <div class="table-header" style="display: flex; padding: 8px; background: #f5f5f5; font-weight: bold; text-align: center; border-bottom: 1px solid #ddd;">
+                        <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">数量范围</div>
+                        <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">状态</div>
+                        <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">折扣</div>
+                        <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">价格</div>
+                    </div>
+                    <div id="wholesale-list-content">
+                        ${wholesaleData.map(tier => `
+                            <div class="wholesale-item" style="display: flex; padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">
+                                <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${tier.range}</div>
+                                <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${tier.status === 1 ? '<span class="ant-tag ant-tag-green">启用</span>' : '<span class="ant-tag ant-tag-red">禁用</span>'}</div>
+                                <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: ${tier.color};">${(tier.discount * 100).toFixed(0)}%</div>
+                                <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: ${tier.color};">${tier.price}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+        modal.style.display = 'block';
+    }
+
+    // 关闭批发优惠弹窗
+    function closeWholesaleModal() {
+        const modal = document.getElementById('wholesaleModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
     window.tableConfig = {
         tableName: 'item',
         tableTitle: '商品信息',
@@ -102,39 +178,38 @@
         defaultPerPage: 20,
         fields: [
             { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'user_id', generator: () => randomInt(1, 5) }, // 关联 5 个用户
-            { name: 'store_id', generator: () => randomInt(1, 5) }, // 关联 5 个店铺
-            { name: 'brand_id', generator: () => randomInt(1, 5) }, // 关联 5 个品牌
-            { name: 'services_id', generator: () => randomInt(1, 5) }, // 关联 5 个服务
-            { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
-            { name: 'delivery_type', generator: () => randomInt(0, 2) }, // 0:自提, 1:快递, 2:同城
-            { name: 'sort_index', generator: () => randomInt(1, 100) }, // 排序 1-100
-            { name: 'stock_quantity', generator: () => randomInt(0, 500) }, // 库存 0-500
-            { name: 'lower_notice_quantity', generator: () => randomInt(5, 50) }, // 低库存提醒 5-50
-            { name: 'shelf_life', generator: () => randomInt(1, 5) }, // 保质期 1-5 年
-            { name: 'after_sales_time', generator: () => randomInt(7, 365) }, // 售后时间 7-365 天
-            { name: 'price', generator: () => (randomInt(50, 999) + randomInt(0, 99) / 100).toFixed(2) }, // 价格 50.00-999.99
-            { name: 'original_price', generator: id => (parseFloat(tableConfig.fields.find(f => f.name === 'price').generator(id)) * randomInt(120, 150) / 100).toFixed(2) }, // 原价 = 现价 * 1.2-1.5
-            { name: 'custom_url', generator: id => `/products/${getRandomItem(productNames).toLowerCase().replace(' ', '-')}-${id}` }, // 自定义URL
-            { name: 'cover_pic', generator: () => getRandomImage('sexy') }, // 封面图
-            { name: 'field_list', generator: () => JSON.stringify(['color', 'size']) }, // 固定字段列表
-            { name: 'choose_field_index', generator: () => randomInt(0, 1) }, // 选择字段索引 0-1
-            { name: 'last_restock_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 30), 'days').unix() }, // 最近补货时间
-            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }, // 创建时间
-            { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() }, // 更新时间
-            // 多语言字段（移除多语言文字生成）
-            { name: 'status', isLangField: true, generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
-            { name: 'version', isLangField: true, generator: () => randomInt(1, 5) }, // 版本 1-5
+            { name: 'user_id', generator: () => randomInt(1, 5) },
+            { name: 'store_id', generator: () => randomInt(1, 5) },
+            { name: 'brand_id', generator: () => randomInt(1, 5) },
+            { name: 'services_id', generator: () => randomInt(1, 5) },
+            { name: 'status', generator: () => randomInt(0, 1) },
+            { name: 'delivery_type', generator: () => randomInt(0, 2) },
+            { name: 'sort_index', generator: () => randomInt(1, 100) },
+            { name: 'stock_quantity', generator: () => randomInt(0, 500) },
+            { name: 'lower_notice_quantity', generator: () => randomInt(5, 50) },
+            { name: 'shelf_life', generator: () => randomInt(1, 5) },
+            { name: 'after_sales_time', generator: () => randomInt(7, 365) },
+            { name: 'price', generator: () => (randomInt(50, 999) + randomInt(0, 99) / 100).toFixed(2) },
+            { name: 'original_price', generator: id => (parseFloat(tableConfig.fields.find(f => f.name === 'price').generator(id)) * randomInt(120, 150) / 100).toFixed(2) },
+            { name: 'custom_url', generator: id => `/products/${getRandomItem(productNames).toLowerCase().replace(' ', '-')}-${id}` },
+            { name: 'cover_pic', generator: () => getRandomImage('sexy') },
+            { name: 'field_list', generator: () => JSON.stringify(['color', 'size']) },
+            { name: 'choose_field_index', generator: () => randomInt(0, 1) },
+            { name: 'last_restock_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 30), 'days').unix() },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
+            { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
+            { name: 'status', isLangField: true, generator: () => randomInt(0, 1) },
+            { name: 'version', isLangField: true, generator: () => randomInt(1, 5) },
             { name: 'language', isLangField: true, generator: (id, lang) => lang },
-            { name: 'seo_keywords', isLangField: true, generator: (id) => `${getRandomItem(productNames)}, product ${id}, buy online` }, // 简单关键词
-            { name: 'seo_description', isLangField: true, generator: (id) => `Description for product ${id}, great quality and price.` }, // 简单描述
-            { name: 'name', isLangField: true, generator: (id) => `${getRandomItem(brands)} ${getRandomItem(productNames)} ${id}` }, // 简单商品名称
-            { name: 'after_sales_rules', isLangField: true, generator: (id) => `Returns accepted within 30 days for product ${id}.` }, // 简单售后规则
-            { name: 'sample_pics', isLangField: true, generator: () => JSON.stringify([getRandomImage('sexy'), getRandomImage('sexy')]) }, // 2 张示例图片
-            { name: 'content', isLangField: true, generator: (id) => `Features of product ${id}, suitable for daily use.` }, // 简单内容
+            { name: 'seo_keywords', isLangField: true, generator: (id) => `${getRandomItem(productNames)}, product ${id}, buy online` },
+            { name: 'seo_description', isLangField: true, generator: (id) => `Description for product ${id}, great quality and price.` },
+            { name: 'name', isLangField: true, generator: (id) => `${getRandomItem(brands)} ${getRandomItem(productNames)} ${id}` },
+            { name: 'after_sales_rules', isLangField: true, generator: (id) => `Returns accepted within 30 days for product ${id}.` },
+            { name: 'sample_pics', isLangField: true, generator: () => JSON.stringify([getRandomImage('sexy'), getRandomImage('sexy')]) },
+            { name: 'content', isLangField: true, generator: (id) => `Features of product ${id}, suitable for daily use.` },
             { name: 'create_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'update_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
-            { name: 'site_reply', isLangField: true, generator: (id) => `Thank you for your interest in product ${id}!` } // 简单回复
+            { name: 'site_reply', isLangField: true, generator: (id) => `Thank you for your interest in product ${id}!` }
         ],
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
@@ -166,7 +241,12 @@
                     return coverPic ? `<div class="cover-pic-preview"><img src="${coverPic}" alt="封面图" onclick="enlargeImage(${item.id}, 0, ['${coverPic}'])"></div>` : '<div class="cover-pic-preview"><span class="placeholder" onclick="alert(\'图片不存在\')">无</span></div>';
                 }
             },
-            { name: 'price', label: '价格', className: 'col-price' },
+            {
+                name: 'price',
+                label: '价格',
+                className: 'col-price',
+                formatter: (v, item) => `<span style="cursor: pointer; color: #f97316;" onclick="showWholesaleModal(${item.id})">${v}</span>`
+            },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             {
                 name: 'actions',
