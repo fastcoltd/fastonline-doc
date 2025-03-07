@@ -116,6 +116,156 @@
     function getCountryOptions() {
         return countryOptions;
     }
+    // 显示审核弹窗
+    function showReviewModal(storeId) {
+        const store = tableData.find(i => i.id === storeId);
+        if (!store) return;
+
+        const modal = document.createElement('div');
+        modal.id = 'reviewModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+
+        const langFilter = document.querySelector('#languageFilter')?.value || 'en_US';
+        const currentLangData = tableLangData.find(l => l.store_id === storeId && l.language === langFilter) || {};
+        const onlineLangData = tableLangData.find(l => l.store_id === storeId && l.language === langFilter && l.status === 1) || null;
+
+        const langFields = window.tableConfig.modalTabs.find(tab => tab.id === 'lang_content').fields.filter(f => f.isLangField);
+        const comparisonHTML = langFields.map(field => {
+            let onlineValue = onlineLangData ? onlineLangData[field.name] || 'N/A' : '初次提交';
+            let currentValue = currentLangData[field.name] || 'N/A';
+            const isDifferent = randomInt(0, 1) === 1; // 随机差异作为示例
+            const isLongText = String(currentValue).length > 100;
+
+            let onlineDisplay = onlineValue;
+            let currentDisplay = currentValue;
+            if (isLongText) {
+                onlineDisplay = `<textarea readonly class="ant-input" rows="6" style="width: 100%; resize: none;">${onlineValue}</textarea>`;
+                currentDisplay = `<textarea readonly class="ant-input" rows="6" style="width: 100%; resize: none;">${currentValue}</textarea>`;
+            }
+
+            return `
+            <div style="display: flex; padding: 12px; border-bottom: 1px solid #eee; align-items: center; ${isDifferent ? 'background: #fff7e6;' : ''}">
+                <div style="width: 15%; padding-right: 12px; font-weight: bold; color: #555;">${field.label}</div>
+                <div style="flex: 1; padding-right: 12px;">${onlineDisplay}</div>
+                <div style="flex: 1; padding-right: 12px; ${isDifferent ? 'color: red;' : 'color: green;'}">${currentDisplay}</div>
+                <div style="width: 10%; text-align: center;">
+                    <button class="ant-btn ant-btn-link" style="${isDifferent ? 'color: red;' : 'color: green;'}" onclick="showPreviewModal('${field.name}', '${escapeHtml(String(onlineValue))}', '${escapeHtml(String(currentValue))}', false)">对比</button>
+                </div>
+            </div>
+        `;
+        }).join('');
+
+        modal.innerHTML = `
+        <div class="modal-content" style="width: 80%; max-height: 90vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <button class="close-btn" onclick="closeReviewModal()">×</button>
+            <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">审核店铺 (ID: ${storeId})</h3>
+            <div class="review-comparison" style="padding: 16px;">
+                <h4 style="margin-bottom: 12px; color: #333;">版本对比</h4>
+                <div style="display: flex; background: #fafafa; padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">
+                    <div style="width: 15%;">字段</div>
+                    <div style="flex: 1;">线上版本</div>
+                    <div style="flex: 1;">审核版本</div>
+                    <div style="width: 10%; text-align: center;">操作</div>
+                </div>
+                <div style="border: 1px solid #eee; border-top: none; background: #fff;">${comparisonHTML}</div>
+            </div>
+            <div class="review-action" style="padding: 16px; border-top: 1px solid #eee;">
+                <h4 style="margin-bottom: 12px; color: #333;">审核操作</h4>
+                <div style="margin-bottom: 16px;">
+                    <label style="font-weight: bold;">状态:</label>
+                    <select id="reviewStatus" class="ant-select" style="width: 200px; margin-left: 8px;">
+                        <option value="1">通过 (上线)</option>
+                        <option value="2">驳回 (拒绝)</option>
+                        <option value="3">关店</option>
+                        <option value="4">禁止</option>
+                    </select>
+                </div>
+                <div id="reviewReply" style="display: none; margin-bottom: 16px;">
+                    <label style="font-weight: bold;">回复:</label>
+                    <textarea id="reviewSiteReply" class="ant-input" rows="4" style="width: 100%; margin-top: 8px;"></textarea>
+                </div>
+                <div style="text-align: right;">
+                    <button class="ant-btn" onclick="closeReviewModal()" style="margin-right: 8px;">取消</button>
+                    <button class="ant-btn ant-btn-primary" onclick="submitReview(${storeId})">审核</button>
+                </div>
+            </div>
+        </div>
+    `;
+        modal.style.display = 'block';
+
+        document.getElementById('reviewStatus').addEventListener('change', (e) => {
+            document.getElementById('reviewReply').style.display = e.target.value !== '1' ? 'block' : 'none';
+        });
+    }
+
+    // 关闭审核弹窗
+    function closeReviewModal() {
+        const modal = document.getElementById('reviewModal');
+        if (modal) modal.remove();
+    }
+
+    // 提交审核
+    function submitReview(storeId) {
+        const status = parseInt(document.getElementById('reviewStatus').value);
+        const siteReply = document.getElementById('reviewSiteReply')?.value || '';
+        const store = tableData.find(i => i.id === storeId);
+        const langFilter = document.querySelector('#languageFilter')?.value || 'en_US';
+        const langData = tableLangData.find(l => l.store_id === storeId && l.language === langFilter);
+
+        if (store) store.status = status;
+        if (langData) {
+            langData.status = status;
+            if (status !== 1 && siteReply) langData.site_reply = siteReply;
+        }
+
+        closeReviewModal();
+        renderTable();
+    }
+
+    // 显示预览弹窗
+    function showPreviewModal(fieldName, oldValue, newValue, isImageField = false) {
+        const modal = document.createElement('div');
+        modal.id = 'previewModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+
+        const contentHeight = Math.min(Math.max(oldValue.length, newValue.length) * 20, window.innerHeight * 0.8);
+        let oldDisplay = unescapeHtml(oldValue);
+        let newDisplay = unescapeHtml(newValue);
+
+        modal.innerHTML = `
+        <div class="modal-content" style="width: 70%; height: ${contentHeight}px; max-height: 80vh; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <button class="close-btn" onclick="closePreviewModal()">×</button>
+            <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">${fieldName} 预览</h3>
+            <div style="display: flex; height: calc(100% - 40px);">
+                <div style="flex: 1; padding: 12px; overflow-y: auto; border-right: 1px solid #ddd; background: #fafafa;">
+                    <strong style="color: #555;">旧版本:</strong>
+                    <div style="margin-top: 8px;">${oldDisplay}</div>
+                </div>
+                <div style="flex: 1; padding: 12px; overflow-y: auto; background: #fff;">
+                    <strong style="color: #555;">新版本:</strong>
+                    <div style="margin-top: 8px;">${newDisplay}</div>
+                </div>
+            </div>
+        </div>
+    `;
+        modal.style.display = 'block';
+    }
+
+    // 关闭预览弹窗
+    function closePreviewModal() {
+        const modal = document.getElementById('previewModal');
+        if (modal) modal.remove();
+    }
+
+    // HTML 转义和反转义
+    function escapeHtml(text) {
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+    function unescapeHtml(html) {
+        return html.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#039;/g, "'");
+    }
     window.tableConfig = {
         tableName: 'store',
         tableTitle: '店铺信息',
@@ -124,7 +274,7 @@
         fields: [
             { name: 'id', isSystemField: true, generator: id => id },
             { name: 'user_id', generator: () => randomInt(1, 5) }, // 关联 5 个用户
-            { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
+            { name: 'status', generator: () => randomInt(0, 4) }, // 0:待审核, 1:已上线, 2:已拒绝, 3:已关店, 4:已禁止
             { name: 'level', generator: () => randomInt(1, 5) }, // 店铺等级 1-5
             { name: 'margin', generator: () => randomDecimal(500, 5000, 2) }, // 保证金 500-5000
             { name: 'commission', generator: () => randomDecimal(0.01, 0.05, 4) }, // 佣金率 1%-5%
@@ -141,7 +291,7 @@
             // 多语言字段
             { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) }, // 多语言表ID
             { name: 'store_id', isLangField: true, generator: id => id },
-            { name: 'status', isLangField: true, generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
+            { name: 'status', isLangField: true, generator: (id) => id % 2 === 0 ? 1 : 0 }, // 多语言状态，偶数ID为已上线，奇数ID为待审核
             { name: 'version', isLangField: true, generator: () => randomInt(1, 5) }, // 版本 1-5
             { name: 'language', isLangField: true, generator: (id, lang) => lang },
             { name: 'seo_keywords', isLangField: true, generator: id => `${getRandomItem(storeNames)}, store ${id}, shopping` },
@@ -161,31 +311,50 @@
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
-            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '已上线' }, { value: 2, label: '已拒绝' }, { value: 3, label: '已关店' }, { value: 4, label: '已禁止' }] } },
             { label: '批量修改用户', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'user_id', label: '用户', type: 'select', options: users.map((u, i) => ({ value: i + 1, label: u })) } },
             { label: '批量修改国家', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'country', label: '国家', type: 'select', options: countries.map(c => ({ value: c, label: c })) } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'user_id', label: '用户', className: 'col-user-id', formatter: v => users[v - 1] || `User ${v}` },
-            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
+            {
+                name: 'status',
+                label: '状态',
+                className: 'col-status',
+                formatter: v => {
+                    switch (v) {
+                        case 0: return '<span class="ant-tag ant-tag-orange">待审核</span>';
+                        case 1: return '<span class="ant-tag ant-tag-green">已上线</span>';
+                        case 2: return '<span class="ant-tag ant-tag-red">已拒绝</span>';
+                        case 3: return '<span class="ant-tag ant-tag-gray">已关店</span>';
+                        case 4: return '<span class="ant-tag ant-tag-volcano">已禁止</span>';
+                        default: return '<span class="ant-tag">未知</span>';
+                    }
+                }
+            },
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'name', label: '店铺名称', className: 'col-name', isLangField: true },
             { name: 'logo', label: '店铺标志', className: 'col-logo', formatter: v => v ? `<div class="logo-preview"><img src="${v}" alt="标志" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="logo-preview"><span class="placeholder" onclick="alert(\'标志不存在\')">无</span></div>' },
             { name: 'country', label: '国家', className: 'col-country' },
             { name: 'custom_url', label: '自定义URL', className: 'col-custom-url' },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
-            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
-                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
-                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
-            ` }
+            {
+                name: 'actions',
+                label: '操作',
+                className: 'col-actions',
+                formatter: (_, item) => `
+            <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+            ${item.status !== 0 ? `<button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>` : `<button class="ant-btn ant-btn-primary" onclick="showReviewModal(${item.id})">审核</button>`}
+        `
+            }
         ],
         langFields: {
             foreignKey: 'store_id',
             languages: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
         },
         filterFields: [
-            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '待审核' }, { value: '1', label: '已上线' }, { value: '2', label: '已拒绝' }, { value: '3', label: '已关店' }, { value: '4', label: '已禁止' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
             { id: 'userId', type: 'select', options: [{ value: '', label: '全部用户' }, ...users.map((u, i) => ({ value: `${i + 1}`, label: u }))], filter: (data, value) => value ? data.filter(d => d.user_id === parseInt(value)) : data },
             { id: 'country', type: 'select', options: [{ value: '', label: '全部国家' }, ...countries.map(c => ({ value: c, label: c }))], filter: (data, value) => value ? data.filter(d => d.country === value) : data },
             { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'en_US', label: '英语' }, { value: 'zh_CN', label: '中文' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.store_id === d.id && l.language === value)) : data },
