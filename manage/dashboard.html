@@ -24,22 +24,33 @@
 
         <!-- 主内容区域 -->
         <div class="main-content">
-            <h2 style="font-size: 20px; margin-bottom: 24px;">单项统计</h2>
-            <div class="dashboard-grid">
-                <div class="card"><div class="card-title">用户总数 (user)</div><div class="card-content">1,234</div><div class="card-subtext">昨日新增: 15</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='user_info.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">订单总数 (orders)</div><div class="card-content">567</div><div class="card-subtext">待处理: 45</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='order_info.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">店铺销售额 (store_stat)</div><div class="card-content">¥12,345</div><div class="card-subtext">店铺总数: 78</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='store_stat_overview.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">今日排班 (schedule)</div><div class="card-content">8</div><div class="card-subtext">已签到: 6</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='schedule_plan.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">工单记录 (order_ticket)</div><div class="card-content">45</div><div class="card-subtext">待处理: 15</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='ticket_record.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">订单退款申请 (orders_refunds)</div><div class="card-content">22</div><div class="card-subtext">待审核: 10</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='refund_management.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">订单换货申请 (orders_replacements)</div><div class="card-content">18</div><div class="card-subtext">待处理: 8</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='replacement_management.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">客户投诉 (complaint)</div><div class="card-content">15</div><div class="card-subtext">待解决: 7</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='complaint_record.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">用户KYC审核 (user_kyc)</div><div class="card-content">50</div><div class="card-subtext">待审核: 20</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='kyc_verification.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">商品审核 (item)</div><div class="card-content">120</div><div class="card-subtext">待审核: 35</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='item_info.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">店铺审核 (store)</div><div class="card-content">78</div><div class="card-subtext">待审核: 12</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='store_info.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">店铺FAQ审核 (store_faq)</div><div class="card-content">25</div><div class="card-subtext">待审核: 8</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='store_faq.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">博客审核 (user_blog)</div><div class="card-content">40</div><div class="card-subtext">待审核: 15</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='blog_management.html'">查看详情</button></div>
-                <div class="card"><div class="card-title">博客文章审核 (posts)</div><div class="card-content">60</div><div class="card-subtext">待审核: 18</div><button class="ant-btn ant-btn-primary" onclick="window.location.href='article_management.html'">查看详情</button></div>
+            <h2 style="font-size: 20px; margin-bottom: 24px;">平台概况</h2>
+            <div class="dashboard-grid"></div>
+
+            <!-- 平台热门 -->
+            <div class="hot-section">
+                <h2 style="font-size: 20px; margin-bottom: 24px;">平台热门</h2>
+                <div class="hot-filter">
+                    <select class="ant-select" id="hotTopSelect" onchange="updateHotSection()">
+                        <option value="10" selected>Top 10</option>
+                        <option value="15">Top 15</option>
+                        <option value="20">Top 20</option>
+                        <option value="30">Top 30</option>
+                        <option value="50">Top 50</option>
+                        <option value="100">Top 100</option>
+                    </select>
+                    <select class="ant-select" id="hotTimeRangeSelect" onchange="updateHotSection()">
+                        <option value="today" selected>今天</option>
+                        <option value="7">最近1周</option>
+                        <option value="30">最近30天</option>
+                        <option value="60">最近60天</option>
+                        <option value="90">最近90天</option>
+                        <option value="custom">自定义</option>
+                    </select>
+                    <input type="date" class="ant-input" id="hotStartDate" onchange="updateHotCustomRange()" value="2025-03-07" style="display: none;">
+                    <input type="date" class="ant-input" id="hotEndDate" onchange="updateHotCustomRange()" value="2025-03-07" style="display: none;">
+                </div>
+                <div class="hot-container"></div>
             </div>
 
             <!-- 趋势统计 -->
@@ -53,8 +64,8 @@
                         <option value="90">最近90天</option>
                         <option value="custom">自定义</option>
                     </select>
-                    <input type="date" class="ant-input" id="startDate" onchange="updateCustomRange()" value="2025-02-23">
-                    <input type="date" class="ant-input" id="endDate" onchange="updateCustomRange()" value="2025-03-01">
+                    <input type="date" class="ant-input" id="startDate" onchange="updateCustomRange()" value="2025-02-28">
+                    <input type="date" class="ant-input" id="endDate" onchange="updateCustomRange()" value="2025-03-07">
                 </div>
                 <div class="brand-service-filter">
                     <select class="ant-select" id="brandSelect">
@@ -145,7 +156,7 @@
 <script>
     // 全局变量
     const timeRanges = { 7: 7, 30: 30, 60: 60, 90: 90 };
-    let labels = Array.from({ length: 7 }, (_, i) => moment('2025-03-01').subtract(6 - i, 'days').format('YYYY-MM-DD'));
+    let labels = Array.from({ length: 7 }, (_, i) => moment('2025-03-07').subtract(6 - i, 'days').format('YYYY-MM-DD'));
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: true,
@@ -153,83 +164,320 @@
         scales: { y: { beginAtZero: true } }
     };
 
-    // 图表初始化
-    const charts = [
-        new Chart(document.getElementById('salesMoneyChart'), {
-            type: 'line', data: {
-                labels, datasets: [
-                    { label: '充值额', data: [100, 120, 150, 130, 140, 160, 180], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
-                    { label: '销售额', data: [200, 220, 250, 230, 240, 260, 280], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true },
-                    { label: '退款额', data: [20, 25, 30, 28, 25, 30, 35], backgroundColor: 'rgba(255, 77, 79, 0.3)', borderColor: 'rgba(255, 77, 79, 1)', fill: true }
-                ]
-            }, options: chartOptions
-        }),
-        new Chart(document.getElementById('salesAvgChart'), {
-            type: 'line', data: {
-                labels, datasets: [
-                    { label: '平均购买件数', data: [5, 6, 5, 7, 6, 8, 7], backgroundColor: 'rgba(255, 215, 0, 0.3)', borderColor: 'rgba(255, 215, 0, 1)', fill: true },
-                    { label: '客单价', data: [50, 55, 60, 58, 62, 65, 70], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true }
-                ]
-            }, options: chartOptions
-        }),
-        new Chart(document.getElementById('salesCountChart'), {
-            type: 'line', data: {
-                labels, datasets: [
-                    { label: '订单数', data: [30, 35, 40, 38, 42, 45, 50], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
-                    { label: '售后数', data: [5, 6, 7, 8, 6, 7, 9], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true },
-                    { label: '退款订单数', data: [3, 4, 5, 4, 5, 6, 7], backgroundColor: 'rgba(255, 77, 79, 0.3)', borderColor: 'rgba(255, 77, 79, 1)', fill: true },
-                    { label: '工单数', data: [10, 12, 15, 14, 13, 16, 18], backgroundColor: 'rgba(255, 215, 0, 0.3)', borderColor: 'rgba(255, 215, 0, 1)', fill: true }
-                ]
-            }, options: chartOptions
-        }),
-        new Chart(document.getElementById('userAvgChart'), {
-            type: 'line', data: {
-                labels, datasets: [
-                    { label: '用户平均订单数', data: [2.5, 2.8, 3.0, 2.9, 3.2, 3.5, 3.7], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
-                    { label: '用户平均购买数', data: [10, 12, 15, 14, 16, 18, 20], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true }
-                ]
-            }, options: chartOptions
-        }),
-        new Chart(document.getElementById('basicStoreChart'), {
-            type: 'line', data: {
-                labels, datasets: [
-                    { label: '新增店铺数', data: [5, 6, 7, 8, 6, 9, 10], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
-                    { label: '新增商品数', data: [20, 25, 30, 28, 32, 35, 40], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true }
-                ]
-            }, options: chartOptions
-        }),
-        new Chart(document.getElementById('basicUserChart'), {
-            type: 'line', data: {
-                labels, datasets: [
-                    { label: '用户注册', data: [50, 55, 60, 58, 62, 65, 70], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
-                    { label: 'KYC', data: [10, 12, 15, 14, 13, 16, 18], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true },
-                    { label: '新增店铺数', data: [5, 6, 7, 8, 6, 9, 10], backgroundColor: 'rgba(255, 77, 79, 0.3)', borderColor: 'rgba(255, 77, 79, 1)', fill: true },
-                    { label: '黑名单', data: [2, 3, 4, 3, 5, 4, 6], backgroundColor: 'rgba(255, 215, 0, 0.3)', borderColor: 'rgba(255, 215, 0, 1)', fill: true }
-                ]
-            }, options: chartOptions
-        }),
-        new Chart(document.getElementById('basicContentChart'), {
-            type: 'line', data: {
-                labels, datasets: [
-                    { label: '新增文章数量', data: [15, 18, 20, 22, 19, 23, 25], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
-                    { label: '新增博客数量', data: [3, 4, 5, 6, 4, 7, 8], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true }
-                ]
-            }, options: chartOptions
-        }),
-        new Chart(document.getElementById('complaintChart'), {
-            type: 'line', data: {
-                labels, datasets: [
-                    { label: '投诉总数', data: [15, 17, 20, 18, 19, 22, 25], backgroundColor: 'rgba(255, 77, 79, 0.3)', borderColor: 'rgba(255, 77, 79, 1)', fill: true }
-                ]
-            }, options: chartOptions
-        })
+    // 单项统计配置
+    const dashboardStatsConfig = [
+        { title: "网站流量", content: "2,345", subtext: "访问: 2,100 | 设备: 1,800 | 在线: 20", link: null, color: "#3b82f6" },
+        { title: "网站用户", content: "2,345", subtext: "跳出率: 20% | 时长: 600s | 转化: 20%", link: null, color: "#3b82f6" },
+        { title: "新增客户", content: "1,234", subtext: "活跃数: 890 | 付费数: 200 | 昨日: 15", link: "user.html", color: "#3b82f6" },
+        { title: "实名认证", content: "50", subtext: "新增: 15 | 通过: 20 | 拒绝: 2", link: "user_kyc.html", color: "#3b82f6" },
+        { title: "需求审核", content: "45", subtext: "新增: 15 | 通过: 20 | 中标: 10", link: "demand_records.html", color: "#3b82f6" },
+        { title: "订单总数", content: "567", subtext: "待处理: 45 | 客单价: $120 | 客单量: 2.5", link: "orders.html", color: "#10b981" },
+        { title: "订单退款", content: "22", subtext: "新增: 60 | 完结: 8 | 拒绝: 8", link: "orders_refunds.html", color: "#10b981" },
+        { title: "订单换货", content: "18", subtext: "新增: 60 | 完结: 8 | 拒绝: 8", link: "orders_replacements.html", color: "#10b981" },
+        { title: "工单数据", content: "45", subtext: "新增: 15 | 完结: 30 | 超时: 30", link: "orders_ticket.html", color: "#10b981" },
+        { title: "客户投诉", content: "15", subtext: "新增: 15 | 完成: 30", link: "complaint.html", color: "#10b981" },
+        { title: "店铺销售", content: "$12,345", subtext: "总数: 78 | 平均销售额: $158", link: "store_stat.html", color: "#8b5cf6" },
+        { title: "店铺审核", content: "78", subtext: "新增: 15 | 通过: 10 | 拒绝: 2", link: "store.html", color: "#8b5cf6" },
+        { title: "问答审核", content: "25", subtext: "新增: 31 | 通过: 25 | 拒绝: 2", link: "store_faq.html", color: "#8b5cf6" },
+        { title: "商品审核", content: "120", subtext: "新增: 95 | 完成: 35 | 拒绝: 2", link: "item.html", color: "#f59e0b" },
+        { title: "博客审核", content: "40", subtext: "新增: 15 | 通过: 25 | 拒绝: 2", link: "user_blog.html", color: "#ec4899" },
+        { title: "文章审核", content: "60", subtext: "新增: 315 | 通过: 215 | 拒绝: 2", link: "posts.html", color: "#ec4899" },
+        { title: "充值金额", content: "$15,678", subtext: "次数: 123 | 单次均值: $127", link: "payment_record.html", color: "#14b8a6" },
+        { title: "充值争议", content: "12", subtext: "新增: 31 | 完结: 15 | 涉及渠道: 3", link: "payment_dispute.html", color: "#14b8a6" },
+        { title: "违规事件", content: "30", subtext: "新增: 10 | 店铺: 15 | 客户: 3", link: "violations_event.html", color: "#ef4444" },
+        { title: "违规处罚", content: "25", subtext: "新增: 5 | 店铺: 18 | 客户: 12", link: "user_sanctions.html", color: "#ef4444" },
+        { title: "今日排班", content: "8", subtext: "客服数: 6 | 财务数: 5 | 版次数: 3", link: "schedule.html", color: "#6366f1" },
+        { title: "客服交接", content: "35", subtext: "跟进中: 20 | 已完结: 15 | 超时: 3", link: "handover_events.html", color: "#6366f1" },
+        { title: "员工请假", content: "10", subtext: "请假人数: 8 | 总时长: 24小时", link: "leave_requests.html", color: "#6366f1" },
+        { title: "打卡签到", content: "50", subtext: "应签到: 60 | 实际签到: 50 | 漏卡: 10", link: "check_in_records.html", color: "#6366f1" }
     ];
+
+    // 平台热门配置
+    const hotStatsConfig = {
+        "hotProducts": {
+            title: "热门商品",
+            headers: ["名次",  "商品名称", "客单价", "销售额"],
+            data: Array.from({ length: 100 }, (_, i) => {
+                const sales = Math.floor(10000 - i * 90);
+                const unitPrice = Math.floor(Math.random() * 150 + 50);
+                return {
+                    rank: i + 1,
+                    productName: ["SmartWatch Pro", "Wireless Earbuds", "Eco-Friendly Charger", "Gaming Mouse", "Fitness Tracker"][i % 5], // 真實商品名循環
+                    unitPrice: `$${unitPrice}`,
+                    sales: sales,
+                    storeLink: `store_${["techtrend", "gizmohub", "ecomart", "gearzone", "trendytech"][i % 5]}.html`,
+                    productLink: `product_${["smartwatch-pro", "wireless-earbuds", "eco-charger", "gaming-mouse", "fitness-tracker"][i % 5]}.html`
+                };
+            }).map((item, index) => ({
+                rank: index + 1,
+                productName: `<a href="${item.productLink}" class="hot-link">${item.productName}</a>`,
+                unitPrice: item.unitPrice,
+                sales: `$${item.sales.toLocaleString()}`
+            })),
+            color: "#f59e0b"
+        },
+        "hotStores": {
+            title: "热门店铺",
+            headers: ["名次", "店铺名", "客单价", "销售额"],
+            data: Array.from({ length: 100 }, (_, i) => {
+                const sales = Math.floor(20000 - i * 175);
+                const unitPrice = Math.floor(Math.random() * 200 + 100);
+                return {
+                    rank: i + 1,
+                    storeName: ["GreenLiving", "TechBit", "UrbanGear", "EcoTrend", "SmartShop"][i % 5], // 真實店铺名循環
+                    unitPrice: `$${unitPrice}`,
+                    sales: sales,
+                    storeLink: `store_${["greenliving", "techbit", "urbangear", "ecotrend", "smartshop"][i % 5]}.html`
+                };
+            }).map((item, index) => ({
+                rank: index + 1,
+                storeName: `<a href="${item.storeLink}" class="hot-link">${item.storeName}</a>`,
+                unitPrice: item.unitPrice,
+                sales: `$${item.sales.toLocaleString()}`
+            })),
+            color: "#8b5cf6"
+        },
+        "hotArticles": {
+            title: "热门文章",
+            headers: ["名次", "用户名", "文章名", "点赞量"],
+            data: Array.from({ length: 100 }, (_, i) => {
+                const likes = Math.floor(1000 - i * 9);
+                return {
+                    rank: i + 1,
+                    userName: ["JaneDoe", "MarkLee", "SaraKim", "TomChen", "LisaWu"][i % 5], // 真實用户名循環
+                    articleName: ["Tech Trends Unveiled", "AI Revolution Insights", "Green Living Tips", "Gadget Reviews", "Future of Work"][i % 5], // 真實文章名循環
+                    likes: likes,
+                    userLink: `user_${["janedoe", "marklee", "sarakim", "tomchen", "lisawu"][i % 5]}.html`,
+                    articleLink: `article_${["tech-trends", "ai-revolution", "green-living", "gadget-reviews", "future-work"][i % 5]}.html`
+                };
+            }).map((item, index) => ({
+                rank: index + 1,
+                userName: `<a href="${item.userLink}" class="hot-link">${item.userName}</a>`,
+                articleName: `<a href="${item.articleLink}" class="hot-link">${item.articleName}</a>`,
+                likes: item.likes.toLocaleString()
+            })),
+            color: "#ec4899"
+        },
+        "hotDemands": {
+            title: "热门需求",
+            headers: ["名次", "用户名", "需求名", "竞标数"],
+            data: Array.from({ length: 100 }, (_, i) => {
+                const bids = Math.floor(50 - i * 0.4);
+                return {
+                    rank: i + 1,
+                    userName: ["AlexSmith", "EmmaBrown", "LiamJones", "OliviaWang", "NoahLi"][i % 5], // 真實用户名循環
+                    demandName: ["Web Design Service", "Mobile App Dev", "SEO Optimization", "Graphic Design", "Content Writing"][i % 5], // 真實需求名循環
+                    bids: bids,
+                    userLink: `user_${["alexsmith", "emmabrown", "liamjones", "oliviawang", "noahli"][i % 5]}.html`,
+                    demandLink: `demand_${["web-design", "mobile-app", "seo-opt", "graphic-design", "content-writing"][i % 5]}.html`
+                };
+            }).map((item, index) => ({
+                rank: index + 1,
+                userName: `<a href="${item.userLink}" class="hot-link">${item.userName}</a>`,
+                demandName: `<a href="${item.demandLink}" class="hot-link">${item.demandName}</a>`,
+                bids: item.bids.toLocaleString()
+            })),
+            color: "#3b82f6"
+        }
+    };
+
+    // 格式化 subtext
+    function formatSubtext(subtext) {
+        return subtext.replace(/(\d+(?:,\d+)?(?:\.\d+)?(?:\$|小时|%)?)/g, '<span style="font-weight:500;color: #f97316">$1</span>');
+    }
+
+    // 生成單項統計卡片
+    function generateDashboardStats() {
+        const dashboardGrid = document.querySelector('.dashboard-grid');
+        if (!dashboardGrid) return;
+        dashboardGrid.innerHTML = '';
+        dashboardStatsConfig.forEach(stat => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.borderLeft = `4px solid ${stat.color}`;
+            if (stat.link) card.onclick = () => window.location.href = stat.link;
+            card.innerHTML = `
+            <div class="card-title">${stat.title}</div>
+            <div class="card-content">${stat.content}</div>
+            <div class="card-subtext">${formatSubtext(stat.subtext)}</div>
+        `;
+            dashboardGrid.appendChild(card);
+        });
+    }
+
+    // 生成平台热门卡片
+    function generateHotStats() {
+        const hotContainer = document.querySelector('.hot-container');
+        if (!hotContainer) return;
+        hotContainer.innerHTML = '';
+        const topLimit = parseInt(document.getElementById('hotTopSelect').value);
+
+        Object.keys(hotStatsConfig).forEach(key => {
+            const config = hotStatsConfig[key];
+            const card = document.createElement('div');
+            card.className = 'hot-card';
+            card.style.borderLeft = `4px solid ${config.color}`;
+
+            const title = document.createElement('div');
+            title.className = 'hot-title';
+            title.textContent = config.title;
+            card.appendChild(title);
+
+            const header = document.createElement('div');
+            header.className = 'hot-header';
+            header.innerHTML = config.headers.map(h => `<div>${h}</div>`).join('');
+            card.appendChild(header);
+
+            const dataList = document.createElement('div');
+            dataList.className = 'hot-data';
+            const limitedData = config.data.slice(0, topLimit);
+            limitedData.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'hot-row';
+                row.innerHTML = Object.values(item).map(val => `<div>${val}</div>`).join('');
+                dataList.appendChild(row);
+            });
+            card.appendChild(dataList);
+
+            hotContainer.appendChild(card);
+        });
+    }
+
+    // 更新平台热门數據
+    function updateHotSection() {
+        const timeRange = document.getElementById('hotTimeRangeSelect').value;
+        const startDateInput = document.getElementById('hotStartDate');
+        const endDateInput = document.getElementById('hotEndDate');
+
+        if (timeRange === 'custom') {
+            startDateInput.style.display = 'inline-block';
+            endDateInput.style.display = 'inline-block';
+        } else {
+            startDateInput.style.display = 'none';
+            endDateInput.style.display = 'none';
+            const today = moment('2025-03-07');
+            const days = timeRanges[timeRange] || 1;
+            const startDate = today.clone().subtract(days - 1, 'days');
+            startDateInput.value = startDate.format('YYYY-MM-DD');
+            endDateInput.value = today.format('YYYY-MM-DD');
+            generateHotStats();
+        }
+    }
+
+    // 自定义时间范围更新
+    function updateHotCustomRange() {
+        const startDate = moment(document.getElementById('hotStartDate').value);
+        const endDate = moment(document.getElementById('hotEndDate').value);
+        if (startDate.isValid() && endDate.isValid() && startDate <= endDate) {
+            document.getElementById('hotTimeRangeSelect').value = 'custom';
+            generateHotStats();
+        }
+    }
+
+    // 图表初始化
+    let charts = [];
+    function initCharts() {
+        charts = [
+            new Chart(document.getElementById('salesMoneyChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '充值额', data: [100, 120, 150, 130, 140, 160, 180], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
+                        { label: '销售额', data: [200, 220, 250, 230, 240, 260, 280], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true },
+                        { label: '退款额', data: [20, 25, 30, 28, 25, 30, 35], backgroundColor: 'rgba(255, 77, 79, 0.3)', borderColor: 'rgba(255, 77, 79, 1)', fill: true }
+                    ]
+                },
+                options: chartOptions
+            }),
+            new Chart(document.getElementById('salesAvgChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '平均购买件数', data: [5, 6, 5, 7, 6, 8, 7], backgroundColor: 'rgba(255, 215, 0, 0.3)', borderColor: 'rgba(255, 215, 0, 1)', fill: true },
+                        { label: '客单价', data: [50, 55, 60, 58, 62, 65, 70], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true }
+                    ]
+                },
+                options: chartOptions
+            }),
+            new Chart(document.getElementById('salesCountChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '订单数', data: [30, 35, 40, 38, 42, 45, 50], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
+                        { label: '售后数', data: [5, 6, 7, 8, 6, 7, 9], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true },
+                        { label: '退款订单数', data: [3, 4, 5, 4, 5, 6, 7], backgroundColor: 'rgba(255, 77, 79, 0.3)', borderColor: 'rgba(255, 77, 79, 1)', fill: true },
+                        { label: '工单数', data: [10, 12, 15, 14, 13, 16, 18], backgroundColor: 'rgba(255, 215, 0, 0.3)', borderColor: 'rgba(255, 215, 0, 1)', fill: true }
+                    ]
+                },
+                options: chartOptions
+            }),
+            new Chart(document.getElementById('userAvgChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '客户平均订单数', data: [2.5, 2.8, 3.0, 2.9, 3.2, 3.5, 3.7], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
+                        { label: '客户平均购买数', data: [10, 12, 15, 14, 16, 18, 20], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true }
+                    ]
+                },
+                options: chartOptions
+            }),
+            new Chart(document.getElementById('basicStoreChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '新增店铺数', data: [5, 6, 7, 8, 6, 9, 10], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
+                        { label: '新增商品数', data: [20, 25, 30, 28, 32, 35, 40], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true }
+                    ]
+                },
+                options: chartOptions
+            }),
+            new Chart(document.getElementById('basicUserChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '客户注册', data: [50, 55, 60, 58, 62, 65, 70], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
+                        { label: 'KYC', data: [10, 12, 15, 14, 13, 16, 18], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true },
+                        { label: '新增店铺数', data: [5, 6, 7, 8, 6, 9, 10], backgroundColor: 'rgba(255, 77, 79, 0.3)', borderColor: 'rgba(255, 77, 79, 1)', fill: true },
+                        { label: '黑名单', data: [2, 3, 4, 3, 5, 4, 6], backgroundColor: 'rgba(255, 215, 0, 0.3)', borderColor: 'rgba(255, 215, 0, 1)', fill: true }
+                    ]
+                },
+                options: chartOptions
+            }),
+            new Chart(document.getElementById('basicContentChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '新增文章数量', data: [15, 18, 20, 22, 19, 23, 25], backgroundColor: 'rgba(249, 115, 22, 0.3)', borderColor: 'rgba(249, 115, 22, 1)', fill: true },
+                        { label: '新增博客数量', data: [3, 4, 5, 6, 4, 7, 8], backgroundColor: 'rgba(30, 58, 138, 0.3)', borderColor: 'rgba(30, 58, 138, 1)', fill: true }
+                    ]
+                },
+                options: chartOptions
+            }),
+            new Chart(document.getElementById('complaintChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '投诉总数', data: [15, 17, 20, 18, 19, 22, 25], backgroundColor: 'rgba(255, 77, 79, 0.3)', borderColor: 'rgba(255, 77, 79, 1)', fill: true }
+                    ]
+                },
+                options: chartOptions
+            })
+        ];
+    }
 
     // 时间范围更新函数
     function updateTimeRange(value) {
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
-        const today = moment('2025-03-01');
+        const today = moment('2025-03-07');
         if (value === 'custom') {
             startDateInput.style.display = 'inline-block';
             endDateInput.style.display = 'inline-block';
@@ -272,7 +520,10 @@
         w3.includeHTML(() => {
             console.log('External HTML included');
             initMenus();
-            updateTimeRange('7'); // 初始化最近1周
+            generateDashboardStats();
+            generateHotStats();
+            initCharts();
+            updateTimeRange('7');
         });
     };
 </script>

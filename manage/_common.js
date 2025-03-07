@@ -150,8 +150,8 @@ function highlightCurrentMenu() {
 
 function handleMobileSidebar() {
     const isMobile = window.innerWidth <= 768;
-
     if (isMobile) {
+        console.log(`isMobile: ${isMobile}, create mobile menu`)
         if (!document.querySelector('.mobile-sidebar')) {
             createMobileSidebar();
         }

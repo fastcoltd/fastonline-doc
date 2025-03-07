@@ -1,5 +1,6 @@
 /* 基础布局和全局样式 */
-html, body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+html { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
 .container { display: flex; flex-direction: column; min-height: 100vh; }
 .content-wrapper { display: flex; flex: 1; margin-top: 4em; transition: margin-left 0.3s ease; }
 
@@ -45,7 +46,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-fami
 .sidebar.collapsed .trigger::before { content: "➤"; }
 
 /* 主内容区域样式 */
-.main-content { flex: 1; width: 100%;padding: 0.25em 0.75em 1.5em 0.75em; overflow-y: auto; }
+.main-content { flex: 1; width: 100%; padding: 0.25em 0.75em 1.5em 0.75em; overflow-y: auto; }
 
 /* 按钮样式 */
 .ant-btn { padding: 0.25em 0.75em; border-radius: 0.25em; cursor: pointer; margin-top: 0; background: #fff; border: 0.0625em solid #d9d9d9; color: rgba(0, 0, 0, 0.85); transition: all 0.3s; }
@@ -54,17 +55,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-fami
 .ant-btn-primary:hover { background: #fb923c; }
 .ant-btn-danger { background: #f5222d; border: none; color: #fff; }
 .ant-btn-danger:hover { background: #ff4d4f; }
-
-.tag-close {
-    color: blue !important;
-    font-size: 14px !important;
-    height: 1em;
-    margin: 0.2em !important;
-    cursor: pointer;
-}
-.tag-close:hover {
-    color: red !important;
-}
+.tag-close { color: blue !important; font-size: 14px !important; height: 1em; margin: 0.2em !important; cursor: pointer; }
+.tag-close:hover { color: red !important; }
 
 /* Ant Design Tab 样式 */
 .ant-tabs { background: #fff; border-radius: 0.5em; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.1); overflow: hidden; margin-top: 0.4em; }
@@ -80,8 +72,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-fami
 .ant-tabs-ink-bar-animated { transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1); }
 .ant-tabs-content-holder { padding: 1em; }
 .ant-tabs-tabpane { outline: none; }
+.ant-tree { width: 20em; scrollbar-width: none; }
 
-.ant-tree{width: 20em;scrollbar-width: none}
 /* 状态 Tag 样式调整 */
 .ant-tag { padding: 0.125em 0.5em; border-radius: 0.25em; font-size: 0.75em; line-height: 1.25em; }
 .ant-tag-default { background-color: #fafafa; border-color: #d9d9d9; color: #595959; }
@@ -96,7 +88,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-fami
 .ant-tag-lime { background-color: #fcffe6; border-color: #eaff8f; color: #a0d911; }
 .ant-tag-volcano { background-color: #fff2e8; border-color: #ffbb96; color: #fa541c; }
 .ant-tag-geekblue { background-color: #f0f5ff; border-color: #adc6ff; color: #2f54eb; }
-/* 特殊状态颜色 */
 .ant-tag-success { background-color: #f6ffed; border-color: #b7eb8f; color: #52c41a; }
 
 /* 筛选和输入框样式 */
@@ -115,7 +106,7 @@ select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-
 .task-item { display: flex; width: 100%; }
 .table-header div { padding: 0.2em; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
 .task-item div { padding: 0.2em; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
-.task-list { overflow-x: scroll !important; scrollbar-width: none;background: #fff; padding: 0; border-radius: 0.5em; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.1); overflow-x: auto; }
+.task-list { overflow-x: scroll !important; scrollbar-width: none; background: #fff; padding: 0; border-radius: 0.5em; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.1); overflow-x: auto; }
 .task-item { display: flex; justify-content: space-between; align-items: center; white-space: nowrap; }
 .task-item:hover { background: #fafafa; }
 .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5em, 1fr)); gap: 0.625em; margin-bottom: 1.25em; }
@@ -168,10 +159,12 @@ select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-
 
 /* Dashboard 特定样式 */
 .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16.25em, 1fr)); gap: 1.25em; }
-.card { background: #fff; padding: 1em; border-radius: 0.5em; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.1); }
-.card-title { font-size: 1em; font-weight: 500; margin-bottom: 0.75em; color: #000; }
-.card-content { font-size: 1.5em; font-weight: 600; color: #f97316; }
-.card-subtext { font-size: 0.75em; color: #888; margin-top: 0.25em; }
+.card { background: linear-gradient(135deg, #ffffff, #f9fafb); padding: 1.25em; border-radius: 0.75em; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease; }
+.card:hover { transform: translateY(-5px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); background: #f5f5f5; }
+.card:active { background: #e5e7eb; transform: translateY(0); }
+.card-title { font-size: 1.1em; font-weight: 600; margin-bottom: 0.5em; color: #1f2937; }
+.card-content { font-size: 1.75em; font-weight: 700; color: #f97316; margin-bottom: 0.25em; }
+.card-subtext { font-size: 0.85em; color: #6b7280; font-style: italic; }
 .charts-section { margin-top: 2.5em; }
 .charts-container { display: flex; gap: 1.25em; margin-top: 0.75em; justify-content: space-between; }
 .chart-card { background: #fff; padding: 1em; border-radius: 0.5em; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.1); width: calc(50% - 0.625em); }
@@ -179,6 +172,49 @@ select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-
 canvas { max-width: 100%; height: auto; }
 .time-filter { margin-bottom: 0.75em; display: flex; align-items: center; }
 .brand-service-filter { margin-bottom: 0.75em; }
+
+/* 平台热门样式 */
+.hot-section { margin-top: 2.5em; }
+.hot-filter { display: flex; gap: 1em; margin-bottom: 1em; }
+.hot-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25em; }
+.hot-card { background: linear-gradient(135deg, #ffffff, #f9fafb); padding: 1.25em; border-radius: 0.75em; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow-x: auto; }
+.hot-header-container { margin-bottom: 0.5em; }
+.hot-title { font-size: 1.1em; font-weight: 600; margin-bottom: 0.75em; color: #1f2937; }
+.hot-header { display: flex; background: #f1f5f9; padding: 0.5em 0; font-weight: 500; color: #4b5563; border-bottom: 1px solid #e5e7eb; }
+.hot-header div { text-align: center; white-space: nowrap; }
+
+/* 調整欄寬 */
+.hot-header div:nth-child(1) { flex: 0 0 8%; } /* 名次，縮減寬度 */
+.hot-header div:nth-child(2) { flex: 2; } /* 商品名称/店铺名/用户名，增寬 */
+.hot-header div:nth-child(3) { flex: 1.5; } /* 客单价/文章名/需求名，稍寬 */
+.hot-header div:nth-child(4) { flex: 1; } /* 销售额/点赞量/竞标数 */
+.hot-header div:nth-child(5) { flex: 1; } /* 销售额（僅热门商品，保持不變） */
+
+.hot-divider { height: 1px; background: #e5e7eb; margin: 0.5em 0; }
+.hot-data { max-height: 400px; overflow-y: auto; }
+.hot-row { display: flex; padding: 0.5em 0; border-bottom: 1px solid #e5e7eb; }
+.hot-row div { text-align: center; white-space: nowrap; color: #374151; }
+
+/* 調整數據欄寬 */
+.hot-row div:nth-child(1) { flex: 0 0 8%; } /* 名次 */
+.hot-row div:nth-child(2) { flex: 2; overflow: hidden; text-overflow: ellipsis; } /* 商品名称/店铺名/用户名 */
+.hot-row div:nth-child(3) { flex: 1.5; overflow: hidden; text-overflow: ellipsis; } /* 客单价/文章名/需求名 */
+.hot-row div:nth-child(4) { flex: 1; } /* 销售额/点赞量/竞标数 */
+.hot-row div:nth-child(5) { flex: 1; } /* 销售额（僅热门商品） */
+
+.hot-row:hover { background: #f5f5f5; }
+.hot-link { color: #374151; text-decoration: none; }
+.hot-link:hover { color: #f97316; }
+
+/* 滾動條樣式 */
+.hot-card:nth-child(1) .hot-data::-webkit-scrollbar { width: 6px; } /* 熱門商品 */
+.hot-card:nth-child(1) .hot-data::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
+.hot-card:nth-child(2) .hot-data::-webkit-scrollbar { width: 6px; } /* 熱門店鋪 */
+.hot-card:nth-child(2) .hot-data::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 3px; }
+.hot-card:nth-child(3) .hot-data::-webkit-scrollbar { width: 6px; } /* 熱門文章 */
+.hot-card:nth-child(3) .hot-data::-webkit-scrollbar-thumb { background: #ec4899; border-radius: 3px; }
+.hot-card:nth-child(4) .hot-data::-webkit-scrollbar { width: 6px; } /* 熱門需求 */
+.ho
 
 /* 底部样式 */
 .footer { text-align: center; padding: 1.25em 0; color: #888; font-size: 0.75em; background: #fff; border-top: 0.0625em solid #e8e8e8; flex-shrink: 0; width: 100%; }
@@ -217,6 +253,7 @@ canvas { max-width: 100%; height: auto; }
     .brand-logo { width: auto; font-size: 1.25em; margin: 0; flex-shrink: 1; }
     .top-menu { display: none; }
     .user-info { margin-left: 0; flex-wrap: nowrap; justify-content: flex-end; padding: 0; overflow: hidden; }
+    .logout-btn { color: #fff; text-decoration: none; padding: 0.25em 1.75em 0.25em 0.25em; transition: all 0.3s; }
     .language-select { margin: 0 0.3125em; }
     .timezone { display: none; }
     .sidebar { display: none; }
@@ -226,7 +263,14 @@ canvas { max-width: 100%; height: auto; }
     .footer { padding: 0.625em 0; font-size: 0.625em; }
     .floating-toggle { display: flex; }
     .mobile-sidebar { display: block; }
-    .col-actions{min-width: 8em !important;}
+    .col-actions { min-width: 8em !important; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .card { padding: 1em; border-radius: 0.5em; }
+    .charts-container { flex-direction: column; gap: 1.25em; }
+    .chart-card { width: 92%; }
+    .hot-container { grid-template-columns: 1fr; }
+    .hot-card { padding: 1em; border-radius: 0.5em; }
+    .hot-data { max-height: 25em; }
 }
 
 /* 响应式设计 - PC 端 (min-width: 48.0625em = 769px) */
