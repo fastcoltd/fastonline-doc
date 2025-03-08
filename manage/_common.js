@@ -297,6 +297,7 @@ function initModalClose() {
     });
 }
 
+// 请假相关函数
 function openLeaveModal() {
     document.getElementById('leaveStartTime').value = moment().format('YYYY-MM-DDTHH:mm');
     document.getElementById('leaveEndTime').value = '';
@@ -309,9 +310,6 @@ function closeLeaveModal() {
 }
 
 function submitLeave() {
-    const name = document.getElementById('leaveName').value;
-    const position = document.getElementById('leavePosition').value;
-    const shift = document.getElementById('leaveShift').value;
     const startTime = document.getElementById('leaveStartTime').value;
     const endTime = document.getElementById('leaveEndTime').value;
     const type = document.getElementById('leaveType').value;
@@ -322,6 +320,72 @@ function submitLeave() {
         return;
     }
 
+    const name = "张三";
+    const position = "客服专员";
+    const shift = "2025/03/08 早班1";
     console.log(`请假申请: 姓名: ${name}, 职位: ${position}, 班次: ${shift}, 时间: ${startTime} - ${endTime}, 类型: ${type}, 理由: ${reason}`);
     closeLeaveModal();
 }
+
+// 新增函数：初始化弹窗关闭逻辑
+function initModalClose() {
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            // 如果点击的是modal本身（空白区域），而不是modal-content或其子元素
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+}
+
+// 签到相关函数
+let checkinTimer;
+function openCheckinModal() {
+    document.getElementById('checkinModal').style.display = 'flex';
+    const types = [
+        { name: "上班打卡", color: "#52c41a" }, // 绿色
+        { name: "迟到打卡", color: "#faad14" }, // 黄色
+        { name: `第${Math.floor(Math.random() * 5) + 1}次在岗卡`, color: "#1890ff" }, // 蓝色
+        { name: "下班打卡", color: "#f5222d" }  // 红色
+    ];
+    const randomType = types[Math.floor(Math.random() * types.length)];
+    const checkinTypeElement = document.getElementById('checkinType');
+    const checkinButton = document.getElementById('checkinButton');
+    checkinTypeElement.textContent = randomType.name;
+    checkinTypeElement.style.color = randomType.color; // 设置类型字段颜色
+    checkinButton.style.backgroundColor = randomType.color; // 设置按钮背景色
+
+    let countdown = 30;
+    const countdownElement = document.getElementById('checkinCountdown');
+    countdownElement.textContent = `${countdown}`;
+    checkinTimer = setInterval(() => {
+        countdown--;
+        countdownElement.textContent = `${countdown}`;
+        if (countdown <= 0) {
+            clearInterval(checkinTimer);
+            closeCheckinModal();
+            console.log('签到超时，记录为缺卡');
+        }
+    }, 1000);
+}
+
+function closeCheckinModal() {
+    clearInterval(checkinTimer);
+    document.getElementById('checkinModal').style.display = 'none';
+}
+
+function submitCheckin() {
+    const name = "张三";
+    const position = "客服专员";
+    const shift = "2025/03/08 早班1";
+    const checkinType = document.getElementById('checkinType').textContent;
+    console.log(`签到成功: 姓名: ${name}, 职位: ${position}, 班次: ${shift}, 类型: ${checkinType}`);
+    clearInterval(checkinTimer);
+    closeCheckinModal();
+}
+
+// 每5分钟触发签到弹窗
+setInterval(() => {
+    openCheckinModal();
+}, 300000); // 5分钟 = 300,000毫秒

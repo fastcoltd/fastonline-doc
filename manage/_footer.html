@@ -9,23 +9,35 @@
     </button>
 </div>
 
+<!-- 签到悬浮窗按钮 -->
+<div class="float-btn" style="bottom: 9em;">
+    <button class="checkin-btn" onclick="openCheckinModal()">
+        <span class="anticon anticon-clock-circle">
+            <svg viewBox="64 64 896 896" focusable="false" data-icon="clock-circle" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+                <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/>
+                <path d="M686.7 638.6L544.1 535.5V288c0-4.4-3.6-8-8-8H488c-4.4 0-8 3.6-8 8v275.4c0 2.6 1.2 5 3.3 6.5l165.4 120.6c3.6 2.6 8.6 1.8 11.2-1.7l28.6-39c2.6-3.7 1.8-8.7-1.8-11.2z"/>
+            </svg>
+        </span>
+    </button>
+</div>
+
 <!-- 请假弹窗 -->
 <div id="leaveModal" class="leave-modal">
     <div class="leave-modal-content">
         <button class="close-btn" onclick="closeLeaveModal()">×</button>
         <h3>请假</h3>
         <form id="leaveForm">
-            <div class="ant-form-item">
+            <div class="ant-form-item info">
                 <label>姓名:</label>
-                <span class="" style="display: inline-block; padding: 4px 8px;">张三</span>
+                <span>张三</span>
             </div>
-            <div class="ant-form-item">
+            <div class="ant-form-item info">
                 <label>职位:</label>
-                <span class="" style="display: inline-block; padding: 4px 8px;">客服专员</span>
+                <span>客服专员</span>
             </div>
-            <div class="ant-form-item">
+            <div class="ant-form-item info">
                 <label>班次:</label>
-                <span class="" style="display: inline-block; padding: 4px 8px;">2025/03/08 早班1</span>
+                <span>2025/03/08 早班1</span>
             </div>
             <div class="ant-form-item">
                 <label>开始时间:</label>
@@ -51,7 +63,38 @@
             </div>
             <div class="modal-buttons">
                 <button type="button" class="ant-btn" onclick="closeLeaveModal()">取消</button>
-                <button type="button" class="ant-btn ant-btn-primary" onclick="submitLeave()">提交申请</button>
+                <button type="button" class="ant-btn ant-btn-primary" style="background-color: #1e3a8a" onclick="submitLeave()">提交申请</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- 签到弹窗 -->
+<div id="checkinModal" class="checkin-modal">
+    <div class="checkin-modal-content">
+        <button class="close-btn" onclick="closeCheckinModal()">×</button>
+        <h3>签到</h3>
+        <form id="checkinForm">
+            <div class="ant-form-item info">
+                <label>姓名:</label>
+                <span>张三</span>
+            </div>
+            <div class="ant-form-item info">
+                <label>职位:</label>
+                <span>客服专员</span>
+            </div>
+            <div class="ant-form-item info">
+                <label>班次:</label>
+                <span>2025/03/08 早班1</span>
+            </div>
+            <div class="ant-form-item info">
+                <label>类型:</label>
+                <span id="checkinType" style="font-weight: bold;"></span>
+            </div>
+            <div class="modal-buttons checkin-buttons">
+                <button type="button" class="ant-btn ant-btn-primary" id="checkinButton" onclick="submitCheckin()" style="width: 5em; height: 5em; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.2em; padding: 0;">
+                    <span>签到</span>
+                    <span id="checkinCountdown">15 s</span>
+                </button>
             </div>
         </form>
     </div>
