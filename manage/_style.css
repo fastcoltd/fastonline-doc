@@ -229,7 +229,7 @@ select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-
 .event-close-btn { position: absolute; top: 0.75em; right: 0.75em; width: 1.5em; height: 1.5em; font-size: 1.2em; line-height: 1.5em; text-align: center; background: #f5222d; color: #fff; border: none; border-radius: 50%; cursor: pointer; transition: background 0.3s ease, transform 0.3s ease; }
 .event-close-btn:hover { background: #ff4d4f; transform: scale(1.1); }
 
-/* 响应式设计 - 移动端 (max-width: 48em = 768px) */
+/* _style.css (仅展示移动端部分，替换之前的事件弹窗和 floating-toggle 相关样式) */
 @media (max-width: 48em) {
     .header { padding: 0 0.625em; height: 4em; flex-wrap: nowrap; overflow: hidden; }
     .header-toggle { display: block; margin-right: 0.625em; }
@@ -244,7 +244,7 @@ select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-
     .content-wrapper { margin-left: 0; margin-top: 4em; transition: none; }
     .main-content { padding: 0.625em; }
     .footer { padding: 0.625em 0; font-size: 0.625em; }
-    .floating-toggle { display: flex; }
+    .floating-toggle { display: flex; justify-content: center; align-items: center;position: fixed; bottom: 1em; right: 1em; width: 3em; height: 3em; background: #1e3a8a; border-radius: 50%; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.15); cursor: pointer; transition: all 0.3s ease; z-index: 2001; display: flex; align-items: center; justify-content: center; }
     .float-btn { display: flex; }
     .mobile-sidebar { display: block; }
     .col-actions { min-width: 8em !important; }
@@ -279,13 +279,14 @@ select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-
     .time-btn-group { gap: 4px; flex-wrap: wrap; width: 100%; justify-content: flex-start; }
     .time-btn { font-size: 0.75em; padding: 0.2em 0.5em; height: 1.8em; }
 
-    .event-popup { width: 95%; max-width: 24em; bottom: 1em; right: 1em; box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.3); }
+    .event-popup { width: 95%; max-width: 24em; bottom: 1em; right: 1em; box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.3); z-index: 9999; }
     .event-popup-content { padding: 1em; }
     .event-popup h3 { font-size: 1.2em; margin-bottom: 0.5em; text-align: left; }
     .event-popup p { font-size: 0.95em; margin-bottom: 1em; text-align: left; }
     .event-buttons { gap: 0.5em; flex-wrap: wrap; }
     .event-buttons .ant-btn { padding: 0.4em 1em; font-size: 0.9em; }
-    .event-close-btn { top: 0.5em; right: 0.5em; width: 1.2em; height: 1.2em; font-size: 1em; line-height: 1.2em; }
+    .event-close-btn { position: absolute; top: 0.5em; right: 0.5em; width: 1.2em; height: 1.2em; font-size: 1em; line-height: 1.2em; text-align: center; background: #f5222d; color: #fff; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .event-close-btn:hover { background: #ff4d4f; transform: scale(1.1); }
 }
 
 /* 响应式设计 - PC端 (min-width: 48.0625em = 769px) */

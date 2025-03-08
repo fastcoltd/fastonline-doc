@@ -528,7 +528,7 @@ document.addEventListener('keydown', (e) => {
 
 function startRandomEventPopups() {
     function scheduleNextPopup() {
-        const delay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 10000; // 5-10秒
+        const delay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 30000; // 5-10秒
         setTimeout(() => {
             showEventPopup();
             scheduleNextPopup();
