@@ -228,6 +228,30 @@ canvas { max-width: 100%; height: auto; } /* 画布 */
 .floating-toggle::before { content: "≡"; font-size: 1.5em; color: #fff; } /* 悬浮按钮图标（未展开） */
 .mobile-sidebar.open + .floating-toggle::before { content: "×"; } /* 悬浮按钮图标（展开） */
 
+.float-btn { position: fixed; bottom: 5em; right: 1em; z-index: 1000; }
+.leave-btn { width: 3em; height: 3em; background-color: #1e3a8a; color: #fff; border: none; border-radius: 1.5em; font-size: 1em; cursor: pointer; box-shadow: 0 0.25em 0.75em rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+.leave-btn:hover { background-color: #3b82f6; transform: translateY(-0.1em); box-shadow: 0 0.35em 1em rgba(0, 0, 0, 0.25); }
+.leave-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1001; align-items: center; justify-content: center; }
+.leave-modal-content { background: #fff; width: 25em; padding: 2em; border-radius: 1em; box-shadow: 0 0.5em 1.5em rgba(0, 0, 0, 0.2); position: relative; animation: slideIn 0.3s ease-out; background: linear-gradient(145deg, #ffffff, #f9fafb); overflow: hidden; display: flex; flex-direction: column; }
+.leave-modal-content h3 { margin: 0 0 1.5em; font-size: 1.5em; color: #1e3a8a; text-align: center; font-weight: 600; letter-spacing: 0.05em; }
+.close-btn { position: absolute; top: 1em; right: 1em; font-size: 1.33em; border: none; background: none; cursor: pointer; color: #666; transition: color 0.2s; }
+.close-btn:hover { color: #ff4d4f; }
+.leave-modal-content .ant-form-item { margin-bottom: 1em; display: flex; align-items: center; }
+.leave-modal-content .ant-form-item label { width: 5em !important; font-size: 1em; color: #1e3a8a; font-weight: 500; }
+.leave-modal-content .ant-form-item.info span { font-size: 1em; color: #333; }
+.leave-modal-content .ant-form-item input, .leave-modal-content .ant-form-item select, .leave-modal-content .ant-form-item textarea { flex: 1; padding: 0.5em 0.75em; border: 1px solid #d9d9d9; border-radius: 0.5em; font-size: 1em; transition: border-color 0.3s; }
+.leave-modal-content .ant-form-item input:focus, .leave-modal-content .ant-form-item select:focus, .leave-modal-content .ant-form-item textarea:focus { border-color: #1e3a8a; outline: none; box-shadow: 0 0 0 0.17em rgba(30, 58, 138, 0.2); }
+.leave-modal-content .ant-form-item textarea { resize: none; height: 5em; }
+.leave-modal-content form { flex: 1; display: flex; flex-direction: column; }
+.modal-buttons { text-align: right; margin-top: auto; padding-top: 1.5em; }
+.modal-buttons button { padding: 0.5em 1.5em; font-size: 1em; border-radius: 0.5em; transition: all 0.3s; }
+.modal-buttons .ant-btn { border: 1px solid #d9d9d9; background: #fff; color: #333; }
+.modal-buttons .ant-btn:hover { border-color: #1e3a8a; color: #1e3a8a; }
+.modal-buttons .ant-btn-primary { border: none; background: #1e3a8a; color: #fff; }
+.modal-buttons .ant-btn-primary:hover { background: #3b82f6; }
+@media (max-width: 768px) { .leave-modal-content { width: 20em;padding: 1.5em; } }
+@keyframes slideIn { from { transform: translateY(-4.17em); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
 /* 移动端侧边栏菜单样式 */
 .mobile-sidebar { display: none; position: fixed; top: 4em; left: -100%; width: 12.5em; height: calc(100vh - 4em); background: #eef2ff; color: #1e3a8a; transition: left 0.3s ease; z-index: 999; overflow-y: auto; box-shadow: 0.125em 0 0.5em rgba(0, 0, 0, 0.05); } /* 移动端侧边栏 */
 .mobile-sidebar.open { left: 0; } /* 移动端侧边栏展开状态 */
@@ -265,6 +289,7 @@ canvas { max-width: 100%; height: auto; } /* 画布 */
     .main-content { padding: 0.625em; } /* 移动端主内容 */
     .footer { padding: 0.625em 0; font-size: 0.625em; } /* 移动端页脚 */
     .floating-toggle { display: flex; } /* 移动端显示悬浮按钮 */
+    .float-btn { display: flex; } /* 移动端显示悬浮按钮 */
     .mobile-sidebar { display: block; } /* 移动端显示侧边栏 */
     .col-actions { min-width: 8em !important; } /* 移动端操作列宽 */
     .dashboard-grid { grid-template-columns: 1fr; } /* 移动端Dashboard单列 */

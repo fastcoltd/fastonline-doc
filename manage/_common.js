@@ -296,3 +296,32 @@ function initModalClose() {
         });
     });
 }
+
+function openLeaveModal() {
+    document.getElementById('leaveStartTime').value = moment().format('YYYY-MM-DDTHH:mm');
+    document.getElementById('leaveEndTime').value = '';
+    document.getElementById('leaveReason').value = '';
+    document.getElementById('leaveModal').style.display = 'flex';
+}
+
+function closeLeaveModal() {
+    document.getElementById('leaveModal').style.display = 'none';
+}
+
+function submitLeave() {
+    const name = document.getElementById('leaveName').value;
+    const position = document.getElementById('leavePosition').value;
+    const shift = document.getElementById('leaveShift').value;
+    const startTime = document.getElementById('leaveStartTime').value;
+    const endTime = document.getElementById('leaveEndTime').value;
+    const type = document.getElementById('leaveType').value;
+    const reason = document.getElementById('leaveReason').value;
+
+    if (!startTime || !endTime || !reason) {
+        alert('请填写所有必填项！');
+        return;
+    }
+
+    console.log(`请假申请: 姓名: ${name}, 职位: ${position}, 班次: ${shift}, 时间: ${startTime} - ${endTime}, 类型: ${type}, 理由: ${reason}`);
+    closeLeaveModal();
+}

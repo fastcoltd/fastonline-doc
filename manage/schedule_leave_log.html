@@ -105,6 +105,7 @@
     // 模拟排班和管理员名称
     const scheduleNames = ['早班', '中班', '晚班', '夜班', '全天班'];
     const managerNames = ['张经理', '李经理', '王经理', '赵经理', '钱经理'];
+    const leaveTypes = ['事假', '病假', '年假', '其他'];
     const reasons = ['个人事务', '家庭紧急情况', '健康原因', '其他安排', '临时出行'];
 
     window.tableConfig = {
@@ -120,6 +121,7 @@
             { name: 'ask_time', generator: () => moment().subtract(randomInt(1, 60), 'days').unix() },
             { name: 'leave_time', generator: () => moment().add(randomInt(1, 30), 'days').unix() },
             { name: 'back_time', generator: () => moment().add(randomInt(31, 60), 'days').unix() },
+            { name: 'leave_type', generator: () => getRandomItem(leaveTypes) },
             { name: 'reason', generator: () => getRandomItem(reasons) },
             { name: 'mark', generator: id => randomInt(0, 1) ? `请假备注 #${id}: ${getRandomItem(reasons)}` : '' },
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
@@ -139,9 +141,9 @@
             { name: 'ask_time', label: '申请时间', className: 'col-ask-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'leave_time', label: '请假时间', className: 'col-leave-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'back_time', label: '返回时间', className: 'col-back-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'leave_type', label: '请假类型', className: 'col-create-time', },
             { name: 'reason', label: '请假原因', className: 'col-reason' },
             { name: 'mark', label: '备注', className: 'col-mark' },
-            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             {
                 name: 'actions',
                 label: '操作',
@@ -171,6 +173,7 @@
                     { name: 'ask_time', label: '申请时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'leave_time', label: '请假时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'back_time', label: '返回时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'leave_type', label: '请假类型', type: 'select', options: () => leaveTypes, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'reason', label: '请假原因', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'mark', label: '备注', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
@@ -205,8 +208,8 @@
             { name: 'ask_time', label: '申请时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'leave_time', label: '请假时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'back_time', label: '返回时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'leave_type', label: '请假类型' },
             { name: 'reason', label: '请假原因' },
-            { name: 'create_time', label: '创建时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') }
         ];
 
         const infoHTML = reviewFields.map(field => {
