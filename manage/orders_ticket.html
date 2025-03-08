@@ -24,6 +24,154 @@
         .col-aftersales-txt { width: 15%; min-width: 120px; }
         .col-create-time { width: 12%; min-width: 100px; }
         .col-actions { width: 12%; min-width: 100px; }
+        .basic-info { padding: 10px; border-bottom: 1px solid #ddd; }
+        .basic-info .row { display: flex; white-space: nowrap; margin-bottom: 5px; align-items: center; height: 25px; }
+        .basic-info .row > div { margin-right: 20px; }
+        .basic-info .row button { height: 25px; line-height: 25px; padding: 0 10px; }
+        .chat-section { display: flex; flex-direction: column; flex: 1; padding: 10px; }
+        .chat-container { height: 0; flex-grow: 1; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px; }
+        .chat-header { position: sticky; top: 0; background: #f5f5f5; padding: 10px; border-bottom: 1px solid #ddd; z-index: 1; }
+        .chat-message { margin: 10px 0; display: flex; flex-direction: column; align-items: flex-start; }
+        .chat-message.admin { align-items: flex-end; }
+        .chat-message.system { align-items: center; }
+        .chat-message .message-wrapper { display: flex; align-items: center; max-width: 70%; }
+        .chat-message.admin .message-wrapper { flex-direction: row-reverse; }
+        .chat-message .message-content {
+            position: relative;
+            padding: 8px 12px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            color: #000000;
+            word-wrap: break-word;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-message .message-text { flex-grow: 1; }
+        .chat-message .message-time { font-size: 0.8em; color: #888; margin-left: 10px; }
+        .chat-message.system .message-content {
+            color: #ff0000;
+            background: none;
+            display: block;
+        }
+        .chat-message.media .message-content {
+            flex-direction: column; /* 有媒体时垂直排列 */
+            align-items: flex-start;
+        }
+        .chat-message.media .message-text {
+            margin-top: 8px; /* 文本与媒体间距 */
+        }
+        .chat-message.media .message-time {
+            align-self: flex-end; /* 时间靠右 */
+            margin-left: 0;
+        }
+        .chat-message .message-text { flex-grow: 1; }
+        .chat-message .message-time { font-size: 0.8em; color: #888; margin-left: 10px; }
+        .chat-message.system .message-content {
+            color: #ff0000;
+            background: none;
+            display: block; /* 系统消息保持单行布局 */
+        }
+        .chat-message.admin .message-content { background: #e6f7ff; }
+        .chat-message.template-refund .message-content { background: #fff1f0; } /* 退款模板 - 浅红 */
+        .chat-message.template-exchange .message-content { background: #f6ffed; } /* 换货模板 - 浅绿 */
+        .chat-message.template-close .message-content { background: #fff7e6; } /* 关闭模板 - 浅橙 */
+        .chat-message.system .message-content { color: #ff0000; background: none; }
+        .chat-message:not(.system) .message-content::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+        }
+        .chat-message:not(.admin):not(.system) .message-content::before {
+            left: -12px;
+            border-right-color: #f0f0f0;
+        }
+        .chat-message.admin .message-content::before {
+            right: -12px;
+            border-left-color: #e6f7ff;
+        }
+        .chat-message.template-refund:not(.admin) .message-content::before { border-right-color: #fff1f0; }
+        .chat-message.template-exchange:not(.admin) .message-content::before { border-right-color: #f6ffed; }
+        .chat-message.template-close:not(.admin) .message-content::before { border-right-color: #fff7e6; }
+        .chat-message.admin .message-name { color: #ff0000; }
+        .chat-message.system .message-name { color: #722ed1; }
+        .chat-message.store .message-name { color: #52c41a; }
+        .chat-message.customer .message-name { color: #1890ff; }
+        .chat-message .approved { color: #52c41a; } /* 同意 - 绿色 */
+        .chat-message .rejected { color: #ff0000; } /* 拒绝 - 红色 */
+        .chat-message .message-sender {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* 左右居中 */
+            margin-bottom: 10px; /* 与消息内容间距 */
+        }
+        .chat-message.admin .message-sender {
+            flex-direction: column; /* 管理员保持一致 */
+            align-items: center;
+        }
+        .message-avatar {
+            width: 3.5em;
+            height: 3.5em; /* 头像宽高 3em */
+            border-radius: 50%;
+            margin-bottom: 5px; /* 头像与名字间距 */
+        }
+        .chat-message .message-name {
+            font-size: 0.9em;
+            text-align: center;
+        }
+        .chat-message .message-role {
+            font-size: 0.8em;
+            color: #888;
+            text-align: center;
+        }
+        .chat-message .message-content {
+            margin: 0 auto; /* 消息内容也居中 */
+            max-width: 70%;
+        }
+
+        .message-content img { max-width: 100px; cursor: pointer; }
+        .chat-input { display: flex; flex-direction: column; margin-top: 10px; gap: 5px; }
+        .chat-input .message-types { display: flex; gap: 5px; }
+        .chat-input .message-types button { height: 1.5em; }
+        .chat-input .input-row { display: flex; gap: 10px; }
+        .chat-input textarea { flex: 1; height: 60px; resize: none; border-radius: 4px; }
+        .chat-input button.send-btn { height: 60px; width: 100px; }
+        .preview-container { display: flex; align-items: center; gap: 5px; }
+        .preview-container img { max-width: 50px; cursor: pointer; }
+        .preview-container .delete-btn { color: red; cursor: pointer; }
+        .modal-content { width: 900px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+        .small-modal .modal-content { height: 50vh; }
+
+        .modal-content { width: 900px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; background: #fff; border-radius: 4px; box-sizing: border-box; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .chat-section { display: flex; flex-direction: column; flex: 1; padding: 10px; min-height: 0; } /* 防止溢出 */
+        .chat-container { height: 0; flex-grow: 1; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px; }
+        .chat-header { position: sticky; top: 0; background: #f5f5f5; padding: 10px; border-bottom: 1px solid #ddd; z-index: 1; }
+        .chat-input { display: flex; flex-direction: column; margin-top: 10px; gap: 5px; background: #fff; z-index: 1; } /* 确保输入区域可见 */
+        .chat-input .message-types { display: flex; gap: 5px; }
+        .chat-input .input-row { display: flex; gap: 10px; align-items: center; }
+        .chat-input textarea { flex: 1; height: 60px; resize: none; border-radius: 4px; }
+        .chat-input button.send-btn { height: 60px; width: 100px; }
+        .close-btn { font-size: 20px; padding: 5px; position: absolute; top: 10px; right: 10px; }
+        .basic-info { padding: 10px; border-bottom: 1px solid #ddd; }
+        .basic-info .row { display: flex; white-space: nowrap; margin-bottom: 5px; align-items: center; height: 25px; }
+        .small-modal .modal-content { height: 50vh; }
+
+        @media (max-width: 768px) {
+            .modal-content { width: 100vw!important; height: 100vh!important; max-width: 100%!important; max-height: 100%!important; margin: 0; border-radius: 0; position: fixed; top: 0; left: 0; transform: none; background: #fff; } /* 确保背景不透明 */
+            .chat-section { padding: 5px; } /* 减小内边距 */
+            .chat-container { flex-grow: 1; height: auto; }
+            .basic-info { font-size: 14px; }
+            .basic-info .row { flex-wrap: wrap; height: auto; }
+            .chat-header { font-size: 14px; padding: 5px; }
+            .chat-input { margin-top: 5px; padding-bottom: 10px; } /* 确保输入区域有底部空间 */
+            .chat-input textarea { height: 40px; }
+            .chat-input button.send-btn { height: 40px; width: 80px; }
+            .close-btn { font-size: 20px; padding: 5px; }
+            .small-modal .modal-content { width: 100vw; height: 80vh; position: fixed; top: 10vh; left: 0; transform: none; }
+        }
     </style>
 </head>
 <body>
@@ -73,6 +221,7 @@
         </div>
     </div>
 </div>
+
 <script>
     function getRandomItem(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
@@ -105,6 +254,19 @@
         '管理员A', '管理员B', '管理员C', '管理员D', '管理员E',
         '管理员F', '管理员G', '管理员H', '管理员I', '管理员J'
     ];
+    const productNames = [
+        '戴森吹风机VV1', '苹果手机X12', '索尼耳机Pro', '三星平板S9', '华为充电器65W',
+        '小米手表Lite', '罗技键盘K380', '雷蛇鼠标M1', '戴尔显示器27寸', 'TP-Link路由器AX6000'
+    ];
+    const aftersalesTypes = ['退款', '换货', '维修', '补发', '其他'];
+    const joinedTickets = new Set([1, 3, 5]);
+
+    const avatars = {
+        customer: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg',
+        store: 'https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg',
+        admin: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+        system: ''
+    };
 
     window.tableConfig = {
         tableName: 'orders_ticket',
@@ -129,7 +291,6 @@
             { name: 'last_message_summary', generator: () => `用户反馈: ${getRandomItem(aftersalesReasons)}，等待处理。` }
         ],
         actionButtons: [
-            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: statusOptions } }
         ],
@@ -144,6 +305,7 @@
             { name: 'aftersales_txt', label: '售后原因', className: 'col-aftersales-txt' },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" style="background: ${joinedTickets.has(item.id) ? '#1890ff' : '#fa8c16'}; color: white;" onclick="joinRecord(${item.id})" style="margin-right: 8px;">${joinedTickets.has(item.id) ? '进入' : '加入'}</button>
                 <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
                 <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
             ` }
@@ -161,25 +323,24 @@
                 id: 'ticketInfo',
                 title: '工单信息',
                 fields: [
-                    { name: 'orders_id', label: '订单ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: 1000000 + i, label: `ORD-2025-${String(i + 1).padStart(3, '0')}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                    { name: 'user_id', label: '用户ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: userNames[i % userNames.length] })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                    { name: 'store_id', label: '店铺ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: storeNames[i % storeNames.length] })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                    { name: 'manage_id', label: '管理员ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: manageNames[i % manageNames.length] })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                    { name: 'aftersales_id', label: '售后ID', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                    { name: 'orders_id', label: '订单ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: 1000000 + i, label: `ORD-2025-${String(i + 1).padStart(3, '0')}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'user_id', label: '用户ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: userNames[i % userNames.length] })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'store_id', label: '店铺ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: storeNames[i % storeNames.length] })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'manage_id', label: '管理员ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: manageNames[i % manageNames.length] })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'aftersales_id', label: '售后ID', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'id', label: '工单ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
                 ]
             },
-
             {
                 id: 'statusDetails',
                 title: '状态与详情',
                 fields: [
                     { name: 'status', label: '状态', type: 'select', options: statusOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'aftersales_txt', label: '售后原因', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'manage_last_time', label: '最后管理时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                    { name: 'risk_times', label: '风险次数', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                    { name: 'user_read', label: '用户已读', type: 'select', options: [{ value: 0, label: '未读' }, { value: 1, label: '已读' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                    { name: 'store_read', label: '店铺已读', type: 'select', options: [{ value: 0, label: '未读' }, { value: 1, label: '已读' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                    { name: 'manage_last_time', label: '最后管理时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'risk_times', label: '风险次数', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'user_read', label: '用户已读', type: 'select', options: [{ value: 0, label: '未读' }, { value: 1, label: '已读' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'store_read', label: '店铺已读', type: 'select', options: [{ value: 0, label: '未读' }, { value: 1, label: '已读' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'last_message_summary', label: '最后消息概要', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
                     { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
@@ -187,6 +348,343 @@
             }
         ]
     };
+
+    // 加入功能
+    function joinRecord(id) {
+        const record = tableData.find(item => item.id === id);
+        let modal = document.getElementById('joinModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'joinModal';
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
+
+        modal.innerHTML = `
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeJoinModal()">×</button>
+                <h3>加入工单 - ID: ${record.id}</h3>
+                <div class="basic-info">
+                    <div class="row">
+                        <div>工单进度:</div>
+                        <div>工单状态: <strong>${statusOptions[record.status].label}</strong></div>
+                        <div>退款金额: <strong>$${randomInt(0, 200)}</strong></div>
+                        <div>换货数量: <strong>${randomInt(0, 5)}</strong></div>
+                        <div>退款次数: <strong>${randomInt(0, 3)}</strong></div>
+                        <div>换货次数: <strong>${randomInt(0, 2)}</strong></div>
+                    </div>
+                    <div class="row">
+                        <div>工单原因:</div>
+                        <div>售后类型: <strong>${getRandomItem(aftersalesTypes)}</strong></div>
+                        <div>具体原因: <strong>${record.aftersales_txt}</strong></div>
+                        <div>提交时间: <strong>${moment.unix(record.create_time).format('YYYY-MM-DD HH:mm:ss')}</strong></div>
+                    </div>
+                    <div class="row">
+                        <div>在线状态:</div>
+                        <div>店铺: <strong>${storeNames[record.store_id % storeNames.length]} (${randomInt(0, 1) ? '在线' : '离线'})</strong></div>
+                        <div>客户: <strong>${userNames[record.user_id % userNames.length]} (${randomInt(0, 1) ? '在线' : '离线'})</strong></div>
+                    </div>
+                    <div class="row">
+                        <div>操作工单:</div>
+                        <div><button class="ant-btn ant-btn-danger" onclick="closeTicket(${record.id})">关闭工单</button></div>
+                        <div><button class="ant-btn ant-btn-primary" onclick="refund(${record.id})">操作退款</button></div>
+                    </div>
+                </div>
+                <div class="chat-section">
+                    <div class="chat-header">
+                        <strong>订单ID:</strong> <strong>${orderNames[record.orders_id % orderNames.length]}</strong>,
+                        商品: <strong>${getRandomItem(productNames)}</strong>,
+                        数量: <strong>${randomInt(1, 10)}</strong>,
+                        金额: <strong>$${randomInt(50, 500)}</strong>,
+                        售后原因: <strong>${record.aftersales_txt}</strong>,
+                        商品下载: <strong><a href="#">下载</a></strong>
+                    </div>
+                    <div class="chat-container" id="chatHistory"></div>
+                    <div class="chat-input">
+                        <div class="message-types" id="messageTypes">
+                            <button class="ant-btn" onclick="setMessageType('image', ${record.id})">图片</button>
+                            <button class="ant-btn" onclick="setMessageType('file', ${record.id})">文件</button>
+                        </div>
+                        <div class="input-row">
+                            <textarea id="chatInput" placeholder="输入消息 (Ctrl + Enter 发送)"></textarea>
+                            <button class="ant-btn ant-btn-primary send-btn" onclick="sendMessage(${record.id})">发送</button>
+                        </div>
+                    </div>
+                    <input type="file" id="fileUpload" style="display: none;" onchange="uploadFile(${record.id})">
+                </div>
+            </div>
+        `;
+
+        modal.style.display = 'block';
+        renderChatHistory(record.id);
+    }
+
+    let currentMessageType = 'text';
+    let selectedImage = null;
+    let selectedFile = null;
+
+    function setMessageType(type, ticketId) {
+        currentMessageType = type;
+        const messageTypes = document.getElementById('messageTypes');
+        if (type === 'image' && !selectedImage) {
+            document.getElementById('fileUpload').accept = 'image/*';
+            document.getElementById('fileUpload').click();
+        } else if (type === 'file' && !selectedFile) {
+            document.getElementById('fileUpload').accept = '';
+            document.getElementById('fileUpload').click();
+        }
+    }
+
+    function renderChatHistory(ticketId) {
+        const chatHistory = document.getElementById('chatHistory');
+        const messages = [
+            { role: 'system', content: `${userNames[ticketId % userNames.length]} 对订单 ${orderNames[ticketId % orderNames.length]} 提交了工单，原因：${getRandomItem(aftersalesReasons)}`, time: moment().subtract(6, 'days').unix() },
+            { role: 'customer', content: '我的订单还没到，请尽快处理！', time: moment().subtract(5, 'days').unix() },
+            { role: 'store', content: '抱歉，我们正在联系物流公司。', time: moment().subtract(4, 'days').unix() },
+            { role: 'customer', content: '能不能快点？我很急！', time: moment().subtract(4, 'days').unix() },
+            { role: 'admin', content: '物流已确认，预计明天到达。', time: moment().subtract(3, 'days').unix() },
+            { role: 'customer', content: '<img src="https://images.pexels.com/photos/1458283/pexels-photo-1458283.jpeg" alt="损坏照片"> 商品收到时已损坏！', time: moment().subtract(2, 'days').unix() },
+            { role: 'store', content: '<img src="https://images.pexels.com/photos/248077/pexels-photo-248077.jpeg" alt="包装照片"> 这是发货时的包装照片。', time: moment().subtract(2, 'days').unix() },
+            { role: 'customer', content: '附件: <a href="#">损坏证明.pdf</a> (点击下载)', time: moment().subtract(1, 'days').unix() },
+            { role: 'admin', content: '附件: <a href="#">物流单据.docx</a> (点击下载)', time: moment().subtract(1, 'days').unix() },
+            { role: 'system', content: '系统检测到订单异常，请核查。', time: moment().subtract(1, 'days').unix() },
+            { role: 'system', content: '工单已分配给管理员A。', time: moment().subtract(1, 'days').unix() },
+            { role: 'customer', content: `${userNames[ticketId % userNames.length]} 申请了 2件退款，金额为 $100 <span class="approved">(已被客户同意)</span>`, time: moment().subtract(18, 'hours').unix(), template: 'refund' },
+            { role: 'customer', content: `${userNames[ticketId % userNames.length]} 申请了 1件退款，金额为 $50 <span class="rejected">(已被客户拒绝)</span>`, time: moment().subtract(16, 'hours').unix(), template: 'refund' },
+            { role: 'store', content: `${storeNames[ticketId % storeNames.length]} 申请了 3件换货 <span class="approved">(已被店铺同意)</span>`, time: moment().subtract(14, 'hours').unix(), template: 'exchange' },
+            { role: 'customer', content: `${userNames[ticketId % userNames.length]} 申请了 1件换货 <span class="rejected">(已被客户拒绝)</span>`, time: moment().subtract(12, 'hours').unix(), template: 'exchange' },
+            { role: 'customer', content: `${userNames[ticketId % userNames.length]} 申请关闭工单 <span class="approved">(已被客户同意)</span>`, time: moment().subtract(10, 'hours').unix(), template: 'close' },
+            { role: 'store', content: `${storeNames[ticketId % storeNames.length]} 申请关闭工单 <span class="rejected">(已被店铺拒绝)</span>`, time: moment().subtract(8, 'hours').unix(), template: 'close' },
+            { role: 'admin', content: '请提供更多证据以便处理。', time: moment().subtract(6, 'hours').unix() },
+            { role: 'customer', content: '<img src="https://images.pexels.com/photos/123456/pexels-photo-123456.jpeg" alt="新照片"> 这是新的损坏照片。', time: moment().subtract(4, 'hours').unix() },
+            { role: 'store', content: '我们同意退款，请确认金额。', time: moment().subtract(2, 'hours').unix() },
+            { role: 'system', content: '退款已完成，金额 $100。', time: moment().subtract(1, 'hours').unix() }
+        ];
+
+        chatHistory.innerHTML = messages.map(msg => {
+            const sender = msg.role === 'customer' ? '客户' : msg.role === 'store' ? '店铺' : '';
+            let content = msg.content;
+            const isMedia = content.includes('<img') || content.includes('<a href="#">');
+            let mediaContent = '';
+            let textContent = content;
+
+            // 提取媒体内容和文本内容
+            if (isMedia) {
+                const mediaMatch = content.match(/<img[^>]+>|<a[^>]+>[^<]+<\/a>/);
+                if (mediaMatch) {
+                    mediaContent = mediaMatch[0];
+                    textContent = content.replace(mediaContent, '').trim();
+                }
+            }
+
+            if (msg.template) {
+                textContent = textContent.replace('(已同意)', `<span class="approved">(已被${sender}同意)</span>`);
+                textContent = textContent.replace('(已拒绝)', `<span class="rejected">(已被${sender}拒绝)</span>`);
+            }
+
+            return `
+            <div class="chat-message ${msg.role} ${msg.template ? 'template-' + msg.template : ''} ${isMedia ? 'media' : ''}">
+                ${msg.role === 'system' ?
+                `<div class="message-content">系统：${msg.content} ${moment.unix(msg.time).format('HH:mm')}</div>` :
+                `<div class="message-wrapper">
+                        <img src="${avatars[msg.role]}" class="message-avatar">
+                        <div class="message-content">
+                            ${isMedia ? `<div>${mediaContent}</div>` : ''}
+                            <span class="message-text">${msg.role === 'admin' && !isMedia ? `“${textContent}”` : textContent}</span>
+                            <span class="message-time">${moment.unix(msg.time).format('HH:mm')}</span>
+                        </div>
+                    </div>
+                    <span class="message-name">${msg.role === 'customer' ? userNames[ticketId % userNames.length] : msg.role === 'store' ? storeNames[ticketId % storeNames.length] : msg.role === 'admin' ? manageNames[ticketId % manageNames.length] : '系统'}<br/> (${msg.role})</span>`
+            }
+            </div>
+        `;
+        }).join('');
+
+        chatHistory.querySelectorAll('img').forEach(img => {
+            img.addEventListener('click', () => {
+                document.getElementById('enlargedImage').src = img.src;
+                document.getElementById('imageModal').style.display = 'block';
+            });
+        });
+
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    function updateMessageTypes(ticketId) {
+        const messageTypes = document.getElementById('messageTypes');
+        messageTypes.innerHTML = `
+            ${selectedImage ?
+            `<div class="preview-container">
+                    <img src="${selectedImage}" onclick="previewImage('${selectedImage}')">
+                    <span class="delete-btn" onclick="deletePreview('image', ${ticketId})">x</span>
+                </div>` :
+            `<button class="ant-btn" onclick="setMessageType('image', ${ticketId})">图片</button>`}
+            ${selectedFile ?
+            `<div class="preview-container">
+                    <span>${selectedFile.name}</span>
+                    <span class="delete-btn" onclick="deletePreview('file', ${ticketId})">x</span>
+                </div>` :
+            `<button class="ant-btn" onclick="setMessageType('file', ${ticketId})">文件</button>`}
+        `;
+    }
+
+    function sendMessage(ticketId) {
+        const input = document.getElementById('chatInput');
+        if (currentMessageType === 'text' && input.value.trim()) {
+            console.log(`发送文本: ${input.value}`);
+            input.value = '';
+        } else if (currentMessageType === 'image' && selectedImage) {
+            console.log(`发送图片: ${selectedImage}`);
+            selectedImage = null;
+            updateMessageTypes(ticketId);
+        } else if (currentMessageType === 'file' && selectedFile) {
+            console.log(`发送文件: ${selectedFile}`);
+            selectedFile = null;
+            updateMessageTypes(ticketId);
+        }
+    }
+
+    function previewImage(src) {
+        document.getElementById('enlargedImage').src = src;
+        document.getElementById('imageModal').style.display = 'block';
+    }
+
+    function deletePreview(type, ticketId) {
+        if (type === 'image') selectedImage = null;
+        if (type === 'file') selectedFile = null;
+        updateMessageTypes(ticketId);
+    }
+
+    document.getElementById('chatInput')?.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'Enter') sendMessage(ticketId);
+    });
+
+    document.getElementById('chatInput')?.addEventListener('paste', (e) => {
+        const items = e.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                const file = items[i].getAsFile();
+                const reader = new FileReader();
+                reader.onload = () => {
+                    selectedImage = reader.result;
+                    updateMessageTypes(ticketId);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    });
+
+    function uploadFile(ticketId) {
+        const file = document.getElementById('fileUpload').files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (currentMessageType === 'image') {
+                    selectedImage = reader.result;
+                } else if (currentMessageType === 'file') {
+                    selectedFile = file;
+                }
+                updateMessageTypes(ticketId);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function closeTicket(ticketId) {
+        const modal = document.createElement('div');
+        modal.id = 'closeTicketModal';
+        modal.className = 'modal small-modal';
+        modal.innerHTML = `
+            <div class="modal-content" style="width: 400px;">
+                <button class="close-btn" onclick="document.getElementById('closeTicketModal').style.display='none'">×</button>
+                <h3>关闭工单</h3>
+                <div class="ant-form-item">
+                    <label>关闭理由:</label>
+                    <textarea id="closeReason" rows="4" class="ant-input"></textarea>
+                </div>
+                <div class="ant-form-item">
+                    <label>快捷选择:</label>
+                    <select class="ant-select" onchange="document.getElementById('closeReason').value = this.value">
+                        <option value="">选择理由</option>
+                        <option value="问题已解决">问题已解决</option>
+                        <option value="客户取消">客户取消</option>
+                        <option value="重复工单">重复工单</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button class="ant-btn" onclick="document.getElementById('closeTicketModal').style.display='none'">取消</button>
+                    <button class="ant-btn ant-btn-primary" onclick="submitClose(${ticketId})">关闭工单</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.style.display = 'block';
+    }
+
+    function submitClose(ticketId) {
+        const reason = document.getElementById('closeReason').value;
+        if (reason) {
+            console.log(`关闭工单 ${ticketId}, 理由: ${reason}`);
+            document.getElementById('closeTicketModal').style.display = 'none';
+        } else {
+            alert('请输入关闭理由');
+        }
+    }
+
+    function refund(ticketId) {
+        const orderAmount = randomInt(50, 500);
+        const modal = document.createElement('div');
+        modal.id = 'refundModal';
+        modal.className = 'modal small-modal';
+        modal.innerHTML = `
+            <div class="modal-content" style="width: 400px;">
+                <button class="close-btn" onclick="document.getElementById('refundModal').style.display='none'">×</button>
+                <h3>操作退款</h3>
+                <div class="ant-form-item">
+                    <label>订单金额:</label>
+                    <span>$${orderAmount}</span>
+                </div>
+                <div class="ant-form-item">
+                    <label>退款金额:</label>
+                    <input type="number" id="refundAmount" class="ant-input" value="${orderAmount}">
+                </div>
+                <div class="ant-form-item">
+                    <label>退款百分比:</label>
+                    <select class="ant-select" onchange="document.getElementById('refundAmount').value = ${orderAmount} * (this.value / 100)">
+                        <option value="100">100%</option>
+                        <option value="75">75%</option>
+                        <option value="50">50%</option>
+                        <option value="25">25%</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label>退款理由:</label>
+                    <textarea id="refundReason" rows="4" class="ant-input"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button class="ant-btn" onclick="document.getElementById('refundModal').style.display='none'">取消</button>
+                    <button class="ant-btn ant-btn-primary" onclick="submitRefund(${ticketId}, ${orderAmount})">退款</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.style.display = 'block';
+    }
+
+    function submitRefund(ticketId, orderAmount) {
+        const amount = document.getElementById('refundAmount').value;
+        const reason = document.getElementById('refundReason').value;
+        if (amount && reason) {
+            console.log(`退款 ${ticketId}, 金额: $${amount}, 理由: ${reason}`);
+            document.getElementById('refundModal').style.display = 'none';
+        } else {
+            alert('请输入退款金额和理由');
+        }
+    }
+
+    function closeJoinModal() {
+        document.getElementById('joinModal').style.display = 'none';
+    }
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {

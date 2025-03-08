@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popover 聊天室</title>
+    <!-- 引入 Ant Design CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <style>
+        .chat-container {
+            width: 300px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #f0f0f0;
+            border-radius: 4px;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #fafafa;
+        }
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid #f0f0f0;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+<div class="ant-popover" style="position: relative; display: inline-block;">
+    <!-- 触发按钮 -->
+    <button class="ant-btn ant-btn-primary" id="chatTrigger">
+        打开聊天室
+    </button>
+
+    <!-- Popover 内容 -->
+    <div class="ant-popover-content" id="chatPopover" style="display: none; position: absolute; bottom: 40px; left: 0;">
+        <div class="ant-popover-inner">
+            <div class="ant-popover-inner-content">
+                <div class="chat-container">
+                    <!-- 消息列表 -->
+                    <div class="chat-messages">
+                        <div class="ant-comment">
+                            <div class="ant-comment-inner">
+                                <div class="ant-comment-avatar">
+                                        <span class="ant-avatar ant-avatar-circle" style="width: 32px; height: 32px; line-height: 32px;">
+                                            张
+                                        </span>
+                                </div>
+                                <div class="ant-comment-content">
+                                    <div class="ant-comment-content-author">
+                                        <span class="ant-comment-content-author-name">张三</span>
+                                        <span class="ant-comment-content-author-time">今天 10:30</span>
+                                    </div>
+                                    <div class="ant-comment-content-detail">
+                                        <p>大家好！今天天气不错啊。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ant-comment">
+                            <div class="ant-comment-inner">
+                                <div class="ant-comment-avatar">
+                                        <span class="ant-avatar ant-avatar-circle" style="width: 32px; height: 32px; line-height: 32px;">
+                                            李
+                                        </span>
+                                </div>
+                                <div class="ant-comment-content">
+                                    <div class="ant-comment-content-author">
+                                        <span class="ant-comment-content-author-name">李四</span>
+                                        <span class="ant-comment-content-author-time">今天 10:32</span>
+                                    </div>
+                                    <div class="ant-comment-content-detail">
+                                        <p>是的，阳光明媚，很适合出去走走。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ant-comment">
+                            <div class="ant-comment-inner">
+                                <div class="ant-comment-avatar">
+                                        <span class="ant-avatar ant-avatar-circle" style="width: 32px; height: 32px; line-height: 32px;">
+                                            王
+                                        </span>
+                                </div>
+                                <div class="ant-comment-content">
+                                    <div class="ant-comment-content-author">
+                                        <span class="ant-comment-content-author-name">王五</span>
+                                        <span class="ant-comment-content-author-time">今天 10:35</span>
+                                    </div>
+                                    <div class="ant-comment-content-detail">
+                                        <p>你们周末有什么计划吗？</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 输入区域 -->
+                    <div class="chat-input-area">
+                        <div class="ant-row ant-form-item" style="margin-bottom: 8px;">
+                            <input type="text" class="ant-input" placeholder="输入消息..." id="messageInput">
+                        </div>
+                        <button class="ant-btn ant-btn-primary" style="width: 100%;" onclick="sendMessage()">
+                            发送
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 简单的显示/隐藏逻辑
+    const trigger = document.getElementById('chatTrigger');
+    const popover = document.getElementById('chatPopover');
+
+    trigger.addEventListener('click', () => {
+        popover.style.display = popover.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // 发送消息功能
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const messagesContainer = document.querySelector('.chat-messages');
+        const newMessage = document.createElement('div');
+        newMessage.className = 'ant-comment';
+        newMessage.innerHTML = `
+                <div class="ant-comment-inner">
+                    <div class="ant-comment-avatar">
+                        <span class="ant-avatar ant-avatar-circle" style="width: 32px; height: 32px; line-height: 32px;">
+                            我
+                        </span>
+                    </div>
+                    <div class="ant-comment-content">
+                        <div class="ant-comment-content-author">
+                            <span class="ant-comment-content-author-name">我</span>
+                            <span class="ant-comment-content-author-time">${new Date().toLocaleTimeString()}</span>
+                        </div>
+                        <div class="ant-comment-content-detail">
+                            <p>${message}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        messagesContainer.appendChild(newMessage);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        input.value = '';
+    }
+
+    // 按 Enter 发送消息
+    document.getElementById('messageInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
+</body>
+</html>
