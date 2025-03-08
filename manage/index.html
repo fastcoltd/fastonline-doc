@@ -10,99 +10,342 @@
         body {
             margin: 0;
             padding: 0;
-            background: #f0f2f5;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e6f7ff 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
         }
         .header {
             padding: 20px;
+            display: flex;
+            justify-content: flex-start; /* Logo 靠左 */
+            align-items: center;
+            position: relative;
         }
         .brand-logo {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 28px;
+            font-weight: 700;
             color: #1890ff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             margin: 0;
+            transition: transform 0.3s ease;
+        }
+        .brand-logo:hover {
+            transform: scale(1.05);
         }
         .login-container {
             width: 400px;
-            padding: 24px;
+            max-width: 90%;
+            padding: 32px;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
             align-self: center;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            position: relative;
+            z-index: 1;
+        }
+        .login-container:hover {
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
         }
         .login-title {
-            font-size: 20px;
-            font-weight: 500;
-            color: #000;
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2a44;
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
+            position: relative;
+        }
+        .login-title::after {
+            content: '';
+            width: 50px;
+            height: 3px;
+            background: #1890ff;
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
         }
         .ant-form-item {
             margin-bottom: 24px;
+            position: relative;
         }
-        .ant-input {
+        .ant-input, .ant-btn {
             width: 100%;
-            height: 40px;
+            height: 44px;
             padding: 8px 12px;
             border: 1px solid #d9d9d9;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 14px;
             box-sizing: border-box;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
         .ant-input:focus {
             border-color: #40a9ff;
             box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
             outline: none;
         }
+        .captcha-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .captcha-input {
+            flex: 1;
+            min-width: 150px;
+        }
+        .captcha-canvas {
+            height: 44px;
+            width: 120px;
+            border-radius: 6px;
+            border: 1px solid #d9d9d9;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .captcha-canvas:hover {
+            transform: scale(1.02);
+        }
         .ant-btn-primary {
-            width: 100%;
-            height: 40px;
             background: #1890ff;
             border: none;
-            border-radius: 4px;
             color: #fff;
             font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+        .ant-btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        .ant-btn-primary:hover::before {
+            width: 200px;
+            height: 200px;
         }
         .ant-btn-primary:hover {
             background: #40a9ff;
         }
+        .extra-options {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            font-size: 12px;
+            color: #888;
+        }
+        .extra-options a {
+            color: #1890ff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .extra-options a:hover {
+            color: #40a9ff;
+            text-decoration: underline;
+        }
         .footer {
             text-align: center;
-            padding: 20px 0;
             color: #888;
             font-size: 12px;
+            padding-bottom: 2em;
+        }
+
+        /* 移动端美化 */
+        @media (max-width: 768px) {
+            body {
+                background: linear-gradient(135deg, #e6f7ff 0%, #f0f2f5 100%);
+                padding: 10px;
+            }
+            .header {
+                padding: 15px;
+                justify-content: flex-start; /* Logo 靠左 */
+            }
+            .brand-logo {
+                font-size: 22px;
+                color: #fff;
+                background: #1890ff;
+                padding: 5px 15px;
+                border-radius: 20px;
+                box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+            }
+            .login-container {
+                padding: 20px;
+                margin: 0 auto;
+                border-radius: 16px;
+                background: rgba(255, 255, 255, 0.95);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+                border: 1px solid rgba(24, 144, 255, 0.1);
+            }
+            .login-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+                color: #1890ff;
+            }
+            .login-title::after {
+                width: 40px;
+                background: #40a9ff;
+            }
+            .ant-form-item {
+                margin-bottom: 20px;
+            }
+            .ant-input, .ant-btn {
+                height: 40px;
+                font-size: 13px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+            .captcha-canvas {
+                width: 100px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+            .ant-btn-primary {
+                font-size: 14px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+            }
+            .extra-options {
+                font-size: 11px;
+                color: #666;
+            }
+            .footer {
+                font-size: 10px;
+                padding: 15px 0;
+                background: rgba(255, 255, 255, 0.9);
+                border-top: 1px solid rgba(24, 144, 255, 0.1);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1 class="brand-logo">FASTRESP</h1>
-    </div>
-    <div class="login-container">
-        <h2 class="login-title">管理后台登录</h2>
-        <form class="ant-form ant-form-vertical">
-            <div class="ant-form-item">
-                <input type="text" class="ant-input" placeholder="请输入用户名" required />
-            </div>
-            <div class="ant-form-item">
-                <input type="password" class="ant-input" placeholder="请输入密码" required />
-            </div>
-            <div class="ant-form-item">
-				<button type="submit" class="ant-btn ant-btn-primary" onclick="window.location.href='dashboard.html'; return false;">
-					登录
-				</button>
-            </div>
-        </form>
-    </div>
-    <div class="footer">
-        <p>Copyright © 2025 FASTRESP. All Rights Reserved.</p>
-    </div>
+<div class="header">
+    <h1 class="brand-logo">FASTRESP</h1>
+</div>
+<div class="login-container">
+    <h2 class="login-title">管理后台登录</h2>
+    <form class="ant-form ant-form-vertical" id="loginForm">
+        <div class="ant-form-item">
+            <input type="text" class="ant-input" id="username" placeholder="请输入用户名" value="admin" required />
+        </div>
+        <div class="ant-form-item">
+            <input type="password" class="ant-input" id="password" placeholder="请输入密码" value="123456" required />
+        </div>
+        <div class="ant-form-item captcha-container">
+            <input type="text" class="ant-input captcha-input" id="captcha" placeholder="请输入验证码" required />
+            <canvas class="captcha-canvas" id="captchaCanvas" width="120" height="44" onclick="generateCaptcha()"></canvas>
+        </div>
+        <div class="extra-options">
+            <label><input type="checkbox" checked /> 记住我</label>
+            <a href="#">忘记密码?</a>
+        </div>
+        <div class="ant-form-item">
+            <button type="submit" class="ant-btn ant-btn-primary" onclick="handleLogin(event)">
+                登录
+            </button>
+        </div>
+    </form>
+</div>
+<div class="footer">
+    <p>Copyright © 2025 FASTRESP. All Rights Reserved.</p>
+</div>
+
+<script>
+    let captchaText = '';
+
+    // 生成随机验证码
+    function generateCaptcha() {
+        const canvas = document.getElementById('captchaCanvas');
+        const ctx = canvas.getContext('2d');
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        captchaText = '';
+
+        // 调整画布大小（移动端适配）
+        const isMobile = window.innerWidth <= 768;
+        canvas.width = isMobile ? 100 : 120;
+        canvas.height = 44;
+
+        // 清空画布
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 绘制背景
+        ctx.fillStyle = '#f5f5f5';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 生成随机文字
+        for (let i = 0; i < 4; i++) {
+            const char = chars[Math.floor(Math.random() * chars.length)];
+            captchaText += char;
+            ctx.font = `bold ${isMobile ? 20 : 24}px Arial`;
+            ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // 添加随机旋转和位置偏移
+            ctx.save();
+            ctx.translate((canvas.width / 4) * i + (canvas.width / 8), 22);
+            ctx.rotate((Math.random() - 0.5) * 0.4);
+            ctx.fillText(char, 0, 0);
+            ctx.restore();
+        }
+
+        // 添加干扰线
+        for (let i = 0; i < 3; i++) {
+            ctx.beginPath();
+            ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+            ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+            ctx.strokeStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.5)`;
+            ctx.stroke();
+        }
+
+        // 添加噪点
+        for (let i = 0; i < 20; i++) {
+            ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.8)`;
+            ctx.beginPath();
+            ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+        document.getElementById('captcha').value = captchaText
+    }
+
+    // 处理登录
+    function handleLogin(event) {
+        event.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const captchaInput = document.getElementById('captcha').value.toUpperCase();
+
+        if (!username || !password || !captchaInput) {
+            alert('请填写所有字段！');
+            return;
+        }
+
+        if (username === 'admin' && password === '123456' && captchaInput === captchaText) {
+            window.location.href = 'dashboard.html';
+        } else {
+            alert('用户名、密码或验证码错误！');
+            generateCaptcha();
+            document.getElementById('captcha').value = '';
+        }
+    }
+
+    // 初始化验证码并监听窗口大小变化
+    document.addEventListener('DOMContentLoaded', () => {
+        generateCaptcha();
+    });
+    window.addEventListener('resize', generateCaptcha);
+</script>
 </body>
 </html>
