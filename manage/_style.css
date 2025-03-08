@@ -39,7 +39,7 @@ body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-family: -a
 .sidebar.collapsed .sidebar-content { display: none; }
 
 /* 触发器样式（PC端） */
-.trigger { position: fixed; top: 40%; left: 0.25em; width: 2.5em; height: 2.5em; background: #1e3a8a; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.15); cursor: pointer; transition: all 0.3s ease; transform: translateY(-50%); z-index: 2000; }
+.trigger { position: fixed; top: 40%; left: 0.25em; width: 2.2em; height: 2.2em; background: #1e3a8a; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.15); cursor: pointer; transition: all 0.3s ease; transform: translateY(-50%); z-index: 2000; }
 .sidebar:not(.collapsed) .trigger { left: 12.625em; }
 .trigger:hover { background: #3b82f6; transform: translateY(-50%) scale(1.1); }
 .trigger::before { content: "≡"; font-size: 1.125em; color: #fff; }
@@ -235,10 +235,25 @@ select[disabled] { background: #f5f5f5; color: rgba(0, 0, 0, 0.25); cursor: not-
     .col-actions { min-width: 8em !important; }
     .dashboard-grid { grid-template-columns: 1fr; }
     .card { padding: 1em; border-radius: 0.5em; }
-    .charts-container { flex-direction: column; gap: 1.25em; }
-    .chart-card { width: 92%; }
-    .hot-container { grid-template-columns: 1fr; }
-    .hot-card { padding: 1em; border-radius: 0.5em; }
+    .charts-container {
+        display: flex !important; /* 覆盖内联样式 */
+        flex-direction: column !important; /* 强制垂直排列 */
+        gap: 1.25em !important; /* 覆盖内联样式 */
+        justify-content: flex-start !important; /* 重置对齐 */
+    }
+    .chart-card {
+        width: 92% !important; /* 覆盖内联 calc(50% - 0.625em) */
+        margin: 0; /* 移除可能的间距冲突 */
+    }
+    .hot-container {
+        display: grid !important; /* 覆盖内联样式 */
+        grid-template-columns: 1fr !important; /* 强制单列 */
+        gap: 1.25em !important; /* 保持间距一致 */
+    }
+    .hot-card {
+        border-radius: 0.5em;
+        width: 90% !important; /* 确保占满一行 */
+    }
     .hot-data { max-height: 25em; }
     .time-btn-group { gap: 4px; }
     .time-btn { font-size: 0.75em; padding: 0.2em 0.5em; height: 1.8em; }
