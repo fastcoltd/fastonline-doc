@@ -3,45 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 违规记录管理</title>
+    <title>FASTRESP - 违规记录</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" integrity="sha512-Kc2RX0r68yS5yJTuJLUW9RZ56XA8yXvQHIV7R25bHv35XGLQTSVqSAtcfmGrbXkuuKOlOEMA4iO2k2z7E5OuMSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
-        .action-container { margin-bottom: 16px; }
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
         .col-id { width: 8%; min-width: 60px; }
-        .col-user-id { width: 8%; min-width: 80px; }
-        .col-store-id { width: 8%; min-width: 80px; }
-        .col-item-id { width: 8%; min-width: 80px; }
-        .col-demand-id { width: 8%; min-width: 80px; }
-        .col-posts-id { width: 8%; min-width: 80px; }
-        .col-rules-id { width: 8%; min-width: 80px; }
-        .col-event-type { width: 8%; min-width: 80px; }
-        .col-relation-id { width: 8%; min-width: 80px; }
-        .col-status { width: 8%; min-width: 80px; }
-        .col-message { width: 12%; min-width: 120px; }
-        .col-create-time { width: 10%; min-width: 100px; }
-        .col-actions { width: 10%; min-width: 100px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
-        .modal-content h3 { margin: 0 0 16px 0; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
-        .modal-content .ant-form-item { margin-bottom: 16px; }
-        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
-        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .modal-content .ant-form-item.textarea-item { display: block; }
-        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
-        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        .col-user-id { width: 10%; min-width: 80px; }
+        .col-store-id { width: 10%; min-width: 80px; }
+        .col-item-id { width: 12%; min-width: 100px; }
+        .col-demand-id { width: 12%; min-width: 100px; }
+        .col-posts-id { width: 12%; min-width: 100px; }
+        .col-rules-id { width: 10%; min-width: 80px; }
+        .col-event-type { width: 10%; min-width: 80px; }
+        .col-relation-id { width: 12%; min-width: 100px; }
+        .col-status { width: 8%; min-width: 60px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 15%; min-width: 120px; }
+        /* 处罚弹窗违规信息紧凑样式 */
+        #punishModal .ant-form-item.compact { margin-bottom: 4px; display: flex; align-items: center; }
+        #punishModal .ant-form-item.compact label { width: 80px; margin-right: 8px; }
+        #punishModal .ant-form-item.compact span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
 <body>
@@ -55,81 +43,22 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">违规记录管理</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('violations_event.html')">
+                                    <span class="ant-tabs-tab-btn">违规记录</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <select id="userIdFilter" class="ant-select">
-                                        <option value="">全部用户</option>
-                                    </select>
-                                    <select id="storeIdFilter" class="ant-select">
-                                        <option value="">全部店铺</option>
-                                    </select>
-                                    <select id="itemIdFilter" class="ant-select">
-                                        <option value="">全部商品</option>
-                                    </select>
-                                    <select id="postsIdFilter" class="ant-select">
-                                        <option value="">全部帖子</option>
-                                    </select>
-                                    <select id="rulesIdFilter" class="ant-select">
-                                        <option value="">全部规则</option>
-                                    </select>
-                                    <select id="statusFilter" class="ant-select">
-                                        <option value="">全部状态</option>
-                                        <option value="0">关闭</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                    <input type="number" id="eventTypeFilter" class="ant-input" placeholder="事件类型" min="0" max="255">
-                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
-                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addViolationEvent()">添加</button>
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
-                                </div>
-                                <!-- 数据区域 -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-user-id">用户</div>
-                                        <div class="col-store-id">店铺</div>
-                                        <div class="col-item-id">商品</div>
-                                        <div class="col-demand-id">需求</div>
-                                        <div class="col-posts-id">帖子</div>
-                                        <div class="col-rules-id">规则</div>
-                                        <div class="col-event-type">事件类型</div>
-                                        <div class="col-relation-id">关联ID</div>
-                                        <div class="col-status">状态</div>
-                                        <div class="col-message">消息</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
-                                    <div id="violations-event-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
-                                            <option value="10">10 条/页</option>
-                                            <option value="20" selected>20 条/页</option>
-                                            <option value="50">50 条/页</option>
-                                            <option value="100">100 条/页</option>
-                                        </select>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="table-header"></div>
+                                    <div id="violations_event-list">加载中...</div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -139,106 +68,88 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-
-    <!-- 添加/编辑弹窗 -->
-    <div id="violationEventModal" class="modal">
+    <div id="imageModal" class="modal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加违规记录</h3>
-            <form id="violationEventForm">
-                <div class="ant-form-item" id="idField" style="display: none;">
-                    <label>ID:</label>
-                    <input type="number" id="modalId" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>用户ID:</label>
-                    <select id="modalUserId">
-                        <option value="0">请选择用户</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>店铺ID:</label>
-                    <select id="modalStoreId">
-                        <option value="0">请选择店铺</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>商品ID:</label>
-                    <select id="modalItemId">
-                        <option value="0">请选择商品</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>需求ID:</label>
-                    <select id="modalDemandId">
-                        <option value="0">请选择需求</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>帖子ID:</label>
-                    <select id="modalPostsId">
-                        <option value="0">请选择帖子</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>规则ID:</label>
-                    <select id="modalRulesId">
-                        <option value="0">请选择规则</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>事件类型:</label>
-                    <input type="number" id="modalEventType" min="0" max="255">
-                </div>
-                <div class="ant-form-item">
-                    <label>关联ID:</label>
-                    <select id="modalRelationId">
-                        <option value="0">请选择关联</option>
-                    </select>
-                </div>
-                <div class="ant-form-item">
-                    <label>状态:</label>
-                    <select id="modalStatus">
-                        <option value="0">关闭</option>
-                        <option value="1">启用</option>
-                    </select>
-                </div>
-                <div class="ant-form-item textarea-item">
-                    <label>消息:</label>
-                    <textarea id="modalMessage" rows="5"></textarea>
-                </div>
-                <div class="ant-form-item" id="createTimeField" style="display: none;">
-                    <label>创建时间:</label>
-                    <input type="datetime-local" id="modalCreateTime" disabled>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveViolationEvent()">保存</button>
-                </div>
-            </form>
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
         </div>
     </div>
-
-    <!-- 批量修改状态弹窗 -->
-    <div id="statusModal" class="modal">
+    <div id="punishModal" class="modal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeStatusModal()">×</button>
-            <h3>批量修改状态</h3>
-            <form id="statusForm">
-                <div class="ant-form-item">
-                    <label>选中的ID:</label>
-                    <input type="text" id="selectedIds" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>新状态:</label>
-                    <select id="newStatus">
-                        <option value="0">关闭</option>
-                        <option value="1">启用</option>
-                    </select>
-                </div>
+            <button class="close-btn" onclick="closePunishModal()">×</button>
+            <h3>执行处罚</h3>
+            <form id="punishForm">
+                <fieldset disabled>
+                    <legend>违规信息</legend>
+                    <div class="ant-form-item compact">
+                        <label>用户名:</label>
+                        <span id="punishUserName"></span>
+                    </div>
+                    <div class="ant-form-item compact">
+                        <label>店铺名:</label>
+                        <span id="punishStoreName"></span>
+                    </div>
+                    <div class="ant-form-item compact">
+                        <label>商品名:</label>
+                        <span id="punishItemName"></span>
+                    </div>
+                    <div class="ant-form-item compact">
+                        <label>文章名:</label>
+                        <span id="punishPostName"></span>
+                    </div>
+                    <div class="ant-form-item compact">
+                        <label>需求名:</label>
+                        <span id="punishDemandName"></span>
+                    </div>
+                    <div class="ant-form-item compact">
+                        <label>违规类型:</label>
+                        <span id="punishEventType"></span>
+                    </div>
+                    <div class="ant-form-item compact">
+                        <label>违规事件:</label>
+                        <span id="punishEventId"></span>
+                    </div>
+                    <div class="ant-form-item compact">
+                        <label>规则名:</label>
+                        <span id="punishRuleName"></span>
+                    </div>
+                    <div class="ant-form-item compact">
+                        <label>违规信息:</label>
+                        <span id="punishMessage"></span>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>处罚操作</legend>
+                    <div class="ant-form-item">
+                        <label>处罚类型:</label>
+                        <select id="punishType" class="ant-select">
+                            <option value="0">警告</option>
+                            <option value="1">禁言</option>
+                            <option value="2">封禁账户</option>
+                            <option value="3">下架商品</option>
+                            <option value="4">扣除积分</option>
+                        </select>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>开始时间:</label>
+                        <input type="datetime-local" id="punishStartTime" class="ant-input">
+                    </div>
+                    <div class="ant-form-item">
+                        <label>结束时间:</label>
+                        <input type="datetime-local" id="punishEndTime" class="ant-input">
+                    </div>
+                    <div class="ant-form-item textarea-item">
+                        <label>备注:</label>
+                        <textarea id="punishRemark" class="ant-input" rows="5"></textarea>
+                    </div>
+                </fieldset>
                 <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
+                    <button type="button" class="ant-btn" onclick="closePunishModal()">取消</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="applyPunishment()">处罚</button>
                 </div>
             </form>
         </div>
@@ -246,320 +157,175 @@
 </div>
 
 <script>
-    let violationsEventData = [];
-    let page = 1, perPage = 20;
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-    // 定义关联字段的映射
-    const relationMap = {
-        user_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `用户 ${i + 1}` })),
-        store_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `店铺 ${i + 1}` })),
-        item_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `商品 ${i + 1}` })),
-        demand_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `需求 ${i + 1}` })),
-        posts_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `帖子 ${i + 1}` })),
-        rules_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `规则 ${i + 1}` })),
-        relation_id: Array.from({ length: 15 }, (_, i) => ({ id: i + 1, name: `关联 ${i + 1}` }))
+    // 模拟关联表数据
+    const users = Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `用户 ${i + 1}` }));
+    const stores = Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `店铺 ${i + 1}` }));
+    const items = Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `商品 ${i + 1}` }));
+    const demands = Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `需求 ${i + 1}` }));
+    const posts = Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `文章 ${i + 1}` }));
+    const rules = Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `规则 ${i + 1}` }));
+
+    // 事件类型映射
+    const eventTypes = [
+        { value: 0, label: '未知' },
+        { value: 1, label: '恶意评论' },
+        { value: 2, label: '虚假交易' },
+        { value: 3, label: '违规广告' },
+        { value: 4, label: '刷单行为' }
+    ];
+
+    window.tableConfig = {
+        tableName: 'violations_event',
+        tableTitle: '违规记录',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'user_id', generator: () => randomInt(1, 15) },
+            { name: 'store_id', generator: () => randomInt(1, 15) },
+            { name: 'item_id', generator: () => randomInt(1, 15) },
+            { name: 'demand_id', generator: () => randomInt(1, 15) },
+            { name: 'posts_id', generator: () => randomInt(1, 15) },
+            { name: 'rules_id', generator: () => randomInt(1, 15) },
+            { name: 'event_type', generator: () => randomInt(0, 4) },
+            { name: 'relation_id', generator: () => randomInt(1, 15) },
+            { name: 'status', generator: () => randomInt(0, 1) },
+            { name: 'message', generator: id => `违规记录 ${id}: ${getRandomItem(['恶意评论', '虚假交易', '违规广告', '刷单行为'])}` },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '未处理' }, { value: 1, label: '已处理' }] } },
+            { label: '批量修改规则', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'rules_id', label: '规则', type: 'select', options: rules } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'user_id', label: '用户ID', className: 'col-user-id', formatter: v => users.find(u => u.value === v)?.label || '未知用户' },
+            { name: 'store_id', label: '店铺ID', className: 'col-store-id', formatter: v => stores.find(s => s.value === v)?.label || '未知店铺' },
+            { name: 'item_id', label: '商品ID', className: 'col-item-id', formatter: v => items.find(i => i.value === v)?.label || '未知商品' },
+            { name: 'demand_id', label: '需求ID', className: 'col-demand-id', formatter: v => demands.find(d => d.value === v)?.label || '未知需求' },
+            { name: 'posts_id', label: '文章ID', className: 'col-posts-id', formatter: v => posts.find(p => p.value === v)?.label || '未知文章' },
+            { name: 'rules_id', label: '规则ID', className: 'col-rules-id', formatter: v => rules.find(r => r.value === v)?.label || '未知规则' },
+            { name: 'event_type', label: '事件类型', className: 'col-event-type', formatter: v => eventTypes.find(e => e.value === v)?.label || '未知' },
+            { name: 'relation_id', label: '关联ID', className: 'col-relation-id', formatter: v => `关联 ${v}` },
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">未处理</span>' : '<span class="ant-tag ant-tag-green">已处理</span>' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})" style="margin-right: 8px;">删除</button>
+                <button class="ant-btn ant-btn-default" onclick="punishRecord(${item.id})" style="background-color: #ff4d4f; color: #fff;">处罚</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'user_id', type: 'select', options: [{ value: '', label: '全部用户' }, ...users], filter: (data, value) => value === '' ? data : data.filter(d => d.user_id === parseInt(value)) },
+            { id: 'store_id', type: 'select', options: [{ value: '', label: '全部店铺' }, ...stores], filter: (data, value) => value === '' ? data : data.filter(d => d.store_id === parseInt(value)) },
+            { id: 'item_id', type: 'select', options: [{ value: '', label: '全部商品' }, ...items], filter: (data, value) => value === '' ? data : data.filter(d => d.item_id === parseInt(value)) },
+            { id: 'demand_id', type: 'select', options: [{ value: '', label: '全部需求' }, ...demands], filter: (data, value) => value === '' ? data : data.filter(d => d.demand_id === parseInt(value)) },
+            { id: 'posts_id', type: 'select', options: [{ value: '', label: '全部文章' }, ...posts], filter: (data, value) => value === '' ? data : data.filter(d => d.posts_id === parseInt(value)) },
+            { id: 'rules_id', type: 'select', options: [{ value: '', label: '全部规则' }, ...rules], filter: (data, value) => value === '' ? data : data.filter(d => d.rules_id === parseInt(value)) },
+            { id: 'event_type', type: 'select', options: [{ value: '', label: '全部类型' }, ...eventTypes], filter: (data, value) => value === '' ? data : data.filter(d => d.event_type === parseInt(value)) },
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '未处理' }, { value: '1', label: '已处理' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'user_id', label: '用户ID', type: 'select', options: users, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'store_id', label: '店铺ID', type: 'select', options: stores, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'item_id', label: '商品ID', type: 'select', options: items, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'demand_id', label: '需求ID', type: 'select', options: demands, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'posts_id', label: '文章ID', type: 'select', options: posts, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'rules_id', label: '规则ID', type: 'select', options: rules, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'event_type', label: '事件类型', type: 'select', options: eventTypes, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'relation_id', label: '关联ID', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '未处理' }, { value: 1, label: '已处理' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'message', label: '违规信息', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'number', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            }
+        ]
     };
 
-    // 生成下拉数据
-    function populateDropdowns() {
-        const userSelect = document.getElementById('modalUserId');
-        const userFilter = document.getElementById('userIdFilter');
-        const storeSelect = document.getElementById('modalStoreId');
-        const storeFilter = document.getElementById('storeIdFilter');
-        const itemSelect = document.getElementById('modalItemId');
-        const itemFilter = document.getElementById('itemIdFilter');
-        const demandSelect = document.getElementById('modalDemandId');
-        const postsSelect = document.getElementById('modalPostsId');
-        const postsFilter = document.getElementById('postsIdFilter');
-        const rulesSelect = document.getElementById('modalRulesId');
-        const rulesFilter = document.getElementById('rulesIdFilter');
-        const relationSelect = document.getElementById('modalRelationId');
-
-        relationMap.user_id.forEach(item => {
-            userSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            userFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.store_id.forEach(item => {
-            storeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            storeFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.item_id.forEach(item => {
-            itemSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            itemFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.demand_id.forEach(item => {
-            demandSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.posts_id.forEach(item => {
-            postsSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            postsFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.rules_id.forEach(item => {
-            rulesSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-            rulesFilter.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-        relationMap.relation_id.forEach(item => {
-            relationSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
-        });
-    }
-
-    // 获取关联字段的名称
-    function getRelationName(field, id) {
-        if (id === 0) return '未关联';
-        const item = relationMap[field].find(item => item.id === id);
-        return item ? item.name : `未知 (${id})`;
-    }
-
-    // 生成样本数据
-    function generateSampleData() {
-        violationsEventData = [];
-        for (let i = 1; i <= 200; i++) {
-            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            violationsEventData.push({
-                id: i,
-                user_id: Math.floor(Math.random() * 15) + 1,
-                store_id: Math.floor(Math.random() * 15) + 1,
-                item_id: Math.floor(Math.random() * 15) + 1,
-                demand_id: Math.floor(Math.random() * 15) + 1,
-                posts_id: Math.floor(Math.random() * 15) + 1,
-                rules_id: Math.floor(Math.random() * 15) + 1,
-                event_type: Math.floor(Math.random() * 10),
-                relation_id: Math.floor(Math.random() * 15) + 1,
-                status: Math.floor(Math.random() * 2),
-                message: `Violation message ${i}`,
-                create_time: createTime
-            });
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
         }
-        renderViolationsEventList();
-    }
+    });
 
-    // 渲染列表
-    function renderViolationsEventList() {
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const paginatedData = violationsEventData.slice(start, end);
-        const listContainer = document.getElementById('violations-event-list');
-        listContainer.innerHTML = '';
+    // 处罚按钮逻辑
+    function punishRecord(id) {
+        const record = tableData.find(item => item.id === id);
+        if (!record) return;
 
-        paginatedData.forEach(event => {
-            const statusTag = event.status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
-                '<span class="ant-tag ant-tag-green">启用</span>';
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            itemDiv.style = 'border-bottom: 1px solid #ddd;';
-            itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${event.id}"></div>
-                <div class="col-id">${event.id}</div>
-                <div class="col-user-id">${getRelationName('user_id', event.user_id)}</div>
-                <div class="col-store-id">${getRelationName('store_id', event.store_id)}</div>
-                <div class="col-item-id">${getRelationName('item_id', event.item_id)}</div>
-                <div class="col-demand-id">${getRelationName('demand_id', event.demand_id)}</div>
-                <div class="col-posts-id">${getRelationName('posts_id', event.posts_id)}</div>
-                <div class="col-rules-id">${getRelationName('rules_id', event.rules_id)}</div>
-                <div class="col-event-type">${event.event_type}</div>
-                <div class="col-relation-id">${getRelationName('relation_id', event.relation_id)}</div>
-                <div class="col-status">${statusTag}</div>
-                <div class="col-message">${event.message}</div>
-                <div class="col-create-time">${moment.unix(event.create_time).format('YYYY-MM-DD HH:mm')}</div>
-                <div class="col-actions">
-                    <button class="ant-btn" onclick="editViolationEvent(${event.id})">编辑</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteViolationEvent(${event.id})">删除</button>
-                </div>
-            `;
-            listContainer.appendChild(itemDiv);
+        // 填充违规信息
+        document.getElementById('punishUserName').textContent = users.find(u => u.value === record.user_id)?.label || '';
+        document.getElementById('punishStoreName').textContent = stores.find(s => s.value === record.store_id)?.label || '';
+        document.getElementById('punishItemName').textContent = items.find(i => i.value === record.item_id)?.label || '';
+        document.getElementById('punishPostName').textContent = posts.find(p => p.value === record.posts_id)?.label || '';
+        document.getElementById('punishDemandName').textContent = demands.find(d => d.value === record.demand_id)?.label || '';
+
+        // 随机选择单一业务类型展示
+        const businessTypes = [
+            { field: 'punishItemName', label: '商品名' },
+            { field: 'punishPostName', label: '文章名' },
+            { field: 'punishDemandName', label: '需求名' }
+        ];
+        const selectedBusiness = getRandomItem(businessTypes);
+        businessTypes.forEach(bt => {
+            const element = document.getElementById(bt.field);
+            element.parentElement.style.display = bt.field === selectedBusiness.field ? 'flex' : 'none';
         });
 
-        const totalPages = Math.ceil(violationsEventData.length / perPage);
-        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
+        document.getElementById('punishEventType').textContent = eventTypes.find(e => e.value === record.event_type)?.label || '未知';
+        document.getElementById('punishEventId').textContent = record.id;
+        document.getElementById('punishRuleName').textContent = rules.find(r => r.value === record.rules_id)?.label || '未知规则';
+        document.getElementById('punishMessage').textContent = record.message;
+
+        // 初始化处罚操作
+        document.getElementById('punishType').value = '0';
+        document.getElementById('punishStartTime').value = moment().format('YYYY-MM-DDTHH:mm');
+        document.getElementById('punishEndTime').value = '';
+        document.getElementById('punishRemark').value = '';
+
+        document.getElementById('punishModal').style.display = 'block';
     }
 
-    // 筛选
-    function applyFilters() {
-        let filteredData = [...violationsEventData];
-        const userId = document.getElementById('userIdFilter').value;
-        const storeId = document.getElementById('storeIdFilter').value;
-        const itemId = document.getElementById('itemIdFilter').value;
-        const postsId = document.getElementById('postsIdFilter').value;
-        const rulesId = document.getElementById('rulesIdFilter').value;
-        const status = document.getElementById('statusFilter').value;
-        const eventType = document.getElementById('eventTypeFilter').value;
-        const createTimeStart = document.getElementById('createTimeStartFilter').value;
-        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
-
-        if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
-        if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
-        if (itemId) filteredData = filteredData.filter(item => item.item_id === parseInt(itemId));
-        if (postsId) filteredData = filteredData.filter(item => item.posts_id === parseInt(postsId));
-        if (rulesId) filteredData = filteredData.filter(item => item.rules_id === parseInt(rulesId));
-        if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
-        if (eventType) filteredData = filteredData.filter(item => item.event_type === parseInt(eventType));
-        if (createTimeStart) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
-        if (createTimeEnd) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
-
-        violationsEventData = filteredData;
-        page = 1;
-        renderViolationsEventList();
+    function closePunishModal() {
+        document.getElementById('punishModal').style.display = 'none';
     }
 
-    // 分页
-    function changePage(delta) {
-        const totalPages = Math.ceil(violationsEventData.length / perPage);
-        page += delta;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        renderViolationsEventList();
-    }
+    function applyPunishment() {
+        const id = parseInt(document.getElementById('punishEventId').textContent);
+        const punishType = document.getElementById('punishType').value;
+        const startTime = document.getElementById('punishStartTime').value;
+        const endTime = document.getElementById('punishEndTime').value;
+        const remark = document.getElementById('punishRemark').value;
 
-    function jumpToPage() {
-        const newPage = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(violationsEventData.length / perPage);
-        if (newPage >= 1 && newPage <= totalPages) {
-            page = newPage;
-            renderViolationsEventList();
-        } else {
-            alert('请输入有效的页码');
+        // 这里可以添加实际的处罚逻辑，例如更新数据库或记录日志
+        console.log(`处罚记录 ID: ${id}, 类型: ${punishType}, 开始: ${startTime}, 结束: ${endTime}, 备注: ${remark}`);
+
+        // 示例：将状态改为“已处理”
+        const recordIndex = tableData.findIndex(item => item.id === id);
+        if (recordIndex !== -1) {
+            tableData[recordIndex].status = 1;
+            renderTableList();
         }
+
+        closePunishModal();
     }
-
-    function changePerPage() {
-        perPage = parseInt(document.getElementById('perPage').value);
-        page = 1;
-        renderViolationsEventList();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    // 添加
-    function addViolationEvent() {
-        isEditing = false;
-        editId = null;
-        document.getElementById('modalTitle').textContent = '添加违规记录';
-        document.getElementById('idField').style.display = 'none';
-        document.getElementById('modalUserId').value = '0';
-        document.getElementById('modalStoreId').value = '0';
-        document.getElementById('modalItemId').value = '0';
-        document.getElementById('modalDemandId').value = '0';
-        document.getElementById('modalPostsId').value = '0';
-        document.getElementById('modalRulesId').value = '0';
-        document.getElementById('modalEventType').value = '0';
-        document.getElementById('modalRelationId').value = '0';
-        document.getElementById('modalStatus').value = '0';
-        document.getElementById('modalMessage').value = '';
-        document.getElementById('createTimeField').style.display = 'none';
-        document.getElementById('violationEventModal').style.display = 'block';
-    }
-
-    // 编辑
-    let isEditing = false;
-    let editId = null;
-    function editViolationEvent(id) {
-        isEditing = true;
-        editId = id;
-        const event = violationsEventData.find(item => item.id === id);
-        document.getElementById('modalTitle').textContent = '编辑违规记录';
-        document.getElementById('idField').style.display = 'block';
-        document.getElementById('modalId').value = event.id;
-        document.getElementById('modalUserId').value = event.user_id;
-        document.getElementById('modalStoreId').value = event.store_id;
-        document.getElementById('modalItemId').value = event.item_id;
-        document.getElementById('modalDemandId').value = event.demand_id;
-        document.getElementById('modalPostsId').value = event.posts_id;
-        document.getElementById('modalRulesId').value = event.rules_id;
-        document.getElementById('modalEventType').value = event.event_type;
-        document.getElementById('modalRelationId').value = event.relation_id;
-        document.getElementById('modalStatus').value = event.status;
-        document.getElementById('modalMessage').value = event.message;
-        document.getElementById('createTimeField').style.display = 'block';
-        document.getElementById('modalCreateTime').value = moment.unix(event.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('violationEventModal').style.display = 'block';
-    }
-
-    // 保存
-    function saveViolationEvent() {
-        const event = {
-            id: isEditing ? editId : violationsEventData.length + 1,
-            user_id: parseInt(document.getElementById('modalUserId').value) || 0,
-            store_id: parseInt(document.getElementById('modalStoreId').value) || 0,
-            item_id: parseInt(document.getElementById('modalItemId').value) || 0,
-            demand_id: parseInt(document.getElementById('modalDemandId').value) || 0,
-            posts_id: parseInt(document.getElementById('modalPostsId').value) || 0,
-            rules_id: parseInt(document.getElementById('modalRulesId').value) || 0,
-            event_type: parseInt(document.getElementById('modalEventType').value) || 0,
-            relation_id: parseInt(document.getElementById('modalRelationId').value) || 0,
-            status: parseInt(document.getElementById('modalStatus').value),
-            message: document.getElementById('modalMessage').value,
-            create_time: isEditing ? violationsEventData.find(item => item.id === editId).create_time : moment().unix()
-        };
-
-        if (isEditing) {
-            const index = violationsEventData.findIndex(item => item.id === editId);
-            violationsEventData[index] = event;
-        } else {
-            violationsEventData.push(event);
-        }
-        closeModal();
-        renderViolationsEventList();
-    }
-
-    // 删除
-    function deleteViolationEvent(id) {
-        if (confirm('确定要删除此违规记录吗？')) {
-            violationsEventData = violationsEventData.filter(item => item.id !== id);
-            renderViolationsEventList();
-        }
-    }
-
-    // 批量删除
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的违规记录');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个违规记录吗？`)) {
-            violationsEventData = violationsEventData.filter(item => !selectedIds.includes(item.id));
-            renderViolationsEventList();
-        }
-    }
-
-    // 批量修改状态
-    function batchEditStatus() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要修改状态的违规记录');
-            return;
-        }
-        document.getElementById('selectedIds').value = selectedIds.join(', ');
-        document.getElementById('statusModal').style.display = 'block';
-    }
-
-    function saveBatchStatus() {
-        const newStatus = parseInt(document.getElementById('newStatus').value);
-        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
-        violationsEventData = violationsEventData.map(item => selectedIds.includes(item.id) ? { ...item, status: newStatus } : item);
-        closeStatusModal();
-        renderViolationsEventList();
-    }
-
-    function closeModal() {
-        document.getElementById('violationEventModal').style.display = 'none';
-    }
-
-    function closeStatusModal() {
-        document.getElementById('statusModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        w3.includeHTML(() => {
-            initMenus();
-            populateDropdowns();
-            generateSampleData();
-        });
-    };
 </script>
 </body>
 </html>
