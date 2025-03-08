@@ -389,3 +389,154 @@ function submitCheckin() {
 setInterval(() => {
     openCheckinModal();
 }, 300000); // 5分钟 = 300,000毫秒
+
+// _common.js (替换或更新事件弹窗相关代码)
+
+const eventTypes = {
+    articleReview: { name: "文章审核", color: "#ec4899", actionLink: "posts.html", button: "action" },
+    leaveRequest: { name: "请假事件", color: "#6366f1", actionLink: "schedule_leave_log.html", button: "action" },
+    kycVerification: { name: "实名认证", color: "#3b82f6", actionLink: "user_kyc.html", button: "action" },
+    demandReview: { name: "需求审核", color: "#3b82f6", actionLink: "demand.html", button: "action" },
+    ticketInvite: { name: "工单邀请", color: "#10b981", actionLink: "orders_ticket.html", button: "action" },
+    customerComplaint: { name: "客户投诉", color: "#ef4444", actionLink: "complaint.html", button: "action" },
+    storeReview: { name: "店铺审核", color: "#8b5cf6", actionLink: "store.html", button: "action" },
+    storeFaqReview: { name: "店铺FAQ审核", color: "#8b5cf6", actionLink: "store_faq.html", button: "action" },
+    blogReview: { name: "博客审核", color: "#ec4899", actionLink: "user_blog.html", button: "action" },
+    violationEvent: { name: "违规事件", color: "#ef4444", actionLink: "violations_event.html", button: "action" },
+    handoverEvent: { name: "交接事件", color: "#6366f1", actionLink: "schedule_handover.html", button: "view" },
+    withdrawalReview: { name: "提现审核", color: "#14b8a6", actionLink: "store_withdrawal.html", button: "action" },
+    paymentDispute: { name: "支付争议", color: "#14b8a6", actionLink: "payment_dispute.html", button: "action" },
+    riskControlEvent: { name: "风控事件", color: "#ef4444", actionLink: "risk_control_finance.html", button: "action" }
+};
+
+function generateEventContent(eventType) {
+    const users = ["张三", "李四", "王五", "赵六", "刘七"];
+    const stores = ["TechTrend", "GizmoHub", "EcoMart", "GearZone", "TrendyTech"];
+    const articles = ["Tech Trends 2025", "AI Revolution", "Green Living Tips", "Gadget Reviews", "Future Work"];
+    const demands = ["Web Design", "Mobile App Dev", "SEO Optimization", "Graphic Design", "Content Writing"];
+    const tickets = ["TK001", "TK002", "TK003", "TK004", "TK005"];
+    const complaints = ["延迟发货", "商品质量问题", "服务态度差", "退款纠纷", "虚假宣传"];
+    const violations = ["发布违禁内容", "恶意刷单", "虚假交易", "违规广告", "账户异常"];
+
+    switch (eventType) {
+        case "articleReview":
+            return `文章 <span style="color: ${eventTypes[eventType].color}">${articles[Math.floor(Math.random() * articles.length)]}</span> 提交了审核。`;
+        case "leaveRequest":
+            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了请假申请。`;
+        case "kycVerification":
+            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了实名认证审核。`;
+        case "demandReview":
+            return `需求 <span style="color: ${eventTypes[eventType].color}">${demands[Math.floor(Math.random() * demands.length)]}</span> 提交了审核。`;
+        case "ticketInvite":
+            return `工单 <span style="color: ${eventTypes[eventType].color}">${tickets[Math.floor(Math.random() * tickets.length)]}</span> 邀请您加入。`;
+        case "customerComplaint":
+            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了投诉：${complaints[Math.floor(Math.random() * complaints.length)]}。`;
+        case "storeReview":
+            return `店铺 <span style="color: ${eventTypes[eventType].color}">${stores[Math.floor(Math.random() * stores.length)]}</span> 提交了开店审核。`;
+        case "storeFaqReview":
+            return `店铺 <span style="color: ${eventTypes[eventType].color}">${stores[Math.floor(Math.random() * stores.length)]}</span> 提交了FAQ审核。`;
+        case "blogReview":
+            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了博客审核。`;
+        case "violationEvent":
+            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 触发了 <span style="color: ${eventTypes[eventType].color}">${violations[Math.floor(Math.random() * violations.length)]}</span> 违规。`;
+        case "handoverEvent":
+            return `客服 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了交接事项查看。`;
+        case "withdrawalReview":
+            return `店铺 <span style="color: ${eventTypes[eventType].color}">${stores[Math.floor(Math.random() * stores.length)]}</span> 提交了提现 <span style="color: ${eventTypes[eventType].color}">$${Math.floor(Math.random() * 1000)}</span> 审核。`;
+        case "paymentDispute":
+            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了支付争议审核。`;
+        case "riskControlEvent":
+            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 触发了 <span style="color: ${eventTypes[eventType].color}">${violations[Math.floor(Math.random() * violations.length)]}</span> 风控异常。`;
+        default:
+            return "未知事件，请检查配置。";
+    }
+}
+
+function showEventPopup() {
+    const popup = document.getElementById('eventPopup');
+
+    if (popup.style.display === 'block') {
+        return;
+    }
+
+    const title = document.getElementById('eventTitle');
+    const message = document.getElementById('eventMessage');
+    const buttonsContainer = document.getElementById('eventButtons');
+
+    const eventKeys = Object.keys(eventTypes);
+    const randomEventKey = eventKeys[Math.floor(Math.random() * eventKeys.length)];
+    const eventConfig = eventTypes[randomEventKey];
+
+    title.textContent = `新的 ${eventConfig.name} 事件`;
+    message.innerHTML = generateEventContent(randomEventKey);
+
+    popup.style.backgroundColor = `${eventConfig.color}22`;
+
+    buttonsContainer.innerHTML = '';
+    const button = document.createElement('button');
+    if (eventConfig.button === 'action') {
+        button.className = 'ant-btn ant-btn-primary';
+        button.textContent = '立即处理';
+        button.style.backgroundColor = eventConfig.color;
+        button.style.borderColor = eventConfig.color;
+        button.onclick = () => {
+            clearTimeout(popup.autoClose);
+            window.location.href = eventConfig.actionLink;
+            hideEventPopup();
+        };
+    } else if (eventConfig.button === 'okay') {
+        button.className = 'ant-btn';
+        button.textContent = '好的';
+        button.onclick = () => {
+            clearTimeout(popup.autoClose);
+            hideEventPopup();
+        };
+    } else if (eventConfig.button === 'view') {
+        button.className = 'ant-btn ant-btn-primary';
+        button.textContent = '查看';
+        button.style.backgroundColor = eventConfig.color;
+        button.style.borderColor = eventConfig.color;
+        button.onclick = () => {
+            clearTimeout(popup.autoClose);
+            window.location.href = eventConfig.actionLink;
+            hideEventPopup();
+        };
+    }
+    buttonsContainer.appendChild(button);
+
+    popup.style.display = 'block';
+    setTimeout(() => {
+        popup.classList.add('active');
+    }, 10);
+
+    popup.autoClose = setTimeout(hideEventPopup, 10000);
+}
+
+function hideEventPopup() {
+    const popup = document.getElementById('eventPopup');
+    popup.classList.remove('active');
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 300);
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.shiftKey && e.key === 'F') {
+        showEventPopup();
+    }
+});
+
+function startRandomEventPopups() {
+    function scheduleNextPopup() {
+        const delay = Math.floor(Math.random() * (10000 - 5000 + 1)) + 10000; // 5-10秒
+        setTimeout(() => {
+            showEventPopup();
+            scheduleNextPopup();
+        }, delay);
+    }
+    scheduleNextPopup();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    startRandomEventPopups();
+});
