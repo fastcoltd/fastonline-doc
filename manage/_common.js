@@ -339,7 +339,7 @@ function initModalClose() {
     });
 }
 
-// 签到相关函数
+// 打卡相关函数
 let checkinTimer;
 function openCheckinModal() {
     document.getElementById('checkinModal').style.display = 'flex';
@@ -365,7 +365,7 @@ function openCheckinModal() {
         if (countdown <= 0) {
             clearInterval(checkinTimer);
             closeCheckinModal();
-            console.log('签到超时，记录为缺卡');
+            console.log('打卡超时，记录为缺卡');
         }
     }, 1000);
 }
@@ -380,12 +380,12 @@ function submitCheckin() {
     const position = "客服专员";
     const shift = "2025/03/08 早班1";
     const checkinType = document.getElementById('checkinType').textContent;
-    console.log(`签到成功: 姓名: ${name}, 职位: ${position}, 班次: ${shift}, 类型: ${checkinType}`);
+    console.log(`打卡成功: 姓名: ${name}, 职位: ${position}, 班次: ${shift}, 类型: ${checkinType}`);
     clearInterval(checkinTimer);
     closeCheckinModal();
 }
 
-// 每5分钟触发签到弹窗
+// 每5分钟触发打卡弹窗
 setInterval(() => {
     openCheckinModal();
 }, 300000); // 5分钟 = 300,000毫秒
