@@ -880,7 +880,6 @@ function closeImageModal() {
     document.getElementById('imageModal').style.display = 'none';
     currentImageIndex = 0;
 }
-
 // 初始化
 window.onload = () => {
     w3.includeHTML(() => {
