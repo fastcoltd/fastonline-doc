@@ -32,6 +32,7 @@ function renderFilterArea() {
         let input;
         if (field.type === 'select') {
             input = document.createElement('select');
+            input.className = "ant-select"
             input.id = `${field.id}Filter`;
             if (typeof field.options == 'function'){
                 let options = field.options();
@@ -465,7 +466,7 @@ function setupPagination() {
         <button class="ant-btn" onclick="jumpToPage()">跳转</button>
         <span id="page-info">第 1 页 / 共 1 页</span>
         <div class="ant-select ant-select-single ant-select-show-arrow">
-            <select id="perPage" onchange="changePerPage()">
+            <select class="ant-select" id="perPage" onchange="changePerPage()">
                 <option value="10">10 条/页</option>
                 <option value="20" selected>20 条/页</option>
                 <option value="50">50 条/页</option>
@@ -734,7 +735,7 @@ function batchEditField(fieldConfig) {
                 </div>
                 <div class="ant-form-item">
                     <label>新${fieldConfig.label}:</label>
-                    <select id="new${fieldConfig.name}">
+                    <select class="ant-select" id="new${fieldConfig.name}">
                         ${fieldConfig.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}
                     </select>
                 </div>

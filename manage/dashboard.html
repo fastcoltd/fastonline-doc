@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FASTRESP - 系统大盘</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -12,66 +13,118 @@
     <script src="_common.js"></script>
     <style>
         /* Dashboard 特定样式 */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16.25em, 1fr)); gap: 1.25em; } /* Dashboard网格 */
-        .card { background: linear-gradient(135deg, #ffffff, #f9fafb); padding: 1.25em; border-radius: 0.75em; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease; } /* 卡片 */
-        .card:hover { transform: translateY(-5px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); background: #f5f5f5; } /* 卡片悬停效果 */
-        .card:active { background: #e5e7eb; transform: translateY(0); } /* 卡片激活效果 */
-        .card-title { font-size: 1.1em; font-weight: 600; margin-bottom: 0.5em; color: #1f2937; } /* 卡片标题 */
-        .card-content { font-size: 1.75em; font-weight: 700; color: #f97316; margin-bottom: 0.25em; } /* 卡片内容 */
-        .card-subtext { font-size: 0.85em; color: #6b7280; font-style: italic; } /* 卡片副文本 */
-        .charts-section { margin-top: 2.5em; } /* 图表区域 */
-        .charts-container { display: flex; gap: 1.25em; margin-top: 0.75em; justify-content: space-between; } /* 图表容器 */
-        .chart-card { background: #fff; padding: 1em; border-radius: 0.5em; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.1); width: calc(50% - 0.625em); } /* 图表卡片 */
-        .chart-title { font-size: 1em; font-weight: 500; margin-bottom: 0.75em; } /* 图表标题 */
-        canvas { max-width: 100%; height: auto; } /* 画布 */
-        .time-filter { margin-bottom: 0.75em; display: flex; align-items: center; } /* 时间筛选 */
-        .brand-service-filter { margin-bottom: 0.75em; } /* 品牌服务筛选 */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16.25em, 1fr)); gap: 1.25em; }
+        .card { background: linear-gradient(135deg, #ffffff, #f9fafb); padding: 1.25em; border-radius: 0.75em; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); background: #f5f5f5; }
+        .card:active { background: #e5e7eb; transform: translateY(0); }
+        .card-title { font-size: 1.1em; font-weight: 600; margin-bottom: 0.5em; color: #1f2937; }
+        .card-content { font-size: 1.75em; font-weight: 700; color: #f97316; margin-bottom: 0.25em; }
+        .card-subtext { font-size: 0.85em; color: #6b7280; font-style: italic; }
+        .charts-section { margin-top: 2.5em; }
+        .charts-container { display: flex; gap: 1.25em; margin-top: 0.75em; justify-content: space-between; }
+        .chart-card { background: #fff; padding: 1em; border-radius: 0.5em; box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.1); width: calc(50% - 0.625em); }
+        .chart-title { font-size: 1em; font-weight: 500; margin-bottom: 0.75em; }
+        canvas { max-width: 100%; height: auto; }
+        .time-filter { margin-bottom: 0.75em; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .brand-service-filter { margin-bottom: 0.75em; display: flex; gap: 8px; flex-shrink: 0; }
 
         /* 平台热门样式 */
-        .hot-section { margin-top: 2.5em; } /* 热门区域 */
-        .hot-filter { display: flex; gap: 1em; margin-bottom: 1em; } /* 热门筛选 */
-        .hot-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25em; } /* 热门容器 */
-        .hot-card { background: linear-gradient(135deg, #ffffff, #f9fafb); padding: 1.25em; border-radius: 0.75em; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow-x: auto; } /* 热门卡片 */
-        .hot-header-container { margin-bottom: 0.5em; } /* 热门头部容器 */
-        .hot-title { font-size: 1.1em; font-weight: 600; margin-bottom: 0.75em; color: #1f2937; } /* 热门标题 */
-        .hot-header { display: flex; background: #f1f5f9; padding: 0.5em 0; font-weight: 500; color: #4b5563; border-bottom: 1px solid #e5e7eb; } /* 热门表头 */
-        .hot-header div { text-align: center; white-space: nowrap; } /* 热门表头单元格 */
-        .hot-header div:nth-child(1) { flex: 0 0 8%; } /* 名次列宽 */
-        .hot-header div:nth-child(2) { flex: 2; } /* 商品名称/店铺名/用户名列宽 */
-        .hot-header div:nth-child(3) { flex: 1.5; } /* 客单价/文章名/需求名列宽 */
-        .hot-header div:nth-child(4) { flex: 1; } /* 销售额/点赞量/竞标数列宽 */
-        .hot-header div:nth-child(5) { flex: 1; } /* 销售额列宽（仅热门商品） */
-        .hot-divider { height: 1px; background: #e5e7eb; margin: 0.5em 0; } /* 热门分割线 */
-        .hot-data { max-height: 400px; overflow-y: auto; } /* 热门数据区域 */
-        .hot-row { display: flex; padding: 0.5em 0; border-bottom: 1px solid #e5e7eb; } /* 热门数据行 */
-        .hot-row div { text-align: center; white-space: nowrap; color: #374151; } /* 热门数据单元格 */
-        .hot-row div:nth-child(1) { flex: 0 0 8%; } /* 名次列宽 */
-        .hot-row div:nth-child(2) { flex: 2; overflow: hidden; text-overflow: ellipsis; } /* 商品名称/店铺名/用户名列宽 */
-        .hot-row div:nth-child(3) { flex: 1.5; overflow: hidden; text-overflow: ellipsis; } /* 客单价/文章名/需求名列宽 */
-        .hot-row div:nth-child(4) { flex: 1; } /* 销售额/点赞量/竞标数列宽 */
-        .hot-row div:nth-child(5) { flex: 1; } /* 销售额列宽（仅热门商品） */
-        .hot-row:hover { background: #f5f5f5; } /* 热门数据行悬停效果 */
-        .hot-link { color: #374151; text-decoration: none; } /* 热门链接 */
-        .hot-link:hover { color: #f97316; } /* 热门链接悬停效果 */
-        .hot-card:nth-child(1) .hot-data::-webkit-scrollbar { width: 6px; } /* 热门商品滚动条 */
-        .hot-card:nth-child(1) .hot-data::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; } /* 热门商品滚动条滑块 */
-        .hot-card:nth-child(2) .hot-data::-webkit-scrollbar { width: 6px; } /* 热门店铺滚动条 */
-        .hot-card:nth-child(2) .hot-data::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 3px; } /* 热门店铺滚动条滑块 */
-        .hot-card:nth-child(3) .hot-data::-webkit-scrollbar { width: 6px; } /* 热门文章滚动条 */
-        .hot-card:nth-child(3) .hot-data::-webkit-scrollbar-thumb { background: #ec4899; border-radius: 3px; } /* 热门文章滚动条滑块 */
-        .hot-card:nth-child(4) .hot-data::-webkit-scrollbar { width: 6px; } /* 热门需求滚动条 */
+        .hot-section { margin-top: 2.5em; }
+        .hot-filter { display: flex; gap: 1em; margin-bottom: 1em; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; }
+        .hot-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25em; }
+        .hot-card { background: linear-gradient(135deg, #ffffff, #f9fafb); padding: 1.25em; border-radius: 0.75em; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow-x: auto; }
+        .hot-header-container { margin-bottom: 0.5em; }
+        .hot-title { font-size: 1.1em; font-weight: 600; margin-bottom: 0.75em; color: #1f2937; }
+        .hot-header { display: flex; background: #f1f5f9; padding: 0.5em 0; font-weight: 500; color: #4b5563; border-bottom: 1px solid #e5e7eb; }
+        .hot-header div { text-align: center; white-space: nowrap; }
+        .hot-header div:nth-child(1) { flex: 0 0 8%; }
+        .hot-header div:nth-child(2) { flex: 2; }
+        .hot-header div:nth-child(3) { flex: 1.5; }
+        .hot-header div:nth-child(4) { flex: 1; }
+        .hot-header div:nth-child(5) { flex: 1; }
+        .hot-divider { height: 1px; background: #e5e7eb; margin: 0.5em 0; }
+        .hot-data { max-height: 400px; overflow-y: auto; }
+        .hot-row { display: flex; padding: 0.5em 0; border-bottom: 1px solid #e5e7eb; }
+        .hot-row div { text-align: center; white-space: nowrap; color: #374151; }
+        .hot-row div:nth-child(1) { flex: 0 0 8%; }
+        .hot-row div:nth-child(2) { flex: 2; overflow: hidden; text-overflow: ellipsis; }
+        .hot-row div:nth-child(3) { flex: 1.5; overflow: hidden; text-overflow: ellipsis; }
+        .hot-row div:nth-child(4) { flex: 1; }
+        .hot-row div:nth-child(5) { flex: 1; }
+        .hot-row:hover { background: #f5f5f5; }
+        .hot-link { color: #374151; text-decoration: none; }
+        .hot-link:hover { color: #f97316; }
+        .hot-card:nth-child(1) .hot-data::-webkit-scrollbar { width: 6px; }
+        .hot-card:nth-child(1) .hot-data::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
+        .hot-card:nth-child(2) .hot-data::-webkit-scrollbar { width: 6px; }
+        .hot-card:nth-child(2) .hot-data::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 3px; }
+        .hot-card:nth-child(3) .hot-data::-webkit-scrollbar { width: 6px; }
+        .hot-card:nth-child(3) .hot-data::-webkit-scrollbar-thumb { background: #ec4899; border-radius: 3px; }
+        .hot-card:nth-child(4) .hot-data::-webkit-scrollbar { width: 6px; }
 
         /* 时间筛选按钮样式 */
-        .time-btn-group { display: flex; gap: 8px; flex-wrap: wrap; } /* 时间按钮组，允许换行 */
-        .time-btn { padding: 0.25em 0.75em; border-radius: 0.25em; cursor: pointer; background: #fff; border: 0.0625em solid #d9d9d9; color: rgba(0, 0, 0, 0.85); transition: all 0.3s; font-size: 0.875em; height: 2em; line-height: 1.5em; } /* 时间按钮 */
-        .time-btn:hover { background: #f5f5f5; border-color: #f97316; color: #f97316; } /* 时间按钮悬停效果 */
-        .time-btn.active { background: #f97316; border-color: #f97316; color: #fff; } /* 时间按钮激活状态 */
-        .time-btn:focus { outline: none; border-color: #f97316; box-shadow: 0 0 0 0.125em rgba(249, 115, 22, 0.2); } /* 时间按钮聚焦效果 */
+        .time-btn-group { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; }
+        .time-btn { padding: 0.25em 0.75em; border-radius: 0.25em; cursor: pointer; background: #fff; border: 0.0625em solid #d9d9d9; color: rgba(0, 0, 0, 0.85); transition: all 0.3s; font-size: 0.875em; height: 2em; line-height: 1.5em; }
+        .time-btn:hover { background: #f5f5f5; border-color: #f97316; color: #f97316; }
+        .time-btn.active { background: #f97316; border-color: #f97316; color: #fff; }
+        .time-btn:focus { outline: none; border-color: #f97316; box-shadow: 0 0 0 0.125em rgba(249, 115, 22, 0.2); }
+
+        /* 自定义时间输入框样式 */
+        .hot-filter input[type="date"],
+        .filter-row input[type="date"] {
+            height: 2em;
+            padding: 0.25em 0.5em;
+            font-size: 0.875em;
+            border: 0.0625em solid #d9d9d9;
+            border-radius: 0.25em;
+            box-sizing: border-box;
+            vertical-align: middle;
+        }
 
         /* 趋势统计筛选行样式 */
-        .filter-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; } /* 筛选行 */
-        .brand-service-filter { display: flex; gap: 8px; } /* 品牌服务筛选 */
-        .time-filter { display: flex; align-items: center; gap: 8px; } /* 时间筛选 */
+        .filter-row { display: flex; align-items: center; gap: 16px; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; margin-bottom: 16px; }
+
+        /* 移动端样式调整 */
+        @media (max-width: 48em) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .card { padding: 1em; border-radius: 0.5em; }
+            .charts-container {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 1.25em !important;
+                justify-content: flex-start !important;
+            }
+            .chart-card {
+                width: 100% !important;
+                margin: 0;
+            }
+            .hot-container {
+                display: grid !important;
+                grid-template-columns: 1fr !important;
+                gap: 1.25em !important;
+            }
+            .hot-data { max-height: 25em; }
+            .time-btn-group { gap: 4px; flex-wrap: wrap; width: 100%; justify-content: flex-start; }
+            .time-btn { font-size: 0.75em; padding: 0.2em 0.5em; height: 1.8em; }
+            .hot-filter input[type="date"],
+            .filter-row input[type="date"] {
+                height: 1.8em;
+                font-size: 0.75em;
+                padding: 0.2em 0.5em;
+                width: 100%;
+            }
+            .filter-row { gap: 8px; flex-direction: column; align-items: flex-start; flex-wrap: wrap; overflow-x: initial; white-space: normal; }
+            .hot-filter { flex-wrap: wrap; overflow-x: initial; white-space: normal; }
+            .brand-service-filter { width: 100%; flex-direction: column; gap: 4px; }
+            .brand-service-filter .ant-select { width: 100%; }
+            .time-filter { width: 100%; }
+        }
+
+        /* PC端响应式设计 */
+        @media (min-width: 48.0625em) {
+            .charts-container { display: flex; gap: 1.25em; justify-content: space-between; }
+            .chart-card { width: calc(50% - 0.625em); }
+        }
     </style>
 </head>
 <body>
@@ -109,9 +162,9 @@
                         <button class="time-btn" data-range="60" onclick="updateHotSection('60')">最近60天</button>
                         <button class="time-btn" data-range="90" onclick="updateHotSection('90')">最近90天</button>
                         <button class="time-btn" data-range="custom" onclick="toggleHotCustomRange()">自定义</button>
+                        <input type="date" class="ant-input" id="hotStartDate" onchange="updateHotCustomRange()" value="2025-03-07" style="display: none;">
+                        <input type="date" class="ant-input" id="hotEndDate" onchange="updateHotCustomRange()" value="2025-03-07" style="display: none;">
                     </div>
-                    <input type="date" class="ant-input" id="hotStartDate" onchange="updateHotCustomRange()" value="2025-03-07" style="display: none;">
-                    <input type="date" class="ant-input" id="hotEndDate" onchange="updateHotCustomRange()" value="2025-03-07" style="display: none;">
                 </div>
                 <div class="hot-container"></div>
             </div>
@@ -154,9 +207,9 @@
                             <button class="time-btn" data-range="60" onclick="updateTimeRange('60')">最近60天</button>
                             <button class="time-btn" data-range="90" onclick="updateTimeRange('90')">最近90天</button>
                             <button class="time-btn" data-range="custom" onclick="toggleCustomRange()">自定义</button>
+                            <input type="date" class="ant-input" id="startDate" onchange="updateCustomRange()" value="2025-02-28" style="display: none;">
+                            <input type="date" class="ant-input" id="endDate" onchange="updateCustomRange()" value="2025-03-07" style="display: none;">
                         </div>
-                        <input type="date" class="ant-input" id="startDate" onchange="updateCustomRange()" value="2025-02-28" style="display: none;">
-                        <input type="date" class="ant-input" id="endDate" onchange="updateCustomRange()" value="2025-03-07" style="display: none;">
                     </div>
                 </div>
                 <div class="charts-container">

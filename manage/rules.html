@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FASTRESP - 规则</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
@@ -54,7 +55,7 @@
                                 <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('rules.html')" role="tab" aria-selected="true">
                                     <span class="ant-tabs-tab-btn">规则</span>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                             </div>
                         </div>
                     </div>
@@ -65,7 +66,7 @@
                                 <div class="filter-container">
                                     <input type="text" id="indexNumberFilter" class="ant-input" placeholder="索引编号" onkeydown="if(event.key === 'Enter') applyFilters()">
                                     <div class="ant-select ant-select-single ant-select-show-arrow">
-                                        <select id="languageFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                        <select id="languageFilter" onkeydown="if(event.key === 'Enter') applyFilters()" class="ant-select">
                                             <option value="">全部语言</option>
                                             <option value="zh_CN">中文</option>
                                             <option value="en_US">英语</option>
@@ -105,7 +106,7 @@
                                         <button class="ant-btn" onclick="jumpToPage()">跳转</button>
                                         <span id="page-info">第 1 页 / 共 1 页</span>
                                         <div class="ant-select ant-select-single ant-select-show-arrow">
-                                            <select id="perPage" onchange="changePerPage()">
+                                            <select id="perPage" onchange="changePerPage()" class="ant-select">
                                                 <option value="10">10 条/页</option>
                                                 <option value="20" selected>20 条/页</option>
                                                 <option value="50">50 条/页</option>
@@ -146,7 +147,7 @@
                                 <div class="ant-tabs-tab" data-tab="system" id="systemTab">
                                     <span class="ant-tabs-tab-btn">系统信息</span>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                             </div>
                         </div>
                     </div>
@@ -155,14 +156,14 @@
                             <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
                                 <div class="ant-form-item">
                                     <label>状态:</label>
-                                    <select id="modalStatus">
+                                    <select id="modalStatus" class="ant-select">
                                         <option value="0">禁用</option>
                                         <option value="1">启用</option>
                                     </select>
                                 </div>
                                 <div class="ant-form-item">
                                     <label>规则类型:</label>
-                                    <select id="modalRulesType">
+                                    <select id="modalRulesType" class="ant-select">
                                         <option value="0">类型0</option>
                                         <option value="1">类型1</option>
                                     </select>

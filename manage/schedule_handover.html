@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FASTRESP - 班次交接</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
@@ -41,7 +42,7 @@
                             <div class="ant-tabs-nav-list">
                                 <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule_handover.html')">
                                     <span class="ant-tabs-tab-btn">班次交接</span>
-                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                                 </div>
                             </div>
                         </div>
@@ -183,7 +184,7 @@
                 <div style="margin-bottom: 10px;">
                     <label>${field.label}:</label>
                     ${field.type === 'select' ? `
-                        <select id="${field.name}" style="width: 100%;">
+                        <select id="${field.name}" style="width: 100%;" class="ant-select">
                             ${field.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}
                         </select>
                     ` : field.type === 'textarea' ? `
@@ -212,7 +213,7 @@
                 <div style="margin-bottom: 10px;">
                     <label>${field.label}:</label>
                     ${field.type === 'select' ? `
-                        <select id="${field.name}" style="width: 100%;">
+                        <select id="${field.name}" style="width: 100%;" class="ant-select">
                             ${field.options.map(opt => `<option value="${opt.value}" ${record[field.name] === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}
                         </select>
                     ` : field.type === 'textarea' ? `
@@ -352,7 +353,7 @@
             <h3>编辑日志</h3>
             <div style="margin-bottom: 10px;">
                 <label>状态:</label>
-                <select id="editStatus" style="width: 100%;">
+                <select id="editStatus" style="width: 100%;" class="ant-select">
                     <option value="0" ${log.status === 0 ? 'selected' : ''}>显示</option>
                     <option value="1" ${log.status === 1 ? 'selected' : ''}>隐藏</option>
                 </select>

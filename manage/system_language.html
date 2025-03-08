@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FASTRESP - 新系统多语言配置</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
@@ -51,7 +52,7 @@
                                 <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('system_language.html')" role="tab" aria-selected="true">
                                     <span class="ant-tabs-tab-btn">新系统多语言配置</span>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                             </div>
                         </div>
                     </div>
@@ -61,7 +62,7 @@
                                 <!-- 条件筛选区域 -->
                                 <div class="filter-container">
                                     <div class="ant-select ant-select-single ant-select-show-arrow">
-                                        <select id="languageFilter" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                        <select id="languageFilter" onkeydown="if(event.key === 'Enter') applyFilters()" class="ant-select">
                                             <option value="">全部语言</option>
                                             <option value="zh_CN">中文</option>
                                             <option value="en_US">英语</option>
@@ -101,7 +102,7 @@
                                         <button class="ant-btn" onclick="jumpToPage()">跳转</button>
                                         <span id="page-info">第 1 页 / 共 1 页</span>
                                         <div class="ant-select ant-select-single ant-select-show-arrow">
-                                            <select id="perPage" onchange="changePerPage()">
+                                            <select id="perPage" onchange="changePerPage()" class="ant-select">
                                                 <option value="10">10 条/页</option>
                                                 <option value="20" selected>20 条/页</option>
                                                 <option value="50">50 条/页</option>
@@ -143,7 +144,7 @@
                 <div id="editableFields">
                     <div class="ant-form-item">
                         <label>语言:</label>
-                        <select id="modalLanguage">
+                        <select id="modalLanguage" class="ant-select">
                             <option value="zh_CN">中文</option>
                             <option value="en_US">英语</option>
                             <option value="fr_FR">法语</option>
@@ -181,7 +182,7 @@
                 </div>
                 <div class="ant-form-item">
                     <label>新语言:</label>
-                    <select id="newLanguage">
+                    <select id="newLanguage" class="ant-select">
                         <option value="zh_CN">中文</option>
                         <option value="en_US">英语</option>
                         <option value="fr_FR">法语</option>
