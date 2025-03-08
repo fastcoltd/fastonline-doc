@@ -248,14 +248,13 @@ function renderModal(isEditingMode) {
 // 渲染树状结构
 function renderTree(treeData, checkedKeys, fieldName, editable) {
     const container = document.createElement('div');
-    container.className = 'ant-tree';
 
     function renderNode(nodes, level = 0) {
         const ul = document.createElement('ul');
-        ul.className = 'ant-tree-list';
+        ul.className = 'ant-tree-list0';
         nodes.forEach(node => {
             const li = document.createElement('li');
-            li.className = 'ant-tree-treenode';
+            li.className = 'ant-tree-treenode0';
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.value = node.key;
@@ -282,16 +281,16 @@ function renderTree(treeData, checkedKeys, fieldName, editable) {
 
 // 更新树的选择状态
 function updateTreeSelection(fieldName) {
-    const checkboxes = document.querySelectorAll(`#modal${fieldName} .ant-tree input[type="checkbox"]`);
+    const checkboxes = document.querySelectorAll(`#modal${fieldName} .ant-tree0 input[type="checkbox"]`);
     checkboxes.forEach(checkbox => {
-        const parent = checkbox.closest('.ant-tree-treenode');
-        const children = parent.querySelectorAll('.ant-tree-treenode input[type="checkbox"]');
+        const parent = checkbox.closest('.ant-tree-treenode0');
+        const children = parent.querySelectorAll('.ant-tree-treenode0 input[type="checkbox"]');
         if (checkbox.checked) {
             children.forEach(child => child.checked = true);
         }
-        const siblings = parent.parentElement.querySelectorAll(':scope > .ant-tree-treenode > input[type="checkbox"]');
+        const siblings = parent.parentElement.querySelectorAll(':scope > .ant-tree-treenode0 > input[type="checkbox"]');
         const allChecked = Array.from(siblings).every(sib => sib.checked);
-        const parentCheckbox = parent.parentElement.closest('.ant-tree-treenode')?.querySelector('input[type="checkbox"]');
+        const parentCheckbox = parent.parentElement.closest('.ant-tree-treenod0e')?.querySelector('input[type="checkbox"]');
         if (parentCheckbox) parentCheckbox.checked = allChecked;
     });
 }
