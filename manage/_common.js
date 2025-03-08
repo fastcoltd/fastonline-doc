@@ -392,7 +392,7 @@ setInterval(() => {
 
 // _common.js (替换或更新事件弹窗相关代码)
 
-const eventTypes = {
+const eventPopupTypes = {
     articleReview: { name: "文章审核", color: "#ec4899", actionLink: "posts.html", button: "action" },
     leaveRequest: { name: "请假事件", color: "#6366f1", actionLink: "schedule_leave_log.html", button: "action" },
     kycVerification: { name: "实名认证", color: "#3b82f6", actionLink: "user_kyc.html", button: "action" },
@@ -420,33 +420,33 @@ function generateEventContent(eventType) {
 
     switch (eventType) {
         case "articleReview":
-            return `文章 <span style="color: ${eventTypes[eventType].color}">${articles[Math.floor(Math.random() * articles.length)]}</span> 提交了审核。`;
+            return `文章 <span style="color: ${eventPopupTypes[eventType].color}">${articles[Math.floor(Math.random() * articles.length)]}</span> 提交了审核。`;
         case "leaveRequest":
-            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了请假申请。`;
+            return `用户 <span style="color: ${eventPopupTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了请假申请。`;
         case "kycVerification":
-            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了实名认证审核。`;
+            return `用户 <span style="color: ${eventPopupTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了实名认证审核。`;
         case "demandReview":
-            return `需求 <span style="color: ${eventTypes[eventType].color}">${demands[Math.floor(Math.random() * demands.length)]}</span> 提交了审核。`;
+            return `需求 <span style="color: ${eventPopupTypes[eventType].color}">${demands[Math.floor(Math.random() * demands.length)]}</span> 提交了审核。`;
         case "ticketInvite":
-            return `工单 <span style="color: ${eventTypes[eventType].color}">${tickets[Math.floor(Math.random() * tickets.length)]}</span> 邀请您加入。`;
+            return `工单 <span style="color: ${eventPopupTypes[eventType].color}">${tickets[Math.floor(Math.random() * tickets.length)]}</span> 邀请您加入。`;
         case "customerComplaint":
-            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了投诉：${complaints[Math.floor(Math.random() * complaints.length)]}。`;
+            return `用户 <span style="color: ${eventPopupTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了投诉：${complaints[Math.floor(Math.random() * complaints.length)]}。`;
         case "storeReview":
-            return `店铺 <span style="color: ${eventTypes[eventType].color}">${stores[Math.floor(Math.random() * stores.length)]}</span> 提交了开店审核。`;
+            return `店铺 <span style="color: ${eventPopupTypes[eventType].color}">${stores[Math.floor(Math.random() * stores.length)]}</span> 提交了开店审核。`;
         case "storeFaqReview":
-            return `店铺 <span style="color: ${eventTypes[eventType].color}">${stores[Math.floor(Math.random() * stores.length)]}</span> 提交了FAQ审核。`;
+            return `店铺 <span style="color: ${eventPopupTypes[eventType].color}">${stores[Math.floor(Math.random() * stores.length)]}</span> 提交了FAQ审核。`;
         case "blogReview":
-            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了博客审核。`;
+            return `用户 <span style="color: ${eventPopupTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了博客审核。`;
         case "violationEvent":
-            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 触发了 <span style="color: ${eventTypes[eventType].color}">${violations[Math.floor(Math.random() * violations.length)]}</span> 违规。`;
+            return `用户 <span style="color: ${eventPopupTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 触发了 <span style="color: ${eventPopupTypes[eventType].color}">${violations[Math.floor(Math.random() * violations.length)]}</span> 违规。`;
         case "handoverEvent":
-            return `客服 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了交接事项查看。`;
+            return `客服 <span style="color: ${eventPopupTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了交接事项查看。`;
         case "withdrawalReview":
-            return `店铺 <span style="color: ${eventTypes[eventType].color}">${stores[Math.floor(Math.random() * stores.length)]}</span> 提交了提现 <span style="color: ${eventTypes[eventType].color}">$${Math.floor(Math.random() * 1000)}</span> 审核。`;
+            return `店铺 <span style="color: ${eventPopupTypes[eventType].color}">${stores[Math.floor(Math.random() * stores.length)]}</span> 提交了提现 <span style="color: ${eventPopupTypes[eventType].color}">$${Math.floor(Math.random() * 1000)}</span> 审核。`;
         case "paymentDispute":
-            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了支付争议审核。`;
+            return `用户 <span style="color: ${eventPopupTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 提交了支付争议审核。`;
         case "riskControlEvent":
-            return `用户 <span style="color: ${eventTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 触发了 <span style="color: ${eventTypes[eventType].color}">${violations[Math.floor(Math.random() * violations.length)]}</span> 风控异常。`;
+            return `用户 <span style="color: ${eventPopupTypes[eventType].color}">${users[Math.floor(Math.random() * users.length)]}</span> 触发了 <span style="color: ${eventPopupTypes[eventType].color}">${violations[Math.floor(Math.random() * violations.length)]}</span> 风控异常。`;
         default:
             return "未知事件，请检查配置。";
     }
@@ -463,9 +463,9 @@ function showEventPopup() {
     const message = document.getElementById('eventMessage');
     const buttonsContainer = document.getElementById('eventButtons');
 
-    const eventKeys = Object.keys(eventTypes);
+    const eventKeys = Object.keys(eventPopupTypes);
     const randomEventKey = eventKeys[Math.floor(Math.random() * eventKeys.length)];
-    const eventConfig = eventTypes[randomEventKey];
+    const eventConfig = eventPopupTypes[randomEventKey];
 
     title.textContent = `新的 ${eventConfig.name} 事件`;
     message.innerHTML = generateEventContent(randomEventKey);
