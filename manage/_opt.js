@@ -194,12 +194,12 @@ function renderModal(isEditingMode) {
                 if (isEditingMode ? tabField.editableInEdit : tabField.editableInAdd) {
                     const select = document.createElement('select');
                     select.onchange = () => addTag(select, field.name);
-                    select.innerHTML = `<option value="">添加标签</option>` + tabField.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                    select.innerHTML = `<option value="">添加</option>` + tabField.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
                     input.appendChild(select);
                     if (tabField.allowCustom) {
                         const customInput = document.createElement('input');
                         customInput.type = 'text';
-                        customInput.placeholder = '自定义标签';
+                        customInput.placeholder = '自定义';
                         customInput.onkeydown = (e) => {
                             if (e.key === 'Enter') addCustomTag(customInput, field.name);
                         };
@@ -297,7 +297,7 @@ function updateTreeSelection(fieldName) {
     });
 }
 
-// 添加标签
+// 添加
 function addTag(select, fieldName) {
     const value = select.value;
     if (!value) return;
@@ -310,7 +310,7 @@ function addTag(select, fieldName) {
     select.value = '';
 }
 
-// 添加自定义标签
+// 添加自定义
 function addCustomTag(input, fieldName) {
     const value = input.value.trim();
     if (!value) return;
@@ -323,7 +323,7 @@ function addCustomTag(input, fieldName) {
     input.value = '';
 }
 
-// 删除标签
+// 删除
 function removeTag(closeBtn) {
     closeBtn.parentElement.remove();
 }
