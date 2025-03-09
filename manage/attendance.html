@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 考勤记录</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <script src="_opt.js"></script>
+    <style>
+        .col-checkbox { width: 5%; }
+        .col-id { width: 8%; }
+        .col-month { width: 10%; }
+        .col-manage-id { width: 10%; }
+        .col-schedule-count { width: 8%; }
+        .col-expected-hours { width: 8%; }
+        .col-actual-hours { width: 10%; }
+        .col-sign-normal { width: 8%; }
+        .col-sign-late { width: 8%; }
+        .col-sign-miss { width: 8%; }
+        .col-leave-count { width: 8%; }
+        .col-leave-hours { width: 8%; }
+        .col-create-time { width: 10%; }
+        .col-actions { width: 14%; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('attendance.html')">
+                                    <span class="ant-tabs-tab-btn">考勤记录</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
+                                <div class="task-list">
+                                    <div class="table-header"></div>
+                                    <div id="attendance-list">加载中...</div>
+                                    <div class="pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+</div>
+
+<script>
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 员工名称
+    const manageIds = [
+        { value: 1, label: '张伟' }, { value: 2, label: '李娜' }, { value: 3, label: '王磊' },
+        { value: 4, label: '刘芳' }, { value: 5, label: '陈晨' }, { value: 6, label: '杨洋' },
+        { value: 7, label: '赵强' }, { value: 8, label: '孙丽' }, { value: 9, label: '周杰' },
+        { value: 10, label: '吴静' }, { value: 11, label: '郑凯' }, { value: 12, label: '何琳' },
+        { value: 13, label: '徐峰' }, { value: 14, label: '钱红' }, { value: 15, label: '林涛' }
+    ];
+
+    // 生成最近前12个月和后3个月（基于2025-03-09）
+    const months = [];
+    const currentMonth = moment('2025-03-09');
+    for (let i = -12; i <= 3; i++) {
+        const month = currentMonth.clone().add(i, 'months').format('YYYY-MM');
+        months.push(month);
+    }
+
+    // 定义tableConfig
+    window.tableConfig = {
+        tableName: 'attendance',
+        tableTitle: '考勤记录',
+        sampleCount: 225, // 15员工 x 15个月
+        defaultPerPage: 20,
+        fields: [
+            { name: 'month', generator: () => getRandomItem(months) },
+            { name: 'manage_id', generator: () => randomInt(1, 15) },
+            { name: 'schedule_count', generator: () => randomInt(20, 25) },
+            { name: 'expected_hours', generator: () => randomInt(160, 200) }, // 独立随机
+            { name: 'actual_hours', generator: () => randomInt(140, 200) }, // 独立随机，不关联expected_hours
+            { name: 'sign_normal', generator: () => randomInt(15, 20) },
+            { name: 'sign_late', generator: () => randomInt(0, 5) },
+            { name: 'sign_miss', generator: () => randomInt(0, 5) },
+            { name: 'leave_count', generator: () => randomInt(0, 3) },
+            { name: 'leave_hours', generator: () => randomInt(0, 48) },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '查看员工请假', className: 'ant-btn ant-btn-primary', action: 'viewLeaveLog' },
+            { label: '查看员工打卡', className: 'ant-btn ant-btn-primary', action: 'viewSignLog' }
+        ],
+        listFields: [
+            { name: 'month', label: '月份', className: 'col-month', formatter: v => moment(v, 'YYYY-MM').format('YYYY年MM月') },
+            { name: 'manage_id', label: '员工', className: 'col-manage-id', formatter: v => manageIds.find(m => m.value === v)?.label || '未知' },
+            { name: 'schedule_count', label: '排班次数', className: 'col-schedule-count' },
+            { name: 'expected_hours', label: '应上时数', className: 'col-expected-hours' },
+            { name: 'actual_hours', label: '实际时数', className: 'col-actual-hours', formatter: (v, item) => {
+                    const diff = item.expected_hours - v;
+                    return diff > 0 ? `<span>${v} (<span style="color: red;">缺 ${diff}</span>)</span>` : v;
+                }},
+            { name: 'sign_normal', label: '正常签到', className: 'col-sign-normal', formatter: v => `<span style="color: green;">${v}</span>` },
+            { name: 'sign_late', label: '超时签到', className: 'col-sign-late', formatter: v => v > 0 ? `<span style="color: orange;">${v}</span>` : v },
+            { name: 'sign_miss', label: '缺卡次数', className: 'col-sign-miss', formatter: v => v > 0 ? `<span style="color: red;">${v}</span>` : v },
+            { name: 'leave_count', label: '请假次数', className: 'col-leave-count', formatter: v => v > 0 ? `<span style="color: #1890ff;">${v}</span>` : v },
+            { name: 'leave_hours', label: '请假小时', className: 'col-leave-hours' },
+            { name: 'create_time', label: '记录时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="viewLeaveLog(${item.manage_id}, '${item.month}')" style="margin-right: 8px;">请假详情</button>
+                <button class="ant-btn" onclick="viewSignLog(${item.manage_id}, '${item.month}')">打卡详情</button>
+            ` }
+        ],
+        filterFields: [
+            {
+                id: 'month',
+                type: 'select',
+                multiple: true,
+                options: [{ value: '', label: '全部月份' }].concat(months.map(m => ({ value: m, label: moment(m, 'YYYY-MM').format('YYYY年MM月') }))),
+                filter: (data, values) => values.length === 0 || values.includes('') ? data : data.filter(d => values.includes(d.month))
+            },
+            {
+                id: 'manage_id',
+                type: 'select',
+                options: [{ value: '', label: '全部员工' }].concat(manageIds.map(m => ({ value: m.value, label: m.label }))),
+                filter: (data, value) => value === '' ? data : data.filter(d => d.manage_id === parseInt(value))
+            }
+        ]
+    };
+
+    // 异步初始化函数
+    async function initializeTable() {
+        // 等待所有脚本加载完成
+        await new Promise(resolve => {
+            if (document.readyState === 'complete') {
+                resolve();
+            } else {
+                window.addEventListener('load', resolve);
+            }
+        });
+
+        // 确保w3.includeHTML完成
+        await new Promise(resolve => w3.includeHTML(() => {
+            initMenus(); // 假设_common.js中有此函数
+            resolve();
+        }));
+
+        // 延迟确保tableConfig已定义
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // 调用initTable（来自_opt.js）
+        if (typeof window.initTable === 'function') {
+            window.initTable();
+        } else {
+            console.error('initTable 未定义，请检查 _opt.js');
+        }
+    }
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters(); // 假设_opt.js中有此函数
+        }
+    });
+
+    // 查看员工请假日志
+    function viewLeaveLog(manageId, month) {
+        const leaveLogs = generateMockLeaveLogs(manageId, month);
+        showDetailModal('员工请假详情', leaveLogs, [
+            { name: 'schedule_id', label: '排班', formatter: v => `${['早班', '中班', '晚班', '夜班', '全天班'][v % 5]} (${v})` },
+            { name: 'status', label: '状态', formatter: v => v === 0 ? '申请中' : v === 1 ? '已通过' : '已拒绝' },
+            { name: 'leave_time', label: '请假时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'back_time', label: '返回时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'leave_type', label: '请假类型' },
+            { name: 'reason', label: '请假原因' }
+        ]);
+    }
+
+    // 查看员工打卡日志
+    function viewSignLog(manageId, month) {
+        const signLogs = generateMockSignLogs(manageId, month);
+        showDetailModal('员工打卡详情', signLogs, [
+            { name: 'schedule_id', label: '排班', formatter: v => `${['早班', '中班', '晚班', '夜班', '全天班'][v % 5]} (${v})` },
+            { name: 'status', label: '状态', formatter: v => v === 0 ? '未打卡' : v === 1 ? '正常' : v === 2 ? '超时' : '缺卡' },
+            { name: 'trigger_time', label: '触发时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'sign_time', label: '签到时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'reason', label: '原因' }
+        ]);
+    }
+
+    // 模拟请假日志
+    function generateMockLeaveLogs(manageId, month) {
+        const logs = [];
+        const daysInMonth = moment(month, 'YYYY-MM').daysInMonth();
+        for (let i = 0; i < randomInt(0, 3); i++) {
+            const leaveTime = moment(month, 'YYYY-MM').startOf('month').add(randomInt(0, daysInMonth - 1), 'days').unix();
+            const backTime = moment.unix(leaveTime).add(randomInt(1, 5), 'days').unix();
+            logs.push({
+                schedule_id: randomInt(1, 20),
+                manage_id: manageId,
+                status: randomInt(0, 2),
+                leave_time: leaveTime,
+                back_time: backTime,
+                leave_type: getRandomItem(['事假', '病假', '年假', '其他']),
+                reason: getRandomItem(['个人事务', '家庭紧急情况', '健康原因', '其他安排'])
+            });
+        }
+        return logs;
+    }
+
+    // 模拟打卡日志
+    function generateMockSignLogs(manageId, month) {
+        const logs = [];
+        const daysInMonth = moment(month, 'YYYY-MM').daysInMonth();
+        for (let i = 0; i < randomInt(20, 25); i++) {
+            const triggerTime = moment(month, 'YYYY-MM').startOf('month').add(randomInt(0, daysInMonth - 1), 'days').unix();
+            const signTime = moment.unix(triggerTime).add(randomInt(-1, 2), 'hours').unix();
+            logs.push({
+                schedule_id: randomInt(1, 20),
+                manage_id: manageId,
+                status: randomInt(0, 3),
+                trigger_time: triggerTime,
+                sign_time: signTime,
+                reason: getRandomItem(['设备故障', '网络问题', '临时调整', '未及时操作'])
+            });
+        }
+        return logs;
+    }
+
+    // 显示详情弹窗
+    function showDetailModal(title, data, fields) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content" style="width: 80%; max-height: 80vh; overflow-y: auto;">
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()">×</button>
+                <h3>${title}</h3>
+                <table class="ant-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>${fields.map(f => `<th style="border: 1px solid #ddd; padding: 8px;">${f.label}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(item => `
+                            <tr>${fields.map(f => `
+                                <td style="border: 1px solid #ddd; padding: 8px;">${f.formatter ? f.formatter(item[f.name]) : item[f.name] || 'N/A'}</td>
+                            `).join('')}</tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.style.display = 'block';
+    }
+
+    // 异步启动初始化
+    initializeTable();
+</script>
+</body>
+</html>

@@ -77,6 +77,18 @@
         .ant-calendar-table td:hover {
             background: #f5f5f5;
         }
+        .calendar-controls {
+            margin: 10px 0;
+            text-align: center;
+        }
+        .calendar-controls select {
+            padding: 4px;
+            margin: 0 10px;
+            border-radius: 4px;
+        }
+        .calendar-controls button {
+            margin: 0 5px;
+        }
 
         /* 移动端样式（宽度小于768px） */
         @media (max-width: 768px) {
@@ -304,7 +316,7 @@
         }
     });
 
-    // 显示排班日历
+    <!-- 在 showScheduleCalendar() 函数中添加年月选择 -->
     function showScheduleCalendar() {
         let modal = document.getElementById('scheduleCalendarModal');
         if (!modal) {
@@ -314,40 +326,96 @@
             document.body.appendChild(modal);
         }
         modal.innerHTML = `
-        <div class="modal-content" style="width: 80%;height: 75%;">
-            <button class="close-btn" onclick="closeScheduleCalendar()">×</button>
-            <h3>排班日历</h3>
-            <div id="calendarContainer" class="ant-calendar"></div>
+    <div class="modal-content" style="width: 80%;height: 75%;">
+        <button class="close-btn" onclick="closeScheduleCalendar()">×</button>
+        <h3>排班日历</h3>
+        <div class="calendar-controls" style="margin: 10px 0; text-align: center;">
+            <button class="ant-btn" onclick="changeMonth(-1)">◄ 上个月</button>
+            <select id="yearSelect" onchange="updateCalendar()" style="margin: 0 10px; padding: 4px;">
+                ${generateYearOptions()}
+            </select>
+            <select id="monthSelect" onchange="updateCalendar()" style="margin: 0 10px; padding: 4px;">
+                ${generateMonthOptions()}
+            </select>
+            <button class="ant-btn" onclick="changeMonth(1)">下个月 ►</button>
         </div>
+        <div id="calendarContainer" class="ant-calendar"></div>
+    </div>
     `;
         modal.style.display = 'block';
+        // 初始化时设置当前年月
+        const currentMoment = moment();
+        document.getElementById('yearSelect').value = currentMoment.year();
+        document.getElementById('monthSelect').value = currentMoment.month();
         renderCalendar();
     }
 
-    // 关闭日历弹窗
-    function closeScheduleCalendar() {
-        document.getElementById('scheduleCalendarModal').style.display = 'none';
+    // 生成年份选项（当前年前后5年）
+    function generateYearOptions() {
+        const currentYear = moment().year();
+        let options = '';
+        for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+            options += `<option value="${i}">${i}年</option>`;
+        }
+        return options;
     }
 
-    // 渲染日历
+    // 生成月份选项
+    function generateMonthOptions() {
+        let options = '';
+        for (let i = 0; i < 12; i++) {
+            options += `<option value="${i}">${i + 1}月</option>`;
+        }
+        return options;
+    }
+
+    // 更新日历
+    function updateCalendar() {
+        renderCalendar();
+    }
+
+    // 切换月份
+    function changeMonth(delta) {
+        const yearSelect = document.getElementById('yearSelect');
+        const monthSelect = document.getElementById('monthSelect');
+        let year = parseInt(yearSelect.value);
+        let month = parseInt(monthSelect.value);
+
+        month += delta;
+        if (month < 0) {
+            month = 11;
+            year--;
+        } else if (month > 11) {
+            month = 0;
+            year++;
+        }
+
+        yearSelect.value = year;
+        monthSelect.value = month;
+        renderCalendar();
+    }
+
+    // 修改 renderCalendar() 函数以使用选择的年月
     function renderCalendar() {
-        const currentMonth = moment();
+        const year = parseInt(document.getElementById('yearSelect').value);
+        const month = parseInt(document.getElementById('monthSelect').value);
+        const currentMonth = moment({ year, month });
         const daysInMonth = currentMonth.daysInMonth();
         const firstDay = currentMonth.startOf('month').day();
         const WORK_START = 8 * 3600; // 08:00
         const WORK_END = 20 * 3600;  // 20:00
 
         let calendarHtml = `
-        <div class="ant-calendar-header">
-            <span>${currentMonth.format('YYYY年MM月')}</span>
-        </div>
-        <table class="ant-calendar-table">
-            <thead>
-                <tr>
-                    <th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th>
-                </tr>
-            </thead>
-            <tbody>
+    <div class="ant-calendar-header">
+        <span>${currentMonth.format('YYYY年MM月')}</span>
+    </div>
+    <table class="ant-calendar-table">
+        <thead>
+            <tr>
+                <th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th>
+            </tr>
+        </thead>
+        <tbody>
     `;
 
         let dayCount = 0;
@@ -410,8 +478,8 @@
             if (dayCount >= daysInMonth) break;
         }
         calendarHtml += `
-            </tbody>
-        </table>
+        </tbody>
+    </table>
     `;
         document.getElementById('calendarContainer').innerHTML = calendarHtml;
     }
@@ -465,6 +533,10 @@
     // 关闭编辑弹窗
     function closeEditScheduleModal() {
         document.getElementById('editScheduleModal').style.display = 'none';
+    }
+
+    function closeScheduleCalendar() {
+        document.getElementById('scheduleCalendarModal').style.display = 'none';
     }
 
     // 保存排班

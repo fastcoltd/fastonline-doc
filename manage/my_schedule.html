@@ -131,7 +131,6 @@
 
 <script>
     const CURRENT_USER_ID = 1;
-    // 更真实的员工姓名
     const manageIds = [
         { value: 1, label: '张伟' },
         { value: 2, label: '李娜' },
@@ -151,21 +150,23 @@
     ];
     const dates = Array.from({ length: 365 }, (_, i) => moment().subtract(i, 'days').format('YYYY-MM-DD'));
     let tableData = [];
-    const THEME_COLOR = '#1890ff'; // 主题色
+    const THEME_COLOR = '#1890ff';
 
-    // 初始化样本数据，80%天数有排班
+    // 初始化样本数据，80%天数有排班，我的排班占比50%
     function initSampleData() {
         const uniqueDates = dates.slice(0, Math.floor(dates.length * 0.8)); // 80%天数
         uniqueDates.forEach((date, index) => {
             const numSchedules = Math.floor(Math.random() * 3) + 1; // 每一天1-3个排班
             for (let j = 0; j < numSchedules; j++) {
+                const isMyShift = Math.random() < 0.5; // 50%概率是我
+                const manageId = isMyShift ? CURRENT_USER_ID : Math.floor(Math.random() * 14) + 2; // 若不是我，从2-15中选
                 tableData.push({
                     id: index * 3 + j + 1,
                     status: 1,
                     date: date,
                     from: Math.floor(Math.random() * 5 + 8) * 3600,
                     to: Math.floor(Math.random() * 5 + 16) * 3600,
-                    manage_id: Math.floor(Math.random() * 15) + 1,
+                    manage_id: manageId,
                     true_manage_id: Math.floor(Math.random() * 15) + 1,
                     work_start: Math.floor(Math.random() * 5 + 8) * 3600,
                     work_end: Math.floor(Math.random() * 5 + 16) * 3600,
@@ -236,7 +237,8 @@
                 <tbody>
         `;
 
-        let dayCount = 0, selectColor = getRandomColor();
+        let dayCount = 0;
+        const selectColor = getRandomColor(); // 全局随机颜色
         for (let i = 0; i < 6; i++) {
             calendarHtml += '<tr>';
             for (let j = 0; j < 7; j++) {
@@ -257,7 +259,7 @@
                     } else {
                         content = schedules.map(s => {
                             const isMine = s.manage_id === CURRENT_USER_ID;
-                            const colorStyle = isMine ? `style="color: ${THEME_COLOR};font-weight: 900;"` : '';
+                            const colorStyle = isMine ? `style="color: ${THEME_COLOR}; font-weight: 900;"` : '';
                             return `<span ${colorStyle}>${manageIds.find(m => m.value === s.manage_id)?.label || '未知'} (${moment.unix(s.work_start).format('HH:mm')}~${moment.unix(s.work_end).format('HH:mm')})</span>`;
                         }).join('<br>');
                     }
