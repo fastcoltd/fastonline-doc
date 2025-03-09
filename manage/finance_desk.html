@@ -5,75 +5,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FASTRESP - 财务工作台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <style>
+        .summary-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .summary-item {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            min-width: 120px;
+            flex: 1;
+        }
+        .summary-item.selected {
+            border-color: #f97316;
+            color: #000;
+        }
+        .task-list {
+            overflow-x: hidden;
+        }
+        .task-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-width: 1000px;
+        }
+        .task-item div {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .col-type { flex: 0 0 120px; }
+        .col-name { flex: 0 0 150px; }
+        .col-desc { flex: 3; }
+        .col-created { flex: 0 0 120px; }
+        .col-status { flex: 0 0 80px; }
+        .col-follower { flex: 0 0 80px; }
+        .col-follow-time { flex: 0 0 100px; }
+        .col-priority { flex: 0 0 100px; } /* 优先级 */
+        .col-action { flex: 0 0 80px; }
+        .task-item button {
+            margin-left: 10px;
+        }
+        .sort-btn {
+            cursor: pointer;
+            margin-left: 5px;
+            color: #1890ff;
+        }
+        @media (max-width: 768px) {
+            .summary-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .task-list {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 顶部 -->
-        <div id="header" w3-include-html="_header.html"></div>
-
-        <!-- 内容区域 -->
-        <div class="content-wrapper">
-            <!-- 侧边栏 -->
-            <div id="sidebar" w3-include-html="_sidebar.html"></div>
-
-            <!-- 主内容区域 -->
-            <div class="main-content">
-                <div class="tabs-container">
-                    <div class="ant-tabs ant-tabs-top">
-                        <div class="ant-tabs-nav" role="tablist">
-                            <div class="ant-tabs-nav-wrap">
-                                <div class="ant-tabs-nav-list">
-                                    <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('finance_desk.html')" role="tab" aria-selected="true">
-                                        <span class="ant-tabs-tab-btn">财务工作台</span>
-                                    </div>
-                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <div class="ant-tabs-tab-btn">财务工作台</div>
                                 </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                             </div>
                         </div>
-                        <div class="ant-tabs-content-holder">
-                            <div class="ant-tabs-content ant-tabs-content-top">
-                                <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                    <h2>提现审核</h2>
-                                    <div class="filter-container" style="margin-bottom: 20px;">
-                                        <select id="statusFilter" class="ant-select" onchange="applyFilters()">
-                                            <option value="">全部状态</option>
-                                            <option value="0">待审核</option>
-                                            <option value="1">已通过</option>
-                                            <option value="2">已拒绝</option>
-                                        </select>
-                                        <input type="number" id="userIdFilter" class="ant-input" placeholder="用户ID" oninput="applyFilters()">
-                                        <input type="number" id="storeIdFilter" class="ant-input" placeholder="店铺ID" oninput="applyFilters()">
-                                        <input type="date" id="startDate" class="ant-input" onchange="applyFilters()">
-                                        <input type="date" id="endDate" class="ant-input" onchange="applyFilters()">
-                                    </div>
-                                    <div class="task-list">
-                                        <div class="table-header" style="display: flex; padding: 10px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                            <div style="flex: 1;">ID</div>
-                                            <div style="flex: 1;">用户ID</div>
-                                            <div style="flex: 1;">店铺ID</div>
-                                            <div style="flex: 1;">钱包ID</div>
-                                            <div style="flex: 1;">提现金额</div>
-                                            <div style="flex: 1;">转账金额</div>
-                                            <div style="flex: 1;">固定手续费</div>
-                                            <div style="flex: 1;">百分比手续费</div>
-                                            <div style="flex: 1;">状态</div>
-                                            <div style="flex: 1;">创建时间</div>
-                                            <div style="flex: 1;">完成时间</div>
-                                            <div style="flex: 1;">操作</div>
-                                        </div>
-                                        <div id="withdraw-list">加载中...</div>
-                                        <div class="pagination" style="margin-top: 20px; text-align: center;">
-                                            <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                            <span id="page-info">第 1 页 / 共 1 页</span>
-                                            <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                        </div>
-                                    </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
+                                <h2>待办事项小结</h2>
+                                <div class="summary-grid">
+                                    <div class="summary-item selected" onclick="filterTasks('全部')" id="全部">全部任务: <span id="全部-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('提现审核')" id="提现审核">提现审核: <span id="提现审核-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('支付争议审核')" id="支付争议审核">支付争议审核: <span id="支付争议审核-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('财务风控')" id="财务风控">财务风控: <span id="财务风控-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('汇率更新')" id="汇率更新">汇率更新: <span id="汇率更新-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('推广审核')" id="推广审核">推广审核: <span id="推广审核-count">0</span></div>
+                                </div>
+                                <h2>待办任务列表</h2>
+                                <div class="task-list">
+                                    <div id="task-list">加载中...</div>
                                 </div>
                             </div>
                         </div>
@@ -81,129 +115,257 @@
                 </div>
             </div>
         </div>
-
-        <!-- 底部 -->
-        <div id="footer" w3-include-html="_footer.html"></div>
     </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+</div>
 
-    <script>
-        // 全局变量
-        let withdrawData = [];
-        let withdrawPage = 1, withdrawPerPage = 10;
+<script>
+    let allTasks = [];
+    let sortField = null;
+    let sortOrder = 'asc';
+    const followers = ['李明', '王芳', '张强', '赵丽', '陈娜', null]; // 财务人员，包含 null 表示无跟进者
 
-        // Tab 切换函数
-        function switchTab(page) {
-            console.log('Switching to:', page);
-            window.location.href = page;
+    // 计算跟进时间
+    function getFollowTime(createdAt) {
+        const now = moment();
+        const created = moment(createdAt, 'YYYY-MM-DD HH:mm');
+        const diff = now.diff(created);
+        const duration = moment.duration(diff);
+        const days = Math.floor(duration.asDays());
+        const hours = Math.floor(duration.asHours() % 24);
+        const minutes = Math.floor(duration.asMinutes() % 60);
+        return { days, hours, minutes, totalMinutes: duration.asMinutes() };
+    }
+
+    // 渲染跟进时间颜色
+    function getFollowTimeColor(totalMinutes) {
+        if (totalMinutes < 60) return '#52c41a'; // 绿色
+        if (totalMinutes < 1440) return '#fa8c16'; // 橙色
+        return '#f5222d'; // 红色
+    }
+
+    // 渲染优先级颜色
+    function getPriorityColor(priority) {
+        switch (priority) {
+            case 1: return '#52c41a'; // 绿色
+            case 2: return '#fa8c16'; // 橙色
+            case 3: return '#fadb14'; // 黄色
+            case 4: return '#ff4d4f'; // 浅红
+            case 5: return '#f5222d'; // 红色
+            default: return '#000';
         }
+    }
 
-        // 加载提现数据
-        function fetchWithdrawData() {
-            console.log('Fetching withdraw data...');
-            const sampleData = [];
-            for (let i = 1; i <= 50; i++) {
-                const status = Math.floor(Math.random() * 3);
-                sampleData.push({
+    // 数量背景颜色
+    function getCountBackgroundColor(count) {
+        if (count === 0) return '#f0f2f5'; // 浅灰
+        if (count <= 5) return '#e6ffe6'; // 浅绿
+        if (count <= 10) return '#fff7e6'; // 浅橙
+        if (count <= 20) return '#fff1f0'; // 浅红
+        return '#ffe6e6'; // 稍深的浅红
+    }
+
+    // 类型颜色映射
+    const typeColors = {
+        '提现审核': 'blue', '支付争议审核': 'cyan', '财务风控': 'purple',
+        '汇率更新': 'green', '推广审核': 'orange'
+    };
+
+    // 任务加载
+    function fetchTasks() {
+        console.log('Fetching tasks...');
+        const storedTasks = localStorage.getItem('financeTasks');
+        if (storedTasks && JSON.parse(storedTasks).every(task => task.description && typeof task.priority === 'number')) {
+            allTasks = JSON.parse(storedTasks);
+        } else {
+            localStorage.removeItem('financeTasks');
+            const tasks = [];
+            const types = ['提现审核', '支付争议审核', '财务风控', '汇率更新', '推广审核'];
+            const descriptions = {
+                '提现审核': [
+                    '店铺ID:12345申请提现$500，需核实账户余额和交易记录',
+                    '用户ID:67890提交提现请求¥2000，请审核银行卡信息',
+                    '提现单号#1001，金额$1000，需确认无未结订单'
+                ],
+                '支付争议审核': [
+                    '订单ID:78901支付争议，用户称未收到货，需核查物流状态',
+                    '争议#2001：用户质疑扣款$300，请检查支付流水',
+                    '支付争议：订单ID:45678，用户申请退款¥1500，需审核证据'
+                ],
+                '财务风控': [
+                    '用户ID:11223账户异常，短时间内大额转账¥50000，需审查',
+                    '店铺“电子商城”频繁提现，疑似洗钱行为，请核查',
+                    '风控事件#3001：订单ID:33445支付异常，需评估风险'
+                ],
+                '汇率更新': [
+                    'USD/CNY汇率需更新，当前值6.75，建议调整至6.80',
+                    'EUR/USD汇率异常波动，请核实最新市场数据',
+                    '汇率更新请求：JPY/CNY需调整，当前值0.055，请确认'
+                ],
+                '推广审核': [
+                    '店铺“时尚之家”提交推广计划，预算$2000，需审核投放内容',
+                    '推广ID:54321，申请提升商品曝光，金额¥5000，请评估效果',
+                    '用户ID:98765推广请求，需核查广告素材是否合规'
+                ]
+            };
+            const statuses = {
+                '提现审核': ['待审核', '审核中', '待转账'],
+                '支付争议审核': ['待核查', '调查中', '待裁决'],
+                '财务风控': ['待评估', '审查中', '待确认'],
+                '汇率更新': ['待更新', '核实中', '待发布'],
+                '推广审核': ['待审核', '审核中', '待分配']
+            };
+            for (let i = 1; i <= 40; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                const description = descriptions[type][Math.floor(Math.random() * descriptions[type].length)];
+                const follower = followers[Math.floor(Math.random() * followers.length)];
+                const priority = Math.floor(Math.random() * 5) + 1;
+                const statusList = statuses[type];
+                const status = statusList[Math.floor(Math.random() * statusList.length)];
+                tasks.push({
                     id: i,
-                    user_id: Math.floor(Math.random() * 1000) + 1,
-                    store_id: Math.floor(Math.random() * 500) + 1,
-                    user_wallet_id: Math.floor(Math.random() * 200) + 1,
+                    type: type,
+                    name: `${type} #${i}`,
+                    description: description,
+                    created_at: `2025-03-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')} ${String(Math.floor(Math.random() * 24)).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
                     status: status,
-                    current_rate: (Math.random() * 0.1 + 0.95).toFixed(4),
-                    withdraw_amount: (Math.random() * 1000 + 50).toFixed(2),
-                    transfer_amount: (Math.random() * 900 + 40).toFixed(2),
-                    fee_fixed: (Math.random() * 5).toFixed(2),
-                    fee_percent: (Math.random() * 0.05).toFixed(4),
-                    create_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix(),
-                    finished_time: status === 1 ? moment().subtract(Math.floor(Math.random() * 10), 'days').unix() : (status === 2 ? moment().subtract(Math.floor(Math.random() * 15), 'days').unix() : 0),
-                    proof_document: `doc_${i}.pdf`,
-                    payment_bills: `bill_${i}`,
-                    system_reply: status === 1 ? 'Approved' : status === 2 ? 'Rejected due to insufficient funds' : ''
+                    follower: follower,
+                    priority: priority
                 });
             }
-            withdrawData = sampleData;
-            applyFilters();
+            allTasks = tasks;
+            localStorage.setItem('financeTasks', JSON.stringify(tasks));
         }
+        updateSummary();
+        const selectedFilter = localStorage.getItem('selectedFilter') || '全部';
+        filterTasks(selectedFilter);
+    }
 
-        // 渲染提现列表
-        function renderWithdrawList(data) {
-            const start = (withdrawPage - 1) * withdrawPerPage;
-            const end = start + withdrawPerPage;
-            const paginatedData = data.slice(start, end);
-            const listContainer = document.getElementById('withdraw-list');
-            listContainer.innerHTML = '';
-
-            paginatedData.forEach(item => {
-                const statusTag = item.status === 0 ? '<span class="ant-tag ant-tag-blue">待审核</span>' :
-                                  item.status === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' :
-                                  '<span class="ant-tag ant-tag-red">已拒绝</span>';
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'task-item';
-                itemDiv.style = `padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; margin: 5px 0;`;
-                itemDiv.innerHTML = `
-                    <div style="flex: 1;">${item.id}</div>
-                    <div style="flex: 1;">${item.user_id}</div>
-                    <div style="flex: 1;">${item.store_id}</div>
-                    <div style="flex: 1;">${item.user_wallet_id}</div>
-                    <div style="flex: 1;">${item.withdraw_amount}</div>
-                    <div style="flex: 1;">${item.transfer_amount}</div>
-                    <div style="flex: 1;">${item.fee_fixed}</div>
-                    <div style="flex: 1;">${item.fee_percent}</div>
-                    <div style="flex: 1;">${statusTag}</div>
-                    <div style="flex: 1;">${moment.unix(item.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                    <div style="flex: 1;">${item.finished_time ? moment.unix(item.finished_time).format('YYYY-MM-DD HH:mm:ss') : '-'}</div>
-                    <button class="ant-btn ant-btn-primary" style="flex: 1;" onclick="handleWithdraw(${item.id})">处理</button>
-                `;
-                listContainer.appendChild(itemDiv);
+    // 渲染任务列表
+    function renderTasks(taskList) {
+        console.log('Rendering tasks:', taskList.length);
+        const taskContainer = document.getElementById('task-list');
+        if (!taskContainer) {
+            console.error('Task list container not found');
+            return;
+        }
+        taskContainer.innerHTML = `
+            <div class="task-item" style="font-weight: bold; background: #f5f5f5;">
+                <div class="col-type">类型</div>
+                <div class="col-name">任务名称</div>
+                <div class="col-desc">描述</div>
+                <div class="col-created">创建时间</div>
+                <div class="col-status">状态</div>
+                <div class="col-follower">跟进者</div>
+                <div class="col-follow-time">跟进时间 <span class="sort-btn" onclick="sortTasks('followTime')">排序</span></div>
+                <div class="col-priority">优先级 <span class="sort-btn" onclick="sortTasks('priority')">排序</span></div>
+                <div class="col-action">操作</div>
+            </div>
+        `;
+        const sortedList = [...taskList];
+        if (sortField === 'followTime') {
+            sortedList.sort((a, b) => {
+                const timeA = getFollowTime(a.created_at).totalMinutes;
+                const timeB = getFollowTime(b.created_at).totalMinutes;
+                return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
             });
-
-            const totalPages = Math.ceil(data.length / withdrawPerPage);
-            document.getElementById('page-info').textContent = `第 ${withdrawPage} 页 / 共 ${totalPages} 页`;
+        } else if (sortField === 'priority') {
+            sortedList.sort((a, b) => sortOrder === 'asc' ? a.priority - b.priority : b.priority - a.priority);
         }
+        sortedList.forEach(task => {
+            const followTime = getFollowTime(task.created_at);
+            const followTimeStr = `${followTime.days > 0 ? followTime.days + '天' : ''}${followTime.hours > 0 ? followTime.hours + '小时' : ''}${followTime.minutes}分钟`;
+            const followTimeColor = getFollowTimeColor(followTime.totalMinutes);
+            const priorityColor = getPriorityColor(task.priority);
+            const typeColor = typeColors[task.type] || 'grey';
+            const statusColor = task.status === '待审核' || task.status === '待核查' || task.status === '待评估' || task.status === '待更新' ? '#f5222d' : '#1890ff';
+            const followerText = task.follower ? task.follower : '<span style="color: #f5222d">未分配</span>';
+            const taskItem = document.createElement('div');
+            taskItem.className = 'task-item';
+            taskItem.innerHTML = `
+                <div class="col-type"><span class="ant-tag ant-tag-${typeColor}">${task.type}</span></div>
+                <div class="col-name">${task.name}</div>
+                <div class="col-desc">${task.description}</div>
+                <div class="col-created">${task.created_at}</div>
+                <div class="col-status"><span style="color: ${statusColor}">${task.status}</span></div>
+                <div class="col-follower">${followerText}</div>
+                <div class="col-follow-time" style="color: ${followTimeColor}">${followTimeStr}</div>
+                <div class="col-priority" style="color: ${priorityColor}">${task.priority}</div>
+                <div class="col-action"><button class="ant-btn ant-btn-primary" onclick="handleTask(${task.id})">处理</button></div>
+            `;
+            taskContainer.appendChild(taskItem);
+        });
+    }
 
-        // 应用筛选
-        function applyFilters() {
-            const status = document.getElementById('statusFilter').value;
-            const userId = document.getElementById('userIdFilter').value;
-            const storeId = document.getElementById('storeIdFilter').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            let filteredData = withdrawData;
-            if (status) filteredData = filteredData.filter(item => item.status === parseInt(status));
-            if (userId) filteredData = filteredData.filter(item => item.user_id === parseInt(userId));
-            if (storeId) filteredData = filteredData.filter(item => item.store_id === parseInt(storeId));
-            if (startDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
-            if (endDate) filteredData = filteredData.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
-
-            withdrawPage = 1;
-            renderWithdrawList(filteredData);
+    // 更新待办事项统计
+    function updateSummary() {
+        console.log('Updating summary...');
+        const counts = {'全部': allTasks.length};
+        allTasks.forEach(task => {
+            counts[task.type] = (counts[task.type] || 0) + 1;
+        });
+        for (const type in counts) {
+            const element = document.getElementById(type);
+            const countSpan = document.getElementById(`${type}-count`);
+            if (element && countSpan) {
+                countSpan.innerText = counts[type];
+                element.style.backgroundColor = getCountBackgroundColor(counts[type]);
+            }
         }
+    }
 
-        // 切换页面
-        function changePage(delta) {
-            const totalPages = Math.ceil(withdrawData.length / withdrawPerPage);
-            withdrawPage += delta;
-            if (withdrawPage < 1) withdrawPage = 1;
-            if (withdrawPage > totalPages) withdrawPage = totalPages;
-            applyFilters();
+    // 筛选任务
+    function filterTasks(type) {
+        console.log('Filtering tasks by:', type);
+        document.querySelectorAll('.summary-item').forEach(el => {
+            el.classList.remove('selected');
+            el.style.border = '2px solid #ddd';
+        });
+        const selectedItem = document.getElementById(type);
+        if (selectedItem) {
+            selectedItem.classList.add('selected');
+            selectedItem.style.border = '2px solid #f97316';
+            localStorage.setItem('selectedFilter', type);
         }
-
-        // 处理提现
-        function handleWithdraw(id) {
-            console.log('Handling withdraw:', id);
-            alert('处理提现 ID: ' + id);
+        if (type === '全部') {
+            renderTasks(allTasks);
+        } else {
+            renderTasks(allTasks.filter(task => task.type === type));
         }
+    }
 
-        // 初始化
-        window.onload = () => {
-            console.log('Page loaded, initializing...');
-            w3.includeHTML(() => {
-                console.log('External HTML included');
-                initMenus();
-                fetchWithdrawData();
-            });
-        };
-    </script>
+    // 排序任务
+    function sortTasks(field) {
+        if (sortField === field) {
+            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortOrder = 'asc';
+        }
+        filterTasks(localStorage.getItem('selectedFilter') || '全部');
+    }
+
+    // 处理任务
+    function handleTask(taskId) {
+        console.log('Handling task:', taskId);
+        const task = allTasks.find(t => t.id === taskId);
+        if (task) {
+            task.status = task.type === '汇率更新' ? '核实中' : '审核中'; // 示例状态更新
+            localStorage.setItem('financeTasks', JSON.stringify(allTasks));
+            filterTasks(localStorage.getItem('selectedFilter') || '全部');
+            alert(`任务 ID: ${taskId} 已更新状态为“${task.status}”`);
+        }
+    }
+
+    // 初始化
+    window.onload = () => {
+        console.log('Page loaded, initializing...');
+        w3.includeHTML(() => {
+            console.log('External HTML included');
+            initMenus();
+            fetchTasks();
+        });
+    };
+</script>
 </body>
 </html>
