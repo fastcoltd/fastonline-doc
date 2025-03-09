@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 我的排班</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <style>
+        .filter-container {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 16px;
+        }
+        .ant-calendar {
+            width: 100%;
+            height: auto;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .ant-calendar-header {
+            text-align: center;
+            font-size: 16px;
+            padding: 1% 0;
+        }
+        .ant-calendar-table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .ant-calendar-table th {
+            width: 14.28%;
+            height: 30px;
+            text-align: center;
+            padding: 0.5%;
+            border: 1px solid #f0f0f0;
+            font-size: 12px;
+            background: #fafafa;
+            box-sizing: border-box;
+        }
+        .ant-calendar-table td {
+            width: 14.28%;
+            height: 80px;
+            text-align: center;
+            padding: 0.5%;
+            border: 1px solid #f0f0f0;
+            font-size: 12px;
+            vertical-align: top;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ant-calendar-table td.has-schedule {
+        }
+        @media (max-width: 768px) {
+            .ant-calendar-table th {
+                font-size: 10px;
+                height: 20px;
+                padding: 0.3%;
+            }
+            .ant-calendar-table td {
+                font-size: 10px;
+                height: 60px;
+                padding: 0.3%;
+            }
+            .ant-calendar-header {
+                font-size: 14px;
+            }
+        }
+        @media (max-width: 480px) {
+            .ant-calendar-table th {
+                font-size: 8px;
+                height: 15px;
+                padding: 0.2%;
+            }
+            .ant-calendar-table td {
+                font-size: 8px;
+                height: 40px;
+                padding: 0.2%;
+            }
+            .ant-calendar-header {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('my_schedule.html')">
+                                    <span class="ant-tabs-tab-btn">我的排班</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container">
+                                    <select id="yearFilter" class="ant-select" onchange="renderMyScheduleCalendar()">
+                                    </select>
+                                    <select id="monthFilter" class="ant-select" onchange="renderMyScheduleCalendar()">
+                                    </select>
+                                </div>
+                                <div id="myScheduleCalendar" class="ant-calendar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+</div>
+
+<script>
+    const CURRENT_USER_ID = 1;
+    // 更真实的员工姓名
+    const manageIds = [
+        { value: 1, label: '张伟' },
+        { value: 2, label: '李娜' },
+        { value: 3, label: '王磊' },
+        { value: 4, label: '刘芳' },
+        { value: 5, label: '陈晨' },
+        { value: 6, label: '杨洋' },
+        { value: 7, label: '赵强' },
+        { value: 8, label: '孙丽' },
+        { value: 9, label: '周杰' },
+        { value: 10, label: '吴静' },
+        { value: 11, label: '郑凯' },
+        { value: 12, label: '何琳' },
+        { value: 13, label: '徐峰' },
+        { value: 14, label: '钱红' },
+        { value: 15, label: '林涛' }
+    ];
+    const dates = Array.from({ length: 365 }, (_, i) => moment().subtract(i, 'days').format('YYYY-MM-DD'));
+    let tableData = [];
+    const THEME_COLOR = '#1890ff'; // 主题色
+
+    // 初始化样本数据，80%天数有排班
+    function initSampleData() {
+        const uniqueDates = dates.slice(0, Math.floor(dates.length * 0.8)); // 80%天数
+        uniqueDates.forEach((date, index) => {
+            const numSchedules = Math.floor(Math.random() * 3) + 1; // 每一天1-3个排班
+            for (let j = 0; j < numSchedules; j++) {
+                tableData.push({
+                    id: index * 3 + j + 1,
+                    status: 1,
+                    date: date,
+                    from: Math.floor(Math.random() * 5 + 8) * 3600,
+                    to: Math.floor(Math.random() * 5 + 16) * 3600,
+                    manage_id: Math.floor(Math.random() * 15) + 1,
+                    true_manage_id: Math.floor(Math.random() * 15) + 1,
+                    work_start: Math.floor(Math.random() * 5 + 8) * 3600,
+                    work_end: Math.floor(Math.random() * 5 + 16) * 3600,
+                    ask_leave_count: Math.floor(Math.random() * 6),
+                    time_off_work: Math.floor(Math.random() * 9) * 3600,
+                    sign_count: Math.floor(Math.random() * 11),
+                    miss_count: Math.floor(Math.random() * 4),
+                    mark: `排班备注-${index * 3 + j + 1}`,
+                    update_time: moment().subtract(Math.floor(Math.random() * 90), 'days').unix(),
+                    create_time: moment().subtract(Math.floor(Math.random() * 365), 'days').unix()
+                });
+            }
+        });
+    }
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return `${color}33`; // 浅色背景
+    }
+
+    function initFilters() {
+        const yearSelect = document.getElementById('yearFilter');
+        const monthSelect = document.getElementById('monthFilter');
+        const currentYear = moment().year();
+
+        for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.text = `${i}年`;
+            yearSelect.appendChild(option);
+        }
+        yearSelect.value = currentYear;
+
+        for (let i = 1; i <= 12; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.text = `${i < 10 ? '0' + i : i}月`;
+            monthSelect.appendChild(option);
+        }
+        monthSelect.value = moment().month() + 1;
+    }
+
+    function renderMyScheduleCalendar() {
+        const year = parseInt(document.getElementById('yearFilter').value);
+        const month = parseInt(document.getElementById('monthFilter').value) - 1;
+        const currentMonth = moment([year, month]);
+        const daysInMonth = currentMonth.daysInMonth();
+        const firstDay = currentMonth.startOf('month').day();
+
+        let calendarHtml = `
+            <div class="ant-calendar-header">
+                <span>${currentMonth.format('YYYY年MM月')}</span>
+            </div>
+            <table class="ant-calendar-table">
+                <thead>
+                    <tr>
+                        <th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        let dayCount = 0, selectColor = getRandomColor();
+        for (let i = 0; i < 6; i++) {
+            calendarHtml += '<tr>';
+            for (let j = 0; j < 7; j++) {
+                if ((i === 0 && j < firstDay) || dayCount >= daysInMonth) {
+                    calendarHtml += '<td></td>';
+                } else {
+                    dayCount++;
+                    const date = currentMonth.clone().date(dayCount).format('YYYY-MM-DD');
+                    const schedules = tableData.filter(d => d.date === date && d.status === 1);
+                    const hasSchedule = schedules.length > 0;
+                    const isMySchedule = schedules.some(s => s.manage_id === CURRENT_USER_ID);
+                    const className = hasSchedule ? 'has-schedule' : '';
+                    const style = isMySchedule ? `style="background-color: ${selectColor};"` : '';
+
+                    let content = '';
+                    if (!hasSchedule) {
+                        content = '<span style="color: red;">无排班</span>';
+                    } else {
+                        content = schedules.map(s => {
+                            const isMine = s.manage_id === CURRENT_USER_ID;
+                            const colorStyle = isMine ? `style="color: ${THEME_COLOR};font-weight: 900;"` : '';
+                            return `<span ${colorStyle}>${manageIds.find(m => m.value === s.manage_id)?.label || '未知'} (${moment.unix(s.work_start).format('HH:mm')}~${moment.unix(s.work_end).format('HH:mm')})</span>`;
+                        }).join('<br>');
+                    }
+
+                    calendarHtml += `<td class="${className}" ${style}>${dayCount}<br>${content}</td>`;
+                }
+            }
+            calendarHtml += '</tr>';
+            if (dayCount >= daysInMonth) break;
+        }
+        calendarHtml += `
+                </tbody>
+            </table>
+        `;
+        document.getElementById('myScheduleCalendar').innerHTML = calendarHtml;
+    }
+
+    window.onload = function() {
+        w3.includeHTML(() => {
+            initMenus();
+            initSampleData();
+            initFilters();
+            renderMyScheduleCalendar();
+        });
+    };
+</script>
+</body>
+</html>
