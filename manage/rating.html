@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_opt.js"></script>
     <style>
         .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
         .action-container { margin-bottom: 16px; }
@@ -58,67 +59,12 @@
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
                             <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <select id="statusFilter" class="ant-select">
-                                        <option value="">全部状态</option>
-                                        <option value="0">关闭</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                    <select id="ratingTypeFilter" class="ant-select">
-                                        <option value="">全部类型</option>
-                                        <option value="0">商品</option>
-                                        <option value="1">帖子</option>
-                                        <option value="2">店铺</option>
-                                    </select>
-                                    <select id="languageFilter" class="ant-select">
-                                        <option value="">全部语言</option>
-                                        <option value="zh_CN">中文</option>
-                                        <option value="en_US">English</option>
-                                    </select>
-                                    <select id="langStatusFilter" class="ant-select">
-                                        <option value="">全部语言状态</option>
-                                        <option value="0">关闭</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                    <input type="text" id="ratingNameFilter" class="ant-input" placeholder="评分项名称">
-                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
-                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addRating()">添加</button>
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
-                                </div>
-                                <!-- 数据区域 -->
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-status">状态</div>
-                                        <div class="col-rating-type">评分类型</div>
-                                        <div class="col-language">语言</div>
-                                        <div class="col-lang-status">语言状态</div>
-                                        <div class="col-rating-name">评分项名称</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
+                                    <div class="table-header"></div>
                                     <div id="rating-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
-                                            <option value="10">10 条/页</option>
-                                            <option value="20" selected>20 条/页</option>
-                                            <option value="50">50 条/页</option>
-                                            <option value="100">100 条/页</option>
-                                        </select>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -128,411 +74,237 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-
-    <!-- 添加/编辑弹窗 -->
-    <div id="ratingModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加评分项</h3>
-            <form id="ratingForm">
-                <div class="ant-form-item" id="idField" style="display: none;">
-                    <label>ID:</label>
-                    <input type="number" id="modalId" disabled>
-                </div>
-                <div class="ant-tabs ant-tabs-top">
-                    <div class="ant-tabs-nav">
-                        <div class="ant-tabs-nav-wrap">
-                            <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
-                                    <span class="ant-tabs-tab-btn">基本信息</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="lang">
-                                    <span class="ant-tabs-tab-btn">多语言信息</span>
-                                </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ant-tabs-content-holder">
-                        <div class="ant-tabs-content">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
-                                <div class="ant-form-item">
-                                    <label>状态:</label>
-                                    <select id="modalStatus" class="ant-select">
-                                        <option value="0">关闭</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>评分类型:</label>
-                                    <select id="modalRatingType" class="ant-select">
-                                        <option value="0">商品</option>
-                                        <option value="1">帖子</option>
-                                        <option value="2">店铺</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item" id="createTimeField" style="display: none;">
-                                    <label>创建时间:</label>
-                                    <input type="datetime-local" id="modalCreateTime" disabled>
-                                </div>
-                            </div>
-                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>语言:</label>
-                                    <select id="modalLanguage" class="ant-select">
-                                        <option value="zh_CN">中文</option>
-                                        <option value="en_US">English</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>语言状态:</label>
-                                    <select id="modalLangStatus" class="ant-select">
-                                        <option value="0">关闭</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>评分项名称:</label>
-                                    <input type="text" id="modalRatingName" maxlength="128">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveRating()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 批量修改状态弹窗 -->
-    <div id="statusModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeStatusModal()">×</button>
-            <h3>批量修改状态</h3>
-            <form id="statusForm">
-                <div class="ant-form-item">
-                    <label>选中的ID:</label>
-                    <input type="text" id="selectedIds" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>新状态:</label>
-                    <select id="newStatus" class="ant-select">
-                        <option value="0">关闭</option>
-                        <option value="1">启用</option>
-                    </select>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
 </div>
 
 <script>
-    let ratingData = [];
-    let ratingLangData = [];
-    let page = 1, perPage = 20;
+    const ratingTypes = [
+        { value: '0', label: '商品' },
+        { value: '1', label: '帖子' },
+        { value: '2', label: '店铺' }
+    ];
 
-    // 生成样本数据
-    function generateSampleData() {
-        ratingData = [];
-        ratingLangData = [];
-        const languages = ['zh_CN', 'en_US'];
-        for (let i = 1; i <= 200; i++) {
-            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            ratingData.push({
-                id: i,
-                status: Math.floor(Math.random() * 2),
-                rating_type: Math.floor(Math.random() * 3),
-                create_time: createTime
-            });
-
-            languages.forEach(lang => {
-                ratingLangData.push({
-                    id: ratingLangData.length + 1,
-                    rating_id: i,
-                    language: lang,
-                    status: Math.floor(Math.random() * 2),
-                    rating_name: lang === 'zh_CN' ? `评分项 ${i}` : `Rating ${i}`
-                });
-            });
-        }
-        renderRatingList();
-    }
-
-    // 渲染列表
-    function renderRatingList() {
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const paginatedData = ratingData.slice(start, end);
-        const listContainer = document.getElementById('rating-list');
-        listContainer.innerHTML = '';
-
-        paginatedData.forEach(rating => {
-            const langEntries = ratingLangData.filter(item => item.rating_id === rating.id);
-            langEntries.forEach(langEntry => {
-                const statusTag = rating.status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
-                    '<span class="ant-tag ant-tag-green">启用</span>';
-                const langStatusTag = langEntry.status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
-                    '<span class="ant-tag ant-tag-green">启用</span>';
-                const ratingTypeText = rating.rating_type === 0 ? '商品' : rating.rating_type === 1 ? '帖子' : '店铺';
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'task-item';
-                itemDiv.style = 'border-bottom: 1px solid #ddd;';
-                itemDiv.innerHTML = `
-                    <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${langEntry.id}"></div>
-                    <div class="col-id">${rating.id}</div>
-                    <div class="col-status">${statusTag}</div>
-                    <div class="col-rating-type">${ratingTypeText}</div>
-                    <div class="col-language">${langEntry.language}</div>
-                    <div class="col-lang-status">${langStatusTag}</div>
-                    <div class="col-rating-name">${langEntry.rating_name}</div>
-                    <div class="col-create-time">${moment.unix(rating.create_time).format('YYYY-MM-DD HH:mm')}</div>
-                    <div class="col-actions">
-                        <button class="ant-btn" onclick="editRating(${langEntry.id})">编辑</button>
-                        <button class="ant-btn ant-btn-danger" onclick="deleteRating(${langEntry.id})">删除</button>
-                    </div>
-                `;
-                listContainer.appendChild(itemDiv);
-            });
-        });
-
-        const totalPages = Math.ceil(ratingData.length / perPage);
-        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
-    }
-
-    // 筛选
-    function applyFilters() {
-        let filteredRatings = [...ratingData];
-        let filteredLangs = [...ratingLangData];
-        const status = document.getElementById('statusFilter').value;
-        const ratingType = document.getElementById('ratingTypeFilter').value;
-        const language = document.getElementById('languageFilter').value;
-        const langStatus = document.getElementById('langStatusFilter').value;
-        const ratingName = document.getElementById('ratingNameFilter').value.toLowerCase();
-        const createTimeStart = document.getElementById('createTimeStartFilter').value;
-        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
-
-        if (status) filteredRatings = filteredRatings.filter(item => item.status === parseInt(status));
-        if (ratingType) filteredRatings = filteredRatings.filter(item => item.rating_type === parseInt(ratingType));
-        if (createTimeStart) filteredRatings = filteredRatings.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
-        if (createTimeEnd) filteredRatings = filteredRatings.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
-        if (language) filteredLangs = filteredLangs.filter(item => item.language === language);
-        if (langStatus) filteredLangs = filteredLangs.filter(item => item.status === parseInt(langStatus));
-        if (ratingName) filteredLangs = filteredLangs.filter(item => item.rating_name.toLowerCase().includes(ratingName));
-
-        const ratingIds = new Set(filteredRatings.map(r => r.id));
-        filteredLangs = filteredLangs.filter(lang => ratingIds.has(lang.rating_id));
-        ratingData = filteredRatings.filter(r => filteredLangs.some(l => l.rating_id === r.id));
-        page = 1;
-        renderRatingList();
-    }
-
-    // 分页
-    function changePage(delta) {
-        const totalPages = Math.ceil(ratingData.length / perPage);
-        page += delta;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        renderRatingList();
-    }
-
-    function jumpToPage() {
-        const newPage = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(ratingData.length / perPage);
-        if (newPage >= 1 && newPage <= totalPages) {
-            page = newPage;
-            renderRatingList();
-        } else {
-            alert('请输入有效的页码');
-        }
-    }
-
-    function changePerPage() {
-        perPage = parseInt(document.getElementById('perPage').value);
-        page = 1;
-        renderRatingList();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    // 添加
-    function addRating() {
-        isEditing = false;
-        editId = null;
-        document.getElementById('modalTitle').textContent = '添加评分项';
-        document.getElementById('idField').style.display = 'none';
-        document.getElementById('modalStatus').value = '0';
-        document.getElementById('modalRatingType').value = '0';
-        document.getElementById('createTimeField').style.display = 'none';
-        document.getElementById('modalLanguage').value = 'zh_CN';
-        document.getElementById('modalLanguage').disabled = false;
-        document.getElementById('modalLangStatus').value = '0';
-        document.getElementById('modalRatingName').value = '';
-        setupTabs();
-        document.getElementById('ratingModal').style.display = 'block';
-    }
-
-    // 编辑
-    let isEditing = false;
-    let editId = null;
-    function editRating(id) {
-        isEditing = true;
-        editId = id;
-        const langEntry = ratingLangData.find(item => item.id === id);
-        const rating = ratingData.find(item => item.id === langEntry.rating_id);
-        document.getElementById('modalTitle').textContent = '编辑评分项';
-        document.getElementById('idField').style.display = 'block';
-        document.getElementById('modalId').value = rating.id;
-        document.getElementById('modalStatus').value = rating.status;
-        document.getElementById('modalRatingType').value = rating.rating_type;
-        document.getElementById('createTimeField').style.display = 'block';
-        document.getElementById('modalCreateTime').value = moment.unix(rating.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalLanguage').value = langEntry.language;
-        document.getElementById('modalLanguage').disabled = true;
-        document.getElementById('modalLangStatus').value = langEntry.status;
-        document.getElementById('modalRatingName').value = langEntry.rating_name || '';
-        setupTabs();
-        document.getElementById('ratingModal').style.display = 'block';
-    }
-
-    // Tab 设置
-    function setupTabs() {
-        const tabButtons = document.querySelectorAll('#ratingModal .ant-tabs-tab');
-        const tabPanes = document.querySelectorAll('#ratingModal .ant-tabs-tabpane');
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
-                button.classList.add('ant-tabs-tab-active');
-                const tabId = button.getAttribute('data-tab');
-                tabPanes.forEach(pane => {
-                    pane.style.display = pane.id === tabId ? 'block' : 'none';
-                });
-                document.querySelector('#ratingModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
-                document.querySelector('#ratingModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
-            });
-        });
-        tabButtons[0].classList.add('ant-tabs-tab-active');
-        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
-    }
-
-    // 保存
-    function saveRating() {
-        const ratingId = isEditing ? parseInt(document.getElementById('modalId').value) : ratingData.length + 1;
-        const langId = isEditing ? editId : ratingLangData.length + 1;
-        const now = moment().unix();
-
-        let rating = ratingData.find(item => item.id === ratingId);
-        if (!rating) {
-            rating = {
-                id: ratingId,
-                status: parseInt(document.getElementById('modalStatus').value),
-                rating_type: parseInt(document.getElementById('modalRatingType').value),
-                create_time: now
-            };
-            ratingData.push(rating);
-        } else {
-            rating.status = parseInt(document.getElementById('modalStatus').value);
-            rating.rating_type = parseInt(document.getElementById('modalRatingType').value);
-        }
-
-        let langEntry = ratingLangData.find(item => item.id === langId);
-        if (!langEntry) {
-            langEntry = {
-                id: langId,
-                rating_id: ratingId,
-                language: document.getElementById('modalLanguage').value,
-                status: parseInt(document.getElementById('modalLangStatus').value),
-                rating_name: document.getElementById('modalRatingName').value || ''
-            };
-            ratingLangData.push(langEntry);
-        } else {
-            langEntry.status = parseInt(document.getElementById('modalLangStatus').value);
-            langEntry.rating_name = document.getElementById('modalRatingName').value || '';
-        }
-
-        closeModal();
-        renderRatingList();
-    }
-
-    // 删除
-    function deleteRating(id) {
-        if (confirm('确定要删除此评分项吗？')) {
-            const langEntry = ratingLangData.find(item => item.id === id);
-            ratingLangData = ratingLangData.filter(item => item.id !== id);
-            if (!ratingLangData.some(item => item.rating_id === langEntry.rating_id)) {
-                ratingData = ratingData.filter(item => item.id !== langEntry.rating_id);
+    window.tableConfig = {
+        tableName: 'rating',
+        tableTitle: '评分项',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'status', generator: () => Math.floor(Math.random() * 2) },
+            { name: 'rating_type', generator: () => Math.floor(Math.random() * 3) },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(Math.floor(Math.random() * 60), 'days').unix() },
+            { name: 'language', isLangField: true, generator: () => ['zh_CN', 'en_US'][Math.floor(Math.random() * 2)] },
+            { name: 'lang_status', isLangField: true, generator: () => Math.floor(Math.random() * 2) },
+            { name: 'rating_name', isLangField: true, generator: (id, lang) => lang === 'zh_CN' ? `评分项 ${id}` : `Rating ${id}` }
+        ],
+        langFields: {
+            foreignKey: 'rating_id',
+            languages: ['zh_CN', 'en_US']
+        },
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', action: 'batchEditStatus' },
+            { label: '批量添加', className: 'ant-btn ant-btn-primary', action: 'batchAddRatings' }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
+            { name: 'rating_type', label: '评分类型', className: 'col-rating-type', formatter: v => ratingTypes.find(t => t.value === v.toString())?.label || '未知' },
+            {
+                name: 'language',
+                label: '语言',
+                className: 'col-language',
+                formatter: (_, item) => {
+                    const langData = tableLangData.find(l => l[config.langFields.foreignKey] === item.id);
+                    return langData ? langData.language : '';
+                }
+            },
+            {
+                name: 'lang_status',
+                label: '语言状态',
+                className: 'col-lang-status',
+                formatter: (_, item) => {
+                    const langData = tableLangData.find(l => l[config.langFields.foreignKey] === item.id);
+                    return langData ? (langData.lang_status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' : '<span class="ant-tag ant-tag-green">启用</span>') : '';
+                }
+            },
+            {
+                name: 'rating_name',
+                label: '评分项名称',
+                className: 'col-rating-name',
+                formatter: (_, item) => {
+                    const langData = tableLangData.find(l => l[config.langFields.foreignKey] === item.id);
+                    return langData ? langData.rating_name : '';
+                }
+            },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm') },
+            {
+                name: 'actions',
+                label: '操作',
+                className: 'col-actions',
+                formatter: (_, item) => `
+                    <button class="ant-btn" onclick="editRecord(${item.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+                `
             }
-            renderRatingList();
-        }
-    }
-
-    // 批量删除
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的评分项');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个评分项吗？`)) {
-            const ratingIdsToDelete = new Set();
-            selectedIds.forEach(id => {
-                const langEntry = ratingLangData.find(item => item.id === id);
-                if (langEntry) ratingIdsToDelete.add(langEntry.rating_id);
-                ratingLangData = ratingLangData.filter(item => item.id !== id);
-            });
-            ratingData = ratingData.filter(item => !ratingIdsToDelete.has(item.id));
-            renderRatingList();
-        }
-    }
+        ],
+        filterFields: [
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '关闭' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'rating_type', type: 'select', options: [{ value: '', label: '全部类型' }, ...ratingTypes], filter: (data, value) => value === '' ? data : data.filter(d => d.rating_type === parseInt(value)) },
+            { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'zh_CN', label: '中文' }, { value: 'en_US', label: 'English' }], filter: (data, value) => value === '' ? data : data.filter(d => tableLangData.some(l => l[config.langFields.foreignKey] === d.id && l.language === value)) },
+            { id: 'lang_status', type: 'select', options: [{ value: '', label: '全部语言状态' }, { value: '0', label: '关闭' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => tableLangData.some(l => l[config.langFields.foreignKey] === d.id && l.lang_status === parseInt(value))) },
+            { id: 'rating_name', type: 'text', placeholder: '评分项名称', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l[config.langFields.foreignKey] === d.id && l.rating_name.toLowerCase().includes(value.toLowerCase()))) : data },
+            { id: 'createTimeStart', type: 'datetime-local', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'createTimeEnd', type: 'datetime-local', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'id', label: 'ID', type: 'number', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: '0', label: '关闭' }, { value: '1', label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'rating_type', label: '评分类型', type: 'select', options: ratingTypes, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            },
+            {
+                id: 'lang',
+                title: '多语言信息',
+                fields: [
+                    { name: 'language', label: '语言', type: 'select', options: [{ value: 'zh_CN', label: '中文' }, { value: 'en_US', label: 'English' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                    { name: 'lang_status', label: '语言状态', type: 'select', options: [{ value: '0', label: '关闭' }, { value: '1', label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'rating_name', label: '评分项名称', type: 'text', maxlength: 128, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            }
+        ]
+    };
 
     // 批量修改状态
-    function batchEditStatus() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
+    window.batchEditStatus = function() {
+        const selectedIds = getSelectedIds();
         if (selectedIds.length === 0) {
             alert('请先选择要修改状态的评分项');
             return;
         }
-        document.getElementById('selectedIds').value = selectedIds.join(', ');
-        document.getElementById('statusModal').style.display = 'block';
-    }
+        batchEditField({ name: 'status', label: '状态', type: 'select', options: [{ value: '0', label: '关闭' }, { value: '1', label: '启用' }] });
+    };
 
-    function saveBatchStatus() {
-        const newStatus = parseInt(document.getElementById('newStatus').value);
-        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
-        const ratingIds = new Set();
-        selectedIds.forEach(id => {
-            const langEntry = ratingLangData.find(item => item.id === id);
-            if (langEntry) ratingIds.add(langEntry.rating_id);
+    // 批量添加评分项
+    window.batchAddRatings = function() {
+        const modal = document.createElement('div');
+        modal.id = 'batchAddRatingsModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+
+        modal.innerHTML = `
+            <div class="modal-content" style="width: 600px; padding: 24px;">
+                <button class="close-btn" onclick="closeBatchAddRatingsModal()">×</button>
+                <h3 style="margin-bottom: 24px; font-size: 18px;">批量添加评分项</h3>
+                <div class="ant-form-item">
+                    <label style="width: 120px; text-align: right; margin-right: 8px;">评分类型:</label>
+                    <select class="ant-select" id="batchAddRatingType" style="flex: 1;">
+                        ${ratingTypes.map(t => `<option value="${t.value}">${t.label}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label style="width: 120px; text-align: right; margin-right: 8px;">语言:</label>
+                    <select class="ant-select" id="batchAddLanguage" style="flex: 1;">
+                        <option value="zh_CN">中文</option>
+                        <option value="en_US">English</option>
+                    </select>
+                </div>
+                <div class="ant-form-item">
+                    <label style="width: 120px; text-align: right; margin-right: 8px;">评分项名称:</label>
+                    <div id="batchAddRatingNames" class="ant-input" style="flex: 1; min-height: 32px; border: 1px solid #ddd; border-radius: 4px; padding: 4px;">
+                        <input type="text" placeholder="输入评分项名称，按 Enter 添加" style="margin: 4px; padding: 4px;" onkeydown="if(event.key === 'Enter') addCustomRatingTag(this)">
+                    </div>
+                </div>
+                <div class="modal-buttons" style="text-align: right; margin-top: 20px;">
+                    <button class="ant-btn" onclick="closeBatchAddRatingsModal()">取消</button>
+                    <button class="ant-btn ant-btn-primary" onclick="saveBatchAddRatings()">批量添加</button>
+                </div>
+            </div>
+        `;
+        modal.style.display = 'block';
+    };
+
+    // 添加自定义评分项标签
+    window.addCustomRatingTag = function(input) {
+        const value = input.value.trim();
+        if (!value) return;
+
+        const container = document.getElementById('batchAddRatingNames');
+        const tags = Array.from(container.querySelectorAll('.ant-tag')).map(tag => tag.dataset.value);
+        if (!tags.includes(value)) {
+            const tag = document.createElement('span');
+            tag.className = 'ant-tag ant-tag-orange';
+            tag.dataset.value = value;
+            tag.innerHTML = `${value} <span class="tag-close" onclick="removeBatchTag(this)">×</span>`;
+            container.insertBefore(tag, input);
+        }
+        input.value = '';
+    };
+
+    // 删除批量添加中的标签
+    window.removeBatchTag = function(closeBtn) {
+        closeBtn.parentElement.remove();
+    };
+
+    // 保存批量添加
+    window.saveBatchAddRatings = function() {
+        const ratingType = parseInt(document.getElementById('batchAddRatingType').value);
+        const language = document.getElementById('batchAddLanguage').value;
+        const ratingNames = Array.from(document.getElementById('batchAddRatingNames').querySelectorAll('.ant-tag')).map(tag => tag.dataset.value);
+
+        if (ratingNames.length === 0) {
+            alert('请至少输入一个评分项名称');
+            return;
+        }
+
+        const now = moment().unix();
+        const newRecords = ratingNames.map((ratingName, index) => {
+            const ratingId = tableData.length + index + 1;
+            tableLangData.push({
+                id: tableLangData.length + 1,
+                rating_id: ratingId,
+                language: language,
+                lang_status: 1, // 默认启用
+                rating_name: ratingName
+            });
+            return {
+                id: ratingId,
+                status: 1, // 默认启用
+                rating_type: ratingType,
+                create_time: now
+            };
         });
-        ratingData = ratingData.map(item => ratingIds.has(item.id) ? { ...item, status: newStatus } : item);
-        closeStatusModal();
-        renderRatingList();
-    }
 
-    function closeModal() {
-        document.getElementById('ratingModal').style.display = 'none';
-    }
+        tableData.push(...newRecords);
+        closeBatchAddRatingsModal();
+        renderTableList();
+    };
 
-    function closeStatusModal() {
-        document.getElementById('statusModal').style.display = 'none';
-    }
+    // 关闭批量添加弹窗
+    window.closeBatchAddRatingsModal = function() {
+        const modal = document.getElementById('batchAddRatingsModal');
+        if (modal) modal.style.display = 'none';
+    };
 
-    window.onload = () => {
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
         w3.includeHTML(() => {
             initMenus();
-            generateSampleData();
+            initTable(window.tableConfig);
         });
-    };
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
 </script>
 </body>
 </html>
