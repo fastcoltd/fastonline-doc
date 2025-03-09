@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_opt.js"></script>
     <style>
         .ant-input, .ant-select, .ant-btn { margin-right: 8px; }
         .filter-container { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; flex-wrap: wrap; }
@@ -17,19 +18,15 @@
         .table-header, .task-item { display: flex; width: 100%; }
         .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 8%; min-width: 60px; }
-        .col-quick-message-type-id { width: 12%; min-width: 100px; }
-        .col-manage-id { width: 12%; min-width: 100px; }
-        .col-status { width: 8%; min-width: 60px; }
-        .col-use-count { width: 8%; min-width: 60px; }
-        .col-mark { width: 12%; min-width: 100px; }
-        .col-language { width: 10%; min-width: 80px; }
-        .col-message { width: 15%; min-width: 120px; }
-        .col-last-use-time { width: 12%; min-width: 100px; }
-        .col-actions { width: 10%; min-width: 100px; }
+        .col-id { width: 10%; min-width: 60px; }
+        .col-quick-message-id { width: 15%; min-width: 100px; }
+        .col-language { width: 15%; min-width: 100px; }
+        .col-actions { width: 20%; min-width: 150px; }
+        .col-quick-message-type-id { width: 15%; min-width: 100px; }
+        .col-message { width: 30%; min-width: 180px; } /* 调整消息列宽度以适应新列 */
         .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1080px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 1440px; overflow-y: auto; position: relative; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 800px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; position: relative; }
         .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
         .modal-buttons { text-align: right; margin-top: 20px; }
         .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
@@ -39,8 +36,6 @@
         .modal-content .ant-form-item.textarea-item { display: block; }
         .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; }
         .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
-        .ant-tabs-content { min-height: 400px; }
-        .ant-tabs-tabpane { padding: 10px 0; }
     </style>
 </head>
 <body>
@@ -54,8 +49,8 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('quick_message.html')" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">快捷回复</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">快捷回复多语言</span>
                                 </div>
                                 <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                             </div>
@@ -65,71 +60,14 @@
                         <div class="ant-tabs-content ant-tabs-content-top">
                             <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
                                 <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <div class="ant-select ant-select-single ant-select-show-arrow">
-                                        <select id="typeIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()"class="ant-select">
-                                            <option value="">全部类型</option>
-                                            <!-- 动态生成类型选项 -->
-                                        </select>
-                                    </div>
-                                    <div class="ant-select ant-select-single ant-select-show-arrow">
-                                        <select id="manageIdFilter" onkeydown="if(event.key === 'Enter') applyFilters()"class="ant-select">
-                                            <option value="">全部管理员</option>
-                                            <!-- 动态生成管理员选项 -->
-                                        </select>
-                                    </div>
-                                    <div class="ant-select ant-select-single ant-select-show-arrow">
-                                        <select id="languageFilter" onkeydown="if(event.key === 'Enter') applyFilters()"class="ant-select">
-                                            <option value="">全部语言</option>
-                                            <option value="zh_CN">中文</option>
-                                            <option value="en_US">英语</option>
-                                            <option value="fr_FR">法语</option>
-                                            <option value="es_ES">西班牙语</option>
-                                            <option value="vi_VN">越南语</option>
-                                            <option value="ru_RU">俄语</option>
-                                        </select>
-                                    </div>
-                                    <input type="datetime-local" id="lastUseTimeFilter" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()" placeholder="最后使用时间">
-                                    <input type="date" id="startDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                    <input type="date" id="endDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
+                                <div class="filter-container"></div>
                                 <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addMessage()">添加</button>
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                </div>
+                                <div class="action-container"></div>
                                 <!-- 数据区域 -->
                                 <div class="task-list">
-                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-quick-message-type-id">类型名称</div>
-                                        <div class="col-manage-id">管理员名称</div>
-                                        <div class="col-status">状态</div>
-                                        <div class="col-use-count">使用次数</div>
-                                        <div class="col-mark">备注</div>
-                                        <div class="col-language">语言</div>
-                                        <div class="col-message">消息</div>
-                                        <div class="col-last-use-time">最后使用时间</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
-                                    <div id="message-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <div class="ant-select ant-select-single ant-select-show-arrow">
-                                            <select id="perPage" onchange="changePerPage()">
-                                                <option value="10">10 条/页</option>
-                                                <option value="20" selected>20 条/页</option>
-                                                <option value="50">50 条/页</option>
-                                                <option value="100">100 条/页</option>
-                                            </select>
-                                        </div>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;"></div>
+                                    <div id="quick-message-lang-list">加载中...</div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -139,496 +77,199 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-
-    <!-- 添加弹窗 -->
-    <div id="addModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeAddModal()">×</button>
-            <h3>添加快捷回复</h3>
-            <form id="addForm">
-                <div class="ant-tabs ant-tabs-top">
-                    <div class="ant-tabs-nav">
-                        <div class="ant-tabs-nav-wrap">
-                            <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
-                                    <span class="ant-tabs-tab-btn">基本信息</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="lang">
-                                    <span class="ant-tabs-tab-btn">多语言</span>
-                                </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ant-tabs-content-holder">
-                        <div class="ant-tabs-content">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
-                                <div class="ant-form-item">
-                                    <label>类型ID:</label>
-                                    <select id="addTypeId">
-                                        <!-- 动态生成类型选项 -->
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>管理员ID:</label>
-                                    <select id="addManageId">
-                                        <!-- 动态生成管理员选项 -->
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>状态:</label>
-                                    <select id="addStatus">
-                                        <option value="0">禁用</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>使用次数:</label>
-                                    <input type="number" id="addUseCount" min="0" value="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>备注:</label>
-                                    <input type="text" id="addMark" maxlength="64">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>最后使用时间:</label>
-                                    <input type="datetime-local" id="addLastUseTime">
-                                </div>
-                            </div>
-                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>语言:</label>
-                                    <select id="addLanguage">
-                                        <option value="zh_CN">中文</option>
-                                        <option value="en_US">英语</option>
-                                        <option value="fr_FR">法语</option>
-                                        <option value="es_ES">西班牙语</option>
-                                        <option value="vi_VN">越南语</option>
-                                        <option value="ru_RU">俄语</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item textarea-item">
-                                    <label>消息:</label>
-                                    <textarea id="addMessage" rows="5" maxlength="255"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeAddModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveAdd()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 编辑弹窗 -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeEditModal()">×</button>
-            <h3>编辑快捷回复</h3>
-            <form id="editForm">
-                <div class="ant-tabs ant-tabs-top">
-                    <div class="ant-tabs-nav">
-                        <div class="ant-tabs-nav-wrap">
-                            <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
-                                    <span class="ant-tabs-tab-btn">基本信息</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="lang">
-                                    <span class="ant-tabs-tab-btn">多语言</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="system">
-                                    <span class="ant-tabs-tab-btn">系统信息</span>
-                                </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ant-tabs-content-holder">
-                        <div class="ant-tabs-content">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
-                                <div class="ant-form-item">
-                                    <label>类型ID:</label>
-                                    <select id="editTypeId">
-                                        <!-- 动态生成类型选项 -->
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>管理员ID:</label>
-                                    <select id="editManageId">
-                                        <!-- 动态生成管理员选项 -->
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>状态:</label>
-                                    <select id="editStatus">
-                                        <option value="0">禁用</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>使用次数:</label>
-                                    <input type="number" id="editUseCount" min="0">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>备注:</label>
-                                    <input type="text" id="editMark" maxlength="64">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>最后使用时间:</label>
-                                    <input type="datetime-local" id="editLastUseTime">
-                                </div>
-                            </div>
-                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>语言:</label>
-                                    <select id="editLanguage" disabled>
-                                        <option value="zh_CN">中文</option>
-                                        <option value="en_US">英语</option>
-                                        <option value="fr_FR">法语</option>
-                                        <option value="es_ES">西班牙语</option>
-                                        <option value="vi_VN">越南语</option>
-                                        <option value="ru_RU">俄语</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item textarea-item">
-                                    <label>消息:</label>
-                                    <textarea id="editMessage" rows="5" maxlength="255"></textarea>
-                                </div>
-                            </div>
-                            <div class="ant-tabs-tabpane" id="system" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>ID:</label>
-                                    <input type="text" id="editId" disabled>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>更新时间:</label>
-                                    <input type="datetime-local" id="editUpdateTime" disabled>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>创建时间:</label>
-                                    <input type="datetime-local" id="editCreateTime" disabled>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeEditModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveEdit()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
 </div>
-
 <script>
-    let messageData = [];
-    let langData = [];
-    let messagePage = 1, messagePerPage = 20;
-    let typeData = [];
-    let manageData = [];
-    let editLangId = null;
+    const languages = {
+        'zh_CN': '中文',
+        'en_US': '英语',
+        'fr_FR': '法语',
+        'es_ES': '西班牙语',
+        'vi_VN': '越南语',
+        'ru_RU': '俄语'
+    };
 
-    function fetchData() {
-        console.log('Fetching data...');
-        messageData = [];
-        langData = [];
-        typeData = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `消息类型 ${i + 1}` }));
-        manageData = Array.from({length: 15}, (_, i) => ({ id: i + 1, name: `管理员 ${i + 1}` }));
+    // 模拟消息类型数据
+    const messageTypes = [
+        { id: 1, name: '问候' },
+        { id: 2, name: '告别' },
+        { id: 3, name: '询问' },
+        { id: 4, name: '通知' },
+        { id: 5, name: '其他' }
+    ];
 
-        const typeSelects = [document.getElementById('typeIdFilter'), document.getElementById('addTypeId'), document.getElementById('editTypeId')];
-        typeSelects.forEach(select => {
-            typeData.forEach(type => {
-                const option = document.createElement('option');
-                option.value = type.id;
-                option.text = type.name;
-                select.appendChild(option);
-            });
-        });
+    window.tableConfig = {
+        tableName: 'quick_message_lang',
+        tableTitle: '快捷回复多语言',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'quick_message_id', generator: id => Math.ceil(id / 2) }, // 模拟外键
+            { name: 'quick_message_type_id', generator: () => messageTypes[Math.floor(Math.random() * messageTypes.length)].id }, // 新增消息类型字段
+            { name: 'language', generator: () => Object.keys(languages)[Math.floor(Math.random() * Object.keys(languages).length)] },
+            { name: 'message', generator: id => `Quick message ${id} in ${Object.values(languages)[Math.floor(Math.random() * Object.values(languages).length)]}` }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量添加', className: 'ant-btn ant-btn-primary', action: 'batchAddMessages' }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'quick_message_id', label: '快捷消息ID', className: 'col-quick-message-id' },
+            {
+                name: 'quick_message_type_id',
+                label: '消息类型',
+                className: 'col-quick-message-type-id',
+                formatter: v => messageTypes.find(t => t.id === v)?.name || v
+            }, // 新增消息类型列
+            { name: 'language', label: '语言', className: 'col-language', formatter: v => languages[v] || v },
+            { name: 'message', label: '消息', className: 'col-message', formatter: v => v.length > 50 ? `${v.substring(0, 50)}...` : v },
+            {
+                name: 'actions',
+                label: '操作',
+                className: 'col-actions',
+                formatter: (_, item) => `
+                    <button class="ant-btn" onclick="editRecord(${item.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+                `
+            }
+        ],
+        filterFields: [
+            {
+                id: 'language',
+                type: 'select',
+                options: [{ value: '', label: '全部语言' }, ...Object.entries(languages).map(([value, label]) => ({ value, label }))],
+                filter: (data, value) => value === '' ? data : data.filter(d => d.language === value)
+            },
+            {
+                id: 'quick_message_type_id',
+                type: 'select',
+                options: [{ value: '', label: '全部类型' }, ...messageTypes.map(t => ({ value: t.id.toString(), label: t.name }))],
+                filter: (data, value) => value === '' ? data : data.filter(d => d.quick_message_type_id === parseInt(value))
+            },
+            {
+                id: 'quick_message_id',
+                type: 'number',
+                placeholder: '快捷消息ID',
+                filter: (data, value) => value ? data.filter(d => d.quick_message_id === parseInt(value)) : data
+            }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'quick_message_id', label: '快捷消息ID', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    {
+                        name: 'quick_message_type_id',
+                        label: '消息类型',
+                        type: 'select',
+                        options: messageTypes.map(t => ({ value: t.id.toString(), label: t.name })),
+                        showInAdd: true,
+                        showInEdit: true,
+                        editableInAdd: true,
+                        editableInEdit: true
+                    }, // 新增消息类型字段
+                    {
+                        name: 'language',
+                        label: '语言',
+                        type: 'select',
+                        options: Object.entries(languages).map(([value, label]) => ({ value, label })),
+                        showInAdd: true,
+                        showInEdit: true,
+                        editableInAdd: true,
+                        editableInEdit: true
+                    },
+                    { name: 'message', label: '消息', type: 'textarea', rows: 5, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            }
+        ]
+    };
 
-        const manageSelects = [document.getElementById('manageIdFilter'), document.getElementById('addManageId'), document.getElementById('editManageId')];
-        manageSelects.forEach(select => {
-            manageData.forEach(manage => {
-                const option = document.createElement('option');
-                option.value = manage.id;
-                option.text = manage.name;
-                select.appendChild(option);
-            });
-        });
+    // 批量添加功能
+    window.batchAddMessages = function() {
+        const modal = document.createElement('div');
+        modal.id = 'batchAddMessagesModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
 
-        const languages = ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'];
-        const messages = {
-            'zh_CN': '你好，这是快捷回复',
-            'en_US': 'Hello, this is a quick reply',
-            'fr_FR': 'Bonjour, ceci est une réponse rapide',
-            'es_ES': 'Hola, esta es una respuesta rápida',
-            'vi_VN': 'Xin chào, đây là phản hồi nhanh',
-            'ru_RU': 'Привет, это быстрый ответ'
-        };
-
-        for (let i = 1; i <= 200; i++) {
-            const message = {
-                id: i,
-                quick_message_type_id: Math.ceil(Math.random() * 15),
-                manage_id: Math.ceil(Math.random() * 15),
-                status: Math.floor(Math.random() * 2),
-                use_count: Math.floor(Math.random() * 100),
-                mark: `快捷回复备注 ${i}`,
-                last_use_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix(),
-                update_time: moment().subtract(Math.floor(Math.random() * 20), 'days').unix(),
-                create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix()
-            };
-            messageData.push(message);
-
-            const lang = languages[Math.floor(Math.random() * languages.length)];
-            langData.push({
-                id: i,
-                quick_message_id: i,
-                language: lang,
-                message: `${messages[lang]} ${i}`
-            });
-        }
-        renderMessageList();
-    }
-
-    function getTypeName(typeId) {
-        const type = typeData.find(t => t.id === typeId);
-        return type ? type.name : typeId;
-    }
-
-    function getManageName(manageId) {
-        const manage = manageData.find(m => m.id === manageId);
-        return manage ? manage.name : manageId;
-    }
-
-    function renderMessageList() {
-        const start = (messagePage - 1) * messagePerPage;
-        const end = start + messagePerPage;
-        const paginatedData = langData.slice(start, end);
-        const listContainer = document.getElementById('message-list');
-        listContainer.innerHTML = '';
-
-        paginatedData.forEach(item => {
-            const message = messageData.find(m => m.id === item.quick_message_id);
-            const statusTag = message.status === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' :
-                '<span class="ant-tag ant-tag-green">启用</span>';
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            itemDiv.style = `border-bottom: 1px solid #ddd;`;
-            itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${item.id}"></div>
-                <div class="col-id">${message.id}</div>
-                <div class="col-quick-message-type-id">${getTypeName(message.quick_message_type_id)}</div>
-                <div class="col-manage-id">${getManageName(message.manage_id)}</div>
-                <div class="col-status">${statusTag}</div>
-                <div class="col-use-count">${message.use_count}</div>
-                <div class="col-mark">${message.mark}</div>
-                <div class="col-language">${item.language}</div>
-                <div class="col-message">${item.message.substring(0, 50)}${item.message.length > 50 ? '...' : ''}</div>
-                <div class="col-last-use-time">${moment.unix(message.last_use_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                <div class="col-actions">
-                    <button class="ant-btn" onclick="editMessage(${item.id})">编辑</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteMessage(${item.id})">删除</button>
+        modal.innerHTML = `
+            <div class="modal-content" style="width: 600px; padding: 24px;">
+                <button class="close-btn" onclick="closeBatchAddMessagesModal()">×</button>
+                <h3 style="margin-bottom: 24px; font-size: 18px;">批量添加快捷回复多语言</h3>
+                <div class="ant-form-item">
+                    <select class="ant-select" id="batchAddTypeId">
+                        ${messageTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                    </select>
                 </div>
-            `;
-            listContainer.appendChild(itemDiv);
-        });
+                <div class="ant-form-item">
+                    <select class="ant-select" id="batchAddLanguage">
+                        ${Object.entries(languages).map(([value, label]) => `<option value="${value}">${label}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="ant-form-item textarea-item">
+                    <textarea id="batchAddContent" style="min-height: 30em;" rows="10" class="ant-input" placeholder="一行一条消息，例如：Hello World"></textarea>
+                </div>
+                <div class="modal-buttons" style="text-align: right; margin-top: 20px;">
+                    <button class="ant-btn" onclick="closeBatchAddMessagesModal()">取消</button>
+                    <button class="ant-btn ant-btn-primary" onclick="saveBatchAddMessages()">批量添加</button>
+                </div>
+            </div>
+        `;
+        modal.style.display = 'block';
+    };
 
-        const totalPages = Math.ceil(langData.length / messagePerPage);
-        document.getElementById('page-info').textContent = `第 ${messagePage} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
-    }
+    window.saveBatchAddMessages = function() {
+        const typeId = parseInt(document.getElementById('batchAddTypeId').value);
+        const language = document.getElementById('batchAddLanguage').value;
+        const content = document.getElementById('batchAddContent').value.trim();
 
-    function applyFilters() {
-        const typeId = document.getElementById('typeIdFilter').value;
-        const manageId = document.getElementById('manageIdFilter').value;
-        const language = document.getElementById('languageFilter').value;
-        const lastUseTime = document.getElementById('lastUseTimeFilter').value;
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
-        let filteredLangData = langData;
-        if (typeId) filteredLangData = filteredLangData.filter(item => messageData.find(m => m.id === item.quick_message_id).quick_message_type_id === parseInt(typeId));
-        if (manageId) filteredLangData = filteredLangData.filter(item => messageData.find(m => m.id === item.quick_message_id).manage_id === parseInt(manageId));
-        if (language) filteredLangData = filteredLangData.filter(item => item.language === language);
-        if (lastUseTime) filteredLangData = filteredLangData.filter(item => moment.unix(messageData.find(m => m.id === item.quick_message_id).last_use_time).isSame(moment(lastUseTime), 'day'));
-        if (startDate) filteredLangData = filteredLangData.filter(item => moment.unix(messageData.find(m => m.id === item.quick_message_id).create_time).isSameOrAfter(startDate));
-        if (endDate) filteredLangData = filteredLangData.filter(item => moment.unix(messageData.find(m => m.id === item.quick_message_id).create_time).isSameOrBefore(endDate));
-
-        messagePage = 1;
-        langData = filteredLangData;
-        renderMessageList();
-    }
-
-    function changePage(delta) {
-        const totalPages = Math.ceil(langData.length / messagePerPage);
-        messagePage += delta;
-        if (messagePage < 1) messagePage = 1;
-        if (messagePage > totalPages) messagePage = totalPages;
-        renderMessageList();
-    }
-
-    function jumpToPage() {
-        const page = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(langData.length / messagePerPage);
-        if (page >= 1 && page <= totalPages) {
-            messagePage = page;
-            renderMessageList();
-        } else {
-            alert('请输入有效的页码');
-        }
-    }
-
-    function changePerPage() {
-        messagePerPage = parseInt(document.getElementById('perPage').value);
-        messagePage = 1;
-        renderMessageList();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    function setupTabs(modalId) {
-        const tabButtons = document.querySelectorAll(`#${modalId} .ant-tabs-tab`);
-        const tabPanes = document.querySelectorAll(`#${modalId} .ant-tabs-tabpane`);
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
-                button.classList.add('ant-tabs-tab-active');
-                const tabId = button.getAttribute('data-tab');
-                tabPanes.forEach(pane => {
-                    pane.style.display = pane.id === tabId ? 'block' : 'none';
-                });
-                document.querySelector(`#${modalId} .ant-tabs-ink-bar`).style.left = `${button.offsetLeft}px`;
-                document.querySelector(`#${modalId} .ant-tabs-ink-bar`).style.width = `${button.offsetWidth}px`;
-            });
-        });
-        tabButtons[0].classList.add('ant-tabs-tab-active');
-        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
-    }
-
-    function addMessage() {
-        document.getElementById('addTypeId').value = '';
-        document.getElementById('addManageId').value = '';
-        document.getElementById('addStatus').value = '0';
-        document.getElementById('addUseCount').value = '0';
-        document.getElementById('addMark').value = '';
-        document.getElementById('addLastUseTime').value = '';
-        document.getElementById('addLanguage').value = 'zh_CN';
-        document.getElementById('addMessage').value = '';
-        document.getElementById('addModal').style.display = 'block';
-        setupTabs('addModal');
-    }
-
-    function editMessage(langId) {
-        const langItem = langData.find(l => l.id === langId);
-        const message = messageData.find(m => m.id === langItem.quick_message_id);
-        editLangId = langId;
-
-        document.getElementById('editId').value = message.id;
-        document.getElementById('editTypeId').value = message.quick_message_type_id;
-        document.getElementById('editManageId').value = message.manage_id;
-        document.getElementById('editStatus').value = message.status;
-        document.getElementById('editUseCount').value = message.use_count;
-        document.getElementById('editMark').value = message.mark;
-        document.getElementById('editLastUseTime').value = moment.unix(message.last_use_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('editUpdateTime').value = moment.unix(message.update_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('editCreateTime').value = moment.unix(message.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('editLanguage').value = langItem.language;
-        document.getElementById('editMessage').value = langItem.message;
-
-        document.getElementById('editModal').style.display = 'block';
-        setupTabs('editModal');
-    }
-
-    function saveAdd() {
-        const newMessage = {
-            id: messageData.length + 1,
-            quick_message_type_id: parseInt(document.getElementById('addTypeId').value),
-            manage_id: parseInt(document.getElementById('addManageId').value),
-            status: parseInt(document.getElementById('addStatus').value),
-            use_count: parseInt(document.getElementById('addUseCount').value),
-            mark: document.getElementById('addMark').value,
-            last_use_time: document.getElementById('addLastUseTime').value ? moment(document.getElementById('addLastUseTime').value).unix() : 0,
-            update_time: moment().unix(),
-            create_time: moment().unix()
-        };
-        messageData.push(newMessage);
-
-        const newLang = {
-            id: langData.length + 1,
-            quick_message_id: newMessage.id,
-            language: document.getElementById('addLanguage').value,
-            message: document.getElementById('addMessage').value
-        };
-        langData.push(newLang);
-
-        closeAddModal();
-        renderMessageList();
-    }
-
-    function saveEdit() {
-        const langItem = langData.find(l => l.id === editLangId);
-        const message = messageData.find(m => m.id === langItem.quick_message_id);
-
-        message.quick_message_type_id = parseInt(document.getElementById('editTypeId').value);
-        message.manage_id = parseInt(document.getElementById('editManageId').value);
-        message.status = parseInt(document.getElementById('editStatus').value);
-        message.use_count = parseInt(document.getElementById('editUseCount').value);
-        message.mark = document.getElementById('editMark').value;
-        message.last_use_time = document.getElementById('editLastUseTime').value ? moment(document.getElementById('editLastUseTime').value).unix() : 0;
-        message.update_time = moment().unix();
-
-        langItem.message = document.getElementById('editMessage').value;
-
-        closeEditModal();
-        renderMessageList();
-    }
-
-    function deleteMessage(langId) {
-        if (confirm('确定要删除此快捷回复吗？')) {
-            const langItem = langData.find(l => l.id === langId);
-            messageData = messageData.filter(m => m.id !== langItem.quick_message_id);
-            langData = langData.filter(l => l.quick_message_id !== langItem.quick_message_id);
-            renderMessageList();
-        }
-    }
-
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的快捷回复');
+        if (!content) {
+            alert('请输入至少一条消息');
             return;
         }
-        if (confirm(`确定要删除 ${selectedIds.length} 个快捷回复吗？`)) {
-            const messageIdsToDelete = selectedIds.map(id => langData.find(l => l.id === id).quick_message_id);
-            messageData = messageData.filter(m => !messageIdsToDelete.includes(m.id));
-            langData = langData.filter(l => !selectedIds.includes(l.id));
-            renderMessageList();
+
+        const messages = content.split('\n').filter(line => line.trim() !== '');
+        if (messages.length === 0) {
+            alert('请输入有效的消息内容');
+            return;
         }
-    }
 
-    function closeAddModal() {
-        document.getElementById('addModal').style.display = 'none';
-    }
-
-    function closeEditModal() {
-        document.getElementById('editModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        console.log('Page loaded, initializing...');
-        w3.includeHTML(() => {
-            console.log('External HTML included');
-            initMenus();
-            fetchData();
+        const newRecords = messages.map((message, index) => {
+            const quickMessageId = tableData.length + index + 1; // 简单模拟，每条消息一个新 quick_message_id
+            return {
+                id: tableData.length + index + 1,
+                quick_message_id: quickMessageId,
+                quick_message_type_id: typeId, // 新增消息类型
+                language: language,
+                message: message.trim()
+            };
         });
+
+        tableData.push(...newRecords);
+        closeBatchAddMessagesModal();
+        renderTableList();
     };
+
+    window.closeBatchAddMessagesModal = function() {
+        const modal = document.getElementById('batchAddMessagesModal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        w3.includeHTML(() => {
+            initMenus();
+            initTable(window.tableConfig);
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
 </script>
 </body>
 </html>
