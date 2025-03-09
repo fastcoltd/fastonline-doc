@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FASTRESP - 需求信息</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css"/>
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
     <script src="_opt.js"></script>
+    <script src="_img.js"></script>
     <style>
         .col-checkbox { width: 5%; min-width: 50px; }
         .col-id { width: 8%; min-width: 60px; }
@@ -25,6 +26,11 @@
         .col-quantity { width: 8%; min-width: 60px; }
         .col-create-time { width: 12%; min-width: 100px; }
         .col-actions { width: 18%; min-width: 100px; }
+        .col-store { width: 15%; min-width: 120px; }
+        .col-bid-price { width: 12%; min-width: 100px; }
+        .col-bid-images { width: 25%; min-width: 200px; }
+        .col-field-info { width: 20%; min-width: 150px; }
+        .col-bid-description { width: 20%; min-width: 150px; }
     </style>
 </head>
 <body>
@@ -40,7 +46,7 @@
                             <div class="ant-tabs-nav-list">
                                 <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('demand.html')">
                                     <span class="ant-tabs-tab-btn">需求信息</span>
-                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 80px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -63,6 +69,7 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
+
     <!-- 审核弹窗 -->
     <div id="reviewModal" class="modal">
         <div class="modal-content" style="width: 80%; max-height: 90vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
@@ -98,8 +105,44 @@
             </div>
         </div>
     </div>
+
     <!-- 预览弹窗 -->
     <div id="previewModal" class="modal"></div>
+
+    <!-- 图片放大弹窗 -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">❮</button>
+                <img id="enlargedImage" src="" alt="Enlarged Image">
+                <button class="carousel-btn right" onclick="shiftImage(1)">❯</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 竞标者列表弹窗 -->
+    <div id="biddersModal" class="modal">
+        <div class="modal-content" style="width: 80%; max-height: 90vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <button class="close-btn" onclick="closeBiddersModal()">×</button>
+            <h3 id="biddersModalTitle">竞标者列表</h3>
+            <div id="biddersContent" style="padding: 16px;">
+                <!-- 需求信息板块 -->
+                <div id="demandInfo" style="margin-bottom: 20px; padding: 16px; background: #fafafa; border-radius: 8px;">
+                    <h4 style="margin-bottom: 12px; color: #333;">需求信息</h4>
+                    <div id="demandInfoContent"></div>
+                </div>
+                <!-- 竞标者列表板块 -->
+                <div id="biddersList" style="padding: 16px; background: #fff; border-radius: 8px; border: 1px solid #eee;">
+                    <h4 style="margin-bottom: 12px; color: #333;">竞标者列表</h4>
+                    <div class="task-list" id="biddersTable" style="max-height: 50vh; overflow-y: auto;">
+                        <div class="table-header" style="background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;"></div>
+                        <div id="biddersTableContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -118,7 +161,8 @@
     const brandNames = ['Nike', 'Adidas', 'Apple', 'Samsung', 'Sony'];
     const serviceNames = ['技术支持', '物流服务', '客户咨询', '售后维修', '支付支持'];
     const storeNames = ['时尚服饰店', '电子产品店', '美食天地', '家居生活馆', '运动装备店'];
-    let i = 0
+
+    let i = 0;
     const statusList = [
         {value: i++, label: '待审核'},
         {value: i++, label: '通过审核'},
@@ -137,12 +181,10 @@
         {value: i++, label: '已废弃'}
     ];
 
-    function getStatusMap(){
+    function getStatusMap() {
         let statusMap = {};
-        statusList.forEach(i =>{
-            statusMap[i.value] = i.label
-        })
-        return statusMap
+        statusList.forEach(i => statusMap[i.value] = i.label);
+        return statusMap;
     }
 
     // 多语言样本数据
@@ -173,13 +215,13 @@
         }
     };
 
+    // 表格配置
     window.tableConfig = {
         tableName: 'demand',
         tableTitle: '需求信息',
         sampleCount: 200,
         defaultPerPage: 20,
         fields: [
-            // 主表字段
             { name: 'id', isSystemField: true, generator: id => id },
             { name: 'status', generator: () => randomInt(0, statusList.length - 1) },
             { name: 'user_id', generator: () => randomInt(1, 50) },
@@ -201,7 +243,6 @@
             { name: 'amount', generator: () => randomInt(0, 1) ? randomDecimal(50, 1000, 2) : 0 },
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'confirm_time', isSystemField: true, generator: () => randomInt(0, 1) ? moment().subtract(randomInt(1, 300), 'days').unix() : 0 },
-            // 多语言表字段
             { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) },
             { name: 'demand_id', isLangField: true, generator: id => id },
             { name: 'language', isLangField: true, generator: (id, lang) => lang },
@@ -230,7 +271,7 @@
             { name: 'status', label: '状态', className: 'col-status', formatter: v => {
                     const statusMap = getStatusMap();
                     const colorMap = { 0: 'orange', 1: 'green', 2: 'red', 3: 'blue', 4: 'purple', 5: 'green', 6: 'gray', 7: 'gray', 8: 'red' };
-                    return `<span class="ant-tag ant-tag-${colorMap[v]}">${statusMap[v]}</span>`;
+                    return `<span class="ant-tag ant-tag-${colorMap[v] || 'default'}">${statusMap[v]}</span>`;
                 }},
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'demand_name', label: '需求名称', className: 'col-demand-name', isLangField: true },
@@ -243,10 +284,10 @@
                 label: '操作',
                 className: 'col-actions',
                 formatter: (_, item) => `
-                    <button class="ant-btn ant-btn-primary" onclick="window.location.href='demand_bid.html'" style="margin-right: 8px;">竞标者</button>
-                    <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
-                    ${item.status === 0 ? `<button class="ant-btn ant-btn-primary" onclick="showReviewModal(${item.id})">审核</button>` : `<button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>`}
-                `
+        ${item.status >= 5 ? `<button class="ant-btn ant-btn-ghost" onclick="showBiddersModal(${item.id})" style="margin-right: 8px;">竞标者</button>` : ''}
+        <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+        ${item.status === 0 ? `<button class="ant-btn ant-btn-primary" onclick="showReviewModal(${item.id})">审核</button>` : `<button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>`}
+    `
             }
         ],
         filterFields: [
@@ -315,15 +356,7 @@
         ]
     };
 
-    // 支持 Enter 键触发查询
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
-            applyFilters();
-        }
-    });
-
     // 显示审核弹窗
-    let currentReviewId = null;
     function showReviewModal(id) {
         const demand = tableData.find(item => item.id === id);
         if (!demand) return;
@@ -333,15 +366,9 @@
         const modal = document.getElementById('reviewModal');
         const comparisonContent = document.getElementById('comparisonContent');
 
-        // 获取当前语言版本（以 zh_CN 为例）
         const currentLang = tableLangData.find(lang => lang.demand_id === id && lang.language === 'zh_CN') || {};
+        const onlineLang = tableLangData.filter(lang => lang.demand_id === id && tableData.find(d => d.id === lang.demand_id).status === 1).sort((a, b) => b.version - a.version)[0] || null;
 
-        // 查找线上版本（状态为“通过审核”的最高版本）
-        const onlineLang = tableLangData
-            .filter(lang => lang.demand_id === id && tableData.find(d => d.id === lang.demand_id).status === 1)
-            .sort((a, b) => b.version - a.version)[0] || null;
-
-        // 定义对比字段
         const reviewFields = [
             { name: 'user_id', label: '用户', formatter: v => `${userNames[v % userNames.length]} (${v})` },
             { name: 'brand_id', label: '品牌', formatter: v => `${brandNames[v % brandNames.length]} (${v})` },
@@ -366,15 +393,15 @@
             const isDifferent = formattedOnline !== formattedCurrent;
 
             return `
-                <div style="display: flex; padding: 12px; border-bottom: 1px solid #eee; align-items: center; ${isDifferent ? 'background: #fff7e6;' : ''}">
-                    <div style="width: 15%; padding-right: 12px; font-weight: bold; color: #555;">${field.label}</div>
-                    <div style="flex: 1; padding-right: 12px;">${formattedOnline}</div>
-                    <div style="flex: 1; padding-right: 12px; ${isDifferent ? 'color: red;' : 'color: green;'}">${formattedCurrent}</div>
-                    <div style="width: 10%; text-align: center;">
-                        <button class="ant-btn ant-btn-link" style="${isDifferent ? 'color: red;' : 'color: green;'}" onclick="showPreviewModal('${field.name}', '${escapeHtml(String(formattedOnline))}', '${escapeHtml(String(formattedCurrent))}', false)">对比</button>
-                    </div>
+            <div style="display: flex; padding: 12px; border-bottom: 1px solid #eee; align-items: center; ${isDifferent ? 'background: #fff7e6;' : ''}">
+                <div style="width: 15%; padding-right: 12px; font-weight: bold; color: #555;">${field.label}</div>
+                <div style="flex: 1; padding-right: 12px;">${formattedOnline}</div>
+                <div style="flex: 1; padding-right: 12px; ${isDifferent ? 'color: red;' : 'color: green;'}">${formattedCurrent}</div>
+                <div style="width: 10%; text-align: center;">
+                    <button class="ant-btn ant-btn-link" style="${isDifferent ? 'color: red;' : 'color: green;'}" onclick="showPreviewModal('${field.name}', '${escapeHtml(String(formattedOnline))}', '${escapeHtml(String(formattedCurrent))}')">对比</button>
                 </div>
-            `;
+            </div>
+        `;
         }).join('');
 
         comparisonContent.innerHTML = comparisonHTML;
@@ -390,8 +417,7 @@
 
     // 关闭审核弹窗
     function closeReviewModal() {
-        const modal = document.getElementById('reviewModal');
-        if (modal) modal.style.display = 'none';
+        document.getElementById('reviewModal').style.display = 'none';
     }
 
     // 提交审核
@@ -402,61 +428,154 @@
         const langEntry = tableLangData.find(lang => lang.demand_id === currentReviewId && lang.language === 'zh_CN');
 
         if (demand && langEntry) {
-            if (status === 2 && !siteReply) {
-                alert('请填写拒绝原因');
-                return;
-            }
-
+            if (status === 2 && !siteReply) return alert('请填写拒绝原因');
             demand.status = status;
-            if (status === 2 && siteReply) {
-                langEntry.site_reply = siteReply; // 拒绝时保存回复
-            }
+            if (status === 2 && siteReply) langEntry.site_reply = siteReply;
             langEntry.update_time = moment().unix();
         }
-
         closeReviewModal();
-        renderTable();
+        renderTableList();
     }
 
     // 显示预览弹窗
-    function showPreviewModal(fieldName, oldValue, newValue, isImageField = false) {
+    function showPreviewModal(fieldName, oldValue, newValue) {
         const modal = document.getElementById('previewModal');
         const contentHeight = Math.min(Math.max(oldValue.length, newValue.length) * 20, window.innerHeight * 0.8);
         let oldDisplay = unescapeHtml(oldValue);
         let newDisplay = unescapeHtml(newValue);
 
         modal.innerHTML = `
-            <div class="modal-content" style="width: 70%; height: ${contentHeight}px; min-height: 20vh; max-height: 80vh; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                <button class="close-btn" onclick="closePreviewModal()">×</button>
-                <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">${fieldName} 预览</h3>
-                <div style="display: flex; height: calc(100% - 40px);">
-                    <div style="flex: 1; padding: 12px; overflow-y: auto; border-right: 1px solid #ddd; background: #fafafa;">
-                        <strong style="color: #555;">旧版本:</strong>
-                        <div style="margin-top: 8px;">${oldDisplay}</div>
-                    </div>
-                    <div style="flex: 1; padding: 12px; overflow-y: auto; background: #fff;">
-                        <strong style="color: #555;">新版本:</strong>
-                        <div style="margin-top: 8px;">${newDisplay}</div>
-                    </div>
+        <div class="modal-content" style="width: 70%; height: ${contentHeight}px; min-height: 20vh; max-height: 80vh; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <button class="close-btn" onclick="closePreviewModal()">×</button>
+            <h3 style="padding: 16px; border-bottom: 1px solid #eee; margin: 0;">${fieldName} 预览</h3>
+            <div style="display: flex; height: calc(100% - 40px);">
+                <div style="flex: 1; padding: 12px; overflow-y: auto; border-right: 1px solid #ddd; background: #fafafa;">
+                    <strong style="color: #555;">旧版本:</strong>
+                    <div style="margin-top: 8px;">${oldDisplay}</div>
+                </div>
+                <div style="flex: 1; padding: 12px; overflow-y: auto; background: #fff;">
+                    <strong style="color: #555;">新版本:</strong>
+                    <div style="margin-top: 8px;">${newDisplay}</div>
                 </div>
             </div>
-        `;
+        </div>
+    `;
         modal.style.display = 'block';
     }
 
     // 关闭预览弹窗
     function closePreviewModal() {
-        const modal = document.getElementById('previewModal');
-        if (modal) modal.style.display = 'none';
+        document.getElementById('previewModal').style.display = 'none';
+    }
+
+    // 显示竞标者列表弹窗
+    function showBiddersModal(demandId) {
+        const demand = tableData.find(item => item.id === demandId);
+        if (!demand) return;
+
+        const modal = document.getElementById('biddersModal');
+        const title = document.getElementById('biddersModalTitle');
+        const demandInfoContent = document.getElementById('demandInfoContent');
+        const biddersTableHeader = document.getElementById('biddersTable').querySelector('.table-header');
+        const biddersTableContent = document.getElementById('biddersTableContent');
+
+        title.textContent = `竞标者列表 (需求 ID: ${demandId})`;
+
+        // 渲染需求信息
+        const langData = tableLangData.find(l => l.demand_id === demandId && l.language === 'zh_CN') || {};
+        demandInfoContent.innerHTML = `
+        <p><strong>需求名称:</strong> ${langData.demand_name || 'N/A'}
+        <strong>用户:</strong> ${userNames[demand.user_id % userNames.length]} (${demand.user_id})
+        <strong>品牌:</strong> ${brandNames[demand.brand_id % brandNames.length]} (${demand.brand_id})
+        <strong>服务:</strong> ${serviceNames[demand.services_id % serviceNames.length]} (${demand.services_id})
+        <strong>价格范围:</strong> $${demand.price_from.toFixed(2)} - $${demand.price_to.toFixed(2)}
+        <strong>数量:</strong> ${demand.quantity}</p>
+    `;
+
+        // 定义竞标者列表字段
+        const bidderFields = [
+            { name: 'id', label: 'ID', className: 'col-id', width: '8%' },
+            { name: 'store', label: '店铺', className: 'col-store', width: '15%', formatter: v => `${storeNames[v % storeNames.length]} (${v})` },
+            { name: 'bid_price', label: '竞标价格', className: 'col-bid-price', width: '12%', formatter: v => `$${v.toFixed(2)}` },
+            { name: 'bid_images', label: '竞标图片', className: 'col-bid-images', width: '25%', formatter: v => v.map(url => `<img src="${url}" style="width: 50px; height: 50px; margin-right: 5px; cursor: pointer;" onclick="enlargeImage(null, 0, ${JSON.stringify(v)})">`).join('') },
+            { name: 'field_info', label: '字段信息', className: 'col-field-info', width: '15%' }, // 调整宽度以适应新列
+            { name: 'bid_description', label: '竞标描述', className: 'col-bid-description', width: '15%' }, // 调整宽度以适应新列
+            { name: 'bid_status', label: '中标状态', className: 'col-status', width: '10%', formatter: v => {
+                    const statusMap = { 0: '已投标', 1: '中标', 2: '未中标' };
+                    const colorMap = { 0: 'blue', 1: 'green', 2: 'red' };
+                    return `<span class="ant-tag ant-tag-${colorMap[v]}">${statusMap[v]}</span>`;
+                }}
+        ];
+
+        // 渲染表头
+        biddersTableHeader.innerHTML = '';
+        biddersTableHeader.style = 'padding: 10px; display: flex; position: sticky; top: 0; z-index: 1; background: #f5f5f5;'; // 修改样式
+        bidderFields.forEach(field => {
+            const div = document.createElement('div');
+            div.className = field.className;
+            div.style.width = field.width;
+            div.textContent = field.label;
+            biddersTableHeader.appendChild(div);
+        });
+
+        // 生成随机竞标者数据，新增 bid_status
+        const bidderCount = randomInt(5, 10);
+        const biddersData = [];
+        for (let i = 1; i <= bidderCount; i++) {
+            const bidder = {
+                id: i,
+                store: randomInt(1, 15),
+                bid_price: randomDecimal(demand.price_from, demand.price_to, 2),
+                bid_images: Array.from({ length: randomInt(2, 3) }, () => getRandomImage('default')),
+                field_info: `字段信息 #${i} - 规格: ${randomInt(1, 10)}x${randomInt(1, 10)}`,
+                bid_description: `竞标描述 #${i}: 提供高质量产品，交货期${randomInt(7, 30)}天。`,
+                bid_status: randomInt(0, 2) // 0: 已投标, 1: 中标, 2: 未中标
+            };
+            biddersData.push(bidder);
+        }
+
+        // 渲染竞标者列表，检查 bid_status 并设置绿色背景
+        biddersTableContent.innerHTML = '';
+        biddersData.forEach(bidder => {
+            const row = document.createElement('div');
+            row.className = 'task-item';
+            row.style = `border-bottom: 1px solid #ddd; display: flex; padding: 10px; ${bidder.bid_status === 1 ? 'background: #e6ffe6;' : ''}`; // 中标时绿色背景
+            let rowHtml = '';
+            bidderFields.forEach(field => {
+                const value = bidder[field.name];
+                rowHtml += `<div class="${field.className}" style="width: ${field.width}">${field.formatter ? field.formatter(value) : value}</div>`;
+            });
+            row.innerHTML = rowHtml;
+            biddersTableContent.appendChild(row);
+        });
+
+        modal.style.display = 'block';
+    }
+
+    // 关闭竞标者列表弹窗
+    function closeBiddersModal() {
+        document.getElementById('biddersModal').style.display = 'none';
     }
 
     // HTML 转义和反转义
     function escapeHtml(text) {
-        return text.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, '\'');
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
     }
     function unescapeHtml(html) {
-        return html.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, "'");
+        return html.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#x27;/g, "'");
     }
+
+    // 初始化
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initMenus();
+            initTable(window.tableConfig);
+        });
+    };
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') applyFilters();
+    });
 </script>
-</body>
 </html>
