@@ -52,7 +52,7 @@
         .col-created { flex: 0 0 120px; }
         .col-status { flex: 0 0 80px; }
         .col-follower { flex: 0 0 80px; }
-        .col-follow-time { flex: 0 0 100px; }
+        .col-follow-time { flex: 0 0 120px; } /* 时长 */
         .col-priority { flex: 0 0 100px; } /* 优先级 */
         .col-action { flex: 0 0 80px; }
         .task-item button {
@@ -125,7 +125,7 @@
     let sortOrder = 'asc';
     const followers = ['李明', '王芳', '张强', '赵丽', '陈娜', null]; // 财务人员，包含 null 表示无跟进者
 
-    // 计算跟进时间
+    // 计算时长
     function getFollowTime(createdAt) {
         const now = moment();
         const created = moment(createdAt, 'YYYY-MM-DD HH:mm');
@@ -137,7 +137,7 @@
         return { days, hours, minutes, totalMinutes: duration.asMinutes() };
     }
 
-    // 渲染跟进时间颜色
+    // 渲染时长颜色
     function getFollowTimeColor(totalMinutes) {
         if (totalMinutes < 60) return '#52c41a'; // 绿色
         if (totalMinutes < 1440) return '#fa8c16'; // 橙色
@@ -257,7 +257,7 @@
                 <div class="col-created">创建时间</div>
                 <div class="col-status">状态</div>
                 <div class="col-follower">跟进者</div>
-                <div class="col-follow-time">跟进时间 <span class="sort-btn" onclick="sortTasks('followTime')">排序</span></div>
+                <div class="col-follow-time">时长 <span class="sort-btn" onclick="sortTasks('followTime')">排序</span></div>
                 <div class="col-priority">优先级 <span class="sort-btn" onclick="sortTasks('priority')">排序</span></div>
                 <div class="col-action">操作</div>
             </div>
