@@ -3,152 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Popover 聊天室</title>
+    <title>Telegram 风格聊天框</title>
     <!-- 引入 Ant Design CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css" integrity="sha512-MXKWv8T2M8D48kMxhKdj5Z/WVgqZ0k2q3eb0vRzwHgQv+0S4KScp6qXTLvovTjE8FOVR01D+tK9N7IWWKyS99dg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        .chat-container {
+        .chat-app {
+            display: flex;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            border: 1px solid #e8e8e8;
+            background: #fff;
+        }
+        .contact-list {
             width: 300px;
-            height: 400px;
+            background: #fafafa;
+            border-right: 1px solid #e8e8e8;
+            overflow-y: auto;
+        }
+        .contact-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .contact-item:hover, .contact-item.active {
+            background: #e6f7ff;
+        }
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #52c41a;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
+        }
+        .chat-area {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            border: 1px solid #f0f0f0;
-            border-radius: 4px;
+        }
+        .chat-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
         }
         .chat-messages {
             flex: 1;
+            padding: 20px;
             overflow-y: auto;
-            padding: 16px;
-            background: #fafafa;
+            background: #f0f2f5;
+        }
+        .message-wrapper {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .message-sent {
+            flex-direction: row-reverse;
+        }
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .message-sent .message-bubble {
+            background: #1890ff;
+            color: #fff;
+        }
+        .message-received .message-bubble {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+        }
+        .message-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+            text-align: right;
+        }
+        .message-sent .message-time {
+            color: #d9efff;
+        }
+        .message-avatar {
+            margin: 0 8px;
+        }
+        .message-image {
+            max-width: 200px;
+            border-radius: 8px;
+            margin-top: 4px;
+        }
+        .message-link {
+            color: #1890ff;
+            text-decoration: underline;
+            margin-top: 4px;
         }
         .chat-input-area {
             padding: 16px;
-            border-top: 1px solid #f0f0f0;
+            border-top: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
             background: #fff;
         }
     </style>
 </head>
 <body>
-<div class="ant-popover" style="position: relative; display: inline-block;">
-    <!-- 触发按钮 -->
-    <button class="ant-btn ant-btn-primary" id="chatTrigger">
-        打开聊天室
-    </button>
-
-    <!-- Popover 内容 -->
-    <div class="ant-popover-content" id="chatPopover" style="display: none; position: absolute; bottom: 40px; left: 0;">
-        <div class="ant-popover-inner">
-            <div class="ant-popover-inner-content">
-                <div class="chat-container">
-                    <!-- 消息列表 -->
-                    <div class="chat-messages">
-                        <div class="ant-comment">
-                            <div class="ant-comment-inner">
-                                <div class="ant-comment-avatar">
-                                        <span class="ant-avatar ant-avatar-circle" style="width: 32px; height: 32px; line-height: 32px;">
-                                            张
-                                        </span>
-                                </div>
-                                <div class="ant-comment-content">
-                                    <div class="ant-comment-content-author">
-                                        <span class="ant-comment-content-author-name">张三</span>
-                                        <span class="ant-comment-content-author-time">今天 10:30</span>
-                                    </div>
-                                    <div class="ant-comment-content-detail">
-                                        <p>大家好！今天天气不错啊。</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="ant-comment">
-                            <div class="ant-comment-inner">
-                                <div class="ant-comment-avatar">
-                                        <span class="ant-avatar ant-avatar-circle" style="width: 32px; height: 32px; line-height: 32px;">
-                                            李
-                                        </span>
-                                </div>
-                                <div class="ant-comment-content">
-                                    <div class="ant-comment-content-author">
-                                        <span class="ant-comment-content-author-name">李四</span>
-                                        <span class="ant-comment-content-author-time">今天 10:32</span>
-                                    </div>
-                                    <div class="ant-comment-content-detail">
-                                        <p>是的，阳光明媚，很适合出去走走。</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="ant-comment">
-                            <div class="ant-comment-inner">
-                                <div class="ant-comment-avatar">
-                                        <span class="ant-avatar ant-avatar-circle" style="width: 32px; height: 32px; line-height: 32px;">
-                                            王
-                                        </span>
-                                </div>
-                                <div class="ant-comment-content">
-                                    <div class="ant-comment-content-author">
-                                        <span class="ant-comment-content-author-name">王五</span>
-                                        <span class="ant-comment-content-author-time">今天 10:35</span>
-                                    </div>
-                                    <div class="ant-comment-content-detail">
-                                        <p>你们周末有什么计划吗？</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<div class="chat-app">
+    <!-- 左侧联系人列表 -->
+    <div class="contact-list">
+        <div class="ant-list ant-list-bordered">
+            <div class="contact-item active" onclick="switchChat('张三')">
+                <div class="ant-list-item-meta">
+                    <div class="ant-list-item-meta-avatar">
+                        <span class="ant-avatar ant-avatar-circle" style="width: 40px; height: 40px; line-height: 40px;">张</span>
                     </div>
-
-                    <!-- 输入区域 -->
-                    <div class="chat-input-area">
-                        <div class="ant-row ant-form-item" style="margin-bottom: 8px;">
-                            <input type="text" class="ant-input" placeholder="输入消息..." id="messageInput">
-                        </div>
-                        <button class="ant-btn ant-btn-primary" style="width: 100%;" onclick="sendMessage()">
-                            发送
-                        </button>
+                    <div class="ant-list-item-meta-content">
+                        <h4 class="ant-list-item-meta-title">张三<span class="online-dot"></span></h4>
+                        <div class="ant-list-item-meta-description">你看这图怎么样？</div>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-item" onclick="switchChat('李四')">
+                <div class="ant-list-item-meta">
+                    <div class="ant-list-item-meta-avatar">
+                        <span class="ant-avatar ant-avatar-circle" style="width: 40px; height: 40px; line-height: 40px;">李</span>
+                    </div>
+                    <div class="ant-list-item-meta-content">
+                        <h4 class="ant-list-item-meta-title">李四</h4>
+                        <div class="ant-list-item-meta-description">周末有空吗？</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- 右侧聊天区域 -->
+    <div class="chat-area">
+        <!-- 聊天头部 -->
+        <div class="chat-header">
+            <span class="ant-avatar ant-avatar-circle" style="width: 32px; height: 32px; line-height: 32px; margin-right: 8px;">张</span>
+            <h3 class="ant-typography" id="chatTitle">张三</h3>
+            <span class="online-dot" style="margin-left: 8px;"></span>
+        </div>
+
+        <!-- 消息列表 -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="message-wrapper message-received">
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">张</span>
+                <div class="message-bubble">
+                    <p>嘿，最近怎么样啊？</p>
+                    <div class="message-time">10:30</div>
+                </div>
+            </div>
+            <div class="message-wrapper message-sent">
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">我</span>
+                <div class="message-bubble">
+                    <p>还行吧，你呢？</p>
+                    <div class="message-time">10:32</div>
+                </div>
+            </div>
+            <div class="message-wrapper message-received">
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">张</span>
+                <div class="message-bubble">
+                    <p>我也还好，看看这张图咋样？</p>
+                    <img class="message-image" src="https://picsum.photos/200/150" alt="示例图片">
+                    <div class="message-time">10:33</div>
+                </div>
+            </div>
+            <div class="message-wrapper message-sent">
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">我</span>
+                <div class="message-bubble">
+                    <p>不错啊，挺好看的！</p>
+                    <div class="message-time">10:34</div>
+                </div>
+            </div>
+            <div class="message-wrapper message-received">
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">张</span>
+                <div class="message-bubble">
+                    <p>哈哈，给你个链接瞧瞧</p>
+                    <a href="https://example.com" target="_blank" class="message-link">https://example.com</a>
+                    <div class="message-time">10:35</div>
+                </div>
+            </div>
+            <div class="message-wrapper message-sent">
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">我</span>
+                <div class="message-bubble">
+                    <p>我去，这网站牛逼！</p>
+                    <div class="message-time">10:36</div>
+                </div>
+            </div>
+            <div class="message-wrapper message-received">
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">张</span>
+                <div class="message-bubble">
+                    <p>再给你发张图</p>
+                    <img class="message-image" src="https://picsum.photos/200/100" alt="另一张图">
+                    <div class="message-time">10:37</div>
+                </div>
+            </div>
+            <div class="message-wrapper message-sent">
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">我</span>
+                <div class="message-bubble">
+                    <p>卧槽，太美了！</p>
+                    <div class="message-time">10:38</div>
+                </div>
+            </div>
+            <div class="message-wrapper message-received">
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">张</span>
+                <div class="message-bubble">
+                    <p>周末要不要一起出去玩？</p>
+                    <div class="message-time">10:39</div>
+                </div>
+            </div>
+            <div class="message-wrapper message-sent">
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">我</span>
+                <div class="message-bubble">
+                    <p>好啊，定个地方吧！</p>
+                    <div class="message-time">10:40</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="chat-input-area">
+            <input type="text" class="ant-input" placeholder="输入消息..." id="messageInput" style="flex: 1; margin-right: 8px;">
+            <button class="ant-btn ant-btn-primary" onclick="sendMessage()">发送</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    // 简单的显示/隐藏逻辑
-    const trigger = document.getElementById('chatTrigger');
-    const popover = document.getElementById('chatPopover');
+    // 当前聊天对象
+    let currentChat = '张三';
 
-    trigger.addEventListener('click', () => {
-        popover.style.display = popover.style.display === 'none' ? 'block' : 'none';
-    });
-
-    // 发送消息功能
+    // 发送消息
     function sendMessage() {
         const input = document.getElementById('messageInput');
+        const messagesContainer = document.getElementById('chatMessages');
         const message = input.value.trim();
+
         if (!message) return;
 
-        const messagesContainer = document.querySelector('.chat-messages');
         const newMessage = document.createElement('div');
-        newMessage.className = 'ant-comment';
+        newMessage.className = 'message-wrapper message-sent';
         newMessage.innerHTML = `
-                <div class="ant-comment-inner">
-                    <div class="ant-comment-avatar">
-                        <span class="ant-avatar ant-avatar-circle" style="width: 32px; height: 32px; line-height: 32px;">
-                            我
-                        </span>
-                    </div>
-                    <div class="ant-comment-content">
-                        <div class="ant-comment-content-author">
-                            <span class="ant-comment-content-author-name">我</span>
-                            <span class="ant-comment-content-author-time">${new Date().toLocaleTimeString()}</span>
-                        </div>
-                        <div class="ant-comment-content-detail">
-                            <p>${message}</p>
-                        </div>
-                    </div>
+                <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">我</span>
+                <div class="message-bubble">
+                    <p>${message}</p>
+                    <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                 </div>
             `;
         messagesContainer.appendChild(newMessage);
@@ -156,11 +258,29 @@
         input.value = '';
     }
 
-    // 按 Enter 发送消息
+    // 切换聊天
+    function switchChat(name) {
+        const items = document.querySelectorAll('.contact-item');
+        items.forEach(item => item.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        currentChat = name;
+        document.getElementById('chatTitle').textContent = name;
+        const messagesContainer = document.getElementById('chatMessages');
+        messagesContainer.innerHTML = `
+                <div class="message-wrapper message-received">
+                    <span class="ant-avatar ant-avatar-circle message-avatar" style="width: 32px; height: 32px; line-height: 32px;">${name[0]}</span>
+                    <div class="message-bubble">
+                        <p>嗨，我是${name}，有什么我可以帮你的？</p>
+                        <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    </div>
+                </div>
+            `;
+    }
+
+    // 回车发送
     document.getElementById('messageInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
+        if (e.key === 'Enter') sendMessage();
     });
 </script>
 </body>
