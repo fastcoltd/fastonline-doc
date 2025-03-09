@@ -34,18 +34,18 @@ function renderFilterArea() {
             input = document.createElement('select');
             input.className = "ant-select"
             input.id = `${field.id}Filter`;
-            if (typeof field.options == 'function'){
+            if (typeof field.options == 'function') {
                 let options = field.options();
                 field.options = options
             }
             let optIndex = 1
             field.options.forEach(opt => {
-                if (typeof opt == 'object'){
+                if (typeof opt == 'object') {
                     const option = document.createElement('option');
                     option.value = opt.value;
                     option.textContent = opt.label;
                     input.appendChild(option);
-                }else{
+                } else {
                     const option = document.createElement('option');
                     option.value = String(optIndex++);
                     option.textContent = opt;
@@ -153,7 +153,7 @@ function renderModal(isEditingMode) {
             if (tabField.type === 'select') {
                 input = document.createElement('select');
                 input.id = `modal${field.name}`;
-                if (typeof tabField.options == 'function'){
+                if (typeof tabField.options == 'function') {
                     let options = tabField.options();
                     tabField.options = options
                 }
@@ -178,7 +178,7 @@ function renderModal(isEditingMode) {
                 previewDiv.id = `modal${field.name}Preview`;
                 formItem.appendChild(previewDiv);
             } else if (tabField.type === 'tag') {
-                if (typeof tabField.options == 'function'){
+                if (typeof tabField.options == 'function') {
                     let options = tabField.options();
                     tabField.options = options;
                 }
@@ -186,7 +186,7 @@ function renderModal(isEditingMode) {
                 input.id = `modal${field.name}`;
                 const tags = isEditingMode ? JSON.parse((tableData.find(item => item.id === editId) || {})[field.name] || '[]') : [];
                 tags.forEach(tag => {
-                    if (typeof tag == 'number'){
+                    if (typeof tag == 'number') {
                         tag = tabField.options[tag]
                     }
                     input.innerHTML += `<span class="ant-tag ant-tag-${tabField.color || 'blue'}" data-value="${tag}">${tag} <span class="tag-close" onclick="removeTag(this)">×</span></span>`;
@@ -200,7 +200,9 @@ function renderModal(isEditingMode) {
                         const customInput = document.createElement('input');
                         customInput.type = 'text';
                         customInput.placeholder = '自定义标签';
-                        customInput.onkeydown = (e) => { if (e.key === 'Enter') addCustomTag(customInput, field.name); };
+                        customInput.onkeydown = (e) => {
+                            if (e.key === 'Enter') addCustomTag(customInput, field.name);
+                        };
                         input.appendChild(customInput);
                     }
                 }
@@ -337,7 +339,7 @@ async function fetchTableData(sampleCount) {
     const totalBatches = Math.ceil(sampleCount / batchSize);
 
     // 显示加载提示
-    const listContainer = document.getElementById(`${config.tableName}-list`);
+    const listContainer = getTableDataListElement();
     listContainer.innerHTML = '<div class="ant-spin ant-spin-spinning"><span class="ant-spin-dot ant-spin-dot-spin"><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i></span><span> 数据加载中...</span></div>';
 
     // 分批生成数据的异步函数
@@ -403,9 +405,15 @@ function generateLangRecord(id, lang, index) {
     return langRecord;
 }
 
+function getTableDataListElement() {
+    let list = document.getElementById(`${config.tableName}-list`.replaceAll("_", "-"))
+    let _list = document.getElementById(`${config.tableName}-list`)
+    return _list ?? list;
+}
+
 // 渲染表内容
 function renderTableList() {
-    const listContainer = document.getElementById(`${config.tableName}-list`);
+    const listContainer = getTableDataListElement();
     listContainer.innerHTML = '<div class="ant-spin ant-spin-spinning"><span class="ant-spin-dot ant-spin-dot-spin"><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i></span></div>';
 
     requestAnimationFrame(() => {
@@ -415,7 +423,7 @@ function renderTableList() {
         const end = Math.min(start + perPage, tableData.length);
         const paginatedData = tableData.slice(start, end);
 
-        let randomLang = randomInt(0, config.langFields?.languages.length-1) ?? 0;
+        let randomLang = randomInt(0, config.langFields?.languages.length - 1) ?? 0;
         const langFilter = document.querySelector(`#languageFilter`)?.value || (config.langFields?.languages[randomLang] || '');
         paginatedData.forEach(item => {
             const row = document.createElement('div');
@@ -720,7 +728,7 @@ function batchEditField(fieldConfig) {
         modal.className = 'modal';
         document.body.appendChild(modal);
     }
-    if (typeof fieldConfig.options == 'function'){
+    if (typeof fieldConfig.options == 'function') {
         fieldConfig.options = fieldConfig.options()
     }
     modal.innerHTML = `
@@ -880,6 +888,13 @@ function closeImageModal() {
     document.getElementById('imageModal').style.display = 'none';
     currentImageIndex = 0;
 }
+
+if (undefined == randomInt) {
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+}
+
 // 初始化
 window.onload = () => {
     w3.includeHTML(() => {
