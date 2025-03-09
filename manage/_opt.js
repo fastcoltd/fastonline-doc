@@ -136,10 +136,13 @@ function renderModal(isEditingMode) {
         tabPane.id = tab.id;
         tabPane.style.display = index === 0 ? 'block' : 'none';
 
+        let fieldCount = 0;
         tab.fields.forEach(tabField => {
             const field = config.fields.find(f => f.name === tabField.name) || tabField;
             if (isEditingMode && tabField.showInEdit === false) return;
             if (!isEditingMode && tabField.showInAdd === false) return;
+
+            fieldCount++;
 
             const formItem = document.createElement('div');
             formItem.className = 'ant-form-item' + (tabField.type === 'textarea' ? ' textarea-item' : tabField.type === 'file' ? ' image-item' : tabField.type === 'tree' ? ' tree-item' : '');
@@ -221,6 +224,11 @@ function renderModal(isEditingMode) {
             formItem.appendChild(input);
             tabPane.appendChild(formItem);
         });
+
+
+        if (fieldCount <= 0){
+            navList.removeChild(tabButton)
+        }
 
         contentHolder.appendChild(tabPane);
     });

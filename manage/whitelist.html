@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 白名单</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
+    <style>
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 60px; }
+        .col-status { width: 10%; min-width: 60px; }
+        .col-language { width: 15%; min-width: 80px; }
+        .col-item-type { width: 15%; min-width: 80px; }
+        .col-item-value { width: 35%; min-width: 100px; }
+        .col-create-time { width: 15%; min-width: 100px; }
+        .col-actions { width: 10%; min-width: 100px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('whitelist.html')">
+                                    <span class="ant-tabs-tab-btn">白名单</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
+                                <div class="task-list">
+                                    <div class="table-header"></div>
+                                    <div id="whitelist-list">加载中...</div>
+                                    <div class="pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 样本数据生成参考值
+    const languages = ['', 'zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']; // 添加空值选项
+    const itemTypes = [
+        { value: 0, label: '域名' },
+        { value: 1, label: 'IP' },
+        { value: 2, label: '文本' }
+    ];
+    const domains = ['example.com', 'test.org', 'safe.net', 'secure.io', 'trusted.com', 'whitelist.org', 'domain.cn', 'safezone.net', 'myapp.com', 'testsite.io'];
+    const ips = ['192.168.1.1', '10.0.0.1', '172.16.0.1', '8.8.8.8', '1.1.1.1', '203.0.113.5', '198.51.100.10', '127.0.0.1', '169.254.0.1', '100.64.0.1'];
+    const texts = ['safe content', 'approved text', 'trusted message', 'allow this', 'whitelisted phrase', 'secure note', 'pass text', 'good words', 'ok message', 'valid string'];
+
+    // 批量添加函数
+    function batchAddRecords() {
+        let modal = document.getElementById('batchAddModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'batchAddModal';
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
+        modal.innerHTML = `
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeBatchAddModal()">×</button>
+                <h3>批量添加白名单</h3>
+                <form id="batchAddForm">
+                    <div class="ant-form-item">
+                        <label>类型:</label>
+                        <select id="batchItemType" class="ant-select">
+                            ${itemTypes.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="ant-form-item">
+                        <label>语言:</label>
+                        <select id="batchLanguage" class="ant-select">
+                            ${languages.map(lang => `<option value="${lang}">${lang === '' ? '无' : lang}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="ant-form-item textarea-item">
+                        <label>内容 (每行一个):</label>
+                        <textarea id="batchItemValues" class="ant-input" rows="5" placeholder="请输入白名单内容，每行一个"></textarea>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="ant-btn" onclick="closeBatchAddModal()">取消</button>
+                        <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchAdd()">保存</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        modal.style.display = 'block';
+    }
+
+    function closeBatchAddModal() {
+        document.getElementById('batchAddModal').style.display = 'none';
+    }
+
+    function saveBatchAdd() {
+        const itemType = parseInt(document.getElementById('batchItemType').value);
+        const language = document.getElementById('batchLanguage').value; // 允许空值
+        const itemValues = document.getElementById('batchItemValues').value.trim().split('\n').filter(v => v.trim() !== '');
+
+        if (itemValues.length === 0) {
+            alert('请输入至少一条白名单内容！');
+            return;
+        }
+
+        itemValues.forEach(value => {
+            const record = {
+                id: tableData.length + 1,
+                status: 1, // 默认启用
+                language: language, // 允许空值
+                item_type: itemType,
+                item_value: value.trim(),
+                create_time: moment().unix()
+            };
+            tableData.push(record);
+        });
+
+        closeBatchAddModal();
+        renderTableList();
+    }
+
+    window.tableConfig = {
+        tableName: 'whitelist',
+        tableTitle: '白名单',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'status', generator: () => randomInt(0, 1) },
+            { name: 'language', generator: () => getRandomItem(languages) }, // 样本数据中包含空值
+            { name: 'item_type', generator: () => randomInt(0, 2) },
+            { name: 'item_value', generator: id => {
+                    const type = randomInt(0, 2);
+                    return type === 0 ? `${getRandomItem(domains).replace('.com', '')}-${id}.com` :
+                        type === 1 ? `${randomInt(1, 255)}.${randomInt(0, 255)}.${randomInt(0, 255)}.${id}` :
+                            `${getRandomItem(texts)}-${id}`;
+                }},
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量添加', className: 'ant-btn ant-btn-default', color: '#52c41a', action: 'batchAddRecords' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
+            { label: '批量修改类型', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'item_type', label: '类型', type: 'select', options: itemTypes } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
+            { name: 'language', label: '语言', className: 'col-language', formatter: v => v === '' ? '无' : v },
+            { name: 'item_type', label: '类型', className: 'col-item-type', formatter: v => itemTypes.find(t => t.value === v)?.label || '未知' },
+            { name: 'item_value', label: '内容', className: 'col-item-value' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'language', type: 'select', options: [{ value: '', label: '无' }, ...languages.slice(1).map(l => ({ value: l, label: l }))], filter: (data, value) => value === '' ? data : data.filter(d => d.language === value) },
+            { id: 'item_type', type: 'select', options: [{ value: '', label: '全部类型' }, ...itemTypes], filter: (data, value) => value === '' ? data : data.filter(d => d.item_type === parseInt(value)) },
+            { id: 'item_value', type: 'text', placeholder: '搜索内容', filter: (data, value) => value ? data.filter(d => d.item_value.toLowerCase().includes(value.toLowerCase())) : data },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'language', label: '语言', type: 'select', options: languages.map(l => ({ value: l, label: l === '' ? '无' : l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'item_type', label: '类型', type: 'select', options: itemTypes, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'item_value', label: '内容', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            }
+        ]
+    };
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
+</script>
+</body>
+</html>
