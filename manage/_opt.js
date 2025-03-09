@@ -189,7 +189,7 @@ function renderModal(isEditingMode) {
                     if (typeof tag == 'number') {
                         tag = tabField.options[tag]
                     }
-                    input.innerHTML += `<span class="ant-tag ant-tag-${tabField.color || 'blue'}" data-value="${tag}">${tag} <span class="tag-close" onclick="removeTag(this)">×</span></span>`;
+                    input.innerHTML += `<span class="ant-tag ant-tag-${tabField.color || 'blue'}" data-value="${tag}">${tag} <span class="tag-close" onclick="removeTag(this, '${field.name}')">×</span></span>`;
                 });
                 if (isEditingMode ? tabField.editableInEdit : tabField.editableInAdd) {
                     const select = document.createElement('select');
@@ -304,8 +304,14 @@ function addTag(select, fieldName) {
     const container = document.getElementById(`modal${fieldName}`);
     const tags = Array.from(container.querySelectorAll('.ant-tag')).map(tag => tag.dataset.value);
     if (!tags.includes(value)) {
-        const color = container.closest('.ant-form-item').querySelector('label').nextElementSibling.className.includes('ant-tag-') ? container.closest('.ant-form-item').querySelector('.ant-tag').className.match(/ant-tag-\w+/)[0].replace('ant-tag-', '') : 'blue';
-        container.insertBefore(document.createRange().createContextualFragment(`<span class="ant-tag ant-tag-${color}" data-value="${value}">${value} <span class="tag-close" onclick="removeTag(this)">×</span></span>`), select);
+        const color = container.closest('.ant-form-item').querySelector('label').nextElementSibling.className.includes('ant-tag-')
+            ? container.closest('.ant-form-item').querySelector('.ant-tag').className.match(/ant-tag-\w+/)[0].replace('ant-tag-', '')
+            : 'blue';
+        container.insertBefore(document.createRange().createContextualFragment(`<span class="ant-tag ant-tag-${color}" data-value="${value}">${value} <span class="tag-close" onclick="removeTag(this, '${fieldName}')">×</span></span>`), select);
+
+        // 从下拉列表中移除已选项
+        const option = select.querySelector(`option[value="${value}"]`);
+        if (option) option.remove();
     }
     select.value = '';
 }
@@ -318,7 +324,7 @@ function addCustomTag(input, fieldName) {
     const tags = Array.from(container.querySelectorAll('.ant-tag')).map(tag => tag.dataset.value);
     if (!tags.includes(value)) {
         const color = container.closest('.ant-form-item').querySelector('label').nextElementSibling.className.includes('ant-tag-') ? container.closest('.ant-form-item').querySelector('.ant-tag').className.match(/ant-tag-\w+/)[0].replace('ant-tag-', '') : 'orange';
-        container.insertBefore(document.createRange().createContextualFragment(`<span class="ant-tag ant-tag-${color}" data-value="${value}">${value} <span class="tag-close" onclick="removeTag(this)">×</span></span>`), container.querySelector('select'));
+        container.insertBefore(document.createRange().createContextualFragment(`<span class="ant-tag ant-tag-${color}" data-value="${value}">${value} <span class="tag-close" onclick="removeTag(this, '${fieldName}')">×</span></span>`), container.querySelector('select'));
     }
     input.value = '';
 }
@@ -326,6 +332,26 @@ function addCustomTag(input, fieldName) {
 // 删除
 function removeTag(closeBtn) {
     closeBtn.parentElement.remove();
+}
+function removeTag(closeBtn, fieldName) {
+    const tag = closeBtn.parentElement;
+    const value = tag.dataset.value;
+    tag.remove();
+
+    // 将移除的选项加回下拉列表并排序
+    const container = document.getElementById(`modal${fieldName}`);
+    const select = container.querySelector('select');
+    const options = Array.from(select.options).map(opt => ({ value: opt.value, text: opt.text }));
+
+    // 从配置中获取原始选项文本（假设 tabField.options 可用）
+    const tabField = config.modalTabs
+        .flatMap(tab => tab.fields)
+        .find(f => f.name === fieldName && f.type === 'tag');
+    const optionText = tabField?.options?.find(opt => opt.value === value)?.label || value;
+
+    options.push({ value: value, text: optionText });
+    options.sort((a, b) => a.value === '' ? -1 : a.value.localeCompare(b.value)); // 保持“添加”选项在首位并按值排序
+    select.innerHTML = options.map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('');
 }
 
 // 生成样本数据

@@ -138,7 +138,8 @@
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改服务', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'services_id', label: '服务', type: 'select', options: getServicesOptions } },
-            { label: '批量修改属性', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'attr_id', label: '属性', type: 'select', options: getAttrOptions } }
+            { label: '批量修改属性', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'attr_id', label: '属性', type: 'select', options: getAttrOptions } },
+            { label: '批量添加', className: 'ant-btn ant-btn-primary', action: 'batchAddServicesAttr' } // 新增批量添加
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
@@ -169,7 +170,104 @@
             }
         ]
     };
+    // 批量添加服务属性
+    window.batchAddServicesAttr = function() {
+        const modal = document.createElement('div');
+        modal.id = 'batchAddServicesAttrModal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
 
+        modal.innerHTML = `
+        <div class="modal-content" style="width: 600px; padding: 24px;">
+            <button class="close-btn" onclick="closeBatchAddServicesAttrModal()">×</button>
+            <h3 style="margin-bottom: 24px; font-size: 18px;">批量添加服务属性</h3>
+            <div class="ant-form-item">
+                <label style="width: 120px; text-align: right; margin-right: 8px;">服务:</label>
+                <select class="ant-select" id="batchAddServicesId" style="flex: 1;">
+                    ${servicesData.map(s => `<option value="${s.id}">${s.services_name}</option>`).join('')}
+                </select>
+            </div>
+            <div class="ant-form-item">
+                <label style="width: 120px; text-align: right; margin-right: 8px;">属性:</label>
+                <div id="batchAddAttrIds" class="ant-input" style="flex: 1; min-height: 32px; border: 1px solid #ddd; border-radius: 4px; padding: 4px;">
+                    <select onchange="addAttrTag(this)" style="margin: 4px;" id="batchAddAttrSelect">
+                        <option value="">添加属性</option>
+                        ${attrData.map(a => `<option value="${a.id}">${a.attr_name}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-buttons" style="text-align: right; margin-top: 20px;">
+                <button class="ant-btn" onclick="closeBatchAddServicesAttrModal()">取消</button>
+                <button class="ant-btn ant-btn-primary" onclick="saveBatchAddServicesAttr()">批量添加</button>
+            </div>
+        </div>
+    `;
+        modal.style.display = 'block';
+    };
+
+    // 添加属性标签并更新下拉列表
+    window.addAttrTag = function(select) {
+        const value = select.value;
+        if (!value) return;
+
+        const container = document.getElementById('batchAddAttrIds');
+        const tags = Array.from(container.querySelectorAll('.ant-tag')).map(tag => tag.dataset.value);
+        if (!tags.includes(value)) {
+            const tag = document.createElement('span');
+            tag.className = 'ant-tag ant-tag-blue';
+            tag.dataset.value = value;
+            tag.innerHTML = `${attrData.find(a => a.id === parseInt(value)).attr_name} <span class="tag-close" onclick="removeAttrTag(this)">×</span>`;
+            container.insertBefore(tag, select);
+
+            // 从下拉列表中移除已选项
+            const option = select.querySelector(`option[value="${value}"]`);
+            if (option) option.remove();
+        }
+        select.value = '';
+    };
+
+    // 删除属性标签并恢复到下拉列表
+    window.removeAttrTag = function(closeBtn) {
+        const tag = closeBtn.parentElement;
+        const value = tag.dataset.value;
+        const attr = attrData.find(a => a.id === parseInt(value));
+        tag.remove();
+
+        // 将移除的选项加回下拉列表并排序
+        const select = document.getElementById('batchAddAttrSelect');
+        const options = Array.from(select.options).map(opt => ({ value: opt.value, text: opt.text }));
+        options.push({ value: attr.id.toString(), text: attr.attr_name });
+        options.sort((a, b) => a.value === '' ? -1 : parseInt(a.value) - parseInt(b.value)); // 保持“添加属性”在首位并按 ID 排序
+        select.innerHTML = options.map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('');
+    };
+
+    // 保存批量添加
+    window.saveBatchAddServicesAttr = function() {
+        const servicesId = parseInt(document.getElementById('batchAddServicesId').value);
+        const attrIds = Array.from(document.getElementById('batchAddAttrIds').querySelectorAll('.ant-tag')).map(tag => parseInt(tag.dataset.value));
+
+        if (attrIds.length === 0) {
+            alert('请至少选择一个属性');
+            return;
+        }
+
+        const newRecords = attrIds.map((attrId, index) => ({
+            id: tableData.length + index + 1,
+            services_id: servicesId,
+            attr_id: attrId,
+            create_time: moment().unix()
+        }));
+
+        tableData.push(...newRecords);
+        closeBatchAddServicesAttrModal();
+        renderTableList();
+    };
+
+    // 关闭批量添加弹窗
+    window.closeBatchAddServicesAttrModal = function() {
+        const modal = document.getElementById('batchAddServicesAttrModal');
+        if (modal) modal.style.display = 'none';
+    };
     // 支持 Enter 键触发查询
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
