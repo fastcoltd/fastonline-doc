@@ -10,18 +10,76 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <style>
+        .summary-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .summary-item {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            min-width: 120px;
+            flex: 1;
+        }
+        .summary-item.selected {
+            border-color: #f97316;
+            color: #000;
+        }
+        .task-list {
+            overflow-x: hidden;
+        }
+        .task-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-width: 1000px;
+        }
+        .task-item div {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .col-type { flex: 0 0 100px; } /* 类型 */
+        .col-name { flex: 0 0 100px; } /* 任务名称 */
+        .col-desc { flex: 3; } /* 描述，尽可能宽 */
+        .col-created { flex: 0 0 120px; } /* 创建时间 */
+        .col-status { flex: 0 0 80px; } /* 状态 */
+        .col-follower { flex: 0 0 80px; } /* 跟进者 */
+        .col-follow-time { flex: 0 0 120px; } /* 跟进时间 */
+        .col-priority { flex: 0 0 60px; } /* 优先级 */
+        .col-action { flex: 0 0 80px; } /* 操作 */
+        .task-item button {
+            margin-left: 10px;
+        }
+        .sort-btn {
+            cursor: pointer;
+            margin-left: 5px;
+            color: #1890ff;
+        }
+        @media (max-width: 768px) {
+            .summary-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .task-list {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <!-- 顶部 -->
     <div id="header" w3-include-html="_header.html"></div>
-
-    <!-- 内容区域 -->
     <div class="content-wrapper">
-        <!-- 侧边栏 -->
         <div id="sidebar" w3-include-html="_sidebar.html"></div>
-
-        <!-- 主内容区域 -->
         <div class="main-content">
             <div class="tabs-container">
                 <div class="ant-tabs ant-tabs-top">
@@ -49,6 +107,10 @@
                                     <div class="summary-item" onclick="filterTasks('需求审核')" id="需求审核">需求审核: <span id="需求审核-count">0</span></div>
                                     <div class="summary-item" onclick="filterTasks('博客审核')" id="博客审核">博客审核: <span id="博客审核-count">0</span></div>
                                     <div class="summary-item" onclick="filterTasks('投诉处理')" id="投诉处理">投诉处理: <span id="投诉处理-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('商品审核')" id="商品审核">商品审核: <span id="商品审核-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('违规处罚')" id="违规处罚">违规处罚: <span id="违规处罚-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('交接任务')" id="交接任务">交接任务: <span id="交接任务-count">0</span></div>
+                                    <div class="summary-item" onclick="filterTasks('请假审批')" id="请假审批">请假审批: <span id="请假审批-count">0</span></div>
                                 </div>
                                 <h2>待办任务列表</h2>
                                 <div class="task-list">
@@ -61,51 +123,120 @@
             </div>
         </div>
     </div>
-
-    <!-- 底部 -->
     <div id="footer" w3-include-html="_footer.html"></div>
 </div>
 
 <script>
     // 全局变量
     let allTasks = [];
+    let sortField = null;
+    let sortOrder = 'asc';
+    const followers = ['张三', '李四', '王五', '赵六', '陈七', null]; // 添加 null 表示无跟进者
 
-    // Tab 切换函数（仅保留一个 Tab，无需切换逻辑）
-    function switchTab(page) {
-        // 由于只有一个 Tab，此函数暂时无实际作用
-        console.log('Tab is static: 客服工作台');
+    // 计算跟进时间
+    function getFollowTime(createdAt) {
+        const now = moment();
+        const created = moment(createdAt, 'YYYY-MM-DD HH:mm');
+        const diff = now.diff(created);
+        const duration = moment.duration(diff);
+        const days = Math.floor(duration.asDays());
+        const hours = Math.floor(duration.asHours() % 24);
+        const minutes = Math.floor(duration.asMinutes() % 60);
+        return { days, hours, minutes, totalMinutes: duration.asMinutes() };
     }
+
+    // 渲染跟进时间颜色
+    function getFollowTimeColor(totalMinutes) {
+        if (totalMinutes < 60) return '#52c41a'; // 绿色
+        if (totalMinutes < 1440) return '#fa8c16'; // 橙色
+        return '#f5222d'; // 红色
+    }
+
+    // 渲染优先级颜色
+    function getPriorityColor(priority) {
+        switch (priority) {
+            case 1: return '#52c41a'; // 绿色
+            case 2: return '#fa8c16'; // 橙色
+            case 3: return '#fadb14'; // 黄色
+            case 4: return '#ff4d4f'; // 浅红
+            case 5: return '#f5222d'; // 红色
+            default: return '#000';
+        }
+    }
+
+    // 数量背景颜色
+    function getCountBackgroundColor(count) {
+        if (count === 0) return '#f0f2f5'; // 浅灰
+        if (count <= 5) return '#e6ffe6'; // 浅绿
+        if (count <= 10) return '#fff7e6'; // 浅橙
+        if (count <= 20) return '#fff1f0'; // 浅红
+        return '#ffe6e6'; // 更红但不深
+    }
+
+    // 类型颜色映射
+    const typeColors = {
+        '文章审核': 'blue', 'KYC 审核': 'cyan', '店铺审核': 'purple', 'FAQ 审核': 'geekblue',
+        '工单处理': 'magenta', '需求审核': 'gold', '博客审核': 'lime', '投诉处理': 'red',
+        '商品审核': 'green', '违规处罚': 'volcano', '交接任务': 'orange', '请假审批': 'pink'
+    };
 
     // 任务加载
     function fetchTasks() {
         console.log('Fetching tasks...');
         const storedTasks = localStorage.getItem('allTasks');
-        if (storedTasks && JSON.parse(storedTasks).every(task => task.description)) {
+        if (storedTasks && JSON.parse(storedTasks).every(task => task.description && typeof task.priority === 'number')) {
             allTasks = JSON.parse(storedTasks);
         } else {
             localStorage.removeItem('allTasks');
             const tasks = [];
-            const types = ['文章审核', 'KYC 审核', '店铺审核', 'FAQ 审核', '工单处理', '需求审核', '博客审核', '投诉处理'];
+            const types = [
+                '文章审核', 'KYC 审核', '店铺审核', 'FAQ 审核', '工单处理', '需求审核',
+                '博客审核', '投诉处理', '商品审核', '违规处罚', '交接任务', '请假审批'
+            ];
             const descriptions = {
-                '文章审核': ['用户提交的文章内容需审核', '检查文章是否符合平台规范', '审核新上传的文章草稿'],
-                'KYC 审核': ['用户身份验证待审核', '检查KYC资料完整性', '审核用户提交的身份证明'],
-                '店铺审核': ['新店铺注册信息待审核', '检查店铺资质文件', '审核店铺运营许可'],
-                'FAQ 审核': ['新FAQ内容待审核', '检查FAQ问题与回答一致性', '审核FAQ更新请求'],
-                '工单处理': ['用户提交的工单待处理', '处理技术支持请求', '解决用户账户问题'],
-                '需求审核': ['用户需求申请待审核', '检查需求描述是否清晰', '审核需求优先级'],
-                '博客审核': ['用户博客文章待审核', '检查博客内容原创性', '审核博客图片版权'],
-                '投诉处理': ['用户投诉待处理', '调查订单相关投诉', '处理用户服务纠纷']
+                '文章审核': ['用户ID:12345提交的文章《产品评测》需审核是否存在违规内容', '新文章《平台使用指南》需确认是否符合发布规范', '文章《最新促销活动》等待审核图片版权和文字准确性'],
+                'KYC 审核': ['用户ID:67890提交的身份证照片需核实真实性', 'KYC申请（用户:张某某）需审核护照和地址证明', '新用户KYC资料不完整，请核查补充信息'],
+                '店铺审核': ['店铺“时尚之家”提交的营业执照需审核有效期', '新店铺“健康生活馆”申请，需确认税务登记信息', '店铺ID:54321的资质文件需核实是否存在伪造'],
+                'FAQ 审核': ['新FAQ“如何退货”需审核回答是否与政策一致', 'FAQ更新请求：检查“支付问题”内容是否准确', '用户提交的FAQ建议“配送时效”待审核'],
+                '工单处理': ['工单#1001：用户反馈订单未发货，请联系物流核查', '用户ID:98765提交的技术支持请求，需解决登录问题', '工单#1002：账户余额异常，请核实交易记录'],
+                '需求审核': ['用户提交的需求“定制手机壳”需审核描述完整性', '需求ID:45678，检查是否符合平台支持范围', '新需求“批量采购办公用品”需评估优先级'],
+                '博客审核': ['博客《2025趋势预测》需检查是否存在抄袭', '用户ID:11223的博客图片需审核版权归属', '新博客《美食推荐》待审核敏感词汇'],
+                '投诉处理': ['投诉#2001：订单ID:78901配送延迟，需联系卖家处理', '用户投诉店铺服务态度恶劣，请调查聊天记录', '投诉#2002：商品质量问题，需核实退款申请'],
+                '商品审核': ['商品“无线耳机”描述需审核是否夸大宣传', '新上架商品“智能手表”图片需确认与实物一致', '商品ID:33445需检查是否涉及禁售品类'],
+                '违规处罚': ['用户ID:44556发布违禁广告，需审核处罚建议', '店铺“电子商城”多次延迟发货，需确认违规次数', '违规事件#3001：虚假交易，需核实证据并处理'],
+                '交接任务': ['3月10日客服A交接：用户ID:55667订单纠纷未解决', '交接记录：工单#1003需跟进物流状态', '客服B交接：投诉#2003需联系用户确认解决方案'],
+                '请假审批': ['客服张三提交3月15日-3月17日请假申请，需审批', '请假ID:6001，客服李四申请病假，请确认证明', '3月20日客服王五休假请求，需安排替班人员']
+            };
+            const statuses = {
+                '文章审核': ['待审核', '审核中', '待发布'],
+                'KYC 审核': ['待核实', '资料待补', '审核中'],
+                '店铺审核': ['待审核', '资质待补', '审核中'],
+                'FAQ 审核': ['待审核', '内容待改', '审核中'],
+                '工单处理': ['待响应', '处理中', '待反馈'],
+                '需求审核': ['待评估', '审核中', '待分配'],
+                '博客审核': ['待审核', '审核中', '待修改'],
+                '投诉处理': ['待调查', '处理中', '待回复'],
+                '商品审核': ['待审核', '描述待改', '审核中'],
+                '违规处罚': ['待核查', '调查中', '待裁决'],
+                '交接任务': ['待接收', '跟进中', '待确认'],
+                '请假审批': ['待审批', '审批中', '待安排']
             };
             for (let i = 1; i <= 40; i++) {
                 const type = types[Math.floor(Math.random() * types.length)];
                 const description = descriptions[type][Math.floor(Math.random() * descriptions[type].length)];
+                const follower = followers[Math.floor(Math.random() * followers.length)]; // 可能为 null
+                const priority = Math.floor(Math.random() * 5) + 1;
+                const statusList = statuses[type];
+                const status = statusList[Math.floor(Math.random() * statusList.length)];
                 tasks.push({
                     id: i,
                     type: type,
-                    name: `任务 #${i}`,
+                    name: `${type} #${i}`,
                     description: description,
-                    created_at: `2025-03-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
-                    status: '待处理'
+                    created_at: `2025-03-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')} ${String(Math.floor(Math.random() * 24)).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+                    status: status,
+                    follower: follower,
+                    priority: priority
                 });
             }
             allTasks = tasks;
@@ -124,19 +255,52 @@
             console.error('Task list container not found');
             return;
         }
-        taskContainer.innerHTML = '';
-        taskList.forEach(task => {
+        taskContainer.innerHTML = `
+            <div class="task-item" style="font-weight: bold; background: #f5f5f5;">
+                <div class="col-type">类型</div>
+                <div class="col-name">任务名称</div>
+                <div class="col-desc">描述</div>
+                <div class="col-created">创建时间</div>
+                <div class="col-status">状态</div>
+                <div class="col-follower">跟进者</div>
+                <div class="col-follow-time">跟进时间 <span class="sort-btn" onclick="sortTasks('followTime')">排序</span></div>
+                <div class="col-priority">优先级 <span class="sort-btn" onclick="sortTasks('priority')">排序</span></div>
+                <div class="col-action">操作</div>
+            </div>
+        `;
+        const sortedList = [...taskList];
+        if (sortField === 'followTime') {
+            sortedList.sort((a, b) => {
+                const timeA = getFollowTime(a.created_at).totalMinutes;
+                const timeB = getFollowTime(b.created_at).totalMinutes;
+                return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+            });
+        } else if (sortField === 'priority') {
+            sortedList.sort((a, b) => sortOrder === 'asc' ? a.priority - b.priority : b.priority - a.priority);
+        }
+        sortedList.forEach(task => {
+            const followTime = getFollowTime(task.created_at);
+            const followTimeStr = `${followTime.days > 0 ? followTime.days + '天' : ''}${followTime.hours > 0 ? followTime.hours + '小时' : ''}${followTime.minutes}分钟`;
+            const followTimeColor = getFollowTimeColor(followTime.totalMinutes);
+            const priorityColor = getPriorityColor(task.priority);
+            const typeColor = typeColors[task.type] || 'grey';
+            const statusColor = task.status === '待审核' || task.status === '待核实' || task.status === '待响应' || task.status === '待评估' || task.status === '待调查' || task.status === '待接收' || task.status === '待审批' ? '#f5222d' : '#1890ff';
+            const followerText = task.follower ? task.follower : '<span style="color: #f5222d">未分配</span>';
             const taskItem = document.createElement('div');
             taskItem.className = 'task-item';
-            taskItem.style = `padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; margin: 5px 0;`;
-            taskItem.innerHTML = `<div style="flex: 1;"><strong>${task.type}</strong><br>${task.name}</div>
-                                      <div style="flex: 2;">${task.description}</div>
-                                      <div style="flex: 1;">${task.created_at}</div>
-                                      <div style="flex: 1;">${task.status}</div>
-                                      <button class='ant-btn ant-btn-primary' onclick='handleTask(${task.id})'>处理</button>`;
+            taskItem.innerHTML = `
+                <div class="col-type"><span class="ant-tag ant-tag-${typeColor}">${task.type}</span></div>
+                <div class="col-name">${task.name}</div>
+                <div class="col-desc">${task.description}</div>
+                <div class="col-created">${task.created_at}</div>
+                <div class="col-status"><span style="color: ${statusColor}">${task.status}</span></div>
+                <div class="col-follower">${followerText}</div>
+                <div class="col-follow-time" style="color: ${followTimeColor}">${followTimeStr}</div>
+                <div class="col-priority" style="color: ${priorityColor}">${task.priority}</div>
+                <div class="col-action"><button class="ant-btn ant-btn-primary" onclick="handleTask(${task.id})">处理</button></div>
+            `;
             taskContainer.appendChild(taskItem);
         });
-        console.log('Tasks rendered');
     }
 
     // 更新待办事项统计
@@ -147,8 +311,12 @@
             counts[task.type] = (counts[task.type] || 0) + 1;
         });
         for (const type in counts) {
-            const element = document.getElementById(`${type}-count`);
-            if (element) element.innerText = counts[type];
+            const element = document.getElementById(type);
+            const countSpan = document.getElementById(`${type}-count`);
+            if (element && countSpan) {
+                countSpan.innerText = counts[type];
+                element.style.backgroundColor = getCountBackgroundColor(counts[type]);
+            }
         }
     }
 
@@ -163,8 +331,8 @@
         if (selectedItem) {
             selectedItem.classList.add('selected');
             selectedItem.style.border = '2px solid #f97316';
+            localStorage.setItem('selectedFilter', type);
         }
-
         if (type === '全部') {
             renderTasks(allTasks);
         } else {
@@ -172,10 +340,27 @@
         }
     }
 
+    // 排序任务
+    function sortTasks(field) {
+        if (sortField === field) {
+            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortOrder = 'asc';
+        }
+        filterTasks(localStorage.getItem('selectedFilter') || '全部');
+    }
+
     // 处理任务
     function handleTask(taskId) {
         console.log('Handling task:', taskId);
-        alert('处理任务 ID: ' + taskId);
+        const task = allTasks.find(t => t.id === taskId);
+        if (task) {
+            task.status = task.type === '请假审批' ? '审批中' : '处理中';
+            localStorage.setItem('allTasks', JSON.stringify(allTasks));
+            filterTasks(localStorage.getItem('selectedFilter') || '全部');
+            alert(`任务 ID: ${taskId} 已更新状态为“${task.status}”`);
+        }
     }
 
     // 初始化
