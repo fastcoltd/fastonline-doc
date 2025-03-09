@@ -161,14 +161,16 @@
 
         @media (max-width: 768px) {
             .modal-content { width: 100vw!important; height: 100vh!important; max-width: 100%!important; max-height: 100%!important; margin: 0; border-radius: 0; position: fixed; top: 0; left: 0; transform: none; background: #fff; } /* 确保背景不透明 */
-            .chat-section { padding: 5px; } /* 减小内边距 */
+            .modal-content h3 {margin-bottom: 0}
+            .basic-info .row > div { margin-right: 0.4em; }
+            .chat-section { padding: 0em; } /* 减小内边距 */
             .chat-container { flex-grow: 1; height: auto; }
-            .basic-info { font-size: 14px; }
-            .basic-info .row { flex-wrap: wrap; height: auto; }
-            .chat-header { font-size: 14px; padding: 5px; }
-            .chat-input { margin-top: 5px; padding-bottom: 10px; } /* 确保输入区域有底部空间 */
-            .chat-input textarea { height: 40px; }
-            .chat-input button.send-btn { height: 40px; width: 80px; }
+            .basic-info { font-size: 14px;padding: 0.2em; }
+            .basic-info .row { flex-wrap: wrap; height: auto; margin: 0.2em; }
+            .chat-header { font-size: 14px; padding: 0.2em; }
+            .chat-input { margin-top: 0; padding-bottom: 0.4em; } /* 确保输入区域有底部空间 */
+            .chat-input textarea { height: 3em; }
+            .chat-input button.send-btn { height: 3em; width: 4em; }
             .close-btn { font-size: 20px; padding: 5px; }
             .small-modal .modal-content { width: 100vw; height: 80vh; position: fixed; top: 10vh; left: 0; transform: none; }
         }
@@ -362,22 +364,22 @@
 
         modal.innerHTML = `
             <div class="modal-content">
-                <button class="close-btn" onclick="closeJoinModal()">×</button>
-                <h3>加入工单 - ID: ${record.id}</h3>
+                <button class="event-close-btn" onclick="closeJoinModal()">×</button>
+                <h3>加入工单 - ID: ${record.id}, 订单：${orderNames[record.orders_id % orderNames.length]}</h3>
                 <div class="basic-info">
                     <div class="row">
                         <div>工单进度:</div>
-                        <div>工单状态: <strong>${statusOptions[record.status].label}</strong></div>
-                        <div>退款金额: <strong>$${randomInt(0, 200)}</strong></div>
-                        <div>换货数量: <strong>${randomInt(0, 5)}</strong></div>
-                        <div>退款次数: <strong>${randomInt(0, 3)}</strong></div>
-                        <div>换货次数: <strong>${randomInt(0, 2)}</strong></div>
+                        <div>状态: <strong>${statusOptions[record.status].label}</strong></div>
+                        <div>金额: <strong>$${randomInt(0, 200)}</strong></div>
+                        <div>换货: <strong>${randomInt(0, 5)}</strong></div>
+                        <div>退款: <strong>${randomInt(0, 3)}</strong></div>
+                        <div>换货: <strong>${randomInt(0, 2)}</strong></div>
                     </div>
                     <div class="row">
                         <div>工单原因:</div>
-                        <div>售后类型: <strong>${getRandomItem(aftersalesTypes)}</strong></div>
-                        <div>具体原因: <strong>${record.aftersales_txt}</strong></div>
-                        <div>提交时间: <strong>${moment.unix(record.create_time).format('YYYY-MM-DD HH:mm:ss')}</strong></div>
+                        <div>类型: <strong>${getRandomItem(aftersalesTypes)}</strong></div>
+                        <div>原因: <strong>${record.aftersales_txt}</strong></div>
+                        <div>时间: <strong>${moment.unix(record.create_time).format('HH:mm:ss')}</strong></div>
                     </div>
                     <div class="row">
                         <div>在线状态:</div>
@@ -392,12 +394,8 @@
                 </div>
                 <div class="chat-section">
                     <div class="chat-header">
-                        <strong>订单ID:</strong> <strong>${orderNames[record.orders_id % orderNames.length]}</strong>,
-                        商品: <strong>${getRandomItem(productNames)}</strong>,
-                        数量: <strong>${randomInt(1, 10)}</strong>,
-                        金额: <strong>$${randomInt(50, 500)}</strong>,
-                        售后原因: <strong>${record.aftersales_txt}</strong>,
-                        商品下载: <strong><a href="#">下载</a></strong>
+                        <strong>${getRandomItem(productNames)}*${randomInt(1, 10)}</strong> | <strong>$${randomInt(50, 500)}</strong> |
+                        <strong><a href="#">下载</a></strong>
                     </div>
                     <div class="chat-container" id="chatHistory"></div>
                     <div class="chat-input">
