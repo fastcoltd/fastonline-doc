@@ -695,11 +695,13 @@ function renderActionButtons() {
         }
         button.style.marginRight = '8px'; // 添加按钮间隙
         button.onclick = () => {
-            if (buttonConfig.action === 'addRecord') {
+            if(typeof window[buttonConfig.action] == 'function'){
+                window[buttonConfig.action]()
+            }else if (buttonConfig.action === 'addRecord') {
                 addRecord();
             } else if (buttonConfig.action === 'batchDelete') {
                 batchDelete();
-            } else if (buttonConfig.field) {
+            }else if (buttonConfig.field) {
                 batchEditField(buttonConfig.field);
             }
         };
