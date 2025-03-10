@@ -84,8 +84,11 @@ body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-family: -a
 .summary-item.selected { background: #f97316; color: #fff; border-color: #f97316; }
 
 /* 分页样式 */
-.pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 1em !important; margin-bottom: 1em !important; }
 #page-info { height: 2em; line-height: 2em; font-size: 0.875em; color: rgba(0, 0, 0, 0.65); font-weight: 500; padding: 0 0.5em; display: flex; align-items: center; }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 1em !important; margin-bottom: 1em !important; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; padding: 0 0.5em; scrollbar-width: thin; }
+.pagination::-webkit-scrollbar { height: 6px; }
+.pagination::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+.pagination::-webkit-scrollbar-thumb:hover { background: #555; }
 
 /* 表单和弹窗样式 */
 .ant-form-item { margin-bottom: 1.5em; }
@@ -102,14 +105,20 @@ body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-family: -a
 .ant-form-item.image-item input[type="file"] { display: block; margin-bottom: 8px; }
 .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
 .close-btn:hover { color: rgba(0, 0, 0, 0.85); }
-.filter-container { display: flex; align-items: center; gap: 8px; white-space: nowrap; overflow-x: auto; margin-bottom: 16px; padding-bottom: 4px; }
-.filter-container .ant-input { flex-shrink: 0; min-width: 100px; max-width: 200px; padding: 8px; border-radius: 4px; box-sizing: border-box; }
-.filter-container .ant-select { flex-shrink: 0; min-width: 100px; max-width: 200px; padding: 8px; border-radius: 4px; box-sizing: border-box; }
-.filter-container .ant-btn { flex-shrink: 0; min-width: 80px; padding: 0.25em 0.75em; border-radius: 0.25em; cursor: pointer; background: #fff; border: 0.0625em solid #d9d9d9; color: rgba(0, 0, 0, 0.85); transition: all 0.3s; }
-.filter-container::-webkit-scrollbar { height: 6px; }
-.filter-container::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+
+.filter-container { display: flex; align-items: center; gap: 0.5em; white-space: nowrap; overflow-x: auto; padding-bottom: 0.5em; flex-wrap: nowrap; scrollbar-width: thin; }
+.filter-container .ant-input { flex-shrink: 0; min-width: 6.25em; max-width: 12.5em; padding: 0.25em 0.25em 0.25em 0; border-radius: 0.25em; box-sizing: border-box; }
+.filter-container .ant-select { flex-shrink: 0; min-width: 6.25em; max-width: 12.5em; padding: 0.25em 0.25em 0.25em 0; border-radius: 0.25em; box-sizing: border-box; }
+.filter-container .ant-btn { flex-shrink: 0; min-width: 5em; padding: 0.5em 0.5em 0.5em 0; border-radius: 0.25em; cursor: pointer; background: #fff; border: 0.0625em solid #d9d9d9; color: rgba(0, 0, 0, 0.85); transition: all 0.3s; }
+.filter-container::-webkit-scrollbar { height: 0.375em; }
+.filter-container::-webkit-scrollbar-thumb { background: #888; border-radius: 0.1875em; }
 .filter-container::-webkit-scrollbar-thumb:hover { background: #555; }
-.action-container { margin-bottom: 16px; }
+
+.action-container { display: flex; align-items: center; gap: 0.5em; white-space: nowrap; overflow-x: auto; margin-bottom: 0.5em; flex-wrap: nowrap; scrollbar-width: thin; }
+.action-container::-webkit-scrollbar { height: 0.375em; }
+.action-container::-webkit-scrollbar-thumb { background: #888; border-radius: 0.1875em; }
+.action-container::-webkit-scrollbar-thumb:hover { background: #555; }
+
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
 .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1080px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 1440px; overflow-y: auto; position: relative; }
 .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
@@ -254,12 +263,16 @@ body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-family: -a
     .event-buttons .ant-btn { padding: 0.4em 1em; font-size: 1.2em; }
     .event-close-btn { position: absolute; top: 0.5em; right: 0.5em; width: 1.4em; height: 1.4em; font-size: 1.4em; text-align: center; background: #f5222d; color: #fff; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .event-close-btn:hover { background: #ff4d4f; transform: scale(1.1); }
-    .filter-container { flex-wrap: wrap; white-space: normal; overflow-x: visible; }
-    .filter-container .ant-input { min-width: 80px; max-width: 100%; }
-    .filter-container .ant-select { min-width: 80px; max-width: 100%; }
-    .filter-container .ant-btn { min-width: 60px; }
+    .history-nav-floating { top: 4.8em; left: 0; right: 0;}
 
-    .history-nav-floating { top: 4.8em; left: 0; right: 0; }
+    .filter-container { flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; scrollbar-width: none;}
+    .filter-container .ant-input { min-width: 5em; max-width: 100%; }
+    .filter-container .ant-select { min-width: 5em; max-width: 100%; }
+    .filter-container .ant-btn { min-width: 3.75em; }
+
+    .action-container { flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; scrollbar-width: none;}
+
+    .pagination { justify-content: flex-start;scrollbar-width: none;}
 }
 @media (min-width: 48.0625em) {
     .content-wrapper { margin-left: 14em; }
