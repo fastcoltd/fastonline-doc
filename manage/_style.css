@@ -243,3 +243,208 @@ body { height: 100%; margin: 0; padding: 0; background: #f0f2f5; font-family: -a
     .content-wrapper { margin-left: 14em; }
     .sidebar.collapsed + .content-wrapper { margin-left: 0; }
 }
+
+
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2em;
+    height: 2em;
+    background: #1e3a8a;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* 移除默认 padding，确保图标居中 */
+}
+
+.nav-arrow:hover {
+    background: #3b82f6;
+}
+
+.nav-arrow.left {
+    left: 0.5em;
+}
+
+.nav-arrow.right {
+    right: 0.5em;
+}
+
+.nav-arrow .anticon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content-wrapper {
+}
+
+/* 移动端调整 */
+@media (max-width: 48em) {
+    .history-nav-floating {
+        top: 100%; /* 紧贴移动端 header */
+        left: 0;
+        right: 0;
+    }
+    .content-wrapper {
+        margin-top: 7.8em; /* 移动端 header 4.8em + nav 3em */
+    }
+}
+
+.history-nav-floating {
+    position: fixed;
+    top: 4em; /* 保持不变 */
+    left: 14.8em;
+    right: 0.7em;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0.125em 0.5em rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 0.5em 0.5em;
+    padding: 0.5em;
+    display: flex;
+    align-items: center;
+    transition: left 0.3s ease;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-y: auto;
+}
+
+.sidebar.collapsed .history-nav-floating {
+    left: 1em; /* 修改为 1em，与 sidebar 折叠时 main-content 左侧对齐 */
+}
+
+.history-nav-container {
+    display: flex;
+    gap: 0.5em;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.history-nav-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.history-nav-item {
+    display: inline-flex;
+    align-items: center;
+    background: #dbeafe;
+    color: #1e3a8a;
+    padding: 0.25em 0.75em;
+    border-radius: 0.25em;
+    font-size: 0.875em;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+    user-select: none;
+}
+
+.history-nav-item:hover {
+    background: #1e3a8a !important; border-color: #1e3a8a; color: #fff!important; font-weight: bold !important;
+}
+
+.history-nav-item.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.history-nav-item .priority-dot {
+    width: 1.2em; /* 1em 圆点 */
+    height: 1.2em;
+    border-radius: 50%;
+    margin-right: 0.5em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.priority-0 { background-color: #d1d5db; } /* 灰色 - 默认 */
+.priority-1 { background-color: #facc15; } /* 黄色 - 非常低 */
+.priority-2 { background-color: #f97316; } /* 橙色 - 低 */
+.priority-3 { background-color: #10b981; } /* 绿色 - 中 */
+.priority-4 { background-color: #3b82f6; } /* 蓝色 - 高 */
+.priority-5 { background-color: #ef4444; } /* 红色 - 非常高 */
+
+
+.history-nav-item .close-btn {
+    position: absolute;
+    top: -0em;
+    right: -0.35em;
+    width: 1em;
+    height: 1em;
+    background: #f5222d;
+    color: #fff;
+    border: none;
+    display: none;
+    border-radius: 50%;
+    font-size: 0.85em;
+    line-height: 1em;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.history-nav-item:hover .close-btn {
+    display: block;
+}
+
+.history-nav-item .close-btn:hover {
+    background: #ff4d4f;
+}
+
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2em;
+    height: 2em;
+    background: #1e3a8a;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* 移除默认 padding，确保图标居中 */
+    z-index: 999; /* 确保箭头在内容上方 */
+}
+
+.nav-arrow:hover {
+    background: #3b82f6;
+}
+
+.nav-arrow.left {
+    left: 0.5em;
+}
+
+.nav-arrow.right {
+    right: 0.5em;
+}
+
+.nav-arrow .anticon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* 移动端调整 */
+@media (max-width: 48em) {
+    .history-nav-floating {
+        top: 4.8em; /* 移动端 header 高度 */
+        left: 0;
+        right: 0;
+    }
+    .content-wrapper {
+        margin-top: 7.8em; /* 移动端 header 4.8em + nav 3em */
+    }
+}

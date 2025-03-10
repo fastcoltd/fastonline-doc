@@ -1,5 +1,178 @@
 // _common.js
 
+// 历史点击页面记录
+let historyPages = JSON.parse(localStorage.getItem('historyPages')) || [];
+
+function resetTopNav(){
+    historyPages = JSON.parse(localStorage.getItem('historyPages')) || [];
+    if (!historyPages || historyPages.length <= 0){
+        document.querySelector('.content-wrapper').style = "";
+        document.querySelector('.history-nav-floating').style = "display: none;";
+    }else{
+        document.querySelector('.content-wrapper').style = "margin-top: 7em;";
+        document.querySelector('.history-nav-floating').style = "";
+    }
+
+}
+
+function insertHistoryNav() {
+    // 检查是否已存在，避免重复插入
+    if (document.querySelector('.history-nav-floating')) return;
+
+    const navDiv = document.createElement('div');
+    navDiv.className = 'history-nav-floating';
+    navDiv.innerHTML = `
+        <button class="nav-arrow left" id="historyNavLeftArrow" style="display: none;">
+            <span class="anticon anticon-left">
+                <svg viewBox="64 64 896 896" focusable="false" data-icon="left" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+                    <path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path>
+                </svg>
+            </span>
+        </button>
+        <div class="history-nav-container" id="historyNavContainer"></div>
+        <button class="nav-arrow right" id="historyNavRightArrow">
+            <span class="anticon anticon-right">
+                <svg viewBox="64 64 896 896" focusable="false" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+                    <path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path>
+                </svg>
+            </span>
+        </button>
+    `;
+
+    // 查找 tabs-container 或 main-content 作为插入点
+    const tabsContainer = document.querySelector('.tabs-container');
+    const mainContent = document.querySelector('.main-content');
+    if (tabsContainer) {
+        tabsContainer.parentNode.insertBefore(navDiv, tabsContainer);
+    } else if (mainContent) {
+        mainContent.insertBefore(navDiv, mainContent.firstChild);
+    }
+    resetTopNav()
+}
+
+function updateHistoryNav() {
+    const container = document.getElementById('historyNavContainer');
+    const leftArrow = document.getElementById('historyNavLeftArrow');
+    const rightArrow = document.getElementById('historyNavRightArrow');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    historyPages.forEach((page, index) => {
+        const item = document.createElement('div');
+        item.className = 'history-nav-item';
+        item.draggable = true;
+        item.dataset.index = index;
+
+        const dot = document.createElement('span');
+        dot.className = `priority-dot priority-${page.priority || 0}`;
+        dot.onclick = (e) => {
+            e.stopPropagation();
+            togglePriority(index);
+        };
+
+        const title = document.createElement('span');
+        title.textContent = page.title;
+        title.onclick = () => window.location.href = page.url;
+
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'close-btn';
+        closeBtn.textContent = `X`;
+        closeBtn.onclick = (e) => {
+            e.stopPropagation();
+            removeHistoryPage(index);
+        };
+
+        item.appendChild(dot);
+        item.appendChild(title);
+        item.appendChild(closeBtn);
+        container.appendChild(item);
+
+        // 拖拽事件
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragover', handleDragOver);
+        item.addEventListener('drop', handleDrop);
+        item.addEventListener('dragend', handleDragEnd);
+    });
+
+    // 更新箭头显示
+    updateArrows(container, leftArrow, rightArrow);
+
+    container.addEventListener('scroll', () => updateArrows(container, leftArrow, rightArrow));
+    leftArrow.onclick = () => container.scrollBy({ left: -200, behavior: 'smooth' });
+    rightArrow.onclick = () => container.scrollBy({ left: 200, behavior: 'smooth' });
+
+    localStorage.setItem('historyPages', JSON.stringify(historyPages));
+    resetTopNav()
+}
+
+function updateArrows(container, leftArrow, rightArrow) {
+    const scrollLeft = container.scrollLeft;
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+
+    // 确保箭头始终可见，只要有可滚动内容
+    leftArrow.style.display = scrollLeft > 0 ? 'block' : 'none';
+    rightArrow.style.display = scrollLeft + clientWidth < scrollWidth ? 'block' : 'none';
+}
+
+// 添加历史页面
+function addHistoryPage(title, url) {
+    const existingIndex = historyPages.findIndex(page => page.url === url);
+    if (existingIndex !== -1) {
+        // 如果页面已存在，移到最前
+        const [page] = historyPages.splice(existingIndex, 1);
+        historyPages.unshift(page);
+    } else {
+        // 新增页面，不限制个数
+        historyPages.unshift({ title, url, priority: 0 });
+    }
+    updateHistoryNav();
+}
+
+// 移除历史页面
+function removeHistoryPage(index) {
+    historyPages.splice(index, 1);
+    updateHistoryNav();
+}
+
+// 切换优先级
+function togglePriority(index) {
+    const page = historyPages[index];
+    page.priority = (page.priority + 1) % 6; // 0 -> 1 -> 2 -> 3 -> 0
+    updateHistoryNav();
+}
+
+// 拖拽功能
+let draggedIndex = null;
+
+function handleDragStart(e) {
+    draggedIndex = parseInt(e.target.dataset.index);
+    e.target.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    const targetIndex = parseInt(e.target.closest('.history-nav-item')?.dataset.index);
+    if (targetIndex !== undefined && draggedIndex !== targetIndex) {
+        const [draggedPage] = historyPages.splice(draggedIndex, 1);
+        historyPages.splice(targetIndex, 0, draggedPage);
+        updateHistoryNav();
+    }
+}
+
+function handleDragEnd(e) {
+    e.target.classList.remove('dragging');
+    draggedIndex = null;
+}
+
+// 在 initMenus 中监听 sidebar 点击并添加历史记录
 function initMenus() {
     const topMenuItems = document.querySelectorAll('.top-menu-item');
     topMenuItems.forEach(item => {
@@ -19,6 +192,20 @@ function initMenus() {
         });
     });
 
+    // 监听 sidebar 点击
+    document.querySelectorAll('.sidebar-submenu-item a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const title = link.textContent.trim();
+            const url = link.getAttribute('href');
+            addHistoryPage(title, url);
+        });
+    });
+
+    // 动态插入导航条并初始化
+    insertHistoryNav();
+    updateHistoryNav();
+
+    // 其余已有代码...
     const currentUrl = window.location.pathname.split('/').pop() || 'dashboard.html';
     let activeTopMenu = null;
 
@@ -83,13 +270,13 @@ function initMenus() {
     setInterval(updateTime, 1000);
     highlightCurrentMenu();
 
-    // 初始化移动端侧边栏并监听窗口大小变化
     handleMobileSidebar();
     window.addEventListener('resize', handleMobileSidebar);
 
-    // 添加弹窗关闭逻辑
     initModalClose();
 }
+
+// 其余已有代码保持不变...
 
 function toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
