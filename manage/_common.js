@@ -1,6 +1,7 @@
 // _common.js
 
 // 历史点击页面记录
+let isInitHistoryNav = false
 let historyPages = JSON.parse(localStorage.getItem('historyPages')) || [];
 
 function resetTopNav(){
@@ -18,6 +19,8 @@ function resetTopNav(){
 function insertHistoryNav() {
     // 检查是否已存在，避免重复插入
     if (document.querySelector('.history-nav-floating')) return;
+
+    isInitHistoryNav = true;
 
     const navDiv = document.createElement('div');
     navDiv.className = 'history-nav-floating';
@@ -56,9 +59,15 @@ function updateHistoryNav() {
     const rightArrow = document.getElementById('historyNavRightArrow');
     if (!container) return;
 
-    container.innerHTML = '';
 
-    historyPages.forEach((page, index) => {
+    container.innerHTML = '';
+    let historyPagesSort = historyPages
+    if (isInitHistoryNav){
+        historyPagesSort.sort((a, b) => b.priority - a.priority);
+        isInitHistoryNav = false;
+    }
+
+    historyPagesSort.forEach((page, index) => {
         const item = document.createElement('div');
         item.className = 'history-nav-item';
         item.draggable = true;
@@ -102,7 +111,7 @@ function updateHistoryNav() {
     leftArrow.onclick = () => container.scrollBy({ left: -200, behavior: 'smooth' });
     rightArrow.onclick = () => container.scrollBy({ left: 200, behavior: 'smooth' });
 
-    localStorage.setItem('historyPages', JSON.stringify(historyPages));
+    localStorage.setItem('historyPages', JSON.stringify(historyPagesSort));
     resetTopNav()
 }
 
