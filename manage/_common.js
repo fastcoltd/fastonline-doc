@@ -277,31 +277,50 @@ function initMenus() {
     addHistoryPage(title, url);
     updateHistoryNav();
 
+    initSidebarShow()
 }
 
-// 其余已有代码保持不变...
+let sidebarHideKey = 'sidebarHideKey'
+
+function initSidebarShow(){
+    let sidebarHide = JSON.parse(localStorage.getItem(sidebarHideKey)) || [];
+    sidebarHide = sidebarHide.length < 1 ? false : sidebarHide[`${sidebarHideKey}`];
+    if(sidebarHide){
+        toggleSidebar()
+    }else{
+        toggleMobileSidebar()
+    }
+}
 
 function toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const contentWrapper = document.querySelector('.content-wrapper');
+    const historyNavFloating = document.querySelector('.history-nav-floating');
 
     sidebar.classList.toggle('collapsed');
     sidebar.classList.toggle('active');
 
+    let hide = false;
     if (window.innerWidth > 768) {
         if (sidebar.classList.contains('collapsed')) {
+            hide = true;
             contentWrapper.style.marginLeft = '0';
+            historyNavFloating.style = 'left: 0.8em!important;';
         } else {
             contentWrapper.style.marginLeft = '14em';
+            historyNavFloating.style = 'left: 14.8em!important;';
         }
     } else {
         contentWrapper.style.marginLeft = '0';
+        historyNavFloating.style = 'left: 0.8em!important;';
         if (sidebar.classList.contains('active')) {
             sidebar.style.transform = 'translateX(0)';
         } else {
+            hide = true;
             sidebar.style.transform = 'translateX(-100%)';
         }
     }
+    localStorage.setItem(sidebarHideKey, JSON.stringify({sidebarHideKey: hide}));
 }
 
 function updateTime() {
@@ -450,7 +469,10 @@ function createMobileSidebar() {
 
 function toggleMobileSidebar() {
     const mobileSidebar = document.querySelector('.mobile-sidebar');
-    mobileSidebar.classList.toggle('open');
+    if (mobileSidebar){
+        mobileSidebar.classList.toggle('open');
+        localStorage.setItem(sidebarHideKey, JSON.stringify({sidebarHideKey: !mobileSidebar.classList.contains('open')}));
+    }
 }
 
 function highlightMobileMenu() {
