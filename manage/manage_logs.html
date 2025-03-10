@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 管理员日志</title>
+    <title>FASTRESP - 员工日志</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -37,7 +37,7 @@
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
                                 <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('manage_logs.html')">
-                                    <span class="ant-tabs-tab-btn">管理员日志</span>
+                                    <span class="ant-tabs-tab-btn">员工日志</span>
                                     <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                                 </div>
                             </div>
@@ -86,12 +86,12 @@
 
     window.tableConfig = {
         tableName: 'manage_logs',
-        tableTitle: '管理员日志',
+        tableTitle: '员工日志',
         sampleCount: 200,
         defaultPerPage: 20,
         fields: [
             { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'manage_id', generator: () => randomInt(1, 5) }, // 关联 5 个管理员
+            { name: 'manage_id', generator: () => randomInt(1, 5) }, // 关联 5 个员工
             { name: 'ip', generator: () => randomIp() }, // 随机IP地址
             { name: 'ua', generator: () => getRandomItem(userAgents) }, // 随机用户代理
             { name: 'method', generator: () => getRandomItem(methods) }, // HTTP方法
@@ -108,7 +108,7 @@
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'manage_id', label: '管理员', className: 'col-manage-id', formatter: v => managers[v - 1] || `Admin ${v}` },
+            { name: 'manage_id', label: '员工', className: 'col-manage-id', formatter: v => managers[v - 1] || `Admin ${v}` },
             { name: 'ip', label: 'IP地址', className: 'col-ip', formatter: v => `${(v >>> 24) & 255}.${(v >>> 16) & 255}.${(v >>> 8) & 255}.${v & 255}` },
             { name: 'method', label: '方法', className: 'col-method', formatter: v => {
                     switch (v) {
@@ -129,7 +129,7 @@
             ` }
         ],
         filterFields: [
-            { id: 'manageId', type: 'select', options: [{ value: '', label: '全部管理员' }, ...managers.map((m, i) => ({ value: `${i + 1}`, label: m }))], filter: (data, value) => value ? data.filter(d => d.manage_id === parseInt(value)) : data },
+            { id: 'manageId', type: 'select', options: [{ value: '', label: '全部员工' }, ...managers.map((m, i) => ({ value: `${i + 1}`, label: m }))], filter: (data, value) => value ? data.filter(d => d.manage_id === parseInt(value)) : data },
             { id: 'method', type: 'select', options: [{ value: '', label: '全部方法' }, ...methods.map(m => ({ value: m, label: m }))], filter: (data, value) => value ? data.filter(d => d.method === value) : data },
             { id: 'code', type: 'select', options: [{ value: '', label: '全部状态码' }, { value: '200', label: '200' }, { value: '400', label: '400' }], filter: (data, value) => value === '' ? data : data.filter(d => d.code === parseInt(value)) },
             { id: 'module', type: 'text', placeholder: '搜索模块', filter: (data, value) => value ? data.filter(d => d.module.toLowerCase().includes(value.toLowerCase())) : data },
@@ -142,7 +142,7 @@
                 id: 'basic',
                 title: '基本信息',
                 fields: [
-                    { name: 'manage_id', label: '管理员', type: 'select', options: managers.map((m, i) => ({ value: i + 1, label: m })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'manage_id', label: '员工', type: 'select', options: managers.map((m, i) => ({ value: i + 1, label: m })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'ip', label: 'IP地址', type: 'text', formatter: v => v ? `${(v >>> 24) & 255}.${(v >>> 16) & 255}.${(v >>> 8) & 255}.${v & 255}` : '', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'ua', label: '用户代理', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'method', label: '方法', type: 'select', options: methods.map(m => ({ value: m, label: m })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },

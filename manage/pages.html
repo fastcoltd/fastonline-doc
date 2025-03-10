@@ -94,7 +94,7 @@
         defaultPerPage: 20,
         fields: [
             { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'manage_id', generator: () => randomInt(1, 5) }, // 关联 5 个管理员
+            { name: 'manage_id', generator: () => randomInt(1, 5) }, // 关联 5 个员工
             { name: 'pages_type', generator: () => randomInt(1, 5) }, // 关联 5 种页面类型
             { name: 'status', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用
             { name: 'custom_url', generator: id => `/pages/${getRandomItem(pageTypes).toLowerCase()}-${id}` }, // 自定义URL
@@ -116,12 +116,12 @@
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
-            { label: '批量修改管理员', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'manage_id', label: '管理员', type: 'select', options: managers.map((m, i) => ({ value: i + 1, label: m })) } },
+            { label: '批量修改员工', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'manage_id', label: '员工', type: 'select', options: managers.map((m, i) => ({ value: i + 1, label: m })) } },
             { label: '批量修改页面类型', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'pages_type', label: '页面类型', type: 'select', options: pageTypes.map((t, i) => ({ value: i + 1, label: t })) } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'manage_id', label: '管理员', className: 'col-manage-id', formatter: v => managers[v - 1] || `Admin ${v}` },
+            { name: 'manage_id', label: '员工', className: 'col-manage-id', formatter: v => managers[v - 1] || `Admin ${v}` },
             { name: 'pages_type', label: '页面类型', className: 'col-pages-type', formatter: v => pageTypes[v - 1] || `Type ${v}` },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
@@ -144,7 +144,7 @@
             languages: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
         },
         filterFields: [
-            { id: 'manageId', type: 'select', options: [{ value: '', label: '全部管理员' }, ...managers.map((m, i) => ({ value: `${i + 1}`, label: m }))], filter: (data, value) => value ? data.filter(d => d.manage_id === parseInt(value)) : data },
+            { id: 'manageId', type: 'select', options: [{ value: '', label: '全部员工' }, ...managers.map((m, i) => ({ value: `${i + 1}`, label: m }))], filter: (data, value) => value ? data.filter(d => d.manage_id === parseInt(value)) : data },
             { id: 'pagesType', type: 'select', options: [{ value: '', label: '全部类型' }, ...pageTypes.map((t, i) => ({ value: `${i + 1}`, label: t }))], filter: (data, value) => value ? data.filter(d => d.pages_type === parseInt(value)) : data },
             { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
             { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'en_US', label: '英语' }, { value: 'zh_CN', label: '中文' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.pages_id === d.id && l.language === value)) : data },
@@ -157,7 +157,7 @@
                 id: 'basic',
                 title: '基本信息',
                 fields: [
-                    { name: 'manage_id', label: '管理员', type: 'select', options: managers.map((m, i) => ({ value: i + 1, label: m })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'manage_id', label: '员工', type: 'select', options: managers.map((m, i) => ({ value: i + 1, label: m })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'pages_type', label: '页面类型', type: 'select', options: pageTypes.map((t, i) => ({ value: i + 1, label: t })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },

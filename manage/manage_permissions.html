@@ -160,7 +160,7 @@
         }
     ];
 
-    // 获取所有管理员选项
+    // 获取所有员工选项
     function getManageOptions() {
         return manageData.map(item => ({ value: item.id, label: item.full_name }));
     }
@@ -218,7 +218,7 @@
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'manage_id', label: '管理员', className: 'col-manage-name', formatter: v => manageData.find(m => m.id === v)?.full_name || '未知' },
+            { name: 'manage_id', label: '员工', className: 'col-manage-name', formatter: v => manageData.find(m => m.id === v)?.full_name || '未知' },
             { name: 'resource_id', label: '资源', className: 'col-resource-name', formatter: v => {
                     const flat = getResourceOptions();
                     return flat.find(r => r.value === v)?.label || '未知';
@@ -235,7 +235,7 @@
             ` }
         ],
         filterFields: [
-            { id: 'manageId', type: 'select', options: [{ value: '', label: '全部管理员' }, ...getManageOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.manage_id === parseInt(value)) },
+            { id: 'manageId', type: 'select', options: [{ value: '', label: '全部员工' }, ...getManageOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.manage_id === parseInt(value)) },
             { id: 'resourceId', type: 'select', options: [{ value: '', label: '全部资源' }, ...getResourceOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.resource_id === value) }
         ],
         modalTabs: [
@@ -243,7 +243,7 @@
                 id: 'basic',
                 title: '基本信息',
                 fields: [
-                    { name: 'manage_id', label: '管理员', type: 'select', options: getManageOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'manage_id', label: '员工', type: 'select', options: getManageOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'resource_id', label: '资源', type: 'select', options: getResourceOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false }
                 ]
             },

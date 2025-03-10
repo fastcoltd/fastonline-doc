@@ -109,9 +109,9 @@ user_wallet:用户钱包
 violations_event:违规记录
 vip:VIP信息
 vip_lang:VIP多语言
-manage:管理员
-manage_logs:管理员日志
-manage_permissions:管理员权限
+manage:员工
+manage_logs:员工日志
+manage_permissions:员工权限
 quick_message:快捷回复
 quick_message_lang:快捷消息多语言
 quick_message_type:快捷消息类型

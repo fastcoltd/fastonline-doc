@@ -108,12 +108,12 @@
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
-            { label: '批量修改管理员', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'manage_id', label: '管理员', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `管理员${i + 1}` }))] } }
+            { label: '批量修改员工', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'manage_id', label: '员工', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `员工${i + 1}` }))] } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'use_type', label: '类型', className: 'col-use-type', formatter: v => `类型${v}` },
-            { name: 'manage_id', label: '管理员', className: 'col-manage-id', formatter: v => v === 0 ? '无' : `管理员${v}` },
+            { name: 'manage_id', label: '员工', className: 'col-manage-id', formatter: v => v === 0 ? '无' : `员工${v}` },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'title', label: '标题', className: 'col-title', isLangField: true },
@@ -134,7 +134,7 @@
             languages: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
         },
         filterFields: [
-            { id: 'manageId', type: 'select', options: [{ value: '', label: '全部管理员' }, { value: '0', label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: `${i + 1}`, label: `管理员${i + 1}` }))], filter: (data, value) => value ? data.filter(d => d.manage_id === parseInt(value)) : data },
+            { id: 'manageId', type: 'select', options: [{ value: '', label: '全部员工' }, { value: '0', label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: `${i + 1}`, label: `员工${i + 1}` }))], filter: (data, value) => value ? data.filter(d => d.manage_id === parseInt(value)) : data },
             { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'en_US', label: '英语' }, { value: 'zh_CN', label: '中文' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.faq_id === d.id && l.language === value)) : data },
             { id: 'title', type: 'text', placeholder: '搜索标题', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.faq_id === d.id && l.title.toLowerCase().includes(value.toLowerCase()))) : data },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
@@ -146,7 +146,7 @@
                 title: '基本信息',
                 fields: [
                     { name: 'use_type', label: '类型', type: 'select', options: Array.from({ length: 5 }, (_, i) => ({ value: i, label: `类型${i}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'manage_id', label: '管理员', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `管理员${i + 1}` }))], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'manage_id', label: '员工', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `员工${i + 1}` }))], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
@@ -173,7 +173,7 @@
         ],
         indexedFields: [
             { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], buttonColor: '#fa8c16' },
-            { name: 'manage_id', label: '管理员', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `管理员${i + 1}` }))], buttonColor: '#52c41a' }
+            { name: 'manage_id', label: '员工', type: 'select', options: [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `员工${i + 1}` }))], buttonColor: '#52c41a' }
         ]
     };
 </script>

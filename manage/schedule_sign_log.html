@@ -70,7 +70,7 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // 模拟排班和管理员名称
+    // 模拟排班和员工名称
     const scheduleNames = ['早班', '中班', '晚班', '夜班', '全天班'];
     const managerNames = ['张经理', '李经理', '王经理', '赵经理', '钱经理'];
     const reasons = ['设备故障', '网络问题', '临时调整', '未及时操作', '其他原因'];
@@ -95,12 +95,12 @@
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '未打卡' }, { value: 1, label: '正常' }, { value: 2, label: '超时' }, { value: 3, label: '缺卡' }] } },
             { label: '批量修改排班', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'schedule_id', label: '排班', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${scheduleNames[i % scheduleNames.length]} ${i + 1}` })) } },
-            { label: '批量修改管理员', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'manage_id', label: '管理员', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })) } }
+            { label: '批量修改员工', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'manage_id', label: '员工', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })) } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'schedule_id', label: '排班', className: 'col-schedule-id', formatter: v => `${scheduleNames[v % scheduleNames.length]} (${v})` },
-            { name: 'manage_id', label: '管理员', className: 'col-manage-id', formatter: v => `${managerNames[v % managerNames.length]} (${v})` },
+            { name: 'manage_id', label: '员工', className: 'col-manage-id', formatter: v => `${managerNames[v % managerNames.length]} (${v})` },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-orange">未打卡</span>' : v === 1 ? '<span class="ant-tag ant-tag-green">正常</span>' : v === 2 ? '<span class="ant-tag ant-tag-blue">超时</span>' : '<span class="ant-tag ant-tag-red">缺卡</span>' },
             { name: 'trigger_time', label: '触发时间', className: 'col-trigger-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'sign_time', label: '签到时间', className: 'col-sign-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
@@ -124,7 +124,7 @@
                 title: '基本信息',
                 fields: [
                     { name: 'schedule_id', label: '排班', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${scheduleNames[i % scheduleNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'manage_id', label: '管理员', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'manage_id', label: '员工', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '未打卡' }, { value: 1, label: '正常' }, { value: 2, label: '超时' }, { value: 3, label: '缺卡' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'trigger_time', label: '触发时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'sign_time', label: '签到时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },

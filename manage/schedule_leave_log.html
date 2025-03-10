@@ -102,7 +102,7 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // 模拟排班和管理员名称
+    // 模拟排班和员工名称
     const scheduleNames = ['早班', '中班', '晚班', '夜班', '全天班'];
     const managerNames = ['张经理', '李经理', '王经理', '赵经理', '钱经理'];
     const leaveTypes = ['事假', '病假', '年假', '其他'];
@@ -131,12 +131,12 @@
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '申请中' }, { value: 1, label: '已通过' }, { value: 2, label: '已拒绝' }] } },
             { label: '批量修改排班', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'schedule_id', label: '排班', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${scheduleNames[i % scheduleNames.length]} ${i + 1}` })) } },
-            { label: '批量修改管理员', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'manage_id', label: '管理员', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })) } }
+            { label: '批量修改员工', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'manage_id', label: '员工', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })) } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'schedule_id', label: '排班', className: 'col-schedule-id', formatter: v => `${scheduleNames[v % scheduleNames.length]} (${v})` },
-            { name: 'manage_id', label: '管理员', className: 'col-manage-id', formatter: v => `${managerNames[v % managerNames.length]} (${v})` },
+            { name: 'manage_id', label: '员工', className: 'col-manage-id', formatter: v => `${managerNames[v % managerNames.length]} (${v})` },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-orange">申请中</span>' : v === 1 ? '<span class="ant-tag ant-tag-green">已通过</span>' : '<span class="ant-tag ant-tag-red">已拒绝</span>' },
             { name: 'ask_time', label: '申请时间', className: 'col-ask-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'leave_time', label: '请假时间', className: 'col-leave-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
@@ -168,7 +168,7 @@
                 title: '基本信息',
                 fields: [
                     { name: 'schedule_id', label: '排班', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${scheduleNames[i % scheduleNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'manage_id', label: '管理员', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'manage_id', label: '员工', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '申请中' }, { value: 1, label: '已通过' }, { value: 2, label: '已拒绝' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'ask_time', label: '申请时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'leave_time', label: '请假时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
@@ -204,7 +204,7 @@
         // 定义展示字段
         const reviewFields = [
             { name: 'schedule_id', label: '排班', formatter: v => `${scheduleNames[v % scheduleNames.length]} (${v})` },
-            { name: 'manage_id', label: '管理员', formatter: v => `${managerNames[v % managerNames.length]} (${v})` },
+            { name: 'manage_id', label: '员工', formatter: v => `${managerNames[v % managerNames.length]} (${v})` },
             { name: 'ask_time', label: '申请时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'leave_time', label: '请假时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'back_time', label: '返回时间', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
