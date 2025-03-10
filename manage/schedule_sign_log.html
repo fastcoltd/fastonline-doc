@@ -3,25 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 排班签到日志</title>
+    <title>FASTRESP - 签到记录</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
+    <script src="_img.js"></script>
     <script src="_opt.js"></script>
     <style>
         .col-checkbox { width: 5%; min-width: 50px; }
         .col-id { width: 8%; min-width: 60px; }
-        .col-schedule-id { width: 10%; min-width: 80px; }
+        .col-schedule-id { width: 12%; min-width: 100px; }
         .col-manage-id { width: 10%; min-width: 80px; }
+        .col-sign-type { width: 10%; min-width: 80px; }
         .col-status { width: 8%; min-width: 60px; }
         .col-trigger-time { width: 12%; min-width: 100px; }
         .col-sign-time { width: 12%; min-width: 100px; }
-        .col-reason { width: 10%; min-width: 80px; }
+        .col-reason { width: 12%; min-width: 100px; }
+        .col-site-reply { width: 12%; min-width: 100px; }
         .col-create-time { width: 12%; min-width: 100px; }
-        .col-actions { width: 12%; min-width: 100px; }
+        .col-actions { width: 14%; min-width: 120px; }
+        .review-info { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 15px; border: 1px solid #e8e8e8; border-radius: 4px; background: #fafafa; margin-bottom: 20px; }
+        .review-info div { flex: 1 1 45%; min-width: 200px; text-align: left; padding: 5px 0; }
+        .review-info div strong { display: inline-block; width: 80px; color: #1e3a8a; }
     </style>
 </head>
 <body>
@@ -36,7 +42,7 @@
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
                                 <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('schedule_sign_log.html')">
-                                    <span class="ant-tabs-tab-btn">排班签到日志</span>
+                                    <span class="ant-tabs-tab-btn">签到记录</span>
                                     <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                                 </div>
                             </div>
@@ -49,7 +55,7 @@
                                 <div class="action-container"></div>
                                 <div class="task-list">
                                     <div class="table-header"></div>
-                                    <div id="schedule_sign_log-list">加载中...</div>
+                                    <div id="schedule-sign-log-list">加载中...</div>
                                     <div class="pagination"></div>
                                 </div>
                             </div>
@@ -60,61 +66,124 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
+        </div>
+    </div>
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeReviewModal()">×</button>
+            <h3>审核补卡申请</h3>
+            <div id="reviewInfo" class="review-info"></div>
+            <div class="ant-form-item">
+                <label>审核结果:</label>
+                <select id="reviewResult" class="ant-select">
+                    <option value="pass">通过</option>
+                    <option value="reject">拒绝</option>
+                </select>
+            </div>
+            <div class="ant-form-item" id="rejectReasonContainer" style="display: none;">
+                <label>拒绝理由:</label>
+                <textarea id="rejectReason" class="ant-input" rows="4" placeholder="请输入拒绝理由"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="ant-btn" onclick="closeReviewModal()">取消</button>
+                <button class="ant-btn ant-btn-primary" onclick="submitReview()">提交</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    function getRandomItem(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
-    }
     function randomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // 模拟排班和员工名称
-    const scheduleNames = ['早班', '中班', '晚班', '夜班', '全天班'];
-    const managerNames = ['张经理', '李经理', '王经理', '赵经理', '钱经理'];
-    const reasons = ['设备故障', '网络问题', '临时调整', '未及时操作', '其他原因'];
+    // 模拟数据选项
+    const signTypes = [
+        { value: 0, label: '上班卡', color: 'green' },
+        { value: 1, label: '休息下班卡', color: 'blue' },
+        { value: 2, label: '休息上班卡', color: 'cyan' },
+        { value: 3, label: '下班卡', color: 'red' },
+        { value: 4, label: '在岗卡', color: 'purple' },
+        { value: 5, label: '补卡', color: 'orange' }
+    ];
+    const statusOptions = [
+        { value: 0, label: '未打卡', color: 'red' },
+        { value: 1, label: '正常', color: 'green' },
+        { value: 2, label: '超时', color: 'orange' },
+        { value: 3, label: '缺卡', color: 'volcano' }
+    ];
+    const scheduleOptions = Array.from({ length: 15 }, (_, i) => ({
+        value: i + 1,
+        label: `SCH-2025-03-${String(randomInt(1, 31)).padStart(2, '0')}-Shift${randomInt(1, 3)}`
+    }));
+    const manageNames = [
+        '张伟', '王芳', '李强', '赵敏', '刘洋', '陈静', '杨磊', '孙丽', '周杰', '吴娜',
+        '郑凯', '徐颖', '马超', '胡芳', '郭涛'
+    ];
+    const manageOptions = manageNames.map((name, i) => ({ value: i + 1, label: name }));
 
     window.tableConfig = {
         tableName: 'schedule_sign_log',
-        tableTitle: '排班签到日志',
+        tableTitle: '签到记录',
         sampleCount: 200,
         defaultPerPage: 20,
         fields: [
             { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'schedule_id', generator: () => randomInt(1, 20) },
-            { name: 'manage_id', generator: () => randomInt(1, 10) },
-            { name: 'status', generator: () => randomInt(0, 3) }, // 0:未打卡, 1:正常, 2:超时, 3:缺卡
+            { name: 'schedule_id', generator: () => randomInt(1, 15) },
+            { name: 'manage_id', generator: () => randomInt(1, 15) },
+            { name: 'sign_type', generator: () => randomInt(0, 5) },
+            { name: 'status', generator: () => randomInt(0, 3) },
             { name: 'trigger_time', generator: () => moment().subtract(randomInt(1, 30), 'days').unix() },
-            { name: 'sign_time', generator: () => moment().subtract(randomInt(0, 29), 'days').unix() },
-            { name: 'reason', generator: () => getRandomItem(reasons) },
-            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+            { name: 'sign_time', generator: () => moment().subtract(randomInt(1, 30), 'days').unix() },
+            { name: 'reason', generator: id => {
+                    const status = tableData.find(item => item.id === id)?.status;
+                    return status !== 1 ? `签到异常 ${randomInt(1, 100)}` : '';
+                }},
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
+            { name: 'site_reply', generator: () => randomInt(0, 1) ? `审核回复 ${randomInt(1, 50)}` : '' }
         ],
         actionButtons: [
-            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
-            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '未打卡' }, { value: 1, label: '正常' }, { value: 2, label: '超时' }, { value: 3, label: '缺卡' }] } },
-            { label: '批量修改排班', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'schedule_id', label: '排班', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${scheduleNames[i % scheduleNames.length]} ${i + 1}` })) } },
-            { label: '批量修改员工', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'manage_id', label: '员工', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })) } }
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'status', label: '状态', type: 'select', options: statusOptions } },
+            { label: '批量修改排班', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'schedule_id', label: '排班ID', type: 'select', options: scheduleOptions } },
+            { label: '批量修改员工', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'manage_id', label: '员工ID', type: 'select', options: manageOptions } }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'schedule_id', label: '排班', className: 'col-schedule-id', formatter: v => `${scheduleNames[v % scheduleNames.length]} (${v})` },
-            { name: 'manage_id', label: '员工', className: 'col-manage-id', formatter: v => `${managerNames[v % managerNames.length]} (${v})` },
-            { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-orange">未打卡</span>' : v === 1 ? '<span class="ant-tag ant-tag-green">正常</span>' : v === 2 ? '<span class="ant-tag ant-tag-blue">超时</span>' : '<span class="ant-tag ant-tag-red">缺卡</span>' },
+            { name: 'schedule_id', label: '排班ID', className: 'col-schedule-id', formatter: v => scheduleOptions.find(opt => opt.value === v)?.label || v },
+            { name: 'manage_id', label: '员工ID', className: 'col-manage-id', formatter: v => manageOptions.find(opt => opt.value === v)?.label || v },
+            { name: 'sign_type', label: '签到类型', className: 'col-sign-type', formatter: v => {
+                    const type = signTypes.find(opt => opt.value === v);
+                    return type ? `<span class="ant-tag ant-tag-${type.color}">${type.label}</span>` : v;
+                }},
+            { name: 'status', label: '状态', className: 'col-status', formatter: v => {
+                    const status = statusOptions.find(opt => opt.value === v);
+                    return status ? `<span class="ant-tag ant-tag-${status.color}">${status.label}</span>` : v;
+                }},
             { name: 'trigger_time', label: '触发时间', className: 'col-trigger-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'sign_time', label: '签到时间', className: 'col-sign-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
-            { name: 'reason', label: '原因', className: 'col-reason' },
+            { name: 'reason', label: '理由', className: 'col-reason', formatter: v => v || '无' },
+            { name: 'site_reply', label: '审核回复', className: 'col-site-reply', formatter: v => v || '无' },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
-                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn" onclick="editRecord(${item.id}, true)" style="margin-right: 8px;">查看</button>
+                ${item.sign_type === 5 ? `<button class="ant-btn ant-btn-primary" onclick="openReviewModal(${item.id})" style="margin-right: 8px;">审核</button>` : ''}
                 <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
             ` }
         ],
         filterFields: [
-            { id: 'schedule_id', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${scheduleNames[i % scheduleNames.length]} ${i + 1}` })), filter: (data, value) => value === '' ? data : data.filter(d => d.schedule_id === parseInt(value)) },
-            { id: 'manage_id', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })), filter: (data, value) => value === '' ? data : data.filter(d => d.manage_id === parseInt(value)) },
-            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '未打卡' }, { value: '1', label: '正常' }, { value: '2', label: '超时' }, { value: '3', label: '缺卡' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
+            { id: 'schedule_id', type: 'select', options: [{ value: '', label: '全部排班' }, ...scheduleOptions], filter: (data, value) => value === '' ? data : data.filter(d => d.schedule_id === parseInt(value)) },
+            { id: 'manage_id', type: 'select', options: [{ value: '', label: '全部员工' }, ...manageOptions], filter: (data, value) => value === '' ? data : data.filter(d => d.manage_id === parseInt(value)) },
+            { id: 'sign_type', type: 'select', options: [{ value: '', label: '全部类型' }, ...signTypes], filter: (data, value) => value === '' ? data : data.filter(d => d.sign_type === parseInt(value)) },
+            { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, ...statusOptions], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
             { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
         ],
@@ -123,18 +192,72 @@
                 id: 'basic',
                 title: '基本信息',
                 fields: [
-                    { name: 'schedule_id', label: '排班', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${scheduleNames[i % scheduleNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'manage_id', label: '员工', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `${managerNames[i % managerNames.length]} ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '未打卡' }, { value: 1, label: '正常' }, { value: 2, label: '超时' }, { value: 3, label: '缺卡' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'trigger_time', label: '触发时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'sign_time', label: '签到时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'reason', label: '原因', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                    { name: 'schedule_id', label: '排班ID', type: 'select', options: scheduleOptions, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'manage_id', label: '员工ID', type: 'select', options: manageOptions, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'sign_type', label: '签到类型', type: 'select', options: signTypes, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'status', label: '状态', type: 'select', options: statusOptions, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'trigger_time', label: '触发时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'sign_time', label: '签到时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'reason', label: '理由', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'site_reply', label: '审核回复', type: 'textarea', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
                 ]
             }
         ]
     };
+
+    // 审核弹窗逻辑
+    let currentReviewId = null;
+
+    function openReviewModal(id) {
+        currentReviewId = id;
+        const record = tableData.find(item => item.id === id);
+        const infoDiv = document.getElementById('reviewInfo');
+        infoDiv.innerHTML = `
+            <div><strong>排班ID:</strong> ${scheduleOptions.find(opt => opt.value === record.schedule_id)?.label || record.schedule_id}</div>
+            <div><strong>员工:</strong> ${manageOptions.find(opt => opt.value === record.manage_id)?.label || record.manage_id}</div>
+            <div><strong>签到类型:</strong> ${signTypes.find(opt => opt.value === record.sign_type)?.label || record.sign_type}</div>
+            <div><strong>状态:</strong> ${statusOptions.find(opt => opt.value === record.status)?.label || record.status}</div>
+            <div><strong>触发时间:</strong> ${moment.unix(record.trigger_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+            <div><strong>签到时间:</strong> ${moment.unix(record.sign_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+            <div><strong>理由:</strong> ${record.reason || '无'}</div>
+            <div><strong>创建时间:</strong> ${moment.unix(record.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+        `;
+        document.getElementById('reviewResult').value = 'pass';
+        document.getElementById('rejectReasonContainer').style.display = 'none';
+        document.getElementById('rejectReason').value = '';
+        document.getElementById('reviewModal').style.display = 'block';
+
+        document.getElementById('reviewResult').onchange = function() {
+            document.getElementById('rejectReasonContainer').style.display = this.value === 'reject' ? 'block' : 'none';
+        };
+    }
+
+    function closeReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+        currentReviewId = null;
+    }
+
+    function submitReview() {
+        const result = document.getElementById('reviewResult').value;
+        const rejectReason = document.getElementById('rejectReason').value;
+        const record = tableData.find(item => item.id === currentReviewId);
+
+        if (result === 'pass') {
+            record.status = 1; // 通过改为正常
+            record.site_reply = '补卡申请通过';
+        } else if (result === 'reject') {
+            if (!rejectReason) {
+                alert('请填写拒绝理由！');
+                return;
+            }
+            record.status = 3; // 拒绝改为缺卡
+            record.site_reply = `补卡申请拒绝：${rejectReason}`;
+        }
+
+        renderTableList();
+        closeReviewModal();
+    }
 
     // 支持 Enter 键触发查询
     document.addEventListener('keydown', (e) => {

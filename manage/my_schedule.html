@@ -59,6 +59,64 @@
         }
         .ant-calendar-table td.has-schedule {
         }
+        .attendance-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 24px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            min-width: 800px;
+            max-width: 90vw;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 999;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 16px;
+            color: #999;
+            cursor: pointer;
+        }
+        .modal-close:hover {
+            color: #000;
+        }
+        .modal-close-disabled {
+            cursor: not-allowed;
+            color: #d9d9d9;
+        }
+        .modal-close-disabled:hover {
+            color: #d9d9d9;
+        }
+        .attendance-table-wrapper {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 60vh; /* 默认限制高度，桌面端可见 */
+            -webkit-overflow-scrolling: touch;
+        }
+        .makeup-modal {
+            z-index: 1001;
+        }
+        .makeup-modal-overlay {
+            z-index: 1000;
+        }
+        .ant-modal-footer {
+            text-align: right;
+            padding: 10px 16px;
+            border-top: 1px solid #f0f0f0;
+        }
         @media (max-width: 768px) {
             .ant-calendar-table th {
                 font-size: 10px;
@@ -72,6 +130,35 @@
             }
             .ant-calendar-header {
                 font-size: 14px;
+            }
+            .attendance-modal {
+                min-width: 100px;
+                width: 90vw;
+                padding: 16px;
+                max-height: 80vh; /* 移动端限制整个弹窗高度 */
+                overflow-y: auto;
+            }
+            .attendance-table-wrapper {
+                max-height: 50vh; /* 移动端表格区域更矮，确保可见 */
+            }
+            .ant-modal-body {
+                padding: 16px;
+            }
+            .ant-form-item {
+                margin-bottom: 12px;
+            }
+            .ant-form-item-label {
+                font-size: 12px;
+            }
+            .ant-input, .ant-form-text, .ant-tag {
+                font-size: 12px;
+            }
+            .ant-btn {
+                padding: 4px 12px;
+                font-size: 12px;
+            }
+            .ant-modal-footer {
+                padding: 8px 12px;
             }
         }
         @media (max-width: 480px) {
@@ -152,14 +239,13 @@
     let tableData = [];
     const THEME_COLOR = '#1890ff';
 
-    // 初始化样本数据，80%天数有排班，我的排班占比50%
     function initSampleData() {
-        const uniqueDates = dates.slice(0, Math.floor(dates.length * 0.8)); // 80%天数
+        const uniqueDates = dates.slice(0, Math.floor(dates.length * 0.8));
         uniqueDates.forEach((date, index) => {
-            const numSchedules = Math.floor(Math.random() * 3) + 1; // 每一天1-3个排班
+            const numSchedules = Math.floor(Math.random() * 3) + 1;
             for (let j = 0; j < numSchedules; j++) {
-                const isMyShift = Math.random() < 0.5; // 50%概率是我
-                const manageId = isMyShift ? CURRENT_USER_ID : Math.floor(Math.random() * 14) + 2; // 若不是我，从2-15中选
+                const isMyShift = Math.random() < 0.5;
+                const manageId = isMyShift ? CURRENT_USER_ID : Math.floor(Math.random() * 14) + 2;
                 tableData.push({
                     id: index * 3 + j + 1,
                     status: 1,
@@ -182,17 +268,13 @@
         });
     }
 
-    function getRandomItem(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
-    }
-
     function getRandomColor() {
         const letters = '0123456789ABCDEF';
         let color = '#';
         for (let i = 0; i < 6; i++) {
             color += letters[Math.floor(Math.random() * 16)];
         }
-        return `${color}33`; // 浅色背景
+        return `${color}33`;
     }
 
     function initFilters() {
@@ -238,7 +320,7 @@
         `;
 
         let dayCount = 0;
-        const selectColor = getRandomColor(); // 全局随机颜色
+        const selectColor = getRandomColor();
         for (let i = 0; i < 6; i++) {
             calendarHtml += '<tr>';
             for (let j = 0; j < 7; j++) {
@@ -260,7 +342,14 @@
                         content = schedules.map(s => {
                             const isMine = s.manage_id === CURRENT_USER_ID;
                             const colorStyle = isMine ? `style="color: ${THEME_COLOR}; font-weight: 900;"` : '';
-                            return `<span ${colorStyle}>${manageIds.find(m => m.value === s.manage_id)?.label || '未知'} (${moment.unix(s.work_start).format('HH:mm')}~${moment.unix(s.work_end).format('HH:mm')})</span>`;
+                            let statusTag = '';
+                            if (isMine) {
+                                const isAbnormal = Math.random() < 0.2;
+                                statusTag = isAbnormal ?
+                                    ` <span class="abnormal-tag" onclick="showAttendanceModal('${date}', ${s.id})" style="color: red; font-weight: bold; cursor: pointer;">考勤异常</span>` :
+                                    ` <span style="color: #52c41a; font-weight: bold;">考勤正常</span>`;
+                            }
+                            return `<span ${colorStyle}>${manageIds.find(m => m.value === s.manage_id)?.label || '未知'} (${moment.unix(s.work_start).format('HH:mm')}~${moment.unix(s.work_end).format('HH:mm')})${statusTag}</span>`;
                         }).join('<br>');
                     }
 
@@ -277,6 +366,199 @@
         document.getElementById('myScheduleCalendar').innerHTML = calendarHtml;
     }
 
+    function showAttendanceModal(date, scheduleId) {
+        const schedule = tableData.find(s => s.id === scheduleId);
+        const attendanceData = generateAttendanceData(schedule);
+
+        let modalHtml = `
+            <div class="modal-overlay" onclick="closeModal()"></div>
+            <div class="attendance-modal" id="attendanceModal">
+                <span class="modal-close" onclick="closeModal()">×</span>
+                <h3 class="ant-modal-title" style="margin-bottom: 16px;">打卡信息</h3>
+                <div class="attendance-table-wrapper">
+                    <table class="ant-table ant-table-bordered">
+                        <thead class="ant-table-thead">
+                            <tr>
+                                <th>日期</th>
+                                <th>排班时间</th>
+                                <th>员工名</th>
+                                <th>打卡类型</th>
+                                <th>打卡状态</th>
+                                <th>打卡时间</th>
+                                <th>触发时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="ant-table-tbody">
+        `;
+
+        const typeColors = {
+            '上班卡': '#1890ff',
+            '休息下班卡': '#52c41a',
+            '休息上班卡': '#fa8c16',
+            '下班卡': '#eb2f96',
+            '在岗卡': '#13c2c2'
+        };
+
+        const statusColors = {
+            '未打卡': '#d9d9d9',
+            '正常': '#52c41a',
+            '超时': '#faad14',
+            '缺卡': '#f5222d'
+        };
+
+        attendanceData.forEach(record => {
+            const canMakeup = ['上班卡', '休息下班卡', '休息上班卡', '下班卡'].includes(record.type) && record.status === '缺卡';
+            const highlight = record.status === '缺卡' || record.status === '未打卡';
+            const rowClass = highlight ? 'ant-table-row ant-table-row-level-0 ant-table-row-selected' : 'ant-table-row ant-table-row-level-0';
+
+            modalHtml += `
+                <tr class="${rowClass}">
+                    <td>${record.date}</td>
+                    <td>${moment.unix(schedule.work_start).format('HH:mm')}~${moment.unix(schedule.work_end).format('HH:mm')}</td>
+                    <td>${manageIds.find(m => m.value === schedule.manage_id)?.label}</td>
+                    <td><span class="ant-tag" style="background-color: ${typeColors[record.type]}; color: white;">${record.type}</span></td>
+                    <td><span class="ant-tag" style="background-color: ${statusColors[record.status]}; color: white;">${record.status}</span></td>
+                    <td>${record.time || '-'}</td>
+                    <td>${record.triggerTime || '-'}</td>
+                    <td>${canMakeup ? `<button class="ant-btn ant-btn-primary" onclick="showMakeupModal(${schedule.id}, '${record.type}')">申请补卡</button>` : '-'}</td>
+                </tr>
+            `;
+        });
+
+        modalHtml += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    function generateAttendanceData(schedule) {
+        const records = [];
+        const workStart = moment.unix(schedule.work_start);
+        const workEnd = moment.unix(schedule.work_end);
+        const duration = workEnd.diff(workStart, 'hours');
+
+        records.push({
+            type: '上班卡',
+            status: Math.random() > 0.2 ? '正常' : '缺卡',
+            time: Math.random() > 0.2 ? workStart.format('HH:mm') : null,
+            date: schedule.date
+        });
+
+        records.push({
+            type: '休息下班卡',
+            status: Math.random() > 0.2 ? '正常' : '缺卡',
+            time: Math.random() > 0.2 ? workStart.clone().add(duration/2 - 1, 'hours').format('HH:mm') : null,
+            date: schedule.date
+        });
+
+        records.push({
+            type: '休息上班卡',
+            status: Math.random() > 0.2 ? '正常' : '缺卡',
+            time: Math.random() > 0.2 ? workStart.clone().add(duration/2, 'hours').format('HH:mm') : null,
+            date: schedule.date
+        });
+
+        records.push({
+            type: '下班卡',
+            status: Math.random() > 0.2 ? '正常' : '缺卡',
+            time: Math.random() > 0.2 ? workEnd.format('HH:mm') : null,
+            date: schedule.date
+        });
+
+        let currentTime = workStart.clone();
+        let inPostCount = 0;
+        const statuses = ['未打卡', '正常', '超时', '缺卡'];
+        while (currentTime.isBefore(workEnd) && inPostCount < 8) {
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            records.push({
+                type: '在岗卡',
+                status: randomStatus,
+                time: randomStatus === '正常' || randomStatus === '超时' ? currentTime.format('HH:mm') : null,
+                triggerTime: currentTime.format('HH:mm'),
+                date: schedule.date
+            });
+            currentTime.add(1, 'hour');
+            inPostCount++;
+        }
+
+        return records;
+    }
+
+    function showMakeupModal(scheduleId, type) {
+        const schedule = tableData.find(s => s.id === scheduleId);
+        const typeColors = {
+            '上班卡': '#1890ff',
+            '休息下班卡': '#52c41a',
+            '休息上班卡': '#fa8c16',
+            '下班卡': '#eb2f96',
+            '在岗卡': '#13c2c2'
+        };
+        const modalHtml = `
+            <div class="modal-overlay makeup-modal-overlay"></div>
+            <div class="attendance-modal ant-modal makeup-modal">
+                <span class="modal-close modal-close-disabled">×</span>
+                <div class="ant-modal-content">
+                    <div class="ant-modal-header">
+                        <div class="ant-modal-title">申请补卡</div>
+                    </div>
+                    <div class="ant-modal-body">
+                        <form class="ant-form ant-form-vertical">
+                            <div class="ant-form-item">
+                                <label class="ant-form-item-label">员工:</label>
+                                <div class="ant-form-item-control">
+                                    <span class="ant-form-text">${manageIds.find(m => m.value === schedule.manage_id)?.label}</span>
+                                </div>
+                            </div>
+                            <div class="ant-form-item">
+                                <label class="ant-form-item-label">排班:</label>
+                                <div class="ant-form-item-control">
+                                    <span class="ant-form-text">${schedule.date} (${moment.unix(schedule.work_start).format('HH:mm')}~${moment.unix(schedule.work_end).format('HH:mm')})</span>
+                                </div>
+                            </div>
+                            <div class="ant-form-item">
+                                <label class="ant-form-item-label">打卡类型:</label>
+                                <div class="ant-form-item-control">
+                                    <span class="ant-tag" style="background-color: ${typeColors[type]}; color: white;">${type}</span>
+                                </div>
+                            </div>
+                            <div class="ant-form-item">
+                                <label class="ant-form-item-label">打卡时间:</label>
+                                <div class="ant-form-item-control">
+                                    <input type="time" id="makeupTime" class="ant-input" />
+                                </div>
+                            </div>
+                            <div class="ant-form-item">
+                                <label class="ant-form-item-label">原因:</label>
+                                <div class="ant-form-item-control">
+                                    <textarea id="makeupReason" class="ant-input" rows="4"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="ant-modal-footer">
+                        <button type="button" onclick="submitMakeup(${schedule.id}, '${type}')" class="ant-btn ant-btn-primary">申请补卡</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    function submitMakeup(scheduleId, type) {
+        const time = document.getElementById('makeupTime').value;
+        const reason = document.getElementById('makeupReason').value;
+        console.log('补卡申请:', { scheduleId, type, time, reason });
+        closeModal();
+    }
+
+    function closeModal() {
+        document.querySelectorAll('.modal-overlay, .attendance-modal').forEach(el => el.remove());
+    }
+
     window.onload = function() {
         w3.includeHTML(() => {
             initMenus();
@@ -286,5 +568,6 @@
         });
     };
 </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91e2bd1b8eb2b063',t:'MTc0MTYwODkzOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

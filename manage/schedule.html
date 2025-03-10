@@ -148,6 +148,15 @@
                 font-size: 12px;
             }
         }
+        .col-schedule-name { width: 15%; }
+
+        @media (max-width: 768px) {
+            .col-schedule-name { width: 20%; }
+        }
+
+        @media (max-width: 480px) {
+            .col-schedule-name { width: 25%; }
+        }
     </style>
 </head>
 <body>
@@ -221,6 +230,7 @@
             { name: 'date', generator: () => getRandomItem(dates) },
             { name: 'from', generator: () => randomInt(8, 12) * 3600 }, // 8-12点开始
             { name: 'to', generator: () => randomInt(16, 20) * 3600 }, // 16-20点结束
+            { name: 'schedule_name', generator: () => '' },
             { name: 'manage_id', generator: () => randomInt(0, 14) + 1 },
             { name: 'true_manage_id', generator: () => randomInt(0, 14) + 1 },
             { name: 'work_start', generator: () => randomInt(8, 12) * 3600 },
@@ -245,6 +255,7 @@
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">无效</span>' : '<span class="ant-tag ant-tag-green">有效</span>' },
+            { name: 'schedule_name', label: '排班名称', className: 'col-work-schedule' },
             { name: 'date', label: '日期', className: 'col-date' },
             { name: 'from', label: '起始', className: 'col-from', formatter: v => moment.unix(v).format('HH:mm') },
             { name: 'to', label: '结束', className: 'col-to', formatter: v => moment.unix(v).format('HH:mm') },
@@ -277,6 +288,7 @@
                 title: '基本信息',
                 fields: [
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '无效' }, { value: 1, label: '有效' }], showInAdd: false, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'schedule_name', label: '排班名称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'date', label: '日期', type: 'date', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'from', label: '起始时间', type: 'select', options: Array.from({ length: 13 }, (_, i) => ({ value: (i + 8) * 3600, label: `${i + 8}:00` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'to', label: '结束时间', type: 'select', options: Array.from({ length: 13 }, (_, i) => ({ value: (i + 12) * 3600, label: `${i + 12}:00` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
@@ -486,6 +498,9 @@
 
     // 编辑日期排班
     function editScheduleDate(date) {
+        const schedules = tableData.filter(d => d.date === date && d.status === 1);
+        const existingSchedule = schedules.length > 0 ? schedules[0] : null;
+
         let modal = document.getElementById('editScheduleModal');
         if (!modal) {
             modal = document.createElement('div');
@@ -503,21 +518,25 @@
                     <input type="date" class="ant-input" value="${date}" disabled>
                 </div>
                 <div class="ant-form-item">
+                    <label>排班名称:</label>
+                    <input type="text" class="ant-input" id="editScheduleName" value="${existingSchedule ? existingSchedule.schedule_name : ''}">
+                </div>
+                <div class="ant-form-item">
                     <label>开始时间:</label>
                     <select class="ant-select" id="editWorkStart">
-                        ${Array.from({ length: 13 }, (_, i) => `<option value="${(i + 8) * 3600}">${i + 8}:00</option>`).join('')}
+                        ${Array.from({ length: 13 }, (_, i) => `<option value="${(i + 8) * 3600}" ${existingSchedule && existingSchedule.work_start === (i + 8) * 3600 ? 'selected' : ''}>${i + 8}:00</option>`).join('')}
                     </select>
                 </div>
                 <div class="ant-form-item">
                     <label>结束时间:</label>
                     <select class="ant-select" id="editWorkEnd">
-                        ${Array.from({ length: 13 }, (_, i) => `<option value="${(i + 12) * 3600}">${i + 12}:00</option>`).join('')}
+                        ${Array.from({ length: 13 }, (_, i) => `<option value="${(i + 12) * 3600}" ${existingSchedule && existingSchedule.work_end === (i + 12) * 3600 ? 'selected' : ''}>${i + 12}:00</option>`).join('')}
                     </select>
                 </div>
                 <div class="ant-form-item">
                     <label>员工:</label>
                     <select class="ant-select" id="editManageId">
-                        ${manageIds.map(m => `<option value="${m.value}">${m.label}</option>`).join('')}
+                        ${manageIds.map(m => `<option value="${m.value}" ${existingSchedule && existingSchedule.manage_id === m.value ? 'selected' : ''}>${m.label}</option>`).join('')}
                     </select>
                 </div>
                 <div class="modal-buttons">
@@ -544,17 +563,20 @@
         const workStart = parseInt(document.getElementById('editWorkStart').value);
         const workEnd = parseInt(document.getElementById('editWorkEnd').value);
         const manageId = parseInt(document.getElementById('editManageId').value);
+        const scheduleName = document.getElementById('editScheduleName').value ||
+            `${moment.unix(workStart).format('H:mm')}~${moment.unix(workEnd).format('H:mm')} ${moment(date).format('MM/DD')} (早班)`;
 
         const newRecord = {
             id: tableData.length + 1,
-            status: 1, // 默认有效
+            status: 1,
             date: date,
             from: workStart,
             to: workEnd,
             manage_id: manageId,
-            true_manage_id: manageId, // 默认与manage_id一致
+            true_manage_id: manageId,
             work_start: workStart,
             work_end: workEnd,
+            schedule_name: scheduleName, // 添加排班名称
             ask_leave_count: 0,
             time_off_work: 0,
             sign_count: 0,
@@ -565,8 +587,8 @@
         };
         tableData.push(newRecord);
         closeEditScheduleModal();
-        renderCalendar(); // 刷新日历
-        renderTableList(); // 刷新列表
+        renderCalendar();
+        renderTableList();
     }
 </script>
 </body>
