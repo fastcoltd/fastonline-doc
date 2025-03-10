@@ -6,7 +6,7 @@ let historyPages = JSON.parse(localStorage.getItem('historyPages')) || [];
 
 function resetTopNav(){
     historyPages = JSON.parse(localStorage.getItem('historyPages')) || [];
-    if (!historyPages || historyPages.length <= 0){
+    if (!historyPages || historyPages.length <= 1){
         document.querySelector('.content-wrapper').style = "";
         document.querySelector('.history-nav-floating').style = "display: none;";
     }else{
@@ -201,20 +201,6 @@ function initMenus() {
         });
     });
 
-    // 监听 sidebar 点击
-    document.querySelectorAll('.sidebar-submenu-item a').forEach(link => {
-        link.addEventListener('click', (e) => {
-            const title = link.textContent.trim();
-            const url = link.getAttribute('href');
-            addHistoryPage(title, url);
-        });
-    });
-
-    // 动态插入导航条并初始化
-    insertHistoryNav();
-    updateHistoryNav();
-
-    // 其余已有代码...
     const currentUrl = window.location.pathname.split('/').pop() || 'dashboard.html';
     let activeTopMenu = null;
 
@@ -283,6 +269,14 @@ function initMenus() {
     window.addEventListener('resize', handleMobileSidebar);
 
     initModalClose();
+
+    // 动态插入导航条并初始化
+    insertHistoryNav();
+    let title = document.title.split("-")[1].trim()
+    let url = window.location.href;
+    addHistoryPage(title, url);
+    updateHistoryNav();
+
 }
 
 // 其余已有代码保持不变...
