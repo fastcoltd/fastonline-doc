@@ -1,105 +1,5 @@
-<!-- 请假悬浮窗按钮 -->
-<div class="float-btn">
-    <button class="leave-btn" onclick="openLeaveModal()">
-        <span class="anticon anticon-user">
-            <svg width="1.5em" height="1.5em" viewBox="64 64 896 896" focusable="false" data-icon="user" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-                <path d="M858.5 763.6a374 374 0 0 0-66.5-206.5c-49.8-74.6-129.6-122.6-218.5-122.6s-168.7 48-218.5 122.6a374 374 0 0 0-66.5 206.5c0 8.3.7 16.6 2 24.8 2.5 15.5 16.6 26.5 32.3 26.5h567.4c15.7 0 29.8-11 32.3-26.5 1.3-8.2 2-16.5 2-24.8zM512 576c-88.4 0-160 71.6-160 160s71.6 160 160 160 160-71.6 160-160-71.6-160-160-160zm0-432c-79.5 0-144 64.5-144 144s64.5 144 144 144 144-64.5 144-144-64.5-144-144-144z"/>
-            </svg>
-        </span>
-    </button>
-</div>
+<div w3-include-html="_float_buttons.html"></div>
 
-<!-- 签到悬浮窗按钮 -->
-<div class="float-btn" style="bottom: 9em;">
-    <button class="checkin-btn" onclick="openCheckinModal()">
-        <span class="anticon anticon-clock-circle">
-            <svg width="1.5em" height="1.5em" viewBox="0 0 1024 1024"  fill="currentColor">
-              <path d="M416 128h192v128H416zM128 256h768v640H128zM352 704l128 128 256-256" fill="currentColor"/>
-            </svg>
-        </span>
-    </button>
-</div>
-
-<!-- 请假弹窗 -->
-<div id="leaveModal" class="leave-modal">
-    <div class="leave-modal-content">
-        <button class="close-btn" onclick="closeLeaveModal()">×</button>
-        <h3>请假</h3>
-        <form id="leaveForm">
-            <div class="ant-form-item info">
-                <label>姓名:</label>
-                <span>张三</span>
-            </div>
-            <div class="ant-form-item info">
-                <label>职位:</label>
-                <span>客服专员</span>
-            </div>
-            <div class="ant-form-item info">
-                <label>班次:</label>
-                <span>2025/03/08 早班1</span>
-            </div>
-            <div class="ant-form-item">
-                <label>开始时间:</label>
-                <input type="datetime-local" id="leaveStartTime" class="ant-input">
-            </div>
-            <div class="ant-form-item">
-                <label>结束时间:</label>
-                <input type="datetime-local" id="leaveEndTime" class="ant-input">
-            </div>
-            <div class="ant-form-item">
-                <label>请假类型:</label>
-                <select id="leaveType" class="ant-select">
-                    <option value="0">事假</option>
-                    <option value="1">病假</option>
-                    <option value="2">年假</option>
-                    <option value="3">调休</option>
-                    <option value="4">其他</option>
-                </select>
-            </div>
-            <div class="ant-form-item">
-                <label>请假理由:</label>
-                <textarea id="leaveReason" class="ant-input" rows="6" placeholder="请输入请假理由"></textarea>
-            </div>
-            <div class="modal-buttons">
-                <button type="button" class="ant-btn" onclick="closeLeaveModal()">取消</button>
-                <button type="button" class="ant-btn ant-btn-primary" style="background-color: #1e3a8a" onclick="submitLeave()">提交申请</button>
-            </div>
-        </form>
-    </div>
-</div>
-<!-- 打卡弹窗 -->
-<div id="checkinModal" class="checkin-modal">
-    <div class="checkin-modal-content">
-        <button class="close-btn" onclick="closeCheckinModal()">×</button>
-        <h3>打卡</h3>
-        <form id="checkinForm">
-            <div class="ant-form-item info">
-                <label>姓名:</label>
-                <span>张三</span>
-            </div>
-            <div class="ant-form-item info">
-                <label>职位:</label>
-                <span>客服专员</span>
-            </div>
-            <div class="ant-form-item info">
-                <label>班次:</label>
-                <span>2025/03/08 早班1</span>
-            </div>
-            <div class="ant-form-item info">
-                <label>类型:</label>
-                <span id="checkinType" style="font-weight: bold;"></span>
-            </div>
-            <div class="modal-buttons checkin-buttons">
-                <button type="button" class="ant-btn ant-btn-primary" id="checkinButton" onclick="submitCheckin()" style="width: 5em; height: 5em; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.2em; padding: 0;">
-                    <span>打卡</span>
-                    <span id="checkinCountdown">15 s</span>
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- _footer.html -->
 <div class="footer">
     <p>Copyright © 2025 FASTRESP. All Rights Reserved.</p>
     <!-- 事件弹窗容器 -->
@@ -112,3 +12,5 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript" src="_chat.js"/>
