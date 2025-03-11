@@ -287,7 +287,6 @@ function initSidebarShow(){
     sidebarHide = sidebarHide.length < 1 ? false : sidebarHide[`${sidebarHideKey}`];
     if(sidebarHide){
         toggleSidebar()
-    }else{
         toggleMobileSidebar()
     }
 }
@@ -471,7 +470,7 @@ function toggleMobileSidebar() {
     const mobileSidebar = document.querySelector('.mobile-sidebar');
     if (mobileSidebar){
         mobileSidebar.classList.toggle('open');
-        localStorage.setItem(sidebarHideKey, JSON.stringify({sidebarHideKey: !mobileSidebar.classList.contains('open')}));
+        localStorage.setItem(sidebarHideKey, JSON.stringify({sidebarHideKey: mobileSidebar.classList.contains('open')}));
     }
 }
 
