@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页 - FASTRESP</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="_site.css">
+</head>
+<body>
+<!-- 头部 -->
+<div class="container">
+    <div w3-include-html="_header.html"></div>
+</div>
+
+<!-- 主内容 -->
+<div class="container">
+    <!-- 服务分类 -->
+    <div class="service-menu" id="service-menu"></div>
+
+    <!-- 轮播图 -->
+    <div class="carousel">
+        <div class="carousel-item" style="opacity: 1;">社媒营销 - 提升您的品牌影响力</div>
+        <div class="carousel-item" style="opacity: 0;">软件开发 - 定制您的专属解决方案</div>
+        <div class="carousel-item" style="opacity: 0;">SEO优化 - 让您的网站脱颖而出</div>
+    </div>
+
+    <!-- 热门品牌 -->
+    <div class="scroll-section">
+        <h2 class="section-title">热门品牌</h2>
+        <div id="hot-brands" class="scroll-list"></div>
+    </div>
+
+    <!-- 热门服务 -->
+    <div class="scroll-section">
+        <h2 class="section-title">热门服务</h2>
+        <div id="hot-services" class="scroll-list"></div>
+    </div>
+
+    <!-- 热门商品 -->
+    <div class="card-container">
+        <h2 class="section-title">热门商品</h2>
+        <div id="hot-products" class="card-list"></div>
+    </div>
+
+    <!-- 热门店铺 -->
+    <div class="card-container">
+        <h2 class="section-title">热门店铺</h2>
+        <div id="hot-shops" class="card-list"></div>
+    </div>
+
+    <!-- 热门精选 -->
+    <div class="card-container">
+        <h2 class="section-title">热门精选</h2>
+        <div id="hot-albums" class="card-list"></div>
+    </div>
+
+    <!-- 热门文章 -->
+    <div class="card-container">
+        <h2 class="section-title">热门文章</h2>
+        <div id="hot-articles" class="card-list"></div>
+    </div>
+
+    <!-- 精选评价 -->
+    <div class="card-container">
+        <h2 class="section-title">精选评价</h2>
+        <div id="top-reviews" class="card-list"></div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div class="container">
+    <div w3-include-html="_footer.html"></div>
+</div>
+
+<!-- 脚本 -->
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_common.js"></script>
+<script src="_location.js"></script>
+<script>
+    // 引入公共HTML
+    function includeHTML() {
+        var z, i, elmnt, file, xhttp;
+        z = document.getElementsByTagName("*");
+        for (i = 0; i < z.length; i++) {
+            elmnt = z[i];
+            file = elmnt.getAttribute("w3-include-html");
+            if (file) {
+                xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        elmnt.innerHTML = this.responseText;
+                        elmnt.removeAttribute("w3-include-html");
+                        includeHTML();
+                    }
+                }
+                xhttp.open("GET", file, true);
+                xhttp.send();
+                return;
+            }
+        }
+    }
+    includeHTML();
+
+    // 动态创建弹窗容器
+    function createModal(id) {
+        if (!document.getElementById(id)) {
+            const modal = document.createElement('div');
+            modal.id = id;
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
+    }
+
+    // 使用 Lorem Picsum 生成图片
+    function getPicsumImage(width, height, seed) {
+        return `https://picsum.photos/seed/${seed}/${width}/${height}`;
+    }
+    const placeholderImage = 'https://via.placeholder.com/300x200?text=Image+Not+Found';
+
+    function generateCards(containerId, cardType, data) {
+        const container = document.getElementById(containerId);
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = cardType === 'scroll' ? 'scroll-card' : 'card';
+            const stars = Math.round(item.rating || 0);
+            card.innerHTML = `
+          <img src="${item.cover || item.icon || placeholderImage}" alt="${item.title || item.name}" onerror="this.src='${placeholderImage}'">
+          <div class="card-content">
+            <h3>${item.title || item.name}</h3>
+            ${item.price ? `<p>价格: ${item.price}</p>` : ''}
+            ${item.sales ? `<p>销量: ${item.sales}</p>` : ''}
+            ${item.rating ? `<p class="stars">${'<i class="anticon anticon-star-o" style="color: #fadb14;"></i>'.repeat(stars)} (${item.ratingCount || 0})</p>` : ''}
+            ${item.stock ? `<p>库存: ${item.stock}</p>` : ''}
+            ${item.shopName ? `<p>店铺: ${item.shopName}</p>` : ''}
+            ${item.slogan ? `<p>${item.slogan}</p>` : ''}
+            ${item.tags ? `<p>${item.tags.map(tag => `<span class="ant-tag">${tag}</span>`).join('')}</p>` : ''}
+            ${item.service ? `<p>服务: ${item.service}</p>` : ''}
+            ${item.content ? `<p>${item.content}</p>` : ''}
+          </div>
+        `;
+            card.onclick = () => window.location.href = item.link || '#';
+            container.appendChild(card);
+        });
+    }
+
+    // 生成文章列表
+    function generateArticles(containerId, min, max) {
+        const container = document.getElementById(containerId);
+        const count = faker.datatype.number({ min: 5, max: 10 }); // 限制为5-10篇文章
+        for (let i = 0; i < count; i++) {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="#">${faker.lorem.sentence()}</a>`;
+            container.appendChild(li);
+        }
+    }
+
+    // 生成服务菜单
+    function generateServiceMenu() {
+        const menu = document.getElementById('service-menu');
+        const categories = [
+            { name: '社媒营销', sub: ['账号服务', '粉丝增长', '内容创作'] },
+            { name: 'SEO', sub: ['关键词优化', '排名提升', '网站分析'] },
+            { name: '软件开发', sub: ['定制开发', '技术支持', '应用维护'] },
+            { name: '设计', sub: ['平面设计', 'UI/UX', '品牌标识'] },
+            { name: '写作', sub: ['软文撰写', '技术文档', '创意写作'] },
+            { name: '广告', sub: ['广告投放', '营销策划', '数据分析'] }
+        ];
+        categories.forEach(cat => {
+            const div = document.createElement('div');
+            div.className = 'level-1';
+            div.innerHTML = `${cat.name}<div class="level-2">${cat.sub.map(sub => `<a href="#">${sub}</a>`).join('')}</div>`;
+            menu.appendChild(div);
+        });
+    }
+
+    // 动态生成弹窗内容
+    function generateLoginModal() {
+        return `
+        <h3>登录</h3>
+        <input type="text" placeholder="用户名"><br><br>
+        <input type="password" placeholder="密码"><br><br>
+        <button onclick="hideModal('login-modal')">登录</button>
+        <p>或使用第三方登录: <a href="#">Google</a> | <a href="#">Facebook</a></p>
+        <span class="modal-close" onclick="hideModal('login-modal')">×</span>
+      `;
+    }
+
+    // 使用 Faker.js v5 生成假数据
+    const hotBrands = Array(12).fill().map((_, i) => ({
+        icon: `https://picsum.photos/seed/brand${i}/50/50`,
+        title: ['Google', 'Microsoft', 'Facebook', 'Twitter', 'Instagram', 'TikTok', 'Amazon', 'Apple', 'Netflix', 'Adobe', 'Spotify', 'PayPal'][i],
+        link: '#'
+    }));
+
+    const hotServices = Array(12).fill().map((_, i) => ({
+        icon: `https://picsum.photos/seed/service${i}/50/50`,
+        title: ['账号管理', '粉丝增长', '频道运营', '广告投放', 'SEO优化', '点卡服务', '游戏代练', '软件开发', '软文撰写', '平面设计', '在线课程', '代运营'][i],
+        link: '#'
+    }));
+
+    const hotProducts = Array(15).fill().map((_, i) => ({
+        cover: getPicsumImage(300, 200, 'product' + i),
+        title: faker.commerce.productName(),
+        price: '¥' + faker.commerce.price(50, 200),
+        stock: faker.datatype.number({ min: 10, max: 100 }),
+        rating: faker.datatype.float({ min: 4, max: 5, precision: 0.1 }),
+        ratingCount: faker.datatype.number({ min: 20, max: 100 }),
+        sales: faker.datatype.number({ min: 100, max: 500 }),
+        shopName: faker.company.companyName(),
+        link: '#'
+    }));
+
+    const hotShops = Array(15).fill().map((_, i) => ({
+        cover: getPicsumImage(300, 200, 'shop' + i),
+        name: faker.company.companyName(),
+        sales: faker.datatype.number({ min: 300, max: 1000 }),
+        slogan: faker.company.catchPhrase(),
+        tags: [faker.lorem.word(), faker.lorem.word()],
+        link: '#'
+    }));
+
+    const hotAlbums = Array(10).fill().map((_, i) => ({
+        cover: getPicsumImage(300, 200, 'album' + i),
+        title: faker.commerce.department() + '专辑',
+        tags: [faker.lorem.word(), faker.lorem.word()],
+        productCount: faker.datatype.number({ min: 5, max: 20 }),
+        sales: faker.datatype.number({ min: 200, max: 600 }),
+        orders: faker.datatype.number({ min: 50, max: 200 }),
+        favorites: faker.datatype.number({ min: 100, max: 300 }),
+        link: '#'
+    }));
+
+    const hotArticles = Array(10).fill().map((_, i) => ({
+        cover: getPicsumImage(300, 200, 'article' + i),
+        title: faker.lorem.sentence(),
+        rating: faker.datatype.float({ min: 4, max: 5, precision: 0.1 }),
+        ratingCount: faker.datatype.number({ min: 10, max: 50 }),
+        author: faker.name.findName(),
+        link: '#'
+    }));
+
+    const topReviews = Array(10).fill().map((_, i) => ({
+        cover: getPicsumImage(300, 200, 'review' + i),
+        title: faker.commerce.productName(),
+        service: faker.commerce.department(),
+        rating: faker.datatype.float({ min: 4, max: 5, precision: 0.1 }),
+        ratingCount: faker.datatype.number({ min: 20, max: 100 }),
+        content: faker.lorem.paragraph(),
+        link: '#'
+    }));
+
+    // 初始化
+    window.onload = () => {
+        createModal('login-modal');
+        generateServiceMenu();
+        generateCards('hot-brands', 'scroll', hotBrands);
+        generateCards('hot-services', 'scroll', hotServices);
+        generateCards('hot-products', 'card', hotProducts);
+        generateCards('hot-shops', 'card', hotShops);
+        generateCards('hot-albums', 'card', hotAlbums);
+        generateCards('hot-articles', 'card', hotArticles);
+        generateCards('top-reviews', 'card', topReviews);
+        generateArticles('about-articles', 5, 10);
+        generateArticles('buyer-articles', 5, 10);
+        generateArticles('seller-articles', 5, 10);
+        generateArticles('resource-articles', 5, 10);
+        initCarousel();
+    };
+</script>
+</body>
+</html>
