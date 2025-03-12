@@ -61,7 +61,7 @@ function generateFieldContent(item, fieldName, value, config, tagColors) {
                 : '';
             return position === 'header'
                 ? `<h3${applyStyle(style)}>${content}</h3>`
-                : `<p${applyStyle(style)}>${label || fieldName}: ${content}</p>`;
+                : `<p${applyStyle(style)}>${label ? `${label}:` : ""} ${content}</p>`;
 
         case 'tag':
             if (Array.isArray(value)) {
@@ -197,13 +197,6 @@ function getPicsumImage(width, height, seed) {
 }
 
 const placeholderImage = 'https://via.placeholder.com/300x200?text=Image+Not+Found';
-
-// 滚动函数
-function scrollList(containerId, direction) {
-    const list = document.getElementById(containerId);
-    const scrollAmount = 7.5 * 2; // 每次滚动2个卡片宽度 (7.5em)
-    list.scrollLeft += direction * scrollAmount * 16; // 转换为px
-}
 
 // 轮播图动态效果
 function initCarousel() {
