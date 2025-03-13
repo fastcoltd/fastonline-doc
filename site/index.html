@@ -30,15 +30,21 @@
 
     <!-- 热门平台 -->
     <div class="scroll-section">
-        <h2 class="section-title">热门平台</h2>
-        <div id="hot-platforms" class="scroll-list"></div>
-        <div class="scroll-arrow left" onclick="scrollList('hot-platforms', -1)"><i class="fas fa-chevron-left"></i></div>
-        <div class="scroll-arrow right" onclick="scrollList('hot-platforms', 1)"><i class="fas fa-chevron-right"></i></div>
+        <div class="title-with-link">
+            <h2 class="section-title">平台列表</h2>
+            <a href="#" class="see-all">View All</a>
+        </div>
+        <div id="hot-brands" class="scroll-list"></div>
+        <div class="scroll-arrow left" onclick="scrollList('hot-brands', -1)"><i class="fas fa-chevron-left"></i></div>
+        <div class="scroll-arrow right" onclick="scrollList('hot-brands', 1)"><i class="fas fa-chevron-right"></i></div>
     </div>
 
     <!-- 热门服务 -->
     <div class="scroll-section">
-        <h2 class="section-title">热门服务</h2>
+        <div class="title-with-link">
+            <h2 class="section-title">服务列表</h2>
+            <a href="#" class="see-all">View All</a>
+        </div>
         <div id="hot-services" class="scroll-list"></div>
         <div class="scroll-arrow left" onclick="scrollList('hot-services', -1)"><i class="fas fa-chevron-left"></i></div>
         <div class="scroll-arrow right" onclick="scrollList('hot-services', 1)"><i class="fas fa-chevron-right"></i></div>
@@ -46,38 +52,56 @@
 
     <!-- 热门商品 -->
     <div class="card-container">
-        <h2 class="section-title">热门商品</h2>
-        <div id="hot-products" class="card-list"></div>
+        <div class="title-with-link">
+            <h2 class="section-title">热门商品</h2>
+            <a href="#" class="see-all">More...</a>
+        </div>
+        <div id="hot-items" class="card-list"></div>
     </div>
 
     <!-- 热门店铺 -->
     <div class="card-container">
-        <h2 class="section-title">热门店铺</h2>
-        <div id="hot-shops" class="card-list"></div>
+        <div class="title-with-link">
+            <h2 class="section-title">热门店铺</h2>
+            <a href="#" class="see-all">More...</a>
+        </div>
+        <div id="hot-stores" class="card-list"></div>
     </div>
 
     <!-- 热门精选 -->
     <div class="card-container">
-        <h2 class="section-title">热门精选</h2>
+        <div class="title-with-link">
+            <h2 class="section-title">热门精选</h2>
+            <a href="#" class="see-all">More...</a>
+        </div>
         <div id="hot-albums" class="card-list"></div>
     </div>
 
     <!-- 热门需求 -->
     <div class="card-container">
-        <h2 class="section-title">热门需求</h2>
+        <div class="title-with-link">
+            <h2 class="section-title">热门需求</h2>
+            <a href="#" class="see-all">More...</a>
+        </div>
         <div id="hot-demands" class="card-list"></div>
     </div>
 
     <!-- 热门文章 -->
     <div class="card-container">
-        <h2 class="section-title">热门文章</h2>
-        <div id="hot-articles" class="card-list"></div>
+        <div class="title-with-link">
+            <h2 class="section-title">热门文章</h2>
+            <a href="#" class="see-all">More...</a>
+        </div>
+        <div id="hot-posts" class="card-list"></div>
     </div>
 
     <!-- 精选评价 -->
     <div class="card-container">
-        <h2 class="section-title">精选评价</h2>
-        <div id="top-reviews" class="card-list"></div>
+        <div class="title-with-link">
+            <h2 class="section-title">精选评价</h2>
+            <a href="#" class="see-all">More...</a>
+        </div>
+        <div id="top-comments" class="card-list"></div>
     </div>
 </div>
 
@@ -98,7 +122,7 @@
     // 生成服务菜单
     function generateServiceMenu() {
         const menu = document.getElementById('service-menu');
-        const categories = [
+        const services = [
             {name: '社媒营销', sub: ['账号服务', '粉丝增长', '内容创作']},
             {name: 'SEO', sub: ['关键词优化', '排名提升', '网站分析']},
             {name: '软件开发', sub: ['定制开发', '技术支持', '应用维护']},
@@ -106,7 +130,7 @@
             {name: '写作', sub: ['软文撰写', '技术文档', '创意写作']},
             {name: '广告', sub: ['广告投放', '营销策划', '数据分析']}
         ];
-        categories.forEach(cat => {
+        services.forEach(cat => {
             const div = document.createElement('div');
             div.className = 'level-1';
             div.innerHTML = `${cat.name}<div class="level-2">${cat.sub.map(sub => `<a href="#">${sub}</a>`).join('')}</div>`;
@@ -251,23 +275,23 @@
     window.onload = () => {
         w3.includeHTML(() => {
             generateServiceMenu();
-            generateCards('hot-platforms', 'scroll', hotPlatforms, platformFieldConfig);
+            generateCards('hot-brands', 'scroll', hotPlatforms, platformFieldConfig);
             generateCards('hot-services', 'scroll', hotServices, serviceFieldConfig);
-            generateCards('hot-products', 'card', hotProducts, productFieldConfig);
-            generateCards('hot-shops', 'card', hotShops, shopFieldConfig);
+            generateCards('hot-items', 'card', hotProducts, productFieldConfig);
+            generateCards('hot-stores', 'card', hotShops, shopFieldConfig);
             generateCards('hot-demands', 'card', hotDemands, demandFieldConfig);
             generateCards('hot-albums', 'card', hotAlbums, albumFieldConfig);
-            generateCards('hot-articles', 'card', hotArticles, articleFieldConfig);
-            generateCards('top-reviews', 'card', topReviews, reviewFieldConfig);
-            generateArticles('about-articles', 5, 8);
-            generateArticles('buyer-articles', 5, 8);
-            generateArticles('seller-articles', 5, 8);
-            generateArticles('resource-articles', 5, 8);
+            generateCards('hot-posts', 'card', hotArticles, articleFieldConfig);
+            generateCards('top-comments', 'card', topReviews, reviewFieldConfig);
+            generateArticles('about-posts', 5, 8);
+            generateArticles('buyer-posts', 5, 8);
+            generateArticles('seller-posts', 5, 8);
+            generateArticles('resource-posts', 5, 8);
             initCarousel();
 
 
             // 初始化箭头状态并绑定滚动监听
-            ['hot-platforms', 'hot-services'].forEach(id => {
+            ['hot-brands', 'hot-services'].forEach(id => {
                 const list = document.getElementById(id);
                 updateArrows(id);
                 list.addEventListener('scroll', () => updateArrows(id));
