@@ -161,31 +161,33 @@
         title: { type: 'text', style: {} }
     };
 
-    // 其他字段配置保持不变
+    // 热门商品字段配置，添加“立即购买”按钮
     const productFieldConfig = {
         favorite: {
             type: 'favorite',
             style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
             customClass: 'fas fa-heart favorite-icon',
-            onClick: (item, element) => { element.classList.toggle('favorited');},
+            onClick: (item, element) => { element.classList.toggle('favorited'); },
             sample: () => faker.datatype.boolean()
         },
         image: { type: 'image', position: 'header', style: { }, sample: i => getPicsumImage(300, 200, `product${i}`) },
         title: { type: 'text', position: 'header', style: {}, sample: () => faker.commerce.productName() },
-        price: { type: 'price', label: '价格', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(50, 200, 2, "$")},
+        price: { type: 'price', label: '价格', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
         stock: { type: 'text', label: '库存', style: {}, sample: () => faker.datatype.number({ min: 10, max: 100 }) },
         rating: { type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
         sales: { type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 100, max: 500 }) },
         shopName: { type: 'text', label: '店铺', style: {}, sample: () => faker.company.companyName() },
-        tags: { type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') }
+        tags: { type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') },
+        buyNow: { type: 'button', value: '立即购买', style: { width: '100%', display: 'block', marginTop: '0.625em' } }
     };
 
+    // 热门店铺字段配置，添加“进入”按钮
     const shopFieldConfig = {
         favorite: {
             type: 'favorite',
             style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
             customClass: 'fas fa-heart favorite-icon',
-            onClick: (item, element) => { element.classList.toggle('favorited');},
+            onClick: (item, element) => { element.classList.toggle('favorited'); },
             sample: () => faker.datatype.boolean()
         },
         image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `shop${i}`) },
@@ -193,7 +195,8 @@
         sales: { type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 300, max: 1000 }) },
         rating: { type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
         slogan: { type: 'text', label: '标语', style: {}, sample: () => faker.company.catchPhrase() },
-        tags: { type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') }
+        tags: { type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') },
+        enter: { type: 'button', value: '进入', style: { width: '100%', display: 'block', marginTop: '0.625em' } }
     };
 
     const demandFieldConfig = {
@@ -201,10 +204,11 @@
         demandName: { type: 'text', position: 'header', style: {}, sample: () => faker.company.companyName() },
         productName: { type: 'text', label: "品牌", style: {}, sample: () => faker.commerce.productName() },
         productCount: { type: 'text', label: '需求数量', style: {}, sample: () => faker.datatype.number({ min: 5, max: 20 }) },
-        price: { type: 'price', label: '出价范围', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(50, 200, 2, "$")},
-        totalPrice: { type: 'price', label: '总价', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(1000, 5000, 2, "$")},
+        price: { type: 'price', label: '出价范围', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
+        totalPrice: { type: 'price', label: '总价', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(1000, 5000, 2, "$") },
         bids: { type: 'text', label: '竞标人数', style: {}, sample: () => faker.datatype.number({ min: 300, max: 1000 }) },
-        tags: { type: 'tag', label: '要求', style: {}, sample: () => faker.lorem.words(3).split(' ') }
+        tags: { type: 'tag', label: '要求', style: {}, sample: () => faker.lorem.words(3).split(' ') },
+        bidNow: { type: 'button', value: '投标', style: { width: '100%', display: 'block', marginTop: '0.625em' } }
     };
 
     const albumFieldConfig = {
@@ -212,7 +216,7 @@
             type: 'favorite',
             style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
             customClass: 'fas fa-heart favorite-icon',
-            onClick: (item, element) => { element.classList.toggle('favorited');},
+            onClick: (item, element) => { element.classList.toggle('favorited'); },
             sample: () => faker.datatype.boolean()
         },
         image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `album${i}`) },
@@ -228,7 +232,7 @@
             type: 'favorite',
             style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
             customClass: 'fas fa-heart favorite-icon',
-            onClick: (item, element) => { element.classList.toggle('favorited');},
+            onClick: (item, element) => { element.classList.toggle('favorited'); },
             sample: () => faker.datatype.boolean()
         },
         image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `article${i}`) },
@@ -289,7 +293,6 @@
             generateArticles('resource-posts', 5, 8);
             initCarousel();
 
-
             // 初始化箭头状态并绑定滚动监听
             ['hot-brands', 'hot-services'].forEach(id => {
                 const list = document.getElementById(id);
@@ -299,12 +302,13 @@
 
             // 绑定弹窗事件
             document.querySelectorAll('.footer-right a:not([target])').forEach(item => {
-                item.onclick = function (){
+                item.onclick = function () {
                     showModal(`${this.id}-modal`, generateSelectorModal(this.id));
                 }
-            })
+            });
         });
     };
 </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91f928e65c4153fc',t:'MTc0MTg0NDA0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

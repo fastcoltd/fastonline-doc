@@ -172,6 +172,10 @@ function generateData(fieldConfig, count) {
     return Array(count).fill().map((_, i) => {
         const item = { link: '#' };
         for (const [fieldName, config] of Object.entries(fieldConfig)) {
+            if (config.value){
+                item[fieldName] = config.value
+                continue
+            }
 
             let values = {}, index = 0, keys = Object.keys(config)
             Object.values(config).forEach(_value =>{
