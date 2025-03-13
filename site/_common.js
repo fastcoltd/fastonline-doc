@@ -113,6 +113,8 @@ function generateFieldContent(item, fieldName, value, config, tagColors) {
 }
 
 function generateRating(item, value, style) {
+    let count = typeof value == 'object' ? value['count'] : 0
+    value = typeof value == 'object' ? value['sample'] : 0.0
     const rating = parseFloat(value) || 0;
     const starOutlined = '<svg><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="none" stroke="var(--vibrant-orange)" stroke-width="1"/></svg>';
     const starFilled = '<svg starPercent><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="var(--vibrant-orange)" stroke="var(--vibrant-orange)" stroke-width="1"/></svg>';
@@ -131,14 +133,13 @@ function generateRating(item, value, style) {
             filledStarsHtml += `<span class="star empty"></span>`;
         }
     }
-
     let contentHtml = `
             <p class="rating"${item.position ? ` style="text-align: ${item.position};"` : ''}>
                 <span class="stars">
                     <span class="star-bg">${starOutlined.repeat(5)}</span>
                     <span class="star-filled">${filledStarsHtml}</span>
                 </span>
-                <span class="rating-count">${value} (${item.ratingCount || 0})</span>
+                <span class="rating-count">${value} (${count || 0})</span>
             </p>`;
     return contentHtml;
 }
@@ -149,6 +150,25 @@ function generateSampleData(fieldConfig, count = 10) {
         const item = { link: '#' };
         for (const [fieldName, config] of Object.entries(fieldConfig)) {
             item[fieldName] = generateFieldSample(config, i);
+        }
+        return item;
+    });
+}
+
+function generateData(fieldConfig, count) {
+    return Array(count).fill().map((_, i) => {
+        const item = { link: '#' };
+        for (const [fieldName, config] of Object.entries(fieldConfig)) {
+
+            let values = {}, index = 0, keys = Object.keys(config)
+            Object.values(config).forEach(_value =>{
+                if (typeof _value == 'function'){
+                    values[keys[index]] = _value(i)
+                }
+                index++
+            })
+            let valueLen = Object.keys(values).length;
+            item[fieldName] = valueLen <= 0 ? "N/A" : valueLen == 1 ? Object.values(values)[0] : values;
         }
         return item;
     });

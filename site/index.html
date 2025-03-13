@@ -137,7 +137,7 @@
         title: { type: 'text', position: 'header', style: {}, sample: () => faker.commerce.productName() },
         price: { type: 'text', label: '价格', format: v => `¥${v}`, style: {}, sample: () => faker.commerce.price(50, 200) },
         stock: { type: 'text', label: '库存', style: {}, sample: () => faker.datatype.number({ min: 10, max: 100 }) },
-        rating: { type: 'rating', label: '评分', style: {}, sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
+        rating: { type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
         sales: { type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 100, max: 500 }) },
         shopName: { type: 'text', label: '店铺', style: {}, sample: () => faker.company.companyName() },
         tags: { type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') }
@@ -147,7 +147,7 @@
         image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `shop${i}`) },
         name: { type: 'text', position: 'header', style: {}, sample: () => faker.company.companyName() },
         sales: { type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 300, max: 1000 }) },
-        rating: { type: 'rating', label: '评分', style: {}, sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
+        rating: { type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
         slogan: { type: 'text', label: '标语', style: {}, sample: () => faker.company.catchPhrase() },
         tags: { type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') }
     };
@@ -164,7 +164,7 @@
     const articleFieldConfig = {
         image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `article${i}`) },
         title: { type: 'text', position: 'header', style: {}, sample: () => faker.lorem.sentence() },
-        rating: { type: 'rating', label: '评分', style: {}, sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
+        rating: { type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
         author: { type: 'text', label: '作者', style: {}, sample: () => faker.name.findName() }
     };
 
@@ -172,7 +172,7 @@
         image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `review${i}`) },
         title: { type: 'text', position: 'header', style: {}, sample: () => faker.commerce.productName() },
         service: { type: 'text', label: '服务', style: {}, sample: () => faker.commerce.department() },
-        rating: { type: 'rating', label: '评分', style: {}, sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
+        rating: { type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
         content: { type: 'text', label: '内容', style: {}, sample: () => faker.lorem.paragraph() }
     };
 
@@ -182,17 +182,6 @@
     const hotAlbums = generateData(albumFieldConfig, 10);
     const hotArticles = generateData(articleFieldConfig, 10);
     const topReviews = generateData(reviewFieldConfig, 5);
-
-    // 生成样本数据的通用函数
-    function generateData(fieldConfig, count) {
-        return Array(count).fill().map((_, i) => {
-            const item = { link: '#' };
-            for (const [fieldName, config] of Object.entries(fieldConfig)) {
-                item[fieldName] = typeof config.sample === 'function' ? config.sample(i) : config.sample;
-            }
-            return item;
-        });
-    }
 
     function scrollList(containerId, direction) {
         const list = document.getElementById(containerId);
