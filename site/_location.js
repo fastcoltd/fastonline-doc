@@ -720,18 +720,20 @@ const timezones = [
 
 function generateSelectorModal(type) {
     const data = type === 'language' ? languages : type === 'currency' ? currencies : timezones;
-    let options = data.map(item => `<option value="${item.code}">${item.name} (${item.country})</option>`).join('');
+    let options = data.map(item => `<option value="${item.name}">${item.name} (${item.country})</option>`).join('');
     return `
         <h3>选择${type === 'language' ? '语言' : type === 'currency' ? '货币' : '时区'}</h3>
-        <select onchange="updateSelection('${type}', this.value)">
+        <select onchange="updateSelection('${type}', this.value, this.text)">
             <option value="">请选择</option>
             ${options}
         </select>
     `;
 }
 
-function updateSelection(type, value) {
-    console.log(`${type} updated to: ${value}`); // 可替换为实际保存逻辑
+function updateSelection(type, value, label) {
+    console.log(`${type} updated to: ${value} ${label}`); // 可替换为实际保存逻辑
+
+    document.getElementById(type).innerText = value;
     hideModal(`${type}-modal`);
 }
 

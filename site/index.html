@@ -62,6 +62,12 @@
         <div id="hot-albums" class="card-list"></div>
     </div>
 
+    <!-- 热门需求 -->
+    <div class="card-container">
+        <h2 class="section-title">热门需求</h2>
+        <div id="hot-demands" class="card-list"></div>
+    </div>
+
     <!-- 热门文章 -->
     <div class="card-container">
         <h2 class="section-title">热门文章</h2>
@@ -133,9 +139,16 @@
 
     // 其他字段配置保持不变
     const productFieldConfig = {
+        favorite: {
+            type: 'favorite',
+            style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
+            customClass: 'fas fa-heart favorite-icon',
+            onClick: (item, element) => { element.classList.toggle('favorited');},
+            sample: () => faker.datatype.boolean()
+        },
         image: { type: 'image', position: 'header', style: { }, sample: i => getPicsumImage(300, 200, `product${i}`) },
         title: { type: 'text', position: 'header', style: {}, sample: () => faker.commerce.productName() },
-        price: { type: 'text', label: '价格', format: v => `¥${v}`, style: {}, sample: () => faker.commerce.price(50, 200) },
+        price: { type: 'price', label: '价格', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(50, 200, 2, "$")},
         stock: { type: 'text', label: '库存', style: {}, sample: () => faker.datatype.number({ min: 10, max: 100 }) },
         rating: { type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
         sales: { type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 100, max: 500 }) },
@@ -144,6 +157,13 @@
     };
 
     const shopFieldConfig = {
+        favorite: {
+            type: 'favorite',
+            style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
+            customClass: 'fas fa-heart favorite-icon',
+            onClick: (item, element) => { element.classList.toggle('favorited');},
+            sample: () => faker.datatype.boolean()
+        },
         image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `shop${i}`) },
         name: { type: 'text', position: 'header', style: {}, sample: () => faker.company.companyName() },
         sales: { type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 300, max: 1000 }) },
@@ -152,7 +172,25 @@
         tags: { type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') }
     };
 
+    const demandFieldConfig = {
+        image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `shop${i}`) },
+        demandName: { type: 'text', position: 'header', style: {}, sample: () => faker.company.companyName() },
+        productName: { type: 'text', label: "品牌", style: {}, sample: () => faker.commerce.productName() },
+        productCount: { type: 'text', label: '需求数量', style: {}, sample: () => faker.datatype.number({ min: 5, max: 20 }) },
+        price: { type: 'price', label: '出价范围', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(50, 200, 2, "$")},
+        totalPrice: { type: 'price', label: '总价', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(1000, 5000, 2, "$")},
+        bids: { type: 'text', label: '竞标人数', style: {}, sample: () => faker.datatype.number({ min: 300, max: 1000 }) },
+        tags: { type: 'tag', label: '要求', style: {}, sample: () => faker.lorem.words(3).split(' ') }
+    };
+
     const albumFieldConfig = {
+        favorite: {
+            type: 'favorite',
+            style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
+            customClass: 'fas fa-heart favorite-icon',
+            onClick: (item, element) => { element.classList.toggle('favorited');},
+            sample: () => faker.datatype.boolean()
+        },
         image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `album${i}`) },
         title: { type: 'text', position: 'header', style: {}, sample: () => faker.commerce.department() },
         productCount: { type: 'text', label: '商品数', style: {}, sample: () => faker.datatype.number({ min: 5, max: 20 }) },
@@ -162,6 +200,13 @@
     };
 
     const articleFieldConfig = {
+        favorite: {
+            type: 'favorite',
+            style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
+            customClass: 'fas fa-heart favorite-icon',
+            onClick: (item, element) => { element.classList.toggle('favorited');},
+            sample: () => faker.datatype.boolean()
+        },
         image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `article${i}`) },
         title: { type: 'text', position: 'header', style: {}, sample: () => faker.lorem.sentence() },
         rating: { type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
@@ -178,9 +223,10 @@
 
     // 配置数据
     const hotProducts = generateData(productFieldConfig, 15);
-    const hotShops = generateData(shopFieldConfig, 15);
-    const hotAlbums = generateData(albumFieldConfig, 10);
-    const hotArticles = generateData(articleFieldConfig, 10);
+    const hotShops = generateData(shopFieldConfig, 10);
+    const hotAlbums = generateData(albumFieldConfig, 5);
+    const hotDemands = generateData(demandFieldConfig, 5);
+    const hotArticles = generateData(articleFieldConfig, 5);
     const topReviews = generateData(reviewFieldConfig, 5);
 
     function scrollList(containerId, direction) {
@@ -209,6 +255,7 @@
             generateCards('hot-services', 'scroll', hotServices, serviceFieldConfig);
             generateCards('hot-products', 'card', hotProducts, productFieldConfig);
             generateCards('hot-shops', 'card', hotShops, shopFieldConfig);
+            generateCards('hot-demands', 'card', hotDemands, demandFieldConfig);
             generateCards('hot-albums', 'card', hotAlbums, albumFieldConfig);
             generateCards('hot-articles', 'card', hotArticles, articleFieldConfig);
             generateCards('top-reviews', 'card', topReviews, reviewFieldConfig);
@@ -218,11 +265,6 @@
             generateArticles('resource-articles', 5, 8);
             initCarousel();
 
-            // 绑定弹窗事件
-            let footChange = document.querySelectorAll('.footer-right a:not([target])')
-            footChange[0].onclick = () => showModal('language-modal', generateSelectorModal('language'));
-            footChange[1].onclick = () => showModal('timezone-modal', generateSelectorModal('timezone'));
-            footChange[2].onclick = () => showModal('currency-modal', generateSelectorModal('currency'));
 
             // 初始化箭头状态并绑定滚动监听
             ['hot-platforms', 'hot-services'].forEach(id => {
@@ -230,6 +272,13 @@
                 updateArrows(id);
                 list.addEventListener('scroll', () => updateArrows(id));
             });
+
+            // 绑定弹窗事件
+            document.querySelectorAll('.footer-right a:not([target])').forEach(item => {
+                item.onclick = function (){
+                    showModal(`${this.id}-modal`, generateSelectorModal(this.id));
+                }
+            })
         });
     };
 </script>

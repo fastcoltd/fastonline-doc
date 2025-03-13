@@ -1,9 +1,9 @@
-// 生成卡片函数
+// _common.js 修改部分
 function generateCards(containerId, cardType, data, fieldConfig) {
     const container = document.getElementById(containerId);
     const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
 
-    data.forEach(item => {
+    data.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = cardType === 'scroll' ? 'scroll-card' : 'card';
 
@@ -11,19 +11,20 @@ function generateCards(containerId, cardType, data, fieldConfig) {
         let contentHtml = '';
         const processedFields = new Set();
 
+
         for (const [fieldName, config] of Object.entries(fieldConfig)) {
-            const value = item[fieldName];
+            const value = item[fieldName] !== undefined ? item[fieldName] : config.value;
             if (value === undefined || processedFields.has(fieldName)) continue;
 
             if (config.mergeWith) {
                 config.mergeWith.forEach(mergeField => processedFields.add(mergeField));
             }
 
-            const fieldContent = generateFieldContent(item, fieldName, value, config, tagColors);
+            const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, config, tagColors, containerId, index);
             if (config.position === 'header') {
-                headerHtml += fieldContent;
+                headerHtml += fieldContent.html;
             } else {
-                contentHtml += fieldContent;
+                contentHtml += fieldContent.html;
             }
         }
 
@@ -35,7 +36,79 @@ function generateCards(containerId, cardType, data, fieldConfig) {
         `;
         card.onclick = item.link && !fieldConfig.button ? () => window.location.href = item.link : null;
         container.appendChild(card);
+
+        // 渲染后绑定点击事件
+        for (const [fieldName, config] of Object.entries(fieldConfig)) {
+            if (config.onClick) {
+                const elementId = `${containerId}-${fieldName}-${index}`;
+                const element = card.querySelector(`#${elementId}`);
+                if (element) {
+                    element.addEventListener('click', (event) => {
+                        event.stopPropagation(); // 防止冒泡到卡片
+                        config.onClick(item, element); // 只在点击时执行
+                    });
+                }
+            }
+        }
     });
+}
+
+// 生成字段内容（只返回 HTML）
+function generateFieldContent(fieldConfig, item, fieldName, value, config, tagColors, containerId, index) {
+    const { type = 'text', label, format, style = {}, customClass, mergeWith, position } = config;
+    let content = '';
+    const elementId = `${containerId}-${fieldName}-${index}`; // 唯一 ID
+
+    switch (type) {
+        case 'text':
+            content = typeof value === 'string' || typeof value === 'number'
+                ? format ? format(value) : value
+                : '';
+            return {
+                html: position === 'header'
+                    ? `<h3 id="${elementId}"${applyStyle(style)}>${content}</h3>`
+                    : `<p id="${elementId}"${applyStyle(style)}>${label ? `${label}:` : ""} ${content}</p>`
+            };
+        case 'price':
+            let showPrice = format ? format(fieldConfig, value['sample']) : value
+            return {
+                html: `<p class="${customClass || ''}" id="${elementId}"${applyStyle(style)}>${label ? `${label}:` : ""} ${showPrice}</p>`
+            };
+        case 'tag':
+            if (Array.isArray(value)) {
+                content = value.map((tag, idx) =>
+                    `<span class="ant-tag ${tagColors[idx % tagColors.length]}"${applyStyle(style)}>${tag}</span>`
+                ).join('');
+                return { html: `<p${applyStyle(config.containerStyle)}>${content}</p>` };
+            }
+            break;
+        case 'button':
+            if (value) {
+                return { html: `<a href="${item.link || '#'}" id="${elementId}" class="card-button"${applyStyle(style)}>${value}</a>` };
+            }
+            break;
+        case 'icon':
+            if (value){
+                return { html: `<i id="${elementId}" class="${value}"${applyStyle(style)}></i>` };
+            }
+            break;
+        case 'favorite':
+            let fullClass = customClass + (value ? "" : " favorited")
+            return { html: `<i id="${elementId}" class="${fullClass}"${applyStyle(style)}></i>` };
+            break;
+        case 'image':
+            if (value) {
+                return { html: `<img id="${elementId}" src="${value}" alt="${fieldName}" onerror="this.src='${placeholderImage}'"${applyStyle(style)}>` };
+            }
+            break;
+
+        case 'rating':
+            return { html: generateRating(item, value, style) };
+        default:
+            console.warn(`不支持的字段类型: ${type}`);
+            return { html: '' };
+    }
+    return { html: '' };
 }
 
 // 动态应用样式
@@ -46,67 +119,10 @@ function applyStyle(styleObj) {
     if (styleObj.fontSize) styles.push(`font-size: ${styleObj.fontSize}`);
     if (styleObj.bold) styles.push(`font-weight: bold`);
     if (styleObj.textAlign) styles.push(`text-align: ${styleObj.textAlign}`);
+    if (styleObj.position) styles.push(`position: ${styleObj.position}`);
+    if (styleObj.top) styles.push(`top: ${styleObj.top}`);
+    if (styleObj.right) styles.push(`right: ${styleObj.right}`);
     return styles.length ? ` style="${styles.join(';')}"` : '';
-}
-
-// 生成字段内容
-function generateFieldContent(item, fieldName, value, config, tagColors) {
-    const { type = 'text', label, format, style = {}, mergeWith, position } = config;
-    let content = '';
-
-    switch (type) {
-        case 'text':
-            content = typeof value === 'string' || typeof value === 'number'
-                ? format ? format(value) : value
-                : '';
-            return position === 'header'
-                ? `<h3${applyStyle(style)}>${content}</h3>`
-                : `<p${applyStyle(style)}>${label ? `${label}:` : ""} ${content}</p>`;
-
-        case 'tag':
-            if (Array.isArray(value)) {
-                content = value.map((tag, index) =>
-                    `<span class="ant-tag ${tagColors[index % tagColors.length]}"${applyStyle(style)}>${tag}</span>`
-                ).join('');
-                return `<p${applyStyle(config.containerStyle)}>${content}</p>`;
-            }
-            break;
-
-        case 'button':
-            if (value) {
-                return `<a href="${item.link || '#'}" class="card-button"${applyStyle(style)}>${value}</a>`;
-            }
-            break;
-        case 'icon':
-            if (value) {
-                return `<i class="${value}"${applyStyle(style)}></i>`;
-            }
-            break;
-        case 'badge':
-            if (value) {
-                return `<span class="badge"${applyStyle(style)}>${format ? format(value) : value}</span>`;
-            }
-            break;
-
-        case 'avatar':
-            if (value) {
-                return `<img src="${value}" alt="${fieldName}" style="width: 3em; height: 3em; border-radius: 50%;"${applyStyle(style)}>`;
-            }
-            break;
-
-        case 'image':
-            if (value) {
-                return `<img src="${value}" alt="${fieldName}" onerror="this.src='${placeholderImage}'"${applyStyle(style)}>`;
-            }
-            break;
-
-        case 'rating':
-            return generateRating(item, value, style);
-        default:
-            console.warn(`不支持的字段类型: ${type}`);
-            return '';
-    }
-    return '';
 }
 
 function generateRating(item, value, style) {
@@ -159,8 +175,12 @@ function generateData(fieldConfig, count) {
 
             let values = {}, index = 0, keys = Object.keys(config)
             Object.values(config).forEach(_value =>{
-                if (typeof _value == 'function'){
-                    values[keys[index]] = _value(i)
+                let key = keys[index]
+                if (['onClick'].includes(key)){
+
+                }
+                else if (typeof _value == 'function'){
+                    values[key] = _value(i)
                 }
                 index++
             })
