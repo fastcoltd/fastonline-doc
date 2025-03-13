@@ -50,60 +50,63 @@ function applyStyle(styleObj) {
 }
 
 // 生成字段内容
-function generateFieldContent(item, key, config) {
-    let html = '';
-    const value = item[key];
-    const customClass = config.class ? ` ${config.class}` : ''; // 支持自定义 class
+function generateFieldContent(item, fieldName, value, config, tagColors) {
+    const { type = 'text', label, format, style = {}, mergeWith, position } = config;
+    let content = '';
 
-    // 根据字段类型生成内容
-    switch (config.type) {
-        case 'image':
-            if (config.position === 'header') {
-                html = `<img src="${value}" alt="${item.title || item.name || ''}" class="card-image${customClass}" style="${Object.entries(config.style || {}).map(([k, v]) => `${k}: ${v}`).join(';')}">`;
-            }
-            break;
-
+    switch (type) {
         case 'text':
-            if (config.position === 'header') {
-                html = `<h3 class="card-title${customClass}" style="${Object.entries(config.style || {}).map(([k, v]) => `${k}: ${v}`).join(';')}">${value}</h3>`;
-            } else {
-                html = `<p class="card-text${customClass}" style="${Object.entries(config.style || {}).map(([k, v]) => `${k}: ${v}`).join(';')}">${config.label ? `${config.label}: ` : ''}${config.format ? config.format(value) : value}</p>`;
+            content = typeof value === 'string' || typeof value === 'number'
+                ? format ? format(value) : value
+                : '';
+            return position === 'header'
+                ? `<h3${applyStyle(style)}>${content}</h3>`
+                : `<p${applyStyle(style)}>${label ? `${label}:` : ""} ${content}</p>`;
+
+        case 'tag':
+            if (Array.isArray(value)) {
+                content = value.map((tag, index) =>
+                    `<span class="ant-tag ${tagColors[index % tagColors.length]}"${applyStyle(style)}>${tag}</span>`
+                ).join('');
+                return `<p${applyStyle(config.containerStyle)}>${content}</p>`;
             }
             break;
 
+        case 'button':
+            if (value) {
+                return `<a href="${item.link || '#'}" class="card-button"${applyStyle(style)}>${value}</a>`;
+            }
+            break;
         case 'icon':
-            html = `<i class="${value || config.iconClass}${customClass}" style="${Object.entries(config.style || {}).map(([k, v]) => `${k}: ${v}`).join(';')}"></i>`;
-            if (key === 'icon' && item.title) {
-                html = `<div class="card-content${customClass}"><i class="${value || config.iconClass}"></i><p>${item.title}</p></div>`;
+            if (value) {
+                return `<i class="${value}"${applyStyle(style)}></i>`;
+            }
+            break;
+        case 'badge':
+            if (value) {
+                return `<span class="badge"${applyStyle(style)}>${format ? format(value) : value}</span>`;
+            }
+            break;
+
+        case 'avatar':
+            if (value) {
+                return `<img src="${value}" alt="${fieldName}" style="width: 3em; height: 3em; border-radius: 50%;"${applyStyle(style)}>`;
+            }
+            break;
+
+        case 'image':
+            if (value) {
+                return `<img src="${value}" alt="${fieldName}" onerror="this.src='${placeholderImage}'"${applyStyle(style)}>`;
             }
             break;
 
         case 'rating':
-            const rating = value;
-            const count = config.count ? item[`${key}Count`] : '';
-            html = `
-                <div class="rating${customClass}" style="${Object.entries(config.style || {}).map(([k, v]) => `${k}: ${v}`).join(';')}">
-                    <div class="stars">
-                        <div class="star-bg">${'<svg><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>'.repeat(5)}</div>
-                        <div class="star-filled" style="width: ${rating / 5 * 100}%">${'<svg><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>'.repeat(5)}</div>
-                    </div>
-                    ${count ? `<span class="rating-count">(${count})</span>` : ''}
-                </div>`;
-            break;
-
-        case 'tag':
-            html = `<div class="card-tags${customClass}" style="${Object.entries(config.style || {}).map(([k, v]) => `${k}: ${v}`).join(';')}">${value.map(tag => `<span class="ant-tag">${tag}</span>`).join('')}</div>`;
-            break;
-
-        case 'favorite': // 新增收藏类型
-            html = `<i class="far fa-heart${customClass}" style="${Object.entries(config.style || {}).map(([k, v]) => `${k}: ${v}`).join(';')}"></i>`;
-            break;
-
+            return generateRating(item, value, style);
         default:
-            break;
+            console.warn(`不支持的字段类型: ${type}`);
+            return '';
     }
-
-    return html;
+    return '';
 }
 
 function generateRating(item, value, style) {
