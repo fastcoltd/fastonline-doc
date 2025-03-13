@@ -101,6 +101,7 @@
 <script src="_data.js"></script>
 <script src="_common.js"></script>
 <script src="_location.js"></script>
+<script src="_member.js"></script>
 <script>
     // 配置和业务逻辑
 
@@ -115,21 +116,10 @@
         });
     }
 
-    // 生成登录弹窗内容
-    function generateLoginModal() {
-        return `
-            <h3>登录</h3>
-            <input type="text" placeholder="用户名"><br><br>
-            <input type="password" placeholder="密码"><br><br>
-            <button onclick="hideModal('login-modal')">登录</button>
-            <p>或使用第三方登录: <a href="#">Google</a> | <a href="#">Facebook</a></p>
-        `;
-    }
-
     // 定义字段配置，热门平台：上部 logo，下部名称
     const platformFieldConfig = {
-        logo: { type: 'image', style: { } }, // 上部 logo
-        name: { type: 'text' ,style: { } } // 下部名称
+        logo: { type: 'image', style: { } },
+        name: { type: 'text', style: { } }
     };
 
     // 定义字段配置，热门服务：icon + 文字组合
@@ -280,11 +270,10 @@
             document.querySelectorAll('.footer-right a:not([target])').forEach(item => {
                 item.onclick = function () {
                     showModal(`${this.id}-modal`, generateSelectorModal(this.id));
-                }
+                };
             });
         });
     };
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91f928e65c4153fc',t:'MTc0MTg0NDA0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

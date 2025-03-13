@@ -157,17 +157,6 @@ function generateRating(item, value, style) {
     return contentHtml;
 }
 
-// 样本数据生成函数
-function generateSampleData(fieldConfig, count = 10) {
-    return Array(count).fill().map((_, i) => {
-        const item = { link: '#' };
-        for (const [fieldName, config] of Object.entries(fieldConfig)) {
-            item[fieldName] = generateFieldSample(config, i);
-        }
-        return item;
-    });
-}
-
 function generateData(fieldConfig, count) {
     return Array(count).fill().map((_, i) => {
         const item = { link: '#' };
@@ -195,26 +184,8 @@ function generateData(fieldConfig, count) {
     });
 }
 
-// 根据字段类型生成样本数据
-function generateFieldSample(config, index) {
-    const { type = 'text', sample } = config;
-    if (sample) return typeof sample === 'function' ? sample(index) : sample;
-
-    switch (type) {
-        case 'text': return faker.lorem.words(3);
-        case 'tag': return faker.lorem.words(3).split(' ');
-        case 'button': return '点击我';
-        case 'icon': return `fa fa-star`;
-        case 'badge': return faker.datatype.number({ min: 1, max: 99 });
-        case 'avatar': return getPicsumImage(50, 50, `avatar${index}`);
-        case 'image': return getPicsumImage(300, 200, `image${index}`);
-        case 'rating': return faker.datatype.float({ min: 1, max: 5, precision: 0.1 });
-        default: return null;
-    }
-}
-
-// 弹窗函数
-function showModal(modalId, content) {
+function showModal(modalId, content, options = {}) {
+    const { className = '', style = {} } = options; // 解构 options，设置默认值
     let modal = document.getElementById(modalId);
     if (!modal) {
         modal = document.createElement('div');
@@ -223,10 +194,15 @@ function showModal(modalId, content) {
         modal.innerHTML = '<div class="modal-content"><span class="modal-close" onclick="hideModal(\'' + modalId + '\')">×</span></div>';
         document.body.appendChild(modal);
     }
-    modal.querySelector('.modal-content').innerHTML = '<span class="modal-close" onclick="hideModal(\'' + modalId + '\')">×</span>' + content;
+
+    const modalContent = modal.querySelector('.modal-content');
+    modalContent.className = 'modal-content ' + className;
+    Object.assign(modalContent.style, style);
+
+    // 注入内容
+    modalContent.innerHTML = '<span class="modal-close" onclick="hideModal(\'' + modalId + '\')">×</span>' + content;
     modal.style.display = 'block';
 }
-
 function hideModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.style.display = 'none';
