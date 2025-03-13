@@ -37,17 +37,6 @@
         <div class="scroll-arrow right" onclick="scrollList('hot-brands', 1)"><i class="fas fa-chevron-right"></i></div>
     </div>
 
-    <!-- 热门服务 -->
-    <div class="scroll-section">
-        <div class="title-with-link">
-            <h2 class="section-title">服务列表</h2>
-            <a href="#" class="see-all">View All</a>
-        </div>
-        <div id="hot-services" class="scroll-list"></div>
-        <div class="scroll-arrow left" onclick="scrollList('hot-services', -1)"><i class="fas fa-chevron-left"></i></div>
-        <div class="scroll-arrow right" onclick="scrollList('hot-services', 1)"><i class="fas fa-chevron-right"></i></div>
-    </div>
-
     <!-- 热门商品 -->
     <div class="card-container">
         <div class="title-with-link">
@@ -276,7 +265,6 @@
         w3.includeHTML(() => {
             generateServiceMenu();
             generateCards('hot-brands', 'scroll', hotPlatforms, platformFieldConfig);
-            generateCards('hot-services', 'scroll', hotServices, serviceFieldConfig);
             generateCards('hot-items', 'card', hotProducts, productFieldConfig);
             generateCards('hot-stores', 'card', hotShops, shopFieldConfig);
             generateCards('hot-demands', 'card', hotDemands, demandFieldConfig);
@@ -290,7 +278,7 @@
             initCarousel();
 
             // 初始化箭头状态并绑定滚动监听
-            ['hot-brands', 'hot-services'].forEach(id => {
+            ['hot-brands'].forEach(id => {
                 const list = document.getElementById(id);
                 updateArrows(id);
                 list.addEventListener('scroll', () => updateArrows(id));
