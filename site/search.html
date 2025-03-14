@@ -11,24 +11,25 @@
     <link rel="stylesheet" href="_site.css">
     <style>
         .search-container { display: flex; gap: 2em; padding: 2em 0; }
-        .sidebar { flex: 0 0 20em; }
+        .sidebar { flex: 0 0 20em; background: var(--bg-white); padding: 1em; border-radius: 0.5em; box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1); }
         .main-content { flex: 1; }
-        .filter-section { margin-bottom: 1.5em; }
-        .filter-section h4 { font-size: var(--font-medium); margin-bottom: 0.5em; color: var(--text-primary); }
-        .filter-row { display: flex; align-items: center; gap: 1em; margin-bottom: 0.5em; }
+        .filter-row { display: flex; align-items: center; gap: 1em; margin-bottom: 0.75em; }
         .filter-row label { font-size: var(--font-small); color: var(--text-secondary); white-space: nowrap; }
         .filter-row .ant-input, .filter-row .ant-select { flex: 1; }
         .filter-row .ant-input-number { width: 5em; }
         .tag-list { display: flex; flex-wrap: wrap; gap: 0.5em; margin-top: 0.5em; }
-        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em; font-size: var(--font-medium); }
-        .search-card { display: flex; align-items: center; padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; margin-bottom: 0.5em; cursor: pointer; background: var(--bg-white); }
+        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em; font-size: var(--font-medium); color: var(--text-primary); }
+        .search-card { display: flex; align-items: center; padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; margin-bottom: 0.5em; cursor: pointer; background: var(--bg-white); transition: all 0.2s; }
         .search-card:hover { border-color: var(--vibrant-orange); box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
-        .search-card img { width: 5em; height: 5em; object-fit: cover; margin-right: 1em; border-radius: 0.25em; }
+        .search-card img { width: 6em; height: 6em; object-fit: cover; margin-right: 1em; border-radius: 0.25em; }
         .search-card-content { flex: 1; }
-        .search-card-content h3 { font-size: var(--font-medium); margin: 0 0 0.5em; }
-        .search-card-content p { font-size: var(--font-small); color: var(--text-secondary); margin: 0.2em 0; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin-top: 1.5em; font-size: var(--font-small); }
-        .pagination .ant-btn { padding: 0.3em 1em; }
+        .search-card-content h3 { font-size: var(--font-medium); margin: 0 0 0.5em; color: var(--text-primary); }
+        .search-card-content p { font-size: var(--font-small); color: var(--text-secondary); margin: 0.3em 0; }
+        .search-card-content .price { color: var(--vibrant-orange); font-weight: bold; }
+        .search-card-content .ant-tag { margin-right: 0.5em; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin-top: 1.5em; font-size: var(--font-small); color: var(--text-primary); }
+        .pagination .ant-btn { padding: 0.3em 1em; background: var(--bg-white); border-color: var(--border-color); }
+        .pagination .ant-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
         .pagination .ant-select { width: 6em; }
     </style>
 </head>
@@ -41,8 +42,8 @@
     <div class="search-container">
         <!-- 侧边栏 -->
         <div class="sidebar">
-            <div class="filter-section">
-                <h4>搜索类型</h4>
+            <div class="filter-row">
+                <label>搜索类型:</label>
                 <select class="ant-select ant-select-single ant-select-show-arrow" id="search-type">
                     <option value="items">商品</option>
                     <option value="stores">店铺</option>
@@ -50,74 +51,56 @@
                     <option value="demands">需求</option>
                 </select>
             </div>
-            <div class="filter-section">
-                <h4>品牌</h4>
-                <div class="filter-row">
-                    <label>品牌:</label>
-                    <input class="ant-input" list="brand-list" id="brand-filter" placeholder="输入品牌快速定位">
-                    <datalist id="brand-list"></datalist>
-                </div>
+            <div class="filter-row">
+                <label>品牌:</label>
+                <input class="ant-input" list="brand-list" id="brand-filter" placeholder="输入品牌快速定位">
+                <datalist id="brand-list"></datalist>
             </div>
-            <div class="filter-section">
-                <h4>服务</h4>
-                <div class="filter-row">
-                    <label>服务:</label>
-                    <input class="ant-input" list="service-list" id="service-filter" placeholder="输入服务快速定位">
-                    <datalist id="service-list"></datalist>
-                </div>
+            <div class="filter-row">
+                <label>服务:</label>
+                <input class="ant-input" list="service-list" id="service-filter" placeholder="输入服务快速定位">
+                <datalist id="service-list"></datalist>
             </div>
-            <div class="filter-section">
-                <h4>属性</h4>
-                <div class="filter-row">
-                    <label>属性:</label>
-                    <select class="ant-select ant-select-single ant-select-show-arrow" id="attribute-type" onchange="updateAttributeValues()">
-                        <option value="">选择属性类型</option>
-                    </select>
-                    <select class="ant-select ant-select-single ant-select-show-arrow" id="attribute-value" onchange="addAttributeTag()">
-                        <option value="">选择属性值</option>
-                    </select>
-                </div>
-                <div id="attribute-tags" class="tag-list"></div>
+            <div class="filter-row">
+                <label>属性:</label>
+                <select class="ant-select ant-select-single ant-select-show-arrow" id="attribute-type" onchange="updateAttributeValues()">
+                    <option value="">选择属性类型</option>
+                </select>
+                <select class="ant-select ant-select-single ant-select-show-arrow" id="attribute-value" onchange="addAttributeTag()">
+                    <option value="">选择属性值</option>
+                </select>
             </div>
-            <div class="filter-section">
-                <h4>范围筛选</h4>
-                <div class="filter-row">
-                    <label>价格:</label>
-                    <input class="ant-input-number" type="number" id="price-min" placeholder="最低" min="0">
-                    <span>~</span>
-                    <input class="ant-input-number" type="number" id="price-max" placeholder="最高" min="0">
-                </div>
-                <div class="filter-row">
-                    <label>库存:</label>
-                    <input class="ant-input-number" type="number" id="stock-min" placeholder="最小" min="0">
-                    <span>~</span>
-                    <input class="ant-input-number" type="number" id="stock-max" placeholder="最大" min="0">
-                </div>
-                <div class="filter-row">
-                    <label>评分:</label>
-                    <input class="ant-input-number" type="number" id="rating-min" placeholder="最低" min="0" max="5" step="0.1">
-                    <span>~</span>
-                    <input class="ant-input-number" type="number" id="rating-max" placeholder="最高" min="0" max="5" step="0.1">
-                </div>
+            <div id="attribute-tags" class="tag-list"></div>
+            <div class="filter-row">
+                <label>价格:</label>
+                <input class="ant-input-number" type="number" id="price-min" placeholder="最低" min="0">
+                <span>~</span>
+                <input class="ant-input-number" type="number" id="price-max" placeholder="最高" min="0">
             </div>
-            <div class="filter-section">
-                <h4>更新时间</h4>
-                <div class="filter-row">
-                    <label>晚于:</label>
-                    <input class="ant-input" type="datetime-local" id="update-time">
-                </div>
+            <div class="filter-row">
+                <label>库存:</label>
+                <input class="ant-input-number" type="number" id="stock-min" placeholder="最小" min="0">
+                <span>~</span>
+                <input class="ant-input-number" type="number" id="stock-max" placeholder="最大" min="0">
             </div>
-            <div class="filter-section">
-                <h4>标签</h4>
-                <div class="filter-row">
-                    <label>标签:</label>
-                    <select class="ant-select ant-select-single ant-select-show-arrow" id="tag-filter" onchange="addTag()">
-                        <option value="">选择标签</option>
-                    </select>
-                </div>
-                <div id="tag-list" class="tag-list"></div>
+            <div class="filter-row">
+                <label>评分:</label>
+                <input class="ant-input-number" type="number" id="rating-min" placeholder="最低" min="0" max="5" step="0.1">
+                <span>~</span>
+                <input class="ant-input-number" type="number" id="rating-max" placeholder="最高" min="0" max="5" step="0.1">
             </div>
-            <button class="ant-btn ant-btn-primary btn-orange-solid-medium" onclick="applyFilters()">应用筛选</button>
+            <div class="filter-row">
+                <label>更新时间晚于:</label>
+                <input class="ant-input" type="datetime-local" id="update-time">
+            </div>
+            <div class="filter-row">
+                <label>标签:</label>
+                <select class="ant-select ant-select-single ant-select-show-arrow" id="tag-filter" onchange="addTag()">
+                    <option value="">选择标签</option>
+                </select>
+            </div>
+            <div id="tag-list" class="tag-list"></div>
+            <button class="ant-btn ant-btn-primary btn-orange-solid-medium" onclick="applyFilters()" style="width: 100%; margin-top: 1em;">应用筛选</button>
         </div>
 
         <!-- 主要内容 -->
@@ -154,6 +137,7 @@
 <!-- 脚本 -->
 <script src="https://www.w3schools.com/lib/w3.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_config.js"></script>
 <script src="_data.js"></script>
 <script src="_common.js"></script>
 <script src="_location.js"></script>
@@ -162,9 +146,10 @@
     let currentPage = 1;
     let itemsPerPage = 20;
     let searchType = 'items';
-    let searchKeyword = new URLSearchParams(window.location.search).get('q') || 'test';
+    let searchKeyword = '';
     let filteredResults = [];
     let allResults = [];
+    let availableTags = [...ecommerceTags]; // 可用标签列表
 
     // 初始化筛选
     function initFilters() {
@@ -190,8 +175,14 @@
             attributeType.appendChild(option);
         });
 
+        updateTagFilter();
+    }
+
+    // 更新标签下拉框
+    function updateTagFilter() {
         const tagFilter = document.getElementById('tag-filter');
-        ecommerceTags.forEach(tag => {
+        tagFilter.innerHTML = '<option value="">选择标签</option>';
+        availableTags.forEach(tag => {
             const option = document.createElement('option');
             option.value = tag;
             option.text = tag;
@@ -238,13 +229,20 @@
             tag.className = 'ant-tag ant-tag-blue';
             tag.innerHTML = `${value} <span class="anticon anticon-close close" onclick="removeTag(this, 'tag-list')"></span>`;
             tags.appendChild(tag);
+            availableTags = availableTags.filter(t => t !== value);
             document.getElementById('tag-filter').value = '';
+            updateTagFilter();
             applyFilters();
         }
     }
 
     // 删除标签
     function removeTag(element, containerId) {
+        const tagText = element.parentElement.textContent.trim().replace('', '');
+        if (containerId === 'tag-list') {
+            availableTags.push(tagText);
+            updateTagFilter();
+        }
         element.parentElement.remove();
         applyFilters();
     }
@@ -261,21 +259,31 @@
                     item.brandName = hotPlatforms[Math.floor(Math.random() * hotPlatforms.length)].name;
                     item.tags = ecommerceTags.slice(0, Math.floor(Math.random() * 3) + 1);
                     item.updateTime = faker.date.recent(30).toISOString();
+                    item.description = faker.lorem.sentence();
+                    item.seller = faker.company.companyName();
+                    item.shipping = ecommerceTags[Math.floor(Math.random() * ecommerceTags.length)];
                     break;
                 case 'stores':
                     item = generateData(shopFieldConfig, 1)[0];
                     item.tags = ecommerceTags.slice(0, Math.floor(Math.random() * 3) + 1);
                     item.updateTime = faker.date.recent(30).toISOString();
+                    item.description = faker.lorem.sentence();
+                    item.location = faker.address.city();
+                    item.products = faker.datatype.number({ min: 10, max: 100 });
                     break;
                 case 'posts':
                     item = generateData(articleFieldConfig, 1)[0];
                     item.tags = ecommerceTags.slice(0, Math.floor(Math.random() * 3) + 1);
                     item.updateTime = faker.date.recent(30).toISOString();
+                    item.summary = faker.lorem.paragraph();
+                    item.views = faker.datatype.number({ min: 100, max: 10000 });
                     break;
                 case 'demands':
                     item = generateData(demandFieldConfig, 1)[0];
                     item.tags = ecommerceTags.slice(0, Math.floor(Math.random() * 3) + 1);
                     item.updateTime = faker.date.recent(30).toISOString();
+                    item.deadline = faker.date.future().toISOString().split('T')[0];
+                    item.buyer = faker.name.findName();
                     break;
             }
             const attrKeys = Object.keys(ecommerceAttributes);
@@ -323,7 +331,11 @@
                 });
             }
             if (tags.length > 0 && !tags.every(tag => item.tags.includes(tag))) match = false;
-            return match;
+            return match && (item.title?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+                item.name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+                item.demandName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+                item.description?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+                item.summary?.toLowerCase().includes(searchKeyword.toLowerCase()));
         });
         currentPage = 1;
         updateResults();
@@ -345,9 +357,14 @@
                 <img src="${item.image || placeholderImage}" alt="${item.title || item.name}">
                 <div class="search-card-content">
                     <h3>${item.title || item.name || item.demandName}</h3>
-                    ${item.price ? `<p>价格: <span class="price">${item.price}</span></p>` : ''}
-                    ${item.stock ? `<p>库存: ${item.stock}</p>` : ''}
+                    ${item.description ? `<p>描述: ${item.description}</p>` : item.summary ? `<p>摘要: ${item.summary}</p>` : ''}
+                    ${item.price ? `<p>价格: <span class="price">${item.price}</span></p>` : item.totalPrice ? `<p>总价: <span class="price">${item.totalPrice}</span></p>` : ''}
+                    ${item.stock ? `<p>库存: ${item.stock}</p>` : item.productCount ? `<p>需求数量: ${item.productCount}</p>` : ''}
                     ${item.rating ? `<div class="rating">${generateRating(item, item.rating)}</div>` : ''}
+                    ${item.seller ? `<p>卖家: ${item.seller}</p>` : item.buyer ? `<p>买家: ${item.buyer}</p>` : item.author ? `<p>作者: ${item.author}</p>` : ''}
+                    ${item.shipping ? `<p>配送: ${item.shipping}</p>` : item.deadline ? `<p>截止日期: ${item.deadline}</p>` : item.views ? `<p>浏览量: ${item.views}</p>` : ''}
+                    ${item.location ? `<p>位置: ${item.location}</p>` : ''}
+                    ${item.products ? `<p>商品数: ${item.products}</p>` : ''}
                     ${item.tags ? `<p>${item.tags.map(tag => `<span class="ant-tag ant-tag-blue">${tag}</span>`).join('')}</p>` : ''}
                 </div>
                 <i class="fas fa-heart favorite-icon ${item.favorite ? 'favorited' : ''}" onclick="toggleFavorite(this)" style="font-size: var(--font-large); margin-left: 1em;"></i>
@@ -403,9 +420,9 @@
         const sortBy = document.getElementById('sort-by').value;
         filteredResults.sort((a, b) => {
             if (sortBy === 'relevance') return 0;
-            if (sortBy === 'price') return parseFloat(a.price?.replace('$', '') || 0) - parseFloat(b.price?.replace('$', '') || 0);
+            if (sortBy === 'price') return parseFloat(a.price?.replace('$', '') || a.totalPrice?.replace('$', '') || 0) - parseFloat(b.price?.replace('$', '') || b.totalPrice?.replace('$', '') || 0);
             if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
-            if (sortBy === 'stock') return (b.stock || 0) - (a.stock || 0);
+            if (sortBy === 'stock') return (b.stock || b.productCount || 0) - (a.stock || a.productCount || 0);
             if (sortBy === 'sales') return (b.sales || 0) - (a.sales || 0);
         });
         updateResults();
@@ -415,6 +432,23 @@
     window.onload = () => {
         w3.includeHTML(() => {
             initFilters();
+
+            // 从头部搜索框读取关键字
+            const searchInput = document.getElementById('search');
+            if (searchInput) {
+                searchKeyword = searchInput.value || 'test';
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        searchKeyword = searchInput.value;
+                        allResults = generateSearchData();
+                        filteredResults = [...allResults];
+                        applyFilters();
+                    }
+                });
+            } else {
+                searchKeyword = new URLSearchParams(window.location.search).get('q') || 'test';
+            }
+
             document.getElementById('search-type').value = searchType;
             document.getElementById('search-type').onchange = () => {
                 searchType = document.getElementById('search-type').value;
