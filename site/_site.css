@@ -36,13 +36,22 @@ a:hover { color: var(--font-green); }
 .header-inner .service-menu .platform-item { display: flex; align-items: center; padding: 0.25em 0; color: var(--text-primary); white-space: nowrap; }
 .header-inner .service-menu .platform-item:hover { color: var(--font-green);}
 .header-inner .service-menu .platform-logo { width: 1.5em; height: 1.5em; margin-right: 0.5em; border-radius: 50%; }
-
-
-.header-actions { display: flex; align-items: center; }
+/* 头部样式 - 下拉菜单相关 */
+.header-actions { display: flex; align-items: center; position: relative; }
 .header-actions a { margin-left: 1.25em; font-size: var(--font-large); font-weight: bold; padding: 0.5em 1em; border-radius: 0.375em; }
 .header-actions a:hover { font-weight: bold; }
-.join-btn {margin-left: 0.5em;}
+.header-actions .dropdown { position: relative; display: inline-flex; align-items: center; }
+.header-actions .dropdown-toggle { display: flex; align-items: center; }
+.header-actions .dropdown-arrow { margin-left: 0.5em; transition: transform 0.2s; }
+.header-actions .dropdown:hover .dropdown-arrow { transform: rotate(-180deg); }
+.header-actions .dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.375em; box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1); z-index: 1000; min-width: 20em; padding: 0.5em 0; } /* 增加宽度以容纳更长描述 */
+.header-actions .dropdown-menu a { display: flex; flex-direction: column; margin: 0; padding: 0.5em 1em; font-size: var(--font-medium); font-weight: normal; color: var(--text-primary); }
+.header-actions .dropdown-menu a:hover { color: var(--font-green); background: var(--bg-light); }
+.header-actions .dropdown-menu .dropdown-desc { font-size: calc(var(--font-small) * 0.9); color: var(--text-secondary); font-weight: normal; }
+.header-actions .dropdown:hover .dropdown-menu { display: block; }
+.join-btn { margin-left: 0.5em; }
 .list-btn { padding: 0.375em 0.75em; font-size: var(--font-small); }
+
 
 .search-box { position: relative; flex: 1; margin: 0 1.875em; display: flex; align-items: center; }
 .search-wrapper { flex: 1; display: flex; align-items: center; border: 0.0625em solid var(--border-color); border-right: none; border-radius: 0.375em 0 0 0.375em; overflow: hidden; background: var(--bg-white); }
