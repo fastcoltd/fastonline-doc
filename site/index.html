@@ -23,7 +23,6 @@
         <div class="carousel-item" style="opacity: 0;">SEO优化 - 让您的网站脱颖而出</div>
     </div>
 
-    <!-- 热门平台 -->
     <div class="scroll-section">
         <div class="title-with-link">
             <h2 class="section-title">Brnads</h2>
@@ -100,19 +99,6 @@
 <script src="_location.js"></script>
 <script src="_member.js"></script>
 <script>
-    // 配置和业务逻辑
-
-    // 生成服务菜单
-    function generateServiceMenu() {
-        const menu = document.getElementById('service-menu');
-        services.forEach(cat => {
-            const div = document.createElement('div');
-            div.className = 'level-1';
-            div.innerHTML = `${cat.name}<div class="level-2">${cat.sub.map(sub => `<a href="#">${sub}</a>`).join('')}</div>`;
-            menu.appendChild(div);
-        });
-    }
-
     // 定义字段配置，热门平台：上部 logo，下部名称
     const platformFieldConfig = {
         logo: { type: 'image', style: { } },
@@ -243,7 +229,8 @@
 
     window.onload = () => {
         w3.includeHTML(() => {
-            generateServiceMenu();
+            generateServiceMenu()
+
             generateCards('hot-brands', 'scroll', hotPlatforms, platformFieldConfig);
             generateCards('hot-items', 'card', hotProducts, productFieldConfig);
             generateCards('hot-stores', 'card', hotShops, shopFieldConfig);

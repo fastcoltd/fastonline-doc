@@ -107,57 +107,65 @@ const hotServices = [
     { icon: 'fas fa-tasks', title: 'Project Management', link: '#' }
 ];
 
+// 从 hotPlatforms 随机选取 20-50 个平台名称和 logo
+function getRandomPlatforms(min, max) {
+    const count = Math.floor(Math.random() * (max - min + 1)) + min;
+    const shuffled = hotPlatforms.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count).map(platform => ({ name: platform.name, logo: platform.logo }));
+}
+
+// 更新 services 数据，随机附带 hotPlatforms 中的名称和 logo
 const services = [
-    { name: 'Social Media',
-        sub: ['Account Management', 'Follower Growth', 'Account Trading', 'Follower Trading', 'Short Video Production', 'Live Streaming Promotion', 'Content Scheduling', 'Hashtag Strategy', 'Engagement Boosting', 'Profile Optimization',
-            'Ad Campaign Setup', 'Influencer Collaboration', 'Analytics Reporting', 'Comment Moderation', 'Story Creation', 'Trend Research', 'Branded Content', 'Social Listening', 'Crisis Management', 'Giveaway Campaigns',
-            'Meme Marketing', 'Cross-Platform Posting', 'Audience Targeting'] },
-    { name: 'SEO',
-        sub: ['Keyword Optimization', 'Backlink Building', 'Website SEO Audit', 'Local SEO', 'Ranking Monitoring', 'Rating Boosting', 'On-Page Optimization', 'Off-Page Optimization', 'Technical SEO', 'Content Gap Analysis',
-            'Competitor Research', 'Sitemap Creation', 'Mobile Optimization', 'Voice Search Optimization', 'Link Cleanup', 'SEO Reporting', 'Schema Markup', 'Page Speed Improvement', 'Crawl Error Fixing', 'Keyword Cannibalization Fix',
-            'SEO Strategy Consulting', 'Penalty Recovery'] },
-    { name: 'Ecommerce',
-        sub: ['Store Management', 'Product Listing Optimization', 'Order Brushing', 'Rating Brushing', 'Payment Gateway Integration', 'Logistics Management', 'Inventory Tracking', 'Customer Support Setup', 'Return Processing', 'Discount Campaigns',
-            'Product Photography', 'Storefront Design', 'Cart Abandonment Recovery', 'Upsell Strategy', 'Cross-Selling Setup', 'Marketplace Integration', 'Price Monitoring', 'Review Management', 'Shipping Optimization', 'Tax Configuration',
-            'Bulk Listing Upload', 'Sales Analytics'] },
-    { name: 'Gaming',
-        sub: ['Game Boosting', 'Game Card Recharge', 'Game Account Trading', 'Gear Trading', 'Game Companionship', 'Level Up Service', 'In-Game Currency Trading', 'Achievement Unlocking', 'Custom Build Creation', 'Tournament Coaching',
-            'Rank Boosting', 'Item Farming', 'Account Recovery', 'Game Testing', 'Mod Installation', 'Server Hosting', 'Event Participation', 'Skin Trading', 'Bot Services', 'Strategy Guides',
-            'Live Stream Setup', 'Clan Management'] },
-    { name: 'Web Dev',
-        sub: ['Frontend Development', 'Backend Development', 'Website Maintenance', 'API Integration', 'Security Optimization', 'Responsive Design', 'Database Design', 'Custom CMS Development', 'E-commerce Integration', 'Plugin Development',
-            'Site Migration', 'Domain Setup', 'Hosting Configuration', 'SSL Installation', 'Performance Tuning', 'Accessibility Compliance', 'Bug Fixing', 'Version Control Setup', 'SEO-Friendly Coding', 'Landing Page Creation',
-            'Template Customization', 'Web App Development'] },
-    { name: 'Content',
-        sub: ['Blog Writing', 'Video Script Writing', 'Social Media Content', 'Advertorial Writing', 'SEO Copywriting', 'Review Ghostwriting', 'Email Newsletter Writing', 'White Paper Creation', 'Case Study Writing', 'Product Descriptions',
-            'Press Release Writing', 'Infographic Scripts', 'Podcast Scripting', 'E-book Writing', 'Landing Page Copy', 'Ad Copywriting', 'User Guide Creation', 'Content Translation', 'Keyword Research', 'Content Editing',
-            'Tone Adjustment', 'Content Repurposing'] },
-    { name: 'Data',
-        sub: ['Traffic Analysis', 'User Behavior Tracking', 'Traffic Brushing', 'Data Visualization', 'Conversion Rate Optimization', 'Fake Data Generation', 'A/B Testing', 'Heatmap Analysis', 'Customer Segmentation', 'Funnel Analysis',
-            'Retention Tracking', 'Churn Prediction', 'KPI Reporting', 'Dashboard Creation', 'Real-Time Analytics', 'Data Cleaning', 'Trend Forecasting', 'Competitor Benchmarking', 'Survey Analysis', 'Data Integration',
-            'Click Fraud Detection', 'ROI Calculation'] },
-    { name: 'Design',
-        sub: ['Brand Logo Design', 'E-commerce Banner Design', 'UI/UX Design', 'Packaging Design', 'Poster Creation', 'Avatar Customization', 'Brochure Design', 'Business Card Design', 'Flyer Creation', 'Social Media Graphics',
-            'Website Mockups', 'App Interface Design', 'Illustration Drawing', 'Motion Graphics', '3D Modeling', 'Photo Editing', 'Typography Design', 'Infographic Creation', 'Presentation Design', 'Merchandise Design',
-            'Icon Set Creation', 'Color Scheme Development'] },
-    { name: 'Ads',
-        sub: ['Google Ads Placement', 'Social Media Ads', 'Ad Click Brushing', 'Remarketing Strategy', 'Ad Performance Analysis', 'Budget Management', 'Display Ad Design', 'Video Ad Production', 'PPC Optimization', 'Keyword Bidding',
-            'Landing Page Ads', 'Affiliate Marketing Setup', 'Email Campaign Ads', 'Native Advertising', 'Ad Copy Testing', 'Audience Targeting', 'Campaign Scheduling', 'Ad Fraud Monitoring', 'Influencer Ad Integration', 'Geo-Targeting',
-            'Conversion Tracking', 'Brand Awareness Campaigns'] },
-    { name: 'Trading',
-        sub: ['Platform Account Trading', 'Virtual Currency Trading', 'Follower Boosting', 'Verified Account Service', 'Used Account Recycling', 'Bulk Account Registration', 'Account Verification', 'Profile Enhancement', 'Email Account Trading', 'Social Media Handle Trading',
-            'Password Recovery', 'Account Suspension Appeal', 'Multi-Account Management', 'Proxy Setup', 'Account Security Audit', 'Bot Account Creation', 'Custom Username Trading', 'Account Data Migration', 'Membership Upgrades', 'Account Reselling',
-            'Fake Identity Creation', 'Account Activity Boosting'] },
-    { name: 'Mobile Apps',
-        sub: ['iOS Development', 'Android Development', 'Cross-Platform Apps', 'App Store Optimization', 'Push Notification Setup', 'In-App Purchases', 'App Maintenance', 'UI/UX Design', 'Bug Fixing', 'Performance Optimization',
-            'Beta Testing', 'App Analytics', 'Feature Updates', 'Custom API Integration', 'App Security', 'Localization Services', 'App Prototyping', 'User Feedback Collection', 'App Monetization', 'Wearable Integration',
-            'App Deployment', 'Crash Reporting'] },
-    { name: 'Security',
-        sub: ['Vulnerability Scanning', 'Data Encryption', 'Firewall Setup', 'Penetration Testing', 'Security Audits', 'DDoS Protection', 'Identity Management', 'Secure Hosting', 'Malware Removal', 'Incident Response',
-            'Security Training', 'Risk Assessment', 'Backup Solutions', 'Access Control', 'Network Monitoring', 'Compliance Consulting', 'Phishing Protection', 'Secure API Design', 'Password Management', 'Threat Intelligence',
-            'Security Patching', 'Data Recovery'] }
+    { name: 'Social Media', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Social Accounts', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'SEO & SEM', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Ecommerce', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Gaming', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Content', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Design', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Promotion & Ads', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Trading', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Mobile Apps', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Soft Develop', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Cloud Service', sub: getRandomPlatforms(15, hotPlatforms.length) },
+    { name: 'Security', sub: getRandomPlatforms(15, hotPlatforms.length) }
 ];
 
+// 生成服务菜单（调整为横向分组，每 3 个字母）
+function generateServiceMenu() {
+    const menu = document.getElementById('service-menu');
+    services.forEach(cat => {
+        const div = document.createElement('div');
+        div.className = 'level-1';
+        const subByLetter = {};
+        cat.sub.forEach(item => {
+            const firstLetter = item.name[0].toUpperCase();
+            if (!subByLetter[firstLetter]) subByLetter[firstLetter] = [];
+            subByLetter[firstLetter].push(item);
+        });
+        let subHtml = '<div class="letter-groups">';
+        const letterGroups = ['A-C', 'D-F', 'G-I', 'J-L', 'M-O', 'P-R', 'S-U', 'V-X', 'Y-Z'];
+        letterGroups.forEach(group => {
+            const [start, end] = group.split('-');
+            const groupLetters = Object.keys(subByLetter).sort().filter(letter => letter >= start && letter <= end);
+            if (groupLetters.length > 0) {
+                subHtml += '<div class="letter-group">';
+                subHtml += `<span class="letter-header">${groupLetters.join('')}</span><div class="platform-list">`;
+                groupLetters.forEach(letter => {
+                    subByLetter[letter].forEach(item => {
+                        subHtml += `<a href="#" class="platform-item"><img src="${item.logo}" alt="${item.name}" class="platform-logo">${item.name}</a>`;
+                    });
+                });
+                subHtml += '</div></div>';
+            }
+        });
+        subHtml += '</div>';
+        div.innerHTML = `${cat.name}<div class="level-2">${subHtml}</div>`;
+        menu.appendChild(div);
+    });
+}
+
+window.generateServiceMenu = generateServiceMenu;
 window.hotPlatforms = hotPlatforms;
 window.hotServices = hotServices;
 window.services = services;

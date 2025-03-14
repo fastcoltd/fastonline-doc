@@ -19,13 +19,25 @@ a:hover { color: var(--font-green); }
 .logo-fast, .logo-resp { animation: none; }
 @keyframes gradientShift { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
 
-.header-inner .service-menu { max-width: var(--max-content-width); margin: 0 auto;;background: var(--bg-white); display: flex; justify-content: flex-start; align-items: center; gap: 2em;}
-.header-inner .service-menu .level-1 { z-index: 100; position: relative; cursor: pointer; font-size: var(--font-large); color: var(--font-black); padding: 0.6em 0em 0.6em; }
+.header-inner .service-menu { max-width: var(--max-content-width); margin: 0 auto; background: var(--bg-white); display: flex; justify-content: flex-start; align-items: center; gap: 2em; position: relative; }
+.header-inner .service-menu .level-1 {min-width: 2em;max-width: 10em; z-index: 100; position: relative; cursor: pointer; font-size: var(--font-large); color: var(--font-black); padding: 0.6em 0em 0.6em; }
 .header-inner .service-menu .level-1:hover { color: var(--font-green); box-shadow: inset 0 -0.2em 0 var(--font-green); }
-.header-inner .service-menu .level-2 { z-index: 100; display: none; position: absolute; top: calc(100% + 0.0625em); left: 0; font-size: var(--font-medium); background: var(--bg-white); border: 0.0625em solid var(--border-color); padding: 0.9375em; border-radius: 0.375em; box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1); white-space: nowrap; }
-.header .service-menu .level-2 a { display: block; padding: 0.25em 0; color: var(--text-primary); }
-.header-inner .service-menu .level-2 a:hover { color: var(--font-green); }
+
+/* 二级菜单样式调整（根据位置靠左或靠右，静态范围） */
+.header-inner .service-menu .level-2 { z-index: 100; display: none; position: absolute; top: calc(100% + 0.0625em); left: 0; font-size: var(--font-medium); background: var(--bg-white); border: 0.0625em solid var(--border-color); padding: 0.9375em; border-radius: 0.375em; box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1); max-width: calc(var(--max-content-width) - 2em); transform-origin: left top; }
 .header-inner .service-menu .level-1:hover .level-2 { display: block; }
+.header-inner .service-menu .letter-groups { display: flex; flex-direction: row; gap: 1em; flex-wrap: nowrap; }
+.header-inner .service-menu .letter-group { display: flex; flex-direction: column; align-items: center; }
+.header-inner .service-menu .letter-header { font-weight: bold; color: var(--text-secondary); margin-bottom: 0.25em; }
+.header-inner .service-menu .platform-list { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: flex-start; }
+.header-inner .service-menu .platform-item { display: flex; align-items: center; padding: 0.25em 0; color: var(--text-primary); white-space: nowrap; }
+.header-inner .service-menu .platform-item:hover { color: var(--font-green); }
+.header-inner .service-menu .platform-logo { width: 1.5em; height: 1.5em; margin-right: 0.5em; border-radius: 50%; }
+
+/* 根据 level-1 在菜单中的位置判断靠左或靠右，静态范围 */
+.header-inner .service-menu .level-1:nth-child(-n+7) .level-2 { left: 0; transform-origin: left top; }
+.header-inner .service-menu .level-1:nth-child(n+8) .level-2 { left: auto; right: 0; transform-origin: right top; }
+
 
 .header-actions { display: flex; align-items: center; }
 .header-actions a { margin-left: 1.25em; font-size: var(--font-large); font-weight: bold; padding: 0.5em 1em; border-radius: 0.375em; }
