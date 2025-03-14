@@ -116,19 +116,19 @@ function getRandomPlatforms(min, max) {
 
 // 更新 services 数据，随机附带 hotPlatforms 中的名称和 logo
 const services = [
-    { name: 'Social Media', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Social Accounts', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'SEO & SEM', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Ecommerce', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Gaming', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Content', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Design', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Promotion & Ads', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Trading', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Mobile Apps', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Soft Develop', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Cloud Service', sub: getRandomPlatforms(15, hotPlatforms.length) },
-    { name: 'Security', sub: getRandomPlatforms(15, hotPlatforms.length) }
+    { name: 'Social Media', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Social Accounts', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'SEO & SEM', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Ecommerce', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Gaming', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Content', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Design', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Promotion & Ads', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Trading', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Mobile Apps', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Soft Develop', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Cloud Service', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
+    { name: 'Security', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) }
 ];
 
 // 生成服务菜单（调整为横向分组，每 3 个字母）
