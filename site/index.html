@@ -95,9 +95,9 @@
 <script src="https://www.w3schools.com/lib/w3.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
 <script src="_data.js"></script>
-<script src="_common.js"></script>
 <script src="_location.js"></script>
 <script src="_member.js"></script>
+<script src="_common.js"></script>
 <script>
     // 定义字段配置，热门平台：上部 logo，下部名称
     const platformFieldConfig = {
@@ -229,8 +229,6 @@
 
     window.onload = () => {
         w3.includeHTML(() => {
-            generateServiceMenu()
-
             generateCards('hot-brands', 'scroll', hotPlatforms, platformFieldConfig);
             generateCards('hot-items', 'card', hotProducts, productFieldConfig);
             generateCards('hot-stores', 'card', hotShops, shopFieldConfig);
@@ -238,10 +236,7 @@
             generateCards('hot-campaigns', 'card', hotCampaigns, campaignFieldConfig);
             generateCards('hot-posts', 'card', hotArticles, articleFieldConfig);
             generateCards('top-comments', 'card', topReviews, reviewFieldConfig);
-            generateArticles('about-posts', 5, 8);
-            generateArticles('buyer-posts', 5, 8);
-            generateArticles('seller-posts', 5, 8);
-            generateArticles('resource-posts', 5, 8);
+
             initCarousel();
 
             // 初始化箭头状态并绑定滚动监听

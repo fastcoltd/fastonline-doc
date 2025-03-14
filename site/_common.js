@@ -236,3 +236,14 @@ function generateArticles(containerId, min, max) {
         container.appendChild(li);
     }
 }
+
+
+window.addEventListener("load", function()  {
+    setTimeout(()=>{
+        generateServiceMenu()
+        generateArticles('about-posts', 5, 8);
+        generateArticles('buyer-posts', 5, 8);
+        generateArticles('seller-posts', 5, 8);
+        generateArticles('resource-posts', 5, 8);
+    }, 100)
+})
