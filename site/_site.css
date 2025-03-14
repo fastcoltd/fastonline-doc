@@ -4,7 +4,7 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css');
 
 /* 全局样式 */
-body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: var(--bg-light); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
+body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: var(--bg-white); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
 a { text-decoration: none; color: var(--text-primary); }
 a:hover { color: var(--font-green); }
 
@@ -12,12 +12,20 @@ a:hover { color: var(--font-green); }
 .container { max-width: var(--max-content-width); margin: 0 auto; padding: 0 1.875em; }
 
 /* 头部样式 */
-.header { width: 100%; background: var(--bg-white); border-bottom: 0.0625em solid var(--border-color); position: relative; }
-.header-inner { width: 100%; background: var(--bg-white); padding: 1.25em 0; }
-.header-inner .content-wrapper { max-width: var(--max-content-width); margin: 0 auto; padding: 0 1.875em; display: flex; align-items: center; justify-content: space-between; }
-.logo {margin-left: 0.5em; font-size: var(--font-xxlarge); font-weight: bold; display: inline-flex; background: linear-gradient(to right, var(--vibrant-orange), var(--natural-green)); -webkit-background-clip: text; color: transparent; animation: gradientShift 4s infinite alternate; }
+.header { width: 100%; background: var(--bg-white);}
+.header-inner { width: 100%; background: var(--bg-white); border-bottom: 0.0625em solid var(--border-color); position: relative;}
+.header-inner .content-wrapper { max-width: var(--max-content-width); margin: 0 auto; padding: 1.25em 1.875em; display: flex; align-items: center; justify-content: space-between; }
+.logo {margin-left: 0em; font-size: var(--font-xxlarge); font-weight: bold; display: inline-flex; background: linear-gradient(to right, var(--vibrant-orange), var(--natural-green)); -webkit-background-clip: text; color: transparent; animation: gradientShift 4s infinite alternate; }
 .logo-fast, .logo-resp { animation: none; }
 @keyframes gradientShift { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+
+.header-inner .service-menu { max-width: var(--max-content-width); margin: 0 auto;padding: 0.2em 1.875em;;background: var(--bg-white); display: flex; justify-content: flex-start; align-items: center; gap: 1.5625em;}
+.header-inner .service-menu .level-1 { z-index: 100; position: relative; cursor: pointer; font-size: var(--font-medium); color: var(--text-primary); padding: 0.5em 0; }
+.header-inner .service-menu .level-1:hover { color: var(--font-green); }
+.header-inner .service-menu .level-2 { z-index: 100; display: none; position: absolute; top: 100%; left: 0; background: var(--bg-white); border: 0.0625em solid var(--border-color); padding: 0.9375em; border-radius: 0.375em; box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1); white-space: nowrap; }
+.header .service-menu .level-2 a { display: block; padding: 0.25em 0; color: var(--text-primary); }
+.header-inner .service-menu .level-2 a:hover { color: var(--font-green); }
+.header-inner .service-menu .level-1:hover .level-2 { display: block; }
 
 .header-actions { display: flex; align-items: center; }
 .header-actions a { margin-left: 1.25em; font-size: var(--font-large); font-weight: bold; padding: 0.5em 1em; border-radius: 0.375em; }
@@ -58,16 +66,6 @@ a:hover { color: var(--font-green); }
 .btn-orange-solid-medium:active { transform: scale(0.95); transition: transform 0.05s; }
 .btn-orange-solid-large { display: inline-block; padding: 0.625em 1.25em; background: var(--vibrant-orange); border: 0.0625em solid var(--vibrant-orange); border-radius: 0.375em; color: var(--font-white); font-size: var(--font-large); text-align: center; text-decoration: none; cursor: pointer; transition: background 0.2s, color 0.2s, transform 0.1s; }
 .btn-orange-solid-large:active { transform: scale(0.95); transition: transform 0.05s; }
-
-
-/* 服务分类（菜单导航） */
-.service-menu { padding: 1em; background: var(--bg-white); display: flex; justify-content: flex-start; align-items: center; gap: 1.5625em; }
-.service-menu .level-1 { z-index: 100; position: relative; cursor: pointer; font-size: var(--font-medium); color: var(--text-primary); padding: 0.5em 0; }
-.service-menu .level-1:hover { color: var(--font-green); }
-.service-menu .level-2 { z-index: 100; display: none; position: absolute; top: 100%; left: 0; background: var(--bg-white); border: 0.0625em solid var(--border-color); padding: 0.9375em; border-radius: 0.375em; box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1); white-space: nowrap; }
-.service-menu .level-2 a { display: block; padding: 0.25em 0; color: var(--text-primary); }
-.service-menu .level-2 a:hover { color: var(--font-green); }
-.service-menu .level-1:hover .level-2 { display: block; }
 
 /* 轮播图 */
 .carousel { height: 21.875em; position: relative; overflow: hidden; border-radius: 0.5em; }
