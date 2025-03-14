@@ -58,7 +58,7 @@
             <h2 class="section-title">Hot campaigns</h2>
             <a href="#" class="see-all">More...</a>
         </div>
-        <div id="hot-albums" class="card-list"></div>
+        <div id="hot-campaigns" class="card-list"></div>
     </div>
 
     <!-- 热门需求 -->
@@ -73,7 +73,7 @@
     <!-- 热门文章 -->
     <div class="card-container">
         <div class="title-with-link">
-            <h2 class="section-title">Popular posts</h2>
+            <h2 class="section-title">Hot posts</h2>
             <a href="#" class="see-all">More...</a>
         </div>
         <div id="hot-posts" class="card-list"></div>
@@ -140,7 +140,7 @@
         stock: { type: 'text', label: '库存', style: {}, sample: () => faker.datatype.number({ min: 10, max: 100 }) },
         rating: { type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
         sales: { type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 100, max: 500 }) },
-        shopName: { type: 'text', label: '店铺', style: {}, sample: () => faker.company.companyName() },
+        brandName: { type: 'text', label: '品牌', style: {}, sample: () => faker.company.companyName() },
         tags: { type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') },
         buyNow: { type: 'button', value: '立即购买', style: { width: '100%', display: 'block', marginTop: '0.625em' } }
     };
@@ -175,7 +175,7 @@
         bidNow: { type: 'button', value: '投标', style: { width: '100%', display: 'block', marginTop: '0.625em' } }
     };
 
-    const albumFieldConfig = {
+    const campaignFieldConfig = {
         favorite: {
             type: 'favorite',
             style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
@@ -183,12 +183,13 @@
             onClick: (item, element) => { element.classList.toggle('favorited'); },
             sample: () => faker.datatype.boolean()
         },
-        image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `album${i}`) },
+        image: { type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `campaign${i}`) },
         title: { type: 'text', position: 'header', style: {}, sample: () => faker.commerce.department() },
         productCount: { type: 'text', label: '商品数', style: {}, sample: () => faker.datatype.number({ min: 5, max: 20 }) },
         sales: { type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 200, max: 600 }) },
         orders: { type: 'text', label: '订单数', style: {}, sample: () => faker.datatype.number({ min: 50, max: 200 }) },
-        favorites: { type: 'text', label: '收藏数', style: {}, sample: () => faker.datatype.number({ min: 100, max: 300 }) }
+        favorites: { type: 'text', label: '收藏数', style: {}, sample: () => faker.datatype.number({ min: 100, max: 300 }) },
+        tags: { type: 'tag', label: '要求', style: {}, sample: () => faker.lorem.words(3).split(' ') },
     };
 
     const articleFieldConfig = {
@@ -216,7 +217,7 @@
     // 配置数据
     const hotProducts = generateData(productFieldConfig, 18);
     const hotShops = generateData(shopFieldConfig, 12);
-    const hotAlbums = generateData(albumFieldConfig, 6);
+    const hotCampaigns = generateData(campaignFieldConfig, 6);
     const hotDemands = generateData(demandFieldConfig, 6);
     const hotArticles = generateData(articleFieldConfig, 6);
     const topReviews = generateData(reviewFieldConfig, 6);
@@ -247,7 +248,7 @@
             generateCards('hot-items', 'card', hotProducts, productFieldConfig);
             generateCards('hot-stores', 'card', hotShops, shopFieldConfig);
             generateCards('hot-demands', 'card', hotDemands, demandFieldConfig);
-            generateCards('hot-albums', 'card', hotAlbums, albumFieldConfig);
+            generateCards('hot-campaigns', 'card', hotCampaigns, campaignFieldConfig);
             generateCards('hot-posts', 'card', hotArticles, articleFieldConfig);
             generateCards('top-comments', 'card', topReviews, reviewFieldConfig);
             generateArticles('about-posts', 5, 8);
