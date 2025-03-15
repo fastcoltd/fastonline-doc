@@ -1,7 +1,7 @@
-// _common.js 修改部分
+const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
+
 function generateCards(containerId, cardType, data, fieldConfig) {
     const container = document.getElementById(containerId);
-    const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
 
     data.forEach((item, index) => {
         const card = document.createElement('div');
@@ -11,11 +11,9 @@ function generateCards(containerId, cardType, data, fieldConfig) {
         let contentHtml = '';
         const processedFields = new Set();
 
-
         for (const [fieldName, config] of Object.entries(fieldConfig)) {
             const value = item[fieldName] !== undefined ? item[fieldName] : config.value;
             if (value === undefined || processedFields.has(fieldName)) continue;
-
             if (config.mergeWith) {
                 config.mergeWith.forEach(mergeField => processedFields.add(mergeField));
             }
@@ -23,8 +21,7 @@ function generateCards(containerId, cardType, data, fieldConfig) {
             if (undefined == config[cardType] || !config[cardType]){
                 continue;
             }
-
-            const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, config, tagColors, containerId, index);
+            const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, config, containerId, index);
             if (config.position === 'header') {
                 headerHtml += fieldContent.html;
             } else {
@@ -57,11 +54,10 @@ function generateCards(containerId, cardType, data, fieldConfig) {
     });
 }
 
-// 生成字段内容（只返回 HTML）
-function generateFieldContent(fieldConfig, item, fieldName, value, config, tagColors, containerId, index) {
+function generateFieldContent(fieldConfig, item, fieldName, value, config, containerId, index) {
     const { type = 'text', label, format, style = {}, customClass, mergeWith, position } = config;
     let content = '';
-    const elementId = `${containerId}-${fieldName}-${index}`; // 唯一 ID
+    const elementId = `${containerId}-${fieldName}-${index}`;
 
     switch (type) {
         case 'text':
@@ -115,7 +111,6 @@ function generateFieldContent(fieldConfig, item, fieldName, value, config, tagCo
     return { html: '' };
 }
 
-// 动态应用样式
 function applyStyle(styleObj) {
     if (!styleObj) return '';
     const styles = [];
@@ -207,19 +202,18 @@ function showModal(modalId, content, options = {}) {
     modalContent.innerHTML = '<span class="modal-close" onclick="hideModal(\'' + modalId + '\')">×</span>' + content;
     modal.style.display = 'block';
 }
+
 function hideModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.style.display = 'none';
 }
 
-// 图片占位符
 function getPicsumImage(width, height, seed) {
     return `https://picsum.photos/seed/${seed}/${width}/${height}`;
 }
 
 const placeholderImage = 'https://via.placeholder.com/300x200?text=Image+Not+Found';
 
-// 轮播图动态效果
 function initCarousel() {
     let current = 0;
     const items = document.querySelectorAll('.carousel-item');
@@ -230,7 +224,6 @@ function initCarousel() {
     }, 3000);
 }
 
-// 生成文章列表（不含业务文字，参数化）
 function generateArticles(containerId, min, max) {
     const container = document.getElementById(containerId);
     const count = faker.datatype.number({min: min, max: max});
@@ -240,7 +233,6 @@ function generateArticles(containerId, min, max) {
         container.appendChild(li);
     }
 }
-
 
 window.addEventListener("load", function()  {
     setTimeout(()=>{
