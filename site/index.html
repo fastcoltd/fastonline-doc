@@ -101,12 +101,12 @@
 <script src="_common.js"></script>
 <script>
     // 配置数据
-    const hotProducts = generateData(productFieldConfig, 18);
-    const hotShops = generateData(shopFieldConfig, 12);
+    const hotProducts = generateData(itemFieldConfig, 18);
+    const hotShops = generateData(storeFieldConfig, 12);
     const hotCampaigns = generateData(campaignFieldConfig, 6);
     const hotDemands = generateData(demandFieldConfig, 6);
-    const hotArticles = generateData(articleFieldConfig, 6);
-    const topReviews = generateData(reviewFieldConfig, 6);
+    const hotArticles = generateData(postsFieldConfig, 6);
+    const topReviews = generateData(ordersCommentFieldConfig, 6);
 
     function scrollList(containerId, direction) {
         const list = document.getElementById(containerId);
@@ -129,13 +129,13 @@
 
     window.onload = () => {
         w3.includeHTML(() => {
-            generateCards('hot-brands', 'scroll', hotPlatforms, platformFieldConfig);
-            generateCards('hot-items', 'card', hotProducts, productFieldConfig);
-            generateCards('hot-stores', 'card', hotShops, shopFieldConfig);
+            generateCards('hot-brands', 'scroll-card', hotPlatforms, brandFieldConfig);
+            generateCards('hot-items', 'card', hotProducts, itemFieldConfig);
+            generateCards('hot-stores', 'card', hotShops, storeFieldConfig);
             generateCards('hot-demands', 'card', hotDemands, demandFieldConfig);
             generateCards('hot-campaigns', 'card', hotCampaigns, campaignFieldConfig);
-            generateCards('hot-posts', 'card', hotArticles, articleFieldConfig);
-            generateCards('top-comments', 'card', topReviews, reviewFieldConfig);
+            generateCards('hot-posts', 'card', hotArticles, postsFieldConfig);
+            generateCards('top-comments', 'card', topReviews, ordersCommentFieldConfig);
 
             initCarousel();
 

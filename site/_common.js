@@ -1,11 +1,11 @@
 // _common.js 修改部分
-function generateCards(containerId, cardType, data, fieldConfig) {
+function generateCards(containerId, className, data, fieldConfig) {
     const container = document.getElementById(containerId);
     const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
 
     data.forEach((item, index) => {
         const card = document.createElement('div');
-        card.className = cardType === 'scroll' ? 'scroll-card' : 'card';
+        card.className = className;
 
         let headerHtml = '';
         let contentHtml = '';

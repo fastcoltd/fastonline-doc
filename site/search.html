@@ -11,24 +11,19 @@
     <link rel="stylesheet" href="_site.css">
     <style>
         .search-container { display: flex; gap: 2em; padding: 2em 0; }
-        .sidebar { flex: 0 0 20em; background: var(--bg-white); padding: 1em; border-radius: 0.5em; box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.1); }
+        .sidebar { flex: 0 0 20em; }
         .main-content { flex: 1; }
-        .filter-row { display: flex; align-items: center; gap: 1em; margin-bottom: 0.75em; }
+        .filter-row { display: flex; align-items: center; gap: 1em; margin-bottom: 0.5em; }
         .filter-row label { font-size: var(--font-small); color: var(--text-secondary); white-space: nowrap; }
         .filter-row .ant-input, .filter-row .ant-select { flex: 1; }
         .filter-row .ant-input-number { width: 5em; }
         .tag-list { display: flex; flex-wrap: wrap; gap: 0.5em; margin-top: 0.5em; }
+        .ant-tag { padding: 0.2em 0.5em; font-size: var(--font-small); cursor: pointer; }
+        .ant-tag .close { margin-left: 0.5em; color: var(--text-secondary); }
+        .ant-tag .close:hover { color: var(--vibrant-orange); }
         .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em; font-size: var(--font-medium); color: var(--text-primary); }
-        .search-card { display: flex; align-items: center; padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; margin-bottom: 0.5em; cursor: pointer; background: var(--bg-white); transition: all 0.2s; }
-        .search-card:hover { border-color: var(--vibrant-orange); box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
-        .search-card img { width: 6em; height: 6em; object-fit: cover; margin-right: 1em; border-radius: 0.25em; }
-        .search-card-content { flex: 1; }
-        .search-card-content h3 { font-size: var(--font-medium); margin: 0 0 0.5em; color: var(--text-primary); }
-        .search-card-content p { font-size: var(--font-small); color: var(--text-secondary); margin: 0.3em 0; }
-        .search-card-content .price { color: var(--vibrant-orange); font-weight: bold; }
-        .search-card-content .ant-tag { margin-right: 0.5em; }
         .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin-top: 1.5em; font-size: var(--font-small); color: var(--text-primary); }
-        .pagination .ant-btn { padding: 0.3em 1em; background: var(--bg-white); border-color: var(--border-color); }
+        .pagination .ant-btn { padding: 0.3em 1em; background: var(--bg-white); border-color: var(--border-color); color: var(--text-primary); }
         .pagination .ant-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
         .pagination .ant-select { width: 6em; }
     </style>
@@ -44,23 +39,14 @@
         <div class="sidebar">
             <div class="filter-row">
                 <label>搜索类型:</label>
-                <select class="ant-select ant-select-single ant-select-show-arrow" id="search-type">
+                <select class="ant-select ant-select-single ant-select-show-arrow" id="search-type" onchange="updateSearchType()">
                     <option value="items">商品</option>
                     <option value="stores">店铺</option>
                     <option value="posts">文章</option>
                     <option value="demands">需求</option>
                 </select>
             </div>
-            <div class="filter-row">
-                <label>品牌:</label>
-                <input class="ant-input" list="brand-list" id="brand-filter" placeholder="输入品牌快速定位">
-                <datalist id="brand-list"></datalist>
-            </div>
-            <div class="filter-row">
-                <label>服务:</label>
-                <input class="ant-input" list="service-list" id="service-filter" placeholder="输入服务快速定位">
-                <datalist id="service-list"></datalist>
-            </div>
+            <div id="dynamic-filters"></div>
             <div class="filter-row">
                 <label>属性:</label>
                 <select class="ant-select ant-select-single ant-select-show-arrow" id="attribute-type" onchange="updateAttributeValues()">
@@ -72,24 +58,6 @@
             </div>
             <div id="attribute-tags" class="tag-list"></div>
             <div class="filter-row">
-                <label>价格:</label>
-                <input class="ant-input-number" type="number" id="price-min" placeholder="最低" min="0">
-                <span>~</span>
-                <input class="ant-input-number" type="number" id="price-max" placeholder="最高" min="0">
-            </div>
-            <div class="filter-row">
-                <label>库存:</label>
-                <input class="ant-input-number" type="number" id="stock-min" placeholder="最小" min="0">
-                <span>~</span>
-                <input class="ant-input-number" type="number" id="stock-max" placeholder="最大" min="0">
-            </div>
-            <div class="filter-row">
-                <label>评分:</label>
-                <input class="ant-input-number" type="number" id="rating-min" placeholder="最低" min="0" max="5" step="0.1">
-                <span>~</span>
-                <input class="ant-input-number" type="number" id="rating-max" placeholder="最高" min="0" max="5" step="0.1">
-            </div>
-            <div class="filter-row">
                 <label>更新时间晚于:</label>
                 <input class="ant-input" type="datetime-local" id="update-time">
             </div>
@@ -100,7 +68,7 @@
                 </select>
             </div>
             <div id="tag-list" class="tag-list"></div>
-            <button class="ant-btn ant-btn-primary btn-orange-solid-medium" onclick="applyFilters()" style="width: 100%; margin-top: 1em;">应用筛选</button>
+            <button class="ant-btn ant-btn-primary btn-orange-solid-medium" onclick="applyFilters()">应用筛选</button>
         </div>
 
         <!-- 主要内容 -->
@@ -115,7 +83,7 @@
                     <option value="sales">按销量排序</option>
                 </select>
             </div>
-            <div id="search-results"></div>
+            <div id="search-results" class="card-list"></div>
             <div class="pagination">
                 <button class="ant-btn" onclick="changePage(-1)">上一页</button>
                 <span id="pagination-info"></span>
@@ -149,45 +117,63 @@
     let searchKeyword = '';
     let filteredResults = [];
     let allResults = [];
-    let availableTags = [...ecommerceTags]; // 可用标签列表
+    let selectedTags = new Set();
+
+    // 可筛选字段配置
+    const filterConfigs = {
+        'items': {
+            'brandName': { type: 'text', label: '品牌' },
+            'price': { type: 'price', label: '价格' },
+            'stock': { type: 'number', label: '库存' },
+            'rating': { type: 'rating', label: '评分', min: 0, max: 5 },
+            'sales': { type: 'number', label: '销量' }
+        },
+        'stores': {
+            'sales': { type: 'number', label: '销量' },
+            'rating': { type: 'rating', label: '评分', min: 0, max: 5 }
+        },
+        'posts': {
+            'author': { type: 'text', label: '作者' },
+            'rating': { type: 'rating', label: '评分', min: 0, max: 5 }
+        },
+        'demands': {
+            'productName': { type: 'text', label: '产品名称' },
+            'productCount': { type: 'number', label: '需求数量' },
+            'price': { type: 'price', label: '出价范围' },
+            'totalPrice': { type: 'price', label: '总价' },
+            'bids': { type: 'number', label: '竞标人数' }
+        }
+    };
 
     // 初始化筛选
     function initFilters() {
-        const brandList = document.getElementById('brand-list');
-        hotPlatforms.forEach(p => {
-            const option = document.createElement('option');
-            option.value = p.name;
-            brandList.appendChild(option);
-        });
-
-        const serviceList = document.getElementById('service-list');
-        hotServices.forEach(s => {
-            const option = document.createElement('option');
-            option.value = s.title;
-            serviceList.appendChild(option);
-        });
-
         const attributeType = document.getElementById('attribute-type');
-        Object.keys(ecommerceAttributes).forEach(attr => {
-            const option = document.createElement('option');
-            option.value = attr;
-            option.text = attr;
-            attributeType.appendChild(option);
-        });
-
+        if (typeof ecommerceAttributes !== 'undefined') {
+            Object.keys(ecommerceAttributes).forEach(attr => {
+                const option = document.createElement('option');
+                option.value = attr;
+                option.text = attr;
+                attributeType.appendChild(option);
+            });
+        }
         updateTagFilter();
+        updateFilters();
     }
 
     // 更新标签下拉框
     function updateTagFilter() {
         const tagFilter = document.getElementById('tag-filter');
         tagFilter.innerHTML = '<option value="">选择标签</option>';
-        availableTags.forEach(tag => {
-            const option = document.createElement('option');
-            option.value = tag;
-            option.text = tag;
-            tagFilter.appendChild(option);
-        });
+        if (typeof ecommerceTags !== 'undefined') {
+            ecommerceTags.forEach(tag => {
+                if (!selectedTags.has(tag)) {
+                    const option = document.createElement('option');
+                    option.value = tag;
+                    option.text = tag;
+                    tagFilter.appendChild(option);
+                }
+            });
+        }
     }
 
     // 更新属性值下拉框
@@ -195,7 +181,7 @@
         const type = document.getElementById('attribute-type').value;
         const valueSelect = document.getElementById('attribute-value');
         valueSelect.innerHTML = '<option value="">选择属性值</option>';
-        if (type && ecommerceAttributes[type]) {
+        if (type && typeof ecommerceAttributes !== 'undefined' && ecommerceAttributes[type]) {
             ecommerceAttributes[type].forEach(val => {
                 const option = document.createElement('option');
                 option.value = val;
@@ -203,6 +189,74 @@
                 valueSelect.appendChild(option);
             });
         }
+    }
+
+    // 更新搜索类型并重新生成数据和筛选条件
+    function updateSearchType() {
+        searchType = document.getElementById('search-type').value;
+        allResults = generateSearchData();
+        filteredResults = [...allResults];
+        updateFilters();
+        applyFilters();
+    }
+
+    // 动态生成筛选条件
+    function updateFilters() {
+        const config = filterConfigs[searchType];
+        const dynamicFilters = document.getElementById('dynamic-filters');
+        dynamicFilters.innerHTML = '';
+
+        Object.entries(config).forEach(([fieldName, fieldConfig]) => {
+            const filterRow = document.createElement('div');
+            filterRow.className = 'filter-row';
+
+            const label = document.createElement('label');
+            label.textContent = `${fieldConfig.label}:`;
+            filterRow.appendChild(label);
+
+            if (fieldConfig.type === 'text') {
+                const input = document.createElement('input');
+                input.className = 'ant-input';
+                input.id = `${fieldName}-filter`;
+                input.placeholder = `输入${fieldConfig.label}快速定位`;
+                if (fieldName === 'brandName' && typeof hotPlatforms !== 'undefined') {
+                    input.setAttribute('list', 'brand-list');
+                    const datalist = document.createElement('datalist');
+                    datalist.id = 'brand-list';
+                    hotPlatforms.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.name;
+                        datalist.appendChild(option);
+                    });
+                    filterRow.appendChild(datalist);
+                }
+                filterRow.appendChild(input);
+            } else if (fieldConfig.type === 'price' || fieldConfig.type === 'rating' || fieldConfig.type === 'number') {
+                const minInput = document.createElement('input');
+                minInput.className = 'ant-input-number';
+                minInput.type = 'number';
+                minInput.id = `${fieldName}-min`;
+                minInput.placeholder = '最低';
+                minInput.min = fieldConfig.min || 0;
+                minInput.max = fieldConfig.max || undefined;
+                filterRow.appendChild(minInput);
+
+                const span = document.createElement('span');
+                span.textContent = '~';
+                filterRow.appendChild(span);
+
+                const maxInput = document.createElement('input');
+                maxInput.className = 'ant-input-number';
+                maxInput.type = 'number';
+                maxInput.id = `${fieldName}-max`;
+                maxInput.placeholder = '最高';
+                maxInput.min = fieldConfig.min || 0;
+                maxInput.max = fieldConfig.max || undefined;
+                filterRow.appendChild(maxInput);
+            }
+
+            dynamicFilters.appendChild(filterRow);
+        });
     }
 
     // 添加属性标签
@@ -213,7 +267,7 @@
             const tags = document.getElementById('attribute-tags');
             const tag = document.createElement('span');
             tag.className = 'ant-tag ant-tag-blue';
-            tag.innerHTML = `${type}: ${value} <span class="anticon anticon-close close" onclick="removeTag(this, 'attribute-tags')"></span>`;
+            tag.innerHTML = `${type}: ${value} <span class="close" onclick="removeTag(this, 'attribute-tags')">×</span>`;
             tags.appendChild(tag);
             document.getElementById('attribute-value').value = '';
             applyFilters();
@@ -224,106 +278,93 @@
     function addTag() {
         const value = document.getElementById('tag-filter').value;
         if (value) {
+            selectedTags.add(value);
             const tags = document.getElementById('tag-list');
             const tag = document.createElement('span');
             tag.className = 'ant-tag ant-tag-blue';
-            tag.innerHTML = `${value} <span class="anticon anticon-close close" onclick="removeTag(this, 'tag-list')"></span>`;
+            tag.innerHTML = `${value} <span class="close" onclick="removeTag(this, 'tag-list', '${value}')">×</span>`;
             tags.appendChild(tag);
-            availableTags = availableTags.filter(t => t !== value);
-            document.getElementById('tag-filter').value = '';
             updateTagFilter();
+            document.getElementById('tag-filter').value = '';
             applyFilters();
         }
     }
 
     // 删除标签
-    function removeTag(element, containerId) {
-        const tagText = element.parentElement.textContent.trim().replace('', '');
-        if (containerId === 'tag-list') {
-            availableTags.push(tagText);
-            updateTagFilter();
-        }
+    function removeTag(element, containerId, tagValue) {
         element.parentElement.remove();
+        if (tagValue) selectedTags.delete(tagValue);
+        if (containerId === 'tag-list') updateTagFilter();
         applyFilters();
     }
 
     // 生成搜索数据
     function generateSearchData() {
-        const data = [];
-        const count = 100;
-        for (let i = 0; i < count; i++) {
-            let item;
-            switch (searchType) {
-                case 'items':
-                    item = generateData(productFieldConfig, 1)[0];
-                    item.brandName = hotPlatforms[Math.floor(Math.random() * hotPlatforms.length)].name;
-                    item.tags = ecommerceTags.slice(0, Math.floor(Math.random() * 3) + 1);
-                    item.updateTime = faker.date.recent(30).toISOString();
-                    item.description = faker.lorem.sentence();
-                    item.seller = faker.company.companyName();
-                    item.shipping = ecommerceTags[Math.floor(Math.random() * ecommerceTags.length)];
-                    break;
-                case 'stores':
-                    item = generateData(shopFieldConfig, 1)[0];
-                    item.tags = ecommerceTags.slice(0, Math.floor(Math.random() * 3) + 1);
-                    item.updateTime = faker.date.recent(30).toISOString();
-                    item.description = faker.lorem.sentence();
-                    item.location = faker.address.city();
-                    item.products = faker.datatype.number({ min: 10, max: 100 });
-                    break;
-                case 'posts':
-                    item = generateData(articleFieldConfig, 1)[0];
-                    item.tags = ecommerceTags.slice(0, Math.floor(Math.random() * 3) + 1);
-                    item.updateTime = faker.date.recent(30).toISOString();
-                    item.summary = faker.lorem.paragraph();
-                    item.views = faker.datatype.number({ min: 100, max: 10000 });
-                    break;
-                case 'demands':
-                    item = generateData(demandFieldConfig, 1)[0];
-                    item.tags = ecommerceTags.slice(0, Math.floor(Math.random() * 3) + 1);
-                    item.updateTime = faker.date.recent(30).toISOString();
-                    item.deadline = faker.date.future().toISOString().split('T')[0];
-                    item.buyer = faker.name.findName();
-                    break;
-            }
-            const attrKeys = Object.keys(ecommerceAttributes);
-            item.attributes = {};
-            for (let j = 0; j < 3; j++) {
-                const key = attrKeys[Math.floor(Math.random() * attrKeys.length)];
-                item.attributes[key] = ecommerceAttributes[key][Math.floor(Math.random() * ecommerceAttributes[key].length)];
-            }
-            data.push(item);
+        try {
+            const config = fieldConfigs[searchType];
+            if (!config) throw new Error(`Field config for ${searchType} not found`);
+            const data = generateData(config, 100);
+            data.forEach(item => {
+                item.description = faker.lorem.sentences(2);
+                item.updateTime = faker.date.recent(30).toISOString();
+                item.attributes = {};
+                item.tags = typeof ecommerceTags !== 'undefined' ? ecommerceTags.slice(0, Math.floor(Math.random() * 3) + 1) : [];
+                if (typeof ecommerceAttributes !== 'undefined') {
+                    const attrKeys = Object.keys(ecommerceAttributes);
+                    for (let j = 0; j < 3; j++) {
+                        const key = attrKeys[Math.floor(Math.random() * attrKeys.length)];
+                        item.attributes[key] = ecommerceAttributes[key][Math.floor(Math.random() * ecommerceAttributes[key].length)];
+                    }
+                }
+            });
+            console.log('Generated Data:', data);
+            return data;
+        } catch (error) {
+            console.error('Error generating search data:', error);
+            return [];
         }
-        return data;
     }
 
     // 应用筛选
     function applyFilters() {
-        const brand = document.getElementById('brand-filter').value;
-        const service = document.getElementById('service-filter').value;
-        const priceMin = parseFloat(document.getElementById('price-min').value) || 0;
-        const priceMax = parseFloat(document.getElementById('price-max').value) || Infinity;
-        const stockMin = parseInt(document.getElementById('stock-min').value) || 0;
-        const stockMax = parseInt(document.getElementById('stock-max').value) || Infinity;
-        const ratingMin = parseFloat(document.getElementById('rating-min').value) || 0;
-        const ratingMax = parseFloat(document.getElementById('rating-max').value) || 5;
+        const config = filterConfigs[searchType];
+        const filters = {};
+        Object.keys(config).forEach(fieldName => {
+            if (document.getElementById(`${fieldName}-min`) && document.getElementById(`${fieldName}-max`)) {
+                filters[fieldName] = {
+                    min: parseFloat(document.getElementById(`${fieldName}-min`).value) || 0,
+                    max: parseFloat(document.getElementById(`${fieldName}-max`).value) || Infinity
+                };
+            } else if (document.getElementById(`${fieldName}-filter`)) {
+                filters[fieldName] = document.getElementById(`${fieldName}-filter`).value;
+            }
+        });
         const updateTime = document.getElementById('update-time').value;
         const attributeTags = Array.from(document.getElementById('attribute-tags').children).map(tag => {
-            const [type, value] = tag.textContent.split(': ').map(t => t.trim().replace('', ''));
+            const [type, value] = tag.textContent.split(': ').map(t => t.trim().replace('×', ''));
             return { type, value };
         });
-        const tags = Array.from(document.getElementById('tag-list').children).map(tag => tag.textContent.trim().replace('', ''));
+        const tags = Array.from(document.getElementById('tag-list').children).map(tag => tag.textContent.trim().replace('×', ''));
 
         filteredResults = allResults.filter(item => {
             let match = true;
-            if (brand && item.brandName !== brand) match = false;
-            if (service && item.title !== service) match = false;
-            if (item.price) {
-                const price = parseFloat(item.price.sample.replace('$', ''));
-                if (price < priceMin || price > priceMax) match = false;
-            }
-            if (item.stock && (item.stock < stockMin || item.stock > stockMax)) match = false;
-            if (item.rating && (item.rating < ratingMin || item.rating > ratingMax)) match = false;
+            Object.entries(filters).forEach(([fieldName, filter]) => {
+                if (filter.min !== 0 || filter.max !== Infinity) {
+                    const value = item[fieldName];
+                    if (fieldName === 'price' || fieldName === 'totalPrice') {
+                        const price = parseFloat(value?.replace('$', '') || 0);
+                        if (price < filter.min || price > filter.max) match = false;
+                    } else if (fieldName === 'rating') {
+                        const rating = value?.sample || 0;
+                        if (rating < filter.min || rating > filter.max) match = false;
+                    } else {
+                        const numValue = parseFloat(value) || 0;
+                        if (numValue < filter.min || numValue > filter.max) match = false;
+                    }
+                } else if (filter && item[fieldName] !== filter) {
+                    match = false;
+                }
+            });
             if (updateTime && item.updateTime && new Date(item.updateTime) < new Date(updateTime)) match = false;
             if (attributeTags.length > 0) {
                 attributeTags.forEach(tag => {
@@ -331,12 +372,14 @@
                 });
             }
             if (tags.length > 0 && !tags.every(tag => item.tags.includes(tag))) match = false;
-            return match && (item.title?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-                item.name?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-                item.demandName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-                item.description?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-                item.summary?.toLowerCase().includes(searchKeyword.toLowerCase()));
+            return match && (
+                (item.title?.toLowerCase().includes(searchKeyword.toLowerCase())) ||
+                (item.name?.toLowerCase().includes(searchKeyword.toLowerCase())) ||
+                (item.demandName?.toLowerCase().includes(searchKeyword.toLowerCase())) ||
+                (item.description?.toLowerCase().includes(searchKeyword.toLowerCase()))
+            );
         });
+        console.log('Filtered Results:', filteredResults);
         currentPage = 1;
         updateResults();
     }
@@ -349,37 +392,14 @@
         const results = filteredResults.slice(start, end);
         const container = document.getElementById('search-results');
         container.innerHTML = '';
-
-        results.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'search-card';
-            card.innerHTML = `
-                <img src="${item.image || placeholderImage}" alt="${item.title || item.name}">
-                <div class="search-card-content">
-                    <h3>${item.title || item.name || item.demandName}</h3>
-                    ${item.description ? `<p>描述: ${item.description}</p>` : item.summary ? `<p>摘要: ${item.summary}</p>` : ''}
-                    ${item.price ? `<p>价格: <span class="price">${item.price}</span></p>` : item.totalPrice ? `<p>总价: <span class="price">${item.totalPrice}</span></p>` : ''}
-                    ${item.stock ? `<p>库存: ${item.stock}</p>` : item.productCount ? `<p>需求数量: ${item.productCount}</p>` : ''}
-                    ${item.rating ? `<div class="rating">${generateRating(item, item.rating)}</div>` : ''}
-                    ${item.seller ? `<p>卖家: ${item.seller}</p>` : item.buyer ? `<p>买家: ${item.buyer}</p>` : item.author ? `<p>作者: ${item.author}</p>` : ''}
-                    ${item.shipping ? `<p>配送: ${item.shipping}</p>` : item.deadline ? `<p>截止日期: ${item.deadline}</p>` : item.views ? `<p>浏览量: ${item.views}</p>` : ''}
-                    ${item.location ? `<p>位置: ${item.location}</p>` : ''}
-                    ${item.products ? `<p>商品数: ${item.products}</p>` : ''}
-                    ${item.tags ? `<p>${item.tags.map(tag => `<span class="ant-tag ant-tag-blue">${tag}</span>`).join('')}</p>` : ''}
-                </div>
-                <i class="fas fa-heart favorite-icon ${item.favorite ? 'favorited' : ''}" onclick="toggleFavorite(this)" style="font-size: var(--font-large); margin-left: 1em;"></i>
-            `;
-            container.appendChild(card);
-        });
-
+        try {
+            generateCards('search-results', 'card', results, fieldConfigs[searchType]);
+        } catch (error) {
+            console.error('Error rendering cards:', error);
+        }
         document.getElementById('result-count').textContent = filteredResults.length;
         document.getElementById('search-keyword').textContent = searchKeyword;
         updatePagination();
-    }
-
-    // 切换收藏状态
-    function toggleFavorite(element) {
-        element.classList.toggle('favorited');
     }
 
     // 更新分页信息
@@ -420,10 +440,10 @@
         const sortBy = document.getElementById('sort-by').value;
         filteredResults.sort((a, b) => {
             if (sortBy === 'relevance') return 0;
-            if (sortBy === 'price') return parseFloat(a.price?.replace('$', '') || a.totalPrice?.replace('$', '') || 0) - parseFloat(b.price?.replace('$', '') || b.totalPrice?.replace('$', '') || 0);
-            if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
-            if (sortBy === 'stock') return (b.stock || b.productCount || 0) - (a.stock || a.productCount || 0);
-            if (sortBy === 'sales') return (b.sales || 0) - (a.sales || 0);
+            if (sortBy === 'price') return parseFloat(a.price?.replace('$', '') || 0) - parseFloat(b.price?.replace('$', '') || 0);
+            if (sortBy === 'rating') return (b.rating?.sample || 0) - (a.rating?.sample || 0);
+            if (sortBy === 'stock') return (parseFloat(b.stock) || 0) - (parseFloat(a.stock) || 0);
+            if (sortBy === 'sales') return (parseFloat(b.sales) || 0) - (parseFloat(a.sales) || 0);
         });
         updateResults();
     }
@@ -431,41 +451,36 @@
     // 初始化页面
     window.onload = () => {
         w3.includeHTML(() => {
-            initFilters();
-
-            // 从头部搜索框读取关键字
-            const searchInput = document.getElementById('search');
-            if (searchInput) {
-                searchKeyword = searchInput.value || 'test';
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        searchKeyword = searchInput.value;
-                        allResults = generateSearchData();
-                        filteredResults = [...allResults];
-                        applyFilters();
+            try {
+                const searchInput = document.getElementById('search');
+                if (searchInput) {
+                    searchKeyword = searchInput.value || new URLSearchParams(window.location.search).get('q') || 'test';
+                    const searchButton = document.querySelector('.search-box button');
+                    if (searchButton) {
+                        searchButton.onclick = () => {
+                            searchKeyword = searchInput.value;
+                            window.location.href = `search.html?q=${encodeURIComponent(searchKeyword)}`;
+                        };
                     }
-                });
-            } else {
-                searchKeyword = new URLSearchParams(window.location.search).get('q') || 'test';
-            }
+                } else {
+                    searchKeyword = new URLSearchParams(window.location.search).get('q') || 'test';
+                }
 
-            document.getElementById('search-type').value = searchType;
-            document.getElementById('search-type').onchange = () => {
-                searchType = document.getElementById('search-type').value;
+                initFilters();
+                document.getElementById('search-type').value = searchType;
+                document.getElementById('jump-to-page').onchange = () => {
+                    const page = parseInt(document.getElementById('jump-to-page').value);
+                    if (page >= 1 && page <= Math.ceil(filteredResults.length / itemsPerPage)) {
+                        currentPage = page;
+                        updateResults();
+                    }
+                };
                 allResults = generateSearchData();
                 filteredResults = [...allResults];
                 applyFilters();
-            };
-            document.getElementById('jump-to-page').onchange = () => {
-                const page = parseInt(document.getElementById('jump-to-page').value);
-                if (page >= 1 && page <= Math.ceil(filteredResults.length / itemsPerPage)) {
-                    currentPage = page;
-                    updateResults();
-                }
-            };
-            allResults = generateSearchData();
-            filteredResults = [...allResults];
-            applyFilters();
+            } catch (error) {
+                console.error('Error during initialization:', error);
+            }
         });
     };
 </script>
