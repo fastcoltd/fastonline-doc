@@ -26,7 +26,9 @@ let itemFieldConfig = {
     stock: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '库存', style: {}, sample: () => faker.datatype.number({ min: 10, max: 100 }) },
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
     sales: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 100, max: 500 }) },
+    store: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '店铺',  style: {}, sample: () => faker.company.companyName() },
     brandName: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '品牌', style: {}, sample: () => faker.company.companyName() },
+    lastUpdate: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '最后更新', style: {}, sample: () => `2025-03-01 12:00:11` },
     tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') },
     buyNow: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: '立即购买', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 };
@@ -43,6 +45,7 @@ let storeFieldConfig = {
     image: { card: true, cardSq: true, cardHoriz: true, type: 'image',  style: {}, sample: i => getPicsumImage(300, 200, `store-${i}`) },
     name: { card: true, cardSq: true, cardHoriz: true, type: 'text',  style: {}, sample: () => faker.company.companyName() },
     sales: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 300, max: 1000 }) },
+    salesTotal: { card: false, cardSq: false, cardHoriz: true, type: 'price', label: '销售额', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(5000, 200000, 2, "$") },
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
     slogan: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '标语', style: {}, sample: () => faker.company.catchPhrase() },
     tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') },
@@ -74,6 +77,9 @@ let postsFieldConfig = {
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
     author: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '作者', style: {}, sample: () => faker.name.findName() },
     content: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '内容', style: {}, sample: () => faker.lorem.paragraph() },
+    paid: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '付费', style: {}, format: (d, v) => {
+        return v ? `<span style="color: var(--font-orange)">付费</span>` : `<span style="color: var(--font-green)">免费</span>`
+        }, sample: () => faker.datatype.boolean() },
     tags: { card: false, cardSq: false, cardHoriz: true, type: 'tag', label: '标签', style: {}, sample: () => faker.lorem.words(3).split(' ') },
     joinNow: { card: false, cardSq: false, cardHoriz: true, type: 'button', value: '查看', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 };

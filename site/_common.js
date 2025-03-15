@@ -59,20 +59,18 @@ function generateFieldContent(fieldConfig, item, fieldName, value, config, conta
     let content = '';
     const elementId = `${containerId}-${fieldName}-${index}`;
 
+    content = format ? format(fieldConfig, value['sample']) : value;
+
     switch (type) {
         case 'text':
-            content = typeof value === 'string' || typeof value === 'number'
-                ? format ? format(value) : value
-                : '';
             return {
                 html: position === 'header'
                     ? `<h3 id="${elementId}"${applyStyle(style)}>${content}</h3>`
                     : `<p id="${elementId}"${applyStyle(style)}>${label ? `${label}:` : ""} ${content}</p>`
             };
         case 'price':
-            let showPrice = format ? format(fieldConfig, value['sample']) : value
             return {
-                html: `<p class="${customClass || ''}" id="${elementId}"${applyStyle(style)}>${label ? `${label}:` : ""} ${showPrice}</p>`
+                html: `<p class="${customClass || ''}" id="${elementId}"${applyStyle(style)}>${label ? `${label}:` : ""} ${content}</p>`
             };
         case 'tag':
             if (Array.isArray(value)) {

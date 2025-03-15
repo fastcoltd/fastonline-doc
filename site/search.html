@@ -416,7 +416,7 @@
             // 收集字段并按长度排序
             const fieldItems = [];
             Object.entries(config).forEach(([fieldName, fieldConfig]) => {
-                if (fieldConfig.cardHoriz !== true) return;
+                if (!fieldConfig.cardHoriz) return;
 
                 const value = item[fieldName] !== undefined ? item[fieldName] : fieldConfig.value;
                 const fieldContent = generateFieldContent(config, item, fieldName, value, fieldConfig, 'search-results', index);
