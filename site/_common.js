@@ -1,11 +1,11 @@
 // _common.js 修改部分
-function generateCards(containerId, className, data, fieldConfig) {
+function generateCards(containerId, cardType, data, fieldConfig) {
     const container = document.getElementById(containerId);
     const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
 
     data.forEach((item, index) => {
         const card = document.createElement('div');
-        card.className = className;
+        card.className = cardType;
 
         let headerHtml = '';
         let contentHtml = '';
@@ -18,6 +18,10 @@ function generateCards(containerId, className, data, fieldConfig) {
 
             if (config.mergeWith) {
                 config.mergeWith.forEach(mergeField => processedFields.add(mergeField));
+            }
+
+            if (undefined == config[cardType] || !config[cardType]){
+                continue;
             }
 
             const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, config, tagColors, containerId, index);
