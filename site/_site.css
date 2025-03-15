@@ -103,6 +103,26 @@ a:hover { color: var(--font-green); }
 .pagination a { display: inline-block; padding: 0.3em 0.6em; margin: 0 0.3em; border: 0.0625em solid var(--border-color); border-radius: 0.25em; text-decoration: none; color: var(--text-primary); }
 .pagination a:hover { border-color: var(--natural-green); color: var(--natural-green); }
 
+/* 横版卡片样式 */
+.cardHoriz { flex: 0 0 100%; max-width: 100%; min-height: 8em; margin-bottom: 0.5em; padding: 0.5em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; display: flex; align-items: center; }
+.cardHoriz:hover { border-color: var(--natural-green); box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
+.cardHoriz .image-wrapper { flex: 0 0 8em; height: 8em; margin-right: 1em; }
+.cardHoriz .image-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 0.25em; }
+.cardHoriz .card-content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.cardHoriz .title-wrapper { margin: 0; font-size: var(--font-medium); color: var(--text-primary); font-weight: bold; }
+.cardHoriz .title-wrapper p {margin: 0}
+.cardHoriz .fields-row { display: flex; flex-wrap: wrap; min-height: 2.8em; column-gap: 1em; }
+.cardHoriz .field-item p { margin: 0; font-size: var(--font-small); color: var(--text-secondary); }
+.cardHoriz .field-item .price { font-size: 1em; font-weight: 800; color: red; }
+.cardHoriz .bottom-row { padding-bottom:0.2em;display: flex; align-items: center; gap: 1em; flex-wrap: wrap; }
+.cardHoriz .rating-wrapper { flex: 0 0 auto; }
+.cardHoriz .tags-wrapper p { margin: 0; display: flex; flex-wrap: wrap; gap: 0.5em; }
+.cardHoriz .tags-wrapper .ant-tag { margin: 0; padding: 0.125em 0.5em; border-radius: 0.25em; font-size: var(--font-small); }
+.cardHoriz .button-wrapper { margin-left: auto; }
+.cardHoriz .button-wrapper .card-button { margin: 0; padding: 0.5em 1em; font-size: var(--font-medium); }
+.cardHoriz .favorite-icon { top: 0.5em; right: 0.5em; }
+
+
 /*星星*/
 .rating { margin: 0.3125em 0; height: 2em; line-height: 2em; display: flex; align-items: center; }
 .rating .stars { position: relative; display: inline-flex; white-space: nowrap; }
@@ -196,6 +216,7 @@ a:hover { color: var(--font-green); }
 
 }
 @media (max-width: 80em) {
+    .sidebar { display: none; }
     .card { flex: 0 0 calc(25% - 0.5em); max-width: calc(25% - 0.5em); }
     .header-inner .header-actions a { display: none; }
     .header-inner .search-box { display: none; }
@@ -220,7 +241,14 @@ a:hover { color: var(--font-green); }
     .footer-bottom .social-links img { margin: 0.3125em; }
     .footer-inner .content-wrapper { max-width: var(--max-content-width); margin: 0 auto; padding: 0em; }
     .card { flex: 0 0 calc(33.33% - 0.5em); max-width: calc(33.33% - 0.5em); }
-    .cardHoriz { flex: 0 0 100%; max-width: 100%; min-height: 8em; } .cardHoriz img { width: 8em; height: 8em; } .cardHoriz .fields-row { gap: 0.5em; }
+
+
+    .cardHoriz { flex-direction: column; min-height: auto; align-items: flex-start; }
+    .cardHoriz .image-wrapper { width: 100%; height: 8.75em; margin-right: 0; margin-bottom: 0.5em; }
+    .cardHoriz .fields-row { flex-wrap: wrap; gap: 0.5em; }
+    .cardHoriz .bottom-row { flex-direction: column; align-items: flex-start; gap: 0.5em; }
+    .cardHoriz .button-wrapper { width: 100%; margin-left: 0; }
+    .cardHoriz .button-wrapper .card-button { width: 100%; }
 }
 @media (max-width: 48em) {
     body { padding-top: 5em; }

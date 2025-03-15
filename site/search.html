@@ -310,7 +310,6 @@
                     }
                 }
             });
-            console.log('Generated Data:', data);
             return data;
         } catch (error) {
             console.error('Error generating search data:', error);
@@ -394,7 +393,6 @@
         updateResults();
     }
 
-    // 更新结果显示
     function updateResults() {
         itemsPerPage = parseInt(document.getElementById('items-per-page').value);
         const start = (currentPage - 1) * itemsPerPage;
@@ -402,13 +400,82 @@
         const results = filteredResults.slice(start, end);
         const container = document.getElementById('search-results');
         container.innerHTML = '';
-        try {
-            generateCards('search-results', 'card', results, fieldConfigs[searchType]);
-        } catch (error) {
-            console.error('Error rendering cards:', error);
-        }
-        let keywords = searchKeyword || '全部';
-        document.getElementById('resultsShow').innerHTML = `搜索 <b style="color: var(--font-green)">${searchType}</b>, "<b>${keywords}</b>"，找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条结果`;
+
+        const config = fieldConfigs[searchType];
+        results.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'cardHoriz';
+
+            let imageHtml = '';
+            let titleHtml = '';
+            let fieldsHtml = '<div class="fields-row">';
+            let bottomHtml = '<div class="bottom-row">';
+            let favoriteHtml = '';
+            let hasTitle = false;
+
+            // 收集字段并按长度排序
+            const fieldItems = [];
+            Object.entries(config).forEach(([fieldName, fieldConfig]) => {
+                if (fieldConfig.cardHoriz !== true) return;
+
+                const value = item[fieldName] !== undefined ? item[fieldName] : fieldConfig.value;
+                const fieldContent = generateFieldContent(config, item, fieldName, value, fieldConfig, 'search-results', index);
+                const type = fieldConfig.type || 'text';
+                const contentLength = (typeof value === 'string' ? value : JSON.stringify(value)).length;
+
+                if (type === 'image' && !imageHtml) {
+                    imageHtml = `<div class="image-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'text' && !hasTitle) {
+                    titleHtml = `<div class="title-wrapper">${fieldContent.html}</div>`;
+                    hasTitle = true;
+                } else if (type === 'rating') {
+                    bottomHtml += `<div class="rating-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'tag') {
+                    bottomHtml += `<div class="tags-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'button') {
+                    bottomHtml += `<div class="button-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'favorite') {
+                    favoriteHtml = fieldContent.html;
+                } else {
+                    fieldItems.push({ html: fieldContent.html, length: contentLength, name: fieldName });
+                }
+            });
+
+            // 按字段值长度排序，长的放后面
+            fieldItems.sort((a, b) => a.length - b.length);
+            fieldItems.forEach(item => {
+                fieldsHtml += `<span class="field-item">${item.html}</span>`;
+            });
+            fieldsHtml += '</div>';
+            bottomHtml += '</div>';
+
+            // 组合 HTML 并包裹在 <a> 标签中
+            card.innerHTML = `
+                    ${imageHtml}
+                    <div class="card-content">
+                        ${titleHtml}
+                        ${fieldsHtml}
+                        ${bottomHtml}
+                        ${favoriteHtml}
+                    </div>
+            `;
+            container.appendChild(card);
+
+            // 绑定 onClick 事件
+            Object.entries(config).forEach(([fieldName, fieldConfig]) => {
+                if (fieldConfig.cardHoriz === true && fieldConfig.onClick) {
+                    const elementId = `${'search-results'}-${fieldName}-${index}`;
+                    const element = card.querySelector(`#${elementId}`);
+                    if (element) {
+                        element.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            fieldConfig.onClick(item, element);
+                        });
+                    }
+                }
+            });
+        });
+
         updatePagination();
     }
 
@@ -481,6 +548,9 @@
                         };
                     }
                 }
+
+                let keywords = searchKeyword || '全部';
+                document.getElementById('resultsShow').innerHTML = `在 <b style="color: var(--font-green)">${searchType}</b> 分类中，搜索 "<b style="color: var(--font-green)">${keywords}</b>"，找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条结果`;
 
                 initFilters();
                 document.getElementById('search-type').value = searchType;
