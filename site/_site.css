@@ -85,12 +85,12 @@ a:hover { color: var(--font-green); }
 
 /* 搜索页面样式 */
 .search-container { display: flex; gap: 2em; padding: 2em 0; }
-.sidebar { flex: 0 0 25em; padding: 1em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; }
+.sidebar { flex: 0 0 15em; padding: 1em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; }
 .filter-row-select, .sort-select {  padding: 0.3em 1em;width: 10em; }
 .filter-row { display: flex; align-items: center; padding: 0.5em; gap: 1em; margin-bottom: 0.5em; }
 .filter-row label { font-size: var(--font-small); color: var(--text-secondary); white-space: nowrap; }
 .filter-row .ant-input, .filter-row .ant-select { flex: 1; }
-.filter-row .ant-input-number { width: 5em; }
+.filter-row .ant-input-number { width: 40%; }
 .tag-list { display: flex; flex-wrap: wrap; gap: 0.5em; margin: 0em 0 0.8em 0em; }
 .tag-close{cursor: pointer}
 .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em; font-size: var(--font-medium); color: var(--text-primary); }
@@ -100,6 +100,18 @@ a:hover { color: var(--font-green); }
 .pagination-select {  padding: 0.3em 1em;width: 10em; }
 .pagination a { display: inline-block; padding: 0.3em 0.6em; margin: 0 0.3em; border: 0.0625em solid var(--border-color); border-radius: 0.25em; text-decoration: none; color: var(--text-primary); }
 .pagination a:hover { border-color: var(--natural-green); color: var(--natural-green); }
+
+/*星星*/
+.rating { margin: 0.3125em 0; height: 2em; line-height: 2em; display: flex; align-items: center; }
+.rating .stars { position: relative; display: inline-flex; white-space: nowrap; }
+.rating .star-bg { display: flex; white-space: nowrap; }
+.rating .star-bg svg { width: 2em; height: 2em; fill: none; stroke: var(--vibrant-orange); }
+.rating .star-filled { position: absolute; top: 0; left: 0; display: flex; white-space: nowrap; }
+.rating .star { width: 2em; height: 2em; overflow: hidden; }
+.rating .star.partial { overflow: hidden; }
+.rating .star.empty { visibility: hidden; }
+.rating .star svg { width: 2em; height: 2em; }
+.rating .rating-count { margin-left: 0.5em; color: var(--text-secondary); }
 
 /* 其他页面样式 */
 .carousel { height: 21.875em; position: relative; overflow: hidden; border-radius: 0.5em; }
@@ -120,17 +132,28 @@ a:hover { color: var(--font-green); }
 .card p { margin: 0.3125em 0; font-size: var(--font-small); color: var(--text-secondary); }
 .card .price { font-size: 1em; font-weight: 800; color: red; }
 .card .card-content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding-top: 0.5375em; }
-.card .card-content .rating { margin: 0.3125em 0; height: 2em; line-height: 2em; display: flex; align-items: center; }
-.card .card-content .rating .stars { position: relative; display: inline-flex; white-space: nowrap; }
-.card .card-content .rating .star-bg { display: flex; white-space: nowrap; }
-.card .card-content .rating .star-bg svg { width: 2em; height: 2em; fill: none; stroke: var(--vibrant-orange); }
-.card .card-content .rating .star-filled { position: absolute; top: 0; left: 0; display: flex; white-space: nowrap; }
-.card .card-content .rating .star { width: 2em; height: 2em; overflow: hidden; }
-.card .card-content .rating .star.partial { overflow: hidden; }
-.card .card-content .rating .star.empty { visibility: hidden; }
-.card .card-content .rating .star svg { width: 2em; height: 2em; }
-.card .card-content .rating .rating-count { margin-left: 0.5em; color: var(--text-secondary); }
 .card .card-content .ant-tag { margin-right: 0.5em; padding: 0.125em 0.5em; border-radius: 0.25em; font-size: var(--font-small); }
+
+
+.cardHoriz { flex: 0 0 100%; max-width: 100%; margin-bottom: 0.5em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; display: flex; flex-direction: row; min-height: auto; height: auto; }
+.cardHoriz:hover { border-color: var(--vibrant-orange); box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
+.cardHoriz img { width: 5em; height: 5em; object-fit: cover; display: block; }
+.cardHoriz .card-content { flex: 1; display: flex; flex-direction: column; padding: 0.5em; gap: 0.3em; overflow: hidden; }
+.cardHoriz h3 { margin: 0; font-size: var(--font-medium); font-weight: bold; line-height: 1.2; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* 名称一行 */
+.cardHoriz .card-content > div:not(:last-child) { display: flex; flex-direction: row; align-items: center; gap: 0.5em; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none; max-height: 2em; line-height: 1.2; } /* 字段强制一行 */
+.cardHoriz .card-content > div:not(:last-child) * { display: inline; vertical-align: middle; margin: 0; } /* 强制所有子元素内联 */
+.cardHoriz .card-content > div:not(:last-child)::-webkit-scrollbar { display: none; }
+.cardHoriz .card-content > div:last-child { display: flex; justify-content: flex-end; }
+.cardHoriz .price { font-size: var(--font-small); font-weight: 800; color: var(--font-orange); }
+.cardHoriz .ant-tag { margin-right: 0.3em; padding: 0.1em 0.3em; border-radius: 0.2em; font-size: var(--font-small); color: var(--text-secondary); }
+.cardHoriz .card-button { padding: 0.3em 0.6em; background: var(--natural-green); color: var(--font-white); border: 0.1225em solid var(--natural-green); border-radius: 0.375em; font-size: var(--font-small); text-align: center; transition: background 0.2s, color 0.2s; font-weight: bold; width: auto; display: inline-block; }
+.cardHoriz .card-button:hover { background: var(--vibrant-orange); border-color: var(--vibrant-orange); }
+.cardHoriz .card-button:active { transform: scale(0.95); transition: transform 0.1s; }
+.card-list.cardHoriz-list { flex-direction: column; gap: 0.5em; }
+
+
+
+
 .card-button { display: block; width: 100%; margin-top: 1em; padding: 0.5em 0; background: transparent; color: var(--natural-green); border: 0.1225em solid var(--natural-green); border-radius: 0.375em; font-size: var(--font-medium); text-align: center; margin-bottom: 0.2em; transition: background 0.2s, color 0.2s; }
 .card-button:active { transform: scale(0.95); transition: transform 0.1s; }
 .favorite-icon { cursor: pointer; color: transparent; transition: color 0.1s, border 0.1s; -webkit-text-stroke: 1px var(--font-white); color: var(--text-secondary); }
@@ -184,16 +207,21 @@ a:hover { color: var(--font-green); }
 
 /* 移动端适配 */
 @media (max-width: 100em) { .container { max-width: 100%; } }
-@media (max-width: 100em) { .card { flex: 0 0 calc(20% - 0.5em); max-width: calc(20% - 0.5em); } }
-@media (max-width: 80em) { .card { flex: 0 0 calc(25% - 0.5em); max-width: calc(25% - 0.5em); } }
-@media (max-width: 60em) {
-    .header-inner { padding: 0; }
-    .header-inner .content-wrapper { padding: 0; display: flex; }
-    .header-inner .content-wrapper { padding: 0.5em 0.5em; }
+@media (max-width: 100em) {
+    .card { flex: 0 0 calc(20% - 0.5em); max-width: calc(20% - 0.5em); }
+
+}
+@media (max-width: 80em) {
+    .card { flex: 0 0 calc(25% - 0.5em); max-width: calc(25% - 0.5em); }
     .header-inner .header-actions a { display: none; }
     .header-inner .search-box { display: none; }
     .header-inner:has(.service-menu) { display: none; }
     .header-inner .header-actions .join-btn { display: block; border: none; }
+}
+@media (max-width: 60em) {
+    .header-inner { padding: 0; }
+    .header-inner .content-wrapper { padding: 0; display: flex; }
+    .header-inner .content-wrapper { padding: 0.5em 0.5em; }
     .search-wrapper { flex: 1; display: flex; align-items: center; border: 0.0625em solid var(--border-color); border-right: none; border-radius: 0.375em 0 0 0.375em; }
     .search-box select.search-type { width: 5em; padding: 0 0 0 0.8em; font-size: var(--font-medium); background: var(--bg-white); }
     .search-box input { padding: 0.4em; font-size: var(--font-medium); }
@@ -207,8 +235,9 @@ a:hover { color: var(--font-green); }
     .footer-bottom .footer-right a { margin: 0 0.5em; }
     .footer-bottom .social-links img { margin: 0.3125em; }
     .footer-inner .content-wrapper { max-width: var(--max-content-width); margin: 0 auto; padding: 0em; }
+    .card { flex: 0 0 calc(33.33% - 0.5em); max-width: calc(33.33% - 0.5em); }
+    .cardHoriz { flex: 0 0 100%; max-width: 100%; min-height: 8em; } .cardHoriz img { width: 8em; height: 8em; } .cardHoriz .fields-row { gap: 0.5em; }
 }
-@media (max-width: 60em) { .card { flex: 0 0 calc(33.33% - 0.5em); max-width: calc(33.33% - 0.5em); } }
 @media (max-width: 48em) {
     body { padding-top: 5em; }
     .footer, .container { padding: 0 0.5em; }
@@ -220,10 +249,15 @@ a:hover { color: var(--font-green); }
     .carousel-item { line-height: 12.5em; font-size: var(--font-large); }
     .footer-inner { padding: 0.5em; }
     .footer-main { flex-direction: column; }
-    .card .card-content .rating { font-size: 0.7em !important; }
+    .rating { font-size: 0.75em !important; }
     .card { flex: 0 0 calc(50% - 0.5em); max-width: calc(50% - 0.5em); }
     .cardSq { flex: 0 0 6.25em; height: 6.25em; margin-right: 0.625em; }
     .cardSq .card-content img { max-width: 55%; object-fit: cover; margin: 0.4em; border-radius: 50%; justify-content: center; }
     .modal-content { top: 0; left: 0; transform: none; width: 100%; max-width: 100%; height: 100%; max-height: 100vh; border-radius: 0; padding: 1em; margin: 0; }
     .modal-close { top: 0.5em; right: 0.5em; font-size: 1.5em; }
+    .cardHoriz { flex-direction: column; min-height: auto; }
+    .cardHoriz img { width: 100%; height: 8.75em; }
+    .cardHoriz .card-content { padding: 0.625em; }
+    .cardHoriz .fields-row { flex-wrap: wrap; white-space: normal; }
+
 }
