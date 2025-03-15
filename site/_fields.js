@@ -15,13 +15,13 @@ let servicesFieldConfig = {
 let itemFieldConfig = {
     favorite: {
         card: true, cardSq: true, cardHoriz: true, type: 'favorite',
-        style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
+        style: {},
         customClass: 'fas fa-heart favorite-icon',
         onClick: (item, element) => { element.classList.toggle('favorited'); },
         sample: () => faker.datatype.boolean()
     },
-    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', position: 'header', style: { }, sample: i => getPicsumImage(300, 200, `items-${i}`) },
-    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', position: 'header', style: {}, sample: () => faker.commerce.productName() },
+    image: { card: true, cardSq: true, cardHoriz: true, type: 'image',  style: { }, sample: i => getPicsumImage(300, 200, `items-${i}`) },
+    title: { card: true, cardSq: true, cardHoriz: true, type: 'text',  style: {}, sample: () => faker.commerce.productName() },
     price: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '价格', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
     stock: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '库存', style: {}, sample: () => faker.datatype.number({ min: 10, max: 100 }) },
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
@@ -35,13 +35,13 @@ let itemFieldConfig = {
 let storeFieldConfig = {
     favorite: {
         card: true, cardSq: true, cardHoriz: true, type: 'favorite',
-        style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
+        style: {},
         customClass: 'fas fa-heart favorite-icon',
         onClick: (item, element) => { element.classList.toggle('favorited'); },
         sample: () => faker.datatype.boolean()
     },
-    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `store-${i}`) },
-    name: { card: true, cardSq: true, cardHoriz: true, type: 'text', position: 'header', style: {}, sample: () => faker.company.companyName() },
+    image: { card: true, cardSq: true, cardHoriz: true, type: 'image',  style: {}, sample: i => getPicsumImage(300, 200, `store-${i}`) },
+    name: { card: true, cardSq: true, cardHoriz: true, type: 'text',  style: {}, sample: () => faker.company.companyName() },
     sales: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 300, max: 1000 }) },
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
     slogan: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '标语', style: {}, sample: () => faker.company.catchPhrase() },
@@ -50,8 +50,8 @@ let storeFieldConfig = {
 };
 
 let demandFieldConfig = {
-    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `shop${i}`) },
-    demandTitle: { card: true, cardSq: true, cardHoriz: true, type: 'text', position: 'header', style: {}, sample: () => faker.company.companyName() },
+    image: { card: true, cardSq: true, cardHoriz: true, type: 'image',  style: {}, sample: i => getPicsumImage(300, 200, `shop${i}`) },
+    demandTitle: { card: true, cardSq: true, cardHoriz: true, type: 'text',  style: {}, sample: () => faker.company.companyName() },
     brandName: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: "品牌", style: {}, sample: () => faker.commerce.productName() },
     demandCount: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '需求数量', style: {}, sample: () => faker.datatype.number({ min: 5, max: 20 }) },
     price: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '出价范围', format: (d, v) => `<span class="price">${v}</span>`, style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
@@ -64,27 +64,28 @@ let demandFieldConfig = {
 let postsFieldConfig = {
     favorite: {
         card: true, cardSq: true, cardHoriz: true, type: 'favorite',
-        style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
+        style: {},
         customClass: 'fas fa-heart favorite-icon',
         onClick: (item, element) => { element.classList.toggle('favorited'); },
         sample: () => faker.datatype.boolean()
     },
-    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `article${i}`) },
-    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', position: 'header', style: {}, sample: () => faker.lorem.sentence() },
+    image: { card: true, cardSq: true, cardHoriz: true, type: 'image',  style: {}, sample: i => getPicsumImage(300, 200, `article${i}`) },
+    title: { card: true, cardSq: true, cardHoriz: true, type: 'text',  style: {}, sample: () => faker.lorem.sentence() },
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
-    author: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '作者', style: {}, sample: () => faker.name.findName() }
+    author: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '作者', style: {}, sample: () => faker.name.findName() },
+    content: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '内容', style: {}, sample: () => faker.lorem.paragraph() }
 };
 
 let campaignFieldConfig = {
     favorite: {
         card: true, cardSq: true, cardHoriz: true, type: 'favorite',
-        style: { position: 'absolute', top: '1.2em', right: '1.2em', fontSize: '1.5em' },
+        style: {},
         customClass: 'fas fa-heart favorite-icon',
         onClick: (item, element) => { element.classList.toggle('favorited'); },
         sample: () => faker.datatype.boolean()
     },
-    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `campaign${i}`) },
-    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', position: 'header', style: {}, sample: () => faker.commerce.department() },
+    image: { card: true, cardSq: true, cardHoriz: true, type: 'image',  style: {}, sample: i => getPicsumImage(300, 200, `campaign${i}`) },
+    title: { card: true, cardSq: true, cardHoriz: true, type: 'text',  style: {}, sample: () => faker.commerce.department() },
     itemCount: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '商品数', style: {}, sample: () => faker.datatype.number({ min: 5, max: 20 }) },
     sales: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 200, max: 600 }) },
     orders: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '订单数', style: {}, sample: () => faker.datatype.number({ min: 50, max: 200 }) },
@@ -93,8 +94,8 @@ let campaignFieldConfig = {
 };
 
 let ordersCommentFieldConfig = {
-    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', position: 'header', style: {}, sample: i => getPicsumImage(300, 200, `review${i}`) },
-    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', position: 'header', style: {}, sample: () => faker.commerce.productName() },
+    image: { card: true, cardSq: true, cardHoriz: true, type: 'image',  style: {}, sample: i => getPicsumImage(300, 200, `review${i}`) },
+    title: { card: true, cardSq: true, cardHoriz: true, type: 'text',  style: {}, sample: () => faker.commerce.productName() },
     service: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '服务', style: {}, sample: () => faker.commerce.department() },
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
     content: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '内容', style: {}, sample: () => faker.lorem.paragraph() }
