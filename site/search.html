@@ -109,6 +109,7 @@
     let filteredResults = [];
     let allResults = [];
     let selectedTags = new Set();
+    let selectedAttrs = new Set();
 
     // 字段配置映射
     const fieldConfigs = {
@@ -185,10 +186,12 @@
         valueSelect.innerHTML = '<option value="">选择属性值</option>';
         if (type && typeof ecommerceAttributes !== 'undefined' && ecommerceAttributes[type]) {
             ecommerceAttributes[type].forEach(val => {
-                const option = document.createElement('option');
-                option.value = val;
-                option.text = val;
-                valueSelect.appendChild(option);
+                if (!selectedAttrs.has(val)) {
+                    const option = document.createElement('option');
+                    option.value = val;
+                    option.text = val;
+                    valueSelect.appendChild(option);
+                }
             });
         }
     }
@@ -274,10 +277,13 @@
         const type = document.getElementById('attribute-type').value;
         const value = document.getElementById('attribute-value').value;
         if (type && value) {
+            selectedAttrs.add(value)
+            document.getElementById('attribute-value').querySelector(`option[value="${value}"]`).remove();
             const tags = document.getElementById('attribute-tags');
             const tag = document.createElement('span');
-            tag.className = 'ant-tag ant-tag-blue tag-item';
-            tag.innerHTML = `${type}: ${value} <span class="close tag-close" onclick="removeTag(this, 'attribute-tags')">×</span>`;
+            let tagColor = tagColors[randomInt(0, tagColors.length) % tagColors.length]
+            tag.className = `ant-tag ${tagColor} tag-item`;
+            tag.innerHTML = `${type}: <b>${value}</b> <span class="close tag-close" onclick="removeTag(this, 'attribute-tags', '${value}')">×</span>`;
             tags.appendChild(tag);
             document.getElementById('attribute-value').value = '';
             applyFilters();
@@ -303,8 +309,14 @@
     // 删除标签
     function removeTag(element, containerId, tagValue) {
         element.parentElement.remove();
-        if (tagValue) selectedTags.delete(tagValue);
+        if (tagValue) {
+            selectedTags.delete(tagValue);
+            selectedAttrs.delete(tagValue);
+        }
+
         if (containerId === 'tag-list') updateTagFilter();
+        if (containerId === 'attribute-tags') updateAttributeValues();
+
         applyFilters();
     }
 
@@ -322,7 +334,7 @@
         try {
             const config = fieldConfigs[searchType];
             if (!config) throw new Error(`Field config for ${searchType} not found`);
-            const data = generateData(config, 1000);
+            const data = generateData(config, 2000);
             data.forEach(item => {
                 item.description = faker.lorem.sentences(2);
                 item.updateTime = faker.date.recent(30).toISOString();
