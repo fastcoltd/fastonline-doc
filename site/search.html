@@ -57,17 +57,19 @@
                 </div>
                 <div class="result-opt">
                     <div id="resultsShow"></div>
-                    <select class="ant-select sort-select" id="showClass" onchange="changeShowClass()">
-                        <option value="cardHoriz" selected>横板展示</option>
-                        <option value="card">竖版展示</option>
-                    </select>
-                    <select class="ant-select sort-select" id="sort-by" onchange="sortResults()">
-                        <option value="relevance">按相关性排序</option>
-                        <option value="price">按价格排序</option>
-                        <option value="rating">按评分排序</option>
-                        <option value="stock">按库存排序</option>
-                        <option value="sales">按销量排序</option>
-                    </select>
+                    <div class="select-wrapper">
+                        <select class="ant-select sort-select" id="showClass" onchange="changeShowClass()">
+                            <option value="cardHoriz" selected>横板展示</option>
+                            <option value="card">竖版展示</option>
+                        </select>
+                        <select class="ant-select sort-select" id="sort-by" onchange="sortResults()">
+                            <option value="relevance">按相关性排序</option>
+                            <option value="price">按价格排序</option>
+                            <option value="rating">按评分排序</option>
+                            <option value="stock">按库存排序</option>
+                            <option value="sales">按销量排序</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div id="search-results" class="card-list"></div>
@@ -306,6 +308,15 @@
         applyFilters();
     }
 
+    function showFilterList(){
+        let filterTagLen = document.querySelectorAll('.tag-item').length;
+        if (filterTagLen > 0){
+            document.querySelector(".filter-list").style.display = 'flex'
+        }else{
+            document.querySelector(".filter-list").style.display = 'none'
+        }
+    }
+
     // 生成搜索数据
     function generateSearchData() {
         try {
@@ -325,6 +336,7 @@
 
     // 应用筛选
     function applyFilters() {
+        showFilterList()
         const config = filterConfigs[searchType];
         const filters = {};
         Object.keys(config).forEach(fieldName => {
