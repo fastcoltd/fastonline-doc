@@ -143,7 +143,7 @@ const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-r
 
 // 生成服务菜单（调整为横向分组，每 3 个字母）
 function generateServiceMenu() {
-    const menu = document.getElementById('service-menu');
+    const menu = document.getElementById('menu2');
     services.forEach(cat => {
         const div = document.createElement('div');
         div.className = 'level-1';
