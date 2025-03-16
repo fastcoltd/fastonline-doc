@@ -1,5 +1,3 @@
-const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
-
 function generateCards(containerId, cardType, data, fieldConfig) {
     const container = document.getElementById(containerId);
 
@@ -73,6 +71,14 @@ function generateFieldContent(fieldConfig, item, fieldName, value, config, conta
                 html: `<p class="${customClass || ''}" id="${elementId}"${applyStyle(style)}>${label ? `${label}:` : ""} ${content}</p>`
             };
         case 'tag':
+            let resetValue = []
+            if (fieldName == 'attributes'){
+                Object.keys(value).forEach(k => {
+                    let v = value[k]
+                    resetValue.push(`${k} : <b>${v}</b>`)
+                })
+                value = resetValue;
+            }
             if (Array.isArray(value)) {
                 content = value.map((tag, idx) =>
                     `<span class="ant-tag ${tagColors[idx % tagColors.length]}"${applyStyle(style)}>${tag}</span>`

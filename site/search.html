@@ -17,53 +17,58 @@
 <!-- 主内容 -->
 <div class="container">
     <div class="search-container">
-        <!-- 侧边栏 -->
-        <div class="sidebar">
-            <div class="filter-row">
-                <label class="filter-row-label">类型:</label>
-                <select class="ant-select filter-row-select" id="search-type" onchange="updateSearchType()">
-                    <option value="items">商品</option>
-                    <option value="stores">店铺</option>
-                    <option value="posts">文章</option>
-                    <option value="demands">需求</option>
-                </select>
-            </div>
-            <div id="dynamic-filters"></div>
-            <div class="filter-row">
-                <label class="filter-row-label">属性:</label>
-                <select class="ant-select filter-row-select" id="attribute-type" onchange="updateAttributeValues()">
-                    <option value="">选择属性类型</option>
-                </select>
-                <select class="ant-select filter-row-select" id="attribute-value" onchange="addAttributeTag()">
-                    <option value="">选择属性值</option>
-                </select>
-            </div>
-            <div id="attribute-tags" class="tag-list"></div>
-            <div class="filter-row">
-                <label class="filter-row-label">更新晚于:</label>
-                <input class="ant-input filter-row-input" type="datetime-local" id="update-time">
-            </div>
-            <div class="filter-row">
-                <label class="filter-row-label">标签:</label>
-                <select class="ant-select filter-row-select" id="tag-filter" onchange="addTag()">
-                    <option value="">选择标签</option>
-                </select>
-            </div>
-            <div id="tag-list" class="tag-list"></div>
-            <button class="btn-solid-medium" onclick="applyFilters()" style="width: 100%">应用筛选</button>
-        </div>
-
         <!-- 主要内容 -->
         <div class="main-content">
             <div class="result-header">
-                <div id="resultsShow"></div>
-                <select class="ant-select sort-select" id="sort-by" onchange="sortResults()">
-                    <option value="relevance">按相关性排序</option>
-                    <option value="price">按价格排序</option>
-                    <option value="rating">按评分排序</option>
-                    <option value="stock">按库存排序</option>
-                    <option value="sales">按销量排序</option>
-                </select>
+                <div class="filter-bar">
+                    <div class="filter-column">
+                        <label class="filter-column-label">类型:</label>
+                        <select class="ant-select" id="search-type" onchange="updateSearchType()">
+                            <option value="items">商品</option>
+                            <option value="stores">店铺</option>
+                            <option value="posts">文章</option>
+                            <option value="demands">需求</option>
+                        </select>
+                    </div>
+                    <div class="filter-column">
+                        <label class="filter-column-label">属性:</label>
+                        <select class="ant-select" id="attribute-type" onchange="updateAttributeValues()">
+                            <option value="">选择属性类型</option>
+                        </select>
+                        <select class="ant-select" id="attribute-value" onchange="addAttributeTag()">
+                            <option value="">选择属性值</option>
+                        </select>
+                    </div>
+<!--                    <div class="filter-column">-->
+<!--                        <label class="filter-column-label">更新晚于:</label>-->
+<!--                        <input class="ant-input" type="datetime-local" id="update-time">-->
+<!--                    </div>-->
+                    <div class="filter-column">
+                        <label class="filter-column-label">标签:</label>
+                        <select class="ant-select" id="tag-filter" onchange="addTag()">
+                            <option value="">选择标签</option>
+                        </select>
+                    </div>
+                    <button class="btn-solid-medium" onclick="applyFilters()" style="width: auto;">应用筛选</button>
+                </div>
+                <div class="filter-list">
+                    <div id="attribute-tags" class="tag-list"></div>
+                    <div id="tag-list" class="tag-list"></div>
+                </div>
+                <div class="result-opt">
+                    <div id="resultsShow"></div>
+                    <select class="ant-select sort-select" id="showClass" onchange="changeShowClass()">
+                        <option value="cardHoriz" selected>横板展示</option>
+                        <option value="card">竖版展示</option>
+                    </select>
+                    <select class="ant-select sort-select" id="sort-by" onchange="sortResults()">
+                        <option value="relevance">按相关性排序</option>
+                        <option value="price">按价格排序</option>
+                        <option value="rating">按评分排序</option>
+                        <option value="stock">按库存排序</option>
+                        <option value="sales">按销量排序</option>
+                    </select>
+                </div>
             </div>
             <div id="search-results" class="card-list"></div>
             <div class="pagination">
@@ -72,10 +77,11 @@
                 <button class="ant-btn pagination-btn" onclick="changePage(1)">下一页</button>
                 <span>跳转到 <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
                 <span><select class="ant-select pagination-select" id="items-per-page" onchange="updateResults()">
-                    <option value="18">18 条/页</option>
-                    <option value="24" selected>24 条/页</option>
-                    <option value="48">48 条/页</option>
-                    <option value="96">96 条/页</option>
+                    <option value="10" selected>10 条/页</option>
+                    <option value="20" selected>20 条/页</option>
+                    <option value="40">40 条/页</option>
+                    <option value="80">80 条/页</option>
+                    <option value="100">100 条/页</option>
                 </select></span>
             </div>
         </div>
@@ -113,26 +119,29 @@
     // 可筛选字段配置
     const filterConfigs = {
         'items': {
-            'brandName': { type: 'text', label: '品牌' },
+            'brandName': { type: 'text', label: '品牌' , 'data': hotPlatforms},
+            'service': { type: 'text', label: '服务' , 'data': services},
             'price': { type: 'price', label: '价格' },
             'stock': { type: 'number', label: '库存' },
-            'rating': { type: 'rating', label: '评分', min: 0, max: 5 },
-            'sales': { type: 'number', label: '销量' }
+            // 'rating': { type: 'rating', label: '评分', min: 0, max: 5 },
+            // 'sales': { type: 'number', label: '销量' }
         },
         'stores': {
             'sales': { type: 'number', label: '销量' },
             'rating': { type: 'rating', label: '评分', min: 0, max: 5 }
         },
         'posts': {
-            'author': { type: 'text', label: '作者' },
+            'brandName': { type: 'text', label: '品牌' , 'data': hotPlatforms},
+            'service': { type: 'text', label: '服务' , 'data': services},
+            // 'author': { type: 'text', label: '作者' },
             'rating': { type: 'rating', label: '评分', min: 0, max: 5 }
         },
         'demands': {
-            'brandName': { type: 'text', label: '名称' },
+            'brandName': { type: 'text', label: '品牌' , 'data': hotPlatforms},
+            'service': { type: 'text', label: '服务' , 'data': services},
             'demandCount': { type: 'number', label: '数量' },
-            'price': { type: 'price', label: '出价' },
-            'totalPrice': { type: 'price', label: '总价' },
-            'bids': { type: 'number', label: '人数' }
+            'price': { type: 'price', label: '单价' },
+            // 'bids': { type: 'number', label: '人数' }
         }
     };
 
@@ -194,28 +203,32 @@
     // 动态生成筛选条件
     function updateFilters() {
         const config = filterConfigs[searchType];
-        const dynamicFilters = document.getElementById('dynamic-filters');
-        dynamicFilters.innerHTML = '';
 
+        document.querySelectorAll('.dynamic').forEach(item => {
+            item.remove();
+        })
+
+        let firstColumn = document.querySelectorAll('.filter-column')[1];
         Object.entries(config).forEach(([fieldName, fieldConfig]) => {
             const filterRow = document.createElement('div');
-            filterRow.className = 'filter-row';
+            filterRow.className = 'filter-column dynamic';
 
             const label = document.createElement('label');
-            label.className = 'filter-row-label';
+            label.className = 'filter-column-label';
             label.textContent = `${fieldConfig.label}:`;
             filterRow.appendChild(label);
 
             if (fieldConfig.type === 'text') {
                 const input = document.createElement('input');
-                input.className = 'ant-input filter-row-input';
+                input.className = 'ant-input';
                 input.id = `${fieldName}-filter`;
                 input.placeholder = `输入${fieldConfig.label}快速定位`;
-                if (fieldName === 'brandName' && typeof hotPlatforms !== 'undefined') {
-                    input.setAttribute('list', 'brand-list');
+                if (fieldConfig.data) {
+                    let listId = `${fieldName}-list`
+                    input.setAttribute('list', listId);
                     const datalist = document.createElement('datalist');
-                    datalist.id = 'brand-list';
-                    hotPlatforms.forEach(p => {
+                    datalist.id = listId;
+                    fieldConfig.data.forEach(p => {
                         const option = document.createElement('option');
                         option.value = p.name;
                         datalist.appendChild(option);
@@ -225,7 +238,7 @@
                 filterRow.appendChild(input);
             } else if (fieldConfig.type === 'price' || fieldConfig.type === 'rating' || fieldConfig.type === 'number') {
                 const minInput = document.createElement('input');
-                minInput.className = 'ant-input filter-row-number';
+                minInput.className = 'ant-input filter-column-number';
                 minInput.type = 'number';
                 minInput.id = `${fieldName}-min`;
                 minInput.placeholder = '最低';
@@ -234,12 +247,12 @@
                 filterRow.appendChild(minInput);
 
                 const span = document.createElement('span');
-                span.className = 'filter-row-span';
+                span.className = 'filter-column-span';
                 span.textContent = '~';
                 filterRow.appendChild(span);
 
                 const maxInput = document.createElement('input');
-                maxInput.className = 'ant-input filter-row-number';
+                maxInput.className = 'ant-input filter-column-number';
                 maxInput.type = 'number';
                 maxInput.id = `${fieldName}-max`;
                 maxInput.placeholder = '最高';
@@ -248,8 +261,10 @@
                 filterRow.appendChild(maxInput);
             }
 
-            dynamicFilters.appendChild(filterRow);
+            firstColumn.parentNode.insertBefore(filterRow, firstColumn.nextSibling)
+            firstColumn = filterRow
         });
+
     }
 
     // 添加属性标签
@@ -296,19 +311,10 @@
         try {
             const config = fieldConfigs[searchType];
             if (!config) throw new Error(`Field config for ${searchType} not found`);
-            const data = generateData(config, 500);
+            const data = generateData(config, 1000);
             data.forEach(item => {
                 item.description = faker.lorem.sentences(2);
                 item.updateTime = faker.date.recent(30).toISOString();
-                item.attributes = {};
-                item.tags = typeof ecommerceTags !== 'undefined' ? ecommerceTags.slice(0, Math.floor(Math.random() * 3) + 1) : [];
-                if (typeof ecommerceAttributes !== 'undefined') {
-                    const attrKeys = Object.keys(ecommerceAttributes);
-                    for (let j = 0; j < 3; j++) {
-                        const key = attrKeys[Math.floor(Math.random() * attrKeys.length)];
-                        item.attributes[key] = ecommerceAttributes[key][Math.floor(Math.random() * ecommerceAttributes[key].length)];
-                    }
-                }
             });
             return data;
         } catch (error) {
@@ -331,7 +337,7 @@
                 filters[fieldName] = document.getElementById(`${fieldName}-filter`).value;
             }
         });
-        const updateTime = document.getElementById('update-time').value;
+        const updateTime = document.getElementById('update-time')?.value;
         const attributeTags = Array.from(document.getElementById('attribute-tags').children).map(tag => {
             const [type, value] = tag.textContent.split(': ').map(t => t.trim().replace('×', ''));
             return { type, value };
@@ -340,20 +346,26 @@
 
         filteredResults = allResults.filter(item => {
             let match = true;
-
+            let itemValueStr = JSON.stringify(Object.values(item));
             // 字段筛选
             Object.entries(filters).forEach(([fieldName, filter]) => {
-                if (filter.min !== 0 || filter.max !== Infinity) {
-                    const value = item[fieldName];
-                    if (fieldName === 'price' || fieldName === 'totalPrice') {
-                        const price = parseFloat(value?.replace('$', '') || 0);
-                        if (price < filter.min || price > filter.max) match = false;
-                    } else if (fieldName === 'rating') {
-                        const rating = value?.sample || 0;
-                        if (rating < filter.min || rating > filter.max) match = false;
-                    } else {
-                        const numValue = parseFloat(value) || 0;
-                        if (numValue < filter.min || numValue > filter.max) match = false;
+                if (typeof filter == 'object'){
+                    if (filter.min !== 0 || filter.max !== Infinity) {
+                        const value = item[fieldName];
+                        if (fieldName === 'price' || fieldName === 'totalPrice') {
+                            const price = parseFloat(value?.replace('$', '') || 0);
+                            if (price < filter.min || price > filter.max) match = false;
+                        } else if (fieldName === 'rating') {
+                            const rating = value?.sample || 0;
+                            if (rating < filter.min || rating > filter.max) match = false;
+                        } else {
+                            const numValue = parseFloat(value) || 0;
+                            if (numValue < filter.min || numValue > filter.max) match = false;
+                        }
+                    }
+                }else if(filter){
+                    if (item[fieldName].toLowerCase().indexOf(filter.toLowerCase()) === -1 ){
+                        match = false;
                     }
                 }
             });
@@ -363,13 +375,18 @@
 
             // 属性筛选
             if (attributeTags.length > 0) {
+                let matchOne = false;
                 attributeTags.forEach(tag => {
-                    if (!item.attributes[tag.type] || item.attributes[tag.type] !== tag.value) match = false;
+                    let attr = item.attributes[tag.type]
+                    if (attr && attr == tag.value.trim()) {
+                        matchOne = true;
+                    }
                 });
+                match = !matchOne ? false : match;
             }
 
             // 标签筛选
-            if (tags.length > 0) {
+            if (tags.length > 0 && item.tags) {
                 let haveTag = false;
                 let tagsString = tags.join(",");
                 item.tags.forEach(tag => {
@@ -380,17 +397,21 @@
                 match = haveTag ? match : false;
             }
 
-            // 关键字筛选，默认空时不过滤
             if (searchKeyword) {
-                let itemValueStr = JSON.stringify(Object.values(item));
                 match = match && itemValueStr.toLowerCase().indexOf(searchKeyword.toLowerCase()) !== -1;
             }
 
             return match;
         });
         console.log('Filtered Results:', filteredResults);
+        let keywords = searchKeyword || '全部';
+        document.getElementById('resultsShow').innerHTML = `在 <b style="color: var(--font-green)">${searchType}</b> 分类中，搜索 "<b style="color: var(--font-green)">${keywords}</b>"，找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条结果`;
         currentPage = 1;
         updateResults();
+    }
+
+    function changeShowClass(){
+        updateResults()
     }
 
     function updateResults() {
@@ -404,7 +425,8 @@
         const config = fieldConfigs[searchType];
         results.forEach((item, index) => {
             const card = document.createElement('div');
-            card.className = 'cardHoriz';
+            const showClass = document.getElementById('showClass').value;
+            card.className = showClass;
 
             let imageHtml = '';
             let titleHtml = '';
@@ -416,7 +438,7 @@
             // 收集字段并按长度排序
             const fieldItems = [];
             Object.entries(config).forEach(([fieldName, fieldConfig]) => {
-                if (!fieldConfig.cardHoriz) return;
+                if (!fieldConfig[showClass]) return;
 
                 const value = item[fieldName] !== undefined ? item[fieldName] : fieldConfig.value;
                 const fieldContent = generateFieldContent(config, item, fieldName, value, fieldConfig, 'search-results', index);
@@ -548,9 +570,6 @@
                         };
                     }
                 }
-
-                let keywords = searchKeyword || '全部';
-                document.getElementById('resultsShow').innerHTML = `在 <b style="color: var(--font-green)">${searchType}</b> 分类中，搜索 "<b style="color: var(--font-green)">${keywords}</b>"，找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条结果`;
 
                 initFilters();
                 document.getElementById('search-type').value = searchType;

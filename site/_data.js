@@ -53,59 +53,6 @@ const hotPlatforms = [
     { logo: 'https://logo.clearbit.com/bitbucket.org', name: 'Bitbucket', link: 'https://bitbucket.org' }
 ];
 
-// 热门服务样本数据：50 个互联网服务（真实数据，带 Font Awesome 图标）
-const hotServices = [
-    { icon: 'fas fa-user-plus', title: 'Account Creation', link: '#' },
-    { icon: 'fas fa-users', title: 'Follower Growth', link: '#' },
-    { icon: 'fas fa-video', title: 'Video Streaming', link: '#' },
-    { icon: 'fas fa-shopping-cart', title: 'E-commerce', link: '#' },
-    { icon: 'fas fa-cloud', title: 'Cloud Storage', link: '#' },
-    { icon: 'fas fa-search', title: 'SEO Optimization', link: '#' },
-    { icon: 'fas fa-ad', title: 'Ad Placement', link: '#' },
-    { icon: 'fas fa-code', title: 'Web Development', link: '#' },
-    { icon: 'fas fa-pen', title: 'Content Writing', link: '#' },
-    { icon: 'fas fa-paint-brush', title: 'Graphic Design', link: '#' },
-    { icon: 'fas fa-comments', title: 'Live Chat', link: '#' },
-    { icon: 'fas fa-envelope', title: 'Email Marketing', link: '#' },
-    { icon: 'fas fa-mobile-alt', title: 'Mobile App Development', link: '#' },
-    { icon: 'fas fa-shield-alt', title: 'Cybersecurity', link: '#' },
-    { icon: 'fas fa-database', title: 'Database Management', link: '#' },
-    { icon: 'fas fa-globe', title: 'Website Hosting', link: '#' },
-    { icon: 'fas fa-analytics', title: 'Data Analytics', link: '#' },
-    { icon: 'fas fa-headset', title: 'Customer Support', link: '#' },
-    { icon: 'fas fa-share-alt', title: 'Social Sharing', link: '#' },
-    { icon: 'fas fa-photo-video', title: 'Photo Editing', link: '#' },
-    { icon: 'fas fa-play', title: 'Music Streaming', link: '#' },
-    { icon: 'fas fa-shopping-bag', title: 'Online Marketplace', link: '#' },
-    { icon: 'fas fa-lock', title: 'VPN Service', link: '#' },
-    { icon: 'fas fa-cogs', title: 'IT Consulting', link: '#' },
-    { icon: 'fas fa-chart-line', title: 'Traffic Analysis', link: '#' },
-    { icon: 'fas fa-gamepad', title: 'Game Development', link: '#' },
-    { icon: 'fas fa-camera', title: 'Live Streaming', link: '#' },
-    { icon: 'fas fa-wifi', title: 'Network Setup', link: '#' },
-    { icon: 'fas fa-trash', title: 'Spam Filtering', link: '#' },
-    { icon: 'fas fa-blog', title: 'Blog Hosting', link: '#' },
-    { icon: 'fas fa-robot', title: 'AI Chatbots', link: '#' },
-    { icon: 'fas fa-file-alt', title: 'Document Sharing', link: '#' },
-    { icon: 'fas fa-sync', title: 'Data Backup', link: '#' },
-    { icon: 'fas fa-tools', title: 'Tech Support', link: '#' },
-    { icon: 'fas fa-calendar', title: 'Event Scheduling', link: '#' },
-    { icon: 'fas fa-map', title: 'Location Services', link: '#' },
-    { icon: 'fas fa-microphone', title: 'Voice Recording', link: '#' },
-    { icon: 'fas fa-credit-card', title: 'Payment Processing', link: '#' },
-    { icon: 'fas fa-question-circle', title: 'Q&A Forums', link: '#' },
-    { icon: 'fas fa-folder-open', title: 'File Management', link: '#' },
-    { icon: 'fas fa-bell', title: 'Notifications', link: '#' },
-    { icon: 'fas fa-user-shield', title: 'User Authentication', link: '#' },
-    { icon: 'fas fa-tachometer-alt', title: 'Performance Monitoring', link: '#' },
-    { icon: 'fas fa-video-slash', title: 'Content Moderation', link: '#' },
-    { icon: 'fas fa-poll', title: 'Survey Tools', link: '#' },
-    { icon: 'fas fa-shopping-basket', title: 'Subscription Services', link: '#' },
-    { icon: 'fas fa-link', title: 'URL Shortening', link: '#' },
-    { icon: 'fas fa-desktop', title: 'Remote Desktop', link: '#' },
-    { icon: 'fas fa-bug', title: 'Bug Tracking', link: '#' },
-    { icon: 'fas fa-tasks', title: 'Project Management', link: '#' }
-];
 
 // 电商属性/属性值数据（50个属性类型，每个至少10个属性值）
 const ecommerceAttributes = {
@@ -192,6 +139,8 @@ const services = [
     { name: 'Security', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) }
 ];
 
+const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
+
 // 生成服务菜单（调整为横向分组，每 3 个字母）
 function generateServiceMenu() {
     const menu = document.getElementById('service-menu');
@@ -232,5 +181,4 @@ window.generateServiceMenu = generateServiceMenu;
 window.ecommerceAttributes = ecommerceAttributes;
 window.ecommerceTags = ecommerceTags;
 window.hotPlatforms = hotPlatforms;
-window.hotServices = hotServices;
 window.services = services;
