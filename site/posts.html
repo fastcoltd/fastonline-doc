@@ -159,8 +159,8 @@
         try {
             const data = generateData(fieldConfig, 2000);
             const urlParams = new URLSearchParams(window.location.search);
-            const specifiedCategory = urlParams.get('type') || 'Blockchain';
-
+            const specifiedCategory = urlParams.get('type') || 'Blockchain - Crypto';
+            document.title = specifiedCategory;
             data.forEach(item => {
                 item.description = faker.lorem.sentences(2);
                 item.updateTime = faker.date.recent(30).toISOString();
@@ -173,7 +173,6 @@
         }
     }
 
-    // 应用筛选
     // 应用筛选
     function applyFilters() {
         showFilterList();
