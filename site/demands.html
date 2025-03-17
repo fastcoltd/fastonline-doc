@@ -63,12 +63,6 @@
                             <option value="">属性值</option>
                         </select>
                     </div>
-                    <div class="filter-column">
-                        <label class="filter-column-label">标签:</label>
-                        <select class="ant-select" id="tag-filter" onchange="addTag()">
-                            <option value="">标签</option>
-                        </select>
-                    </div>
                     <button class="btn-solid-medium" onclick="applyFilters()">搜索</button>
                 </div>
                 <div class="filter-list">
@@ -135,7 +129,6 @@
 
     // 初始化筛选
     function initFilters() {
-        updateTagFilter();
         updateAttributeFilter();
         updateBrandFilter();
         updateServiceFilter();
@@ -211,22 +204,6 @@
         }
     }
 
-    // 更新标签下拉框
-    function updateTagFilter() {
-        const tagFilter = document.getElementById('tag-filter');
-        tagFilter.innerHTML = '<option value="">选择标签</option>';
-        if (typeof ecommerceTags !== 'undefined') {
-            ecommerceTags.forEach(tag => {
-                if (!selectedTags.has(tag)) {
-                    const option = document.createElement('option');
-                    option.value = tag;
-                    option.text = tag;
-                    tagFilter.appendChild(option);
-                }
-            });
-        }
-    }
-
     // 添加属性标签
     function addAttributeTag() {
         const type = document.getElementById('attribute-type').value;
@@ -241,22 +218,6 @@
             tags.appendChild(tag);
             updateAttributeValues();
             document.getElementById('attribute-value').value = '';
-            applyFilters();
-        }
-    }
-
-    // 添加标签
-    function addTag() {
-        const value = document.getElementById('tag-filter').value;
-        if (value) {
-            selectedTags.add(value);
-            const tags = document.getElementById('tag-list');
-            const tag = document.createElement('span');
-            tag.className = 'ant-tag ant-tag-blue tag-item';
-            tag.innerHTML = `${value} <span class="close tag-close" onclick="removeTag(this, 'tag-list', '${value}')">×</span>`;
-            tags.appendChild(tag);
-            updateTagFilter();
-            document.getElementById('tag-filter').value = '';
             applyFilters();
         }
     }
