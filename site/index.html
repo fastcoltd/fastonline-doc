@@ -26,7 +26,7 @@
     <div class="scroll-section">
         <div class="title-with-link">
             <h2 class="section-title">Brnads</h2>
-            <a href="#" class="see-all">View All</a>
+            <a href="brands-all.html" class="see-all">View All</a>
         </div>
         <div id="hot-brands" class="scroll-list"></div>
         <div class="scroll-arrow left" onclick="scrollList('hot-brands', -1)"><i class="fas fa-chevron-left"></i></div>
@@ -143,13 +143,6 @@
                 const list = document.getElementById(id);
                 updateArrows(id);
                 list.addEventListener('scroll', () => updateArrows(id));
-            });
-
-            // 绑定弹窗事件
-            document.querySelectorAll('.footer-right a:not([target])').forEach(item => {
-                item.onclick = function () {
-                    showModal(`${this.id}-modal`, generateSelectorModal(this.id));
-                };
             });
         });
     };

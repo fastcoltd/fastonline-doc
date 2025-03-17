@@ -99,3 +99,13 @@ document.addEventListener('click', function(e) {
         }
     }
 });
+
+window.addEventListener("load", function()  {
+    setTimeout(()=>{
+        document.querySelectorAll('.footer-right a:not([target])').forEach(item => {
+            item.onclick = function () {
+                showModal(`${this.id}-modal`, generateSelectorModal(this.id));
+            };
+        });
+    }, 100)
+})
