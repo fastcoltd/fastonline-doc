@@ -33,7 +33,8 @@ function generateCards(containerId, cardType, data, fieldConfig) {
             ${contentHtml}
           </div>
         `;
-        card.onclick = item.link && !fieldConfig.button ? () => window.location.href = `${item.link}${item.name}` : null;
+        card.title = item.name ?? '';
+        card.onclick = item.link && !fieldConfig.button ? () => window.location.href = `${item.link}` : null;
         container.appendChild(card);
 
         // 渲染后绑定点击事件

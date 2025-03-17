@@ -21,21 +21,31 @@
         .letter-section { margin-bottom: 2em; }
         .letter-title { font-size: var(--font-xlarge); font-weight: bold; color: var(--text-primary); margin-bottom: 1em; border-bottom: 0.0625em solid var(--border-color); padding-bottom: 0.5em; }
         .brand-list { display: flex; flex-wrap: wrap; gap: 1em; }
-        .brand-card { flex: 0 0 calc(25% - 1em); background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; transition: border-color 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .brand-card { flex: 0 0 calc(25% - 1em); background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; transition: border-color 0.2s, box-shadow 0.2s; display: block; text-decoration: none; color: inherit; }
         .brand-card:hover { border-color: var(--natural-green); box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
         .brand-card .top-section { display: flex; gap: 1em; margin-bottom: 0.75em; }
         .brand-card .left-section { flex: 0 0 5em; display: flex; flex-direction: column; align-items: center; }
-        .brand-card img { width: 4em; height: 4em; border-radius: 50%; margin-bottom: 0.25em; }
-        .brand-card h3 { font-size: var(--font-medium); margin: 0; color: var(--text-primary); text-align: center; }
+        .brand-card img { width: 4em; height: 4em; border-radius: 50%; margin-bottom: 0.25em; scale: 90%; }
+        .brand-card h3 {
+            font-size: var(--font-medium);
+            margin: 0;
+            color: var(--text-primary);
+            text-align: center;
+            white-space: nowrap; /* 防止换行 */
+            overflow: hidden; /* 隐藏溢出内容 */
+            text-overflow: ellipsis; /* 超出部分显示省略号 */
+        }
         .brand-card .right-section { flex: 1; }
         .brand-card .company-info { font-size: var(--font-small); color: var(--text-secondary); }
-        .brand-card .company-info .company-name { color: var(--text-primary); font-weight: bold; }
-        .brand-card .company-info .summary { color: var(--text-secondary); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+        .brand-card .company-info .company-name { color: var(--text-primary);}
+        .brand-card .company-info .company-name a { color: inherit; text-decoration: none; }
+        .brand-card .company-info .company-name a:hover { color: var(--font-green); }
+        .brand-card .company-info .summary { color: var(--text-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
         .brand-card .services-list { margin-bottom: 0.5em; }
-        .brand-card .services-list a { color: var(--text-secondary); font-size: var(--font-small); margin-right: 0.5em; }
+        .brand-card .services-list a { color: var(--text-secondary); font-size: var(--font-small); margin-right: 0.5em; text-decoration: none; }
         .brand-card .services-list a:hover { color: var(--font-green); }
         .brand-card .stats { font-size: var(--font-small); color: var(--text-secondary); display: flex; gap: 1em; flex-wrap: wrap; }
-        .brand-card .stats a { color: var(--natural-green); }
+        .brand-card .stats a { color: var(--natural-green); text-decoration: none; }
         .brand-card .stats a:hover { color: var(--font-green); }
 
         @media (max-width: 60em) {
@@ -97,7 +107,7 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // 生成随机服务（3-5个）
+    // 生成随机服务（2-4个）
     function getRandomServices() {
         const shuffled = services.sort(() => 0.5 - Math.random());
         const count = randomInt(2, 4);
@@ -139,13 +149,15 @@
                         const productCount = randomInt(100, 1000);
                         const faqCount = randomInt(3, 20);
 
-                        const card = document.createElement('div');
+                        const card = document.createElement('a');
                         card.className = 'brand-card';
+                        card.style = "hover { border-color"
+                        card.href = `brand.html?name=${encodeURIComponent(brand.name)}`;
                         card.innerHTML = `
                             <div class="top-section">
                                 <div class="left-section">
                                     <img src="${brand.logo}" alt="${brand.name}">
-                                    <h3>${brand.name}</h3>
+                                    <h3 style="color: ${brand.themeColor}">${brand.name}</h3>
                                 </div>
                                 <div class="right-section">
                                     <div class="company-info">
@@ -188,5 +200,6 @@
         });
     };
 </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'921fbad48943bd26',t:'MTc0MjI0ODQ3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
