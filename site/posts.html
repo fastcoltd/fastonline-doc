@@ -211,9 +211,6 @@
             return match;
         });
 
-
-        // 随机选择一个子分类作为开头
-
         // 组合搜索条件形成一句话，无高亮
         let conditionStr = `在 <b style="color: var(--font-green)">${generateArticleCategory()}</b> 分类中`;
         let conditions = [];
@@ -391,7 +388,7 @@
             const subCount = Math.floor(Math.random() * 11) + 5; // 5-15
             const shuffledSubs = cat.sub.sort(() => 0.5 - Math.random()).slice(0, subCount);
             shuffledSubs.forEach(sub => {
-                subHtml += `<a href="#" class="platform-item">${sub}</a>`;
+                subHtml += `<a href="posts.html?type=${sub}" class="platform-item">${sub}</a>`;
             });
             subHtml += '</div>';
 

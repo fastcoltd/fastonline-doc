@@ -33,7 +33,7 @@
                     <div class="filter-column">
                         <label class="filter-column-label">属性:</label>
                         <select class="ant-select" id="attribute-type" onchange="updateAttributeValues()">
-                            <option value="">属性类型</option>
+                            <option value="">属性</option>
                         </select>
                         <select class="ant-select" id="attribute-value" onchange="addAttributeTag()">
                             <option value="">属性值</option>
@@ -333,6 +333,11 @@
     function generateSearchData() {
         try {
             const config = fieldConfigs[searchType];
+            if(['stores', 'posts'].includes(searchType)){
+                document.querySelectorAll('.filter-column')[1].style.display = "none"
+            }else{
+                document.querySelectorAll('.filter-column')[1].style.display = ""
+            }
             if (!config) throw new Error(`Field config for ${searchType} not found`);
             const data = generateData(config, 2000);
             data.forEach(item => {
