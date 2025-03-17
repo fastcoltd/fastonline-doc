@@ -55,12 +55,24 @@
                         <datalist id="service-list"></datalist>
                     </div>
                     <div class="filter-column">
+                        <label class="filter-column-label">金额:</label>
+                        <input class="ant-input filter-column-number" type="number" id="totalPrice-min" placeholder="最小值" min="0" step="0.01">
+                        <span class="filter-column-span">~</span>
+                        <input class="ant-input filter-column-number" type="number" id="totalPrice-max" placeholder="最大值" min="0" step="0.01">
+                    </div>
+                    <div class="filter-column">
                         <label class="filter-column-label">属性:</label>
                         <select class="ant-select" id="attribute-type" onchange="updateAttributeValues()">
                             <option value="">属性</option>
                         </select>
                         <select class="ant-select" id="attribute-value" onchange="addAttributeTag()">
                             <option value="">属性值</option>
+                        </select>
+                    </div>
+                    <div class="filter-column">
+                        <label class="filter-column-label">标签:</label>
+                        <select class="ant-select" id="tag-filter" onchange="addTag()">
+                            <option value="">标签</option>
                         </select>
                     </div>
                     <button class="btn-solid-medium" onclick="applyFilters()">搜索</button>
@@ -258,6 +270,8 @@
         const statusFilter = document.getElementById('status-filter').value;
         const brandFilter = document.getElementById('brandName-filter').value.toLowerCase();
         const serviceFilter = document.getElementById('service-filter').value.toLowerCase();
+        const totalPriceMin = parseFloat(document.getElementById('totalPrice-min').value) || 0;
+        const totalPriceMax = parseFloat(document.getElementById('totalPrice-max').value) || Infinity;
 
         filteredResults = allResults.filter(item => {
             let match = true;
@@ -273,6 +287,10 @@
 
             // 服务筛选
             if (serviceFilter && !item.service.toLowerCase().includes(serviceFilter)) match = false;
+
+            // 金额范围筛选
+            const totalPrice = parseFloat(item.totalPrice.replace('$', '')) || 0;
+            if (totalPrice < totalPriceMin || totalPrice > totalPriceMax) match = false;
 
             // 属性筛选
             if (selectedAttrs.size > 0 && item.attributes) {
@@ -305,6 +323,17 @@
         if (statusFilter !== 'all') conditions.push(`状态为 <b style="color: ${demandStatusColors[statusFilter] || '#666'}">${statusFilter}</b>`);
         if (brandFilter) conditions.push(`品牌包含 "${brandFilter}"`);
         if (serviceFilter) conditions.push(`服务包含 "${serviceFilter}"`);
+        if (totalPriceMin > 0 || totalPriceMax < Infinity) {
+            let priceText = '';
+            if (totalPriceMin > 0 && totalPriceMax < Infinity) {
+                priceText = `$${totalPriceMin}-$${totalPriceMax}`;
+            } else if (totalPriceMin > 0) {
+                priceText = `大于 $${totalPriceMin}`;
+            } else if (totalPriceMax < Infinity) {
+                priceText = `小于 $${totalPriceMax}`;
+            }
+            conditions.push(`金额范围 ${priceText}`);
+        }
         if (selectedAttrs.size > 0) conditions.push(`属性包含 <b style="color: var(--font-green)">${Array.from(selectedAttrs).join('、')}</b>`);
         if (selectedTags.size > 0) conditions.push(`标签包含 <b style="color: var(--font-green)">${Array.from(selectedTags).join('、')}</b>`);
         const conditionText = conditions.length > 0 ? `，${conditions.join('，')}` : '';
