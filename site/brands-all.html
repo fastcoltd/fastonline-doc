@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>需求列表 - FASTRESP</title>
+    <title>活动列表 - FASTRESP</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -26,53 +26,14 @@
                         <input class="ant-input" type="text" id="search-title" placeholder="输入标题搜索">
                     </div>
                     <div class="filter-column">
-                        <label class="filter-column-label">状态:</label>
-                        <select class="ant-select" id="status-filter" onchange="applyFilters()">
-                            <option value="all">全部</option>
-                            <option value="竞标中" selected>竞标中</option>
-                            <option value="通过">通过</option>
-                            <option value="已交定金">已交定金</option>
-                            <option value="暂未开始">暂未开始</option>
-                            <option value="已中标">已中标</option>
-                            <option value="已付尾款">已付尾款</option>
-                            <option value="已交付">已交付</option>
-                            <option value="需求完成">需求完成</option>
-                            <option value="评价完成">评价完成</option>
-                            <option value="需求过期">需求过期</option>
-                            <option value="已退款">已退款</option>
-                            <option value="客户关闭">客户关闭</option>
-                            <option value="已废弃">已废弃</option>
-                        </select>
-                    </div>
-                    <div class="filter-column">
-                        <label class="filter-column-label">品牌:</label>
-                        <input class="ant-input" type="text" id="brandName-filter" list="brandName-list" placeholder="输入品牌快速定位">
-                        <datalist id="brandName-list"></datalist>
-                    </div>
-                    <div class="filter-column">
-                        <label class="filter-column-label">服务:</label>
-                        <input class="ant-input" type="text" id="service-filter" list="service-list" placeholder="输入服务快速定位">
-                        <datalist id="service-list"></datalist>
-                    </div>
-                    <div class="filter-column">
-                        <label class="filter-column-label">金额:</label>
-                        <input class="ant-input filter-column-number" type="number" id="totalPrice-min" placeholder="最小值" min="0" step="0.01">
-                        <span class="filter-column-span">~</span>
-                        <input class="ant-input filter-column-number" type="number" id="totalPrice-max" placeholder="最大值" min="0" step="0.01">
-                    </div>
-                    <div class="filter-column">
-                        <label class="filter-column-label">属性:</label>
-                        <select class="ant-select" id="attribute-type" onchange="updateAttributeValues()">
-                            <option value="">属性</option>
-                        </select>
-                        <select class="ant-select" id="attribute-value" onchange="addAttributeTag()">
-                            <option value="">属性值</option>
+                        <label class="filter-column-label">标签:</label>
+                        <select class="ant-select" id="tag-filter" onchange="addTag()">
+                            <option value="">选择标签</option>
                         </select>
                     </div>
                     <button class="btn-solid-medium" onclick="applyFilters()">搜索</button>
                 </div>
                 <div class="filter-list">
-                    <div id="attribute-tags" class="tag-list"></div>
                     <div id="tag-list" class="tag-list"></div>
                 </div>
                 <div class="result-opt">
@@ -83,14 +44,14 @@
                             <option value="card">竖版展示</option>
                         </select>
                         <select class="ant-select sort-select" id="sort-by" onchange="sortResults()">
-                            <option value="bids">按竞标人数降序</option>
-                            <option value="totalPrice">按总价降序</option>
-                            <option value="demandCount">按需求数量降序</option>
+                            <option value="visit_count">按访问量降序</option>
+                            <option value="sales_amount">按总销售额降序</option>
+                            <option value="itemCount">按商品数降序</option>
                         </select>
                     </div>
                 </div>
             </div>
-            <div id="demand-results" class="card-list"></div>
+            <div id="campaign-results" class="card-list"></div>
             <div class="pagination">
                 <button class="ant-btn pagination-btn" onclick="changePage(-1)">上一页</button>
                 <span id="pagination-info"></span>
@@ -123,107 +84,62 @@
     let filteredResults = [];
     let allResults = [];
     let selectedTags = new Set();
-    let selectedAttrs = new Set();
 
-    const statusList = Object.keys(demandStatusColors);
-    let extraFields = {
-        status: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '状态', style: {}, format: (d, v) => `<span style="color: ${demandStatusColors[v]}">${v}</span>`, sample: () => {
-                return statusList[Math.floor(Math.random() * statusList.length)]
-            }},
-    };
-    const fieldConfig = Object.assign({}, extraFields , demandFieldConfig);
+    const fieldConfig = Object.assign({}, campaignFieldConfig, {
+        items: {
+            card: true,
+            cardSq: true,
+            cardHoriz: true,
+            type: 'text',
+            label: '商品',
+            style: {},
+            format: (d, v) => {
+                let all = v.map(item => `<a href="item.html?name=${item.name}" style="color: var(--font-orange);border: 1">${item.name}</a> <b style="color: red">(${item.stock}</b>)`).join('，');
+                return `${all}`
+            },
+            sample: () => {
+                return Array(randomInt(5, 8)).fill().map(() => ({
+                    name: faker.commerce.productName(),
+                    stock: faker.datatype.number({ min: 10, max: 100 })
+                }));
+            }
+        }
+    });
 
     // 初始化筛选
     function initFilters() {
-        updateAttributeFilter();
-        updateBrandFilter();
-        updateServiceFilter();
+        updateTagFilter();
     }
 
-    function biddersFormat(value, randomValue){
-        if (typeof value.sample !== 'function'){
-            return
-        }
-        const bidders = value.sample().slice(0, Math.min(5, value.sample().length));
-        let biddersHtml = '<div class="bidders-wrapper" style="display: flex; align-items: center;">';
-        bidders.forEach((bidderImg, idx) => {
-            biddersHtml += `<img src="${bidderImg}" alt="Bidder ${idx + 1}" style="width: 2em; height: 2em; border-radius: 50%; margin-left: ${idx > 0 ? '-0.5em' : '0'}; z-index: ${bidders.length - idx}; border: 2px solid #fff;">`;
-        });
-        biddersHtml += `</div>`;
-        return `${biddersHtml} (${value.sample().length} 人)`
-    }
-
-    // 更新品牌筛选
-    function updateBrandFilter() {
-        const brandList = document.getElementById('brandName-list');
-        brandList.innerHTML = '';
-        if (typeof hotBrands !== 'undefined') {
-            hotBrands.forEach(platform => {
-                const option = document.createElement('option');
-                option.value = platform.name;
-                brandList.appendChild(option);
-            });
-        }
-    }
-
-    // 更新服务筛选
-    function updateServiceFilter() {
-        const serviceList = document.getElementById('service-list');
-        serviceList.innerHTML = '';
-        if (typeof services !== 'undefined') {
-            services.forEach(service => {
-                const option = document.createElement('option');
-                option.value = service.name;
-                serviceList.appendChild(option);
-            });
-        }
-    }
-
-    // 更新属性筛选
-    function updateAttributeFilter() {
-        const attributeType = document.getElementById('attribute-type');
-        attributeType.innerHTML = '<option value="">属性</option>';
-        if (typeof ecommerceAttributes !== 'undefined') {
-            Object.keys(ecommerceAttributes).forEach(attr => {
-                const option = document.createElement('option');
-                option.value = attr;
-                option.text = attr;
-                attributeType.appendChild(option);
-            });
-        }
-    }
-
-    // 更新属性值下拉框
-    function updateAttributeValues() {
-        const type = document.getElementById('attribute-type').value;
-        const valueSelect = document.getElementById('attribute-value');
-        valueSelect.innerHTML = '<option value="">属性值</option>';
-        if (type && typeof ecommerceAttributes !== 'undefined' && ecommerceAttributes[type]) {
-            ecommerceAttributes[type].forEach(val => {
-                if (!selectedAttrs.has(val)) {
+    // 更新标签筛选
+    function updateTagFilter() {
+        const tagSelect = document.getElementById('tag-filter');
+        tagSelect.innerHTML = '<option value="">选择标签</option>';
+        if (typeof ecommerceTags !== 'undefined') {
+            ecommerceTags.forEach(tag => {
+                if (!selectedTags.has(tag)) {
                     const option = document.createElement('option');
-                    option.value = val;
-                    option.text = val;
-                    valueSelect.appendChild(option);
+                    option.value = tag;
+                    option.text = tag;
+                    tagSelect.appendChild(option);
                 }
             });
         }
     }
 
-    // 添加属性标签
-    function addAttributeTag() {
-        const type = document.getElementById('attribute-type').value;
-        const value = document.getElementById('attribute-value').value;
-        if (type && value) {
-            selectedAttrs.add(value);
-            const tags = document.getElementById('attribute-tags');
-            const tag = document.createElement('span');
+    // 添加标签
+    function addTag() {
+        const tag = document.getElementById('tag-filter').value;
+        if (tag) {
+            selectedTags.add(tag);
+            const tags = document.getElementById('tag-list');
+            const tagElement = document.createElement('span');
             let tagColor = tagColors[Math.floor(Math.random() * tagColors.length)];
-            tag.className = `ant-tag ${tagColor} tag-item`;
-            tag.innerHTML = `${type}: <b>${value}</b> <span class="close tag-close" onclick="removeTag(this, 'attribute-tags', '${value}')">×</span>`;
-            tags.appendChild(tag);
-            updateAttributeValues();
-            document.getElementById('attribute-value').value = '';
+            tagElement.className = `ant-tag ${tagColor} tag-item`;
+            tagElement.innerHTML = `${tag} <span class="close tag-close" onclick="removeTag(this, 'tag-list', '${tag}')">×</span>`;
+            tags.appendChild(tagElement);
+            updateTagFilter();
+            document.getElementById('tag-filter').value = '';
             applyFilters();
         }
     }
@@ -234,9 +150,6 @@
         if (containerId === 'tag-list') {
             selectedTags.delete(tagValue);
             updateTagFilter();
-        } else if (containerId === 'attribute-tags') {
-            selectedAttrs.delete(tagValue);
-            updateAttributeValues();
         }
         applyFilters();
     }
@@ -246,13 +159,13 @@
         document.querySelector(".filter-list").style.display = filterTagLen > 0 ? 'flex' : 'none';
     }
 
-    // 生成需求数据
-    function generateDemandData() {
+    // 生成活动数据
+    function generateCampaignData() {
         try {
-            const data = generateData(fieldConfig, 1000);
+            const data = generateData(fieldConfig, 300);
             return data;
         } catch (error) {
-            console.error('Error generating demand data:', error);
+            console.error('生成活动数据时出错:', error);
             return [];
         }
     }
@@ -261,41 +174,12 @@
     function applyFilters() {
         showFilterList();
         const searchTitle = document.getElementById('search-title').value.toLowerCase();
-        const statusFilter = document.getElementById('status-filter').value;
-        const brandFilter = document.getElementById('brandName-filter').value.toLowerCase();
-        const serviceFilter = document.getElementById('service-filter').value.toLowerCase();
-        const totalPriceMin = parseFloat(document.getElementById('totalPrice-min').value) || 0;
-        const totalPriceMax = parseFloat(document.getElementById('totalPrice-max').value) || Infinity;
 
         filteredResults = allResults.filter(item => {
             let match = true;
 
             // 标题搜索
-            if (searchTitle && !item.demandTitle.toLowerCase().includes(searchTitle)) match = false;
-
-            // 状态筛选
-            if (statusFilter !== 'all' && item.status.sample !== statusFilter) match = false;
-
-            // 品牌筛选
-            if (brandFilter && !item.brandName.toLowerCase().includes(brandFilter)) match = false;
-
-            // 服务筛选
-            if (serviceFilter && !item.service.toLowerCase().includes(serviceFilter)) match = false;
-
-            // 金额范围筛选
-            const totalPrice = parseFloat(item.totalPrice.replace('$', '')) || 0;
-            if (totalPrice < totalPriceMin || totalPrice > totalPriceMax) match = false;
-
-            // 属性筛选
-            if (selectedAttrs.size > 0 && item.attributes) {
-                let matchOne = false;
-                selectedAttrs.forEach(attr => {
-                    Object.values(item.attributes).forEach(val => {
-                        if (val === attr) matchOne = true;
-                    });
-                });
-                match = matchOne ? match : false;
-            }
+            if (searchTitle && !item.title.toLowerCase().includes(searchTitle)) match = false;
 
             // 标签筛选
             if (selectedTags.size > 0 && item.tags) {
@@ -311,28 +195,15 @@
         });
 
         // 组合搜索条件形成一句话
-        let conditionStr = `在需求列表中`;
+        let conditionStr = `在活动列表中`;
         let conditions = [];
-        if (searchTitle) conditions.push(`标题包含 "${searchTitle}"`);
-        if (statusFilter !== 'all') conditions.push(`状态为 <b style="color: ${demandStatusColors[statusFilter] || '#666'}">${statusFilter}</b>`);
-        if (brandFilter) conditions.push(`品牌包含 "${brandFilter}"`);
-        if (serviceFilter) conditions.push(`服务包含 "${serviceFilter}"`);
-        if (totalPriceMin > 0 || totalPriceMax < Infinity) {
-            let priceText = '';
-            if (totalPriceMin > 0 && totalPriceMax < Infinity) {
-                priceText = `$${totalPriceMin}-$${totalPriceMax}`;
-            } else if (totalPriceMin > 0) {
-                priceText = `大于 $${totalPriceMin}`;
-            } else if (totalPriceMax < Infinity) {
-                priceText = `小于 $${totalPriceMax}`;
-            }
-            conditions.push(`金额范围 ${priceText}`);
+        if (searchTitle) conditions.push(`标题包含 <b style="color: var(--font-green)">"${searchTitle}"</b>`);
+        if (selectedTags.size > 0) {
+            conditions.push(`标签包含 <b style="color: var(--font-green)">${Array.from(selectedTags).join('、')}</b>`);
         }
-        if (selectedAttrs.size > 0) conditions.push(`属性包含 <b style="color: var(--font-green)">${Array.from(selectedAttrs).join('、')}</b>`);
-        if (selectedTags.size > 0) conditions.push(`标签包含 <b style="color: var(--font-green)">${Array.from(selectedTags).join('、')}</b>`);
         const conditionText = conditions.length > 0 ? `，${conditions.join('，')}` : '';
 
-        document.getElementById('resultsShow').innerHTML = `${conditionStr}${conditionText} 条件中，找到 ${filteredResults.length} 条结果`;
+        document.getElementById('resultsShow').innerHTML = `${conditionStr}${conditionText} 条件中，找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条结果`;
         currentPage = 1;
         updateResults();
     }
@@ -346,7 +217,7 @@
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         const results = filteredResults.slice(start, end);
-        const container = document.getElementById('demand-results');
+        const container = document.getElementById('campaign-results');
         container.innerHTML = '';
 
         results.forEach((item, index) => {
@@ -366,16 +237,16 @@
                 if (!fieldConfig[showClass]) return;
 
                 const value = item[fieldName] !== undefined ? item[fieldName] : fieldConfig.value;
-                const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, fieldConfig, 'demand-results', index);
+                const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, fieldConfig, 'campaign-results', index);
                 const type = fieldConfig.type || 'text';
                 const contentLength = (typeof value === 'string' ? value : JSON.stringify(value)).length;
 
                 if (type === 'image' && !imageHtml) {
                     imageHtml = `<div class="image-wrapper">${fieldContent.html}</div>`;
-                } else if (type === 'text' && !hasTitle && fieldName === 'demandTitle') {
+                } else if (type === 'text' && !hasTitle && fieldName === 'title') {
                     titleHtml = `<div class="title-wrapper">${fieldContent.html}</div>`;
                     hasTitle = true;
-                } else if (type === 'rating' || type == 'bidders') {
+                } else if (type === 'rating') {
                     bottomHtml += `<div class="rating-wrapper">${fieldContent.html}</div>`;
                 } else if (type === 'tag') {
                     bottomHtml += `<div class="tags-wrapper">${fieldContent.html}</div>`;
@@ -383,9 +254,6 @@
                     bottomHtml += `<div class="button-wrapper">${fieldContent.html}</div>`;
                 } else if (type === 'favorite') {
                     favoriteHtml += fieldContent.html;
-                } else if (fieldName === 'status') {
-                    const statusColor = demandStatusColors[value.sample] || '#666';
-                    fieldItems.push({ html: `<p>${fieldConfig.label}: <span style="color: ${statusColor}">${value.sample}</span></p>`, length: contentLength, name: fieldName });
                 } else {
                     fieldItems.push({ html: fieldContent.html, length: contentLength, name: fieldName });
                 }
@@ -411,7 +279,7 @@
 
             Object.entries(fieldConfig).forEach(([fieldName, fieldConfig]) => {
                 if (fieldConfig[showClass] && fieldConfig.onClick) {
-                    const elementId = `demand-results-${fieldName}-${index}`;
+                    const elementId = `campaign-results-${fieldName}-${index}`;
                     const element = card.querySelector(`#${elementId}`);
                     if (element) {
                         element.addEventListener('click', (event) => {
@@ -463,9 +331,9 @@
     function sortResults() {
         const sortBy = document.getElementById('sort-by').value;
         filteredResults.sort((a, b) => {
-            if (sortBy === 'bids') return (parseFloat(b.bids) || 0) - (parseFloat(a.bids) || 0);
-            if (sortBy === 'totalPrice') return parseFloat(b.totalPrice.replace('$', '') || 0) - parseFloat(a.totalPrice.replace('$', '') || 0);
-            if (sortBy === 'demandCount') return (parseFloat(b.demandCount) || 0) - (parseFloat(a.demandCount) || 0);
+            if (sortBy === 'visit_count') return (parseFloat(b.visit_count) || 0) - (parseFloat(a.visit_count) || 0);
+            if (sortBy === 'sales_amount') return parseFloat(b.sales_amount.replace('$', '') || 0) - parseFloat(a.sales_amount.replace('$', '') || 0);
+            if (sortBy === 'itemCount') return (parseFloat(b.itemCount) || 0) - (parseFloat(a.itemCount) || 0);
         });
         updateResults();
     }
@@ -476,7 +344,7 @@
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const specifiedCategory = urlParams.get('type') || 'all';
-                document.title = specifiedCategory === 'all' ? '需求列表 - FASTRESP' : `${specifiedCategory} - 需求列表 - FASTRESP`;
+                document.title = specifiedCategory === 'all' ? '活动列表 - FASTRESP' : `${specifiedCategory} - 活动列表 - FASTRESP`;
 
                 const searchInput = document.getElementById('q');
                 const headerSearchTypeSelect = document.querySelector('.search-type[name="type"]');
@@ -500,11 +368,11 @@
                         updateResults();
                     }
                 };
-                allResults = generateDemandData();
+                allResults = generateCampaignData();
                 filteredResults = [...allResults];
                 applyFilters();
             } catch (error) {
-                console.error('Error during initialization:', error);
+                console.error('初始化页面时出错:', error);
             }
         });
     };

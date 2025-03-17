@@ -183,7 +183,7 @@ function generateArticleCategory(){
 }
 
 function generateBrand(){
-    let choose = hotPlatforms[Math.floor(Math.random() * hotPlatforms.length)]
+    let choose = hotBrands[Math.floor(Math.random() * hotBrands.length)]
     return `<b style="color: var(--font-green);">${choose['name']}</b>`;
 }
 

@@ -1,6 +1,6 @@
 
 // 热门平台样本数据：全球 Top 50 科技平台（真实数据）
-const hotPlatforms = [
+const hotBrands = [
     { logo: 'https://logo.clearbit.com/facebook.com', name: 'Facebook', link: `brands.html?name=`, home: 'https://facebook.com' },
     { logo: 'https://logo.clearbit.com/google.com', name: 'Google', link: `brands.html?name=`, home: 'https://google.com' },
     { logo: 'https://logo.clearbit.com/twitter.com', name: 'Twitter', link: `brands.html?name=`, home: 'https://twitter.com' },
@@ -144,28 +144,28 @@ const articleCategories = [
     { name: 'Career', sub: ['Job Hunting Tips', 'Workplace Stories', 'Industry Insights', 'Remote Work', 'Leadership Skills', 'Team Management', 'Career Planning', 'Startup Ideas'] }
 ];
 
-// 从 hotPlatforms 随机选取 20-50 个平台名称和 logo
+// 从 hotBrands 随机选取 20-50 个平台名称和 logo
 function getRandomPlatforms(min, max) {
     const count = Math.floor(Math.random() * (max - min + 1)) + min;
-    const shuffled = hotPlatforms.sort(() => 0.5 - Math.random());
+    const shuffled = hotBrands.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count).map(platform => ({ name: platform.name, logo: platform.logo }));
 }
 
-// 更新 services 数据，随机附带 hotPlatforms 中的名称和 logo
+// 更新 services 数据，随机附带 hotBrands 中的名称和 logo
 const services = [
-    { name: 'Social Media', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Social Accounts', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'SEO & SEM', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Ecommerce', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Gaming', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Content', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Design', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Promotion & Ads', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Trading', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Mobile Apps', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Soft Develop', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Cloud Service', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) },
-    { name: 'Security', sub: getRandomPlatforms(hotPlatforms.length * 0.4, hotPlatforms.length) }
+    { name: 'Social Media', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Social Accounts', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'SEO & SEM', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Ecommerce', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Gaming', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Content', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Design', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Promotion & Ads', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Trading', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Mobile Apps', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Soft Develop', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Cloud Service', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
+    { name: 'Security', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) }
 ];
 
 const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
@@ -214,5 +214,5 @@ function generateServiceMenu() {
 window.generateServiceMenu = generateServiceMenu;
 window.ecommerceAttributes = ecommerceAttributes;
 window.ecommerceTags = ecommerceTags;
-window.hotPlatforms = hotPlatforms;
+window.hotBrands = hotBrands;
 window.services = services;
