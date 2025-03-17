@@ -33,10 +33,10 @@
                     <div class="filter-column">
                         <label class="filter-column-label">属性:</label>
                         <select class="ant-select" id="attribute-type" onchange="updateAttributeValues()">
-                            <option value="">选择属性类型</option>
+                            <option value="">属性类型</option>
                         </select>
                         <select class="ant-select" id="attribute-value" onchange="addAttributeTag()">
-                            <option value="">选择属性值</option>
+                            <option value="">属性值</option>
                         </select>
                     </div>
 <!--                    <div class="filter-column">-->
@@ -46,7 +46,7 @@
                     <div class="filter-column">
                         <label class="filter-column-label">标签:</label>
                         <select class="ant-select" id="tag-filter" onchange="addTag()">
-                            <option value="">选择标签</option>
+                            <option value="">标签</option>
                         </select>
                     </div>
                     <button class="btn-solid-medium" onclick="applyFilters()" >筛选</button>
@@ -166,7 +166,7 @@
     // 更新标签下拉框
     function updateTagFilter() {
         const tagFilter = document.getElementById('tag-filter');
-        tagFilter.innerHTML = '<option value="">选择标签</option>';
+        tagFilter.innerHTML = '<option value="">标签</option>';
         if (typeof ecommerceTags !== 'undefined') {
             ecommerceTags.forEach(tag => {
                 if (!selectedTags.has(tag)) {
@@ -183,7 +183,7 @@
     function updateAttributeValues() {
         const type = document.getElementById('attribute-type').value;
         const valueSelect = document.getElementById('attribute-value');
-        valueSelect.innerHTML = '<option value="">选择属性值</option>';
+        valueSelect.innerHTML = '<option value="">属性值</option>';
         if (type && typeof ecommerceAttributes !== 'undefined' && ecommerceAttributes[type]) {
             ecommerceAttributes[type].forEach(val => {
                 if (!selectedAttrs.has(val)) {

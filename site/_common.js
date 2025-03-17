@@ -56,9 +56,7 @@ function generateFieldContent(fieldConfig, item, fieldName, value, config, conta
     const { type = 'text', label, format, style = {}, customClass, mergeWith, position } = config;
     let content = '';
     const elementId = `${containerId}-${fieldName}-${index}`;
-
     content = format ? format(fieldConfig, value['sample']) : value;
-
     switch (type) {
         case 'text':
             return {

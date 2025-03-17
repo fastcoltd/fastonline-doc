@@ -22,40 +22,32 @@
             <div class="result-header">
                 <div class="filter-bar">
                     <div class="filter-column">
-                        <label class="filter-column-label">类型:</label>
-                        <select class="ant-select" id="post-type" onchange="updatePostType()">
-                            <option value="all" selected>全部</option>
-                            <option value="Blog">博客</option>
-                            <option value="News">新闻</option>
-                            <option value="Reviews">评论</option>
-                            <option value="Community">社区</option>
-                            <option value="Interviews">访谈</option>
-                            <option value="Tips & Tricks">技巧</option>
-                            <option value="Industry Updates">行业动态</option>
-                            <option value="User Stories">用户故事</option>
-                            <option value="Events">活动</option>
-                            <option value="Announcements">公告</option>
-                        </select>
+                        <label class="filter-column-label">搜索标题:</label>
+                        <input class="ant-input" type="text" id="search-title" placeholder="输入标题搜索">
                     </div>
                     <div class="filter-column">
-                        <label class="filter-column-label">属性:</label>
-                        <select class="ant-select" id="attribute-type" onchange="updateAttributeValues()">
-                            <option value="">选择属性类型</option>
-                        </select>
-                        <select class="ant-select" id="attribute-value" onchange="addAttributeTag()">
-                            <option value="">选择属性值</option>
-                        </select>
+                        <label class="filter-column-label">评分:</label>
+                        <input class="ant-input filter-column-number" type="number" id="rating-min" placeholder="最低" min="0" max="5">
+                        <span class="filter-column-span">~</span>
+                        <input class="ant-input filter-column-number" type="number" id="rating-max" placeholder="最高" min="0" max="5">
                     </div>
                     <div class="filter-column">
                         <label class="filter-column-label">标签:</label>
                         <select class="ant-select" id="tag-filter" onchange="addTag()">
-                            <option value="">选择标签</option>
+                            <option value="">标签</option>
                         </select>
                     </div>
-                    <button class="btn-solid-medium" onclick="applyFilters()">筛选</button>
+                    <div class="filter-column">
+                        <label class="filter-column-label">是否付费:</label>
+                        <select class="ant-select" id="paid-filter" onchange="applyFilters()">
+                            <option value="all" selected>全部</option>
+                            <option value="true">付费</option>
+                            <option value="false">免费</option>
+                        </select>
+                    </div>
+                    <button class="btn-solid-medium" onclick="applyFilters()">搜索</button>
                 </div>
                 <div class="filter-list">
-                    <div id="attribute-tags" class="tag-list"></div>
                     <div id="tag-list" class="tag-list"></div>
                 </div>
                 <div class="result-opt">
@@ -66,11 +58,10 @@
                             <option value="card">竖版展示</option>
                         </select>
                         <select class="ant-select sort-select" id="sort-by" onchange="sortResults()">
-                            <option value="relevance">按相关性排序</option>
-                            <option value="rating">按评分排序</option>
-                            <option value="read_count">按阅读量排序</option>
-                            <option value="comment_count">按评论数排序</option>
-                            <option value="save_count">按收藏数排序</option>
+                            <option value="paid_count">按付费阅读数降序</option>
+                            <option value="rating">按评分降序</option>
+                            <option value="read_count">按阅读量降序</option>
+                            <option value="comment_count">按评论降序</option>
                         </select>
                     </div>
                 </div>
@@ -105,38 +96,17 @@
 <script>
     let currentPage = 1;
     let itemsPerPage = 10;
-    let postType = 'all';
+    let parentType = 'all';
+    let subType = 'all';
     let filteredResults = [];
     let allResults = [];
     let selectedTags = new Set();
-    let selectedAttrs = new Set();
 
-    const fieldConfig = postsFieldConfig; // 使用 postsFieldConfig 配置
-
-    // 可筛选字段配置
-    const filterConfigs = {
-        'posts': {
-            'brandName': { type: 'text', label: '品牌', 'data': hotPlatforms },
-            'service': { type: 'text', label: '服务', 'data': services },
-            'rating': { type: 'rating', label: '评分', min: 0, max: 5 },
-            'read_count': { type: 'number', label: '阅读量' },
-            'comment_count': { type: 'number', label: '评论数' }
-        }
-    };
+    const fieldConfig = postsFieldConfig;
 
     // 初始化筛选
     function initFilters() {
-        const attributeType = document.getElementById('attribute-type');
-        if (typeof ecommerceAttributes !== 'undefined') {
-            Object.keys(ecommerceAttributes).forEach(attr => {
-                const option = document.createElement('option');
-                option.value = attr;
-                option.text = attr;
-                attributeType.appendChild(option);
-            });
-        }
         updateTagFilter();
-        updateFilters();
     }
 
     // 更新标签下拉框
@@ -155,114 +125,7 @@
         }
     }
 
-    // 更新属性值下拉框
-    function updateAttributeValues() {
-        const type = document.getElementById('attribute-type').value;
-        const valueSelect = document.getElementById('attribute-value');
-        valueSelect.innerHTML = '<option value="">选择属性值</option>';
-        if (type && typeof ecommerceAttributes !== 'undefined' && ecommerceAttributes[type]) {
-            ecommerceAttributes[type].forEach(val => {
-                if (!selectedAttrs.has(val)) {
-                    const option = document.createElement('option');
-                    option.value = val;
-                    option.text = val;
-                    valueSelect.appendChild(option);
-                }
-            });
-        }
-    }
-
-    // 更新文章类型并重新生成数据和筛选条件
-    function updatePostType() {
-        postType = document.getElementById('post-type').value;
-        allResults = generatePostData();
-        filteredResults = [...allResults];
-        applyFilters();
-    }
-
-    // 动态生成筛选条件
-    function updateFilters() {
-        const config = filterConfigs['posts'];
-
-        document.querySelectorAll('.dynamic').forEach(item => {
-            item.remove();
-        });
-
-        let firstColumn = document.querySelectorAll('.filter-column')[1];
-        Object.entries(config).forEach(([fieldName, fieldConfig]) => {
-            const filterRow = document.createElement('div');
-            filterRow.className = 'filter-column dynamic';
-
-            const label = document.createElement('label');
-            label.className = 'filter-column-label';
-            label.textContent = `${fieldConfig.label}:`;
-            filterRow.appendChild(label);
-
-            if (fieldConfig.type === 'text') {
-                const input = document.createElement('input');
-                input.className = 'ant-input';
-                input.id = `${fieldName}-filter`;
-                input.placeholder = `输入${fieldConfig.label}快速定位`;
-                if (fieldConfig.data) {
-                    let listId = `${fieldName}-list`;
-                    input.setAttribute('list', listId);
-                    const datalist = document.createElement('datalist');
-                    datalist.id = listId;
-                    fieldConfig.data.forEach(p => {
-                        const option = document.createElement('option');
-                        option.value = p.name;
-                        datalist.appendChild(option);
-                    });
-                    filterRow.appendChild(datalist);
-                }
-                filterRow.appendChild(input);
-            } else if (fieldConfig.type === 'rating' || fieldConfig.type === 'number') {
-                const minInput = document.createElement('input');
-                minInput.className = 'ant-input filter-column-number';
-                minInput.type = 'number';
-                minInput.id = `${fieldName}-min`;
-                minInput.placeholder = '最低';
-                minInput.min = fieldConfig.min || 0;
-                filterRow.appendChild(minInput);
-
-                const span = document.createElement('span');
-                span.className = 'filter-column-span';
-                span.textContent = '~';
-                filterRow.appendChild(span);
-
-                const maxInput = document.createElement('input');
-                maxInput.className = 'ant-input filter-column-number';
-                maxInput.type = 'number';
-                maxInput.id = `${fieldName}-max`;
-                maxInput.placeholder = '最高';
-                maxInput.min = fieldConfig.min || 0;
-                filterRow.appendChild(maxInput);
-            }
-
-            firstColumn.parentNode.insertBefore(filterRow, firstColumn.nextSibling);
-            firstColumn = filterRow;
-        });
-    }
-
-    // 添加属性标签
-    function addAttributeTag() {
-        const type = document.getElementById('attribute-type').value;
-        const value = document.getElementById('attribute-value').value;
-        if (type && value) {
-            selectedAttrs.add(value);
-            document.getElementById('attribute-value').querySelector(`option[value="${value}"]`).remove();
-            const tags = document.getElementById('attribute-tags');
-            const tag = document.createElement('span');
-            let tagColor = tagColors[randomInt(0, tagColors.length) % tagColors.length];
-            tag.className = `ant-tag ${tagColor} tag-item`;
-            tag.innerHTML = `${type}: <b>${value}</b> <span class="close tag-close" onclick="removeTag(this, 'attribute-tags', '${value}')">×</span>`;
-            tags.appendChild(tag);
-            document.getElementById('attribute-value').value = '';
-            applyFilters();
-        }
-    }
-
-    // 添加普通标签
+    // 添加标签
     function addTag() {
         const value = document.getElementById('tag-filter').value;
         if (value) {
@@ -270,7 +133,7 @@
             const tags = document.getElementById('tag-list');
             const tag = document.createElement('span');
             tag.className = 'ant-tag ant-tag-blue tag-item';
-            tag.innerHTML = `${value} <span class="close tag-close" onclick="removeTag(this, 'tag-list', '${value}')">×</span>`;
+            tag.innerHTML = `${value} <span class="close tag-close" onclick="removeTag(this, '${value}')">×</span>`;
             tags.appendChild(tag);
             updateTagFilter();
             document.getElementById('tag-filter').value = '';
@@ -279,34 +142,29 @@
     }
 
     // 删除标签
-    function removeTag(element, containerId, tagValue) {
+    function removeTag(element, tagValue) {
         element.parentElement.remove();
-        if (tagValue) {
-            selectedTags.delete(tagValue);
-            selectedAttrs.delete(tagValue);
-        }
-        if (containerId === 'tag-list') updateTagFilter();
-        if (containerId === 'attribute-tags') updateAttributeValues();
+        selectedTags.delete(tagValue);
+        updateTagFilter();
         applyFilters();
     }
 
     function showFilterList() {
         let filterTagLen = document.querySelectorAll('.tag-item').length;
-        if (filterTagLen > 0) {
-            document.querySelector(".filter-list").style.display = 'flex';
-        } else {
-            document.querySelector(".filter-list").style.display = 'none';
-        }
+        document.querySelector(".filter-list").style.display = filterTagLen > 0 ? 'flex' : 'none';
     }
 
     // 生成文章数据
     function generatePostData() {
         try {
             const data = generateData(fieldConfig, 2000);
+            const urlParams = new URLSearchParams(window.location.search);
+            const specifiedCategory = urlParams.get('type') || 'Blockchain';
+
             data.forEach(item => {
                 item.description = faker.lorem.sentences(2);
                 item.updateTime = faker.date.recent(30).toISOString();
-                item.category = postType === 'all' ? faker.random.arrayElement(['Blog', 'News', 'Reviews', 'Community', 'Interviews', 'Tips & Tricks', 'Industry Updates', 'User Stories', 'Events', 'Announcements']) : postType;
+                item.category.sample = `${specifiedCategory}`;
             });
             return data;
         } catch (error) {
@@ -316,81 +174,68 @@
     }
 
     // 应用筛选
+    // 应用筛选
     function applyFilters() {
         showFilterList();
-        const config = filterConfigs['posts'];
-        const filters = {};
-        Object.keys(config).forEach(fieldName => {
-            if (document.getElementById(`${fieldName}-min`) && document.getElementById(`${fieldName}-max`)) {
-                filters[fieldName] = {
-                    min: parseFloat(document.getElementById(`${fieldName}-min`).value) || 0,
-                    max: parseFloat(document.getElementById(`${fieldName}-max`).value) || Infinity
-                };
-            } else if (document.getElementById(`${fieldName}-filter`)) {
-                filters[fieldName] = document.getElementById(`${fieldName}-filter`).value;
-            }
-        });
-        const attributeTags = Array.from(document.getElementById('attribute-tags').children).map(tag => {
-            const [type, value] = tag.textContent.split(': ').map(t => t.trim().replace('×', ''));
-            return { type, value };
-        });
-        const tags = Array.from(document.getElementById('tag-list').children).map(tag => tag.textContent.trim().replace('×', ''));
+        const searchTitle = document.getElementById('search-title').value.toLowerCase();
+        const ratingMin = parseFloat(document.getElementById('rating-min').value) || 0;
+        const ratingMax = parseFloat(document.getElementById('rating-max').value) || Infinity;
+        const paidFilter = document.getElementById('paid-filter').value;
 
         filteredResults = allResults.filter(item => {
             let match = true;
-            let itemValueStr = JSON.stringify(Object.values(item));
 
-            // 字段筛选
-            Object.entries(filters).forEach(([fieldName, filter]) => {
-                if (typeof filter === 'object') {
-                    if (filter.min !== 0 || filter.max !== Infinity) {
-                        const value = item[fieldName];
-                        if (fieldName === 'rating') {
-                            const rating = value?.sample || 0;
-                            if (rating < filter.min || rating > filter.max) match = false;
-                        } else {
-                            const numValue = parseFloat(value) || 0;
-                            if (numValue < filter.min || numValue > filter.max) match = false;
-                        }
-                    }
-                } else if (filter) {
-                    if (item[fieldName].toLowerCase().indexOf(filter.toLowerCase()) === -1) {
-                        match = false;
-                    }
-                }
-            });
+            // 标题搜索
+            if (searchTitle && !item.title.toLowerCase().includes(searchTitle)) match = false;
 
-            // 属性筛选
-            if (attributeTags.length > 0) {
-                let matchOne = false;
-                attributeTags.forEach(tag => {
-                    let attr = item.attributes[tag.type];
-                    if (attr && attr === tag.value.trim()) {
-                        matchOne = true;
-                    }
-                });
-                match = matchOne ? match : false;
-            }
+            // 评分筛选
+            const rating = item.rating?.sample || 0;
+            if (rating < ratingMin || rating > ratingMax) match = false;
 
             // 标签筛选
-            if (tags.length > 0 && item.tags) {
+            if (selectedTags.size > 0 && item.tags) {
                 let haveTag = false;
-                let tagsString = tags.join(",");
+                let tagsString = Array.from(selectedTags).join(",");
                 item.tags.forEach(tag => {
-                    if (tagsString.indexOf(tag) !== -1) {
-                        haveTag = true;
-                    }
+                    if (tagsString.includes(tag)) haveTag = true;
                 });
                 match = haveTag ? match : false;
             }
 
-            // 类型筛选
-            if (postType !== 'all' && item.category !== postType) match = false;
+            // 付费筛选
+            if (paidFilter !== 'all') {
+                const isPaid = paidFilter === 'true';
+                if (item.paid.sample !== isPaid) match = false;
+            }
 
             return match;
         });
 
-        document.getElementById('resultsShow').innerHTML = `在 <b style="color: var(--font-green)">文章</b> 分类中，找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条结果`;
+
+        // 随机选择一个子分类作为开头
+
+        // 组合搜索条件形成一句话，无高亮
+        let conditionStr = `在 <b style="color: var(--font-green)">${generateArticleCategory()}</b> 分类中`;
+        let conditions = [];
+        if (searchTitle) conditions.push(`关键字 "${searchTitle}"`);
+        if (ratingMin > 0 || ratingMax < Infinity) {
+            let ratingText = '';
+            if (ratingMin > 0 && ratingMax < Infinity) {
+                ratingText = `${ratingMin}-${ratingMax} 分`;
+            } else if (ratingMin > 0) {
+                ratingText = `大于 <b style="color: var(--font-green)">${ratingMin}</b> 分`;
+            } else if (ratingMax < Infinity) {
+                ratingText = `小于 <b style="color: var(--font-green)">${ratingMax}</b> 分`;
+            }
+            conditions.push(`评分范围 ${ratingText}`);
+        }
+        if (selectedTags.size > 0) conditions.push(`标签 <b style="color: var(--font-green)">${Array.from(selectedTags).join('、')}</b>`);
+        if (paidFilter !== 'all') {
+            conditions.push(`付费：<b style="color: var(--font-green)">${paidFilter === 'true' ? '付费' : '免费'}</b>`);
+        }
+        const conditionText = conditions.length > 0 ? `，${conditions.join('，')}` : '';
+
+        document.getElementById('resultsShow').innerHTML = `${conditionStr}${conditionText} 条件中，找到 ${filteredResults.length} 条结果`;
         currentPage = 1;
         updateResults();
     }
@@ -410,7 +255,7 @@
         results.forEach((item, index) => {
             const card = document.createElement('div');
             const showClass = document.getElementById('showClass').value;
-            card.className = showClass;
+            card.className = `${showClass} ${item.paid.sample  ? 'paid-post' : ''}`; // 确保 paid 字段控制样式
 
             let imageHtml = '';
             let titleHtml = '';
@@ -454,14 +299,14 @@
             bottomHtml += '</div>';
 
             card.innerHTML = `
-                ${imageHtml}
-                <div class="card-content">
-                    ${titleHtml}
-                    ${fieldsHtml}
-                    ${bottomHtml}
-                    ${favoriteHtml}
-                </div>
-            `;
+            ${imageHtml}
+            <div class="card-content">
+                ${titleHtml}
+                ${fieldsHtml}
+                ${bottomHtml}
+                ${favoriteHtml}
+            </div>
+        `;
             container.appendChild(card);
 
             Object.entries(fieldConfig).forEach(([fieldName, fieldConfig]) => {
@@ -518,25 +363,48 @@
     function sortResults() {
         const sortBy = document.getElementById('sort-by').value;
         filteredResults.sort((a, b) => {
-            if (sortBy === 'relevance') return 0;
+            if (sortBy === 'paid_count') return (parseFloat(b.paid_count) || 0) - (parseFloat(a.paid_count) || 0);
             if (sortBy === 'rating') return (b.rating?.sample || 0) - (a.rating?.sample || 0);
             if (sortBy === 'read_count') return (parseFloat(b.read_count) || 0) - (parseFloat(a.read_count) || 0);
             if (sortBy === 'comment_count') return (parseFloat(b.comment_count) || 0) - (parseFloat(a.comment_count) || 0);
-            if (sortBy === 'save_count') return (parseFloat(b.save_count) || 0) - (parseFloat(a.save_count) || 0);
         });
         updateResults();
     }
 
-    function randomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+    // 生成 menu2 菜单（文章相关分类，英文）
+    function generateMenu2() {
+        const menu = document.getElementById('menu2');
+        menu.innerHTML = ''; // 清空现有内容
+
+        // 定义文章相关的分类数据（英文）
+
+        // 随机选择 8-12 个一级分类
+        const categoryCount = Math.floor(Math.random() * 5) + 8; // 8-12
+        const shuffledCategories = articleCategories.sort(() => 0.5 - Math.random()).slice(0, categoryCount);
+
+        shuffledCategories.forEach(cat => {
+            const div = document.createElement('div');
+            div.className = 'level-1';
+
+            // 生成二级菜单
+            let subHtml = '<div class="level-2">';
+            const subCount = Math.floor(Math.random() * 11) + 5; // 5-15
+            const shuffledSubs = cat.sub.sort(() => 0.5 - Math.random()).slice(0, subCount);
+            shuffledSubs.forEach(sub => {
+                subHtml += `<a href="#" class="platform-item">${sub}</a>`;
+            });
+            subHtml += '</div>';
+
+            div.innerHTML = `${cat.name}${subHtml}`;
+            menu.appendChild(div);
+        });
     }
 
-    // 初始化页面
     window.onload = () => {
         w3.includeHTML(() => {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
-                postType = urlParams.get('type') || 'all';
+                const specifiedCategory = urlParams.get('type') || 'all';
 
                 const searchInput = document.getElementById('q');
                 const headerSearchTypeSelect = document.querySelector('.search-type[name="type"]');
@@ -553,7 +421,6 @@
                 }
 
                 initFilters();
-                document.getElementById('post-type').value = postType;
                 document.getElementById('jump-to-page').onchange = () => {
                     const page = parseInt(document.getElementById('jump-to-page').value);
                     if (page >= 1 && page <= Math.ceil(filteredResults.length / itemsPerPage)) {
@@ -561,6 +428,7 @@
                         updateResults();
                     }
                 };
+                generateMenu2(); // 生成 menu2 菜单
                 allResults = generatePostData();
                 filteredResults = [...allResults];
                 applyFilters();
@@ -570,5 +438,10 @@
         });
     };
 </script>
+<style>
+    .paid-post {
+        background-color: #FFF3E0; /* 浅橙色背景，用于付费文章 */
+    }
+</style>
 </body>
 </html>

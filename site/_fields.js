@@ -110,7 +110,7 @@ let postsFieldConfig = {
     save_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '收藏数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 20, max: 100 })},
     paid_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '付费阅读数', format: (d, v) => `<span style="color: #FFD700">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 50 })},
     blog_summary: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '文章摘要', format: (d, v) => `<span style="color: #666">${v}</span>`, style: {}, sample: () => faker.lorem.sentence()},
-    category: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '文章分类', format: (d, v) => `<span style="color: #1E90FF">${v}</span>`, style: {}, sample: () => faker.random.arrayElement(['科技', '生活', '美食', '旅行', '时尚'])}
+    category: {card: true, cardSq: true, cardHoriz: true, type: 'text', label: '分类', format: (d, v) => `<b style="color: var(--font-green)">${v}</b>`, style: {}, sample: () => {return generateArticleCategory()}}
 };
 
 let campaignFieldConfig = {
@@ -143,6 +143,7 @@ let ordersCommentFieldConfig = {
     un_like_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '反对数', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 10 })}
 };
 
+
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -170,6 +171,12 @@ function generateTag(min, max){
         }
     }
     return tags;
+}
+
+function generateArticleCategory(){
+    let chooseCategory = articleCategories[Math.floor(Math.random() * articleCategories.length)]
+    const randomCategory = chooseCategory.sub[Math.floor(Math.random() * chooseCategory.sub.length)];
+    return `${chooseCategory.name} - ${randomCategory}`;
 }
 
 function generateBrand(){

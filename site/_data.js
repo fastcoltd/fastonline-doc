@@ -115,6 +115,19 @@ const ecommerceTags = [
     "会员专享", "闪购特价", "节日礼品", "跨境直邮", "本地仓发", "无忧售后", "品质认证", "时尚潮流", "经典款式", "稀缺库存"
 ];
 
+const articleCategories = [
+    { name: 'Technology', sub: ['Artificial Intelligence', 'Blockchain', 'Cloud Computing', 'Internet of Things', '5G Technology', 'Big Data', 'Virtual Reality'] },
+    { name: 'Lifestyle', sub: ['Health & Wellness', 'Food & Cooking', 'Home Decor', 'Fashion Trends', 'Travel Tips', 'Pet Care', 'Sustainable Living'] },
+    { name: 'Finance', sub: ['Investing & Wealth', 'Stock Market', 'Cryptocurrency', 'Startup Stories', 'Economic Trends', 'Personal Finance', 'Tax Planning', 'Real Estate'] },
+    { name: 'Entertainment', sub: ['Movie Reviews', 'Music Picks', 'Gaming Guides', 'Celebrity Gossip', 'TV Shows', 'Anime Culture', 'Live Streaming'] },
+    { name: 'Education', sub: ['Online Learning', 'Career Skills', 'Language Learning', 'Exam Prep', 'Kids Education', 'Higher Education', 'Lifelong Learning', 'Coding Basics'] },
+    { name: 'Sports', sub: ['Football Updates', 'Basketball Insights', 'Fitness Tutorials', 'Outdoor Sports', 'Esports', 'Olympics News', 'Running Tips'] },
+    { name: 'Culture', sub: ['History Tales', 'Art Appreciation', 'Literary Reviews', 'Traditional Culture', 'Modern Art', 'Museum Tours', 'Philosophy Thoughts', 'Religion Studies'] },
+    { name: 'News', sub: ['Global News', 'Local Updates', 'Tech Briefs', 'Finance Digest', 'Entertainment Highlights', 'Sports Roundup', 'Social Issues', 'Breaking News'] },
+    { name: 'Community', sub: ['User Stories', 'Experience Sharing', 'Q&A Discussions', 'Interest Groups', 'Event Recaps', 'Volunteer Logs', 'Forum Highlights'] },
+    { name: 'Career', sub: ['Job Hunting Tips', 'Workplace Stories', 'Industry Insights', 'Remote Work', 'Leadership Skills', 'Team Management', 'Career Planning', 'Startup Ideas'] }
+];
+
 // 从 hotPlatforms 随机选取 20-50 个平台名称和 logo
 function getRandomPlatforms(min, max) {
     const count = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -144,6 +157,11 @@ const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-r
 // 生成服务菜单（调整为横向分组，每 3 个字母）
 function generateServiceMenu() {
     const menu = document.getElementById('menu2');
+
+    const menuLevel1 = document.querySelectorAll('.menu2 .level-1');
+    if (menuLevel1.length > 0){
+        return
+    }
     services.forEach(cat => {
         const div = document.createElement('div');
         div.className = 'level-1';
