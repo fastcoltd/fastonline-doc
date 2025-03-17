@@ -186,7 +186,15 @@ function generateData(fieldConfig, count) {
 
                 }
                 else if (typeof _value == 'function'){
-                    values[key] = _value(i)
+                    if (_value.length == 0){
+                        values[key] =  _value()
+                    }
+                    else if (_value.length == 1){
+                        values[key] =  _value(i)
+                    }
+                    else if (_value.length == 2){
+                        values[key] =  _value
+                    }
                 }
                 index++
             })
