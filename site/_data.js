@@ -115,6 +115,22 @@ const ecommerceTags = [
     "会员专享", "闪购特价", "节日礼品", "跨境直邮", "本地仓发", "无忧售后", "品质认证", "时尚潮流", "经典款式", "稀缺库存"
 ];
 
+const demandStatusColors = {
+    '通过': '#32CD32',        // 绿色
+    '已交定金': '#FFD700',    // 金色
+    '暂未开始': '#A9A9A9',    // 灰色
+    '竞标中': '#1E90FF',      // 蓝色
+    '已中标': '#32CD32',      // 绿色
+    '已付尾款': '#FFD700',    // 金色
+    '已交付': '#32CD32',      // 绿色
+    '需求完成': '#32CD32',    // 绿色
+    '评价完成': '#32CD32',    // 绿色
+    '需求过期': '#FF4500',    // 橙红色
+    '已退款': '#FF4500',      // 橙红色
+    '客户关闭': '#FF4500',    // 橙红色
+    '已废弃': '#FF4500'       // 橙红色
+};
+
 const articleCategories = [
     { name: 'Technology', sub: ['Artificial Intelligence', 'Blockchain', 'Cloud Computing', 'Internet of Things', '5G Technology', 'Big Data', 'Virtual Reality'] },
     { name: 'Lifestyle', sub: ['Health & Wellness', 'Food & Cooking', 'Home Decor', 'Fashion Trends', 'Travel Tips', 'Pet Care', 'Sustainable Living'] },

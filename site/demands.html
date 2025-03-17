@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>需求列表 - FASTRESP</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="_header.html"></div>
+
+<!-- 主内容 -->
+<div class="container">
+    <div class="search-container">
+        <!-- 主要内容 -->
+        <div class="main-content">
+            <div class="result-header">
+                <div class="filter-bar">
+                    <div class="filter-column">
+                        <label class="filter-column-label">搜索标题:</label>
+                        <input class="ant-input" type="text" id="search-title" placeholder="输入标题搜索">
+                    </div>
+                    <div class="filter-column">
+                        <label class="filter-column-label">状态:</label>
+                        <select class="ant-select" id="status-filter" onchange="applyFilters()">
+                            <option value="all">全部</option>
+                            <option value="竞标中" selected>竞标中</option>
+                            <option value="通过">通过</option>
+                            <option value="已交定金">已交定金</option>
+                            <option value="暂未开始">暂未开始</option>
+                            <option value="已中标">已中标</option>
+                            <option value="已付尾款">已付尾款</option>
+                            <option value="已交付">已交付</option>
+                            <option value="需求完成">需求完成</option>
+                            <option value="评价完成">评价完成</option>
+                            <option value="需求过期">需求过期</option>
+                            <option value="已退款">已退款</option>
+                            <option value="客户关闭">客户关闭</option>
+                            <option value="已废弃">已废弃</option>
+                        </select>
+                    </div>
+                    <div class="filter-column">
+                        <label class="filter-column-label">品牌:</label>
+                        <input class="ant-input" type="text" id="brandName-filter" list="brandName-list" placeholder="输入品牌快速定位">
+                        <datalist id="brandName-list"></datalist>
+                    </div>
+                    <div class="filter-column">
+                        <label class="filter-column-label">服务:</label>
+                        <input class="ant-input" type="text" id="service-filter" list="service-list" placeholder="输入服务快速定位">
+                        <datalist id="service-list"></datalist>
+                    </div>
+                    <div class="filter-column">
+                        <label class="filter-column-label">属性:</label>
+                        <select class="ant-select" id="attribute-type" onchange="updateAttributeValues()">
+                            <option value="">属性</option>
+                        </select>
+                        <select class="ant-select" id="attribute-value" onchange="addAttributeTag()">
+                            <option value="">属性值</option>
+                        </select>
+                    </div>
+                    <div class="filter-column">
+                        <label class="filter-column-label">标签:</label>
+                        <select class="ant-select" id="tag-filter" onchange="addTag()">
+                            <option value="">标签</option>
+                        </select>
+                    </div>
+                    <button class="btn-solid-medium" onclick="applyFilters()">搜索</button>
+                </div>
+                <div class="filter-list">
+                    <div id="attribute-tags" class="tag-list"></div>
+                    <div id="tag-list" class="tag-list"></div>
+                </div>
+                <div class="result-opt">
+                    <div id="resultsShow"></div>
+                    <div class="select-wrapper">
+                        <select class="ant-select sort-select" id="showClass" onchange="changeShowClass()">
+                            <option value="cardHoriz" selected>横板展示</option>
+                            <option value="card">竖版展示</option>
+                        </select>
+                        <select class="ant-select sort-select" id="sort-by" onchange="sortResults()">
+                            <option value="bids">按竞标人数降序</option>
+                            <option value="totalPrice">按总价降序</option>
+                            <option value="demandCount">按需求数量降序</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="demand-results" class="card-list"></div>
+            <div class="pagination">
+                <button class="ant-btn pagination-btn" onclick="changePage(-1)">上一页</button>
+                <span id="pagination-info"></span>
+                <button class="ant-btn pagination-btn" onclick="changePage(1)">下一页</button>
+                <span>跳转到 <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
+                <span><select class="ant-select pagination-select" id="items-per-page" onchange="updateResults()">
+                    <option value="10" selected>10 条/页</option>
+                    <option value="20">20 条/页</option>
+                    <option value="40">40 条/页</option>
+                    <option value="80">80 条/页</option>
+                    <option value="100">100 条/页</option>
+                </select></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="_footer.html"></div>
+
+<!-- 脚本 -->
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_common.js"></script>
+<script>
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let filteredResults = [];
+    let allResults = [];
+    let selectedTags = new Set();
+    let selectedAttrs = new Set();
+
+    const statusList = Object.keys(demandStatusColors);
+    let extraFields = {
+        status: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '状态', style: {}, format: (d, v) => `<span style="color: ${demandStatusColors[v]}">${v}</span>`, sample: () => {
+                return statusList[Math.floor(Math.random() * statusList.length)]
+            }},
+    };
+    const fieldConfig = Object.assign({}, extraFields , demandFieldConfig);
+
+    // 初始化筛选
+    function initFilters() {
+        updateTagFilter();
+        updateAttributeFilter();
+        updateBrandFilter();
+        updateServiceFilter();
+    }
+
+    function biddersFormat(value, randomValue){
+        if (typeof value.sample !== 'function'){
+            return
+        }
+        const bidders = value.sample().slice(0, Math.min(5, value.sample().length));
+        let biddersHtml = '<div class="bidders-wrapper" style="display: flex; align-items: center;">';
+        bidders.forEach((bidderImg, idx) => {
+            biddersHtml += `<img src="${bidderImg}" alt="Bidder ${idx + 1}" style="width: 2em; height: 2em; border-radius: 50%; margin-left: ${idx > 0 ? '-0.5em' : '0'}; z-index: ${bidders.length - idx}; border: 2px solid #fff;">`;
+        });
+        biddersHtml += `</div>`;
+        return `${biddersHtml} (${value.sample().length} 人)`
+    }
+
+    // 更新品牌筛选
+    function updateBrandFilter() {
+        const brandList = document.getElementById('brandName-list');
+        brandList.innerHTML = '';
+        if (typeof hotPlatforms !== 'undefined') {
+            hotPlatforms.forEach(platform => {
+                const option = document.createElement('option');
+                option.value = platform.name;
+                brandList.appendChild(option);
+            });
+        }
+    }
+
+    // 更新服务筛选
+    function updateServiceFilter() {
+        const serviceList = document.getElementById('service-list');
+        serviceList.innerHTML = '';
+        if (typeof services !== 'undefined') {
+            services.forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.name;
+                serviceList.appendChild(option);
+            });
+        }
+    }
+
+    // 更新属性筛选
+    function updateAttributeFilter() {
+        const attributeType = document.getElementById('attribute-type');
+        attributeType.innerHTML = '<option value="">属性</option>';
+        if (typeof ecommerceAttributes !== 'undefined') {
+            Object.keys(ecommerceAttributes).forEach(attr => {
+                const option = document.createElement('option');
+                option.value = attr;
+                option.text = attr;
+                attributeType.appendChild(option);
+            });
+        }
+    }
+
+    // 更新属性值下拉框
+    function updateAttributeValues() {
+        const type = document.getElementById('attribute-type').value;
+        const valueSelect = document.getElementById('attribute-value');
+        valueSelect.innerHTML = '<option value="">属性值</option>';
+        if (type && typeof ecommerceAttributes !== 'undefined' && ecommerceAttributes[type]) {
+            ecommerceAttributes[type].forEach(val => {
+                if (!selectedAttrs.has(val)) {
+                    const option = document.createElement('option');
+                    option.value = val;
+                    option.text = val;
+                    valueSelect.appendChild(option);
+                }
+            });
+        }
+    }
+
+    // 更新标签下拉框
+    function updateTagFilter() {
+        const tagFilter = document.getElementById('tag-filter');
+        tagFilter.innerHTML = '<option value="">选择标签</option>';
+        if (typeof ecommerceTags !== 'undefined') {
+            ecommerceTags.forEach(tag => {
+                if (!selectedTags.has(tag)) {
+                    const option = document.createElement('option');
+                    option.value = tag;
+                    option.text = tag;
+                    tagFilter.appendChild(option);
+                }
+            });
+        }
+    }
+
+    // 添加属性标签
+    function addAttributeTag() {
+        const type = document.getElementById('attribute-type').value;
+        const value = document.getElementById('attribute-value').value;
+        if (type && value) {
+            selectedAttrs.add(value);
+            const tags = document.getElementById('attribute-tags');
+            const tag = document.createElement('span');
+            let tagColor = tagColors[Math.floor(Math.random() * tagColors.length)];
+            tag.className = `ant-tag ${tagColor} tag-item`;
+            tag.innerHTML = `${type}: <b>${value}</b> <span class="close tag-close" onclick="removeTag(this, 'attribute-tags', '${value}')">×</span>`;
+            tags.appendChild(tag);
+            updateAttributeValues();
+            document.getElementById('attribute-value').value = '';
+            applyFilters();
+        }
+    }
+
+    // 添加标签
+    function addTag() {
+        const value = document.getElementById('tag-filter').value;
+        if (value) {
+            selectedTags.add(value);
+            const tags = document.getElementById('tag-list');
+            const tag = document.createElement('span');
+            tag.className = 'ant-tag ant-tag-blue tag-item';
+            tag.innerHTML = `${value} <span class="close tag-close" onclick="removeTag(this, 'tag-list', '${value}')">×</span>`;
+            tags.appendChild(tag);
+            updateTagFilter();
+            document.getElementById('tag-filter').value = '';
+            applyFilters();
+        }
+    }
+
+    // 删除标签
+    function removeTag(element, containerId, tagValue) {
+        element.parentElement.remove();
+        if (containerId === 'tag-list') {
+            selectedTags.delete(tagValue);
+            updateTagFilter();
+        } else if (containerId === 'attribute-tags') {
+            selectedAttrs.delete(tagValue);
+            updateAttributeValues();
+        }
+        applyFilters();
+    }
+
+    function showFilterList() {
+        let filterTagLen = document.querySelectorAll('.tag-item').length;
+        document.querySelector(".filter-list").style.display = filterTagLen > 0 ? 'flex' : 'none';
+    }
+
+    // 生成需求数据
+    function generateDemandData() {
+        try {
+            const data = generateData(fieldConfig, 1000);
+            return data;
+        } catch (error) {
+            console.error('Error generating demand data:', error);
+            return [];
+        }
+    }
+
+    // 应用筛选
+    function applyFilters() {
+        showFilterList();
+        const searchTitle = document.getElementById('search-title').value.toLowerCase();
+        const statusFilter = document.getElementById('status-filter').value;
+        const brandFilter = document.getElementById('brandName-filter').value.toLowerCase();
+        const serviceFilter = document.getElementById('service-filter').value.toLowerCase();
+
+        filteredResults = allResults.filter(item => {
+            let match = true;
+
+            // 标题搜索
+            if (searchTitle && !item.demandTitle.toLowerCase().includes(searchTitle)) match = false;
+
+            // 状态筛选
+            if (statusFilter !== 'all' && item.status.sample !== statusFilter) match = false;
+
+            // 品牌筛选
+            if (brandFilter && !item.brandName.toLowerCase().includes(brandFilter)) match = false;
+
+            // 服务筛选
+            if (serviceFilter && !item.service.toLowerCase().includes(serviceFilter)) match = false;
+
+            // 属性筛选
+            if (selectedAttrs.size > 0 && item.attributes) {
+                let matchOne = false;
+                selectedAttrs.forEach(attr => {
+                    Object.values(item.attributes).forEach(val => {
+                        if (val === attr) matchOne = true;
+                    });
+                });
+                match = matchOne ? match : false;
+            }
+
+            // 标签筛选
+            if (selectedTags.size > 0 && item.tags) {
+                let haveTag = false;
+                let tagsString = Array.from(selectedTags).join(",");
+                item.tags.forEach(tag => {
+                    if (tagsString.includes(tag)) haveTag = true;
+                });
+                match = haveTag ? match : false;
+            }
+
+            return match;
+        });
+
+        // 组合搜索条件形成一句话
+        let conditionStr = `在需求列表中`;
+        let conditions = [];
+        if (searchTitle) conditions.push(`标题包含 "${searchTitle}"`);
+        if (statusFilter !== 'all') conditions.push(`状态为 <b style="color: ${demandStatusColors[statusFilter] || '#666'}">${statusFilter}</b>`);
+        if (brandFilter) conditions.push(`品牌包含 "${brandFilter}"`);
+        if (serviceFilter) conditions.push(`服务包含 "${serviceFilter}"`);
+        if (selectedAttrs.size > 0) conditions.push(`属性包含 <b style="color: var(--font-green)">${Array.from(selectedAttrs).join('、')}</b>`);
+        if (selectedTags.size > 0) conditions.push(`标签包含 <b style="color: var(--font-green)">${Array.from(selectedTags).join('、')}</b>`);
+        const conditionText = conditions.length > 0 ? `，${conditions.join('，')}` : '';
+
+        document.getElementById('resultsShow').innerHTML = `${conditionStr}${conditionText} 条件中，找到 ${filteredResults.length} 条结果`;
+        currentPage = 1;
+        updateResults();
+    }
+
+    function changeShowClass() {
+        updateResults();
+    }
+
+    function updateResults() {
+        itemsPerPage = parseInt(document.getElementById('items-per-page').value);
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const results = filteredResults.slice(start, end);
+        const container = document.getElementById('demand-results');
+        container.innerHTML = '';
+
+        results.forEach((item, index) => {
+            const card = document.createElement('div');
+            const showClass = document.getElementById('showClass').value;
+            card.className = showClass;
+
+            let imageHtml = '';
+            let titleHtml = '';
+            let fieldsHtml = '<div class="fields-row">';
+            let bottomHtml = '<div class="bottom-row">';
+            let favoriteHtml = '';
+            let hasTitle = false;
+
+            const fieldItems = [];
+            Object.entries(fieldConfig).forEach(([fieldName, fieldConfig]) => {
+                if (!fieldConfig[showClass]) return;
+
+                const value = item[fieldName] !== undefined ? item[fieldName] : fieldConfig.value;
+                const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, fieldConfig, 'demand-results', index);
+                const type = fieldConfig.type || 'text';
+                const contentLength = (typeof value === 'string' ? value : JSON.stringify(value)).length;
+
+                if (type === 'image' && !imageHtml) {
+                    imageHtml = `<div class="image-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'text' && !hasTitle && fieldName === 'demandTitle') {
+                    titleHtml = `<div class="title-wrapper">${fieldContent.html}</div>`;
+                    hasTitle = true;
+                } else if (type === 'rating' || type == 'bidders') {
+                    bottomHtml += `<div class="rating-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'tag') {
+                    bottomHtml += `<div class="tags-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'button') {
+                    bottomHtml += `<div class="button-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'favorite') {
+                    favoriteHtml += fieldContent.html;
+                } else if (fieldName === 'status') {
+                    const statusColor = demandStatusColors[value.sample] || '#666';
+                    fieldItems.push({ html: `<p>${fieldConfig.label}: <span style="color: ${statusColor}">${value.sample}</span></p>`, length: contentLength, name: fieldName });
+                } else {
+                    fieldItems.push({ html: fieldContent.html, length: contentLength, name: fieldName });
+                }
+            });
+
+            fieldItems.sort((a, b) => a.length - b.length);
+            fieldItems.forEach(item => {
+                fieldsHtml += `<span class="field-item">${item.html}</span>`;
+            });
+            fieldsHtml += '</div>';
+            bottomHtml += '</div>';
+
+            card.innerHTML = `
+                ${imageHtml}
+                <div class="card-content">
+                    ${titleHtml}
+                    ${fieldsHtml}
+                    ${bottomHtml}
+                    ${favoriteHtml}
+                </div>
+            `;
+            container.appendChild(card);
+
+            Object.entries(fieldConfig).forEach(([fieldName, fieldConfig]) => {
+                if (fieldConfig[showClass] && fieldConfig.onClick) {
+                    const elementId = `demand-results-${fieldName}-${index}`;
+                    const element = card.querySelector(`#${elementId}`);
+                    if (element) {
+                        element.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            fieldConfig.onClick(item, element);
+                        });
+                    }
+                }
+            });
+        });
+
+        updatePagination();
+    }
+
+    // 更新分页信息
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+        let paginationHtml = '';
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+        } else {
+            paginationHtml += `<a href="#" onclick="goToPage(1)" ${currentPage === 1 ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>1</a>`;
+            if (currentPage > 4) paginationHtml += '<span>...</span>';
+            for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+            if (currentPage < totalPages - 3) paginationHtml += '<span>...</span>';
+            paginationHtml += `<a href="#" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${totalPages}</a>`;
+        }
+        document.getElementById('pagination-info').innerHTML = paginationHtml;
+        document.getElementById('jump-to-page').max = totalPages;
+    }
+
+    // 跳转页面
+    function goToPage(page) {
+        currentPage = page;
+        updateResults();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+        currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+        updateResults();
+    }
+
+    // 按字段排序
+    function sortResults() {
+        const sortBy = document.getElementById('sort-by').value;
+        filteredResults.sort((a, b) => {
+            if (sortBy === 'bids') return (parseFloat(b.bids) || 0) - (parseFloat(a.bids) || 0);
+            if (sortBy === 'totalPrice') return parseFloat(b.totalPrice.replace('$', '') || 0) - parseFloat(a.totalPrice.replace('$', '') || 0);
+            if (sortBy === 'demandCount') return (parseFloat(b.demandCount) || 0) - (parseFloat(a.demandCount) || 0);
+        });
+        updateResults();
+    }
+
+    // 初始化页面
+    window.onload = () => {
+        w3.includeHTML(() => {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const specifiedCategory = urlParams.get('type') || 'all';
+                document.title = specifiedCategory === 'all' ? '需求列表 - FASTRESP' : `${specifiedCategory} - 需求列表 - FASTRESP`;
+
+                const searchInput = document.getElementById('q');
+                const headerSearchTypeSelect = document.querySelector('.search-type[name="type"]');
+                if (searchInput && headerSearchTypeSelect) {
+                    const searchButton = document.querySelector('.search-box button');
+                    if (searchButton) {
+                        searchButton.onclick = (e) => {
+                            e.preventDefault();
+                            const searchKeyword = searchInput.value;
+                            const searchType = headerSearchTypeSelect.value;
+                            window.location.href = `search.html?q=${encodeURIComponent(searchKeyword)}&type=${searchType}`;
+                        };
+                    }
+                }
+
+                initFilters();
+                document.getElementById('jump-to-page').onchange = () => {
+                    const page = parseInt(document.getElementById('jump-to-page').value);
+                    if (page >= 1 && page <= Math.ceil(filteredResults.length / itemsPerPage)) {
+                        currentPage = page;
+                        updateResults();
+                    }
+                };
+                allResults = generateDemandData();
+                filteredResults = [...allResults];
+                applyFilters();
+            } catch (error) {
+                console.error('Error during initialization:', error);
+            }
+        });
+    };
+</script>
+</body>
+</html>

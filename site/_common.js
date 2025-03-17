@@ -103,9 +103,10 @@ function generateFieldContent(fieldConfig, item, fieldName, value, config, conta
                 return { html: `<img id="${elementId}" src="${value}" alt="${fieldName}" onerror="this.src='${placeholderImage}'"${applyStyle(style)}>` };
             }
             break;
-
         case 'rating':
             return { html: generateRating(item, value, style) };
+        case 'bidders':
+            return { html: generateBidders(label, value, style) };
         default:
             console.warn(`不支持的字段类型: ${type}`);
             return { html: '' };
@@ -125,6 +126,7 @@ function applyStyle(styleObj) {
     if (styleObj.right) styles.push(`right: ${styleObj.right}`);
     return styles.length ? ` style="${styles.join(';')}"` : '';
 }
+
 
 function generateRating(item, value, style) {
     let count = typeof value == 'object' ? value['count'] : 0
@@ -156,6 +158,16 @@ function generateRating(item, value, style) {
                 <span class="rating-count">${value} (${count || 0})</span>
             </p>`;
     return contentHtml;
+}
+
+function generateBidders(label, value, style){
+    const bidders = value.sample.slice(0, Math.min(5, value.sample.length));
+    let biddersHtml = `<div class="bidders-wrapper" style="display: flex; align-items: center;">${label}：`;
+    bidders.forEach((bidderImg, idx) => {
+        biddersHtml += `<img src="${bidderImg}" alt="Bidder ${idx + 1}" style="width: 2em; height: 2em; border-radius: 50%; margin-left: ${idx > 0 ? '-0.5em' : '0'}; z-index: ${bidders.length - idx}; border: 2px solid #fff;">`;
+    });
+    biddersHtml += `(${value.sample.length} 人)</div>`;
+    return biddersHtml;
 }
 
 function generateData(fieldConfig, count) {
