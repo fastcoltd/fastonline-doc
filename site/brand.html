@@ -10,140 +10,55 @@
     <link rel="stylesheet" href="_style.css">
     <link rel="stylesheet" href="_site.css">
     <style>
-        .brand-header {
-            display: flex;
-            align-items: center;
-            padding: 2em 0;
-            border-bottom: 0.0625em solid var(--border-color);
-        }
-        .brand-logo img {
-            width: 6em;
-            height: 6em;
-            border-radius: 50%;
-            margin-right: 1.5em;
-        }
-        .brand-info h1 {
-            font-size: var(--font-xxlarge);
-            margin: 0 0 0.5em;
-        }
-        .brand-info p {
-            font-size: var(--font-medium);
-            color: var(--text-secondary);
-            margin: 0.25em 0;
-        }
-        .brand-summary {
-            max-height: 7.5em;
-            overflow: hidden;
-            position: relative;
-            transition: max-height 0.3s ease;
-        }
-        .brand-summary.expanded {
-            max-height: none;
-        }
-        .toggle-summary {
-            cursor: pointer;
-            color: var(--natural-green);
-            font-size: var(--font-small);
-            margin-top: 0.5em;
-        }
-        .section {
-            padding: 1.5em 0;
-        }
-        .card-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5em;
-            justify-content: center;
-        }
-        .service-section {
-            margin-bottom: 2em;
-        }
-        .service-title {
-            font-size: var(--font-large);
-            margin-bottom: 1em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .cardHoriz {
-            flex: 0 0 100%;
-            max-width: 100%;
-            min-height: 8em;
-            margin-bottom: 0.5em;
-            padding: 0.5em;
-            background: var(--bg-white);
-            border: 0.0625em solid var(--border-color);
-            border-radius: 0.5em;
-            overflow: hidden;
-            cursor: pointer;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-        }
-        .cardHoriz:hover {
-            border-color: var(--natural-green);
-            box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1);
-        }
-        .faq-item {
-            margin-bottom: 1em;
-            padding: 1em;
-            background: var(--bg-white);
-            border: 0.0625em solid var(--border-color);
-            border-radius: 0.5em;
-            transition: box-shadow 0.2s;
-        }
-        .faq-item:hover {
-            box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1);
-        }
-        .faq-question {
-            font-size: var(--font-medium);
-            color: var(--text-primary);
-            font-weight: bold;
-        }
-        .faq-answer {
-            margin-top: 0.5em;
-            font-size: var(--font-small);
-            color: var(--text-secondary);
-            max-height: 7.5em;
-            overflow: hidden;
-        }
-
-        /* 移动端适配 */
+        .brand-header { display: flex; align-items: center; padding: 2em 0; border-bottom: 0.0625em solid var(--border-color); }
+        .brand-logo img { width: 6em; height: 6em; border-radius: 50%; margin-right: 1.5em; }
+        .brand-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; }
+        .brand-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0.25em 0; }
+        .brand-summary { max-height: 7.5em; overflow: hidden; position: relative; transition: max-height 0.3s ease; }
+        .brand-summary.expanded { max-height: none; }
+        .toggle-summary { cursor: pointer; color: var(--natural-green); font-size: var(--font-small); margin-top: 0.5em; }
+        .section { padding: 1.5em 0; }
+        .card-list { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
+        .service-section { margin-bottom: 2em; }
+        .service-title { font-size: var(--font-large); margin-bottom: 1em; display: flex; justify-content: space-between; align-items: center; }
+        .cardHoriz { flex: 0 0 100%; max-width: 100%; min-height: 8em; margin-bottom: 0.5em; padding: 0.5em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; display: flex; align-items: center; }
+        .cardHoriz:hover { border-color: var(--natural-green); box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
+        .faq-item { margin-bottom: 1em; padding: 1em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; transition: box-shadow 0.2s; position: relative; }
+        .faq-item:hover { box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
+        .faq-question { display: flex; align-items: center; cursor: pointer; font-size: var(--font-medium); color: var(--text-primary); font-weight: bold; justify-content: space-between; padding-right: 2.5em; }
+        .faq-question-text { flex: 1; display: flex; align-items: center; flex-wrap: wrap; gap: 0.5em; }
+        .faq-toggle { font-size: 1.25em; color: var(--text-secondary); margin-left: 2em; }
+        .faq-answer { display: none; margin-top: 0.5em; font-size: var(--font-small); color: var(--text-secondary); max-height: 7.5em; overflow: hidden; position: relative; padding-bottom: 1em; line-height: 1.5em; }
+        .faq-answer::after { content: "..."; position: absolute; bottom: 1em; right: 4em; color: var(--text-secondary); }
+        .faq-item.expanded .faq-answer { display: block; }
+        .faq-item.expanded .fa-chevron-down { display: none; }
+        .faq-item:not(.expanded) .fa-chevron-up { display: none; }
+        .faq-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5em; }
+        .faq-vote { display: flex; gap: 1em; }
+        .faq-vote i { font-size: 1.25em; cursor: pointer; color: var(--text-secondary); transition: color 0.2s; }
+        .faq-vote i:hover { color: var(--natural-green); }
+        .faq-vote i.voted { color: var(--vibrant-orange); }
+        .faq-vote span { margin-left: 0.25em; font-size: var(--font-small); }
+        .faq-more { position: absolute; bottom: 0.2em; right: 0.5em; font-size: var(--font-small); color: var(--natural-green); }
+        .faq-more:hover { text-decoration: underline; }
+        .faq-favorite { position: absolute; top: 50%; right: 0.5em; transform: translateY(-50%); font-size: 1.5em; cursor: pointer; color: var(--text-secondary); transition: color 0.2s; }
+        .faq-favorite.favorited { color: #FF0000; }
         @media (max-width: 48em) {
-            .brand-header {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 1em 0;
-            }
-            .brand-logo img {
-                width: 4em;
-                height: 4em;
-                margin-right: 0;
-                margin-bottom: 1em;
-            }
-            .brand-info h1 {
-                font-size: var(--font-xlarge);
-            }
-            .service-title {
-                font-size: var(--font-medium);
-            }
-            .card-list {
-                flex-direction: column;
-                gap: 0.3em;
-            }
-            .cardHoriz {
-                min-height: 6em;
-                padding: 0.3em;
-            }
-            .faq-item {
-                padding: 0.5em;
-            }
-            .faq-question {
-                font-size: var(--font-small);
-            }
-            .faq-answer {
-                font-size: calc(var(--font-small) * 0.9);
-            }
+            .brand-header { flex-direction: column; align-items: flex-start; padding: 1em 0; }
+            .brand-logo img { width: 4em; height: 4em; margin-right: 0; margin-bottom: 1em; }
+            .brand-info h1 { font-size: var(--font-xlarge); }
+            .service-title { font-size: var(--font-medium); }
+            .card-list { flex-direction: column; gap: 0.3em; }
+            .cardHoriz { min-height: 6em; padding: 0.3em; }
+            .faq-item { padding: 0.5em; }
+            .faq-question { font-size: var(--font-small); padding-right: 2em; }
+            .faq-toggle { font-size: 1em; margin-left: 1em; }
+            .faq-answer { font-size: calc(var(--font-small) * 0.9); max-height: 6.75em; padding-bottom: 0.8em; line-height: 1.35em; }
+            .faq-answer::after { right: 3.5em; bottom: 0.8em; }
+            .faq-vote i { font-size: 1em; }
+            .faq-vote span { font-size: calc(var(--font-small) * 0.8); }
+            .faq-more { font-size: calc(var(--font-small) * 0.8); right: 0.3em; bottom: 0.1em; }
+            .faq-favorite { font-size: 1.2em; right: 0.3em; }
         }
     </style>
 </head>
@@ -174,7 +89,7 @@
     <!-- 第五部分：FAQ -->
     <div class="section">
         <h2 class="section-title" id="faq-title"></h2>
-        <div id="brand-faqs" class="faq-list"></div>
+        <div id="brand-faqs" class="card-list"></div>
     </div>
 </div>
 
@@ -273,7 +188,10 @@
         const faqCount = Math.floor(Math.random() * 11) + 5; // 5-15 个 FAQ
         const faqs = generateData({
             title: { type: 'text', sample: () => realFaqs[Math.floor(Math.random() * realFaqs.length)].title },
-            content: { type: 'text', sample: () => realFaqs[Math.floor(Math.random() * realFaqs.length)].content }
+            content: { type: 'text', sample: () => realFaqs[Math.floor(Math.random() * realFaqs.length)].content },
+            usefulCount: { type: 'text', sample: () => Math.floor(Math.random() * 101) },
+            uselessCount: { type: 'text', sample: () => Math.floor(Math.random() * 51) },
+            favorited: { type: 'favorite', sample: () => Math.random() > 0.5 }
         }, faqCount);
 
         const container = document.getElementById('brand-faqs');
@@ -281,11 +199,51 @@
             const faqItem = document.createElement('div');
             faqItem.className = 'faq-item';
             faqItem.innerHTML = `
-                <div class="faq-question">${faq.title}</div>
-                <div class="faq-answer">${faq.content}</div>
+                <div class="faq-question" onclick="toggleAnswer(this)">
+                    <span class="faq-question-text">${faq.title}</span>
+                    <span>
+                        <i class="fas fa-chevron-down faq-toggle"></i>
+                        <i class="fas fa-chevron-up faq-toggle"></i>
+                    </span>
+                </div>
+                <div class="faq-answer">
+                    ${faq.content}
+                    <a href="faq.html?name=${encodeURIComponent(faq.title)}" class="faq-more">More...</a>
+                </div>
+                <div class="faq-actions">
+                    <div class="faq-vote">
+                        <span><i class="fas fa-thumbs-up" onclick="vote(this, 'useful', ${index})"></i> ${faq.usefulCount}</span>
+                        <span><i class="fas fa-thumbs-down" onclick="vote(this, 'useless', ${index})"></i> ${faq.uselessCount}</span>
+                    </div>
+                </div>
+                <i class="fas fa-heart faq-favorite ${faq.favorited ? 'favorited' : ''}" onclick="toggleFavorite(this, ${index})"></i>
             `;
             container.appendChild(faqItem);
         });
+    }
+
+    // 切换回答显示
+    function toggleAnswer(element) {
+        const faqItem = element.closest('.faq-item');
+        faqItem.classList.toggle('expanded');
+    }
+
+    // 投票功能
+    function vote(element, type, index) {
+        const faqs = filteredResults || allResults.slice((currentPage - 1) * 6, currentPage * 6);
+        const item = faqs[index];
+        if (type === 'useful') item.usefulCount++;
+        else item.uselessCount++;
+        element.classList.add('voted');
+        renderFaqs();
+    }
+
+    // 切换收藏状态
+    function toggleFavorite(element, index) {
+        const faqs = filteredResults || allResults.slice((currentPage - 1) * 6, currentPage * 6);
+        const item = faqs[index];
+        item.favorited = !item.favorited;
+        element.classList.toggle('favorited');
     }
 
     // 初始化页面

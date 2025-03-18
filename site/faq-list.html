@@ -74,16 +74,6 @@
         .faq-item:not(.expanded) .fa-chevron-up {
             display: none;
         }
-        .faq-favorite {
-            position: absolute;
-            top: 50%;
-            right: 0.5em;
-            transform: translateY(-50%);
-            font-size: 1.5em;
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: color 0.2s;
-        }
         .faq-favorite.favorited {
             color: #FF0000;
         }
@@ -353,9 +343,12 @@
                     <i class="fas fa-thumbs-down ${item.userVote === 'useless' ? 'voted' : ''}"
                        onclick="vote(this, 'useless', ${index})"></i> ${item.uselessCount}
                 </span>
+                <span>
+                    <i class="fas fa-heart faq-favorite ${item.favorited ? 'favorited' : ''}" onclick="toggleFavorite(this, ${index})"></i>
+                    ${item.favorited ? `<i>saved</i>` : ''}
+                </span>
             </div>
         </div>
-        <i class="fas fa-heart faq-favorite ${item.favorited ? 'favorited' : ''}" onclick="toggleFavorite(this, ${index})"></i>
     `;
             container.appendChild(faqItem);
         });
@@ -403,6 +396,7 @@
         const item = filteredResults[(currentPage - 1) * itemsPerPage + index];
         item.favorited = !item.favorited;
         element.classList.toggle('favorited');
+        updateResults()
     }
 
     // 更新分页
