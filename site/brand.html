@@ -11,14 +11,20 @@
     <link rel="stylesheet" href="_site.css">
     <style>
         body { padding-top: 7.4em !important; }
-        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
-        .brand-header { display: flex; align-items: center; padding: 1em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: height 0.3s ease, padding 0.3s ease; }
+        .container {
+            max-width: var(--max-content-width);
+            margin: -8em auto 0 auto;
+            position: relative;
+            padding-top: 8em;
+            min-height: 200vh;
+        }
+        .brand-header { display: flex; align-items: center; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: height 0.3s ease, padding 0.3s ease; }
         .brand-header.sticky { height: 3em; padding: 0.5em 1em; }
         .brand-header.sticky .brand-info p { opacity: 0; height: 0; margin: 0; }
         .brand-header.sticky .brand-summary { max-height: 0; }
         .brand-header.sticky .toggle-summary { opacity: 0; height: 0; margin: 0; }
         .brand-logo img { width: 6em; height: 6em; border-radius: 50%; margin-right: 1.5em; }
-        .brand-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; }
+        .brand-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0em; }
         .brand-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0.25em 0; transition: opacity 0.3s ease; }
         .brand-summary { max-height: 7.5em; overflow: hidden; position: relative; transition: max-height 0.3s ease; }
         .brand-summary.expanded { max-height: none; }
@@ -353,6 +359,7 @@
         faqs[index].favorited = !faqs[index].favorited;
         renderFaqs();
     }
+
     window.onload = () => {
         w3.includeHTML(() => {
             document.title = `${selectedBrand.name} - FASTRESP`;
@@ -361,6 +368,24 @@
             renderHotDemands();
             renderHotPosts();
             renderFaqs();
+
+            setTimeout(()=>{
+                const header = document.getElementById('brand-header');
+                const xh = 3 * 16; // 3em = 48px
+                const h = header.offsetHeight;
+
+                console.log('Initial header height (h):', h);
+                window.addEventListener('scroll', () => {
+                    const scrollY = window.scrollY;
+                    const threshold = h - xh;
+                    console.log('scrollY:', scrollY, 'threshold:', threshold);
+                    if (scrollY >= threshold) {
+                        header.classList.add('sticky');
+                    } else {
+                        header.classList.remove('sticky');
+                    }
+                });
+            })
         });
     };
 </script>
