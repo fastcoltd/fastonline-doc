@@ -171,6 +171,33 @@ let ordersCommentFieldConfig = {
     un_like_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '反对数', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 10 })}
 };
 
+const faqFieldConfig = {
+    brandName: {
+        type: 'tag',
+        label: 'Brand',
+        format: (d, v) => {
+            const brand = hotBrands.find(b => b.name === v);
+            const color = brand ? brand.themeColor : '#000000';
+            return `<span class="ant-tag" style="color: ${color}">${v}</span>`;
+        },
+        sample: () => hotBrands[Math.floor(Math.random() * hotBrands.length)].name
+    },
+    useType: {
+        type: 'tag',
+        label: 'Type',
+        format: (d, v) => {
+            const types = ['Account Issues', 'Payment Problems', 'Shipping Delays', 'Product Questions', 'Technical Support'];
+            return `<span class="${typeColors[v]}">${types[v]}</span>`;
+        },
+        sample: () => Math.floor(Math.random() * 5)
+    },
+    title: { type: 'text', label: 'Question' },
+    content: { type: 'text', label: 'Answer' },
+    usefulCount: { type: 'text', label: 'Useful', sample: () => Math.floor(Math.random() * 101) },
+    uselessCount: { type: 'text', label: 'Useless', sample: () => Math.floor(Math.random() * 51) },
+    favorited: { type: 'favorite', sample: () => Math.random() > 0.5 }
+};
+
 
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
