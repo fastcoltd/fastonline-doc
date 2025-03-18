@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>品牌详情 - FASTRESP</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        .brand-header {
+            display: flex;
+            align-items: center;
+            padding: 2em 0;
+            border-bottom: 0.0625em solid var(--border-color);
+        }
+        .brand-logo img {
+            width: 6em;
+            height: 6em;
+            border-radius: 50%;
+            margin-right: 1.5em;
+        }
+        .brand-info h1 {
+            font-size: var(--font-xxlarge);
+            margin: 0 0 0.5em;
+        }
+        .brand-info p {
+            font-size: var(--font-medium);
+            color: var(--text-secondary);
+            margin: 0.25em 0;
+        }
+        .brand-summary {
+            max-height: 7.5em;
+            overflow: hidden;
+            position: relative;
+            transition: max-height 0.3s ease;
+        }
+        .brand-summary.expanded {
+            max-height: none;
+        }
+        .toggle-summary {
+            cursor: pointer;
+            color: var(--natural-green);
+            font-size: var(--font-small);
+            margin-top: 0.5em;
+        }
+        .section {
+            padding: 1.5em 0;
+        }
+        .card-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+            justify-content: center;
+        }
+        .service-section {
+            margin-bottom: 2em;
+        }
+        .service-title {
+            font-size: var(--font-large);
+            margin-bottom: 1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cardHoriz {
+            flex: 0 0 100%;
+            max-width: 100%;
+            min-height: 8em;
+            margin-bottom: 0.5em;
+            padding: 0.5em;
+            background: var(--bg-white);
+            border: 0.0625em solid var(--border-color);
+            border-radius: 0.5em;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .cardHoriz:hover {
+            border-color: var(--natural-green);
+            box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1);
+        }
+        .faq-item {
+            margin-bottom: 1em;
+            padding: 1em;
+            background: var(--bg-white);
+            border: 0.0625em solid var(--border-color);
+            border-radius: 0.5em;
+            transition: box-shadow 0.2s;
+        }
+        .faq-item:hover {
+            box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1);
+        }
+        .faq-question {
+            font-size: var(--font-medium);
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+        .faq-answer {
+            margin-top: 0.5em;
+            font-size: var(--font-small);
+            color: var(--text-secondary);
+            max-height: 7.5em;
+            overflow: hidden;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 48em) {
+            .brand-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1em 0;
+            }
+            .brand-logo img {
+                width: 4em;
+                height: 4em;
+                margin-right: 0;
+                margin-bottom: 1em;
+            }
+            .brand-info h1 {
+                font-size: var(--font-xlarge);
+            }
+            .service-title {
+                font-size: var(--font-medium);
+            }
+            .card-list {
+                flex-direction: column;
+                gap: 0.3em;
+            }
+            .cardHoriz {
+                min-height: 6em;
+                padding: 0.3em;
+            }
+            .faq-item {
+                padding: 0.5em;
+            }
+            .faq-question {
+                font-size: var(--font-small);
+            }
+            .faq-answer {
+                font-size: calc(var(--font-small) * 0.9);
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="_header.html"></div>
+
+<!-- 主内容 -->
+<div class="container">
+    <!-- 第一部分：品牌基本信息 -->
+    <div class="brand-header" id="brand-header"></div>
+
+    <!-- 第二部分：品牌下的服务 -->
+    <div class="section" id="brand-services"></div>
+
+    <!-- 第三部分：热门需求 -->
+    <div class="section">
+        <div class="title-with-link" id="hot-demands-title"></div>
+        <div id="hot-demands" class="card-list"></div>
+    </div>
+
+    <!-- 第四部分：热门文章 -->
+    <div class="section">
+        <div class="title-with-link" id="hot-posts-title"></div>
+        <div id="hot-posts" class="card-list"></div>
+    </div>
+
+    <!-- 第五部分：FAQ -->
+    <div class="section">
+        <h2 class="section-title" id="faq-title"></h2>
+        <div id="brand-faqs" class="faq-list"></div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="_footer.html"></div>
+
+<!-- 脚本 -->
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    // 从 URL 获取品牌名称
+    const urlParams = new URLSearchParams(window.location.search);
+    const brandName = urlParams.get('name') || 'Airbnb';
+    const selectedBrand = hotBrands.find(brand => brand.name === brandName) || hotBrands[0];
+
+    // 第一部分：品牌基本信息
+    function renderBrandHeader() {
+        const header = document.getElementById('brand-header');
+        header.innerHTML = `
+            <div class="brand-logo">
+                <img src="${selectedBrand.logo}" alt="${selectedBrand.name}">
+            </div>
+            <div class="brand-info">
+                <h1>${selectedBrand.name}</h1>
+                <p>Category: Tech Platform</p>
+                <p>Company: ${selectedBrand.parentCompany}</p>
+                <div class="brand-summary" id="brand-summary">
+                    ${selectedBrand.description} ${selectedBrand.description} ${selectedBrand.description}
+                </div>
+                <span class="toggle-summary" onclick="toggleSummary()">Show More</span>
+            </div>
+        `;
+    }
+
+    function toggleSummary() {
+        const summary = document.getElementById('brand-summary');
+        summary.classList.toggle('expanded');
+        const toggle = summary.nextElementSibling;
+        toggle.textContent = summary.classList.contains('expanded') ? 'Show Less' : 'Show More';
+    }
+
+    // 第二部分：品牌下的服务
+    function renderBrandServices() {
+        const servicesContainer = document.getElementById('brand-services');
+        const serviceCount = Math.floor(Math.random() * 3) + 3; // 3-5 个服务
+        const shuffledServices = services.sort(() => 0.5 - Math.random()).slice(0, serviceCount);
+
+        shuffledServices.forEach(service => {
+            const serviceSection = document.createElement('div');
+            serviceSection.className = 'service-section';
+            serviceSection.innerHTML = `
+                <div class="service-title">
+                    <h3>${service.name} - Hot Items</h3>
+                    <a href="item-list.html?services=${encodeURIComponent(service.name)}&brandName=${encodeURIComponent(selectedBrand.name)}" class="see-all">More...</a>
+                </div>
+                <div id="service-items-${service.name}" class="card-list"></div>
+            `;
+            servicesContainer.appendChild(serviceSection);
+
+            const items = generateData(itemFieldConfig, 6);
+            generateCards(`service-items-${service.name}`, 'card', items, itemFieldConfig);
+        });
+    }
+
+    // 第三部分：热门需求
+    function renderHotDemands() {
+        const title = document.getElementById('hot-demands-title');
+        title.innerHTML = `
+            <h2 class="section-title">${selectedBrand.name} - Hot Demands</h2>
+            <a href="demand-list.html?brandName=${encodeURIComponent(selectedBrand.name)}" class="see-all">More...</a>
+        `;
+        const demands = generateData(demandFieldConfig, 6);
+        generateCards('hot-demands', 'cardHoriz', demands, demandFieldConfig);
+    }
+
+    // 第四部分：热门文章
+    function renderHotPosts() {
+        const title = document.getElementById('hot-posts-title');
+        title.innerHTML = `
+            <h2 class="section-title">${selectedBrand.name} - Hot Posts</h2>
+            <a href="post-list.html?brandName=${encodeURIComponent(selectedBrand.name)}" class="see-all">More...</a>
+        `;
+        const posts = generateData(postsFieldConfig, 6);
+        generateCards('hot-posts', 'cardHoriz', posts, postsFieldConfig);
+    }
+
+    // 第五部分：FAQ
+    function renderFaqs() {
+        const title = document.getElementById('faq-title');
+        title.textContent = `${selectedBrand.name} - FAQs`;
+        const faqCount = Math.floor(Math.random() * 11) + 5; // 5-15 个 FAQ
+        const faqs = generateData({
+            title: { type: 'text', sample: () => realFaqs[Math.floor(Math.random() * realFaqs.length)].title },
+            content: { type: 'text', sample: () => realFaqs[Math.floor(Math.random() * realFaqs.length)].content }
+        }, faqCount);
+
+        const container = document.getElementById('brand-faqs');
+        faqs.forEach((faq, index) => {
+            const faqItem = document.createElement('div');
+            faqItem.className = 'faq-item';
+            faqItem.innerHTML = `
+                <div class="faq-question">${faq.title}</div>
+                <div class="faq-answer">${faq.content}</div>
+            `;
+            container.appendChild(faqItem);
+        });
+    }
+
+    // 初始化页面
+    window.onload = () => {
+        w3.includeHTML(() => {
+            document.title = `${selectedBrand.name} - FASTRESP`;
+            renderBrandHeader();
+            renderBrandServices();
+            renderHotDemands();
+            renderHotPosts();
+            renderFaqs();
+        });
+    };
+</script>
+</body>
+</html>
