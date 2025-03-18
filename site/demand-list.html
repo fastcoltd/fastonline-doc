@@ -142,19 +142,6 @@
         updateServiceFilter();
     }
 
-    function biddersFormat(value, randomValue){
-        if (typeof value.sample !== 'function'){
-            return
-        }
-        const bidders = value.sample().slice(0, Math.min(5, value.sample().length));
-        let biddersHtml = '<div class="bidders-wrapper" style="display: flex; align-items: center;">';
-        bidders.forEach((bidderImg, idx) => {
-            biddersHtml += `<img src="${bidderImg}" alt="Bidder ${idx + 1}" style="width: 2em; height: 2em; border-radius: 50%; margin-left: ${idx > 0 ? '-0.5em' : '0'}; z-index: ${bidders.length - idx}; border: 2px solid #fff;">`;
-        });
-        biddersHtml += `</div>`;
-        return `${biddersHtml} (${value.sample().length} 人)`
-    }
-
     // 更新品牌筛选
     function updateBrandFilter() {
         const brandList = document.getElementById('brandName-list');

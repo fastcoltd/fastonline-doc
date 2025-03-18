@@ -48,6 +48,17 @@
                             <option value="">选择服务</option>
                         </select>
                     </div>
+                    <div class="filter-column">
+                        <label class="filter-column-label">店铺等级:</label>
+                        <select class="ant-select" id="level-filter">
+                            <option value="">全部等级</option>
+                            <option value="1">Lv1</option>
+                            <option value="2">Lv2</option>
+                            <option value="3">Lv3</option>
+                            <option value="4">Lv4</option>
+                            <option value="5">Lv5</option>
+                        </select>
+                    </div>
                     <button class="btn-solid-medium" onclick="applyFilters()">搜索</button>
                 </div>
                 <div class="filter-list">
@@ -102,7 +113,63 @@
     let allResults = [];
     let selectedTags = new Set();
 
-    const fieldConfig = storeFieldConfig;
+    // 自定义字段配置
+    const customStoreFieldConfig = Object.assign({}, storeFieldConfig, {
+        items: {
+            card: true,
+            cardSq: true,
+            cardHoriz: true,
+            type: 'text',
+            label: '商品',
+            style: {},
+            format: (d, v) => {
+                let all = v.map(item => `<a href="item.html?name=${item.name}" style="color: var(--font-orange);">${item.name}</a> <b style="color: red">(${item.stock})</b>`).join('，');
+                return `${all}`;
+            },
+            sample: () => {
+                return Array(randomInt(2, 5)).fill().map(() => ({
+                    name: faker.commerce.productName(),
+                    stock: faker.datatype.number({ min: 10, max: 100 })
+                }));
+            }
+        },
+        services: {
+            card: true,
+            cardSq: true,
+            cardHoriz: true,
+            type: 'text',
+            label: '服务',
+            style: {},
+            format: (d, v) => {
+                let all = v.map(service => `<a href="store.html?services=${service}" style="color: var(--font-orange);">${service}</a>`).join('，');
+                return `${all}`;
+            },
+            sample: () => {
+                const count = randomInt(1, 3);
+                const shuffled = services.sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, count).map(service => service.name);
+            }
+        },
+        brands: {
+            card: true,
+            cardSq: true,
+            cardHoriz: true,
+            type: 'text',
+            label: '品牌',
+            style: {},
+            format: (d, v) => {
+                let all = v.map(brand => `<a href="store.html?brandName=${brand}" style="color: var(--font-green);">${brand}</a>`).join('，');
+                return `${all}`;
+            },
+            sample: () => {
+                const count = randomInt(1, 5);
+                const shuffled = hotBrands.sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, count).map(brand => brand.name);
+            }
+        }
+    });
+
+    const fieldConfig = customStoreFieldConfig;
 
     // 初始化筛选
     function initFilters() {
@@ -206,6 +273,7 @@
         const ratingMax = parseFloat(document.getElementById('rating-max').value) || 5;
         const selectedBrand = document.getElementById('brand-filter').value;
         const selectedService = document.getElementById('service-filter').value;
+        const selectedLevel = document.getElementById('level-filter').value;
 
         filteredResults = allResults.filter(item => {
             let match = true;
@@ -228,10 +296,13 @@
             if (rating < ratingMin || rating > ratingMax) match = false;
 
             // 品牌筛选
-            if (selectedBrand && item.brandName && !item.brandName.includes(selectedBrand)) match = false;
+            if (selectedBrand && item.brands && !item.brands.includes(selectedBrand)) match = false;
 
             // 服务筛选
-            if (selectedService && item.service && !item.service.includes(selectedService)) match = false;
+            if (selectedService && item.services && !item.services.includes(selectedService)) match = false;
+
+            // 店铺等级筛选
+            if (selectedLevel && item.level !== parseInt(selectedLevel)) match = false;
 
             return match;
         });
@@ -246,6 +317,7 @@
         if (ratingMin || ratingMax < 5) conditions.push(`评分范围 <b style="color: var(--font-green)">${ratingMin}-${ratingMax}</b>`);
         if (selectedBrand) conditions.push(`品牌为 <b style="color: var(--font-green)">${selectedBrand}</b>`);
         if (selectedService) conditions.push(`服务为 <b style="color: var(--font-green)">${selectedService}</b>`);
+        if (selectedLevel) conditions.push(`等级为 <b style="color: var(--font-green)">Lv${selectedLevel}</b>`);
         const conditionText = conditions.length > 0 ? `，${conditions.join('，')}` : '';
 
         document.getElementById('resultsShow').innerHTML = `${conditionStr}${conditionText} 条件中，找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条结果`;
@@ -421,6 +493,11 @@
             }
         });
     };
+
+    // 随机整数函数
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 </script>
 </body>
 </html>
