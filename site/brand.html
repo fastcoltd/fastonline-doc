@@ -10,177 +10,62 @@
     <link rel="stylesheet" href="_style.css">
     <link rel="stylesheet" href="_site.css">
     <style>
-        .brand-header {
-            display: flex;
-            align-items: center;
-            padding: 1em 0;
-            border-bottom: 0.0625em solid var(--border-color);
-        }
-        .brand-logo img {
-            width: 6em;
-            height: 6em;
-            border-radius: 50%;
-            margin-right: 1.5em;
-        }
-        .brand-info h1 {
-            font-size: var(--font-xxlarge);
-            margin: 0 0 0.5em;
-        }
-        .brand-info p {
-            font-size: var(--font-medium);
-            color: var(--text-secondary);
-            margin: 0.25em 0;
-        }
-        .brand-summary {
-            max-height: 7.5em;
-            overflow: hidden;
-            position: relative;
-            transition: max-height 0.3s ease;
-        }
-        .brand-summary.expanded {
-            max-height: none;
-        }
-        .toggle-summary {
-            cursor: pointer;
-            color: var(--natural-green);
-            font-size: var(--font-small);
-            margin-top: 0.5em;
-        }
-        .toggle-summary {
-            cursor: pointer;
-            color: var(--natural-green);
-            font-size: var(--font-small);
-            margin-top: 0.5em;
-        }
-        .card-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5em;
-            justify-content: center;
-        }
-        .service-section {
-            margin-bottom: 1em;
-        }
-        .service-section:last-child {
-            margin-bottom: 0em;
-        }
-        .section {
-            margin-bottom: 1em;padding: 0;
-        }
-        .section:last-child {
-            margin-bottom: 0em;
-        }
-        .service-title {
-            font-size: var(--font-large);
-            margin-bottom: 1em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .cardHoriz {
-            flex: 0 0 100%;
-            max-width: 100%;
-            min-height: 8em;
-            margin-bottom: 0.5em;
-            padding: 0.5em;
-            background: var(--bg-white);
-            border: 0.0625em solid var(--border-color);
-            border-radius: 0.5em;
-            overflow: hidden;
-            cursor: pointer;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-        }
-        .cardHoriz:hover {
-            border-color: var(--natural-green);
-            box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1);
-        }
-        .faq-item {
-            flex: 0 0 100%;
-            max-width: 100%;
-            margin-bottom: 1em;
-            padding: 1em;
-            background: var(--bg-white);
-            border: 0.0625em solid var(--border-color);
-            border-radius: 0.5em;
-            transition: box-shadow 0.2s;
-            position: relative;
-        }
-        .faq-item:hover {
-            box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1);
-        }
-        /* 移动端适配 */
+        body { padding-top: 7.4em !important; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
+        .brand-header { display: flex; align-items: center; padding: 1em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: height 0.3s ease, padding 0.3s ease; }
+        .brand-header.sticky { height: 3em; padding: 0.5em 1em; }
+        .brand-header.sticky .brand-info p { opacity: 0; height: 0; margin: 0; }
+        .brand-header.sticky .brand-summary { max-height: 0; }
+        .brand-header.sticky .toggle-summary { opacity: 0; height: 0; margin: 0; }
+        .brand-logo img { width: 6em; height: 6em; border-radius: 50%; margin-right: 1.5em; }
+        .brand-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; }
+        .brand-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0.25em 0; transition: opacity 0.3s ease; }
+        .brand-summary { max-height: 7.5em; overflow: hidden; position: relative; transition: max-height 0.3s ease; }
+        .brand-summary.expanded { max-height: none; }
+        .toggle-summary { cursor: pointer; color: var(--natural-green); font-size: var(--font-small); margin-top: 0.5em; transition: opacity 0.3s ease; }
+        .card-list { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
+        .service-section { margin-bottom: 1em; }
+        .service-section:last-child { margin-bottom: 0em; }
+        .section { margin-bottom: 1em; padding: 0; }
+        .section:last-child { margin-bottom: 0em; }
+        .service-title { font-size: var(--font-large); margin-bottom: 1em; display: flex; justify-content: space-between; align-items: center; }
+        .cardHoriz { flex: 0 0 100%; max-width: 100%; min-height: 8em; margin-bottom: 0.5em; padding: 0.5em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; display: flex; align-items: center; }
+        .cardHoriz:hover { border-color: var(--natural-green); box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
+        .faq-item { flex: 0 0 100%; max-width: 100%; margin-bottom: 1em; padding: 1em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; transition: box-shadow 0.2s; position: relative; }
+        .faq-item:hover { box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
         @media (max-width: 48em) {
-            .brand-header {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 0.5em 0;
-            }
-            .brand-header.sticky {
-                padding: 0.3em 0.5em;
-            }
-            .brand-logo img {
-                width: 3em;
-                height: 3em;
-                margin-right: 0;
-                margin-bottom: 0.5em;
-            }
-            .brand-info h1 {
-                font-size: var(--font-large);
-            }
-            .service-title {
-                font-size: var(--font-medium);
-            }
-            .card-list {
-                flex-direction: column;
-                gap: 0.3em;
-            }
-            .cardHoriz {
-                min-height: 6em;
-                padding: 0.3em;
-            }
-            .faq-item {
-                padding: 0.5em;
-            }
+            .container { margin: -5em auto 0 auto; padding-top: 5em; }
+            .brand-header { flex-direction: column; align-items: flex-start; padding: 0.5em; }
+            .brand-header.sticky { flex-direction: row; align-items: center; padding: 0.3em 0.5em; height: 3em; }
+            .brand-logo img { width: 3em; height: 3em; margin-right: 0; margin-bottom: 0.5em; }
+            .brand-header.sticky .brand-logo img { margin-right: 1em; margin-bottom: 0; }
+            .brand-info h1 { font-size: var(--font-large); }
+            .service-title { font-size: var(--font-medium); }
+            .card-list { flex-direction: column; gap: 0.3em; }
+            .cardHoriz { min-height: 6em; padding: 0.3em; }
+            .faq-item { padding: 0.5em; }
         }
     </style>
 </head>
 <body>
-<!-- 头部 -->
 <div w3-include-html="_header.html"></div>
-
-<!-- 主内容 -->
 <div class="container">
-    <!-- 第一部分：品牌基本信息 -->
     <div class="brand-header" id="brand-header"></div>
-
-    <!-- 第二部分：品牌下的服务 -->
     <div class="section" id="brand-services" style="padding-top: 1.5em;"></div>
-
-    <!-- 第三部分：热门需求 -->
     <div class="section">
         <div class="title-with-link" id="hot-demands-title"></div>
         <div id="hot-demands" class="card-list"></div>
     </div>
-
-    <!-- 第四部分：热门文章 -->
     <div class="section">
         <div class="title-with-link" id="hot-posts-title"></div>
         <div id="hot-posts" class="card-list"></div>
     </div>
-
-    <!-- 第五部分：FAQ -->
     <div class="section">
         <h3 class="section-title" id="faq-title"></h3>
         <div id="brand-faqs" class="card-list"></div>
     </div>
 </div>
-
-<!-- 底部 -->
 <div w3-include-html="_footer.html"></div>
-
-<!-- 脚本 -->
 <script src="https://www.w3schools.com/lib/w3.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
 <script src="_fields.js"></script>
@@ -189,21 +74,12 @@
 <script src="_member.js"></script>
 <script src="_common.js"></script>
 <script>
-    // 从 URL 获取品牌名称
     const urlParams = new URLSearchParams(window.location.search);
     const brandName = urlParams.get('name') || 'Airbnb';
     const selectedBrand = hotBrands.find(brand => brand.name === brandName) || hotBrands[0];
-
-    // FAQ 类型颜色映射
     const typeColors = {
-        0: 'ant-tag-blue',   // Account Issues
-        1: 'ant-tag-red',    // Payment Problems
-        2: 'ant-tag-orange', // Shipping Delays
-        3: 'ant-tag-green',  // Product Questions
-        4: 'ant-tag-purple'  // Technical Support
+        0: 'ant-tag-blue', 1: 'ant-tag-red', 2: 'ant-tag-orange', 3: 'ant-tag-green', 4: 'ant-tag-purple'
     };
-
-    // 第一部分：品牌基本信息
     function renderBrandHeader() {
         const header = document.getElementById('brand-header');
         header.innerHTML = `
@@ -220,20 +96,16 @@
             </div>
         `;
     }
-
     function toggleSummary() {
         const summary = document.getElementById('brand-summary');
         summary.classList.toggle('expanded');
         const toggle = summary.nextElementSibling;
         toggle.textContent = summary.classList.contains('expanded') ? 'Show Less' : 'Show More';
     }
-
-    // 第二部分：品牌下的服务
     function renderBrandServices() {
         const servicesContainer = document.getElementById('brand-services');
-        const serviceCount = Math.floor(Math.random() * 3) + 3; // 3-5 个服务
+        const serviceCount = Math.floor(Math.random() * 3) + 3;
         const shuffledServices = services.sort(() => 0.5 - Math.random()).slice(0, serviceCount);
-
         shuffledServices.forEach(service => {
             const serviceSection = document.createElement('div');
             serviceSection.className = 'service-section';
@@ -245,13 +117,10 @@
                 <div id="service-items-${service.name}" class="card-list"></div>
             `;
             servicesContainer.appendChild(serviceSection);
-
             const items = generateData(itemFieldConfig, 6);
             generateCards(`service-items-${service.name}`, 'card', items, itemFieldConfig);
         });
     }
-
-    // 第三部分：热门需求
     function renderHotDemands() {
         const title = document.getElementById('hot-demands-title');
         title.innerHTML = `
@@ -261,27 +130,22 @@
         const demands = generateData(demandFieldConfig, randomInt(3,6));
         const container = document.getElementById('hot-demands');
         container.innerHTML = '';
-
         demands.forEach((item, index) => {
             const card = document.createElement('div');
             card.className = 'cardHoriz';
-
             let imageHtml = '';
             let titleHtml = '';
             let fieldsHtml = '<div class="fields-row">';
             let bottomHtml = '<div class="bottom-row">';
             let favoriteHtml = '';
             let hasTitle = false;
-
             const fieldItems = [];
             Object.entries(demandFieldConfig).forEach(([fieldName, fieldConfig]) => {
                 if (!fieldConfig['cardHoriz']) return;
-
                 const value = item[fieldName] !== undefined ? item[fieldName] : fieldConfig.value;
                 const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, fieldConfig, 'hot-demands', index);
                 const type = fieldConfig.type || 'text';
                 const contentLength = (typeof value === 'string' ? value : JSON.stringify(value)).length;
-
                 if (type === 'image' && !imageHtml) {
                     imageHtml = `<div class="image-wrapper">${fieldContent.html}</div>`;
                 } else if (type === 'text' && !hasTitle && fieldName === 'demandTitle') {
@@ -299,14 +163,12 @@
                     fieldItems.push({ html: fieldContent.html, length: contentLength, name: fieldName });
                 }
             });
-
             fieldItems.sort((a, b) => a.length - b.length);
             fieldItems.forEach(item => {
                 fieldsHtml += `<span class="field-item">${item.html}</span>`;
             });
             fieldsHtml += '</div>';
             bottomHtml += '</div>';
-
             card.innerHTML = `
                 ${imageHtml}
                 <div class="card-content">
@@ -317,7 +179,6 @@
                 </div>
             `;
             container.appendChild(card);
-
             Object.entries(demandFieldConfig).forEach(([fieldName, fieldConfig]) => {
                 if (fieldConfig['cardHoriz'] && fieldConfig.onClick) {
                     const elementId = `hot-demands-${fieldName}-${index}`;
@@ -332,38 +193,31 @@
             });
         });
     }
-
-    // 第四部分：热门文章
     function renderHotPosts() {
         const title = document.getElementById('hot-posts-title');
         title.innerHTML = `
             <h3 class="section-title">${selectedBrand.name} - Hot Posts</h3>
             <a href="post-list.html?brandName=${encodeURIComponent(selectedBrand.name)}" class="see-all">More...</a>
         `;
-        const posts = generateData(postsFieldConfig, 6);
+        const posts = generateData(postsFieldConfig, randomInt(1,6));
         const container = document.getElementById('hot-posts');
         container.innerHTML = '';
-
         posts.forEach((item, index) => {
             const card = document.createElement('div');
             card.className = `cardHoriz ${item.paid.sample ? 'paid-post' : ''}`;
-
             let imageHtml = '';
             let titleHtml = '';
             let fieldsHtml = '<div class="fields-row">';
             let bottomHtml = '<div class="bottom-row">';
             let favoriteHtml = '';
             let hasTitle = false;
-
             const fieldItems = [];
             Object.entries(postsFieldConfig).forEach(([fieldName, fieldConfig]) => {
                 if (!fieldConfig['cardHoriz']) return;
-
                 const value = item[fieldName] !== undefined ? item[fieldName] : fieldConfig.value;
                 const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, fieldConfig, 'hot-posts', index);
                 const type = fieldConfig.type || 'text';
                 const contentLength = (typeof value === 'string' ? value : JSON.stringify(value)).length;
-
                 if (type === 'image' && !imageHtml) {
                     imageHtml = `<div class="image-wrapper">${fieldContent.html}</div>`;
                 } else if (type === 'text' && !hasTitle && fieldName === 'title') {
@@ -381,14 +235,12 @@
                     fieldItems.push({ html: fieldContent.html, length: contentLength, name: fieldName });
                 }
             });
-
             fieldItems.sort((a, b) => a.length - b.length);
             fieldItems.forEach(item => {
                 fieldsHtml += `<span class="field-item">${item.html}</span>`;
             });
             fieldsHtml += '</div>';
             bottomHtml += '</div>';
-
             card.innerHTML = `
                 ${imageHtml}
                 <div class="card-content">
@@ -399,7 +251,6 @@
                 </div>
             `;
             container.appendChild(card);
-
             Object.entries(postsFieldConfig).forEach(([fieldName, fieldConfig]) => {
                 if (fieldConfig['cardHoriz'] && fieldConfig.onClick) {
                     const elementId = `hot-posts-${fieldName}-${index}`;
@@ -414,14 +265,12 @@
             });
         });
     }
-
-    // 第五部分：FAQ
     let faqs = [];
     function renderFaqs() {
         const title = document.getElementById('faq-title');
         title.textContent = `${selectedBrand.name} - FAQs`;
         if (faqs.length <= 0){
-            const faqCount = Math.floor(Math.random() * 5) + 5; // 5-15 个 FAQ
+            const faqCount = randomInt(2,8);
             for (let i = 0; i < faqCount; i++) {
                 const baseFaq = realFaqs[i % realFaqs.length];
                 faqs.push({
@@ -436,10 +285,8 @@
                 });
             }
         }
-
         const container = document.getElementById('brand-faqs');
         container.innerHTML = '';
-
         faqs.forEach((item, index) => {
             const faqItem = document.createElement('div');
             faqItem.className = 'faq-item';
@@ -479,12 +326,10 @@
             container.appendChild(faqItem);
         });
     }
-
     function toggleAnswer(element) {
         const faqItem = element.closest('.faq-item');
         faqItem.classList.toggle('expanded');
     }
-
     function vote(element, type, index) {
         const item = faqs[index];
         const otherType = type === 'useful' ? 'useless' : 'useful';
@@ -501,28 +346,13 @@
             if (type === 'useful') item.usefulCount++;
             else item.uselessCount++;
         }
-
         faqs[index].favorited = !faqs[index].favorited;
         renderFaqs();
     }
-
     function toggleFavorite(element, index) {
         faqs[index].favorited = !faqs[index].favorited;
         renderFaqs();
     }
-
-    // 滚动处理
-    window.addEventListener('scroll', () => {
-        const header = document.getElementById('brand-header');
-        const headerHeight = header.offsetHeight;
-        if (window.scrollY > headerHeight) {
-            header.classList.add('sticky');
-        } else {
-            header.classList.remove('sticky');
-        }
-    });
-
-    // 初始化页面
     window.onload = () => {
         w3.includeHTML(() => {
             document.title = `${selectedBrand.name} - FASTRESP`;

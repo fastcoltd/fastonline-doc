@@ -19,7 +19,9 @@ let servicesFieldConfig = {
 
 // 热门商品字段配置，添加“立即购买”按钮
 let itemFieldConfig = {
-    favorite: {card: true, cardSq: true, cardHoriz: true, type: 'favorite', style: {}, customClass: 'fas fa-heart favorite-icon', onClick: (item, element) => { element.classList.toggle('favorited'); }, sample: () => faker.datatype.boolean()},
+    favorite: {card: true, cardSq: true, cardHoriz: true, type: 'favorite', style: {}, customClass: 'fas fa-heart favorite-icon', onClick: (item, element) => {
+        element.classList.toggle('favorited');
+    }, sample: () => faker.datatype.boolean()},
     image: { card: true, cardSq: true, cardHoriz: true, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `items-${i}`) },
     title: { card: true, cardSq: true, cardHoriz: true, type: 'text', style: {}, sample: () => faker.commerce.productName() },
     price: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '价格', style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
