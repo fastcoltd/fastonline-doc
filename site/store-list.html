@@ -116,7 +116,7 @@
     // 自定义字段配置
     const customStoreFieldConfig = Object.assign({}, storeFieldConfig, {
         items: {
-            card: true,
+            card: false,
             cardSq: true,
             cardHoriz: true,
             type: 'text',
@@ -131,40 +131,6 @@
                     name: faker.commerce.productName(),
                     stock: faker.datatype.number({ min: 10, max: 100 })
                 }));
-            }
-        },
-        services: {
-            card: true,
-            cardSq: true,
-            cardHoriz: true,
-            type: 'text',
-            label: '服务',
-            style: {},
-            format: (d, v) => {
-                let all = v.map(service => `<a href="store.html?services=${service}" style="color: var(--font-orange);">${service}</a>`).join('，');
-                return `${all}`;
-            },
-            sample: () => {
-                const count = randomInt(1, 3);
-                const shuffled = services.sort(() => 0.5 - Math.random());
-                return shuffled.slice(0, count).map(service => service.name);
-            }
-        },
-        brands: {
-            card: true,
-            cardSq: true,
-            cardHoriz: true,
-            type: 'text',
-            label: '品牌',
-            style: {},
-            format: (d, v) => {
-                let all = v.map(brand => `<a href="store.html?brandName=${brand}" style="color: var(--font-green);">${brand}</a>`).join('，');
-                return `${all}`;
-            },
-            sample: () => {
-                const count = randomInt(1, 5);
-                const shuffled = hotBrands.sort(() => 0.5 - Math.random());
-                return shuffled.slice(0, count).map(brand => brand.name);
             }
         }
     });
@@ -257,7 +223,7 @@
     // 生成店铺数据
     function generateStoreData() {
         try {
-            const data = generateData(fieldConfig, 300);
+            const data = generateData(fieldConfig, 500);
             return data;
         } catch (error) {
             console.error('生成店铺数据时出错:', error);
@@ -296,10 +262,10 @@
             if (rating < ratingMin || rating > ratingMax) match = false;
 
             // 品牌筛选
-            if (selectedBrand && item.brands && !item.brands.includes(selectedBrand)) match = false;
+            if (selectedBrand && item.brands && !item.brands.sample.includes(selectedBrand)) match = false;
 
             // 服务筛选
-            if (selectedService && item.services && !item.services.includes(selectedService)) match = false;
+            if (selectedService && item.services && !item.services.sample.includes(selectedService)) match = false;
 
             // 店铺等级筛选
             if (selectedLevel && item.level !== parseInt(selectedLevel)) match = false;

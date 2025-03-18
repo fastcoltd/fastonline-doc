@@ -56,6 +56,31 @@ let storeFieldConfig = {
     salesTotal: { card: false, cardSq: false, cardHoriz: true, type: 'price', label: '销售额', style: {}, sample: () => faker.commerce.price(5000, 200000, 2, "$") },
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
     slogan: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '标语', style: {}, sample: () => faker.company.catchPhrase() },
+    services: {
+        card: true, cardSq: true, cardHoriz: true, type: 'text', label: '服务', style: {},
+        format: (t, d, v) => {
+                let all = v.map(service => `<a href="store.html?name=${t.name}&services=${service}" style="color: var(--font-orange);">${service}</a>`).join('，');
+                return `${all}`;
+        },
+        sample: () => {
+            const count = randomInt(1, 3);
+            const shuffled = services.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count).map(service => service.name);
+        }
+    },
+    brands: {
+        card: true, cardSq: true, cardHoriz: true,type: 'text', label: '品牌',style: {},
+        format: (t, d, v) => {
+            let all = v.map(brand => `<a href="store.html?name=${t.name}&brandName=${brand}" style="color: var(--font-green);">${brand}</a>`).join('，');
+            return `${all}`;
+        },
+        sample: () => {
+            const count = randomInt(1, 5);
+            const shuffled = hotBrands.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count).map(brand => brand.name);
+        }
+    },
+
     tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '要求', style: {}, sample: () => {return generateTag(1,3)} },
     enter: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: '进入', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 

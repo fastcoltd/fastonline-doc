@@ -57,7 +57,18 @@ function generateFieldContent(fieldConfig, item, fieldName, value, config, conta
     const { type = 'text', label, format, style = {}, customClass, mergeWith, position } = config;
     let content = '';
     const elementId = `${containerId}-${fieldName}-${index}`;
-    content = format ? format(fieldConfig, value['sample']) : value;
+    content = value;
+    if (format && typeof format == 'function'){
+        if (format.length == 0){
+            content = format()
+        }
+        else if (format.length == 2){
+            content = format(fieldConfig, value['sample'])
+        }
+        else if (format.length == 3){
+            content = format(item, fieldConfig, value['sample'])
+        }
+    }
     switch (type) {
         case 'text':
             return {
@@ -193,7 +204,7 @@ function generateData(fieldConfig, count) {
                     else if (_value.length == 1){
                         values[key] =  _value(i)
                     }
-                    else if (_value.length == 2){
+                    else if (_value.length >= 2){
                         values[key] =  _value
                     }
                 }

@@ -142,6 +142,7 @@
                         const demandCount = randomInt(3, 20);
                         const postCount = randomInt(3, 100);
                         const productCount = randomInt(100, 1000);
+                        const storeCount = randomInt(50, 200);
                         const faqCount = randomInt(3, 20);
 
                         const card = document.createElement('a');
@@ -162,13 +163,14 @@
                                 </div>
                             </div>
                             <div class="services-list">
-                                ${services.map(service => `<a href="brands.html?services=${encodeURIComponent(service)}&name=${encodeURIComponent(brand.name)}">${service}</a>`).join(' | ')}
+                                ${services.map(service => `<a href="brand-list.html?services=${encodeURIComponent(service)}&name=${encodeURIComponent(brand.name)}">${service}</a>`).join(' | ')}
                             </div>
                             <div class="stats">
-                                <span>竞标: <a href="demands.html?brandName=${encodeURIComponent(brand.name)}">${demandCount}</a></span>
+                                <span>商品: <a href="item-list.html?brandName=${encodeURIComponent(brand.name)}">${productCount}</a></span>
+                                <span>店铺: <a href="store-list.html?brandName=${encodeURIComponent(brand.name)}">${storeCount}</a></span>
+                                <span>竞标: <a href="demand-list.html?brandName=${encodeURIComponent(brand.name)}">${demandCount}</a></span>
                                 <span>文章: <a href="post-list.html?brandName=${encodeURIComponent(brand.name)}">${postCount}</a></span>
-                                <span>商品: <a href="items.html?brandName=${encodeURIComponent(brand.name)}">${productCount}</a></span>
-                                <span>FAQ: <a href="faqs.html?brandName=${encodeURIComponent(brand.name)}">${faqCount}</a></span>
+                                <span>FAQ: <a href="faq-list.html?brandName=${encodeURIComponent(brand.name)}">${faqCount}</a></span>
                             </div>
                         `;
                         brandList.appendChild(card);
