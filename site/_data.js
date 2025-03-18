@@ -293,7 +293,7 @@ function generateServiceMenu() {
                 subHtml += `<span class="letter-header">${groupLetters.join('')}</span><div class="platform-list">`;
                 groupLetters.forEach(letter => {
                     subByLetter[letter].forEach(item => {
-                        subHtml += `<a href="brand.html?services=${cat.name}&name=${item.name}" class="platform-item"><img src="${item.logo}" alt="${item.name}" class="platform-logo">${item.name}</a>`;
+                        subHtml += `<a href="item-list.html?services=${cat.name}&brandName=${item.name}" class="platform-item"><img src="${item.logo}" alt="${item.name}" class="platform-logo">${item.name}</a>`;
                     });
                 });
                 subHtml += '</div></div>';
