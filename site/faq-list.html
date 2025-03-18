@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FAQ List - FASTRESP</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        .faq-item {
+            margin-bottom: 1em;
+            padding: 1em;
+            background: var(--bg-white);
+            border: 0.0625em solid var(--border-color);
+            border-radius: 0.5em;
+            transition: box-shadow 0.2s;
+            position: relative;
+        }
+        .faq-item:hover {
+            box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1);
+        }
+        .faq-question {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: var(--font-large);
+            color: var(--text-primary);
+            font-weight: bold;
+            flex-wrap: wrap; /* 移动端支持换行 */
+            gap: 0.5em; /* 标签与文字间距 */
+            padding-right: 3.5em; /* 为收藏按钮和箭头留空间 */
+        }
+        .faq-question-text {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5em;
+        }
+        .faq-toggle {
+            font-size: 1.25em;
+            color: var(--text-secondary);
+            margin-left: 2em; /* 距离问题文字 2em */
+        }
+        .faq-answer {
+            display: none;
+            margin-top: 0.5em;
+            margin-bottom: 2em;
+            font-size: var(--font-medium);
+            color: var(--text-secondary);
+            max-height: 7.5em;
+            position: relative;
+            padding-bottom: 1em; /* 为 More.. 留空间 */
+        }
+        .faq-more {
+            position: absolute;
+            bottom: -2.5em;
+            right: 2em;
+            font-weight: bold;
+            border: 0;
+        }
+        .faq-more:hover {
+            text-decoration: underline;
+        }
+        .faq-item.expanded .faq-answer {
+            display: block;
+        }
+        .faq-item.expanded .fa-chevron-down {
+            display: none;
+        }
+        .faq-item:not(.expanded) .fa-chevron-up {
+            display: none;
+        }
+        .faq-favorite {
+            position: absolute;
+            top: 50%;
+            right: 0.5em;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+        .faq-favorite.favorited {
+            color: #FF0000;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 48em) {
+            .faq-item {
+                padding: 0.5em;
+            }
+            .faq-question {
+                font-size: var(--font-small);
+                padding-right: 2.5em; /* 缩小空间 */
+            }
+            .faq-toggle {
+                font-size: 1em;
+                margin-left: 1em; /* 移动端减小距离 */
+            }
+            .faq-vote i {
+                font-size: 1em;
+            }
+            .faq-vote span {
+                font-size: calc(var(--font-small) * 0.8);
+            }
+            .faq-answer {
+                max-height: 7.5em;
+                font-size: calc(var(--font-medium) * 0.9);
+                padding-bottom: 0.8em;
+                overflow: hidden;
+            }
+            .faq-more {
+                font-size: calc(var(--font-large) * 0.8);
+                right: 2em;
+                bottom: -2em;
+                z-index: 10;
+            }
+            .faq-favorite {
+                font-size: 1.2em;
+                right: 0.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="_header.html"></div>
+
+<!-- 主内容 -->
+<div class="container">
+    <div class="search-container">
+        <div class="main-content">
+            <div class="result-header">
+                <div class="filter-bar">
+                    <div class="filter-column">
+                        <label class="filter-column-label">Type:</label>
+                        <select class="ant-select" id="type-filter">
+                            <option value="">All Types</option>
+                            <option value="0">Account Issues</option>
+                            <option value="1">Payment Problems</option>
+                            <option value="2">Shipping Delays</option>
+                            <option value="3">Product Questions</option>
+                            <option value="4">Technical Support</option>
+                        </select>
+                    </div>
+                    <div class="filter-column">
+                        <label class="filter-column-label">Brand:</label>
+                        <select class="ant-select" id="brand-filter">
+                            <option value="">All Brand</option>
+                        </select>
+                    </div>
+                    <div class="filter-column" >
+                        <label class="filter-column-label">Search Questions:</label>
+                        <input class="ant-input" type="text" id="search-question" style="width: 20em;" placeholder="Enter keywords to search">
+                    </div>
+                    <button class="btn-solid-medium" onclick="applyFilters()">Search</button>
+                </div>
+                <div class="result-opt">
+                    <div id="resultsShow"></div>
+                </div>
+            </div>
+            <div id="faq-results" class="faq-list"></div>
+            <div class="pagination">
+                <button class="ant-btn pagination-btn" onclick="changePage(-1)">Previous</button>
+                <span id="pagination-info"></span>
+                <button class="ant-btn pagination-btn" onclick="changePage(1)">Next</button>
+                <span>Go to <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="_footer.html"></div>
+
+<!-- 脚本 -->
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_common.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script>
+    let currentPage = 1;
+    const itemsPerPage = 20;
+    let filteredResults = [];
+    let allResults = [];
+
+    // FAQ 类型颜色映射
+    const typeColors = {
+        0: 'ant-tag-blue',   // Account Issues
+        1: 'ant-tag-red',    // Payment Problems
+        2: 'ant-tag-orange', // Shipping Delays
+        3: 'ant-tag-green',  // Product Questions
+        4: 'ant-tag-purple'  // Technical Support
+    };
+
+    // FAQ 字段配置
+    const faqFieldConfig = {
+        brandName: {
+            type: 'tag',
+            label: 'Brand',
+            format: (d, v) => {
+                const brand = hotBrands.find(b => b.name === v);
+                const color = brand ? brand.themeColor : '#000000';
+                return `<span class="ant-tag" style="color: ${color}">${v}</span>`;
+            },
+            sample: () => hotBrands[Math.floor(Math.random() * hotBrands.length)].name
+        },
+        useType: {
+            type: 'tag',
+            label: 'Type',
+            format: (d, v) => {
+                const types = ['Account Issues', 'Payment Problems', 'Shipping Delays', 'Product Questions', 'Technical Support'];
+                return `<span class="${typeColors[v]}">${types[v]}</span>`;
+            },
+            sample: () => Math.floor(Math.random() * 5)
+        },
+        title: { type: 'text', label: 'Question' },
+        content: { type: 'text', label: 'Answer' },
+        usefulCount: { type: 'text', label: 'Useful', sample: () => Math.floor(Math.random() * 101) },
+        uselessCount: { type: 'text', label: 'Useless', sample: () => Math.floor(Math.random() * 51) },
+        favorited: { type: 'favorite', sample: () => Math.random() > 0.5 }
+    };
+
+    const realFaqs = [
+        {
+            title: "How do I reset my password?",
+            content: "If you've forgotten your password or need to reset it for security reasons, follow these steps to regain access to your account. First, navigate to the login page on our website or app. Below the login fields, you'll see a 'Forgot Password?' link—click it. You’ll be prompted to enter the email address associated with your account. Once submitted, check your inbox for a password reset email from us (be sure to look in your spam or junk folder if it doesn’t appear within a few minutes). The email will contain a secure link; click it to proceed. You’ll be directed to a page where you can enter a new password. Make sure it’s at least 8 characters long, includes a mix of letters, numbers, and symbols for security, and isn’t something you’ve used before on this site. After confirming the new password, click 'Save' or 'Submit,' and you should be able to log in with your updated credentials. If you don’t receive the email after 10 minutes, try resending it or contact our support team with your account details for further assistance.",
+            useType: 0
+        },
+        {
+            title: "Why is my payment not going through?",
+            content: "Payment issues can be frustrating, but they’re often caused by a few common reasons that can be resolved with some troubleshooting. This might happen if your card has insufficient funds—check your account balance to ensure it covers the transaction amount, including any taxes or shipping fees. Another possibility is an expired or blocked card; verify the expiration date and ensure your bank hasn’t flagged the transaction for security reasons. Sometimes, the problem lies with our payment gateway experiencing temporary downtime, which is rare but can occur during high traffic periods like sales events. To fix this, double-check your card details (number, expiry date, CVV, and billing address) for typos, then try again. If it still fails, attempt using a different payment method, like another card or a digital wallet such as PayPal. You can also contact your bank to confirm there are no restrictions on your account, such as daily spending limits or international transaction blocks. If none of these work, reach out to our customer support team with your order number and a description of the error message (if any) so we can investigate further and assist you in completing your purchase.",
+            useType: 1
+        },
+        {
+            title: "What should I do if my order is delayed?",
+            content: "Order delays can happen due to various factors like weather conditions, carrier issues, or seller processing times, but we’re here to help you track down your package. Start by logging into your account and going to the 'Orders' section. Find the delayed order and click on it to view the tracking information provided by the seller. This will show you the latest status, such as 'In Transit' or 'Held at Customs,' along with the estimated delivery date. If it’s been more than 5 business days past that date and there’s no update, take action. First, contact the seller directly through our messaging system—include your order number and politely ask for an update or an explanation for the delay. Most sellers respond within 24-48 hours. If the tracking shows the package is stuck or lost, or if the seller doesn’t reply within 3 days, escalate the issue to our support team. Submit a ticket with your order details, tracking number, and a brief description of the problem. We’ll work with the seller and carrier to locate your package or, if necessary, arrange a replacement or refund based on our policies. In the meantime, avoid canceling the order unless advised, as this could complicate the resolution process.",
+            useType: 2
+        },
+        {
+            title: "Is this product compatible with my device?",
+            content: "Determining product compatibility is crucial before making a purchase, and we provide several ways to ensure you get the right item. Every product listing on our platform includes a detailed description section—scroll down to find specifications like supported devices, operating systems, or hardware requirements. For example, if you’re buying a phone charger, it might list compatible brands (e.g., Apple, Samsung) and connection types (e.g., USB-C, Lightning). If the description doesn’t explicitly mention your device, look for a 'Compatibility' or 'Specifications' tab, which often includes model numbers or versions (e.g., iPhone 12, Windows 11). Still unsure? Use the 'Ask a Question' feature on the product page to message the seller directly—include your device’s make, model, and any relevant details (e.g., 'Will this work with a 2021 MacBook Pro M1?'). Sellers typically respond within a day with tailored advice. If you’ve already bought the item and it turns out to be incompatible, check the return policy in the listing; most items qualify for a refund within 30 days if unopened and in original condition. To avoid surprises, we recommend cross-checking specs with your device manual or manufacturer’s website before ordering.",
+            useType: 3
+        },
+        {
+            title: "How can I fix a login error on the app?",
+            content: "Login errors can disrupt your experience, but they’re usually fixable with a few steps. If you’re seeing an error like 'Invalid Credentials' or 'Unable to Connect,' start by ensuring your username and password are correct—double-check for typos or extra spaces, and use the 'Show Password' option if available. If you’re sure they’re right, the issue might be app-related. First, try closing the app completely (swipe it away from your recent apps list) and reopening it. If that doesn’t work, clear the app’s cache: on Android, go to Settings > Apps > [App Name] > Storage > Clear Cache; on iOS, you’ll need to offload or reinstall the app (Settings > General > iPhone Storage > [App Name]). Next, check for updates in your app store—install the latest version, as bugs are often fixed in new releases. If the problem persists, uninstall and reinstall the app, then try logging in again. Network issues could also be the culprit—switch between Wi-Fi and mobile data to test connectivity, and ensure you’re not using a VPN that might block our servers. If none of these resolve it, submit a support ticket via our website with your device type (e.g., iPhone 14, Samsung Galaxy S23), app version, and a screenshot of the error. Our technical team will investigate and get back to you within 24-48 hours.",
+            useType: 4
+        },
+        {
+            title: "Can I change my email address?",
+            content: "Yes, you can update your email address in your account settings, and it’s a straightforward process to keep your contact information current. Log into your account on our website or app, then navigate to the 'Account Settings' or 'Profile' section—look for an option like 'Change Email' or 'Edit Contact Info.' Click it, and you’ll be asked to enter your new email address. For security, we’ll send a verification code or link to your current email first; check your inbox (and spam folder) to confirm your identity. Once verified, enter the new email address and, in some cases, re-enter your password to authorize the change. After submitting, you’ll receive a confirmation email at the new address—click the link inside to finalize the update. This ensures no one else can hijack your account. If you no longer have access to your old email, contact our support team with your account username and proof of identity (e.g., a recent order number or a government-issued ID with sensitive info redacted). We’ll manually verify your request and update it within 48 hours. Note that changing your email won’t affect your order history or saved preferences, but you’ll need to use the new email for future logins and notifications.",
+            useType: 0
+        },
+        {
+            title: "Why was my payment declined?",
+            content: "A declined payment can stem from several issues, and understanding the cause is the first step to resolving it. The most common reason is insufficient funds—check your bank account or credit card balance to confirm it covers the total amount, including shipping and taxes. Another frequent issue is an expired card; look at the expiration date on your card and update it in your payment settings if needed. Banks sometimes decline transactions for security reasons, like unusual activity (e.g., a large purchase from a new location)—call your bank to verify and approve the transaction. Incorrect details, such as a wrong CVV code or billing address, can also trigger a decline; review your saved payment method on our site and ensure all fields match your card exactly. Occasionally, our payment processor might experience a glitch, especially during peak times like holidays—wait a few minutes and retry. If it’s still declined, switch to another card or payment option (e.g., PayPal, Apple Pay). For persistent issues, take a screenshot of the error message and contact our support team with your order attempt details. We’ll coordinate with the processor to pinpoint the problem, and you can also ask your bank if they’ve blocked the merchant (us) for any reason, which they can usually unblock instantly.",
+            useType: 1
+        },
+        {
+            title: "How long does shipping usually take?",
+            content: "Shipping times depend on multiple factors like your location, the seller’s warehouse, and the shipping method chosen, but we can give you a general idea to set expectations. For domestic orders within the same country as the seller, standard shipping typically takes 3-7 business days after the seller processes your order (processing can add 1-3 days). International shipping varies widely—expect 7-20 business days for standard options, though express shipping (if offered) can cut this to 3-10 days. You’ll find an estimated delivery date on your order confirmation email or in the 'Orders' section of your account—log in and check there first. Delays can occur due to holidays, customs clearance (for international orders), or unexpected events like storms; track your package with the provided tracking number for real-time updates. If the estimate passes and there’s no movement, message the seller via our platform with your order number for clarification—they might need to expedite it or investigate with the carrier. If they don’t respond within 48 hours or the package is lost, file a support ticket with us. We’ll step in to either expedite delivery, replace the item, or refund you, depending on the situation and our shipping policy terms.",
+            useType: 2
+        },
+        {
+            title: "Does this item come with a warranty?",
+            content: "Whether an item includes a warranty depends on the seller and the product, and we make this information available to help you decide. On every product page, scroll to the 'Product Details' or 'Warranty' section—most sellers list it there. A typical warranty might be 1 year for manufacturing defects, covering repairs or replacements, but some items (like electronics) could offer 2-3 years, while others (like consumables) might have none. Look for specifics like what’s covered (e.g., parts, labor) and what’s not (e.g., accidental damage, wear and tear). If it’s not mentioned, use the 'Ask a Question' feature to ask the seller directly—something like, 'Does this come with a warranty, and what are the terms?' Include the product name for clarity; they’ll usually reply within 24-48 hours. After purchase, keep your order confirmation and any warranty docs emailed by the seller. To claim a warranty, contact the seller first with your order number and issue description—if they don’t resolve it within a reasonable time (e.g., 7 days), escalate to our support team. We’ll enforce our policy, which requires sellers to honor stated warranties, and assist with returns or refunds if the item fails within the warranty period.",
+            useType: 3
+        },
+        {
+            title: "Why can’t I access the website?",
+            content: "If you’re unable to access our website, it could be due to a local issue on your end, a browser problem, or a rare server-side outage—let’s troubleshoot step-by-step. First, check your internet connection—try loading another site like Google to confirm it’s working. If it is, clear your browser’s cache and cookies: in Chrome, go to Settings > Privacy and Security > Clear Browsing Data (select 'Cached images and files'); in Safari, it’s Preferences > Privacy > Manage Website Data. Then, reload our site. If that fails, test it in a different browser (e.g., switch from Chrome to Firefox) or an incognito window to rule out extension conflicts. A VPN might also block access—disable it temporarily and retry. On our end, we occasionally perform maintenance, usually announced on our status page or social media—check there for updates if you suspect downtime. If you see an error like '503 Service Unavailable,' wait 10-15 minutes and try again, as it’s likely temporary. Still stuck? Use another device (e.g., your phone) to see if it’s device-specific. If all else fails, submit a ticket to our support team with your location, device type, browser version, and the exact error message or behavior (e.g., blank page, timeout). We’ll diagnose it and get you back online ASAP.",
+            useType: 4
+        }
+    ];
+
+    // 初始化品牌筛选
+    function initFilters() {
+        const brandSelect = document.getElementById('brand-filter');
+        brandSelect.innerHTML = '<option value="">All Brand</option>';
+        if (typeof hotBrands !== 'undefined') {
+            hotBrands.forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand.name;
+                option.text = brand.name;
+                brandSelect.appendChild(option);
+            });
+        }
+
+        // 检查 URL 参数并自动选中品牌
+        const urlParams = new URLSearchParams(window.location.search);
+        const brandName = urlParams.get('brandName');
+        if (brandName) {
+            brandSelect.value = brandName;
+            applyFilters(); // 自动应用筛选
+        }
+    }
+
+    // 生成 FAQ 数据
+    function generateFaqData() {
+        const data = [];
+        for (let i = 0; i < 1000; i++) {
+            const baseFaq = realFaqs[i % realFaqs.length];
+            const brand = hotBrands[Math.floor(Math.random() * hotBrands.length)].name;
+            data.push({
+                brandName: brand,
+                useType: baseFaq.useType,
+                title: baseFaq.title,
+                content: baseFaq.content,
+                usefulCount: Math.floor(Math.random() * 101),
+                uselessCount: Math.floor(Math.random() * 51),
+                favorited: Math.random() > 0.5
+            });
+        }
+        return data;
+    }
+
+    // 应用筛选
+    function applyFilters() {
+        const searchQuestion = document.getElementById('search-question').value.toLowerCase();
+        const selectedType = document.getElementById('type-filter').value;
+        const selectedBrand = document.getElementById('brand-filter').value;
+
+        filteredResults = allResults.filter(item => {
+            let match = true;
+            if (searchQuestion && !item.title.toLowerCase().includes(searchQuestion)) match = false;
+            if (selectedType && item.useType !== parseInt(selectedType)) match = false;
+            if (selectedBrand && item.brandName !== selectedBrand) match = false;
+            return match;
+        });
+
+        let conditionStr = `In the FAQ list`;
+        let conditions = [];
+        if (searchQuestion) conditions.push(`question contains <b style="color: var(--font-green)">"${searchQuestion}"</b>`);
+        if (selectedType) conditions.push(`type is <b style="color: var(--font-green)">${['Account Issues', 'Payment Problems', 'Shipping Delays', 'Product Questions', 'Technical Support'][selectedType]}</b>`);
+        if (selectedBrand) conditions.push(`brand is <b style="color: var(--font-green)">${selectedBrand}</b>`);
+        const conditionText = conditions.length > 0 ? `, ${conditions.join(', ')}` : '';
+
+        document.getElementById('resultsShow').innerHTML = `${conditionStr}${conditionText} conditions, found <b style="color: var(--font-green)">${filteredResults.length}</b> results`;
+        currentPage = 1;
+        updateResults();
+    }
+
+    function updateResults() {
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const results = filteredResults.slice(start, end);
+        const container = document.getElementById('faq-results');
+        container.innerHTML = '';
+
+        results.forEach((item, index) => {
+            const faqItem = document.createElement('div');
+            faqItem.className = 'faq-item';
+            faqItem.innerHTML = `
+            <div class="faq-question" onclick="toggleAnswer(this)">
+                <span class="faq-question-text">
+                    ${faqFieldConfig.brandName.format(null, item.brandName)}
+                    ${faqFieldConfig.useType.format(null, item.useType)}
+                    ${item.title}
+                </span>
+                <span>
+                    <i class="fas fa-chevron-down faq-toggle"></i>
+                    <i class="fas fa-chevron-up faq-toggle"></i>
+                </span>
+            </div>
+            <div class="faq-answer">
+                ${item.content}
+                <a href="faq.html?name=${encodeURIComponent(item.title)}" class="faq-more">More..</a>
+            </div>
+            <div class="faq-actions">
+                <div class="faq-vote">
+                    <span><i class="fas fa-thumbs-up" onclick="vote(this, 'useful', ${index})"></i> ${item.usefulCount}</span>
+                    <span><i class="fas fa-thumbs-down" onclick="vote(this, 'useless', ${index})"></i> ${item.uselessCount}</span>
+                </div>
+            </div>
+            <i class="fas fa-heart faq-favorite ${item.favorited ? 'favorited' : ''}" onclick="toggleFavorite(this, ${index})"></i>
+        `;
+            container.appendChild(faqItem);
+        });
+
+        updatePagination();
+    }
+
+    // 切换回答显示
+    function toggleAnswer(element) {
+        const faqItem = element.closest('.faq-item');
+        faqItem.classList.toggle('expanded');
+    }
+
+    // 投票功能
+    function vote(element, type, index) {
+        const item = filteredResults[(currentPage - 1) * itemsPerPage + index];
+        if (type === 'useful') item.usefulCount++;
+        else item.uselessCount++;
+        element.classList.add('voted');
+        updateResults();
+    }
+
+    // 切换收藏状态
+    function toggleFavorite(element, index) {
+        const item = filteredResults[(currentPage - 1) * itemsPerPage + index];
+        item.favorited = !item.favorited;
+        element.classList.toggle('favorited');
+    }
+
+    // 更新分页
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+        let paginationHtml = '';
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+        } else {
+            paginationHtml += `<a href="#" onclick="goToPage(1)" ${currentPage === 1 ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>1</a>`;
+            if (currentPage > 4) paginationHtml += '<span>...</span>';
+            for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+            if (currentPage < totalPages - 3) paginationHtml += '<span>...</span>';
+            paginationHtml += `<a href="#" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${totalPages}</a>`;
+        }
+        document.getElementById('pagination-info').innerHTML = paginationHtml;
+        document.getElementById('jump-to-page').max = totalPages;
+    }
+
+    // 跳转页面
+    function goToPage(page) {
+        currentPage = page;
+        updateResults();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+        currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+        updateResults();
+    }
+
+    // 初始化页面
+    window.onload = () => {
+        w3.includeHTML(() => {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const specifiedCategory = urlParams.get('type') || 'all';
+                document.title = specifiedCategory === 'all' ? 'FAQ List - FASTRESP' : `${specifiedCategory} - FAQ List - FASTRESP`;
+
+                const searchInput = document.getElementById('q');
+                const headerSearchTypeSelect = document.querySelector('.search-type[name="type"]');
+                if (searchInput && headerSearchTypeSelect) {
+                    const searchButton = document.querySelector('.search-box button');
+                    if (searchButton) {
+                        searchButton.onclick = (e) => {
+                            e.preventDefault();
+                            const searchKeyword = searchInput.value;
+                            const searchType = headerSearchTypeSelect.value;
+                            window.location.href = `search.html?q=${encodeURIComponent(searchKeyword)}&type=${searchType}`;
+                        };
+                    }
+                }
+
+                initFilters();
+                document.getElementById('jump-to-page').onchange = () => {
+                    const page = parseInt(document.getElementById('jump-to-page').value);
+                    if (page >= 1 && page <= Math.ceil(filteredResults.length / itemsPerPage)) {
+                        currentPage = page;
+                        updateResults();
+                    }
+                };
+                allResults = generateFaqData();
+                filteredResults = [...allResults];
+                applyFilters();
+            } catch (error) {
+                console.error('Error initializing page:', error);
+            }
+        });
+    };
+</script>
+</body>
+</html>

@@ -23,8 +23,9 @@
                 <div class="filter-bar">
                     <div class="filter-column">
                         <label class="filter-column-label">品牌:</label>
-                        <input class="ant-input" type="text" id="brandName-filter" list="brandName-list" placeholder="输入品牌快速定位">
-                        <datalist id="brandName-list"></datalist>
+                        <select class="ant-select" id="brand-filter">
+                            <option value="">选择品牌</option>
+                        </select>
                     </div>
                     <div class="filter-column">
                         <label class="filter-column-label">搜索标题:</label>
@@ -114,6 +115,7 @@
     // 初始化筛选
     function initFilters() {
         updateTagFilter();
+        updateBrandFilter()
     }
 
     // 更新标签下拉框
@@ -128,6 +130,19 @@
                     option.text = tag;
                     tagFilter.appendChild(option);
                 }
+            });
+        }
+    }
+
+    function updateBrandFilter() {
+        const brandSelect = document.getElementById('brand-filter');
+        brandSelect.innerHTML = '<option value="">选择品牌</option>';
+        if (typeof hotBrands !== 'undefined') {
+            hotBrands.forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand.name;
+                option.text = brand.name;
+                brandSelect.appendChild(option);
             });
         }
     }
