@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="_site.css">
     <style>
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
-        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
         .item-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em 0em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
         .item-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0.5em 1em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); display: flex; justify-content: center; }
         .item-header.fixed > div { max-width: var(--max-content-width); width: 100%; }
@@ -308,7 +308,7 @@
             let match = true;
             if (searchName && !item.name.toLowerCase().includes(searchName)) match = false;
 
-            const price = parseFloat(item.sales_amount.sample.replace('$', '')) || 0;
+            const price = parseFloat(item.price.replace('$', '')) || 0;
             if (price < priceMin || price > priceMax) match = false;
 
             const stock = parseInt(item.stock) || 0;
@@ -337,7 +337,7 @@
 
         let conditionStr = `在 <b style="color: var(--font-green)">${brandName}</b> - <b style="color: var(--font-green)">${serviceName}</b> 商品中`;
         let conditions = [];
-        if (searchName) conditions.push(`名称包含 "${searchName}"`);
+        if (searchName) conditions.push(`名称包含 "<b style="color: var(--font-green)">${searchName}</b>"`);
         if (priceMin > 0 || priceMax < Infinity) conditions.push(`价格范围 $${priceMin}-$${priceMax < Infinity ? priceMax : '∞'}`);
         if (stockMin > 0 || stockMax < Infinity) conditions.push(`库存范围 ${stockMin}-${stockMax < Infinity ? stockMax : '∞'}`);
         if (selectedAttrs.size > 0) conditions.push(`属性包含 <b style="color: var(--font-green)">${Array.from(selectedAttrs).join('、')}</b>`);
