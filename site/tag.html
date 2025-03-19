@@ -11,8 +11,9 @@
     <style>
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
         .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
-        .tag-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
-        .tag-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0.5em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .tag-header { max-width: var(--max-content-width); margin: 0 auto; padding: 1em 1em 0em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
+        .tag-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding:  1em 1em 0em 1em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); display: flex; justify-content: center; }
+        .tag-header.fixed > div { max-width: var(--max-content-width); width: 100%; }
         .tag-header h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; color: var(--text-primary); }
         .tag-header p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0; line-height: 1.4; }
         .result-opt { display: flex; justify-content: space-between; align-items: center; margin: 1em 0; font-size: var(--font-medium); color: var(--text-primary); }
@@ -27,34 +28,19 @@
         .pagination a:hover { border-color: var(--natural-green); color: var(--natural-green); }
         .header { transition: opacity 0.3s ease; }
         .header.hidden { opacity: 0; height: 0; overflow: hidden; display: none; }
-        .tag-header.fixed {
-            max-width: none;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 20;
-            border-bottom: 0.0625em solid var(--border-color);
-            left: 0;
-            right: 0;
-            padding: 0.5em 0; /* 修改：确保左右 padding 平衡 */
-            box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1);
-            display: flex; /* 新增：使用 flex 布局 */
-            justify-content: center; /* 新增：水平居中 */
-        }
-        .tag-header.fixed > div { /* 新增：如果有内部容器，确保其宽度受限 */
-            max-width: var(--max-content-width);
-            width: 100%;
-        }
+        .tag-tabs { display: flex; gap: 1em; margin-top: 0.5em; }
+        .tag-tab { padding: 0.3em 0.8em; cursor: pointer; color: var(--text-primary); font-size: var(--font-medium); border-bottom: 2px solid transparent; }
+        .tag-tab.active { color: var(--natural-green); border-bottom: 2px solid var(--natural-green); font-weight: bold; }
+        .tag-tab:hover { color: var(--font-green); }
         @media (max-width: 48em) {
-            body, .container, .tag-header{padding-top: 1.5em!important;margin: 0 !important;}
+            body, .container, .tag-header { padding-top: 1.5em !important; margin: 0 !important; }
             .container { padding-top: 1.5em !important; margin: 0 !important; }
-            .tag-header { padding: 1em; }
-            .tag-header.fixed { padding: 0.5em !important; }
+            .tag-header { padding: 1em 1em 0em 1em; }
+            .tag-header.fixed { padding: 1em 1em 0em 1em;!important; }
             .tag-header h1 { font-size: var(--font-medium); }
             .tag-header p { font-size: var(--font-small); }
-            .tag-header.fixed {
-                padding: 1em !important; /* 修改：移动端保持一致 */
-            }
+            .tag-tabs { flex-wrap: wrap; gap: 0.5em; }
+            .tag-tab { font-size: var(--font-small); padding: 0.2em 0.6em; }
         }
     </style>
 </head>
@@ -109,22 +95,24 @@
 <script src="_common.js"></script>
 <script>
     let currentPage = 1;
-    let itemsPerPage = 20; // 默认值改为20，与您的文档一致
+    let itemsPerPage = 20;
     let filteredResults = [];
     let allResults = [];
     let tagType = '';
     let tagName = '';
+    const typeCounts = {};
 
     // 动态获取参数
     const urlParams = new URLSearchParams(window.location.search);
     tagType = urlParams.get('type') || 'posts';
     tagName = urlParams.get('name') || '满额减免';
-    const typeText = {
+    const typeTextMap = {
         'store': 'Stories',
         'items': 'Items',
         'posts': 'Posts',
         'campaigns': 'Campaigns'
-    }[tagType];
+    };
+    let typeText = typeTextMap[tagType];
 
     // 根据类型选择字段配置和排序选项
     const fieldConfigs = {
@@ -156,16 +144,22 @@
         ]
     };
 
-    const fieldConfig = fieldConfigs[tagType];
+    let fieldConfig = fieldConfigs[tagType];
 
+    // 渲染头部和页签
     function renderTagHeader() {
-        const header = document.getElementById('tag-header');
-        const inner = header.querySelector('.tag-inner'); // 选择内部容器
+        const inner = document.querySelector('.tag-inner');
         const summary = `${faker.lorem.sentence()} ${faker.lorem.sentence()} ${faker.lorem.sentence()}`;
         inner.innerHTML = `
-        <h1>${tagName}</h1>
-        <p>${summary}</p>
-    `;
+            <h1>${tagName}</h1>
+            <p>${summary}</p>
+            <div class="tag-tabs">
+                <span class="tag-tab ${tagType === 'items' ? 'active' : ''}" data-type="items" onclick="changeTagType('items')">Items (${typeCounts['items'] || randomInt(50, 500)})</span>
+                <span class="tag-tab ${tagType === 'store' ? 'active' : ''}" data-type="store" onclick="changeTagType('store')">Stories (${typeCounts['store'] || randomInt(50, 500)})</span>
+                <span class="tag-tab ${tagType === 'posts' ? 'active' : ''}" data-type="posts" onclick="changeTagType('posts')">Posts (${typeCounts['posts'] || randomInt(50, 500)})</span>
+                <span class="tag-tab ${tagType === 'campaigns' ? 'active' : ''}" data-type="campaigns" onclick="changeTagType('campaigns')">Campaigns (${typeCounts['campaigns'] || randomInt(50, 500)})</span>
+            </div>
+        `;
     }
 
     // 初始化排序选项
@@ -183,8 +177,10 @@
     // 生成数据
     function generateTagData() {
         const dataCount = randomInt(50, 500);
+        typeCounts[tagType] = dataCount; // 记录当前类型的数据量
         const data = generateData(fieldConfig, dataCount);
         return data.map(item => {
+            item.tags = item.tags || [];
             item.tags.push(`<b>${tagName}</b>`);
             return item;
         });
@@ -334,6 +330,23 @@
         updateResults();
     }
 
+    // 切换标签类型
+    function changeTagType(newType) {
+        if (newType !== tagType) {
+            tagType = newType;
+            fieldConfig = fieldConfigs[tagType];
+            typeText = typeTextMap[tagType];
+            window.history.pushState({}, document.title, `?type=${tagType}&name=${tagName}`);
+            document.title = `${tagName} - ${typeText} - FASTRESP`;
+            allResults = generateTagData();
+            filteredResults = [...allResults];
+            initSortOptions();
+            currentPage = 1;
+            renderTagHeader();
+            updateResults();
+        }
+    }
+
     // 初始化页面
     window.onload = () => {
         w3.includeHTML(() => {
@@ -355,28 +368,22 @@
             setTimeout(() => {
                 const tagHeader = document.getElementById('tag-header');
                 const topHeader = document.querySelector('.header');
-                const h = tagHeader.offsetHeight; // 获取 tag-header 的初始高度
+                const h = tagHeader.offsetHeight;
                 window.addEventListener('scroll', () => {
                     const scrollY = window.scrollY;
                     if (scrollY >= h) {
-                        tagHeader.classList.add('fixed'); // 固定 tag-header
-                        topHeader.classList.add('hidden'); // 隐藏 header
-                        document.body.style.paddingTop = `${h + 7.4}em`; // 调整 padding 避免内容跳动
+                        tagHeader.classList.add('fixed');
+                        topHeader.classList.add('hidden');
+                        document.body.style.paddingTop = `${h + 7.4}em`;
                     } else {
-                        tagHeader.classList.remove('fixed'); // 恢复 tag-header
-                        topHeader.classList.remove('hidden'); // 显示 header
-                        document.body.style.paddingTop = '7.4em'; // 恢复原始 padding
+                        tagHeader.classList.remove('fixed');
+                        topHeader.classList.remove('hidden');
+                        document.body.style.paddingTop = '7.4em';
                     }
                 });
             }, 0);
         });
     };
-
-    // 随机整数函数
-    function randomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'922d526b7c9fbcd4',t:'MTc0MjM5MTAwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

@@ -306,4 +306,5 @@ window.addEventListener("load", function()  {
         generateArticles('seller-posts', 5, 8);
         generateArticles('resource-posts', 5, 8);
     }, 100)
+
 })
