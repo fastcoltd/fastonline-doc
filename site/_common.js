@@ -255,7 +255,7 @@ function initCarousel() {
         items[current].style.opacity = 0;
         current = (current + 1) % items.length;
         items[current].style.opacity = 1;
-    }, 3000);
+    }, 10000);
 }
 
 function generateArticles(containerId, min, max) {
@@ -268,9 +268,38 @@ function generateArticles(containerId, min, max) {
     }
 }
 
+function bindAllTagClick(){
+    document.querySelectorAll('.ant-tag').forEach(item => {
+        let parentClass = item.closest('.card-list').id;
+        let type
+        if (parentClass.indexOf("item") !== -1) {
+            type = 'items'
+        }else if (parentClass.indexOf("store") !== -1) {
+            type = 'store'
+        }else if (parentClass.indexOf("post") !== -1) {
+            type = 'posts'
+        }else if (parentClass.indexOf("campaign") !== -1) {
+            type = 'campaign'
+        }else if (parentClass.indexOf("demand") !== -1) {
+            type = 'demand'
+        }
+        let attr, value
+        let isAttr = item.innerText.indexOf(":") !== -1
+        if (isAttr){
+            let attrValue = item.innerText.split(":")
+            attr = attrValue[0].trim()
+            value = attrValue[1].trim()
+        }
+        item.onclick = () => {
+            window.open(isAttr ? `attr.html?type=${type}&name=${attr}&value=${value}` : `tag.html?type=${type}&name=${item.innerText}`)
+        }
+    })
+}
+
 window.addEventListener("load", function()  {
     setTimeout(()=>{
         generateServiceMenu()
+        bindAllTagClick()
         generateArticles('about-posts', 5, 8);
         generateArticles('buyer-posts', 5, 8);
         generateArticles('seller-posts', 5, 8);

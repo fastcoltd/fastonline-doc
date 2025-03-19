@@ -205,6 +205,7 @@ const ecommerceAttributes = {
 };
 
 // 电商标签（30个一级标签）
+const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
 const ecommerceTags = [
     "货到付款", "不计免赔", "包邮", "正品保证", "7天退换", "快速发货", "官方授权", "限时折扣", "满额减免", "新品首发",
     "热销推荐", "高性价比", "环保材料", "手工制作", "支持定制", "买家秀", "好评如潮", "库存充足", "现货供应", "预售特惠",
@@ -263,8 +264,6 @@ const services = [
     { name: 'Cloud Service', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) },
     { name: 'Security', sub: getRandomPlatforms(hotBrands.length * 0.4, hotBrands.length) }
 ];
-
-const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
 
 const realFaqs = [
     {
