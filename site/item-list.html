@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HackerRank - Soft Develop - Item List - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
+        .item-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
+        .item-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0.5em 1em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); display: flex; justify-content: center; }
+        .item-header.fixed > div { max-width: var(--max-content-width); width: 100%; }
+        .item-header .brand-info { display: flex; align-items: center; }
+        .item-header .brand-logo img { width: 2.5em; height: 2.5em; border-radius: 50%; margin-right: 1em; }
+        .item-header h1 { font-size: var(--font-large); margin: 0; color: var(--text-primary); }
+        .service-tabs { display: flex; gap: 1em; margin-top: 0.5em; white-space: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .service-tabs::-webkit-scrollbar { display: none; }
+        .service-tab { padding: 0.3em 0.8em; cursor: pointer; color: var(--text-primary); font-size: var(--font-medium); border-bottom: 2px solid transparent; flex-shrink: 0; }
+        .service-tab.active { color: var(--natural-green); border-bottom: 2px solid var(--natural-green); font-weight: bold; }
+        .service-tab:hover { color: var(--font-green); }
+        .filter-bar { display: flex; flex-wrap: wrap; gap: 1em; padding: 1em 0; align-items: center; }
+        .filter-column { display: flex; align-items: center; gap: 0.5em; }
+        .filter-column-label { font-size: var(--font-medium); color: var(--text-primary); }
+        .filter-column-number { width: 6em; }
+        .filter-column-span { margin: 0 0.5em; }
+        .filter-list { display: none; flex-wrap: wrap; gap: 0.5em; margin-bottom: 1em; }
+        .tag-list { display: flex; flex-wrap: wrap; gap: 0.5em; }
+        .tag-item { padding: 0.3em 0.8em; border-radius: 0.25em; }
+        .tag-close { cursor: pointer; margin-left: 0.5em; }
+        .result-opt { display: flex; justify-content: space-between; align-items: center; margin: 1em 0; font-size: var(--font-medium); color: var(--text-primary); }
+        .result-opt select { display: inline-block; float: right; justify-content: flex-end; gap: 1em; margin-left: auto; }
+        .select-wrapper { display: flex; gap: 1em; }
+        .sort-select { padding: 0.3em 1em; width: auto; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin: 1em; font-size: var(--font-small); color: var(--text-primary); }
+        .pagination-btn { padding: 0.3em 1em; background: var(--bg-white); border-color: var(--border-color); color: var(--text-primary); }
+        .pagination-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
+        .pagination-select { padding: 0.3em 1em; width: 8em; }
+        .pagination a { display: inline-block; padding: 0.3em 0.6em; margin: 0 0.3em; border: 0.0625em solid var(--border-color); border-radius: 0.25em; text-decoration: none; color: var(--text-primary); }
+        .pagination a:hover { border-color: var(--natural-green); color: var(--natural-green); }
+        .header { transition: opacity 0.3s ease; }
+        .header.hidden { opacity: 0; height: 0; overflow: hidden; display: none; }
+        @media (max-width: 48em) {
+            body, .container, .item-header { padding-top: 1.5em !important; margin: 0 !important; }
+            .container { padding-top: 1.5em !important; margin: 0 !important; }
+            .item-header { padding: 0.5em 1em; }
+            .item-header.fixed { padding: 0.5em 1em !important; }
+            .item-header .brand-logo img { width: 2em; height: 2em; margin-right: 0.5em; }
+            .item-header h1 { font-size: var(--font-medium); }
+            .service-tabs { gap: 0.5em; }
+            .service-tab { font-size: var(--font-small); padding: 0.2em 0.6em; }
+            .filter-bar { gap: 0.5em; padding: 0.5em 0; }
+            .filter-column-number { width: 5em; }
+        }
+    </style>
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="_header.html"></div>
+
+<!-- 主内容 -->
+<div class="container">
+    <div class="item-header" id="item-header">
+        <div class="item-inner">
+            <div class="brand-info">
+                <div class="brand-logo"><img src="" alt="" id="brand-logo"></div>
+                <h1 id="brand-name"></h1>
+            </div>
+            <div class="service-tabs" id="service-tabs"></div>
+            <div class="filter-bar">
+                <div class="filter-column">
+                    <label class="filter-column-label">属性:</label>
+                    <select class="ant-select" id="attribute-type" onchange="updateAttributeValues()">
+                        <option value="">属性</option>
+                    </select>
+                    <select class="ant-select" id="attribute-value" onchange="addAttributeTag()">
+                        <option value="">属性值</option>
+                    </select>
+                </div>
+                <div class="filter-column">
+                    <label class="filter-column-label">标签:</label>
+                    <select class="ant-select" id="tag-filter" onchange="addTag()">
+                        <option value="">标签</option>
+                    </select>
+                </div>
+                <div class="filter-column">
+                    <label class="filter-column-label">名称:</label>
+                    <input class="ant-input" type="text" id="search-name" placeholder="输入名称搜索">
+                </div>
+                <div class="filter-column">
+                    <label class="filter-column-label">价格:</label>
+                    <input class="ant-input filter-column-number" type="number" id="price-min" placeholder="最小值" min="0" step="0.01">
+                    <span class="filter-column-span">~</span>
+                    <input class="ant-input filter-column-number" type="number" id="price-max" placeholder="最大值" min="0" step="0.01">
+                </div>
+                <div class="filter-column">
+                    <label class="filter-column-label">库存:</label>
+                    <input class="ant-input filter-column-number" type="number" id="stock-min" placeholder="最小值" min="0">
+                    <span class="filter-column-span">~</span>
+                    <input class="ant-input filter-column-number" type="number" id="stock-max" placeholder="最大值" min="0">
+                </div>
+                <button class="ant-btn ant-btn-primary" onclick="applyFilters()">搜索</button>
+            </div>
+            <div class="filter-list">
+                <div id="attribute-tags" class="tag-list"></div>
+                <div id="tag-list" class="tag-list"></div>
+            </div>
+        </div>
+    </div>
+    <div class="section" style="padding-top: 1.5em;">
+        <div class="result-opt">
+            <div id="resultsShow"></div>
+            <div class="select-wrapper">
+                <select class="ant-select sort-select" id="showClass" onchange="changeShowClass()">
+                    <option value="cardHoriz" selected>横板展示</option>
+                    <option value="card">竖版展示</option>
+                </select>
+                <select class="ant-select sort-select" id="sort-by" onchange="sortResults()">
+                    <option value="sales_desc">销量降序 ↓</option>
+                    <option value="rating_desc">评分降序 ↓</option>
+                    <option value="refund_rate_desc">退款率降序 ↓</option>
+                    <option value="replacement_rate_desc">换货率降序 ↓</option>
+                    <option value="price_desc">价格降序 ↓</option>
+                    <option value="price_asc">价格升序 ↑</option>
+                    <option value="stock_desc">库存降序 ↓</option>
+                    <option value="stock_asc">库存升序 ↑</option>
+                    <option value="save_count_desc">收藏量降序 ↓</option>
+                    <option value="save_count_asc">收藏量升序 ↑</option>
+                    <option value="last_restock_time_desc">补货时间降序 ↓</option>
+                </select>
+            </div>
+        </div>
+        <div id="item-results" class="card-list"></div>
+        <div class="pagination">
+            <button class="ant-btn pagination-btn" onclick="changePage(-1)">上一页</button>
+            <span id="pagination-info"></span>
+            <button class="ant-btn pagination-btn" onclick="changePage(1)">下一页</button>
+            <span>跳转到 <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
+            <span><select class="ant-select pagination-select" id="items-per-page" onchange="updateResults()">
+                <option value="20" selected>20 条/页</option>
+                <option value="10">10 条/页</option>
+                <option value="40">40 条/页</option>
+                <option value="80">80 条/页</option>
+                <option value="100">100 条/页</option>
+            </select></span>
+        </div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="_footer.html"></div>
+
+<!-- 脚本 -->
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    let currentPage = 1;
+    let itemsPerPage = 20;
+    let filteredResults = [];
+    let allResults = [];
+    let selectedAttrs = new Set();
+    let selectedTags = new Set();
+
+    // 动态获取参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const serviceName = urlParams.get('services') || 'Soft Develop';
+    const brandName = urlParams.get('brandName') || 'HackerRank';
+    const selectedBrand = hotBrands.find(brand => brand.name === brandName) || hotBrands[0];
+    const fieldConfig = itemFieldConfig;
+
+    // 渲染头部和服务列表
+    function renderItemHeader() {
+        const inner = document.querySelector('.item-inner');
+        const logoImg = document.getElementById('brand-logo');
+        const nameH1 = document.getElementById('brand-name');
+        const serviceTabs = document.getElementById('service-tabs');
+
+        logoImg.src = selectedBrand.logo;
+        logoImg.alt = brandName;
+        nameH1.textContent = brandName;
+
+        const relatedServices = services.filter(service =>
+            service.sub && service.sub.some(sub => {
+                return sub.name == brandName;
+            })
+        );
+        serviceTabs.innerHTML = relatedServices.map(service => `
+            <span class="service-tab ${service.name === serviceName ? 'active' : ''}" data-service="${service.name}" onclick="changeService('${service.name}')">${service.name}</span>
+        `).join('');
+    }
+
+    // 初始化筛选
+    function initFilters() {
+        const attrTypeSelect = document.getElementById('attribute-type');
+        attrTypeSelect.innerHTML = '<option value="">属性</option>';
+        Object.keys(ecommerceAttributes).forEach(attr => {
+            const option = document.createElement('option');
+            option.value = attr;
+            option.text = attr;
+            attrTypeSelect.appendChild(option);
+        });
+
+        const tagSelect = document.getElementById('tag-filter');
+        tagSelect.innerHTML = '<option value="">标签</option>';
+        ecommerceTags.forEach(tag => {
+            const option = document.createElement('option');
+            option.value = tag;
+            option.text = tag;
+            tagSelect.appendChild(option);
+        });
+    }
+
+    // 更新属性值下拉框
+    function updateAttributeValues() {
+        const type = document.getElementById('attribute-type').value;
+        const valueSelect = document.getElementById('attribute-value');
+        valueSelect.innerHTML = '<option value="">属性值</option>';
+        if (type && ecommerceAttributes[type]) {
+            ecommerceAttributes[type].forEach(val => {
+                if (!selectedAttrs.has(val)) {
+                    const option = document.createElement('option');
+                    option.value = val;
+                    option.text = val;
+                    valueSelect.appendChild(option);
+                }
+            });
+        }
+    }
+
+    // 添加属性标签
+    function addAttributeTag() {
+        const type = document.getElementById('attribute-type').value;
+        const value = document.getElementById('attribute-value').value;
+        if (type && value) {
+            selectedAttrs.add(value);
+            const tags = document.getElementById('attribute-tags');
+            const tag = document.createElement('span');
+            let tagColor = tagColors[Math.floor(Math.random() * tagColors.length)];
+            tag.className = `ant-tag ${tagColor} tag-item`;
+            tag.innerHTML = `${type}: <b>${value}</b> <span class="close tag-close" onclick="removeTag(this, 'attribute-tags', '${value}')">×</span>`;
+            tags.appendChild(tag);
+            updateAttributeValues();
+            document.getElementById('attribute-value').value = '';
+            applyFilters();
+        }
+    }
+
+    // 添加标签
+    function addTag() {
+        const tag = document.getElementById('tag-filter').value;
+        if (tag && !selectedTags.has(tag)) {
+            selectedTags.add(tag);
+            const tags = document.getElementById('tag-list');
+            const tagElement = document.createElement('span');
+            let tagColor = tagColors[Math.floor(Math.random() * tagColors.length)];
+            tagElement.className = `ant-tag ${tagColor} tag-item`;
+            tagElement.innerHTML = `<b>${tag}</b> <span class="close tag-close" onclick="removeTag(this, 'tag-list', '${tag}')">×</span>`;
+            tags.appendChild(tagElement);
+            document.getElementById('tag-filter').value = '';
+            applyFilters();
+        }
+    }
+
+    // 删除标签
+    function removeTag(element, containerId, tagValue) {
+        element.parentElement.remove();
+        if (containerId === 'attribute-tags') selectedAttrs.delete(tagValue);
+        else if (containerId === 'tag-list') selectedTags.delete(tagValue);
+        updateAttributeValues();
+        applyFilters();
+    }
+
+    // 显示筛选标签条
+    function showFilterList() {
+        const filterTagLen = document.querySelectorAll('.tag-item').length;
+        document.querySelector('.filter-list').style.display = filterTagLen > 0 ? 'flex' : 'none';
+    }
+
+    // 生成商品数据
+    function generateItemData() {
+        const dataCount = randomInt(100, 500);
+        const data = generateData(fieldConfig, dataCount);
+        return data.map(item => {
+            item.brandName = brandName;
+            item.service = serviceName;
+            return item;
+        });
+    }
+
+    // 应用筛选
+    function applyFilters() {
+        showFilterList();
+        const searchName = document.getElementById('search-name').value.toLowerCase();
+        const priceMin = parseFloat(document.getElementById('price-min').value) || 0;
+        const priceMax = parseFloat(document.getElementById('price-max').value) || Infinity;
+        const stockMin = parseInt(document.getElementById('stock-min').value) || 0;
+        const stockMax = parseInt(document.getElementById('stock-max').value) || Infinity;
+
+        filteredResults = allResults.filter(item => {
+            let match = true;
+
+            if (searchName && !item.name.toLowerCase().includes(searchName)) match = false;
+
+            const price = parseFloat(item.sales_amount.sample.replace('$', '')) || 0;
+            if (price < priceMin || price > priceMax) match = false;
+
+            const stock = parseInt(item.stock) || 0;
+            if (stock < stockMin || stock > stockMax) match = false;
+
+            if (selectedAttrs.size > 0 && item.attributes) {
+                let matchOne = false;
+                selectedAttrs.forEach(attr => {
+                    Object.values(item.attributes).forEach(val => {
+                        if (val === attr) matchOne = true;
+                    });
+                });
+                match = matchOne ? match : false;
+            }
+
+            if (selectedTags.size > 0 && item.tags) {
+                let haveTag = false;
+                selectedTags.forEach(tag => {
+                    if (item.tags.includes(tag)) haveTag = true;
+                });
+                match = haveTag ? match : false;
+            }
+
+            return match;
+        });
+
+        let conditionStr = `在 <b style="color: var(--font-green)">${brandName}</b> - <b style="color: var(--font-green)">${serviceName}</b> 商品中`;
+        let conditions = [];
+        if (searchName) conditions.push(`名称包含 "${searchName}"`);
+        if (priceMin > 0 || priceMax < Infinity) conditions.push(`价格范围 $${priceMin}-$${priceMax < Infinity ? priceMax : '∞'}`);
+        if (stockMin > 0 || stockMax < Infinity) conditions.push(`库存范围 ${stockMin}-${stockMax < Infinity ? stockMax : '∞'}`);
+        if (selectedAttrs.size > 0) conditions.push(`属性包含 <b style="color: var(--font-green)">${Array.from(selectedAttrs).join('、')}</b>`);
+        if (selectedTags.size > 0) conditions.push(`标签包含 <b style="color: var(--font-green)">${Array.from(selectedTags).join('、')}</b>`);
+        const conditionText = conditions.length > 0 ? `，${conditions.join('，')}` : '';
+
+        document.getElementById('resultsShow').innerHTML = `${conditionStr}${conditionText}，找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条结果`;
+        currentPage = 1;
+        updateResults();
+    }
+
+    // 更新展示方式
+    function changeShowClass() {
+        updateResults();
+    }
+
+    // 更新结果显示
+    function updateResults() {
+        itemsPerPage = parseInt(document.getElementById('items-per-page').value);
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const results = filteredResults.slice(start, end);
+        const container = document.getElementById('item-results');
+        container.innerHTML = '';
+
+        results.forEach((item, index) => {
+            const card = document.createElement('div');
+            const showClass = document.getElementById('showClass').value;
+            card.className = showClass;
+
+            let imageHtml = '';
+            let titleHtml = '';
+            let fieldsHtml = '<div class="fields-row">';
+            let bottomHtml = '<div class="bottom-row">';
+            let favoriteHtml = '';
+            let hasTitle = false;
+
+            const fieldItems = [];
+            Object.entries(fieldConfig).forEach(([fieldName, fieldConfig]) => {
+                if (!fieldConfig[showClass]) return;
+
+                const value = item[fieldName] !== undefined ? item[fieldName] : fieldConfig.value;
+                const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, fieldConfig, 'item-results', index);
+                const type = fieldConfig.type || 'text';
+                const contentLength = (typeof value === 'string' ? value : JSON.stringify(value)).length;
+
+                if (type === 'image' && !imageHtml) {
+                    imageHtml = `<div class="image-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'text' && !hasTitle && fieldName === 'name') {
+                    titleHtml = `<div class="title-wrapper">${fieldContent.html}</div>`;
+                    hasTitle = true;
+                } else if (type === 'rating') {
+                    bottomHtml += `<div class="rating-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'tag') {
+                    bottomHtml += `<div class="tags-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'button') {
+                    bottomHtml += `<div class="button-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'favorite') {
+                    favoriteHtml += fieldContent.html;
+                } else {
+                    fieldItems.push({ html: fieldContent.html, length: contentLength, name: fieldName });
+                }
+            });
+
+            fieldItems.sort((a, b) => a.length - b.length);
+            fieldItems.forEach(item => {
+                fieldsHtml += `<span class="field-item">${item.html}</span>`;
+            });
+            fieldsHtml += '</div>';
+            bottomHtml += '</div>';
+
+            card.innerHTML = `
+                ${imageHtml}
+                <div class="card-content">
+                    ${titleHtml}
+                    ${fieldsHtml}
+                    ${bottomHtml}
+                    ${favoriteHtml}
+                </div>
+            `;
+            container.appendChild(card);
+
+            Object.entries(fieldConfig).forEach(([fieldName, fieldConfig]) => {
+                if (fieldConfig[showClass] && fieldConfig.onClick) {
+                    const elementId = `item-results-${fieldName}-${index}`;
+                    const element = card.querySelector(`#${elementId}`);
+                    if (element) {
+                        element.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            fieldConfig.onClick(item, element);
+                        });
+                    }
+                }
+            });
+        });
+
+        updatePagination();
+    }
+
+    // 更新分页
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+        let paginationHtml = '';
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+        } else {
+            paginationHtml += `<a href="#" onclick="goToPage(1)" ${currentPage === 1 ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>1</a>`;
+            if (currentPage > 4) paginationHtml += '<span>...</span>';
+            for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+            if (currentPage < totalPages - 3) paginationHtml += '<span>...</span>';
+            paginationHtml += `<a href="#" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${totalPages}</a>`;
+        }
+        document.getElementById('pagination-info').innerHTML = paginationHtml;
+        document.getElementById('jump-to-page').max = totalPages;
+    }
+
+    // 跳转页面
+    function goToPage(page) {
+        currentPage = page;
+        updateResults();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+        currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+        updateResults();
+    }
+
+    // 切换服务
+    function changeService(newService) {
+        if (newService !== serviceName) {
+            window.history.pushState({}, document.title, `?services=${encodeURIComponent(newService)}&brandName=${encodeURIComponent(brandName)}`);
+            location.reload();
+        }
+    }
+
+    // 排序结果
+    function sortResults() {
+        const sortBy = document.getElementById('sort-by').value;
+        filteredResults.sort((a, b) => {
+            if (sortBy === 'sales_desc') return (parseInt(b.sales) || 0) - (parseInt(a.sales) || 0);
+            if (sortBy === 'rating_desc') return (parseFloat(b.rating.sample) || 0) - (parseFloat(a.rating.sample) || 0);
+            if (sortBy === 'refund_rate_desc') {
+                const aRate = (parseInt(a.refund_count) || 0) / (parseInt(a.orders_count) || 1);
+                const bRate = (parseInt(b.refund_count) || 0) / (parseInt(b.orders_count) || 1);
+                return bRate - aRate;
+            }
+            if (sortBy === 'replacement_rate_desc') {
+                const aRate = (parseInt(a.replacement_count) || 0) / (parseInt(a.orders_count) || 1);
+                const bRate = (parseInt(b.replacement_count) || 0) / (parseInt(b.orders_count) || 1);
+                return bRate - aRate;
+            }
+            if (sortBy === 'price_desc') return (parseFloat(b.sales_amount.replace('$', '')) || 0) - (parseFloat(a.sales_amount.replace('$', '')) || 0);
+            if (sortBy === 'price_asc') return (parseFloat(a.sales_amount.replace('$', '')) || 0) - (parseFloat(b.sales_amount.replace('$', '')) || 0);
+            if (sortBy === 'stock_desc') return (parseInt(b.stock) || 0) - (parseInt(a.stock) || 0);
+            if (sortBy === 'stock_asc') return (parseInt(a.stock) || 0) - (parseInt(b.stock) || 0);
+            if (sortBy === 'save_count_desc') return (parseInt(b.save_count) || 0) - (parseInt(a.save_count) || 0);
+            if (sortBy === 'save_count_asc') return (parseInt(a.save_count) || 0) - (parseInt(b.save_count) || 0);
+            if (sortBy === 'last_restock_time_desc') {
+                const aTime = new Date(a.last_restock_time).getTime();
+                const bTime = new Date(b.last_restock_time).getTime();
+                return bTime - aTime;
+            }
+        });
+        updateResults();
+    }
+
+    // 初始化页面
+    window.onload = () => {
+        w3.includeHTML(() => {
+            document.title = `${brandName} - ${serviceName} - Item List - FASTRESP`;
+            renderItemHeader();
+            initFilters();
+            document.getElementById('jump-to-page').onchange = () => {
+                const page = parseInt(document.getElementById('jump-to-page').value);
+                if (page >= 1 && page <= Math.ceil(filteredResults.length / itemsPerPage)) {
+                    currentPage = page;
+                    updateResults();
+                }
+            };
+            allResults = generateItemData();
+            filteredResults = [...allResults];
+            applyFilters();
+
+            setTimeout(() => {
+                const itemHeader = document.getElementById('item-header');
+                const topHeader = document.querySelector('.header');
+                const h = itemHeader.offsetHeight;
+                window.addEventListener('scroll', () => {
+                    const scrollY = window.scrollY;
+                    if (scrollY >= h) {
+                        itemHeader.classList.add('fixed');
+                        topHeader.classList.add('hidden');
+                        document.body.style.paddingTop = `${h + 7.4}em`;
+                    } else {
+                        itemHeader.classList.remove('fixed');
+                        topHeader.classList.remove('hidden');
+                        document.body.style.paddingTop = '7.4em';
+                    }
+                });
+            }, 0);
+        });
+    };
+</script>
+</body>
+</html>

@@ -107,7 +107,7 @@
     tagType = urlParams.get('type') || 'posts';
     tagName = urlParams.get('name') || '满额减免';
     const typeTextMap = {
-        'store': 'Stories',
+        'stories': 'Stories',
         'items': 'Items',
         'posts': 'Posts',
         'campaigns': 'Campaigns'
@@ -116,13 +116,13 @@
 
     // 根据类型选择字段配置和排序选项
     const fieldConfigs = {
-        'store': storeFieldConfig,
+        'stories': storeFieldConfig,
         'items': itemFieldConfig,
         'posts': postsFieldConfig,
         'campaigns': campaignFieldConfig
     };
     const sortOptions = {
-        'store': [
+        'stories': [
             { value: 'visit_count', text: '按访问量降序' },
             { value: 'sales_amount', text: '按总销售额降序' },
             { value: 'rating', text: '按评分降序' }
@@ -155,7 +155,7 @@
             <p>${summary}</p>
             <div class="tag-tabs">
                 <span class="tag-tab ${tagType === 'items' ? 'active' : ''}" data-type="items" onclick="changeTagType('items')">Items (${typeCounts['items'] || randomInt(50, 500)})</span>
-                <span class="tag-tab ${tagType === 'store' ? 'active' : ''}" data-type="store" onclick="changeTagType('store')">Stories (${typeCounts['store'] || randomInt(50, 500)})</span>
+                <span class="tag-tab ${tagType === 'stories' ? 'active' : ''}" data-type="stories" onclick="changeTagType('stories')">Stories (${typeCounts['stories'] || randomInt(50, 500)})</span>
                 <span class="tag-tab ${tagType === 'posts' ? 'active' : ''}" data-type="posts" onclick="changeTagType('posts')">Posts (${typeCounts['posts'] || randomInt(50, 500)})</span>
                 <span class="tag-tab ${tagType === 'campaigns' ? 'active' : ''}" data-type="campaigns" onclick="changeTagType('campaigns')">Campaigns (${typeCounts['campaigns'] || randomInt(50, 500)})</span>
             </div>
@@ -317,7 +317,7 @@
                 if (sortBy === 'read_count') return (parseInt(b.read_count) || 0) - (parseInt(a.read_count) || 0);
                 if (sortBy === 'rating') return (parseFloat(b.rating.sample) || 0) - (parseFloat(a.rating.sample) || 0);
                 if (sortBy === 'save_count') return (parseInt(b.save_count) || 0) - (parseInt(a.save_count) || 0);
-            } else if (tagType === 'store' || tagType === 'items') {
+            } else if (tagType === 'stories' || tagType === 'items') {
                 if (sortBy === 'visit_count') return (parseInt(b.visit_count) || 0) - (parseInt(a.visit_count) || 0);
                 if (sortBy === 'sales_amount') return parseFloat(b.sales_amount.replace('$', '') || 0) - parseFloat(a.sales_amount.replace('$', '') || 0);
                 if (sortBy === 'rating') return (parseFloat(b.rating.sample) || 0) - (parseFloat(a.rating.sample) || 0);
@@ -368,6 +368,7 @@
             setTimeout(() => {
                 const tagHeader = document.getElementById('tag-header');
                 const topHeader = document.querySelector('.header');
+                const th = topHeader.clientHeight;
                 const h = tagHeader.offsetHeight;
                 window.addEventListener('scroll', () => {
                     const scrollY = window.scrollY;
@@ -381,7 +382,7 @@
                         document.body.style.paddingTop = '7.4em';
                     }
                 });
-            }, 0);
+            }, 200);
         });
     };
 </script>

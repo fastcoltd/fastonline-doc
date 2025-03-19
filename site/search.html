@@ -25,7 +25,7 @@
                         <label class="filter-column-label">类型:</label>
                         <select class="ant-select" id="search-type" onchange="updateSearchType()">
                             <option value="items">商品</option>
-                            <option value="stores">店铺</option>
+                            <option value="stories">店铺</option>
                             <option value="posts">文章</option>
                             <option value="demands">需求</option>
                         </select>
@@ -114,7 +114,7 @@
     // 字段配置映射
     const fieldConfigs = {
         'items': itemFieldConfig,
-        'stores': storeFieldConfig,
+        'stories': storeFieldConfig,
         'posts': postsFieldConfig,
         'demands': demandFieldConfig
     };
@@ -129,7 +129,7 @@
             // 'rating': { type: 'rating', label: '评分', min: 0, max: 5 },
             // 'sales': { type: 'number', label: '销量' }
         },
-        'stores': {
+        'stories': {
             'sales': { type: 'number', label: '销量' },
             'rating': { type: 'rating', label: '评分', min: 0, max: 5 }
         },
@@ -333,7 +333,7 @@
     function generateSearchData() {
         try {
             const config = fieldConfigs[searchType];
-            if(['stores', 'posts'].includes(searchType)){
+            if(['stories', 'posts'].includes(searchType)){
                 document.querySelectorAll('.filter-column')[1].style.display = "none"
             }else{
                 document.querySelectorAll('.filter-column')[1].style.display = ""

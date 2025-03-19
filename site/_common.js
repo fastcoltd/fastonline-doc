@@ -275,7 +275,7 @@ function bindAllTagClick(){
         if (parentClass.indexOf("item") !== -1) {
             type = 'items'
         }else if (parentClass.indexOf("store") !== -1) {
-            type = 'store'
+            type = 'stories'
         }else if (parentClass.indexOf("post") !== -1) {
             type = 'posts'
         }else if (parentClass.indexOf("campaign") !== -1) {
@@ -288,6 +288,9 @@ function bindAllTagClick(){
         }
         if(typeof attrType != 'undefined'){
             type = attrType
+        }
+        if (typeof searchType != 'undefined'){
+            type = searchType
         }
         let attr, value
         let isAttr = item.innerText.indexOf(":") !== -1
