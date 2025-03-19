@@ -279,9 +279,7 @@ function bindAllTagClick(){
         }else if (parentClass.indexOf("post") !== -1) {
             type = 'posts'
         }else if (parentClass.indexOf("campaign") !== -1) {
-            type = 'campaign'
-        }else if (parentClass.indexOf("demand") !== -1) {
-            type = 'demand'
+            type = 'campaigns'
         }
         let attr, value
         let isAttr = item.innerText.indexOf(":") !== -1
@@ -291,7 +289,7 @@ function bindAllTagClick(){
             value = attrValue[1].trim()
         }
         item.onclick = () => {
-            window.open(isAttr ? `attr.html?type=${type}&name=${attr}&value=${value}` : `tag.html?type=${type}&name=${item.innerText}`)
+            window.location.href = isAttr ? `attr.html?type=${type}&name=${attr}&value=${value}` : `tag.html?type=${type}&name=${item.innerText}`
         }
     })
 }
