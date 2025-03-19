@@ -11,7 +11,7 @@ let brandFieldConfig = {
 // 定义字段配置，热门服务：icon + 文字组合
 let servicesFieldConfig = {
     icon: { card: true, cardSq: true, cardHoriz: true, type: 'icon', style: {}, sample: i => getPicsumImage(50, 50, `service-icon-${i}`) },
-    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', style: {}, sample: () => faker.commerce.product() },
+    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', style: {}, sample: () => faker.commerce.productName() },
 
     // 新增字段（面向客户展示）
     summary: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '简介', style: {}, format: (d, v) => `<span style="color: #666">${v}</span>`, sample: () => faker.lorem.sentence()}
