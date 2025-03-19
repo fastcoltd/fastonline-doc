@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>标签 - 满额减免 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
+        .tag-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
+        .tag-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0.5em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .tag-header h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; color: var(--text-primary); }
+        .tag-header p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0; line-height: 1.4; }
+        .result-opt { display: flex; justify-content: space-between; align-items: center; margin: 1em 0; font-size: var(--font-medium); color: var(--text-primary); }
+        .result-opt select { display: inline-block; float: right; justify-content: flex-end; gap: 1em; margin-left: auto; }
+        .select-wrapper { display: flex; gap: 1em; }
+        .sort-select { padding: 0.3em 1em; width: auto; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin: 1em; font-size: var(--font-small); color: var(--text-primary); }
+        .pagination-btn { padding: 0.3em 1em; background: var(--bg-white); border-color: var(--border-color); color: var(--text-primary); }
+        .pagination-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
+        .pagination-select { padding: 0.3em 1em; width: 8em; }
+        .pagination a { display: inline-block; padding: 0.3em 0.6em; margin: 0 0.3em; border: 0.0625em solid var(--border-color); border-radius: 0.25em; text-decoration: none; color: var(--text-primary); }
+        .pagination a:hover { border-color: var(--natural-green); color: var(--natural-green); }
+        .header { transition: opacity 0.3s ease; }
+        .header.hidden { opacity: 0; height: 0; overflow: hidden; display: none; }
+        .tag-header.fixed {
+            max-width: none;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 20;
+            border-bottom: 0.0625em solid var(--border-color);
+            left: 0;
+            right: 0;
+            padding: 0.5em 0; /* 修改：确保左右 padding 平衡 */
+            box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1);
+            display: flex; /* 新增：使用 flex 布局 */
+            justify-content: center; /* 新增：水平居中 */
+        }
+        .tag-header.fixed > div { /* 新增：如果有内部容器，确保其宽度受限 */
+            max-width: var(--max-content-width);
+            width: 100%;
+        }
+        @media (max-width: 48em) {
+            body, .container, .tag-header{padding-top: 1.5em!important;margin: 0 !important;}
+            .container { padding-top: 1.5em !important; margin: 0 !important; }
+            .tag-header { padding: 1em; }
+            .tag-header.fixed { padding: 0.5em !important; }
+            .tag-header h1 { font-size: var(--font-medium); }
+            .tag-header p { font-size: var(--font-small); }
+            .tag-header.fixed {
+                padding: 1em !important; /* 修改：移动端保持一致 */
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="_header.html"></div>
+
+<!-- 主内容 -->
+<div class="container">
+    <div class="tag-header" id="tag-header">
+        <div class="tag-inner"></div>
+    </div>
+    <div class="section" style="padding-top: 1.5em;">
+        <div class="result-opt">
+            <div id="resultsShow"></div>
+            <div class="select-wrapper">
+                <select class="ant-select sort-select" id="showClass" onchange="changeShowClass()">
+                    <option value="cardHoriz" selected>横板展示</option>
+                    <option value="card">竖版展示</option>
+                </select>
+                <select class="ant-select sort-select" id="sort-by" onchange="sortResults()">
+                </select>
+            </div>
+        </div>
+        <div id="tag-results" class="card-list"></div>
+        <div class="pagination">
+            <button class="ant-btn pagination-btn" onclick="changePage(-1)">上一页</button>
+            <span id="pagination-info"></span>
+            <button class="ant-btn pagination-btn" onclick="changePage(1)">下一页</button>
+            <span>跳转到 <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
+            <span><select class="ant-select pagination-select" id="items-per-page" onchange="updateResults()">
+                <option value="10">10 条/页</option>
+                <option value="20" selected>20 条/页</option>
+                <option value="40">40 条/页</option>
+                <option value="80">80 条/页</option>
+                <option value="100">100 条/页</option>
+            </select></span>
+        </div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="_footer.html"></div>
+
+<!-- 脚本 -->
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    let currentPage = 1;
+    let itemsPerPage = 20; // 默认值改为20，与您的文档一致
+    let filteredResults = [];
+    let allResults = [];
+    let tagType = '';
+    let tagName = '';
+
+    // 动态获取参数
+    const urlParams = new URLSearchParams(window.location.search);
+    tagType = urlParams.get('type') || 'posts';
+    tagName = urlParams.get('name') || '满额减免';
+    const typeText = {
+        'store': 'Stories',
+        'items': 'Items',
+        'posts': 'Posts',
+        'campaigns': 'Campaigns'
+    }[tagType];
+
+    // 根据类型选择字段配置和排序选项
+    const fieldConfigs = {
+        'store': storeFieldConfig,
+        'items': itemFieldConfig,
+        'posts': postsFieldConfig,
+        'campaigns': campaignFieldConfig
+    };
+    const sortOptions = {
+        'store': [
+            { value: 'visit_count', text: '按访问量降序' },
+            { value: 'sales_amount', text: '按总销售额降序' },
+            { value: 'rating', text: '按评分降序' }
+        ],
+        'items': [
+            { value: 'visit_count', text: '按访问量降序' },
+            { value: 'sales_amount', text: '按总销售额降序' },
+            { value: 'rating', text: '按评分降序' }
+        ],
+        'posts': [
+            { value: 'read_count', text: '按阅读量降序' },
+            { value: 'rating', text: '按评分降序' },
+            { value: 'save_count', text: '按收藏数降序' }
+        ],
+        'campaigns': [
+            { value: 'visit_count', text: '按访问量降序' },
+            { value: 'sales_amount', text: '按总销售额降序' },
+            { value: 'favorites', text: '按收藏数降序' }
+        ]
+    };
+
+    const fieldConfig = fieldConfigs[tagType];
+
+    function renderTagHeader() {
+        const header = document.getElementById('tag-header');
+        const inner = header.querySelector('.tag-inner'); // 选择内部容器
+        const summary = `${faker.lorem.sentence()} ${faker.lorem.sentence()} ${faker.lorem.sentence()}`;
+        inner.innerHTML = `
+        <h1>${tagName}</h1>
+        <p>${summary}</p>
+    `;
+    }
+
+    // 初始化排序选项
+    function initSortOptions() {
+        const sortSelect = document.getElementById('sort-by');
+        sortSelect.innerHTML = '';
+        sortOptions[tagType].forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option.value;
+            opt.text = option.text;
+            sortSelect.appendChild(opt);
+        });
+    }
+
+    // 生成数据
+    function generateTagData() {
+        const dataCount = randomInt(50, 500);
+        const data = generateData(fieldConfig, dataCount);
+        return data.map(item => {
+            item.tags.push(`<b>${tagName}</b>`);
+            return item;
+        });
+    }
+
+    // 更新结果显示
+    function updateResults() {
+        itemsPerPage = parseInt(document.getElementById('items-per-page').value);
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const results = filteredResults.slice(start, end);
+        const container = document.getElementById('tag-results');
+        container.innerHTML = '';
+
+        document.getElementById('resultsShow').innerHTML = `在 <b style="color: var(--font-green)">${tagName}</b> 中关联的 <b style="color: var(--font-green)">${typeText}</b>，共计找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条`;
+
+        results.forEach((item, index) => {
+            const card = document.createElement('div');
+            const showClass = document.getElementById('showClass').value;
+            card.className = showClass;
+
+            let imageHtml = '';
+            let titleHtml = '';
+            let fieldsHtml = '<div class="fields-row">';
+            let bottomHtml = '<div class="bottom-row">';
+            let favoriteHtml = '';
+            let hasTitle = false;
+
+            const fieldItems = [];
+            Object.entries(fieldConfig).forEach(([fieldName, fieldConfig]) => {
+                if (!fieldConfig[showClass]) return;
+
+                const value = item[fieldName] !== undefined ? item[fieldName] : fieldConfig.value;
+                const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, fieldConfig, 'tag-results', index);
+                const type = fieldConfig.type || 'text';
+                const contentLength = (typeof value === 'string' ? value : JSON.stringify(value)).length;
+
+                if (type === 'image' && !imageHtml) {
+                    imageHtml = `<div class="image-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'text' && !hasTitle && (fieldName === 'name' || fieldName === 'title' || fieldName === 'demandTitle')) {
+                    titleHtml = `<div class="title-wrapper">${fieldContent.html}</div>`;
+                    hasTitle = true;
+                } else if (type === 'rating' || type === 'bidders') {
+                    bottomHtml += `<div class="rating-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'tag') {
+                    bottomHtml += `<div class="tags-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'button') {
+                    bottomHtml += `<div class="button-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'favorite') {
+                    favoriteHtml += fieldContent.html;
+                } else {
+                    fieldItems.push({ html: fieldContent.html, length: contentLength, name: fieldName });
+                }
+            });
+
+            fieldItems.sort((a, b) => a.length - b.length);
+            fieldItems.forEach(item => {
+                fieldsHtml += `<span class="field-item">${item.html}</span>`;
+            });
+            fieldsHtml += '</div>';
+            bottomHtml += '</div>';
+
+            card.innerHTML = `
+                ${imageHtml}
+                <div class="card-content">
+                    ${titleHtml}
+                    ${fieldsHtml}
+                    ${bottomHtml}
+                    ${favoriteHtml}
+                </div>
+            `;
+            container.appendChild(card);
+
+            Object.entries(fieldConfig).forEach(([fieldName, fieldConfig]) => {
+                if (fieldConfig[showClass] && fieldConfig.onClick) {
+                    const elementId = `tag-results-${fieldName}-${index}`;
+                    const element = card.querySelector(`#${elementId}`);
+                    if (element) {
+                        element.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            fieldConfig.onClick(item, element);
+                        });
+                    }
+                }
+            });
+        });
+
+        updatePagination();
+    }
+
+    // 更新分页
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+        let paginationHtml = '';
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+        } else {
+            paginationHtml += `<a href="#" onclick="goToPage(1)" ${currentPage === 1 ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>1</a>`;
+            if (currentPage > 4) paginationHtml += '<span>...</span>';
+            for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+            if (currentPage < totalPages - 3) paginationHtml += '<span>...</span>';
+            paginationHtml += `<a href="#" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${totalPages}</a>`;
+        }
+        document.getElementById('pagination-info').innerHTML = paginationHtml;
+        document.getElementById('jump-to-page').max = totalPages;
+    }
+
+    // 跳转页面
+    function goToPage(page) {
+        currentPage = page;
+        updateResults();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+        currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+        updateResults();
+    }
+
+    // 切换展示方式
+    function changeShowClass() {
+        updateResults();
+    }
+
+    // 排序结果
+    function sortResults() {
+        const sortBy = document.getElementById('sort-by').value;
+        filteredResults.sort((a, b) => {
+            if (tagType === 'posts') {
+                if (sortBy === 'read_count') return (parseInt(b.read_count) || 0) - (parseInt(a.read_count) || 0);
+                if (sortBy === 'rating') return (parseFloat(b.rating.sample) || 0) - (parseFloat(a.rating.sample) || 0);
+                if (sortBy === 'save_count') return (parseInt(b.save_count) || 0) - (parseInt(a.save_count) || 0);
+            } else if (tagType === 'store' || tagType === 'items') {
+                if (sortBy === 'visit_count') return (parseInt(b.visit_count) || 0) - (parseInt(a.visit_count) || 0);
+                if (sortBy === 'sales_amount') return parseFloat(b.sales_amount.replace('$', '') || 0) - parseFloat(a.sales_amount.replace('$', '') || 0);
+                if (sortBy === 'rating') return (parseFloat(b.rating.sample) || 0) - (parseFloat(a.rating.sample) || 0);
+            } else if (tagType === 'campaigns') {
+                if (sortBy === 'visit_count') return (parseInt(b.visit_count) || 0) - (parseInt(a.visit_count) || 0);
+                if (sortBy === 'sales_amount') return parseFloat(b.sales_amount.replace('$', '') || 0) - parseFloat(a.sales_amount.replace('$', '') || 0);
+                if (sortBy === 'favorites') return (parseInt(b.favorites) || 0) - (parseInt(a.favorites) || 0);
+            }
+        });
+        updateResults();
+    }
+
+    // 初始化页面
+    window.onload = () => {
+        w3.includeHTML(() => {
+            document.title = `${tagName} - ${typeText} - FASTRESP`;
+            renderTagHeader();
+            initSortOptions();
+            document.getElementById('jump-to-page').onchange = () => {
+                const page = parseInt(document.getElementById('jump-to-page').value);
+                if (page >= 1 && page <= Math.ceil(filteredResults.length / itemsPerPage)) {
+                    currentPage = page;
+                    updateResults();
+                }
+            };
+            allResults = generateTagData();
+            filteredResults = [...allResults];
+            updateResults();
+
+            // 滚动监听逻辑
+            setTimeout(() => {
+                const tagHeader = document.getElementById('tag-header');
+                const topHeader = document.querySelector('.header');
+                const h = tagHeader.offsetHeight; // 获取 tag-header 的初始高度
+                window.addEventListener('scroll', () => {
+                    const scrollY = window.scrollY;
+                    if (scrollY >= h) {
+                        tagHeader.classList.add('fixed'); // 固定 tag-header
+                        topHeader.classList.add('hidden'); // 隐藏 header
+                        document.body.style.paddingTop = `${h + 7.4}em`; // 调整 padding 避免内容跳动
+                    } else {
+                        tagHeader.classList.remove('fixed'); // 恢复 tag-header
+                        topHeader.classList.remove('hidden'); // 显示 header
+                        document.body.style.paddingTop = '7.4em'; // 恢复原始 padding
+                    }
+                });
+            }, 0);
+        });
+    };
+
+    // 随机整数函数
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'922d526b7c9fbcd4',t:'MTc0MjM5MTAwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>

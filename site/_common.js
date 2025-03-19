@@ -281,6 +281,9 @@ function bindAllTagClick(){
         }else if (parentClass.indexOf("campaign") !== -1) {
             type = 'campaigns'
         }
+        if(typeof tagType != 'undefined'){
+            type = tagType
+        }
         let attr, value
         let isAttr = item.innerText.indexOf(":") !== -1
         if (isAttr){
