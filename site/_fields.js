@@ -179,6 +179,7 @@ let ordersCommentFieldConfig = {
     store: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: "店铺",style: {}, sample: () => faker.company.companyName() },
     brandName: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '品牌', style: {}, sample: () => {return generateBrand()} },
     service: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '服务', style: {}, sample: () => {return generateServices()} },
+    itemName: { card: true, cardSq: true, cardHoriz: true, type: 'text',label: 'Item', style: {}, sample: () => faker.commerce.productName() },
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
     content: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '内容', style: {}, sample: () => faker.lorem.paragraph() },
 
