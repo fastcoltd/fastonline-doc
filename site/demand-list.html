@@ -22,26 +22,12 @@
             <div class="result-header">
                 <div class="filter-bar">
                     <div class="filter-column">
-                        <label class="filter-column-label">搜索标题:</label>
-                        <input class="ant-input" type="text" id="search-title" placeholder="输入标题搜索">
+                        <label class="filter-column-label">Search标题:</label>
+                        <input class="ant-input" type="text" id="search-title" placeholder="输入标题Search">
                     </div>
                     <div class="filter-column">
                         <label class="filter-column-label">状态:</label>
                         <select class="ant-select" id="status-filter" onchange="applyFilters()">
-                            <option value="all">全部</option>
-                            <option value="竞标中" selected>竞标中</option>
-                            <option value="通过">通过</option>
-                            <option value="已交定金">已交定金</option>
-                            <option value="暂未开始">暂未开始</option>
-                            <option value="已中标">已中标</option>
-                            <option value="已付尾款">已付尾款</option>
-                            <option value="已交付">已交付</option>
-                            <option value="需求完成">需求完成</option>
-                            <option value="评价完成">评价完成</option>
-                            <option value="需求过期">需求过期</option>
-                            <option value="已退款">已退款</option>
-                            <option value="客户关闭">客户关闭</option>
-                            <option value="已废弃">已废弃</option>
                         </select>
                     </div>
                     <div class="filter-column">
@@ -61,15 +47,15 @@
                         <input class="ant-input filter-column-number" type="number" id="totalPrice-max" placeholder="最大值" min="0" step="0.01">
                     </div>
                     <div class="filter-column">
-                        <label class="filter-column-label">属性:</label>
+                        <label class="filter-column-label">Attr:</label>
                         <select class="ant-select" id="attribute-type" onchange="updateAttributeValues()">
-                            <option value="">属性</option>
+                            <option value="">Attr</option>
                         </select>
                         <select class="ant-select" id="attribute-value" onchange="addAttributeTag()">
-                            <option value="">属性值</option>
+                            <option value="">Attr Value</option>
                         </select>
                     </div>
-                    <button class="btn-solid-medium" onclick="applyFilters()">搜索</button>
+                    <button class="btn-solid-medium" onclick="applyFilters()">Search</button>
                 </div>
                 <div class="filter-list">
                     <div id="attribute-tags" class="tag-list"></div>
@@ -92,16 +78,16 @@
             </div>
             <div id="demand-results" class="card-list"></div>
             <div class="pagination">
-                <button class="ant-btn pagination-btn" onclick="changePage(-1)">上一页</button>
+                <button class="ant-btn pagination-btn" onclick="changePage(-1)">Previous</button>
                 <span id="pagination-info"></span>
-                <button class="ant-btn pagination-btn" onclick="changePage(1)">下一页</button>
-                <span>跳转到 <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
+                <button class="ant-btn pagination-btn" onclick="changePage(1)">Next</button>
+                <span>Jump to <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
                 <span><select class="ant-select pagination-select" id="items-per-page" onchange="updateResults()">
-                    <option value="10" selected>10 条/页</option>
-                    <option value="20">20 条/页</option>
-                    <option value="40">40 条/页</option>
-                    <option value="80">80 条/页</option>
-                    <option value="100">100 条/页</option>
+                    <option value="10" selected>10 Items/Pg</option>
+                    <option value="20">20 Items/Pg</option>
+                    <option value="40">40 Items/Pg</option>
+                    <option value="80">80 Items/Pg</option>
+                    <option value="100">100 Items/Pg</option>
                 </select></span>
             </div>
         </div>
@@ -140,6 +126,7 @@
         updateAttributeFilter();
         updateBrandFilter();
         updateServiceFilter();
+        updateStatusFilter();
     }
 
     // 更新品牌筛选
@@ -151,6 +138,21 @@
                 const option = document.createElement('option');
                 option.value = platform.name;
                 brandList.appendChild(option);
+            });
+        }
+    }
+
+    function updateStatusFilter() {
+        const statusSelect = document.getElementById('status-filter');
+        statusSelect.innerHTML = '';
+        if (typeof demandStatusColors !== 'undefined') {
+            const option = document.createElement('option');
+            option.text = option.value = "All";
+            statusSelect.appendChild(option);
+            Object.keys(demandStatusColors).forEach(status => {
+                const option = document.createElement('option');
+                option.text = option.value = status;
+                statusSelect.appendChild(option);
             });
         }
     }
@@ -171,7 +173,7 @@
     // 更新属性筛选
     function updateAttributeFilter() {
         const attributeType = document.getElementById('attribute-type');
-        attributeType.innerHTML = '<option value="">属性</option>';
+        attributeType.innerHTML = '<option value="">Attr</option>';
         if (typeof ecommerceAttributes !== 'undefined') {
             Object.keys(ecommerceAttributes).forEach(attr => {
                 const option = document.createElement('option');
@@ -186,7 +188,7 @@
     function updateAttributeValues() {
         const type = document.getElementById('attribute-type').value;
         const valueSelect = document.getElementById('attribute-value');
-        valueSelect.innerHTML = '<option value="">属性值</option>';
+        valueSelect.innerHTML = '<option value="">Attr Value</option>';
         if (type && typeof ecommerceAttributes !== 'undefined' && ecommerceAttributes[type]) {
             ecommerceAttributes[type].forEach(val => {
                 if (!selectedAttrs.has(val)) {
@@ -259,11 +261,11 @@
         filteredResults = allResults.filter(item => {
             let match = true;
 
-            // 标题搜索
+            // 标题Search
             if (searchTitle && !item.demandTitle.toLowerCase().includes(searchTitle)) match = false;
 
             // 状态筛选
-            if (statusFilter !== 'all' && item.status.sample !== statusFilter) match = false;
+            if (statusFilter !== 'All' && item.status.sample !== statusFilter) match = false;
 
             // 品牌筛选
             if (brandFilter && !item.brandName.toLowerCase().includes(brandFilter)) match = false;
@@ -299,7 +301,7 @@
             return match;
         });
 
-        // 组合搜索条件形成一句话
+        // 组合Search条件形成一句话
         let conditionStr = `在需求列表中`;
         let conditions = [];
         if (searchTitle) conditions.push(`标题包含 "${searchTitle}"`);

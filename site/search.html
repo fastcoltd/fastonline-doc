@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>搜索 - FASTRESP</title>
+    <title>Search - FASTRESP</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -49,7 +49,7 @@
                             <option value="">标签</option>
                         </select>
                     </div>
-                    <button class="btn-solid-medium" onclick="applyFilters()" >筛选</button>
+                    <button class="btn-solid-medium" onclick="applyFilters()" >Search</button>
                 </div>
                 <div class="filter-list">
                     <div id="attribute-tags" class="tag-list"></div>
@@ -74,16 +74,16 @@
             </div>
             <div id="search-results" class="card-list"></div>
             <div class="pagination">
-                <button class="ant-btn pagination-btn" onclick="changePage(-1)">上一页</button>
+                <button class="ant-btn pagination-btn" onclick="changePage(-1)">Previous</button>
                 <span id="pagination-info"></span>
-                <button class="ant-btn pagination-btn" onclick="changePage(1)">下一页</button>
-                <span>跳转到 <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
+                <button class="ant-btn pagination-btn" onclick="changePage(1)">Next</button>
+                <span>Jump to <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
                 <span><select class="ant-select pagination-select" id="items-per-page" onchange="updateResults()">
-                    <option value="10" selected>10 条/页</option>
-                    <option value="20" selected>20 条/页</option>
-                    <option value="40">40 条/页</option>
-                    <option value="80">80 条/页</option>
-                    <option value="100">100 条/页</option>
+                    <option value="10" selected>10 Items/Pg</option>
+                    <option value="20" selected>20 Items/Pg</option>
+                    <option value="40">40 Items/Pg</option>
+                    <option value="80">80 Items/Pg</option>
+                    <option value="100">100 Items/Pg</option>
                 </select></span>
             </div>
         </div>
@@ -196,7 +196,7 @@
         }
     }
 
-    // 更新搜索类型并重新生成数据和筛选条件
+    // 更新Search类型并重新生成数据和筛选条件
     function updateSearchType() {
         searchType = document.getElementById('search-type').value;
         allResults = generateSearchData();
@@ -329,7 +329,7 @@
         }
     }
 
-    // 生成搜索数据
+    // 生成Search数据
     function generateSearchData() {
         try {
             const config = fieldConfigs[searchType];
@@ -434,7 +434,7 @@
         });
         console.log('Filtered Results:', filteredResults);
         let keywords = searchKeyword || '全部';
-        document.getElementById('resultsShow').innerHTML = `在 <b style="color: var(--font-green)">${searchType}</b> 分类中，搜索 "<b style="color: var(--font-green)">${keywords}</b>"，找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条结果`;
+        document.getElementById('resultsShow').innerHTML = `在 <b style="color: var(--font-green)">${searchType}</b> 分类中，Search "<b style="color: var(--font-green)">${keywords}</b>"，找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条结果`;
         currentPage = 1;
         updateResults();
     }

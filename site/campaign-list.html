@@ -22,8 +22,8 @@
             <div class="result-header">
                 <div class="filter-bar">
                     <div class="filter-column">
-                        <label class="filter-column-label">搜索标题:</label>
-                        <input class="ant-input" type="text" id="search-title" placeholder="输入标题搜索">
+                        <label class="filter-column-label">Search标题:</label>
+                        <input class="ant-input" type="text" id="search-title" placeholder="输入标题Search">
                     </div>
                     <div class="filter-column">
                         <label class="filter-column-label">标签:</label>
@@ -31,7 +31,7 @@
                             <option value="">选择标签</option>
                         </select>
                     </div>
-                    <button class="btn-solid-medium" onclick="applyFilters()">搜索</button>
+                    <button class="btn-solid-medium" onclick="applyFilters()">Search</button>
                 </div>
                 <div class="filter-list">
                     <div id="tag-list" class="tag-list"></div>
@@ -53,16 +53,16 @@
             </div>
             <div id="campaign-results" class="card-list"></div>
             <div class="pagination">
-                <button class="ant-btn pagination-btn" onclick="changePage(-1)">上一页</button>
+                <button class="ant-btn pagination-btn" onclick="changePage(-1)">Previous</button>
                 <span id="pagination-info"></span>
-                <button class="ant-btn pagination-btn" onclick="changePage(1)">下一页</button>
-                <span>跳转到 <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
+                <button class="ant-btn pagination-btn" onclick="changePage(1)">Next</button>
+                <span>Jump to <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
                 <span><select class="ant-select pagination-select" id="items-per-page" onchange="updateResults()">
-                    <option value="10" selected>10 条/页</option>
-                    <option value="20">20 条/页</option>
-                    <option value="40">40 条/页</option>
-                    <option value="80">80 条/页</option>
-                    <option value="100">100 条/页</option>
+                    <option value="10" selected>10 Items/Pg</option>
+                    <option value="20">20 Items/Pg</option>
+                    <option value="40">40 Items/Pg</option>
+                    <option value="80">80 Items/Pg</option>
+                    <option value="100">100 Items/Pg</option>
                 </select></span>
             </div>
         </div>
@@ -161,7 +161,7 @@
         filteredResults = allResults.filter(item => {
             let match = true;
 
-            // 标题搜索
+            // 标题Search
             if (searchTitle && !item.title.toLowerCase().includes(searchTitle)) match = false;
 
             // 标签筛选
@@ -177,7 +177,7 @@
             return match;
         });
 
-        // 组合搜索条件形成一句话
+        // 组合Search条件形成一句话
         let conditionStr = `在活动列表中`;
         let conditions = [];
         if (searchTitle) conditions.push(`标题包含 <b style="color: var(--font-green)">"${searchTitle}"</b>`);

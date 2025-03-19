@@ -47,7 +47,7 @@ let itemFieldConfig = {
     save_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '收藏数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 20, max: 100 })},
     last_restock_time: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '最后补货时间', format: (d, v) => `<span style="color: #666">${v}</span>`, style: {}, sample: () => faker.date.recent().toLocaleDateString()},
     delivery_type: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '配送方式', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.random.arrayElement(['快递', '自提', '同城配送'])},
-    buyNow: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: '立即购买', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
+    buyNow: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: 'Buy Now', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 };
 
 // 热门店铺字段配置，添加“进入”按钮
@@ -85,7 +85,7 @@ let storeFieldConfig = {
     },
 
     tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '要求', style: {}, sample: () => {return generateTag(1,3)} },
-    enter: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: '进入', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
+    enter: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: 'View', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 
     // 新增字段（面向客户展示）
     level: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '店铺等级', format: (d, v) => `<span style="color: #FFD700">Lv${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 1, max: 5 })},
@@ -113,7 +113,7 @@ let demandFieldConfig = {
             return Array(randomInt(3, 10)).fill().map(() => getPicsumImage(50, 50, `bidder-${Math.random()}`))
     }},
     attributes: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '属性', style: {}, sample: () => {return generateAttr(2,5)}},
-    bidNow: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: '投标', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
+    bidNow: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: 'Bid', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 
     // 新增字段（面向客户展示）
     quantity: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '需求总数', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 10, max: 100 })},
@@ -136,7 +136,7 @@ let postsFieldConfig = {
     tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '要求', style: {}, sample: () => {return generateTag(1,3)} },
 
     // 新增字段（面向客户展示）
-    viewNow: { card: false, cardSq: false, cardHoriz: true, type: 'button', value: '查看', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
+    viewNow: { card: false, cardSq: false, cardHoriz: true, type: 'button', value: 'View', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
     read_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '阅读量', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 100, max: 1000 })},
     comment_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '评论数', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 10, max: 50 })},
     save_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '收藏数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 20, max: 100 })},
@@ -165,7 +165,7 @@ let campaignFieldConfig = {
     },
 
     tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '要求', style: {}, sample: () => {return generateTag(2,4)} },
-    joinNow: { card: false, cardSq: false, cardHoriz: true, type: 'button', value: '查看', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
+    joinNow: { card: false, cardSq: false, cardHoriz: true, type: 'button', value: 'View', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 
     // 新增字段（面向客户展示）
     visit_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '访问量', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 300, max: 1500 })},

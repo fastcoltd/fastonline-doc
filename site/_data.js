@@ -152,80 +152,107 @@ const hotBrands = [
 
 // 电商属性/属性值数据（50个属性类型，每个至少10个属性值）
 const ecommerceAttributes = {
-    "国家": ["USA", "China", "Japan", "Germany", "France", "UK", "Canada", "Australia", "India", "Brazil"],
-    "颜色": ["红色", "蓝色", "绿色", "黑色", "白色", "黄色", "紫色", "橙色", "粉色", "灰色"],
-    "尺寸": ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "定制"],
-    "材质": ["棉", "聚酯", "丝绸", "羊毛", "皮革", "牛仔", "麻", "尼龙", "绒", "竹纤维"],
-    "品牌类型": ["奢侈品", "高端", "中端", "平价", "快时尚", "运动", "户外", "手工", "环保", "本地品牌"],
-    "季节": ["春季", "夏季", "秋季", "冬季", "全季", "春夏", "秋冬", "夏季清凉", "冬季保暖", "过渡季"],
-    "风格": ["休闲", "正式", "运动", "复古", "时尚", "简约", "街头", "民族", "商务", "朋克"],
-    "用途": ["日常", "运动", "旅行", "派对", "工作", "家用", "户外", "礼品", "收藏", "装饰"],
-    "性别": ["男", "女", "中性", "儿童", "婴儿", "青少年", "成人", "孕妇", "情侣", "全家"],
-    "年龄段": ["0-3岁", "4-6岁", "7-12岁", "13-18岁", "19-25岁", "26-35岁", "36-45岁", "46-60岁", "60岁以上", "全年龄"],
-    "包装": ["盒装", "袋装", "散装", "礼盒", "真空", "瓶装", "罐装", "纸袋", "塑料", "环保包装"],
-    "重量": ["<100g", "100-200g", "200-500g", "500g-1kg", "1-2kg", "2-5kg", "5-10kg", "10-20kg", "20kg以上", "定制重量"],
-    "容量": ["<50ml", "50-100ml", "100-250ml", "250-500ml", "500ml-1L", "1-2L", "2-5L", "5-10L", "10L以上", "定制容量"],
-    "保质期": ["1个月", "3个月", "6个月", "1年", "2年", "3年", "5年", "10年", "永久", "无保质期"],
-    "产地": ["本地", "进口", "亚洲", "欧洲", "北美", "南美", "非洲", "澳洲", "手工", "工厂生产"],
-    "认证": ["有机", "无添加", "环保", "FDA", "CE", "ISO", "QS", "绿色食品", "非转基因", "公平贸易"],
-    "电源": ["电池", "USB", "插电", "太阳能", "手动", "无线", "充电", "风能", "混合动力", "无电源"],
-    "屏幕尺寸": ["<5寸", "5-7寸", "7-10寸", "10-13寸", "13-15寸", "15-17寸", "17-20寸", "20寸以上", "无屏幕", "可调节"],
-    "分辨率": ["720p", "1080p", "2K", "4K", "8K", "标清", "高清", "超高清", "定制", "无分辨率"],
-    "内存": ["<1GB", "1-2GB", "2-4GB", "4-8GB", "8-16GB", "16-32GB", "32-64GB", "64-128GB", "128GB以上", "可扩展"],
-    "存储": ["<16GB", "16-32GB", "32-64GB", "64-128GB", "128-256GB", "256-512GB", "512GB-1TB", "1-2TB", "2TB以上", "云存储"],
-    "网络": ["2G", "3G", "4G", "5G", "WiFi", "蓝牙", "有线", "无网络", "双模", "多模"],
-    "操作系统": ["Android", "iOS", "Windows", "Linux", "MacOS", "无系统", "定制", "RTOS", "HarmonyOS", "其他"],
-    "电池容量": ["<1000mAh", "1000-2000mAh", "2000-3000mAh", "3000-5000mAh", "5000-8000mAh", "8000-10000mAh", "10000mAh以上", "无电池", "可更换", "固定"],
-    "充电时间": ["<1小时", "1-2小时", "2-3小时", "3-4小时", "4-6小时", "6-8小时", "8小时以上", "快速充电", "无线充电", "无充电"],
-    "使用场景": ["室内", "室外", "办公", "家庭", "旅行", "运动", "派对", "学习", "娱乐", "紧急"],
-    "目标人群": ["学生", "职场人士", "老年人", "儿童", "运动员", "旅行者", "家庭主妇", "收藏家", "DIY爱好者", "专业人士"],
-    "配件": ["充电器", "耳机", "数据线", "保护套", "支架", "电池", "说明书", "工具包", "清洁布", "无配件"],
-    "运输方式": ["快递", "物流", "空运", "海运", "陆运", "自提", "无人机", "专车", "邮寄", "即时配送"],
-    "配送时间": ["1-2天", "3-5天", "5-7天", "7-10天", "10-15天", "15-30天", "1个月以上", "即时", "预订", "定制"],
-    "退换政策": ["7天无理由", "15天退换", "30天退换", "不支持退换", "仅换不退", "仅退不换", "需联系客服", "保修期内", "特殊条件", "无政策"],
-    "促销类型": ["满减", "折扣", "赠品", "秒杀", "团购", "预售", "返现", "积分", "免邮", "无促销"],
-    "产品类别": ["电子产品", "服装", "鞋帽", "家居", "食品", "美妆", "玩具", "文具", "运动用品", "汽车配件"],
-    "清洁方式": ["手洗", "机洗", "干洗", "擦拭", "水洗", "不可洗", "专业清洗", "蒸汽清洗", "超声波清洗", "自清洁"],
-    "耐用性": ["一次性", "短期使用", "1年内", "1-3年", "3-5年", "5-10年", "10年以上", "超耐用", "易损", "视使用情况"],
-    "防水等级": ["不防水", "生活防水", "IPX4", "IPX5", "IPX6", "IPX7", "IPX8", "完全防水", "防泼溅", "定制防水"],
-    "噪音等级": ["无声", "<20dB", "20-40dB", "40-60dB", "60-80dB", "80-100dB", "100dB以上", "低噪", "静音", "高噪"],
-    "能耗等级": ["A+++", "A++", "A+", "A", "B", "C", "D", "E", "无能耗", "超低能耗"],
-    "安装方式": ["免安装", "自助安装", "专业安装", "壁挂", "落地", "嵌入式", "便携", "固定", "模块化", "定制安装"],
-    "灯光类型": ["无灯光", "LED", "白炽灯", "荧光灯", "RGB", "暖光", "冷光", "可调光", "氛围灯", "智能灯"],
-    "连接方式": ["有线", "无线", "蓝牙", "WiFi", "NFC", "USB", "红外", "Zigbee", "双连接", "多连接"],
-    "控制方式": ["手动", "遥控", "语音", "APP", "触摸", "按键", "感应", "自动", "智能", "混合控制"],
-    "适用设备": ["手机", "平板", "电脑", "电视", "相机", "游戏机", "音响", "通用", "专用", "多设备"],
-    "语言支持": ["中文", "英文", "多语言", "日文", "韩文", "法文", "德文", "西班牙文", "俄文", "无语言"],
-    "版本类型": ["基础版", "标准版", "高级版", "专业版", "旗舰版", "限量版", "定制版", "测试版", "开发版", "收藏版"],
-    "更新频率": ["每日", "每周", "每月", "每季", "每年", "不定期", "无更新", "实时", "手动更新", "自动更新"],
-    "安全等级": ["低", "中", "高", "超高", "军用级", "民用级", "商业级", "基础保护", "多重保护", "无保护"],
-    "环保等级": ["无环保", "低环保", "中环保", "高环保", "全环保", "可回收", "可降解", "零排放", "节能", "绿色认证"],
-    "定制选项": ["不可定制", "颜色定制", "尺寸定制", "图案定制", "功能定制", "全定制", "部分定制", "限量定制", "个性化", "无定制"],
-    "认证机构": ["国家标准", "国际标准", "第三方认证", "品牌认证", "无认证", "ISO9001", "CE认证", "UL认证", "RoHS", "其他认证"]
+    "Country": ["USA", "China", "Japan", "Germany", "France", "UK", "Canada", "Australia", "India", "Brazil"],
+    "Color": ["Red", "Blue", "Green", "Black", "White", "Yellow", "Purple", "Orange", "Pink", "Gray"],
+    "Size": ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "Custom"],
+    "Material": ["Cotton", "Poly", "Silk", "Wool", "Leather", "Denim", "Linen", "Nylon", "Velvet", "Bamboo"],
+    "Brand Type": ["Luxury", "Premium", "Mid-Range", "Affordable", "Fast Fashion", "Sport", "Outdoor", "Handmade", "Eco", "Local"],
+    "Season": ["Spring", "Summer", "Fall", "Winter", "All-Season", "Spring/Summer", "Fall/Winter", "Summer Cool", "Winter Warm", "Transitional"],
+    "Style": ["Casual", "Formal", "Sporty", "Retro", "Trendy", "Minimal", "Street", "Ethnic", "Business", "Punk"],
+    "Use": ["Daily", "Sport", "Travel", "Party", "Work", "Home", "Outdoor", "Gift", "Collectible", "Decor"],
+    "Gender": ["Men", "Women", "Unisex", "Kids", "Baby", "Teens", "Adults", "Maternity", "Couples", "Family"],
+    "Age Group": ["0-3Y", "4-6Y", "7-12Y", "13-18Y", "19-25Y", "26-35Y", "36-45Y", "46-60Y", "60+Y", "All Ages"],
+    "Packaging": ["Boxed", "Bagged", "Bulk", "Gift Box", "Vacuum", "Bottled", "Canned", "Paper Bag", "Plastic", "Eco-Pack"],
+    "Weight": ["<100g", "100-200g", "200-500g", "500g-1kg", "1-2kg", "2-5kg", "5-10kg", "10-20kg", "20kg+", "Custom Wt"],
+    "Capacity": ["<50ml", "50-100ml", "100-250ml", "250-500ml", "500ml-1L", "1-2L", "2-5L", "5-10L", "10L+", "Custom Cap"],
+    "Shelf Life": ["1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y", "10Y", "Permanent", "No Exp"],
+    "Origin": ["Local", "Imported", "Asia", "Europe", "N. America", "S. America", "Africa", "Australia", "Handmade", "Factory"],
+    "Certification": ["Organic", "No Additives", "Eco", "FDA", "CE", "ISO", "QS", "Green Food", "Non-GMO", "Fair Trade"],
+    "Power": ["Battery", "USB", "Plug-In", "Solar", "Manual", "Wireless", "Recharge", "Wind", "Hybrid", "No Power"],
+    "Screen Size": ["<5in", "5-7in", "7-10in", "10-13in", "13-15in", "15-17in", "17-20in", "20in+", "No Screen", "Adjustable"],
+    "Resolution": ["720p", "1080p", "2K", "4K", "8K", "SD", "HD", "UHD", "Custom", "No Res"],
+    "Memory": ["<1GB", "1-2GB", "2-4GB", "4-8GB", "8-16GB", "16-32GB", "32-64GB", "64-128GB", "128GB+", "Expandable"],
+    "Storage": ["<16GB", "16-32GB", "32-64GB", "64-128GB", "128-256GB", "256-512GB", "512GB-1TB", "1-2TB", "2TB+", "Cloud"],
+    "Network": ["2G", "3G", "4G", "5G", "WiFi", "BT", "Wired", "No Net", "Dual", "Multi"],
+    "OS": ["Android", "iOS", "Windows", "Linux", "MacOS", "No OS", "Custom", "RTOS", "HarmonyOS", "Other"],
+    "Battery Cap": ["<1000mAh", "1000-2000mAh", "2000-3000mAh", "3000-5000mAh", "5000-8000mAh", "8000-10000mAh", "10000mAh+", "No Battery", "Replaceable", "Fixed"],
+    "Charge Time": ["<1H", "1-2H", "2-3H", "3-4H", "4-6H", "6-8H", "8H+", "Fast Charge", "Wireless Charge", "No Charge"],
+    "Scenario": ["Indoor", "Outdoor", "Office", "Home", "Travel", "Sport", "Party", "Study", "Entertainment", "Emergency"],
+    "Target": ["Students", "Professionals", "Seniors", "Kids", "Athletes", "Travelers", "Homemakers", "Collectors", "DIYers", "Pros"],
+    "Accessories": ["Charger", "Earphones", "Cable", "Case", "Stand", "Battery", "Manual", "Tool Kit", "Cloth", "None"],
+    "Shipping": ["Express", "Logistics", "Air", "Sea", "Land", "Pickup", "Drone", "Dedicated", "Mail", "Instant"],
+    "Delivery Time": ["1-2D", "3-5D", "5-7D", "7-10D", "10-15D", "15-30D", "1M+", "Instant", "Pre-Order", "Custom"],
+    "Return Policy": ["7D No Reason", "15D Return", "30D Return", "No Returns", "Exchange Only", "Refund Only", "Contact CS", "Warranty", "Special", "None"],
+    "Promo Type": ["Spend & Save", "Discount", "Freebie", "Flash Sale", "Group Buy", "Pre-Sale", "Cashback", "Points", "Free Shipping", "None"],
+    "Category": ["Electronics", "Clothing", "Footwear", "Home", "Food", "Beauty", "Toys", "Stationery", "Sports", "Auto Parts"],
+    "Cleaning": ["Hand Wash", "Machine Wash", "Dry Clean", "Wipe", "Water Wash", "Non-Washable", "Pro Clean", "Steam", "Ultrasonic", "Self-Clean"],
+    "Durability": ["Disposable", "Short-Term", "1Y", "1-3Y", "3-5Y", "5-10Y", "10Y+", "Ultra-Durable", "Fragile", "Usage-Based"],
+    "Waterproof": ["Not Waterproof", "Splash-Proof", "IPX4", "IPX5", "IPX6", "IPX7", "IPX8", "Fully Waterproof", "Splash-Resist", "Custom"],
+    "Noise Level": ["Silent", "<20dB", "20-40dB", "40-60dB", "60-80dB", "80-100dB", "100dB+", "Low Noise", "Quiet", "High Noise"],
+    "Energy Rating": ["A+++", "A++", "A+", "A", "B", "C", "D", "E", "No Energy", "Ultra-Low"],
+    "Installation": ["No Install", "Self-Install", "Pro Install", "Wall-Mount", "Floor", "Embedded", "Portable", "Fixed", "Modular", "Custom"],
+    "Lighting": ["No Light", "LED", "Incandescent", "Fluorescent", "RGB", "Warm", "Cool", "Dimmable", "Ambient", "Smart"],
+    "Connection": ["Wired", "Wireless", "BT", "WiFi", "NFC", "USB", "IR", "Zigbee", "Dual", "Multi"],
+    "Control": ["Manual", "Remote", "Voice", "APP", "Touch", "Button", "Sensor", "Auto", "Smart", "Hybrid"],
+    "Device": ["Phone", "Tablet", "PC", "TV", "Camera", "Console", "Audio", "Universal", "Dedicated", "Multi-Device"],
+    "Language": ["Chinese", "English", "Multi-Lang", "Japanese", "Korean", "French", "German", "Spanish", "Russian", "No Lang"],
+    "Version": ["Basic", "Standard", "Advanced", "Pro", "Flagship", "Ltd Ed", "Custom", "Beta", "Dev", "Collector"],
+    "Update Freq": ["Daily", "Weekly", "Monthly", "Quarterly", "Yearly", "Irregular", "No Update", "Real-Time", "Manual", "Auto"],
+    "Security": ["Low", "Medium", "High", "Ultra-High", "Military", "Civilian", "Commercial", "Basic", "Multi-Layer", "None"],
+    "Eco Level": ["Non-Eco", "Low Eco", "Mid Eco", "High Eco", "Full Eco", "Recyclable", "Biodegradable", "Zero Emission", "Energy-Saving", "Green Cert"],
+    "Customization": ["Non-Custom", "Color", "Size", "Pattern", "Function", "Full Custom", "Partial", "Ltd Custom", "Personalized", "None"],
+    "Cert Agency": ["National", "International", "Third-Party", "Brand", "None", "ISO9001", "CE", "UL", "RoHS", "Other"]
 };
 
 // 电商标签（30个一级标签）
 const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
 const ecommerceTags = [
-    "货到付款", "不计免赔", "包邮", "正品保证", "7天退换", "快速发货", "官方授权", "限时折扣", "满额减免", "新品首发",
-    "热销推荐", "高性价比", "环保材料", "手工制作", "支持定制", "买家秀", "好评如潮", "库存充足", "现货供应", "预售特惠",
-    "会员专享", "闪购特价", "节日礼品", "跨境直邮", "本地仓发", "无忧售后", "品质认证", "时尚潮流", "经典款式", "稀缺库存"
+    "COD", // Cash on Delivery
+    "No Deductible", // 不计免赔
+    "Free Shipping", // 包邮
+    "Authentic", // 正品保证
+    "7-Day Return", // 7天退换
+    "Fast Shipping", // 快速发货
+    "Official Auth", // 官方授权 (Authorized)
+    "Ltd Discount", // 限时折扣 (Limited)
+    "Spend & Save", // 满额减免
+    "New Release", // 新品首发
+    "Top Seller", // 热销推荐
+    "Cost-Effective", // 高性价比
+    "Eco-Friendly", // 环保材料
+    "Handmade", // 手工制作
+    "Customizable", // 支持定制
+    "Buyer Pics", // 买家秀 (Pictures)
+    "Rave Reviews", // 好评如潮
+    "In Stock", // 库存充足
+    "Ready Stock", // 现货供应
+    "Pre-Sale Deal", // 预售特惠
+    "VIP Exclusive", // 会员专享
+    "Flash Sale", // 闪购特价
+    "Holiday Gift", // 节日礼品
+    "Cross-Border", // 跨境直邮
+    "Local Dispatch", // 本地仓发
+    "Hassle-Free Aftercare", // 无忧售后
+    "Certified Quality", // 品质认证
+    "Trendy", // 时尚潮流
+    "Classic Style", // 经典款式
+    "Rare Stock" // 稀缺库存
 ];
 
 const demandStatusColors = {
-    '通过': '#32CD32',        // 绿色
-    '已交定金': '#FFD700',    // 金色
-    '暂未开始': '#A9A9A9',    // 灰色
-    '竞标中': '#1E90FF',      // 蓝色
-    '已中标': '#32CD32',      // 绿色
-    '已付尾款': '#FFD700',    // 金色
-    '已交付': '#32CD32',      // 绿色
-    '需求完成': '#32CD32',    // 绿色
-    '评价完成': '#32CD32',    // 绿色
-    '需求过期': '#FF4500',    // 橙红色
-    '已退款': '#FF4500',      // 橙红色
-    '客户关闭': '#FF4500',    // 橙红色
-    '已废弃': '#FF4500'       // 橙红色
+    'Approved': '#32CD32',        // Green (Grn)
+    'Deposit Paid': '#FFD700',    // Gold (Gld)
+    'Not Started': '#A9A9A9',     // Gray (Gry)
+    'Bidding': '#1E90FF',         // Blue (Blu)
+    'Bid Won': '#32CD32',         // Green (Grn)
+    'Final Payment Paid': '#FFD700', // Gold (Gld)
+    'Delivered': '#32CD32',       // Green (Grn)
+    'Demand Completed': '#32CD32', // Green (Grn)
+    'Review Completed': '#32CD32', // Green (Grn)
+    'Demand Expired': '#FF4500',  // Orange-Red (Org-Red)
+    'Refunded': '#FF4500',        // Orange-Red (Org-Red)
+    'Closed by Client': '#FF4500', // Orange-Red (Org-Red)
+    'Abandoned': '#FF4500'        // Orange-Red (Org-Red)
 };
 
 const articleCategories = [
