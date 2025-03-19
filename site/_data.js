@@ -250,19 +250,19 @@ function getRandomPlatforms(min, max) {
 
 // 更新 services 数据，随机附带 hotBrands 中的名称和 logo
 const services = [
-    { name: 'Social Media', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Social Accounts', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'SEO & SEM', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Ecommerce', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Gaming', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Content', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Design', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Promotion & Ads', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Trading', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Mobile Apps', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Soft Develop', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Cloud Service', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) },
-    { name: 'Security', sub: getRandomPlatforms(hotBrands.length * 0.15, hotBrands.length * 0.55) }
+    { name: 'Social Media', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Social Accounts', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'SEO & SEM', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Ecommerce', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Gaming', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Content', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Design', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Promotion & Ads', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Trading', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Mobile Apps', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Soft Develop', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Cloud Service', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) },
+    { name: 'Security', sub: getRandomPlatforms(hotBrands.length * 0.3, hotBrands.length * 0.55) }
 ];
 
 const realFaqs = [

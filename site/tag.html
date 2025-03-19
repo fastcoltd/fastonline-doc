@@ -365,24 +365,21 @@
             updateResults();
 
             // 滚动监听逻辑
-            setTimeout(() => {
-                const tagHeader = document.getElementById('tag-header');
-                const topHeader = document.querySelector('.header');
-                const th = topHeader.clientHeight;
-                const h = tagHeader.offsetHeight;
-                window.addEventListener('scroll', () => {
-                    const scrollY = window.scrollY;
-                    if (scrollY >= h) {
-                        tagHeader.classList.add('fixed');
-                        topHeader.classList.add('hidden');
-                        document.body.style.paddingTop = `${h + 7.4}em`;
-                    } else {
-                        tagHeader.classList.remove('fixed');
-                        topHeader.classList.remove('hidden');
-                        document.body.style.paddingTop = '7.4em';
-                    }
-                });
-            }, 200);
+            const tagHeader = document.getElementById('tag-header');
+            const topHeader = document.querySelector('.header');
+            const h = tagHeader.offsetHeight;
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                if (scrollY >= h) {
+                    tagHeader.classList.add('fixed');
+                    topHeader.classList.add('hidden');
+                    document.body.style.paddingTop = `${h}px`;
+                } else {
+                    tagHeader.classList.remove('fixed');
+                    topHeader.classList.remove('hidden');
+                    document.body.style.paddingTop = '7.4em';
+                }
+            });
         });
     };
 </script>

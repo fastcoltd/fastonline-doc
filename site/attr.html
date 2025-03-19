@@ -17,11 +17,11 @@
         .attr-header p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0 0 0.5em; line-height: 1.4; }
         .attr-header h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; color: var(--text-primary); }
         .attr-values { display: flex; flex-wrap: wrap; gap: 0.5em; margin: 0.5em 0; }
-        .attr-value { padding: 0.3em 0.8em; font-size: var(--font-medium); text-decoration: none; border-radius: 0.25em; }
+        .attr-value { background: var(--bg-light);padding: 0.3em 0.8em; font-size: var(--font-medium); text-decoration: none; border-radius: 0.25em; }
         .attr-value.active { background: var(--natural-green); color: var(--font-white); }
         .attr-value:hover { color: var(--font-green); }
         .attr-tabs { display: flex; gap: 1em; margin-top: 0.5em; }
-        .attr-tab { padding: 0.3em 0.8em; cursor: pointer; color: var(--text-primary); font-size: var(--font-medium); border-bottom: 2px solid transparent; }
+        .attr-tab { padding: 0.5em 0em 0.2em 0; cursor: pointer; color: var(--text-primary); font-size: var(--font-medium); border-bottom: 2px solid transparent; }
         .attr-tab.active { color: var(--natural-green); border-bottom: 2px solid var(--natural-green); font-weight: bold; }
         .attr-tab:hover { color: var(--font-green); }
         .result-opt { display: flex; justify-content: space-between; align-items: center; margin: 1em 0; font-size: var(--font-medium); color: var(--text-primary); }
@@ -148,9 +148,7 @@
         <p>${summary}</p>
         <div class="attr-values">
             ${Object.entries(ecommerceAttributes[attrName] || {}).map(([_, value], index) => {
-            const colors = ['var(--text-primary)'];
-            const color = colors[index % colors.length];
-            return `<a href="?type=${attrType}&name=${attrName}&value=${value}" class="attr-value ${value === attrValue ? 'active' : ''}" style="color: ${value === attrValue ? 'var(--font-white)' : color}">${value}</a>`;
+            return `<a href="?type=${attrType}&name=${attrName}&value=${value}" class="attr-value ${value === attrValue ? 'active' : ''}" style="color: ${value === attrValue ? 'var(--font-white)' : ''}">${value}</a>`;
         }).join('')}
         </div>
         <div class="attr-tabs">
@@ -359,23 +357,21 @@
             updateResults();
 
             // 滚动监听逻辑
-            setTimeout(() => {
-                const attrHeader = document.getElementById('attr-header');
-                const topHeader = document.querySelector('.header');
-                const h = attrHeader.offsetHeight;
-                window.addEventListener('scroll', () => {
-                    const scrollY = window.scrollY;
-                    if (scrollY >= h) {
-                        attrHeader.classList.add('fixed');
-                        topHeader.classList.add('hidden');
-                        document.body.style.paddingTop = `${h + 7.4}em`;
-                    } else {
-                        attrHeader.classList.remove('fixed');
-                        topHeader.classList.remove('hidden');
-                        document.body.style.paddingTop = '7.4em';
-                    }
-                });
-            }, 0);
+            const attrHeader = document.getElementById('attr-header');
+            const topHeader = document.querySelector('.header');
+            const h = attrHeader.offsetHeight;
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                if (scrollY >= h) {
+                    attrHeader.classList.add('fixed');
+                    topHeader.classList.add('hidden');
+                    document.body.style.paddingTop = `${h}px`;
+                } else {
+                    attrHeader.classList.remove('fixed');
+                    topHeader.classList.remove('hidden');
+                    document.body.style.paddingTop = '7.4em';
+                }
+            });
         });
     };
 </script>

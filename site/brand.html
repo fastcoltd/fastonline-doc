@@ -369,22 +369,20 @@
             renderHotPosts();
             renderFaqs();
 
-            setTimeout(() => {
-                const header = document.getElementById('brand-header');
-                const topHeader = document.querySelector('.header');
-                const h = header.offsetHeight; // 获取 brand-header 的初始高度
-                window.addEventListener('scroll', () => {
-                    const scrollY = window.scrollY;
-                    if (scrollY >= h) {
-                        header.classList.add('fixed'); // 添加 fixed 类，使 brand-header 固定并置顶
-                        topHeader.classList.add('hidden'); // 隐藏 header
-                        document.body.style.paddingTop = `${h}px`; // 调整 padding 保持内容不跳动
-                    } else {
-                        header.classList.remove('fixed'); // 移除 fixed 类，恢复滚动
-                        topHeader.classList.remove('hidden'); // 显示 header
-                        document.body.style.paddingTop = "7.4em"; // 恢复原始 padding
-                    }
-                });
+            const header = document.getElementById('brand-header');
+            const topHeader = document.querySelector('.header');
+            const h = header.offsetHeight; // 获取 brand-header 的初始高度
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                if (scrollY >= h) {
+                    header.classList.add('fixed'); // 添加 fixed 类，使 brand-header 固定并置顶
+                    topHeader.classList.add('hidden'); // 隐藏 header
+                    document.body.style.paddingTop = `${h}px`; // 调整 padding 保持内容不跳动
+                } else {
+                    header.classList.remove('fixed'); // 移除 fixed 类，恢复滚动
+                    topHeader.classList.remove('hidden'); // 显示 header
+                    document.body.style.paddingTop = "7.4em"; // 恢复原始 padding
+                }
             });
         });
     };
