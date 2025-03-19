@@ -245,7 +245,7 @@ const articleCategories = [
 function getRandomPlatforms(min, max) {
     const count = Math.floor(Math.random() * (max - min + 1)) + min;
     const shuffled = hotBrands.sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count).map(platform => ({ name: platform.name, logo: platform.logo }));
+    return shuffled.slice(0, count).map(platform => (platform));
 }
 
 // 更新 services 数据，随机附带 hotBrands 中的名称和 logo
