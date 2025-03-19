@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="_site.css">
     <style>
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
-        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
-        .tag-header { max-width: var(--max-content-width); margin: 0 auto; padding: 1em 1em 0em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 7.4em;}
+        .tag-header { max-width: var(--max-content-width); margin: 0 auto; padding: 1em 1em 0em 0em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
         .tag-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding:  1em 1em 0em 1em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); display: flex; justify-content: center; }
         .tag-header.fixed > div { max-width: var(--max-content-width); width: 100%; }
         .tag-header h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; color: var(--text-primary); }
@@ -28,8 +28,8 @@
         .pagination a:hover { border-color: var(--natural-green); color: var(--natural-green); }
         .header { transition: opacity 0.3s ease; }
         .header.hidden { opacity: 0; height: 0; overflow: hidden; display: none; }
-        .tag-tabs { display: flex; gap: 1em; margin-top: 0.5em; }
-        .tag-tab { padding: 0.3em 0.8em; cursor: pointer; color: var(--text-primary); font-size: var(--font-medium); border-bottom: 2px solid transparent; }
+        .tag-tabs {display: flex; gap: 1em; margin-top: 0.5em; }
+        .tag-tab { padding: 0.3em 0em 0.3em 0; cursor: pointer; color: var(--text-primary); font-size: var(--font-medium); border-bottom: 2px solid transparent; }
         .tag-tab.active { color: var(--natural-green); border-bottom: 2px solid var(--natural-green); font-weight: bold; }
         .tag-tab:hover { color: var(--font-green); }
         @media (max-width: 48em) {
@@ -337,7 +337,7 @@
             fieldConfig = fieldConfigs[tagType];
             typeText = typeTextMap[tagType];
             window.history.pushState({}, document.title, `?type=${tagType}&name=${tagName}`);
-            document.title = `${tagName} - ${typeText} - FASTRESP`;
+            document.title = `标签：${tagName} - ${typeText} - FASTRESP`;
             allResults = generateTagData();
             filteredResults = [...allResults];
             initSortOptions();
@@ -350,7 +350,7 @@
     // 初始化页面
     window.onload = () => {
         w3.includeHTML(() => {
-            document.title = `${tagName} - ${typeText} - FASTRESP`;
+            document.title = `标签：${tagName} - ${typeText} - FASTRESP`;
             renderTagHeader();
             initSortOptions();
             document.getElementById('jump-to-page').onchange = () => {
