@@ -62,7 +62,7 @@
         <div id="hot-posts" class="card-list"></div>
     </div>
     <div class="section">
-        <h3 class="section-title" id="faq-title"></h3>
+        <h3 class="title-with-link" id="faq-title"></h3>
         <div id="brand-faqs" class="card-list"></div>
     </div>
 </div>
@@ -271,7 +271,10 @@
     let faqs = [];
     function renderFaqs() {
         const title = document.getElementById('faq-title');
-        title.textContent = `${selectedBrand.name} - FAQs`;
+        title.innerHTML = `
+            <h3 class="section-title">${selectedBrand.name} - FAQs</h3>
+            <a href="faq-list.html?brandName=${encodeURIComponent(selectedBrand.name)}" class="see-all">More...</a>
+        `;
         if (faqs.length <= 0){
             const faqCount = randomInt(2,8);
             for (let i = 0; i < faqCount; i++) {
