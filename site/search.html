@@ -428,6 +428,13 @@
 
             if (searchKeyword) {
                 match = match && itemValueStr.toLowerCase().indexOf(searchKeyword.toLowerCase()) !== -1;
+                if(match){
+                    Object.keys(item).forEach(k => {
+                        if (typeof item[k] == 'string'){
+                            item[k] = item[k].replaceAll(new RegExp(searchKeyword, "gi"), `<span class="hl">${searchKeyword}</span>`);
+                        }
+                    })
+                }
             }
 
             return match;
