@@ -280,9 +280,14 @@ function bindAllTagClick(){
             type = 'posts'
         }else if (parentClass.indexOf("campaign") !== -1) {
             type = 'campaigns'
+        }else if (parentClass.indexOf("demand") !== -1) {
+            type = 'demands'
         }
         if(typeof tagType != 'undefined'){
             type = tagType
+        }
+        if(typeof attrType != 'undefined'){
+            type = attrType
         }
         let attr, value
         let isAttr = item.innerText.indexOf(":") !== -1

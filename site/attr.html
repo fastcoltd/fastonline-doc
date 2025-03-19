@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>属性 - 适用设备 - 相机 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
+        .attr-header { max-width: var(--max-content-width); margin: 0 auto; padding: 1em 1em 0em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
+        .attr-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 1em 1em 0em 1em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); display: flex; justify-content: center; }
+        .attr-header.fixed > div { max-width: var(--max-content-width); width: 100%; }
+        .attr-header p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0 0 0.5em; line-height: 1.4; }
+        .attr-header h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; color: var(--text-primary); }
+        .attr-values { display: flex; flex-wrap: wrap; gap: 0.5em; margin: 0.5em 0; }
+        .attr-value { padding: 0.3em 0.8em; font-size: var(--font-medium); text-decoration: none; border-radius: 0.25em; }
+        .attr-value.active { background: var(--natural-green); color: var(--font-white); }
+        .attr-value:hover { color: var(--font-green); }
+        .attr-tabs { display: flex; gap: 1em; margin-top: 0.5em; }
+        .attr-tab { padding: 0.3em 0.8em; cursor: pointer; color: var(--text-primary); font-size: var(--font-medium); border-bottom: 2px solid transparent; }
+        .attr-tab.active { color: var(--natural-green); border-bottom: 2px solid var(--natural-green); font-weight: bold; }
+        .attr-tab:hover { color: var(--font-green); }
+        .result-opt { display: flex; justify-content: space-between; align-items: center; margin: 1em 0; font-size: var(--font-medium); color: var(--text-primary); }
+        .result-opt select { display: inline-block; float: right; justify-content: flex-end; gap: 1em; margin-left: auto; }
+        .select-wrapper { display: flex; gap: 1em; }
+        .sort-select { padding: 0.3em 1em; width: auto; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin: 1em; font-size: var(--font-small); color: var(--text-primary); }
+        .pagination-btn { padding: 0.3em 1em; background: var(--bg-white); border-color: var(--border-color); color: var(--text-primary); }
+        .pagination-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
+        .pagination-select { padding: 0.3em 1em; width: 8em; }
+        .pagination a { display: inline-block; padding: 0.3em 0.6em; margin: 0 0.3em; border: 0.0625em solid var(--border-color); border-radius: 0.25em; text-decoration: none; color: var(--text-primary); }
+        .pagination a:hover { border-color: var(--natural-green); color: var(--natural-green); }
+        .header { transition: opacity 0.3s ease; }
+        .header.hidden { opacity: 0; height: 0; overflow: hidden; display: none; }
+        @media (max-width: 48em) {
+            body, .container, .attr-header { padding-top: 1.5em !important; margin: 0 !important; }
+            .container { padding-top: 1.5em !important; margin: 0 !important; }
+            .attr-header { padding: 1em 1em 0em 1em; }
+            .attr-header.fixed { padding: 1em 1em 0em 1em !important; }
+            .attr-header h1 { font-size: var(--font-medium); }
+            .attr-header p { font-size: var(--font-small); margin: 0 0 0.3em; }
+            .attr-values { gap: 0.3em; }
+            .attr-value { font-size: var(--font-small); padding: 0.2em 0.6em; }
+            .attr-tabs { flex-wrap: wrap; gap: 0.5em; }
+            .attr-tab { font-size: var(--font-small); padding: 0.2em 0.6em; }
+        }
+    </style>
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="_header.html"></div>
+
+<!-- 主内容 -->
+<div class="container">
+    <div class="attr-header" id="attr-header">
+        <div class="attr-inner"></div>
+    </div>
+    <div class="section" style="padding-top: 1.5em;">
+        <div class="result-opt">
+            <div id="resultsShow"></div>
+            <div class="select-wrapper">
+                <select class="ant-select sort-select" id="showClass" onchange="changeShowClass()">
+                    <option value="cardHoriz" selected>横板展示</option>
+                    <option value="card">竖版展示</option>
+                </select>
+                <select class="ant-select sort-select" id="sort-by" onchange="sortResults()">
+                </select>
+            </div>
+        </div>
+        <div id="attr-results" class="card-list"></div>
+        <div class="pagination">
+            <button class="ant-btn pagination-btn" onclick="changePage(-1)">上一页</button>
+            <span id="pagination-info"></span>
+            <button class="ant-btn pagination-btn" onclick="changePage(1)">下一页</button>
+            <span>跳转到 <input class="ant-input" type="number" id="jump-to-page" min="1" style="width: 4em;"></span>
+            <span><select class="ant-select pagination-select" id="items-per-page" onchange="updateResults()">
+                <option value="10">10 条/页</option>
+                <option value="20" selected>20 条/页</option>
+                <option value="40">40 条/页</option>
+                <option value="80">80 条/页</option>
+                <option value="100">100 条/页</option>
+            </select></span>
+        </div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="_footer.html"></div>
+
+<!-- 脚本 -->
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    let currentPage = 1;
+    let itemsPerPage = 20;
+    let filteredResults = [];
+    let allResults = [];
+    let attrType = '';
+    let attrName = '';
+    let attrValue = '';
+    const typeCounts = {};
+
+    // 动态获取参数
+    const urlParams = new URLSearchParams(window.location.search);
+    attrType = urlParams.get('type') || 'items';
+    attrName = urlParams.get('name') || '适用设备';
+    attrValue = urlParams.get('value') || '相机';
+    const typeTextMap = {
+        'items': 'Items',
+        'demands': 'Demands'
+    };
+    let typeText = typeTextMap[attrType];
+
+    // 根据类型选择字段配置和排序选项
+    const fieldConfigs = {
+        'items': itemFieldConfig,
+        'demands': demandFieldConfig
+    };
+    const sortOptions = {
+        'items': [
+            { value: 'visit_count', text: '按访问量降序' },
+            { value: 'sales_amount', text: '按总销售额降序' },
+            { value: 'rating', text: '按评分降序' }
+        ],
+        'demands': [
+            { value: 'quantity', text: '按需求总数降序' },
+            { value: 'price_to', text: '按最高出价降序' },
+            { value: 'deposit', text: '按定金降序' }
+        ]
+    };
+
+    let fieldConfig = fieldConfigs[attrType];
+    const summary = `${faker.lorem.sentence()} ${faker.lorem.sentence()} ${faker.lorem.sentence()}`;
+
+    function renderAttrHeader() {
+        const inner = document.querySelector('.attr-inner');
+        inner.innerHTML = `
+        <h1>${attrName}</h1>
+        <p>${summary}</p>
+        <div class="attr-values">
+            ${Object.entries(ecommerceAttributes[attrName] || {}).map(([_, value], index) => {
+            const colors = ['var(--text-primary)'];
+            const color = colors[index % colors.length];
+            return `<a href="?type=${attrType}&name=${attrName}&value=${value}" class="attr-value ${value === attrValue ? 'active' : ''}" style="color: ${value === attrValue ? 'var(--font-white)' : color}">${value}</a>`;
+        }).join('')}
+        </div>
+        <div class="attr-tabs">
+            <span class="attr-tab ${attrType === 'items' ? 'active' : ''}" data-type="items" onclick="changeAttrType('items')">Items (${typeCounts['items'] || randomInt(50, 500)})</span>
+            <span class="attr-tab ${attrType === 'demands' ? 'active' : ''}" data-type="demands" onclick="changeAttrType('demands')">Demands (${typeCounts['demands'] || randomInt(50, 500)})</span>
+        </div>
+    `;
+    }
+
+    // 初始化排序选项
+    function initSortOptions() {
+        const sortSelect = document.getElementById('sort-by');
+        sortSelect.innerHTML = '';
+        sortOptions[attrType].forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option.value;
+            opt.text = option.text;
+            sortSelect.appendChild(opt);
+        });
+    }
+
+    // 生成数据
+    function generateAttrData() {
+        const dataCount = randomInt(50, 150);
+        typeCounts[attrType] = dataCount;
+        const data = generateData(fieldConfig, dataCount);
+        return data.map(item => {
+            item.attributes = item.attributes || {};
+            item.attributes[attrName] = attrValue;
+            return item;
+        });
+    }
+
+    // 更新结果显示
+    function updateResults() {
+        itemsPerPage = parseInt(document.getElementById('items-per-page').value);
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const results = filteredResults.slice(start, end);
+        const container = document.getElementById('attr-results');
+        container.innerHTML = '';
+
+        document.getElementById('resultsShow').innerHTML = `在 <b style="color: var(--font-green)">${attrName}: ${attrValue}</b> 中关联的 <b style="color: var(--font-green)">${typeText}</b>，共计找到 <b style="color: var(--font-green)">${filteredResults.length}</b> 条`;
+
+        results.forEach((item, index) => {
+            const card = document.createElement('div');
+            const showClass = document.getElementById('showClass').value;
+            card.className = showClass;
+
+            let imageHtml = '';
+            let titleHtml = '';
+            let fieldsHtml = '<div class="fields-row">';
+            let bottomHtml = '<div class="bottom-row">';
+            let favoriteHtml = '';
+            let hasTitle = false;
+
+            const fieldItems = [];
+            Object.entries(fieldConfig).forEach(([fieldName, fieldConfig]) => {
+                if (!fieldConfig[showClass]) return;
+
+                const value = item[fieldName] !== undefined ? item[fieldName] : fieldConfig.value;
+                const fieldContent = generateFieldContent(fieldConfig, item, fieldName, value, fieldConfig, 'attr-results', index);
+                const type = fieldConfig.type || 'text';
+                const contentLength = (typeof value === 'string' ? value : JSON.stringify(value)).length;
+
+                if (type === 'image' && !imageHtml) {
+                    imageHtml = `<div class="image-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'text' && !hasTitle && (fieldName === 'name' || fieldName === 'title' || fieldName === 'demandTitle')) {
+                    titleHtml = `<div class="title-wrapper">${fieldContent.html}</div>`;
+                    hasTitle = true;
+                } else if (type === 'rating' || type === 'bidders') {
+                    bottomHtml += `<div class="rating-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'tag') {
+                    bottomHtml += `<div class="tags-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'button') {
+                    bottomHtml += `<div class="button-wrapper">${fieldContent.html}</div>`;
+                } else if (type === 'favorite') {
+                    favoriteHtml += fieldContent.html;
+                } else {
+                    fieldItems.push({ html: fieldContent.html, length: contentLength, name: fieldName });
+                }
+            });
+
+            fieldItems.sort((a, b) => a.length - b.length);
+            fieldItems.forEach(item => {
+                fieldsHtml += `<span class="field-item">${item.html}</span>`;
+            });
+            fieldsHtml += '</div>';
+            bottomHtml += '</div>';
+
+            card.innerHTML = `
+                ${imageHtml}
+                <div class="card-content">
+                    ${titleHtml}
+                    ${fieldsHtml}
+                    ${bottomHtml}
+                    ${favoriteHtml}
+                </div>
+            `;
+            container.appendChild(card);
+
+            Object.entries(fieldConfig).forEach(([fieldName, fieldConfig]) => {
+                if (fieldConfig[showClass] && fieldConfig.onClick) {
+                    const elementId = `attr-results-${fieldName}-${index}`;
+                    const element = card.querySelector(`#${elementId}`);
+                    if (element) {
+                        element.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            fieldConfig.onClick(item, element);
+                        });
+                    }
+                }
+            });
+        });
+
+        updatePagination();
+    }
+
+    // 更新分页
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+        let paginationHtml = '';
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+        } else {
+            paginationHtml += `<a href="#" onclick="goToPage(1)" ${currentPage === 1 ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>1</a>`;
+            if (currentPage > 4) paginationHtml += '<span>...</span>';
+            for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+            if (currentPage < totalPages - 3) paginationHtml += '<span>...</span>';
+            paginationHtml += `<a href="#" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${totalPages}</a>`;
+        }
+        document.getElementById('pagination-info').innerHTML = paginationHtml;
+        document.getElementById('jump-to-page').max = totalPages;
+    }
+
+    // 跳转页面
+    function goToPage(page) {
+        currentPage = page;
+        updateResults();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+        currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+        updateResults();
+    }
+
+    // 切换展示方式
+    function changeShowClass() {
+        updateResults();
+    }
+
+    // 排序结果
+    function sortResults() {
+        const sortBy = document.getElementById('sort-by').value;
+        filteredResults.sort((a, b) => {
+            if (attrType === 'items') {
+                if (sortBy === 'visit_count') return (parseInt(b.visit_count) || 0) - (parseInt(a.visit_count) || 0);
+                if (sortBy === 'sales_amount') return parseFloat(b.sales_amount.replace('$', '') || 0) - parseFloat(a.sales_amount.replace('$', '') || 0);
+                if (sortBy === 'rating') return (parseFloat(b.rating.sample) || 0) - (parseFloat(a.rating.sample) || 0);
+            } else if (attrType === 'demand') {
+                if (sortBy === 'quantity') return (parseInt(b.quantity) || 0) - (parseInt(a.quantity) || 0);
+                if (sortBy === 'price_to') return parseFloat(b.price_to.replace('$', '') || 0) - parseFloat(a.price_to.replace('$', '') || 0);
+                if (sortBy === 'deposit') return parseFloat(b.deposit.replace('$', '') || 0) - parseFloat(a.deposit.replace('$', '') || 0);
+            }
+        });
+        updateResults();
+    }
+
+    // 切换属性类型
+    function changeAttrType(newType) {
+        if (newType !== attrType) {
+            attrType = newType;
+            fieldConfig = fieldConfigs[attrType];
+            typeText = typeTextMap[attrType];
+            window.history.pushState({}, document.title, `?type=${attrType}&name=${attrName}&value=${attrValue}`);
+            document.title = `属性 - ${attrName} - ${attrValue} - FASTRESP`;
+            allResults = generateAttrData();
+            filteredResults = [...allResults];
+            initSortOptions();
+            currentPage = 1;
+            renderAttrHeader();
+            updateResults();
+        }
+    }
+
+    // 初始化页面
+    window.onload = () => {
+        w3.includeHTML(() => {
+            document.title = `${attrName}:${attrValue} - ${attrType} - FASTRESP`;
+            renderAttrHeader();
+            initSortOptions();
+            document.getElementById('jump-to-page').onchange = () => {
+                const page = parseInt(document.getElementById('jump-to-page').value);
+                if (page >= 1 && page <= Math.ceil(filteredResults.length / itemsPerPage)) {
+                    currentPage = page;
+                    updateResults();
+                }
+            };
+            allResults = generateAttrData();
+            filteredResults = [...allResults];
+            updateResults();
+
+            // 滚动监听逻辑
+            setTimeout(() => {
+                const attrHeader = document.getElementById('attr-header');
+                const topHeader = document.querySelector('.header');
+                const h = attrHeader.offsetHeight;
+                window.addEventListener('scroll', () => {
+                    const scrollY = window.scrollY;
+                    if (scrollY >= h) {
+                        attrHeader.classList.add('fixed');
+                        topHeader.classList.add('hidden');
+                        document.body.style.paddingTop = `${h + 7.4}em`;
+                    } else {
+                        attrHeader.classList.remove('fixed');
+                        topHeader.classList.remove('hidden');
+                        document.body.style.paddingTop = '7.4em';
+                    }
+                });
+            }, 0);
+        });
+    };
+</script>
+</body>
+</html>
