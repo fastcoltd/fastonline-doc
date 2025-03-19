@@ -14,7 +14,7 @@
         .brands-container { display: flex; gap: 2em; padding: 1em 0; }
         .letterBar { width: 3em; position: sticky; top: 0em; height: calc(100vh - 1em); overflow-y: auto; background: var(--bg-white); border-right: 0.0625em solid var(--border-color); }
         .letterBar ul { list-style: none; padding: 0; margin: 0; text-align: center; }
-        .letterBar li { padding: 0.5em 0; font-size: var(--font-medium); }
+        .letterBar li { padding: 0.25em 0; font-size: var(--font-medium); }
         .letterBar a { color: var(--text-primary); text-decoration: none; }
         .letterBar a:hover, .letterBar a.active { color: var(--font-green); font-weight: bold; }
         .main-content { flex: 1; }
@@ -62,7 +62,7 @@
             .brand-card .company-info { font-size: calc(var(--font-small) * 0.9); }
             .letter-title { font-size: var(--font-large); }
             .letterBar { width: 2.5em; }
-            .letterBar li { padding: 0.3em 0; }
+            .letterBar li { padding: 0.2em 0; }
         }
     </style>
 </head>
@@ -156,7 +156,7 @@
                                 </div>
                                 <div class="right-section">
                                     <div class="company-info">
-                                        <span class="company-name"><span style="font-size: var(--font-large); color: ${brand.themeColor}">${brand.name}</span></span><br>
+                                        <span class="company-name"><span style="font-size: var(--font-medium); color: ${brand.themeColor}">${brand.name}</span></span><br>
                                         <span class="summary">${brand.description}</span>
                                     </div>
                                 </div>
@@ -182,6 +182,7 @@
 
             // 高亮当前滚动到的字母
             const observer = new IntersectionObserver((entries) => {
+                let top = window.scrollY
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const letter = entry.target.id;
@@ -196,6 +197,5 @@
         });
     };
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'921fbad48943bd26',t:'MTc0MjI0ODQ3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
