@@ -87,26 +87,7 @@
     let allResults = [];
     let selectedTags = new Set();
 
-    const fieldConfig = Object.assign({}, campaignFieldConfig, {
-        items: {
-            card: true,
-            cardSq: true,
-            cardHoriz: true,
-            type: 'text',
-            label: '商品',
-            style: {},
-            format: (d, v) => {
-                let all = v.map(item => `<a href="item.html?name=${item.name}" style="color: var(--font-orange);border: 1">${item.name}</a> <b style="color: red">(${item.stock}</b>)`).join('，');
-                return `${all}`
-            },
-            sample: () => {
-                return Array(randomInt(5, 8)).fill().map(() => ({
-                    name: faker.commerce.productName(),
-                    stock: faker.datatype.number({ min: 10, max: 100 })
-                }));
-            }
-        }
-    });
+    const fieldConfig = Object.assign({}, campaignFieldConfig);
 
     // 初始化筛选
     function initFilters() {

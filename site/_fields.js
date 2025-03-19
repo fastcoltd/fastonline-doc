@@ -150,7 +150,20 @@ let campaignFieldConfig = {
     sales: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 200, max: 600 }) },
     orders: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '订单数', style: {}, sample: () => faker.datatype.number({ min: 50, max: 200 }) },
     favorites: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '收藏数', style: {}, sample: () => faker.datatype.number({ min: 100, max: 300 }) },
-    tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '要求', style: {}, sample: () => {return generateTag(1,3)} },
+    items: { card: true, cardSq: true, cardHoriz: true,type: 'text', label: '商品',style: {},
+        format: (d, v) => {
+            let all = v.map(item => `<a href="item.html?name=${item.name}" style="color: var(--font-orange);border: 1">${item.name}</a> <b style="color: red">(${item.stock}</b>)`).join('，');
+            return `${all}`
+        },
+        sample: () => {
+            return Array(randomInt(5, 8)).fill().map(() => ({
+                name: faker.commerce.productName(),
+                stock: faker.datatype.number({ min: 10, max: 100 })
+            }));
+        }
+    },
+
+    tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '要求', style: {}, sample: () => {return generateTag(2,4)} },
     joinNow: { card: false, cardSq: false, cardHoriz: true, type: 'button', value: '查看', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 
     // 新增字段（面向客户展示）
