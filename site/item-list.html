@@ -305,7 +305,13 @@
 
         filteredResults = allResults.filter(item => {
             let match = true;
-            if (searchName && !item.name.toLowerCase().includes(searchName)) match = false;
+            if (searchName){
+                if(item.name.toLowerCase().includes(searchName)){
+                    item.name = item.name.replaceAll(new RegExp(searchName, "gi"), `<span class="hl">${searchName}</span>`);
+                }else {
+                    match = false;
+                }
+            }
 
             const price = parseFloat(item.price.replace('$', '')) || 0;
             if (price < priceMin || price > priceMax) match = false;

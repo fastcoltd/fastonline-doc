@@ -207,7 +207,13 @@
             let match = true;
 
             // 标题Search
-            if (searchTitle && !item.title.toLowerCase().includes(searchTitle)) match = false;
+            if (searchTitle){
+                if(item.title.toLowerCase().includes(searchTitle)){
+                    item.title = item.title.replaceAll(new RegExp(searchTitle, "gi"), `<span class="hl">${searchTitle}</span>`);
+                }else {
+                    match = false;
+                }
+            }
 
             // 评分筛选
             const rating = item.rating?.sample || 0;

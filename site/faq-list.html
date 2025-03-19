@@ -133,7 +133,14 @@
 
         filteredResults = allResults.filter(item => {
             let match = true;
-            if (searchQuestion && !item.title.toLowerCase().includes(searchQuestion)) match = false;
+            if (searchQuestion){
+                if(item.title.toLowerCase().includes(searchQuestion)){
+                    item.title = item.title.replaceAll(new RegExp(searchQuestion, "gi"), `<span class="hl">${searchQuestion}</span>`);
+                }else {
+                    match = false;
+                }
+            }
+
             if (selectedType && item.useType !== parseInt(selectedType)) match = false;
             if (selectedBrand && item.brandName !== selectedBrand) match = false;
             return match;

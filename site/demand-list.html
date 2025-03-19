@@ -262,7 +262,13 @@
             let match = true;
 
             // 标题Search
-            if (searchTitle && !item.demandTitle.toLowerCase().includes(searchTitle)) match = false;
+            if (searchTitle){
+                if(item.demandTitle.toLowerCase().includes(searchTitle)){
+                    item.demandTitle = item.demandTitle.replaceAll(new RegExp(searchTitle, "gi"), `<span class="hl">${searchTitle}</span>`);
+                }else {
+                    match = false;
+                }
+            }
 
             // 状态筛选
             if (statusFilter !== 'All' && item.status.sample !== statusFilter) match = false;

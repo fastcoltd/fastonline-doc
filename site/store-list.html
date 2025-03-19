@@ -247,7 +247,13 @@
             let match = true;
 
             // 店铺名称Search
-            if (searchTitle && !item.name.toLowerCase().includes(searchTitle)) match = false;
+            if (searchTitle){
+                if(item.name.toLowerCase().includes(searchTitle)){
+                    item.name = item.name.replaceAll(new RegExp(searchTitle, "gi"), `<span class="hl">${searchTitle}</span>`);
+                }else {
+                    match = false;
+                }
+            }
 
             // 标签筛选
             if (selectedTags.size > 0 && item.tags) {
