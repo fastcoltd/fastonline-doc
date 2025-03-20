@@ -15,14 +15,13 @@
         .campaign-header { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 1em 0em 1em 0em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
         .campaign-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 1em 0em 1em 0em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
         .campaign-inner { display: flex; align-items: center; width: 100%; position: relative; }
-        .campaign-header.fixed .campaign-inner { max-width: var(--max-content-width); margin: 0 auto;}
+        .campaign-header.fixed .campaign-inner { max-width: var(--max-content-width); margin: 0 auto; }
         .campaign-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0em; }
         .campaign-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0.25em 0; transition: opacity 0.3s ease; }
         .campaign-summary { max-height: 7.5em; overflow: hidden; position: relative; transition: max-height 0.8s ease; }
         .campaign-summary.expanded { max-height: none; }
         .toggle-summary { cursor: pointer; color: var(--natural-green); font-size: var(--font-small); margin-top: 0.5em; transition: opacity 0.3s ease; }
-        .campaign-meta { display: flex; align-items: center; flex-wrap: nowrap; gap: 1em; margin-top: 0.5em; font-size: var(--font-small); overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
-        .campaign-meta::-webkit-scrollbar { display: none; }
+        .campaign-meta { display: flex; align-items: center; flex-wrap: nowrap; gap: 1em; margin-top: 0.5em; font-size: var(--font-small); }
         .campaign-stats span { margin-right: 1em; }
         .campaign-stats .visits { color: #32CD32; }
         .campaign-stats .orders { color: #1E90FF; }
@@ -38,22 +37,24 @@
         .section-title { font-size: var(--font-large); margin-bottom: 1em; }
         .campaign-content { font-size: var(--font-medium); color: var(--text-secondary); line-height: 1.8; }
         .campaign-cover img { width: 100%; max-height: 20em; object-fit: cover; border-radius: 0.5em; margin-bottom: 1em; }
-        .card-list { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
+        .card-list { display: flex; flex-wrap: nowrap; gap: 0.5em; justify-content: center; }
         .item-group { margin: 1em 0; }
         .other-campaigns { margin-top: 2em; }
-        .ant-tag{cursor: pointer}
+        .ant-tag { cursor: pointer; }
         @media (max-width: 48em) {
             body { padding-top: 1.5em!important; margin: 0 !important; }
             .container { padding-top: 1.5em!important; margin: 0 !important; }
-            .campaign-header { padding-top: 0em!important; margin: 0 !important; max-width: var(--max-content-width); display: flex; flex-direction: column; align-items: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-            .campaign-info h1 { font-size: var(--font-medium); margin: 0; }
-            .campaign-info p { font-size: var(--font-small); margin: 0.2em 0; }
-            .campaign-summary { max-height: 4em; font-size: var(--font-small); }
-            .toggle-summary { font-size: var(--font-small); margin-top: 0.3em; }
+            .campaign-header { padding-top: 0em!important; margin: 0 !important; max-width: var(--max-content-width); display: flex; flex-direction: column; align-items: flex-start; }
             .campaign-header.fixed { padding: 0 !important; width: 100%; left: 0; right: 0; }
             .campaign-header.fixed .campaign-inner { padding: 0.5em; }
-            .campaign-meta { gap: 0.5em; }
+            .campaign-info h1 { font-size: var(--font-medium); margin: 0; }
+            .campaign-info p { font-size: var(--font-small); margin: 0.2em 0; white-space: normal; }
+            .campaign-summary { max-height: 4em; font-size: var(--font-small); white-space: normal; }
+            .toggle-summary { font-size: var(--font-small); margin-top: 0.3em; }
+            .campaign-meta { flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; scrollbar-width: none; gap: 0.5em; }
+            .campaign-meta::-webkit-scrollbar { display: none; }
             .favorite-icon { top: 0.5em; right: 0.5em; font-size: 1.2em; }
+            .card-list{overflow-x: auto;scrollbar-width:none!important;}
         }
     </style>
 </head>
@@ -96,7 +97,7 @@
         },
         tags: generateTag(2, 4),
         favorited: faker.datatype.boolean(),
-        items: generateData(itemFieldConfig, randomInt(5, 15))
+        items: generateData(itemFieldConfig, randomInt(8, 20))
     };
 
     function renderCampaignHeader() {
@@ -144,9 +145,9 @@
         const itemsPerGroup = Math.ceil(campaignData.items.length / groupCount);
         const itemGroups = [];
         for (let i = 0; i < groupCount; i++) {
-            const start = i * itemsPerGroup;
-            const end = Math.min(start + itemsPerGroup, campaignData.items.length);
-            itemGroups.push(campaignData.items.slice(start, end));
+            const end = randomInt(1, itemsPerGroup)
+            itemGroups.push(campaignData.items.slice(0, end));
+            campaignData.items.splice(0, end)
         }
 
         // Insert item groups into text
@@ -163,7 +164,6 @@
 
         container.innerHTML = contentHtml;
 
-        console.log(itemGroups)
         // Render each item group with brand.html-style cardHoriz
         itemGroups.forEach((group, index) => {
             const container = document.getElementById(`item-group-${index}`);
