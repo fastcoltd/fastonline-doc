@@ -397,6 +397,7 @@ function generateServiceMenu() {
 
 // 导出新增数据
 window.generateServiceMenu = generateServiceMenu;
+window.systemType = systemType;
 window.ecommerceAttributes = ecommerceAttributes;
 window.ecommerceTags = ecommerceTags;
 window.hotBrands = hotBrands;

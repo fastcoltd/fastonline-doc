@@ -268,7 +268,6 @@ function generateArticles(containerId, min, max) {
     }
 }
 
-
 function findParentType(item){
     let parentClass = item.closest('.card-list').id;
     let type
@@ -315,6 +314,7 @@ function bindAllButtonClick(){
     document.querySelectorAll('.card-button').forEach(item => {
         let type = findParentType(item)
         let btnText = item.innerText;
+
         item.onclick = () => {
             console.log(type, btnText)
         }
