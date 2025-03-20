@@ -9,40 +9,37 @@
     <link rel="stylesheet" href="_style.css">
     <link rel="stylesheet" href="_site.css">
     <style>
-        html { overflow: auto !important; height: auto; }
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
         .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
-        .post-header { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
-        .post-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
-        .post-inner { display: flex; align-items: center; width: 100%; }
-        .post-header.fixed .post-inner { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; }
+        .post-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
+        .post-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
         .post-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; }
-        .post-meta { display: flex; align-items: center; gap: 1em; flex-wrap: wrap; margin-bottom: 0.5em; }
+        .post-meta { display: flex; flex-direction: column; gap: 0.5em; margin-bottom: 0.5em; width: 100%; }
+        .category { color: var(--font-green); }
         .author { display: flex; align-items: center; gap: 0.5em; }
         .author img { width: 2em; height: 2em; border-radius: 50%; }
-        .store { display: flex; align-items: center; gap: 0.5em; }
-        .store img { width: 1.5em; height: 1.5em; border-radius: 50%; }
-        .category { color: var(--font-green); }
-        .brands { display: flex; gap: 0.5em; flex-wrap: wrap; }
-        .brand-item { display: flex; align-items: center; gap: 0.5em; }
+        .brands-tags-stats { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5em; width: 100%; }
+        .brands-tags { display: flex; flex-wrap: wrap; gap: 0.5em; }
+        .brand-item { display: flex; align-items: center; gap: 0.5em; cursor: pointer; }
         .brand-item img { width: 1.5em; height: 1.5em; border-radius: 50%; }
-        .tags { display: flex; gap: 0.5em; flex-wrap: wrap; }
-        .rating-wrapper { display: flex; align-items: center; gap: 0.5em; }
-        .favorite-wrapper { position: absolute; right: 1em; top: 1em; display: flex; align-items: center; gap: 0.5em; }
+        .stats-rating { display: flex; align-items: center; gap: 1em; flex-wrap: wrap; }
+        .favorite-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.3em; position: absolute; right: 1em; top: 1em; }
+        .favorite-wrapper span {margin: 3em 1.3em 0 1em; }
         .stats { display: flex; gap: 1em; color: var(--text-secondary); }
 
+        /* 其余样式保持不变 */
         .post-content { padding: 1em 0; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); transition: background 0.3s; }
         .post-content img { max-width: 100%; cursor: pointer; }
         .paid-section { filter: blur(5px); position: relative; }
         .paid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; color: #fff; font-size: var(--font-large); cursor: pointer; }
         .theme-toggle { position: fixed; top: 50%; right: 1em; z-index: 100; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 50%; padding: 0.5em; cursor: pointer; }
-        .sidebar { position: fixed; top: 10em; right: 1em; width: 15em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; z-index: 90; max-height: 80vh; overflow-y: auto; }
+        .sidebar { position: fixed; top: 15em; right: 0; width: 15em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em 0 0 0.5em; padding: 1em; z-index: 90; max-height: 80vh; overflow-y: auto; }
         .sidebar a { display: block; margin: 0.5em 0; color: var(--text-primary); }
         .sidebar a:hover { color: var(--natural-green); }
         .share-section { margin: 1em 0; display: flex; gap: 1em; }
-        .share-section img { width: 2em; height: 2em; cursor: pointer; }
+        .share-section img { width: 2em; border-radius: 1em; height: 2em; cursor: pointer; }
         .comments-section { margin: 1em 0; }
-        .comment-list { max-height: 20em; overflow-y: auto; }
+        .comment-list { margin-bottom: 1em; }
         .comment-item { display: flex; gap: 1em; padding: 0.5em 0; border-bottom: 0.0625em solid var(--border-color); }
         .comment-item img { width: 2em; height: 2em; border-radius: 50%; }
         .comment-content { flex: 1; }
@@ -50,16 +47,20 @@
         .self-comment img { width: 2em; height: 2em; border-radius: 50%; }
         .self-comment textarea { width: 100%; padding: 0.5em; margin: 0.5em 0; }
         .captcha { display: flex; align-items: center; gap: 0.5em; margin: 0.5em 0; }
-        .related-items .scroll-list { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 0.5em; }
+        .related-items .scroll-list { display: flex; flex-wrap: nowrap; overflow-x: hidden; gap: 0.5em; position: relative; }
+        .scroll-arrow { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2em; cursor: pointer; color: var(--text-primary); z-index: 10; transition: color 0.2s, opacity 0.2s; opacity: 0.7; }
+        .scroll-arrow.left { left: 0em; }
+        .scroll-arrow.right { right: 0em; }
+        .scroll-arrow:hover { color: var(--natural-green); opacity: 1; }
 
         @media (max-width: 48em) {
-            body { padding-top: 1.5em !important; margin: 0 !important; }
-            .container { padding-top: 1.5em !important; margin: 0 !important; }
-            .post-header { padding: 0.5em; }
+            body, .container, .post-header { padding-top: 1.5em !important; margin: 0 !important; }
             .post-info h1 { font-size: var(--font-large); }
-            .post-meta { flex-direction: column; align-items: flex-start; gap: 0.5em; }
-            .sidebar { display: none; }
+            .post-meta { gap: 0.3em; }
+            .sidebar { right: 0.5em; width: 12em; }
             .theme-toggle { right: 0.5em; }
+            .stats-rating { flex-direction: column; align-items: flex-start; }
+            .brands-tags-stats { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -98,7 +99,7 @@
     const tags = generateTag(1, 3);
     const rating = faker.datatype.float({ min: 4, max: 5, precision: 0.1 });
     const ratingCount = faker.datatype.number({ min: 50, max: 300 });
-    const favoriteCount = faker.datatype.number({ min: 100, max: 1100 });
+    let favoriteCount = faker.datatype.number({ min: 100, max: 1100 });
     const readCount = faker.datatype.number({ min: 100, max: 1000 });
     const paidCount = isPaid ? faker.datatype.number({ min: 0, max: 50 }) : 0;
 
@@ -109,50 +110,61 @@
                 <div class="post-info">
                     <h1>${postTitle}</h1>
                     <div class="post-meta">
-                        <div class="author">
-                            <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
-                            <a href="blog.html?name=${encodeURIComponent(authorName)}">${authorName}</a>
-                        </div>
-                        ${storeName ? `
-                            <div class="store">
-                                <img src="${getPicsumImage(50, 50, `store-${storeName}`)}" alt="${storeName}">
-                                <a href="store.html?name=${encodeURIComponent(storeName)}">${storeName}</a>
-                            </div>
-                        ` : ''}
                         <div class="category">
                             <a href="post-list.html?type=${encodeURIComponent(categories.name)}">${categories.name}</a> >
                             <a href="post-list.html?type=${encodeURIComponent(subCategory)}">${subCategory}</a>
                         </div>
-                        <div class="brands">
-                            ${brands.map(brand => `
-                                <div class="brand-item">
-                                    <img src="${brand.logo}" alt="${brand.name}">
-                                    <span style="color: ${brand.themeColor}">${brand.name}</span>
-                                </div>
-                            `).join('')}
+                        <div class="author">
+                            <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
+                            <a href="blog.html?name=${encodeURIComponent(authorName)}">${authorName}</a>
                         </div>
-                        <div class="tags">
-                            ${tags.map(tag => `<span class="ant-tag">${tag}</span>`).join('')}
+                        <div class="brands-tags-stats">
+                            <div class="brands-tags">
+                                ${brands.map(brand => `
+                                    <div class="brand-item" onclick="window.location.href='brand.html?name=${encodeURIComponent(brand.name)}'">
+                                        <img src="${brand.logo}" alt="${brand.name}">
+                                        <span style="color: ${brand.themeColor}">${brand.name}</span>
+                                    </div>
+                                `).join('')}
+                                ${tags.map((tag, idx) => `<span class="ant-tag ${tagColors[idx % tagColors.length]}">${tag}</span>`).join('')}
+                            </div>
+                            <div class="stats">
+                                <span>Reads: ${readCount}</span>
+                                ${isPaid ? `<span>Paid: ${paidCount}</span>` : ''}
+                            </div>
+                            <div class="stats-rating">
+                                <div class="rating-wrapper">${generateRating({ position: 'left' }, { sample: rating, count: ratingCount }, {})}</div>
+                            </div>
                         </div>
-                        <div class="rating-wrapper">${generateRating({ position: 'left' }, { sample: rating, count: ratingCount }, {})}</div>
                     </div>
-                    <div class="stats">
-                        <span>Reads: ${readCount}</span>
-                        ${isPaid ? `<span>Paid: ${paidCount}</span>` : ''}
-                    </div>
-                    <div class="favorite-wrapper">
-                        <i class="fas fa-heart favorite-icon ${Math.random() > 0.5 ? 'favorited' : ''}" onclick="toggleFavorite(this)"></i>
-                        <span>${favoriteCount}</span>
-                    </div>
+                </div>
+                <div class="favorite-wrapper">
+                    <i class="fas fa-heart favorite-icon ${Math.random() > 0.5 ? 'favorited' : ''}" onclick="toggleFavorite(this)"></i>
+                    <span>${favoriteCount}</span>
                 </div>
             </div>
         `;
+        updateFavoritePosition();
     }
 
     function toggleFavorite(element) {
         element.classList.toggle('favorited');
+        const span = element.nextElementSibling;
+        favoriteCount = element.classList.contains('favorited') ? favoriteCount + 1 : favoriteCount - 1;
+        span.textContent = favoriteCount;
     }
 
+    function updateFavoritePosition() {
+        const header = document.getElementById('post-header');
+        const favoriteWrapper = header.querySelector('.favorite-wrapper');
+        if (header.classList.contains('fixed')) {
+            favoriteWrapper.classList.add('fixed');
+        } else {
+            favoriteWrapper.classList.remove('fixed');
+        }
+    }
+
+    // 其余函数保持不变，只调整头部相关逻辑
     function generatePostContent() {
         const paragraphs = [];
         for (let i = 0; i < randomInt(5, 10); i++) {
@@ -226,7 +238,6 @@
 
     function unlockContent() {
         hideModal('payment-modal');
-        alert(`Congratulations! You've unlocked the paid content for "${postTitle}"`);
         document.querySelectorAll('.paid-section').forEach(el => el.classList.remove('paid-section'));
         document.querySelectorAll('.paid-overlay').forEach(el => el.remove());
     }
@@ -235,9 +246,9 @@
         const share = document.getElementById('share-section');
         share.innerHTML = `
             <h3>Share</h3>
-            <img src="https://via.placeholder.com/32?text=FB" alt="Facebook" onclick="shareTo('facebook')">
-            <img src="https://via.placeholder.com/32?text=TW" alt="Twitter" onclick="shareTo('twitter')">
-            <img src="https://via.placeholder.com/32?text=LI" alt="LinkedIn" onclick="shareTo('linkedin')">
+            <img src="https://logo.clearbit.com/facebook.com" alt="Facebook" onclick="shareTo('facebook')">
+            <img src="https://logo.clearbit.com/twitter.com" alt="Twitter" onclick="shareTo('twitter')">
+            <img src="https://logo.clearbit.com/linkedin.com" alt="LinkedIn" onclick="shareTo('linkedin')">
         `;
     }
 
@@ -261,7 +272,12 @@
         const comments = Array(commentCount).fill().map(() => ({
             user: faker.name.findName(),
             avatar: getPicsumImage(50, 50, `comment-${Math.random()}`),
-            rating: faker.datatype.float({ min: 3, max: 5, precision: 0.1 }),
+            rating: {
+                overall: faker.datatype.float({ min: 3, max: 5, precision: 0.1 }),
+                clarity: faker.datatype.float({ min: 3, max: 5, precision: 0.1 }),
+                depth: faker.datatype.float({ min: 3, max: 5, precision: 0.1 }),
+                usefulness: faker.datatype.float({ min: 3, max: 5, precision: 0.1 })
+            },
             content: faker.lorem.paragraph()
         }));
         let currentPage = 1;
@@ -278,17 +294,44 @@
                             <img src="${comment.avatar}" alt="${comment.user}">
                             <div class="comment-content">
                                 <strong>${comment.user}</strong>
-                                <div class="rating-wrapper">${generateRating({}, { sample: comment.rating, count: 0 }, {})}</div>
+                                <div class="rating-wrapper" onclick="showRatingModal(${JSON.stringify(comment.rating).replace(/"/g, '"')})">${generateRating({}, { sample: comment.rating.overall, count: 0 }, {})}</div>
                                 <p>${comment.content}</p>
                             </div>
                         </div>
                     `).join('')}
                 </div>
                 <div class="pagination">
-                    ${Array(totalPages).fill().map((_, i) => `<a href="#" onclick="renderCommentList(${i + 1}); return false;">${i + 1}</a>`).join('')}
+                    <button class="ant-btn pagination-btn" onclick="changeCommentPage(-1)">Previous</button>
+                    <span id="pagination-info"></span>
+                    <button class="ant-btn pagination-btn" onclick="changeCommentPage(1)">Next</button>
                 </div>
             `;
             commentsSection.innerHTML = html;
+            updateCommentPagination(totalPages);
+        }
+
+        function updateCommentPagination(totalPages) {
+            let paginationHtml = '';
+            if (totalPages <= 7) {
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationHtml += `<a href="#" onclick="renderCommentList(${i}); return false;" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+                }
+            } else {
+                paginationHtml += `<a href="#" onclick="renderCommentList(1); return false;" ${currentPage === 1 ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>1</a>`;
+                if (currentPage > 4) paginationHtml += '<span>...</span>';
+                for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
+                    paginationHtml += `<a href="#" onclick="renderCommentList(${i}); return false;" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+                }
+                if (currentPage < totalPages - 3) paginationHtml += '<span>...</span>';
+                paginationHtml += `<a href="#" onclick="renderCommentList(${totalPages}); return false;" ${currentPage === totalPages ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${totalPages}</a>`;
+            }
+            document.getElementById('pagination-info').innerHTML = paginationHtml;
+        }
+
+        function changeCommentPage(delta) {
+            const totalPages = Math.ceil(commentCount / commentsPerPage);
+            currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+            renderCommentList(currentPage);
         }
 
         renderCommentList(currentPage);
@@ -299,7 +342,9 @@
                     <img src="${getPicsumImage(50, 50, 'self')}" alt="You">
                     <strong>${faker.name.findName()}</strong>
                 </div>
-                <div class="rating-wrapper" id="self-rating"></div>
+                <div class="rating-wrapper" id="self-rating-overall" onclick="showSelfRatingModal('overall')">${generateRating({}, { sample: 0, count: 0 }, {})}</div>
+                <div class="rating-wrapper" id="self-rating-clarity" onclick="showSelfRatingModal('clarity')">${generateRating({}, { sample: 0, count: 0 }, {})}</div>
+                <div class="rating-wrapper" id="self-rating-depth" onclick="showSelfRatingModal('depth')">${generateRating({}, { sample: 0, count: 0 }, {})}</div>
                 <textarea placeholder="Write your comment..."></textarea>
                 <div class="captcha">
                     <input type="text" placeholder="Captcha">
@@ -309,20 +354,44 @@
             </div>
         `;
         commentsSection.innerHTML += selfComment;
+    }
 
-        const ratingWrapper = document.getElementById('self-rating');
-        ratingWrapper.innerHTML = generateRating({}, { sample: 0, count: 0 }, {});
-        ratingWrapper.querySelectorAll('.star').forEach((star, idx) => {
-            star.onclick = () => setRating(idx + 1);
+    function showRatingModal(rating) {
+        showModal('rating-modal', `
+            <h3>Rating Details</h3>
+            <p>Overall: ${generateRating({}, { sample: rating.overall, count: 0 }, {})}</p>
+            <p>Clarity: ${generateRating({}, { sample: rating.clarity, count: 0 }, {})}</p>
+            <p>Depth: ${generateRating({}, { sample: rating.depth, count: 0 }, {})}</p>
+            <p>Usefulness: ${generateRating({}, { sample: rating.usefulness, count: 0 }, {})}</p>
+        `);
+    }
+
+    function showSelfRatingModal(type) {
+        const currentRating = document.getElementById(`self-rating-${type}`).querySelector('.star-filled')?.innerHTML.match(/width:(\d+)%/)?.[1] / 20 || 0;
+        showModal('self-rating-modal', `
+            <h3>Set ${type.charAt(0).toUpperCase() + type.slice(1)} Rating</h3>
+            <div id="temp-rating">${generateRating({}, { sample: currentRating, count: 0 }, {})}</div>
+            <button class="btn-orange-solid-medium" onclick="saveSelfRating('${type}')">Save</button>
+        `, { style: { width: '20em' } });
+        document.getElementById('temp-rating').querySelectorAll('.star').forEach((star, idx) => {
+            star.onclick = () => setTempRating(idx + 1);
         });
     }
 
-    function setRating(value) {
-        const ratingWrapper = document.getElementById('self-rating');
-        ratingWrapper.innerHTML = generateRating({}, { sample: value, count: 0 }, {});
-        ratingWrapper.querySelectorAll('.star').forEach((star, idx) => {
-            star.onclick = () => setRating(idx + 1);
+    function setTempRating(value) {
+        const tempRating = document.getElementById('temp-rating');
+        tempRating.innerHTML = generateRating({}, { sample: value, count: 0 }, {});
+        tempRating.querySelectorAll('.star').forEach((star, idx) => {
+            star.onclick = () => setTempRating(idx + 1);
         });
+    }
+
+    function saveSelfRating(type) {
+        const tempRating = document.getElementById('temp-rating').querySelector('.star-filled')?.innerHTML.match(/width:(\d+)%/)?.[1] / 20 || 0;
+        const selfRating = document.getElementById(`self-rating-${type}`);
+        selfRating.innerHTML = generateRating({}, { sample: tempRating, count: 0 }, {});
+        selfRating.onclick = () => showSelfRatingModal(type);
+        hideModal('self-rating-modal');
     }
 
     function submitComment() {
@@ -330,8 +399,28 @@
     }
 
     function renderRelatedItems() {
-        const items = generateData(itemFieldConfig, 12);
-        generateCards('related-items', 'card', items, itemFieldConfig);
+        const modifiedItemFieldConfig = { ...itemFieldConfig };
+        Object.keys(modifiedItemFieldConfig).forEach(key => {
+            if (!['image', 'name', 'brandName', 'service', 'price', 'rating', 'buyNow'].includes(key)) {
+                modifiedItemFieldConfig[key].card = false;
+            }
+        });
+        const items = generateData(modifiedItemFieldConfig, 12);
+        const container = document.getElementById('related-items');
+        generateCards('related-items', 'card', items, modifiedItemFieldConfig);
+        container.innerHTML += `
+            <i class="fas fa-chevron-left scroll-arrow left" onclick="scrollItems(-1)"></i>
+            <i class="fas fa-chevron-right scroll-arrow right" onclick="scrollItems(1)"></i>
+        `;
+    }
+
+    let scrollPosition = 0;
+    function scrollItems(direction) {
+        const container = document.getElementById('related-items');
+        const cardWidth = container.querySelector('.card').offsetWidth + 8; // Including gap
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        scrollPosition = Math.max(0, Math.min(maxScroll, scrollPosition + direction * cardWidth * 3));
+        container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
     }
 
     window.onload = () => {
@@ -353,10 +442,12 @@
                     header.classList.add('fixed');
                     topHeader.classList.add('hidden');
                     document.body.style.paddingTop = `${initialHeight}px`;
+                    updateFavoritePosition();
                 } else {
                     header.classList.remove('fixed');
                     topHeader.classList.remove('hidden');
                     document.body.style.paddingTop = "7.4em";
+                    updateFavoritePosition();
                 }
             });
         });
