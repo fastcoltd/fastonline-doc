@@ -12,16 +12,22 @@
         html { overflow: auto!important; height: auto; }
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
         .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
-        .brand-header { max-width: var(--max-content-width); margin: 0 auto; display: flex; align-items: center; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; } /* 恢复原始宽度和居中 */
-        .brand-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0; } /* 固定状态铺满宽度 */
-        .brand-inner { display: flex; align-items: center; width: 100%; } /* 非固定状态下保持正常布局 */
-        .brand-header.fixed .brand-inner { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; } /* 固定状态下内容居中 */
+        .brand-header { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 0.5em 0.5em 0 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
+        .brand-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .brand-inner { display: flex; align-items: center; width: 100%; }
+        .brand-header.fixed .brand-inner { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; }
         .brand-logo img { width: 6em; height: 6em; border-radius: 50%; margin-right: 1.5em; }
         .brand-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0em; }
         .brand-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0.25em 0; transition: opacity 0.3s ease; }
         .brand-summary { max-height: 7.5em; overflow: hidden; position: relative; transition: max-height 0.3s ease; }
         .brand-summary.expanded { max-height: none; }
         .toggle-summary { cursor: pointer; color: var(--natural-green); font-size: var(--font-small); margin-top: 0.5em; transition: opacity 0.3s ease; }
+        .tab-bar { background: var(--bg-white); padding: 0.5em 0 0 0; position: relative; z-index: 9; width: 100%; }
+        .brand-header.fixed .tab-bar { position: fixed; width: 100%; top: calc(8em + 0.0625em); left: 0; right: 0;}
+        .tab-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; justify-content: flex-start; gap: 2em; flex-wrap: wrap; }
+        .attr-tab { padding: 0.5em 0em 0.2em 0; cursor: pointer; color: var(--text-primary); font-size: var(--font-medium); border-bottom: 2px solid transparent; }
+        .attr-tab:hover { color: var(--natural-green); }
+        .attr-tab.active { color: var(--natural-green); border-bottom: 2px solid var(--natural-green); font-weight: bold; }
         .card-list { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
         .service-section { margin-bottom: 1em; }
         .service-section:last-child { margin-bottom: 0em; }
@@ -35,16 +41,21 @@
         .header { transition: opacity 0.3s ease; }
         .header.hidden { opacity: 0; height: 0; overflow: hidden; display: none; }
         @media (max-width: 48em) {
-            body, .container, .brand-header{padding-top: 1.5em!important;margin: 0 !important;}
-            .brand-header { max-width: var(--max-content-width); display: flex; flex-direction: row; align-items: center; padding: 0.5em; justify-content: space-between; } /* 改为水平布局 */
-            .brand-logo img { width: 4em; height: 4em; margin-right: 1em; margin-bottom: 0; } /* 缩小 logo 并调整间距 */
-            .brand-info h1 { font-size: var(--font-medium); margin: 0; } /* 缩小标题字体 */
-            .brand-info p { font-size: var(--font-small); margin: 0.2em 0; } /* 缩小副标题字体 */
-            .brand-summary { max-height: 4em; font-size: var(--font-small); } /* 限制摘要高度并缩小字体 */
-            .toggle-summary { font-size: var(--font-small); margin-top: 0.3em; } /* 缩小切换按钮 */
+            body { padding-top: 1.5em!important; margin: 0 !important; }
+            .container { padding-top: 1.5em!important; margin: 0 !important; }
+            .brand-header { padding-top: 0em!important; margin: 0 !important; max-width: var(--max-content-width); display: flex; flex-direction: column; align-items: flex-start;  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;}
+            .brand-logo img { width: 4em; height: 4em; margin-right: 1em; margin-bottom: 0; }
+            .brand-info h1 { font-size: var(--font-medium); margin: 0; }
+            .brand-info p { font-size: var(--font-small); margin: 0.2em 0; }
+            .brand-summary { max-height: 4em; font-size: var(--font-small); }
+            .toggle-summary { font-size: var(--font-small); margin-top: 0.3em; }
             .brand-header.fixed { padding: 0 !important; width: 100%; left: 0; right: 0; }
             .brand-header.fixed .brand-inner { padding: 0.5em; }
             .brand-header.fixed .brand-logo img { width: 2.5em; height: 2.5em; margin-right: 1em; margin-bottom: 0; }
+            .tab-bar {white-space: nowrap; overflow-x: auto; scrollbar-width: none!important; }
+            .tab-inner { display: flex; left:0; gap: 0.5em; flex-wrap: nowrap; overflow-x:auto; justify-content: center; }
+            .attr-tab { font-size: var(--font-small); padding: 0.2em 0em 0.2em 0; }
+            .brand-header.fixed .tab-bar { top: calc(8em + 0.0625em); }
         }
     </style>
 </head>
@@ -81,30 +92,84 @@
     const typeColors = {
         0: 'ant-tag-blue', 1: 'ant-tag-red', 2: 'ant-tag-orange', 3: 'ant-tag-green', 4: 'ant-tag-purple'
     };
+
     function renderBrandHeader() {
         const header = document.getElementById('brand-header');
         header.innerHTML = `
-        <div class="brand-inner">
-            <div class="brand-logo">
-                <img src="${selectedBrand.logo}" alt="${selectedBrand.name}">
-            </div>
-            <div class="brand-info">
-                <h1><a href="brand.html${window.location.search}" style="color: ${selectedBrand.themeColor}">${selectedBrand.name}</a></h1>
-                <p><b>Category</b>: Tech Platform <b>Company</b>: ${selectedBrand.parentCompany}</p>
-                <div class="brand-summary" id="brand-summary">
-                    ${selectedBrand.description} ${selectedBrand.description} ${selectedBrand.description}
-                </div>
-                <span class="toggle-summary" onclick="toggleSummary()">Show More</span>
-            </div>
+    <div class="brand-inner">
+        <div class="brand-logo">
+            <img src="${selectedBrand.logo}" alt="${selectedBrand.name}">
         </div>
+        <div class="brand-info">
+            <h1><a href="brand.html${window.location.search}" style="color: ${selectedBrand.themeColor}">${selectedBrand.name}</a></h1>
+            <p><b>Category</b>: Tech Platform <b>Company</b>: ${selectedBrand.parentCompany}</p>
+            <div class="brand-summary" id="brand-summary">
+                ${selectedBrand.description} ${selectedBrand.description} ${selectedBrand.description}
+            </div>
+            <span class="toggle-summary" onclick="toggleSummary()">Show More</span>
+        </div>
+    </div>
+    <div class="tab-bar" id="tab-bar">
+        <div class="tab-inner">
+            <span class="attr-tab" data-section="hot-demands" onclick="scrollToSection('hot-demands')">Demands</span>
+            <span class="attr-tab" data-section="hot-posts" onclick="scrollToSection('hot-posts')">Posts</span>
+            <span class="attr-tab" data-section="brand-faqs" onclick="scrollToSection('brand-faqs')">FAQ</span>
+        </div>
+    </div>
     `;
+
+        // 动态添加服务名称作为子页签
+        let lastTab
+        const tabInner = document.querySelector('.tab-inner');
+        const servicesContainer = document.getElementById('brand-services');
+        const serviceSections = servicesContainer.getElementsByClassName('service-section');
+        Array.from(serviceSections).forEach((section) => {
+            const serviceName = section.querySelector('.section-title').textContent.replace(' Hot items', '');
+            const serviceTab = document.createElement('span');
+            serviceTab.className = 'attr-tab';
+            serviceTab.setAttribute('data-section', `service-items-${serviceName}`);
+            serviceTab.textContent = serviceName;
+            serviceTab.onclick = () => {
+                scrollToSection(`service-items-${serviceName}`);
+            }
+            if (lastTab){
+                tabInner.insertBefore(serviceTab, lastTab.nextSibling);
+            }else{
+                tabInner.insertBefore(serviceTab, tabInner.children[0]);
+            }
+            lastTab = serviceTab
+        });
     }
+
+    function scrollToSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            let sectionTop = section.getBoundingClientRect().top
+            const header = document.getElementById('brand-header');
+            const headerHeight = header.offsetHeight;
+            const topHeader = document.querySelector('.header');
+            const topHeaderHeight = window.scrollY > 0 ? 0 : topHeader.offsetHeight;
+            const offsetTop = sectionTop + window.scrollY - (headerHeight + topHeaderHeight + 70); // 加10px缓冲
+            window.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth'
+            });
+
+            // 添加选中效果
+            const tabs = document.querySelectorAll('.attr-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            const selectedTab = document.querySelector(`.attr-tab[data-section="${sectionId}"]`);
+            if (selectedTab) selectedTab.classList.add('active');
+        }
+    }
+
     function toggleSummary() {
         const summary = document.getElementById('brand-summary');
         summary.classList.toggle('expanded');
         const toggle = summary.nextElementSibling;
         toggle.textContent = summary.classList.contains('expanded') ? 'Show Less' : 'Show More';
     }
+
     function renderBrandServices() {
         const servicesContainer = document.getElementById('brand-services');
         const serviceCount = Math.floor(Math.random() * 3) + 3;
@@ -196,6 +261,7 @@
             });
         });
     }
+
     function renderHotPosts() {
         const title = document.getElementById('hot-posts-title');
         title.innerHTML = `
@@ -268,6 +334,7 @@
             });
         });
     }
+
     let faqs = [];
     function renderFaqs() {
         const title = document.getElementById('faq-title');
@@ -332,10 +399,12 @@
             container.appendChild(faqItem);
         });
     }
+
     function toggleAnswer(element) {
         const faqItem = element.closest('.faq-item');
         faqItem.classList.toggle('expanded');
     }
+
     function vote(element, type, index) {
         const item = faqs[index];
         const otherType = type === 'useful' ? 'useless' : 'useful';
@@ -355,6 +424,7 @@
         faqs[index].favorited = !faqs[index].favorited;
         renderFaqs();
     }
+
     function toggleFavorite(element, index) {
         faqs[index].favorited = !faqs[index].favorited;
         renderFaqs();
@@ -363,25 +433,26 @@
     window.onload = () => {
         w3.includeHTML(() => {
             document.title = `${selectedBrand.name} - FASTRESP`;
-            renderBrandHeader();
-            renderBrandServices();
+            renderBrandServices(); // 先渲染服务内容
+            renderBrandHeader();   // 再渲染头部，确保服务名称可用
             renderHotDemands();
             renderHotPosts();
             renderFaqs();
 
             const header = document.getElementById('brand-header');
             const topHeader = document.querySelector('.header');
-            const h = header.offsetHeight; // 获取 brand-header 的初始高度
+            const initialHeight = header.offsetHeight; // 记录初始高度
+            header.style.minHeight = `${initialHeight}px`; // 设置最小高度
             window.addEventListener('scroll', () => {
                 const scrollY = window.scrollY;
-                if (scrollY >= h) {
-                    header.classList.add('fixed'); // 添加 fixed 类，使 brand-header 固定并置顶
-                    topHeader.classList.add('hidden'); // 隐藏 header
-                    document.body.style.paddingTop = `${h}px`; // 调整 padding 保持内容不跳动
+                if (scrollY >= initialHeight) {
+                    header.classList.add('fixed');
+                    topHeader.classList.add('hidden');
+                    document.body.style.paddingTop = `${initialHeight}px`;
                 } else {
-                    header.classList.remove('fixed'); // 移除 fixed 类，恢复滚动
-                    topHeader.classList.remove('hidden'); // 显示 header
-                    document.body.style.paddingTop = "7.4em"; // 恢复原始 padding
+                    header.classList.remove('fixed');
+                    topHeader.classList.remove('hidden');
+                    document.body.style.paddingTop = "7.4em";
                 }
             });
         });
