@@ -119,7 +119,7 @@
     }
 
     function generateBids() {
-        const bidCount = randomInt(15, 40);
+        const bidCount = randomInt(5, 40);
         const bidStatuses = ['Bidding', 'Bid Won', 'Delivered', 'Demand Expired', 'Refunded'];
         const bids = Array(bidCount).fill().map(() => {
             const storeData = generateData(storeFieldConfig, 1)[0];
@@ -194,7 +194,8 @@
                 </div>
             `;
             const bidDetails = `
-                <p><b>投标时间</b>: ${new Date(bid.bid_time * 1000).toLocaleString()} <b>投标价格</b>: $${bid.bid_price.toFixed(2)} <b>字段信息</b>: ${isSelf ? bid.field_info : '****'}</p>
+                <p>投标价格</b>: <b style="color: var(--red);">$${bid.bid_price.toFixed(2)} </b> <b>投标时间</b>: ${new Date(bid.bid_time * 1000).toLocaleString()} <b></p>
+                <p>字段信息</b>: ${isSelf ? bid.field_info : '****'}</p>
                 <p><b>提供样品</b>: ${isSelf ? bid.samples_provided.replace(/----/g, '\n') : '****'}</p>
                 ${isSelf ? `
                     <p><b>投标说明</b>: ${bid.bid_information}</p>
