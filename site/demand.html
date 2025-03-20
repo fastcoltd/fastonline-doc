@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>需求详情 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        html { overflow: auto !important; height: auto; }
+        body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
+        .demand-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em 1em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; display: flex; align-items: center; justify-content: flex-start; }
+        .demand-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0.5em 1em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .demand-logo img { width: 2.5em; height: 2.5em; border-radius: 50%; margin-right: 1em; }
+        .demand-info h1 { font-size: var(--font-large); margin: 0; display: inline; }
+        .demand-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0 0 0 1em; display: inline; }
+        .demand-info .ant-tag { margin: 0 0.5em; }
+        .section { margin-bottom: 1em; padding: 0; }
+        .section:last-child { margin-bottom: 0em; }
+        .bid-list { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
+        .bid-item { flex: 0 0 100%; max-width: 100%; min-height: 6em; margin-bottom: 0.5em; padding: 0.5em 1em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; display: flex; align-items: center; position: relative; }
+        .bid-item:hover { border-color: var(--natural-green); box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
+        .bid-item.self { border-color: var(--vibrant-orange); }
+        .bid-avatar img { width: 2em; height: 2em; border-radius: 50%; margin-right: 1em; }
+        .bid-content { flex: 1; }
+        .bid-content p { margin: 0.25em 0; }
+        .bid-content .ant-tag { margin: 0.25em; }
+        .bid-status { position: absolute; top: 0.5em; right: 0.5em; padding: 0.2em 0.5em; border-radius: 0.25em; font-size: var(--font-small); color: #fff; }
+        .bid-images { display: flex; flex-wrap: wrap; gap: 0.5em; }
+        .bid-images img { width: 3em; height: 3em; object-fit: cover; border-radius: 0.25em; cursor: pointer; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin: 1em 0; }
+        .pagination-btn { padding: 0.3em 1em; background: var(--bg-white); border-color: var(--border-color); color: var(--text-primary); }
+        .pagination-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
+        .bid-form { padding: 1em; background: var(--bg-light); border-radius: 0.5em; }
+        .bid-form textarea, .bid-form input[type="number"] { width: 100%; padding: 0.5em; margin: 0.5em 0; }
+        .captcha { display: flex; align-items: center; gap: 0.5em; margin: 0.5em 0; }
+        @media (max-width: 48em) {
+            body { padding-top: 1.5em !important; margin: 0 !important; }
+            .container { padding-top: 1.5em !important; margin: 0 !important; }
+            .demand-header { padding: 0.5em !important; flex-wrap: wrap; gap: 0.5em; }
+            .demand-logo img { width: 2em; height: 2em; margin-right: 0.5em; }
+            .demand-info h1 { font-size: var(--font-medium); }
+            .demand-info p { font-size: var(--font-small); margin: 0 0 0 0.5em; }
+            .bid-avatar img { width: 1.5em; height: 1.5em; }
+            .bid-images img { width: 2.5em; height: 2.5em; }
+            .bid-status { font-size: var(--font-xsmall); padding: 0.1em 0.3em; }
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="_header.html"></div>
+<div class="container">
+    <div class="demand-header" id="demand-header"></div>
+    <div class="section" style="padding-top: 1.5em;">
+        <h3 class="section-title">投标信息</h3>
+        <div id="bid-list" class="bid-list"></div>
+        <div id="pagination" class="pagination"></div>
+    </div>
+    <div class="section">
+        <h3 class="section-title">参与投标</h3>
+        <div id="bid-form" class="bid-form"></div>
+    </div>
+</div>
+<div w3-include-html="_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const demandName = decodeURIComponent(urlParams.get('name') || 'Cassin, Swaniawski and Stamm');
+    const demandData = generateData(demandFieldConfig, 1)[0];
+    demandData.demandTitle = demandName;
+    const brand = hotBrands[Math.floor(Math.random() * hotBrands.length)];
+    const service = services[Math.floor(Math.random() * services.length)];
+    const attributes = generateAttr(3, 5);
+    const userId = Math.floor(Math.random() * 1000); // 模拟当前用户ID
+    const bidsPerPage = 5;
+    let currentPage = 1;
+
+    function renderDemandHeader() {
+        const header = document.getElementById('demand-header');
+        header.innerHTML = `
+            <div class="demand-logo">
+                <img src="${brand.logo}" alt="${brand.name}">
+            </div>
+            <div class="demand-info">
+                <h1><a href="demand.html?name=${encodeURIComponent(demandName)}" style="color: ${brand.themeColor}">${demandName}</a></h1>
+                <p><b>品牌</b>: <span style="color: ${brand.themeColor}">${brand.name}</span></p>
+                <p><b>服务</b>: ${service.name}</p>
+                <p><b>出价范围</b>: ${demandData.price_from.sample} - ${demandData.price_to.sample}</p>
+                <p><b>需求总数</b>: ${demandData.quantity.sample}</p>
+                <p><b>定金</b>: ${demandData.deposit.sample}</p>
+                <p><b>是否需要样品</b>: ${demandData.samples_need.sample}</p>
+                ${Object.entries(attributes).map(([key, value], idx) => `<span class="ant-tag ${tagColors[idx % tagColors.length]}">${key}: ${value}</span>`).join('')}
+            </div>
+        `;
+    }
+
+    function generateBids() {
+        const bidCount = randomInt(5, 15);
+        const bidStatuses = ['Bidding', 'Bid Won', 'Delivered', 'Demand Expired', 'Refunded'];
+        const bids = Array(bidCount).fill().map(() => ({
+            user_id: Math.floor(Math.random() * 1000),
+            store_id: Math.floor(Math.random() * 1000),
+            store_name: faker.company.companyName(),
+            avatar: getPicsumImage(50, 50, `store-${Math.random()}`),
+            bid_time: faker.date.recent().getTime() / 1000,
+            bid_price: parseFloat(faker.commerce.price(40, 300, 2)),
+            bid_information: faker.lorem.sentence(),
+            bid_pics: Array(randomInt(1, 3)).fill().map((_, i) => getPicsumImage(100, 100, `bid-${i}-${Math.random()}`)),
+            status: bidStatuses[Math.floor(Math.random() * bidStatuses.length)]
+        }));
+        if (Math.random() > 0.5) {
+            bids.push({
+                user_id: userId,
+                store_id: Math.floor(Math.random() * 1000),
+                store_name: faker.company.companyName(),
+                avatar: getPicsumImage(50, 50, `self-${Math.random()}`),
+                bid_time: faker.date.recent().getTime() / 1000,
+                bid_price: parseFloat(faker.commerce.price(40, 300, 2)),
+                bid_information: faker.lorem.sentence(),
+                bid_pics: Array(randomInt(1, 3)).fill().map((_, i) => getPicsumImage(100, 100, `self-bid-${i}`)),
+                status: 'Bidding'
+            });
+        }
+        return bids.sort((a, b) => b.bid_time - a.bid_time || a.bid_price - b.bid_price);
+    }
+
+    function renderBidList(page) {
+        const bidList = document.getElementById('bid-list');
+        const bids = generateBids();
+        const totalPages = Math.ceil(bids.length / bidsPerPage);
+        currentPage = Math.max(1, Math.min(totalPages, page));
+        const start = (currentPage - 1) * bidsPerPage;
+        const end = start + bidsPerPage;
+        const pageBids = bids.slice(start, end);
+
+        bidList.innerHTML = pageBids.length === 0 ? '<p style="text-align: center; color: var(--text-secondary);">暂无投标信息</p>' : '';
+        pageBids.forEach((bid, index) => {
+            const isSelf = bid.user_id === userId;
+            const bidItem = document.createElement('div');
+            bidItem.className = `bid-item ${isSelf ? 'self' : ''}`;
+            const visibleFields = [
+                { label: '投标时间', value: new Date(bid.bid_time * 1000).toLocaleString() },
+                { label: '投标价格', value: `$${bid.bid_price.toFixed(2)}` }
+            ];
+            const selfFields = isSelf ? [
+                { label: '投标说明', value: bid.bid_information },
+                { label: '投标图片', value: bid.bid_pics.map(pic => `<img src="${pic}" alt="Bid Image" onclick="showImageModal(this.src)">`).join('') }
+            ] : [
+                { label: '投标说明', value: '****' },
+                { label: '投标图片', value: '****' }
+            ];
+            bidItem.innerHTML = `
+                <div class="bid-avatar">
+                    <img src="${bid.avatar}" alt="${bid.store_name}">
+                </div>
+                <div class="bid-content">
+                    <p><b>${bid.store_name}</b></p>
+                    ${visibleFields.map((field, idx) => `<span class="ant-tag ${tagColors[idx % tagColors.length]}">${field.label}: ${field.value}</span>`).join('')}
+                    ${selfFields.map((field, idx) => `<span class="ant-tag ${tagColors[(idx + visibleFields.length) % tagColors.length]}">${field.label}: ${field.value}</span>`).join('')}
+                </div>
+                <span class="bid-status" style="background-color: ${demandStatusColors[bid.status] || '#A9A9A9'}">${bid.status}</span>
+            `;
+            bidList.appendChild(bidItem);
+        });
+
+        renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+        const pagination = document.getElementById('pagination');
+        let html = `
+            <button class="pagination-btn" onclick="renderBidList(${currentPage - 1})">上一页</button>
+            <span>
+        `;
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<a href="#" onclick="renderBidList(${i}); return false;" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+        } else {
+            html += `<a href="#" onclick="renderBidList(1); return false;" ${currentPage === 1 ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>1</a>`;
+            if (currentPage > 4) html += '<span>...</span>';
+            for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
+                html += `<a href="#" onclick="renderBidList(${i}); return false;" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
+            }
+            if (currentPage < totalPages - 3) html += '<span>...</span>';
+            html += `<a href="#" onclick="renderBidList(${totalPages}); return false;" ${currentPage === totalPages ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${totalPages}</a>`;
+        }
+        html += `
+            </span>
+            <button class="pagination-btn" onclick="renderBidList(${currentPage + 1})">下一页</button>
+        `;
+        pagination.innerHTML = html;
+    }
+
+    function showImageModal(src) {
+        showModal('image-modal', `<img src="${src}" style="max-width: 100%; max-height: 80vh;">`, { style: { width: 'auto', maxWidth: '90%' } });
+    }
+
+    let captchaText = '';
+    function renderBidForm() {
+        const form = document.getElementById('bid-form');
+        const storeName = faker.company.companyName();
+        form.innerHTML = `
+            <p><b>店铺名称</b>: ${storeName}</p>
+            <p><b>投标价格</b>: <input type="number" id="bidPrice" placeholder="请输入投标价格 (美元)" min="40" max="300" step="0.01"></p>
+            <p><b>投标说明</b>: <textarea id="bidInfo" placeholder="请输入投标说明"></textarea></p>
+            <p><b>上传图片</b>: <input type="file" id="bidPics" multiple accept="image/*" style="margin: 0.5em 0;"></p>
+            <div class="captcha">
+                <input type="text" id="captchaInput" placeholder="请输入验证码">
+                <canvas class="captcha-canvas" id="captchaCanvas" width="120" height="30" onclick="generateCaptcha()"></canvas>
+            </div>
+            <button class="btn-orange-solid-medium" onclick="submitBid()">提交投标</button>
+        `;
+        generateCaptcha();
+    }
+
+    function generateCaptcha() {
+        const canvas = document.getElementById('captchaCanvas');
+        const ctx = canvas.getContext('2d');
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        captchaText = '';
+        const isMobile = window.innerWidth <= 768;
+        canvas.width = isMobile ? 100 : 120;
+        canvas.height = 30;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f5f5f5';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < 4; i++) {
+            const char = chars[Math.floor(Math.random() * chars.length)];
+            captchaText += char;
+            ctx.font = `bold ${isMobile ? 20 : 24}px Arial`;
+            ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.save();
+            ctx.translate((canvas.width / 4) * i + (canvas.width / 8), 15);
+            ctx.rotate((Math.random() - 0.5) * 0.4);
+            ctx.fillText(char, 0, 0);
+            ctx.restore();
+        }
+
+        for (let i = 0; i < 3; i++) {
+            ctx.beginPath();
+            ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+            ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+            ctx.strokeStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.5)`;
+            ctx.stroke();
+        }
+
+        for (let i = 0; i < 20; i++) {
+            ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.8)`;
+            ctx.beginPath();
+            ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+    }
+
+    function submitBid() {
+        const price = document.getElementById('bidPrice').value;
+        const info = document.getElementById('bidInfo').value;
+        const pics = document.getElementById('bidPics').files;
+        const captchaInput = document.getElementById('captchaInput').value;
+
+        if (!price || !info || pics.length === 0) {
+            alert('请填写所有必填项并上传至少一张图片！');
+            return;
+        }
+        if (captchaInput !== captchaText) {
+            alert('验证码错误，请重试！');
+            generateCaptcha();
+            return;
+        }
+
+        alert('投标提交成功！');
+        renderBidList(currentPage);
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            document.title = `${demandName} - FASTRESP`;
+            renderDemandHeader();
+            renderBidList(1);
+            renderBidForm();
+
+            const header = document.getElementById('demand-header');
+            const topHeader = document.querySelector('.header');
+            const initialHeight = header.offsetHeight;
+            header.style.minHeight = `${initialHeight}px`;
+
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                if (scrollY >= initialHeight) {
+                    header.classList.add('fixed');
+                    topHeader.classList.add('hidden');
+                    document.body.style.paddingTop = `${initialHeight}px`;
+                } else {
+                    header.classList.remove('fixed');
+                    topHeader.classList.remove('hidden');
+                    document.body.style.paddingTop = "7.4em";
+                }
+            });
+        });
+    };
+</script>
+</body>
+</html>

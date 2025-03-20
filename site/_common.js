@@ -309,6 +309,7 @@ function bindAllTagClick(){
     document.querySelectorAll('.ant-tag').forEach(item => {
         let attr, value
         let type = findParentType(item)
+        if (undefined == type) return
         let isAttr = item.innerText.indexOf(":") !== -1
         if (isAttr){
             let attrValue = item.innerText.split(":")
@@ -343,9 +344,6 @@ function bindAllCardLink(){
                 let pid = p.id.toLowerCase()
                 if (pid.toLowerCase().indexOf("name") !== -1 || pid.indexOf("title") !== -1){
                     link += encodeURIComponent(p.innerText);
-                    // p.onclick = () => {
-                    //     window.location.href = link
-                    // }
                     p.innerHTML = `<a href="${link}">${p.innerHTML}</a>`
                 }
             });
