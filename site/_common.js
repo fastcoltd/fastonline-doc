@@ -269,18 +269,23 @@ function generateArticles(containerId, min, max) {
 }
 
 function findParentType(item){
-    let parentClass = item.closest('.card-list').id;
     let type
-    if (parentClass.indexOf("item") !== -1) {
-        type = 'items'
-    }else if (parentClass.indexOf("store") !== -1) {
-        type = 'stories'
-    }else if (parentClass.indexOf("post") !== -1) {
-        type = 'posts'
-    }else if (parentClass.indexOf("campaign") !== -1) {
-        type = 'campaigns'
-    }else if (parentClass.indexOf("demand") !== -1) {
-        type = 'demands'
+    let parentClass = item.closest('.card-list')?.id;
+    if (!parentClass){
+        parentClass = item.closest('.scroll-list')?.id;
+    }
+    if (parentClass){
+        if (parentClass.indexOf("item") !== -1) {
+            type = 'items'
+        }else if (parentClass.indexOf("store") !== -1) {
+            type = 'stories'
+        }else if (parentClass.indexOf("post") !== -1) {
+            type = 'posts'
+        }else if (parentClass.indexOf("campaign") !== -1) {
+            type = 'campaigns'
+        }else if (parentClass.indexOf("demand") !== -1) {
+            type = 'demands'
+        }
     }
     if(typeof tagType != 'undefined'){
         type = tagType
