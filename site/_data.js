@@ -1,4 +1,14 @@
 
+const systemType = {
+    "items": {"link": "item.html", "list_link": "item-list.html"},
+    "stories": {"link": "store.html", "list_link": "store-list.html"},
+    "posts": {"link": "post.html", "list_link": "post-list.html"},
+    "demands": {"link": "demand.html", "list_link": "demand-list.html"},
+    "campaigns": {"link": "campaign.html", "list_link": "campaign-list.html"},
+    "tag": {"link": "tag.html", "list_link": "tag-list.html"},
+    "attr": {"link": "attr.html", "list_link": "attr-list.html"},
+}
+
 // 热门平台样本数据：全球 Top 50 科技平台（真实数据）
 const hotBrands = [
     { logo: 'https://logo.clearbit.com/facebook.com', name: 'Facebook', link: 'brand.html?name=Facebook', home: 'https://facebook.com', parentCompany: 'Meta', description: 'Social networking platform for connecting people globally.', themeColor: '#1877F2' }, // Facebook Blue

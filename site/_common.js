@@ -268,31 +268,37 @@ function generateArticles(containerId, min, max) {
     }
 }
 
+
+function findParentType(item){
+    let parentClass = item.closest('.card-list').id;
+    let type
+    if (parentClass.indexOf("item") !== -1) {
+        type = 'items'
+    }else if (parentClass.indexOf("store") !== -1) {
+        type = 'stories'
+    }else if (parentClass.indexOf("post") !== -1) {
+        type = 'posts'
+    }else if (parentClass.indexOf("campaign") !== -1) {
+        type = 'campaigns'
+    }else if (parentClass.indexOf("demand") !== -1) {
+        type = 'demands'
+    }
+    if(typeof tagType != 'undefined'){
+        type = tagType
+    }
+    if(typeof attrType != 'undefined'){
+        type = attrType
+    }
+    if (typeof searchType != 'undefined'){
+        type = searchType
+    }
+    return type
+}
+
 function bindAllTagClick(){
     document.querySelectorAll('.ant-tag').forEach(item => {
-        let parentClass = item.closest('.card-list').id;
-        let type
-        if (parentClass.indexOf("item") !== -1) {
-            type = 'items'
-        }else if (parentClass.indexOf("store") !== -1) {
-            type = 'stories'
-        }else if (parentClass.indexOf("post") !== -1) {
-            type = 'posts'
-        }else if (parentClass.indexOf("campaign") !== -1) {
-            type = 'campaigns'
-        }else if (parentClass.indexOf("demand") !== -1) {
-            type = 'demands'
-        }
-        if(typeof tagType != 'undefined'){
-            type = tagType
-        }
-        if(typeof attrType != 'undefined'){
-            type = attrType
-        }
-        if (typeof searchType != 'undefined'){
-            type = searchType
-        }
         let attr, value
+        let type = findParentType(item)
         let isAttr = item.innerText.indexOf(":") !== -1
         if (isAttr){
             let attrValue = item.innerText.split(":")
@@ -305,9 +311,38 @@ function bindAllTagClick(){
     })
 }
 
+function bindAllButtonClick(){
+    document.querySelectorAll('.card-button').forEach(item => {
+        let type = findParentType(item)
+        let btnText = item.innerText;
+        item.onclick = () => {
+            console.log(type, btnText)
+        }
+    })
+}
+
+function bindAllCardLink(){
+    document.querySelectorAll('.card,.cardHoriz').forEach(item => {
+        let type = findParentType(item)
+        if (systemType[type]){
+            item.querySelectorAll("p").forEach(p =>{
+                let pid = p.id.toLowerCase()
+                if (pid.toLowerCase().indexOf("name") !== -1 || pid.indexOf("title") !== -1){
+                    p.onclick = () => {
+                        let link = systemType[type].link
+                        window.location.href = `${link}?name=${encodeURIComponent(p.innerText)}`
+                    }
+                }
+            })
+        }
+    })
+}
+
 window.addEventListener("load", function()  {
     setTimeout(()=>{
         generateServiceMenu()
+        bindAllButtonClick()
+        bindAllCardLink()
         bindAllTagClick()
         generateArticles('about-posts', 5, 8);
         generateArticles('buyer-posts', 5, 8);
