@@ -143,7 +143,7 @@
     function scrollToSection(sectionId) {
         const section = document.getElementById(sectionId);
         if (section) {
-            let sectionTop = section.getBoundingClientRect().top
+            let sectionTop = section.getBoundingClientRect().top;
             const header = document.getElementById('brand-header');
             const headerHeight = header.offsetHeight;
             const topHeader = document.querySelector('.header');
@@ -160,6 +160,33 @@
             const selectedTab = document.querySelector(`.attr-tab[data-section="${sectionId}"]`);
             if (selectedTab) selectedTab.classList.add('active');
         }
+    }
+
+    function updateActiveTabOnScroll() {
+        const sections = document.querySelectorAll('.section, .service-section');
+        const tabs = document.querySelectorAll('.attr-tab');
+        const headerHeight = document.getElementById('brand-header').offsetHeight;
+        const scrollPosition = window.scrollY + headerHeight + 70; // 考虑 header 高度和缓冲
+
+        let activeSectionId = null;
+        sections.forEach(section => {
+            const sectionId = section.id || section.querySelector('.card-list')?.id;
+            const sectionTop = section.offsetTop;
+            const sectionBottom = sectionTop + section.offsetHeight;
+
+            // 判断当前 section 是否在可视范围内
+            if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                activeSectionId = sectionId;
+            }
+        });
+
+        // 更新 tab 选中状态
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+            if (activeSectionId && tab.getAttribute('data-section') === activeSectionId) {
+                tab.classList.add('active');
+            }
+        });
     }
 
     function toggleSummary() {
@@ -432,16 +459,18 @@
     window.onload = () => {
         w3.includeHTML(() => {
             document.title = `${selectedBrand.name} - FASTRESP`;
-            renderBrandServices(); // 先渲染服务内容
-            renderBrandHeader();   // 再渲染头部，确保服务名称可用
+            renderBrandServices();
+            renderBrandHeader();
             renderHotDemands();
             renderHotPosts();
             renderFaqs();
 
             const header = document.getElementById('brand-header');
             const topHeader = document.querySelector('.header');
-            const initialHeight = header.offsetHeight; // 记录初始高度
-            header.style.minHeight = `${initialHeight}px`; // 设置最小高度
+            const initialHeight = header.offsetHeight;
+            header.style.minHeight = `${initialHeight}px`;
+
+            // 滚动时固定 header 的逻辑保持不变
             window.addEventListener('scroll', () => {
                 const scrollY = window.scrollY;
                 if (scrollY >= initialHeight) {
@@ -453,6 +482,8 @@
                     topHeader.classList.remove('hidden');
                     document.body.style.paddingTop = "7.4em";
                 }
+                // 添加自动更新 tab 的调用
+                updateActiveTabOnScroll();
             });
         });
     };
