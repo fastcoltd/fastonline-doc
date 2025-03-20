@@ -273,8 +273,12 @@ function findParentType(item){
     let parentClass = item.closest('.card-list')?.id;
     if (!parentClass){
         parentClass = item.closest('.scroll-list')?.id;
-    }if (!parentClass){
+    }
+    if (!parentClass){
         parentClass = item.closest('.post-header')?.id;
+    }
+    if (!parentClass){
+        parentClass = item.closest('.item-group')?.id;
     }
     if (parentClass){
         if (parentClass.indexOf("item") !== -1) {
@@ -355,6 +359,6 @@ window.addEventListener("load", function()  {
         generateArticles('buyer-posts', 5, 8);
         generateArticles('seller-posts', 5, 8);
         generateArticles('resource-posts', 5, 8);
-    }, 100)
+    }, 200)
 
 })
