@@ -113,6 +113,7 @@ let demandFieldConfig = {
             return Array(randomInt(3, 10)).fill().map(() => getPicsumImage(50, 50, `bidder-${Math.random()}`))
     }},
     attributes: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '属性', style: {}, sample: () => {return generateAttr(2,5)}},
+    demand_information: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '描述', style: {}, sample: () => faker.lorem.paragraph() },
     bidNow: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: 'Bid Now', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 
     // 新增字段（面向客户展示）

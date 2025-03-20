@@ -11,42 +11,59 @@
     <style>
         html { overflow: auto !important; height: auto; }
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
-        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
-        .demand-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em 1em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; display: flex; align-items: center; justify-content: flex-start; }
-        .demand-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0.5em 1em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
-        .demand-logo img { width: 2.5em; height: 2.5em; border-radius: 50%; margin-right: 1em; }
-        .demand-info h1 { font-size: var(--font-large); margin: 0; display: inline; }
-        .demand-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0 0 0 1em; display: inline; }
-        .demand-info .ant-tag { margin: 0 0.5em; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em;}
+        .demand-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em 0 1em 0em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .demand-header.fixed { position: fixed; width: 100%; top: 0; z-index: 20; padding: 0.5em 0 0 1em; border-bottom: 0.0625em solid var(--border-color); left: 50%; transform: translateX(-50%); max-width: var(--max-content-width); box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .demand-logo img { width: 1.5em; height: 1.5em; border-radius: 50%; margin-right: 0.5em; vertical-align: middle; }
+        .demand-info { flex: 1; position: relative; overflow: hidden;gap: 1em;margin: 0}
+        .demand-info h1 { font-size: var(--font-large); margin: 0 0 0.5em; }
+        .demand-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0 0 0.5em }
+        .demand-info p b{margin-left: 1em;}
+        .demand-info p b:first-child{margin-left: 0}
+        .demand-info .price-range span { margin-right: 0.5em; gap: 1em; }
+        .demand-info .price-range .value1 { color: #1E90FF; }
+        .demand-info .price-range .value2 { color: #32CD32; }
+        .demand-info .price-range .value3 { color: #FFD700; }
+        .demand-info .price-range .value4 { color: #FF4500; }
+        .demand-info .requirements { gap: 1em; }
+        .demand-info .requirements .attr { color: #666; }
+        .demand-info .requirements .value { border: 0.0625em solid var(--border-color); padding: 0.1em 0.3em; border-radius: 0.25em; }
+        .demand-info .requirements .tag0 .value { color: #1E90FF; }
+        .demand-info .requirements .tag1 .value { color: #32CD32; }
+        .demand-info .requirements .tag2 .value { color: #FFD700; }
+        .demand-info .requirements .tag3 .value { color: #FF4500; }
+        .demand-info .requirements .tag4 .value { color: #E1306C; }
+        .demand-status {display: flex; position: absolute; top: 7.4em; right: -1.8em; padding: 0.5em; width: 13em; height: 2.5em!important; overflow: hidden;height: 3em; text-align:center;text-overflow: ellipsis;justify-content: center; white-space: nowrap; font-size: var(--font-small); color: #fff; transform: rotate(45deg); transform-origin: top right; }
         .section { margin-bottom: 1em; padding: 0; }
         .section:last-child { margin-bottom: 0em; }
         .bid-list { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
-        .bid-item { flex: 0 0 100%; max-width: 100%; min-height: 6em; margin-bottom: 0.5em; padding: 0.5em 1em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; display: flex; align-items: center; position: relative; }
+        .bid-item { flex: 0 0 100%; max-width: 100%; width: 12em; min-height: 8em; margin-bottom: 0.5em; padding: 0.5em 1em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; display: flex; align-items: center; position: relative; }
         .bid-item:hover { border-color: var(--natural-green); box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
         .bid-item.self { border-color: var(--vibrant-orange); }
         .bid-avatar img { width: 2em; height: 2em; border-radius: 50%; margin-right: 1em; }
         .bid-content { flex: 1; }
         .bid-content p { margin: 0.25em 0; }
-        .bid-content .ant-tag { margin: 0.25em; }
-        .bid-status { position: absolute; top: 0.5em; right: 0.5em; padding: 0.2em 0.5em; border-radius: 0.25em; font-size: var(--font-small); color: #fff; }
+        .bid-content .inline { display: inline; margin-right: 1em; }
         .bid-images { display: flex; flex-wrap: wrap; gap: 0.5em; }
         .bid-images img { width: 3em; height: 3em; object-fit: cover; border-radius: 0.25em; cursor: pointer; }
         .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin: 1em 0; }
         .pagination-btn { padding: 0.3em 1em; background: var(--bg-white); border-color: var(--border-color); color: var(--text-primary); }
         .pagination-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
         .bid-form { padding: 1em; background: var(--bg-light); border-radius: 0.5em; }
-        .bid-form textarea, .bid-form input[type="number"] { width: 100%; padding: 0.5em; margin: 0.5em 0; }
+        .bid-form textarea, .bid-form input[type="number"], .bid-form input[type="text"] { width: 100%; padding: 0.5em; margin: 0.5em 0; }
+        .bid-form textarea { height: 6em; }
         .captcha { display: flex; align-items: center; gap: 0.5em; margin: 0.5em 0; }
         @media (max-width: 48em) {
             body { padding-top: 1.5em !important; margin: 0 !important; }
             .container { padding-top: 1.5em !important; margin: 0 !important; }
             .demand-header { padding: 0.5em !important; flex-wrap: wrap; gap: 0.5em; }
-            .demand-logo img { width: 2em; height: 2em; margin-right: 0.5em; }
-            .demand-info h1 { font-size: var(--font-medium); }
-            .demand-info p { font-size: var(--font-small); margin: 0 0 0 0.5em; }
+            .demand-logo img { width: 1.2em; height: 1.2em; margin-right: 0.3em; }
+            .demand-info h1 { font-size: var(--font-medium); margin: 0 0 0.3em; }
+            .demand-info p { font-size: var(--font-small); margin: 0.2em 0; }
             .bid-avatar img { width: 1.5em; height: 1.5em; }
             .bid-images img { width: 2.5em; height: 2.5em; }
             .bid-status { font-size: var(--font-xsmall); padding: 0.1em 0.3em; }
+           .demand-status { font-size: var(--font-xsmall); padding: 0.3em 0.8em; }
         }
     </style>
 </head>
@@ -76,58 +93,81 @@
     const urlParams = new URLSearchParams(window.location.search);
     const demandName = decodeURIComponent(urlParams.get('name') || 'Cassin, Swaniawski and Stamm');
     const demandData = generateData(demandFieldConfig, 1)[0];
+    console.log(demandData)
     demandData.demandTitle = demandName;
     const brand = hotBrands[Math.floor(Math.random() * hotBrands.length)];
     const service = services[Math.floor(Math.random() * services.length)];
     const attributes = generateAttr(3, 5);
     const userId = Math.floor(Math.random() * 1000); // 模拟当前用户ID
+    const demandStatus = Object.keys(demandStatusColors)[Math.floor(Math.random() * Object.keys(demandStatusColors).length)];
     const bidsPerPage = 5;
     let currentPage = 1;
 
     function renderDemandHeader() {
         const header = document.getElementById('demand-header');
+        const totalAmount = parseFloat(demandData.price_to.sample.split('$')[1]) * parseInt(demandData.quantity.sample);
         header.innerHTML = `
-            <div class="demand-logo">
-                <img src="${brand.logo}" alt="${brand.name}">
-            </div>
-            <div class="demand-info">
-                <h1><a href="demand.html?name=${encodeURIComponent(demandName)}" style="color: ${brand.themeColor}">${demandName}</a></h1>
-                <p><b>品牌</b>: <span style="color: ${brand.themeColor}">${brand.name}</span></p>
-                <p><b>服务</b>: ${service.name}</p>
-                <p><b>出价范围</b>: ${demandData.price_from.sample} - ${demandData.price_to.sample}</p>
-                <p><b>需求总数</b>: ${demandData.quantity.sample}</p>
-                <p><b>定金</b>: ${demandData.deposit.sample}</p>
-                <p><b>是否需要样品</b>: ${demandData.samples_need.sample}</p>
-                ${Object.entries(attributes).map(([key, value], idx) => `<span class="ant-tag ${tagColors[idx % tagColors.length]}">${key}: ${value}</span>`).join('')}
-            </div>
-        `;
+        <div class="demand-info">
+            <h1><a href="demand.html?name=${encodeURIComponent(demandName)}">${demandName}</a></h1>
+            <p><b>品牌</b>: <span class="demand-logo"><img src="${brand.logo}" alt="${brand.name}"></span><span style="color: ${brand.themeColor}">${brand.name}</span> <b>服务</b>: ${service.name}</p>
+            <p class="requirements"><b>产品属性</b>: ${Object.entries(attributes).map(([key, value], idx) => `<span class="tag${idx}"><span class="attr">${key}</span>:<span class="value">${value}</span></span>`).join(' ')}</p>
+            <p class="price-range">
+                <b>出价范围</b>: <span class="value1">${demandData.price_from.sample}</span> - <span class="value2">${demandData.price_to.sample}</span>
+                <b>定金</b>: <span class="value3">${demandData.deposit.sample}</span> <b>所需数量</b>: <span class="value4">${demandData.quantity.sample}</span> <b>总金额</b>: $${totalAmount.toFixed(2)} <b>是否需要样品</b>: ${demandData.samples_need.sample}
+            </p>
+            <p><b>其他要求</b>：<span>${demandData.demand_information}</span></p>
+            <span class="demand-status" style="background-color: ${demandStatusColors[demandStatus]}">${demandStatus}</span>
+        </div>
+    `;
     }
 
     function generateBids() {
         const bidCount = randomInt(5, 15);
         const bidStatuses = ['Bidding', 'Bid Won', 'Delivered', 'Demand Expired', 'Refunded'];
-        const bids = Array(bidCount).fill().map(() => ({
-            user_id: Math.floor(Math.random() * 1000),
-            store_id: Math.floor(Math.random() * 1000),
-            store_name: faker.company.companyName(),
-            avatar: getPicsumImage(50, 50, `store-${Math.random()}`),
-            bid_time: faker.date.recent().getTime() / 1000,
-            bid_price: parseFloat(faker.commerce.price(40, 300, 2)),
-            bid_information: faker.lorem.sentence(),
-            bid_pics: Array(randomInt(1, 3)).fill().map((_, i) => getPicsumImage(100, 100, `bid-${i}-${Math.random()}`)),
-            status: bidStatuses[Math.floor(Math.random() * bidStatuses.length)]
-        }));
+        const bids = Array(bidCount).fill().map(() => {
+            const storeData = generateData(storeFieldConfig, 1)[0];
+            const bidTimes = randomInt(10, 50);
+            const winTimes = Math.floor(bidTimes * Math.random() * 0.5);
+            const sampleInfo = `${faker.internet.email()}----${faker.internet.password()}----${faker.random.arrayElement(['male', 'female'])}----${faker.datatype.number({ min: 50, max: 1000 })}followers----${faker.lorem.word()}`;
+            return {
+                user_id: Math.floor(Math.random() * 1000),
+                store_id: Math.floor(Math.random() * 1000),
+                store_name: storeData.name,
+                avatar: storeData.image,
+                bid_time: faker.date.recent().getTime() / 1000,
+                bid_price: parseFloat(faker.commerce.price(40, 300, 2)),
+                bid_information: faker.lorem.sentence(),
+                bid_pics: Array(randomInt(1, 3)).fill().map((_, i) => getPicsumImage(100, 100, `bid-${i}-${Math.random()}`)),
+                samples_provided: sampleInfo,
+                field_info: `${faker.internet.email()}----${faker.internet.password()}----${faker.random.arrayElement(['male', 'female'])}----${faker.datatype.number({ min: 50, max: 1000 })}followers----${faker.lorem.word()}`,
+                status: bidStatuses[Math.floor(Math.random() * bidStatuses.length)],
+                bid_times: bidTimes,
+                win_times: winTimes,
+                win_rate: (winTimes / bidTimes * 100).toFixed(1),
+                rating: storeData.rating
+            };
+        });
         if (Math.random() > 0.5) {
+            const storeData = generateData(storeFieldConfig, 1)[0];
+            const bidTimes = randomInt(10, 50);
+            const winTimes = Math.floor(bidTimes * Math.random() * 0.5);
+            const sampleInfo = `${faker.internet.email()}----${faker.internet.password()}----${faker.random.arrayElement(['male', 'female'])}----${faker.datatype.number({ min: 50, max: 1000 })}followers----${faker.lorem.word()}`;
             bids.push({
                 user_id: userId,
                 store_id: Math.floor(Math.random() * 1000),
-                store_name: faker.company.companyName(),
-                avatar: getPicsumImage(50, 50, `self-${Math.random()}`),
+                store_name: storeData.name,
+                avatar: storeData.image,
                 bid_time: faker.date.recent().getTime() / 1000,
                 bid_price: parseFloat(faker.commerce.price(40, 300, 2)),
                 bid_information: faker.lorem.sentence(),
                 bid_pics: Array(randomInt(1, 3)).fill().map((_, i) => getPicsumImage(100, 100, `self-bid-${i}`)),
-                status: 'Bidding'
+                samples_provided: sampleInfo,
+                field_info: `${faker.internet.email()}----${faker.internet.password()}----${faker.random.arrayElement(['male', 'female'])}----${faker.datatype.number({ min: 50, max: 1000 })}followers----${faker.lorem.word()}`,
+                status: 'Bidding',
+                bid_times: bidTimes,
+                win_times: winTimes,
+                win_rate: (winTimes / bidTimes * 100).toFixed(1),
+                rating: storeData.rating
             });
         }
         return bids.sort((a, b) => b.bid_time - a.bid_time || a.bid_price - b.bid_price);
@@ -143,29 +183,37 @@
         const pageBids = bids.slice(start, end);
 
         bidList.innerHTML = pageBids.length === 0 ? '<p style="text-align: center; color: var(--text-secondary);">暂无投标信息</p>' : '';
-        pageBids.forEach((bid, index) => {
+        pageBids.forEach((bid) => {
             const isSelf = bid.user_id === userId;
             const bidItem = document.createElement('div');
             bidItem.className = `bid-item ${isSelf ? 'self' : ''}`;
-            const visibleFields = [
-                { label: '投标时间', value: new Date(bid.bid_time * 1000).toLocaleString() },
-                { label: '投标价格', value: `$${bid.bid_price.toFixed(2)}` }
-            ];
-            const selfFields = isSelf ? [
-                { label: '投标说明', value: bid.bid_information },
-                { label: '投标图片', value: bid.bid_pics.map(pic => `<img src="${pic}" alt="Bid Image" onclick="showImageModal(this.src)">`).join('') }
-            ] : [
-                { label: '投标说明', value: '****' },
-                { label: '投标图片', value: '****' }
-            ];
+            const storeInfo = `
+                <p><span class="inline"><b>店铺</b>: <a href="store.html?name=${encodeURIComponent(bid.store_name)}">${bid.store_name}</a></span> <span class="inline"><b>等级</b>: ${bid.rating.sample >= 4.5 ? 'Lv5' : bid.rating.sample >= 4 ? 'Lv4' : 'Lv3'}</span> <span class="inline"><b>评分</b>: ${generateRating({}, bid.rating, {})}</span></p>
+            `;
+            const bidStats = `
+                <p><span class="inline"><b>投标次数</b>: ${bid.bid_times}</span> <span class="inline"><b>中标次数</b>: ${bid.win_times}</span> <span class="inline"><b>中标率</b>: ${bid.win_rate}%</span></p>
+            `;
+            const bidDetails = `
+                <p><b>投标时间</b>: ${new Date(bid.bid_time * 1000).toLocaleString()}</p>
+                <p><b>投标价格</b>: $${bid.bid_price.toFixed(2)}</p>
+                <p><b>字段信息</b>: ${isSelf ? bid.field_info : '****'}</p>
+                <p><b>提供样品</b>: ${isSelf ? bid.samples_provided.replace(/----/g, '\n') : '****'}</p>
+                ${isSelf ? `
+                    <p><b>投标说明</b>: ${bid.bid_information}</p>
+                    <p><b>投标图片</b>: <div class="bid-images">${bid.bid_pics.map(pic => `<img src="${pic}" alt="Bid Image" onclick="showImageModal(this.src)">`).join('')}</div></p>
+                ` : `
+                    <p><b>投标说明</b>: ****</p>
+                    <p><b>投标图片</b>: ****</p>
+                `}
+            `;
             bidItem.innerHTML = `
                 <div class="bid-avatar">
                     <img src="${bid.avatar}" alt="${bid.store_name}">
                 </div>
                 <div class="bid-content">
-                    <p><b>${bid.store_name}</b></p>
-                    ${visibleFields.map((field, idx) => `<span class="ant-tag ${tagColors[idx % tagColors.length]}">${field.label}: ${field.value}</span>`).join('')}
-                    ${selfFields.map((field, idx) => `<span class="ant-tag ${tagColors[(idx + visibleFields.length) % tagColors.length]}">${field.label}: ${field.value}</span>`).join('')}
+                    ${storeInfo}
+                    ${bidStats}
+                    ${bidDetails}
                 </div>
                 <span class="bid-status" style="background-color: ${demandStatusColors[bid.status] || '#A9A9A9'}">${bid.status}</span>
             `;
@@ -209,11 +257,16 @@
     function renderBidForm() {
         const form = document.getElementById('bid-form');
         const storeName = faker.company.companyName();
+        const samplesRequired = demandData.samples_need.sample === '是';
         form.innerHTML = `
             <p><b>店铺名称</b>: ${storeName}</p>
             <p><b>投标价格</b>: <input type="number" id="bidPrice" placeholder="请输入投标价格 (美元)" min="40" max="300" step="0.01"></p>
             <p><b>投标说明</b>: <textarea id="bidInfo" placeholder="请输入投标说明"></textarea></p>
             <p><b>上传图片</b>: <input type="file" id="bidPics" multiple accept="image/*" style="margin: 0.5em 0;"></p>
+            <p><b>字段信息</b>: <textarea id="fieldInfo" placeholder="请输入字段信息，例如：email----password----gender----followers----extra"></textarea></p>
+            ${samplesRequired ? `
+                <p><b>提供样品</b>: <textarea id="samplesProvided" placeholder="请输入样品信息，每行一个，例如：email----password----gender----followers----extra"></textarea></p>
+            ` : ''}
             <div class="captcha">
                 <input type="text" id="captchaInput" placeholder="请输入验证码">
                 <canvas class="captcha-canvas" id="captchaCanvas" width="120" height="30" onclick="generateCaptcha()"></canvas>
@@ -270,9 +323,11 @@
         const price = document.getElementById('bidPrice').value;
         const info = document.getElementById('bidInfo').value;
         const pics = document.getElementById('bidPics').files;
+        const fieldInfo = document.getElementById('fieldInfo').value;
+        const samplesProvided = demandData.samples_need.sample === '是' ? document.getElementById('samplesProvided')?.value : null;
         const captchaInput = document.getElementById('captchaInput').value;
 
-        if (!price || !info || pics.length === 0) {
+        if (!price || !info || pics.length === 0 || !fieldInfo || (demandData.samples_need.sample === '是' && !samplesProvided)) {
             alert('请填写所有必填项并上传至少一张图片！');
             return;
         }
@@ -296,8 +351,6 @@
             const header = document.getElementById('demand-header');
             const topHeader = document.querySelector('.header');
             const initialHeight = header.offsetHeight;
-            header.style.minHeight = `${initialHeight}px`;
-
             window.addEventListener('scroll', () => {
                 const scrollY = window.scrollY;
                 if (scrollY >= initialHeight) {
