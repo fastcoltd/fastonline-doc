@@ -11,39 +11,34 @@
     <style>
         html { overflow: auto !important; height: auto; }
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
-        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em;}
-        .demand-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em 0 1em 0em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; display: flex; align-items: center; justify-content: space-between; position: relative; }
-        .demand-header.fixed { position: fixed; width: 100%; top: 0; z-index: 20; padding: 0.5em 0 0 1em; border-bottom: 0.0625em solid var(--border-color); left: 50%; transform: translateX(-50%); max-width: var(--max-content-width); box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
+        .demand-header { max-width: var(--max-content-width); max-width: none;margin: 0 auto; padding: 0.5em 0 1em 0; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .demand-header.fixed { position: fixed; width: 100%; top: 0; z-index: 20; padding: 0.5em 0 0 0; border-bottom: 0.0625em solid var(--border-color); left: 0; transform: none; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .demand-header.fixed .demand-info { max-width: var(--max-content-width); margin: 0 auto; }
         .demand-logo img { width: 1.5em; height: 1.5em; border-radius: 50%; margin-right: 0.5em; vertical-align: middle; }
-        .demand-info { flex: 1; position: relative; overflow: hidden;gap: 1em;margin: 0}
+        .demand-info { flex: 1; position: relative; overflow: hidden; gap: 1em; margin: 0; }
         .demand-info h1 { font-size: var(--font-large); margin: 0 0 0.5em; }
-        .demand-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0 0 0.5em }
-        .demand-info p b{margin-left: 1em;}
-        .demand-info p b:first-child{margin-left: 0}
+        .demand-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0 0 0.5em; }
+        .demand-info p b { margin-left: 1em; }
+        .demand-info p b:first-child { margin-left: 0; }
         .demand-info .price-range span { margin-right: 0.5em; gap: 1em; }
         .demand-info .price-range .value1 { color: #1E90FF; }
         .demand-info .price-range .value2 { color: #32CD32; }
         .demand-info .price-range .value3 { color: #FFD700; }
         .demand-info .price-range .value4 { color: #FF4500; }
-        .demand-info .requirements { gap: 1em; }
-        .demand-info .requirements .attr { color: #666; }
-        .demand-info .requirements .value { border: 0.0625em solid var(--border-color); padding: 0.1em 0.3em; border-radius: 0.25em; }
-        .demand-info .requirements .tag0 .value { color: #1E90FF; }
-        .demand-info .requirements .tag1 .value { color: #32CD32; }
-        .demand-info .requirements .tag2 .value { color: #FFD700; }
-        .demand-info .requirements .tag3 .value { color: #FF4500; }
-        .demand-info .requirements .tag4 .value { color: #E1306C; }
-        .demand-status {display: flex; position: absolute; top: 7.4em; right: -1.8em; padding: 0.5em; width: 13em; height: 2.5em!important; overflow: hidden;height: 3em; text-align:center;text-overflow: ellipsis;justify-content: center; white-space: nowrap; font-size: var(--font-small); color: #fff; transform: rotate(45deg); transform-origin: top right; }
-        .section { margin-bottom: 1em; padding: 0; }
+        .demand-info .requirements { gap: 1em; flex-wrap: nowrap;}
+        .demand-status { display: flex; position: absolute; top: 7.4em; right: -1.8em; padding: 0.5em; width: 13em; height: 2.5em !important; overflow: hidden; text-align: center; text-overflow: ellipsis; justify-content: center; white-space: nowrap; font-size: var(--font-small); color: #fff; transform: rotate(45deg); transform-origin: top right; }
+        .section { }
         .section:last-child { margin-bottom: 0em; }
         .bid-list { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
-        .bid-item { flex: 0 0 100%; max-width: 100%; width: 12em; min-height: 8em; margin-bottom: 0.5em; padding: 0.5em 1em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; display: flex; align-items: center; position: relative; }
+        .bid-item { flex: 0 0 100%; max-width: 100%; min-height: 8em; margin-bottom: 0.5em; padding: 0.5em 1em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; display: flex; align-items: center; position: relative; }
         .bid-item:hover { border-color: var(--natural-green); box-shadow: 0 0.3125em 0.9375em rgba(0,0,0,0.1); }
         .bid-item.self { border-color: var(--vibrant-orange); }
-        .bid-avatar img { width: 2em; height: 2em; border-radius: 50%; margin-right: 1em; }
         .bid-content { flex: 1; }
         .bid-content p { margin: 0.25em 0; }
-        .bid-content .inline { display: inline; margin-right: 1em; }
+        .bid-content .bid-summary { display: flex; flex-wrap: nowrap; gap: 1em; align-items: center; }
+        .bid-content .bid-summary p { display: inline-block; margin: 0; white-space: nowrap;display: flex; }
+        .bid-status { position: absolute; top: 5.5em; right: -1.5em; padding: 0.3em 0.8em; width: 10em; overflow: hidden; text-align: center; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-small); color: #fff; transform: rotate(45deg); transform-origin: top right; }
         .bid-images { display: flex; flex-wrap: wrap; gap: 0.5em; }
         .bid-images img { width: 3em; height: 3em; object-fit: cover; border-radius: 0.25em; cursor: pointer; }
         .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin: 1em 0; }
@@ -51,7 +46,7 @@
         .pagination-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
         .bid-form { padding: 1em; background: var(--bg-light); border-radius: 0.5em; }
         .bid-form textarea, .bid-form input[type="number"], .bid-form input[type="text"] { width: 100%; padding: 0.5em; margin: 0.5em 0; }
-        .bid-form textarea { height: 6em; }
+        .bid-form textarea.samples { height: 6em; }
         .captcha { display: flex; align-items: center; gap: 0.5em; margin: 0.5em 0; }
         @media (max-width: 48em) {
             body { padding-top: 1.5em !important; margin: 0 !important; }
@@ -60,10 +55,11 @@
             .demand-logo img { width: 1.2em; height: 1.2em; margin-right: 0.3em; }
             .demand-info h1 { font-size: var(--font-medium); margin: 0 0 0.3em; }
             .demand-info p { font-size: var(--font-small); margin: 0.2em 0; }
-            .bid-avatar img { width: 1.5em; height: 1.5em; }
+            .demand-status { font-size: var(--font-xsmall); padding: 0.3em 0.8em; }
             .bid-images img { width: 2.5em; height: 2.5em; }
-            .bid-status { font-size: var(--font-xsmall); padding: 0.1em 0.3em; }
-           .demand-status { font-size: var(--font-xsmall); padding: 0.3em 0.8em; }
+            .bid-status { font-size: var(--font-xsmall); padding: 0.2em 0.6em; width: 6em; top: -0.3em; right: -0.8em; }
+            .bid-content .bid-summary { flex-direction: column; align-items: flex-start; gap: 0.5em; }
+            .bid-content .bid-summary p { display: block; white-space: normal; }
         }
     </style>
 </head>
@@ -93,36 +89,37 @@
     const urlParams = new URLSearchParams(window.location.search);
     const demandName = decodeURIComponent(urlParams.get('name') || 'Cassin, Swaniawski and Stamm');
     const demandData = generateData(demandFieldConfig, 1)[0];
-    console.log(demandData)
     demandData.demandTitle = demandName;
     const brand = hotBrands[Math.floor(Math.random() * hotBrands.length)];
     const service = services[Math.floor(Math.random() * services.length)];
     const attributes = generateAttr(3, 5);
     const userId = Math.floor(Math.random() * 1000); // 模拟当前用户ID
     const demandStatus = Object.keys(demandStatusColors)[Math.floor(Math.random() * Object.keys(demandStatusColors).length)];
-    const bidsPerPage = 5;
+    const bidsPerPage = 10;
     let currentPage = 1;
 
     function renderDemandHeader() {
         const header = document.getElementById('demand-header');
         const totalAmount = parseFloat(demandData.price_to.sample.split('$')[1]) * parseInt(demandData.quantity.sample);
         header.innerHTML = `
-        <div class="demand-info">
-            <h1><a href="demand.html?name=${encodeURIComponent(demandName)}">${demandName}</a></h1>
-            <p><b>品牌</b>: <span class="demand-logo"><img src="${brand.logo}" alt="${brand.name}"></span><span style="color: ${brand.themeColor}">${brand.name}</span> <b>服务</b>: ${service.name}</p>
-            <p class="requirements"><b>产品属性</b>: ${Object.entries(attributes).map(([key, value], idx) => `<span class="tag${idx}"><span class="attr">${key}</span>:<span class="value">${value}</span></span>`).join(' ')}</p>
-            <p class="price-range">
-                <b>出价范围</b>: <span class="value1">${demandData.price_from.sample}</span> - <span class="value2">${demandData.price_to.sample}</span>
-                <b>定金</b>: <span class="value3">${demandData.deposit.sample}</span> <b>所需数量</b>: <span class="value4">${demandData.quantity.sample}</span> <b>总金额</b>: $${totalAmount.toFixed(2)} <b>是否需要样品</b>: ${demandData.samples_need.sample}
-            </p>
-            <p><b>其他要求</b>：<span>${demandData.demand_information}</span></p>
-            <span class="demand-status" style="background-color: ${demandStatusColors[demandStatus]}">${demandStatus}</span>
-        </div>
-    `;
+            <div class="demand-info">
+                <h1><a href="demand.html?name=${encodeURIComponent(demandName)}">${demandName}</a></h1>
+                <p><b>品牌</b>: <span class="demand-logo"><img src="${brand.logo}" alt="${brand.name}"></span><span style="color: ${brand.themeColor}"> <a href="brand.html?name=${brand.name}">${brand.name}</a></span>
+                    <b>服务</b>: <a href="item-list.html?brandName=${brand.name}&serices=${encodeURIComponent(service.name)}">${service.name}</a></p>
+                <p class="requirements"><b>产品属性</b>: ${Object.entries(attributes).map(([key, value], idx) => `<span><span class="ant-tag" style="font-weight: bold;">${key}</span>:  <span class="ant-tag ${tagColors[randomInt(0, tagColors.length-1)]}">${value}</span></span>`).join(' ')}</p>
+                <p class="price-range">
+                    <b>出价范围</b>: <span class="value1">${demandData.price_from.sample}</span> - <span class="value2">${demandData.price_to.sample}</span>
+                    <b>定金</b>: <span class="value3">${demandData.deposit.sample}</span> <b>所需数量</b>: <span class="value4">${demandData.quantity.sample}</span> <b>总金额</b>: $${totalAmount.toFixed(2)} <b>是否需要样品</b>: <b>${demandData.samples_need.sample}</b>
+                    <b>投标时间</b>: <span class="value2">${demandData.bid_time.format(demandData, demandData.bid_time.sample)}</span>
+                </p>
+                <p><b>其他要求</b>: <span>${demandData.demand_information}</span></p>
+                <span class="demand-status" style="background-color: ${demandStatusColors[demandStatus]}">${demandStatus}</span>
+            </div>
+        `;
     }
 
     function generateBids() {
-        const bidCount = randomInt(5, 15);
+        const bidCount = randomInt(15, 40);
         const bidStatuses = ['Bidding', 'Bid Won', 'Delivered', 'Demand Expired', 'Refunded'];
         const bids = Array(bidCount).fill().map(() => {
             const storeData = generateData(storeFieldConfig, 1)[0];
@@ -187,16 +184,17 @@
             const isSelf = bid.user_id === userId;
             const bidItem = document.createElement('div');
             bidItem.className = `bid-item ${isSelf ? 'self' : ''}`;
-            const storeInfo = `
-                <p><span class="inline"><b>店铺</b>: <a href="store.html?name=${encodeURIComponent(bid.store_name)}">${bid.store_name}</a></span> <span class="inline"><b>等级</b>: ${bid.rating.sample >= 4.5 ? 'Lv5' : bid.rating.sample >= 4 ? 'Lv4' : 'Lv3'}</span> <span class="inline"><b>评分</b>: ${generateRating({}, bid.rating, {})}</span></p>
-            `;
-            const bidStats = `
-                <p><span class="inline"><b>投标次数</b>: ${bid.bid_times}</span> <span class="inline"><b>中标次数</b>: ${bid.win_times}</span> <span class="inline"><b>中标率</b>: ${bid.win_rate}%</span></p>
+            const summary = `
+                <div class="bid-summary">
+                    <p><b>店铺</b>: <a href="store.html?name=${encodeURIComponent(bid.store_name)}"><img src="${bid.avatar}" alt="${bid.store_name}" style="width: 1.5em; height: 1.5em; vertical-align: middle; margin-right: 0.5em;">${bid.store_name}</a></p>
+                    <p><b>等级</b>: ${bid.rating.sample >= 4.5 ? 'Lv5' : bid.rating.sample >= 4 ? 'Lv4' : 'Lv3'}</p>
+                    <p><b>评分</b>: ${generateRating({}, bid.rating, {})}</p>
+                    <p><b>投标/中标</b>: ${bid.bid_times}/${bid.win_times}</p>
+                    <p><b>中标率</b>: ${bid.win_rate}%</p>
+                </div>
             `;
             const bidDetails = `
-                <p><b>投标时间</b>: ${new Date(bid.bid_time * 1000).toLocaleString()}</p>
-                <p><b>投标价格</b>: $${bid.bid_price.toFixed(2)}</p>
-                <p><b>字段信息</b>: ${isSelf ? bid.field_info : '****'}</p>
+                <p><b>投标时间</b>: ${new Date(bid.bid_time * 1000).toLocaleString()} <b>投标价格</b>: $${bid.bid_price.toFixed(2)} <b>字段信息</b>: ${isSelf ? bid.field_info : '****'}</p>
                 <p><b>提供样品</b>: ${isSelf ? bid.samples_provided.replace(/----/g, '\n') : '****'}</p>
                 ${isSelf ? `
                     <p><b>投标说明</b>: ${bid.bid_information}</p>
@@ -207,12 +205,8 @@
                 `}
             `;
             bidItem.innerHTML = `
-                <div class="bid-avatar">
-                    <img src="${bid.avatar}" alt="${bid.store_name}">
-                </div>
                 <div class="bid-content">
-                    ${storeInfo}
-                    ${bidStats}
+                    ${summary}
                     ${bidDetails}
                 </div>
                 <span class="bid-status" style="background-color: ${demandStatusColors[bid.status] || '#A9A9A9'}">${bid.status}</span>
@@ -262,11 +256,11 @@
             <p><b>店铺名称</b>: ${storeName}</p>
             <p><b>投标价格</b>: <input type="number" id="bidPrice" placeholder="请输入投标价格 (美元)" min="40" max="300" step="0.01"></p>
             <p><b>投标说明</b>: <textarea id="bidInfo" placeholder="请输入投标说明"></textarea></p>
-            <p><b>上传图片</b>: <input type="file" id="bidPics" multiple accept="image/*" style="margin: 0.5em 0;"></p>
-            <p><b>字段信息</b>: <textarea id="fieldInfo" placeholder="请输入字段信息，例如：email----password----gender----followers----extra"></textarea></p>
+            <p><b>字段信息</b>: <input type="text" id="fieldInfo" placeholder="请输入字段信息，例如：email----password----gender----followers----extra"></p>
             ${samplesRequired ? `
-                <p><b>提供样品</b>: <textarea id="samplesProvided" placeholder="请输入样品信息，每行一个，例如：email----password----gender----followers----extra"></textarea></p>
+                <p><b>提供样品</b>: <textarea class="samples" id="samplesProvided" placeholder="请输入样品信息，每行一个，例如：email----password----gender----followers----extra"></textarea></p>
             ` : ''}
+            <p><b>上传图片</b>: <input type="file" id="bidPics" multiple accept="image/*" style="margin: 0.5em 0;"></p>
             <div class="captcha">
                 <input type="text" id="captchaInput" placeholder="请输入验证码">
                 <canvas class="captcha-canvas" id="captchaCanvas" width="120" height="30" onclick="generateCaptcha()"></canvas>

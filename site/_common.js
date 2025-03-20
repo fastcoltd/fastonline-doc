@@ -139,6 +139,59 @@ function applyStyle(styleObj) {
     return styles.length ? ` style="${styles.join(';')}"` : '';
 }
 
+function generateCaptcha() {
+    const canvas = document.getElementById('captchaCanvas');
+    const ctx = canvas.getContext('2d');
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    captchaText = '';
+
+    // 调整画布大小（移动端适配）
+    const isMobile = window.innerWidth <= 768;
+    canvas.width = isMobile ? 100 : 120;
+    canvas.height = 30;
+
+    // 清空画布
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 绘制背景
+    ctx.fillStyle = '#f5f5f5';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 生成随机文字
+    for (let i = 0; i < 4; i++) {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        captchaText += char;
+        ctx.font = `bold ${isMobile ? 20 : 24}px Arial`;
+        ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // 添加随机旋转和位置偏移
+        ctx.save();
+        ctx.translate((canvas.width / 4) * i + (canvas.width / 8), 22);
+        ctx.rotate((Math.random() - 0.5) * 0.4);
+        ctx.fillText(char, 0, 0);
+        ctx.restore();
+    }
+
+    // 添加干扰线
+    for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.strokeStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.5)`;
+        ctx.stroke();
+    }
+
+    // 添加噪点
+    for (let i = 0; i < 20; i++) {
+        ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.8)`;
+        ctx.beginPath();
+        ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+    document.getElementById('captcha').value = captchaText
+}
 
 function generateRating(item, value, style) {
     let count = typeof value == 'object' ? value['count'] : 0

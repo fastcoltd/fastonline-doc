@@ -108,11 +108,18 @@ let demandFieldConfig = {
     demandCount: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '需求数量', style: {}, sample: () => faker.datatype.number({ min: 5, max: 20 }) },
     price: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '出价范围', style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
     totalPrice: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '总价', style: {}, sample: () => faker.commerce.price(1000, 5000, 2, "$") },
+    bid_time: {card: true, cardSq: false, cardHoriz: true, type: 'text', label: '投标时间', style: {}, format: (d, v) => {
+        return `<b style="color: var(--font-green)">${v[0]}</b> ~ <b style="color: var(--red)">${v[1]}</b>`
+    }, sample: () => [
+        faker.date.recent().toLocaleDateString(),
+            faker.date.recent().toLocaleDateString()
+    ]},
     // bids: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '竞标人数', style: {}, sample: () => faker.datatype.number({ min: 300, max: 1000 }) },
     bidders: { card: true, cardSq: true, cardHoriz: true, type: 'bidders', label: '投标者', style: {}, format: (d, v) => {return ``}, sample: () => {
             return Array(randomInt(3, 10)).fill().map(() => getPicsumImage(50, 50, `bidder-${Math.random()}`))
     }},
     attributes: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '属性', style: {}, sample: () => {return generateAttr(2,5)}},
+
     demand_information: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '描述', style: {}, sample: () => faker.lorem.paragraph() },
     bidNow: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: 'Bid Now', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 
