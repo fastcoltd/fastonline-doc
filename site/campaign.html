@@ -41,6 +41,7 @@
         .card-list { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
         .item-group { margin: 1em 0; }
         .other-campaigns { margin-top: 2em; }
+        .ant-tag{cursor: pointer}
         @media (max-width: 48em) {
             body { padding-top: 1.5em!important; margin: 0 !important; }
             .container { padding-top: 1.5em!important; margin: 0 !important; }
@@ -95,7 +96,7 @@
         },
         tags: generateTag(2, 4),
         favorited: faker.datatype.boolean(),
-        items: generateData(itemFieldConfig, randomInt(5, 12))
+        items: generateData(itemFieldConfig, randomInt(5, 15))
     };
 
     function renderCampaignHeader() {
@@ -135,11 +136,11 @@
 
     function renderCampaignContent() {
         const container = document.getElementById('content-details');
-        const lineCount = randomInt(30, 50);
+        const lineCount = randomInt(15, 30);
         const textLines = Array(lineCount).fill().map(() => faker.lorem.paragraphs(1, '<br>'));
 
         // Split items into 3-5 groups
-        const groupCount = randomInt(6, 10);
+        const groupCount = randomInt(6, 12);
         const itemsPerGroup = Math.ceil(campaignData.items.length / groupCount);
         const itemGroups = [];
         for (let i = 0; i < groupCount; i++) {
@@ -153,7 +154,7 @@
         let remainingLines = [...textLines];
         let remainingGroups = [...itemGroups];
         while (remainingGroups.length > 0 && remainingLines.length > 0) {
-            const insertIndex = Math.floor(Math.random() * remainingLines.length);
+            const insertIndex = Math.floor(Math.random() * (remainingLines.length / remainingGroups.length));
             contentHtml += remainingLines.splice(0, insertIndex + 1).join('<br><br>');
             const group = remainingGroups.shift();
             contentHtml += `<div class="item-group" id="item-group-${itemGroups.indexOf(group)}"></div>`;
