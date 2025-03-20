@@ -12,28 +12,30 @@
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
         .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; min-height: 200vh; }
         .post-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
-        .post-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
+        .post-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .post-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start;}
         .post-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; }
-        .post-meta { display: flex; flex-direction: column; gap: 0.5em; margin-bottom: 0.5em; width: 100%; }
+        .post-meta { display: flex; flex-direction: column; gap: 0.5em; width: 100%; }
         .category { color: var(--font-green); }
+        .author-row { display: flex; gap:1em; justify-content: space-between; align-items: center; width: 100%; }
         .author { display: flex; align-items: center; gap: 0.5em; }
         .author img { width: 2em; height: 2em; border-radius: 50%; }
-        .brands-tags-stats { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5em; width: 100%; }
+        .brands-tags-stats { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5em; }
         .brands-tags { display: flex; flex-wrap: wrap; gap: 0.5em; }
         .brand-item { display: flex; align-items: center; gap: 0.5em; cursor: pointer; }
         .brand-item img { width: 1.5em; height: 1.5em; border-radius: 50%; }
         .stats-rating { display: flex; align-items: center; gap: 1em; flex-wrap: wrap; }
         .favorite-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.3em; position: absolute; right: 1em; top: 1em; }
-        .favorite-wrapper span {margin: 3em 1.3em 0 1em; }
+        .favorite-wrapper span { margin: 3em 1.3em 0 1em; }
         .stats { display: flex; gap: 1em; color: var(--text-secondary); }
 
-        /* 其余样式保持不变 */
-        .post-content { padding: 1em 0; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); transition: background 0.3s; }
+        .post-content { padding: 0.5em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); transition: background 0.3s; }
         .post-content img { max-width: 100%; cursor: pointer; }
-        .paid-section { filter: blur(5px); position: relative; }
+        .paid-content-wrapper { position: relative; }
+        .paid-section { filter: blur(5px); }
         .paid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; color: #fff; font-size: var(--font-large); cursor: pointer; }
         .theme-toggle { position: fixed; top: 50%; right: 1em; z-index: 100; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 50%; padding: 0.5em; cursor: pointer; }
-        .sidebar { position: fixed; top: 15em; right: 0; width: 15em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em 0 0 0.5em; padding: 1em; z-index: 90; max-height: 80vh; overflow-y: auto; }
+        .sidebar { position: fixed; top: 18em; right: 3em; width: 15em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em 0 0 0.5em; padding: 1em; z-index: 90; max-height: 80vh; overflow-y: auto; }
         .sidebar a { display: block; margin: 0.5em 0; color: var(--text-primary); }
         .sidebar a:hover { color: var(--natural-green); }
         .share-section { margin: 1em 0; display: flex; gap: 1em; }
@@ -60,7 +62,7 @@
             .sidebar { right: 0.5em; width: 12em; }
             .theme-toggle { right: 0.5em; }
             .stats-rating { flex-direction: column; align-items: flex-start; }
-            .brands-tags-stats { flex-direction: column; align-items: flex-start; }
+            .author-row { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -114,26 +116,28 @@
                             <a href="post-list.html?type=${encodeURIComponent(categories.name)}">${categories.name}</a> >
                             <a href="post-list.html?type=${encodeURIComponent(subCategory)}">${subCategory}</a>
                         </div>
-                        <div class="author">
-                            <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
-                            <a href="blog.html?name=${encodeURIComponent(authorName)}">${authorName}</a>
-                        </div>
-                        <div class="brands-tags-stats">
-                            <div class="brands-tags">
-                                ${brands.map(brand => `
-                                    <div class="brand-item" onclick="window.location.href='brand.html?name=${encodeURIComponent(brand.name)}'">
-                                        <img src="${brand.logo}" alt="${brand.name}">
-                                        <span style="color: ${brand.themeColor}">${brand.name}</span>
-                                    </div>
-                                `).join('')}
-                                ${tags.map((tag, idx) => `<span class="ant-tag ${tagColors[idx % tagColors.length]}">${tag}</span>`).join('')}
+                        <div class="author-row">
+                            <div class="author">
+                                <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
+                                <a href="blog.html?name=${encodeURIComponent(authorName)}">${authorName}</a>
                             </div>
-                            <div class="stats">
-                                <span>Reads: ${readCount}</span>
-                                ${isPaid ? `<span>Paid: ${paidCount}</span>` : ''}
-                            </div>
-                            <div class="stats-rating">
-                                <div class="rating-wrapper">${generateRating({ position: 'left' }, { sample: rating, count: ratingCount }, {})}</div>
+                            <div class="brands-tags-stats">
+                                <div class="stats">
+                                    <span>Reads: ${readCount}</span>
+                                    ${isPaid ? `<span>Paid: ${paidCount}</span>` : ''}
+                                </div>
+                                <div class="brands-tags">
+                                    ${brands.map(brand => `
+                                        <div class="brand-item" onclick="window.location.href='brand.html?name=${encodeURIComponent(brand.name)}'">
+                                            <img src="${brand.logo}" alt="${brand.name}">
+                                            <span style="color: ${brand.themeColor}">${brand.name}</span>
+                                        </div>
+                                    `).join('')}
+                                    ${tags.map((tag, idx) => `<span class="ant-tag ${tagColors[idx % tagColors.length]}">${tag}</span>`).join('')}
+                                </div>
+                                <div class="stats-rating">
+                                    <div class="rating-wrapper">${generateRating({ position: 'left' }, { sample: rating, count: ratingCount }, {})}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -144,7 +148,6 @@
                 </div>
             </div>
         `;
-        updateFavoritePosition();
     }
 
     function toggleFavorite(element) {
@@ -154,17 +157,6 @@
         span.textContent = favoriteCount;
     }
 
-    function updateFavoritePosition() {
-        const header = document.getElementById('post-header');
-        const favoriteWrapper = header.querySelector('.favorite-wrapper');
-        if (header.classList.contains('fixed')) {
-            favoriteWrapper.classList.add('fixed');
-        } else {
-            favoriteWrapper.classList.remove('fixed');
-        }
-    }
-
-    // 其余函数保持不变，只调整头部相关逻辑
     function generatePostContent() {
         const paragraphs = [];
         for (let i = 0; i < randomInt(5, 10); i++) {
@@ -181,18 +173,32 @@
     function renderPostContent() {
         const content = document.getElementById('post-content');
         const paragraphs = generatePostContent();
-        const freeCount = Math.floor(paragraphs.length / 2);
-        let html = '';
+        const freeCount = isPaid ? Math.max(1, Math.floor(paragraphs.length / 2)) : paragraphs.length; // 付费文章至少有1段免费内容
+        let freeHtml = '';
+        let paidHtml = '';
+
         paragraphs.forEach((para, index) => {
-            const isPaidSection = isPaid && index >= freeCount;
-            html += `
+            const html = `
                 <h2 id="para-${index}">${para.title}</h2>
                 ${para.image ? `<img src="${para.image}" alt="${para.title}" onclick="showImageModal(this.src)">` : ''}
-                <p ${isPaidSection ? 'class="paid-section"' : ''}>${para.content}</p>
-                ${isPaidSection ? `<div class="paid-overlay" onclick="showPaymentModal()">Unlock for $5</div>` : ''}
+                <p>${para.content}</p>
             `;
+            if (index < freeCount) {
+                freeHtml += html;
+            } else {
+                paidHtml += html;
+            }
         });
-        content.innerHTML = html;
+
+        content.innerHTML = `
+            ${freeHtml}
+            ${isPaid && paidHtml ? `
+                <div class="paid-content-wrapper">
+                    <div class="paid-section">${paidHtml}</div>
+                    <div class="paid-overlay" onclick="showPaymentModal()">Unlock for $5</div>
+                </div>
+            ` : paidHtml}
+        `;
 
         const sidebar = document.createElement('div');
         sidebar.className = 'sidebar';
@@ -238,6 +244,7 @@
 
     function unlockContent() {
         hideModal('payment-modal');
+        alert(`Congratulations! You've unlocked the paid content for "${postTitle}"`);
         document.querySelectorAll('.paid-section').forEach(el => el.classList.remove('paid-section'));
         document.querySelectorAll('.paid-overlay').forEach(el => el.remove());
     }

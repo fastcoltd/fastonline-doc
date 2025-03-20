@@ -273,6 +273,8 @@ function findParentType(item){
     let parentClass = item.closest('.card-list')?.id;
     if (!parentClass){
         parentClass = item.closest('.scroll-list')?.id;
+    }if (!parentClass){
+        parentClass = item.closest('.post-header')?.id;
     }
     if (parentClass){
         if (parentClass.indexOf("item") !== -1) {
