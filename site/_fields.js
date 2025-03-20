@@ -134,9 +134,8 @@ let postsFieldConfig = {
     blog_summary: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '摘要', style: {}, sample: () => faker.lorem.paragraph() },
     paid: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '付费', style: {}, format: (d, v) => { return v ? `<span style="color: var(--font-orange)">付费</span>` : `<span style="color: var(--font-green)">免费</span>`; }, sample: () => faker.datatype.boolean() },
     tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '要求', style: {}, sample: () => {return generateTag(1,3)} },
+    viewNow: { card: true, cardSq: false, cardHoriz: true, type: 'button', value: 'View', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 
-    // 新增字段（面向客户展示）
-    viewNow: { card: false, cardSq: false, cardHoriz: true, type: 'button', value: 'View', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
     read_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '阅读量', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 100, max: 1000 })},
     comment_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '评论数', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 10, max: 50 })},
     save_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '收藏数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 20, max: 100 })},

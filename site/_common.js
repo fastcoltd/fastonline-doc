@@ -325,9 +325,10 @@ function bindAllButtonClick(){
     document.querySelectorAll('.card-button').forEach(item => {
         let type = findParentType(item)
         let btnText = item.innerText;
-
-        item.onclick = () => {
-            console.log(type, btnText)
+        if (btnText.indexOf("Now") !== -1){
+            item.onclick = () => {
+                console.log(type, btnText)
+            }
         }
     })
 }
@@ -336,15 +337,25 @@ function bindAllCardLink(){
     document.querySelectorAll('.card,.cardHoriz').forEach(item => {
         let type = findParentType(item)
         if (systemType[type]){
+            let hasBtn = false;
+            let link = `${systemType[type].link}?name=`;
             item.querySelectorAll("p").forEach(p =>{
                 let pid = p.id.toLowerCase()
                 if (pid.toLowerCase().indexOf("name") !== -1 || pid.indexOf("title") !== -1){
-                    p.onclick = () => {
-                        let link = systemType[type].link
-                        window.location.href = `${link}?name=${encodeURIComponent(p.innerText)}`
-                    }
+                    link += encodeURIComponent(p.innerText);
+                    // p.onclick = () => {
+                    //     window.location.href = link
+                    // }
+                    p.innerHTML = `<a href="${link}">${p.innerHTML}</a>`
                 }
-            })
+            });
+            item.querySelectorAll(".card-button").forEach(btn =>{
+                let btnText = btn.innerText;
+                if (["View", "Join"].includes(btnText)){
+                    btn.href = link;
+                }
+                hasBtn = true;
+            });
         }
     })
 }
@@ -359,6 +370,6 @@ window.addEventListener("load", function()  {
         generateArticles('buyer-posts', 5, 8);
         generateArticles('seller-posts', 5, 8);
         generateArticles('resource-posts', 5, 8);
-    }, 200)
+    }, 500)
 
 })
