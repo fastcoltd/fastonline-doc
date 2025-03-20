@@ -275,10 +275,10 @@ function findParentType(item){
         parentClass = item.closest('.scroll-list')?.id;
     }
     if (!parentClass){
-        parentClass = item.closest('.post-header')?.id;
+        parentClass = item.closest('.item-group')?.id;
     }
     if (!parentClass){
-        parentClass = item.closest('.item-group')?.id;
+        parentClass = item.closest('.campaign-header')?.id;
     }
     if (parentClass){
         if (parentClass.indexOf("item") !== -1) {

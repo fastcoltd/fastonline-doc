@@ -12,8 +12,8 @@
         html { overflow: auto!important; height: auto; }
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
         .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
-        .campaign-header { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 0.5em 0.5em 0 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
-        .campaign-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .campaign-header { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 1em 0em 1em 0em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
+        .campaign-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 1em 0em 1em 0em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
         .campaign-inner { display: flex; align-items: center; width: 100%; position: relative; }
         .campaign-header.fixed .campaign-inner { max-width: var(--max-content-width); margin: 0 auto;}
         .campaign-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0em; }
@@ -64,7 +64,7 @@
         <div id="content-details" class="campaign-content"></div>
     </div>
     <div class="section other-campaigns">
-        <h3 class="section-title">其他专辑</h3>
+        <h3 class="section-title">Recommend Campaigns</h3>
         <div id="other-campaigns" class="card-list"></div>
     </div>
 </div>
@@ -101,7 +101,7 @@
     function renderCampaignHeader() {
         const header = document.getElementById('campaign-header');
         const tagsHtml = campaignData.tags.map((tag, idx) =>
-            `<span class="${tagColors[idx % tagColors.length]}">${tag}</span>`
+            `<span class="ant-tag ${tagColors[idx % tagColors.length]}">${tag}</span>`
         ).join('');
         header.innerHTML = `
     <div class="campaign-inner">
@@ -112,11 +112,11 @@
             </div>
             <div class="campaign-meta">
                 <div class="campaign-stats">
-                    <span class="visits">Visits: ${campaignData.stats.visit_count}</span>
-                    <span class="orders">Orders: ${campaignData.stats.orders_count}</span>
-                    <span class="sales">Sales: ${campaignData.stats.sales_amount}</span>
-                    <span class="items">Items Sold: ${campaignData.stats.sales_count}</span>
-                    <span class="saved">Saved: ${campaignData.stats.save_count}</span>
+                    Visits: <span class="visits">${campaignData.stats.visit_count}</span>
+                    Orders: <span class="orders">${campaignData.stats.orders_count}</span>
+                    Sales: <span class="sales">${campaignData.stats.sales_amount}</span>
+                    Sold: <span class="items">${campaignData.stats.sales_count}</span>
+                    Saved: <span class="saved">${campaignData.stats.save_count}</span>
                 </div>
                 <div class="campaign-tags">${tagsHtml}</div>
             </div>
@@ -135,7 +135,7 @@
 
     function renderCampaignContent() {
         const container = document.getElementById('content-details');
-        const lineCount = randomInt(20, 40);
+        const lineCount = randomInt(30, 50);
         const textLines = Array(lineCount).fill().map(() => faker.lorem.paragraphs(1, '<br>'));
 
         // Split items into 3-5 groups
@@ -162,6 +162,7 @@
 
         container.innerHTML = contentHtml;
 
+        console.log(itemGroups)
         // Render each item group with brand.html-style cardHoriz
         itemGroups.forEach((group, index) => {
             const container = document.getElementById(`item-group-${index}`);
@@ -247,7 +248,6 @@
             const header = document.getElementById('campaign-header');
             const topHeader = document.querySelector('.header');
             const initialHeight = header.offsetHeight;
-            header.style.minHeight = `${initialHeight}px`;
             window.addEventListener('scroll', () => {
                 const scrollY = window.scrollY;
                 if (scrollY >= initialHeight) {
