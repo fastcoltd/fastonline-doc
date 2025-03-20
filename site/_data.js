@@ -214,6 +214,8 @@ const ecommerceAttributes = {
     "Cert Agency": ["National", "International", "Third-Party", "Brand", "None", "ISO9001", "CE", "UL", "RoHS", "Other"]
 };
 
+const fieldsList = ["username", "password", "email", "2faEnabled", "2faCode", "recoveryEmail", "recoveryPhone", "lastLogin", "loginAttempts", "sessionToken", "authMethod", "passwordResetToken", "loginIp", "deviceId", "rememberMe", "otpSecret", "backupCodes", "securityQuestion", "securityAnswer", "accountLockStatus"];
+
 // 电商标签（30个一级标签）
 const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
 const ecommerceTags = [
