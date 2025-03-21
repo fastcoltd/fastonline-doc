@@ -440,14 +440,14 @@ window.addEventListener("load", function()  {
         generateArticles('resource-posts', 5, 8);
     }, 500)
 
-    let content;
+    let contentLen;
     setInterval(()=>{
-        if (document.body.innerText.length != content){
+        if (document.body.innerText.length != contentLen){
             bindAllButtonClick()
             bindAllCardLink()
             bindAllTagClick()
-            console.log(`bind new content. ${content}`)
-            content = document.body.innerText.length
+            console.log(`bind new content. ${contentLen}`)
+            contentLen = document.body.innerText.length
         }
     }, 500)
 })
