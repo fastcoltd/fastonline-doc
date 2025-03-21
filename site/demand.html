@@ -12,12 +12,12 @@
         html { overflow: auto !important; height: auto; }
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
         .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
-        .demand-header { max-width: var(--max-content-width); max-width: none;margin: 0 auto; padding: 0.5em 0 1em 0; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .demand-header { max-width: var(--max-content-width); max-width: none; margin: 0 auto; padding: 0.5em 0 1em 0; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; display: flex; align-items: center; justify-content: space-between; position: relative; }
         .demand-header.fixed { position: fixed; width: 100%; top: 0; z-index: 20; padding: 0.5em 0 0 0; border-bottom: 0.0625em solid var(--border-color); left: 0; transform: none; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
         .demand-header.fixed .demand-info { max-width: var(--max-content-width); margin: 0 auto; }
         .demand-logo img { width: 1.5em; height: 1.5em; border-radius: 50%; margin-right: 0.5em; vertical-align: middle; }
         .demand-info { flex: 1; position: relative; overflow: hidden; gap: 1em; margin: 0; }
-        .demand-info h1 { font-size: var(--font-large); margin: 0 0 0.5em; }
+        .demand-info h1 { font-size: var(--font-xlarge); margin: 0 0 0.5em; }
         .demand-info p { font-size: var(--font-medium); color: var(--text-secondary); margin: 0 0 0.5em; }
         .demand-info p b { margin-left: 1em; }
         .demand-info p b:first-child { margin-left: 0; }
@@ -26,8 +26,11 @@
         .demand-info .price-range .value2 { color: #32CD32; }
         .demand-info .price-range .value3 { color: #FFD700; }
         .demand-info .price-range .value4 { color: #FF4500; }
-        .demand-info .requirements { gap: 1em; flex-wrap: nowrap;}
+        .demand-info .requirements { gap: 1em; flex-wrap: nowrap; }
         .demand-status { display: flex; position: absolute; top: 7.4em; right: -1.8em; padding: 0.5em; width: 13em; height: 2.5em !important; overflow: hidden; text-align: center; text-overflow: ellipsis; justify-content: center; white-space: nowrap; font-size: var(--font-small); color: #fff; transform: rotate(45deg); transform-origin: top right; }
+        .owner-info { display: flex; align-items: center; gap: 1em; margin-bottom: 0.5em; }
+        .owner-info img { width: 2em; height: 2em; border-radius: 50%; }
+        .edit-btn { position: absolute; top: 0.5em; right: 1em; padding: 0.3em 1em; background: var(--vibrant-orange); color: #fff; border: none; border-radius: 0.25em; cursor: pointer; }
         .section { }
         .section:last-child { margin-bottom: 0em; }
         .bid-list { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
@@ -37,10 +40,14 @@
         .bid-content { flex: 1; }
         .bid-content p { margin: 0.25em 0; }
         .bid-content .bid-summary { display: flex; flex-wrap: nowrap; gap: 1em; align-items: center; }
-        .bid-content .bid-summary p { display: inline-block; margin: 0; white-space: nowrap;display: flex; }
+        .bid-content .bid-summary p { display: inline-block; margin: 0; white-space: nowrap; display: flex; }
         .bid-status { position: absolute; top: 5.5em; right: -1.5em; padding: 0.3em 0.8em; width: 10em; overflow: hidden; text-align: center; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-small); color: #fff; transform: rotate(45deg); transform-origin: top right; }
         .bid-images { display: flex; flex-wrap: wrap; gap: 0.5em; }
         .bid-images img { width: 3em; height: 3em; object-fit: cover; border-radius: 0.25em; cursor: pointer; }
+        .bid-actions { position: absolute; top: 0.5em; right: 1em; display: flex; gap: 0.5em; }
+        .bid-actions button { padding: 0.3em 0.8em; border: none; border-radius: 0.25em; cursor: pointer; }
+        .bid-actions .edit { background: var(--natural-green); color: #fff; }
+        .bid-actions .select-winner { background: var(--vibrant-orange); color: #fff; }
         .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin: 1em 0; }
         .pagination-btn { padding: 0.3em 1em; background: var(--bg-white); border-color: var(--border-color); color: var(--text-primary); }
         .pagination-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
@@ -57,9 +64,10 @@
             .demand-info p { font-size: var(--font-small); margin: 0.2em 0; }
             .demand-status { font-size: var(--font-xsmall); padding: 0.3em 0.8em; }
             .bid-images img { width: 2.5em; height: 2.5em; }
-            .bid-status { font-size: var(--font-xsmall); padding: 0.2em 0.6em; width: 6em; top: -0.3em; right: -0.8em; }
+            .bid-status { font-size: var(--font-xsmall); padding: 0.2em 0.6em; width: 8em; top: 4.2em; right: -1.5em; }
             .bid-content .bid-summary { flex-direction: column; align-items: flex-start; gap: 0.5em; }
             .bid-content .bid-summary p { display: block; white-space: normal; }
+            .owner-info { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -97,25 +105,71 @@
     const demandStatus = Object.keys(demandStatusColors)[Math.floor(Math.random() * Object.keys(demandStatusColors).length)];
     const bidsPerPage = 10;
     let currentPage = 1;
+    const ownerData = generateData(userFieldConfig, 1)[0];
+    ownerData.demandCount = randomInt(10, 50);
+    ownerData.dealCount = Math.floor(ownerData.demandCount * Math.random() * 0.8);
+    ownerData.dealRate = (ownerData.dealCount / ownerData.demandCount * 100).toFixed(1);
+    ownerData.vipLevel = randomInt(1, 5);
+
+    function isOwner() {
+        return userId === demandData.owerId;
+    }
 
     function renderDemandHeader() {
+        if (Math.random() > 0.5) {
+            demandData.owerId = userId;
+        } else {
+            demandData.owerId = Math.floor(Math.random() * 1000);
+        }
         const header = document.getElementById('demand-header');
         const totalAmount = parseFloat(demandData.price_to.sample.split('$')[1]) * parseInt(demandData.quantity.sample);
         header.innerHTML = `
             <div class="demand-info">
                 <h1><a href="demand.html?name=${encodeURIComponent(demandName)}">${demandName}</a></h1>
-                <p><b>品牌</b>: <span class="demand-logo"><img src="${brand.logo}" alt="${brand.name}"></span><span style="color: ${brand.themeColor}"> <a href="brand.html?name=${brand.name}">${brand.name}</a></span>
+                <div class="owner-info">
+                    <img src="${ownerData.avatar}" alt="${ownerData.nickname}">
+                    <div>
+                        <p><b>发布者</b>: ${ownerData.nickname} (${ownerData.username})</p>
+                        <p><b>发布需求</b>: ${ownerData.demandCount} <b>成交次数</b>: ${ownerData.dealCount} <b>成交率</b>: ${ownerData.dealRate}% <b>VIP等级</b>: <span style="color: #FFD700">Lv${ownerData.vipLevel}</span></p>
+                    </div>
+                </div>
+                <p><b>品牌</b>: <span style="color: ${brand.themeColor}"><a href="brand.html?name=${brand.name}">${brand.name}</a></span>
                     <b>服务</b>: <a href="item-list.html?brandName=${brand.name}&serices=${encodeURIComponent(service.name)}">${service.name}</a></p>
-                <p class="requirements"><b>产品属性</b>: ${Object.entries(attributes).map(([key, value], idx) => `<span><span class="ant-tag" style="font-weight: bold;">${key}</span>:  <span class="ant-tag ${tagColors[randomInt(0, tagColors.length-1)]}">${value}</span></span>`).join(' ')}</p>
+                <p class="requirements"><b>产品属性</b>: ${Object.entries(attributes).map(([key, value], idx) => `<span><span class="ant-tag" style="font-weight: bold;">${key}</span>: <span class="ant-tag ${tagColors[randomInt(0, tagColors.length-1)]}">${value}</span></span>`).join(' ')}</p>
                 <p class="price-range">
-                    <b>出价范围</b>: <span class="value1">${demandData.price_from.sample}</span> - <span class="value2">${demandData.price_to.sample}</span>
+                    <b>出价</b>: <span class="value2">${demandData.price_to.sample}</span>
                     <b>定金</b>: <span class="value3">${demandData.deposit.sample}</span> <b>所需数量</b>: <span class="value4">${demandData.quantity.sample}</span> <b>总金额</b>: $${totalAmount.toFixed(2)} <b>是否需要样品</b>: <b>${demandData.samples_need.sample}</b>
-                    <b>投标时间</b>: <span class="value2">${demandData.bid_time.format(demandData, demandData.bid_time.sample)}</span>
+                    <b>投标时间</b>: <span>${demandData.bid_time.format(demandData, demandData.bid_time.sample)}</span>
                 </p>
                 <p><b>其他要求</b>: <span>${demandData.demand_information}</span></p>
                 <span class="demand-status" style="background-color: ${demandStatusColors[demandStatus]}">${demandStatus}</span>
+                ${isOwner() && demandStatus === 'Bidding' ? '<button class="edit-btn" onclick="editDemand()">编辑</button>' : ''}
             </div>
         `;
+    }
+
+    function editDemand() {
+        const modalContent = `
+            <form id="edit-demand-form">
+                <p><b>出价</b>: <input type="text" name="price_to" value="${demandData.price_to.sample}" required></p>
+                <p><b>定金</b>: <input type="text" name="deposit" value="${demandData.deposit.sample}" required></p>
+                <p><b>所需数量</b>: <input type="number" name="quantity" value="${demandData.quantity.sample}" required></p>
+                <p><b>是否需要样品</b>: <select name="samples_need" required><option value="是" ${demandData.samples_need.sample === '是' ? 'selected' : ''}>是</option><option value="否" ${demandData.samples_need.sample === '否' ? 'selected' : ''}>否</option></select></p>
+                <p><b>其他要求</b>: <textarea name="demand_information">${demandData.demand_information}</textarea></p>
+                <button type="submit">保存</button>
+            </form>
+        `;
+        showModal('edit-demand-modal', modalContent, { style: { width: '50%' } });
+        document.getElementById('edit-demand-form').onsubmit = function(e) {
+            e.preventDefault();
+            demandData.price_to.sample = this.price_to.value;
+            demandData.deposit.sample = this.deposit.value;
+            demandData.quantity.sample = this.quantity.value;
+            demandData.samples_need.sample = this.samples_need.value;
+            demandData.demand_information = this.demand_information.value;
+            closeModal('edit-demand-modal');
+            renderDemandHeader();
+        };
     }
 
     function generateBids() {
@@ -124,12 +178,13 @@
         const bids = Array(bidCount).fill().map(() => {
             const storeData = generateData(storeFieldConfig, 1)[0];
             const bidTimes = randomInt(10, 50);
-            const winTimes = Math.floor(bidTimes * Math.random() * 0.5);
+            const winTimes = Math.floor(bidTimes * Math.random() * 0.8);
             const sampleInfo = `${faker.internet.email()}----${faker.internet.password()}----${faker.random.arrayElement(['male', 'female'])}----${faker.datatype.number({ min: 50, max: 1000 })}followers----${faker.lorem.word()}`;
             return {
                 user_id: Math.floor(Math.random() * 1000),
                 store_id: Math.floor(Math.random() * 1000),
                 store_name: storeData.name,
+                orders_count: randomInt(10, 500),
                 avatar: storeData.image,
                 bid_time: faker.date.recent().getTime() / 1000,
                 bid_price: parseFloat(faker.commerce.price(40, 300, 2)),
@@ -144,16 +199,17 @@
                 rating: storeData.rating
             };
         });
-        if (Math.random() > 0.5) {
+        if (Math.random() > 0.2) {
             const storeData = generateData(storeFieldConfig, 1)[0];
             const bidTimes = randomInt(10, 50);
-            const winTimes = Math.floor(bidTimes * Math.random() * 0.5);
+            const winTimes = Math.floor(bidTimes * Math.random() * 0.8);
             const sampleInfo = `${faker.internet.email()}----${faker.internet.password()}----${faker.random.arrayElement(['male', 'female'])}----followers----${faker.lorem.word()}`;
             bids.push({
                 user_id: userId,
                 store_id: Math.floor(Math.random() * 1000),
                 store_name: storeData.name,
                 avatar: storeData.image,
+                orders_count: randomInt(10, 500),
                 bid_time: faker.date.recent().getTime() / 1000,
                 bid_price: parseFloat(faker.commerce.price(40, 300, 2)),
                 bid_information: faker.lorem.sentence(),
@@ -180,7 +236,7 @@
         const pageBids = bids.slice(start, end);
 
         bidList.innerHTML = pageBids.length === 0 ? '<p style="text-align: center; color: var(--text-secondary);">暂无投标信息</p>' : '';
-        pageBids.forEach((bid) => {
+        pageBids.forEach((bid, index) => {
             const isSelf = bid.user_id === userId;
             const bidItem = document.createElement('div');
             bidItem.className = `bid-item ${isSelf ? 'self' : ''}`;
@@ -189,34 +245,75 @@
                     <p><b>店铺</b>: <a href="store.html?name=${encodeURIComponent(bid.store_name)}"><img src="${bid.avatar}" alt="${bid.store_name}" style="width: 1.5em; height: 1.5em; vertical-align: middle; margin-right: 0.5em;">${bid.store_name}</a></p>
                     <p><b>等级</b>: ${bid.rating.sample >= 4.5 ? 'Lv5' : bid.rating.sample >= 4 ? 'Lv4' : 'Lv3'}</p>
                     <p><b>评分</b>: ${generateRating({}, bid.rating, {})}</p>
+                    <p><b>订单量</b>: ${bid.orders_count}</p>
                     <p><b>投标/中标</b>: ${bid.bid_times}/${bid.win_times}</p>
                     <p><b>中标率</b>: ${bid.win_rate}%</p>
+                    <p><b>投标时间</b>: ${new Date(bid.bid_time * 1000).toLocaleString()}</p>
                 </div>
             `;
-            let fieldTagColor = tagColors[randomInt(0, tagColors.length-1)]
+            let fieldTagColor = tagColors[randomInt(0, tagColors.length - 1)];
             const bidDetails = `
-                <p>投标价格</b>: <b style="color: var(--red);">$${bid.bid_price.toFixed(2)} </b> <b>投标时间</b>: ${new Date(bid.bid_time * 1000).toLocaleString()} <b></p>
-                <p>字段信息</b>: <span class="ant-tag ${fieldTagColor}">${bid.field_info.join(`</span><span class="ant-tag ${fieldTagColor}">`)}</span></p>
-                <p><b>提供样品</b>: ${isSelf ? bid.samples_provided.replace(/----/g, '\n') : `**** ${randomInt(1,10)}件`}</p>
-                ${isSelf ? `
+                <p><b>字段信息</b>: <span class="ant-tag ${fieldTagColor}">${bid.field_info.join(`</span><span class="ant-tag ${fieldTagColor}">`)}</span></p>
+                <p><b>提供样品</b>: ${isSelf || isOwner() ? bid.samples_provided.replace(/----/g, '\n') : `**** ${randomInt(1, 10)}件`}</p>
+                ${isSelf || isOwner() ? `
                     <p><b>投标说明</b>: ${bid.bid_information}</p>
                     <p><b>投标图片</b>: <div class="bid-images">${bid.bid_pics.map(pic => `<img src="${pic}" alt="Bid Image" onclick="showImageModal(this.src)">`).join('')}</div></p>
                 ` : `
                     <p><b>投标说明</b>: ****</p>
-                    <p><b>投标图片</b>: ****</p>
+                    <p><b>样品图片</b>: ****</p>
                 `}
+            `;
+            const actions = `
+                <div class="bid-actions">
+                    ${isSelf && bid.status === 'Bidding' ? `<button class="edit" onclick="editBid(${index + start})">编辑</button>` : ''}
+                    ${isOwner() && bid.status === 'Bidding' ? `<button class="select-winner" onclick="selectWinner(${index + start})">选中为中标</button>` : ''}
+                </div>
             `;
             bidItem.innerHTML = `
                 <div class="bid-content">
                     ${summary}
                     ${bidDetails}
                 </div>
+                ${actions}
                 <span class="bid-status" style="background-color: ${demandStatusColors[bid.status] || '#A9A9A9'}">${bid.status}</span>
             `;
             bidList.appendChild(bidItem);
         });
 
         renderPagination(totalPages);
+    }
+
+    function editBid(index) {
+        const bid = generateBids()[index];
+        const modalContent = `
+            <form id="edit-bid-form">
+                <p><b>投标说明</b>: <textarea name="bid_information">${bid.bid_information}</textarea></p>
+                <p><b>字段信息</b>: <input type="text" name="field_info" value="${bid.field_info.join('----')}" required></p>
+                <p><b>提供样品</b>: <textarea class="samples" name="samples_provided">${bid.samples_provided}</textarea></p>
+                <p><b>上传图片</b>: <input type="file" name="bid_pics" multiple accept="image/*"></p>
+                <button type="submit">保存</button>
+            </form>
+        `;
+        showModal('edit-bid-modal', modalContent, { style: { width: '50%' } });
+        document.getElementById('edit-bid-form').onsubmit = function(e) {
+            e.preventDefault();
+            bid.bid_information = this.bid_information.value;
+            bid.field_info = this.field_info.value.split('----');
+            bid.samples_provided = this.samples_provided.value;
+            // 假设上传图片逻辑，这里仅更新提示
+            alert('图片上传暂不支持，信息已更新');
+            closeModal('edit-bid-modal');
+            renderBidList(currentPage);
+        };
+    }
+
+    function selectWinner(index) {
+        const bids = generateBids();
+        bids.forEach((bid, i) => {
+            bid.status = i === index ? 'Bid Won' : 'Demand Expired';
+        });
+        bids.sort((a, b) => (b.status === 'Bid Won' ? 1 : 0) - (a.status === 'Bid Won' ? 1 : 0));
+        renderBidList(currentPage);
     }
 
     function renderPagination(totalPages) {
@@ -252,11 +349,14 @@
     let captchaText = '';
     function renderBidForm() {
         const form = document.getElementById('bid-form');
+        if (isOwner()) {
+            form.parentElement.remove();
+            return;
+        }
         const storeName = faker.company.companyName();
         const samplesRequired = demandData.samples_need.sample === '是';
         form.innerHTML = `
             <p><b>店铺名称</b>: ${storeName}</p>
-            <p><b>投标价格</b>: <input type="number" id="bidPrice" placeholder="请输入投标价格 (美元)" min="40" max="300" step="0.01"></p>
             <p><b>投标说明</b>: <textarea id="bidInfo" placeholder="请输入投标说明"></textarea></p>
             <p><b>字段信息</b>: <input type="text" id="fieldInfo" placeholder="请输入字段信息，例如：email----password----gender----followers----extra"></p>
             ${samplesRequired ? `
@@ -316,14 +416,13 @@
     }
 
     function submitBid() {
-        const price = document.getElementById('bidPrice').value;
         const info = document.getElementById('bidInfo').value;
         const pics = document.getElementById('bidPics').files;
         const fieldInfo = document.getElementById('fieldInfo').value;
         const samplesProvided = demandData.samples_need.sample === '是' ? document.getElementById('samplesProvided')?.value : null;
         const captchaInput = document.getElementById('captchaInput').value;
 
-        if (!price || !info || pics.length === 0 || !fieldInfo || (demandData.samples_need.sample === '是' && !samplesProvided)) {
+        if (!info || pics.length === 0 || !fieldInfo || (demandData.samples_need.sample === '是' && !samplesProvided)) {
             alert('请填写所有必填项并上传至少一张图片！');
             return;
         }

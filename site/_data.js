@@ -7,6 +7,7 @@ const systemType = {
     "campaigns": {"link": "campaign.html", "list_link": "campaign-list.html"},
     "tag": {"link": "tag.html", "list_link": "tag-list.html"},
     "attr": {"link": "attr.html", "list_link": "attr-list.html"},
+    "pages": {"link": "page.html", "list_link": "page-type.html"},
 }
 
 // 热门平台样本数据：全球 Top 50 科技平台（真实数据）

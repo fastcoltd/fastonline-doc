@@ -190,7 +190,7 @@ function generateCaptcha() {
         ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, 2 * Math.PI);
         ctx.fill();
     }
-    document.getElementById('captcha').value = captchaText
+    document.getElementById('captcha') ? document.getElementById('captcha').value = captchaText : ''
 }
 
 function generateRating(item, value, style) {
@@ -237,7 +237,7 @@ function generateBidders(label, value, style){
 
 function generateData(fieldConfig, count) {
     return Array(count).fill().map((_, i) => {
-        const item = { link: '#' };
+        const item = { link: '' };
         for (const [fieldName, config] of Object.entries(fieldConfig)) {
             if (config.value){
                 item[fieldName] = config.value
@@ -344,6 +344,8 @@ function findParentType(item){
             type = 'campaigns'
         }else if (parentClass.indexOf("demand") !== -1) {
             type = 'demands'
+        }else if (parentClass.indexOf("page") !== -1) {
+            type = 'pages'
         }
     }
     if(typeof tagType != 'undefined'){
@@ -369,8 +371,16 @@ function bindAllTagClick(){
             attr = attrValue[0].trim()
             value = attrValue[1].trim()
         }
-        item.onclick = () => {
-            window.location.href = isAttr ? `attr.html?type=${type}&name=${attr}&value=${value}` : `tag.html?type=${type}&name=${item.innerText}`
+        let link = isAttr ? `attr.html?type=${type}&name=${attr}&value=${value}` : `tag.html?type=${type}&name=${item.innerText}`;
+
+        let tagLink = document.createElement("a")
+        tagLink.classList = item.classList
+        tagLink.href = link;
+        tagLink.title = item.innerText
+        tagLink.innerHTML = item.innerHTML;
+        if (item.parentNode){
+            item.parentNode.insertBefore(tagLink, item)
+            item.remove()
         }
     })
 }
@@ -398,8 +408,18 @@ function bindAllCardLink(){
                 if (pid.toLowerCase().indexOf("name") !== -1 || pid.indexOf("title") !== -1){
                     link += encodeURIComponent(p.innerText);
                     p.innerHTML = `<a href="${link}">${p.innerHTML}</a>`
+
+                    // let cardLink = document.createElement("a")
+                    // cardLink.classList = item.classList
+                    // cardLink.href = link;
+                    // cardLink.innerHTML = item.innerHTML;
+                    // if (item.parentNode){
+                    //     item.parentNode.insertBefore(cardLink, item)
+                    //     item.remove()
+                    // }
                 }
             });
+
             item.querySelectorAll(".card-button").forEach(btn =>{
                 let btnText = btn.innerText;
                 if (["View", "Join"].includes(btnText)){
@@ -414,13 +434,21 @@ function bindAllCardLink(){
 window.addEventListener("load", function()  {
     setTimeout(()=>{
         generateServiceMenu()
-        bindAllButtonClick()
-        bindAllCardLink()
-        bindAllTagClick()
         generateArticles('about-posts', 5, 8);
         generateArticles('buyer-posts', 5, 8);
         generateArticles('seller-posts', 5, 8);
         generateArticles('resource-posts', 5, 8);
     }, 500)
 
+    let content;
+    setInterval(()=>{
+        if (document.body.innerText.length != content){
+            bindAllButtonClick()
+            bindAllCardLink()
+            bindAllTagClick()
+            console.log(`bind new content. ${content}`)
+            content = document.body.innerText.length
+        }
+    }, 500)
 })
+

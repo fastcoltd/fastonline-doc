@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>文章详情 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em;}
+        .page-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
+        .page-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .page-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start;}
+        .page-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; }
+        .page-meta { display: flex; flex-direction: column; gap: 0.5em; width: 100%; }
+        .category { color: var(--font-green); }
+        .author-row { display: flex; gap: 1em; justify-content: space-between; align-items: center; width: 100%; }
+        .author { display: flex; align-items: center; gap: 0.5em; }
+        .author img { width: 2em; height: 2em; border-radius: 50%; }
+        .stats { display: flex; gap: 1em; color: var(--text-secondary); }
+        .favorite-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.3em; position: absolute; right: 1em; top: 1em; }
+        .favorite-wrapper span { margin: 3em 1.3em 0 1em; }
+
+        .page-content { padding: 0.5em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); }
+        .page-content img { max-width: 100%; cursor: pointer; }
+        .cover-image { width: 100%; height: auto; max-height: 400px; object-fit: cover; border-radius: 0.5em; margin-bottom: 1em; }
+        .vote-section { margin: 1em 0; display: flex; gap: 1em; align-items: center; }
+        .vote-section .fas { font-size: var(--font-xlarge); cursor: pointer; }
+        .vote-section .voted { color: #1890ff; font-weight: bold; }
+        .vote-section .fas.fa-thumbs-up.voted { color: var(--natural-green); }
+        .vote-section .fas.fa-thumbs-down.voted { color: darkorange; }
+        .vote-section span { margin: 0 0.5em; }
+
+        .sidebar { position: fixed; top: 18em; right: 3em; width: 15em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em 0 0 0.5em; padding: 1em; z-index: 90; max-height: 80vh; overflow-y: auto; }
+        .sidebar a { display: block; margin: 0.5em 0; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar a:hover { color: var(--natural-green); }
+        .sidebar a.active { color: var(--natural-green); font-weight: bold; }
+        .sidebar .sub-item { padding-left: 1em; }
+
+        .share-section img { width: 1.5em; height: 1.5em; border-radius: 0.5em; cursor: pointer; margin-right: 0.5em; }
+
+        .other-pages { padding: 1em 0; }
+        .other-pages .scroll-list { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 0.5em; scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none; }
+        .other-pages .scroll-list::-webkit-scrollbar { display: none; }
+
+        @media (max-width: 48em) {
+            body, .container, .page-header { padding-top: 1.5em !important; margin: 0 !important; }
+            .page-info h1 { font-size: var(--font-large); }
+            .page-meta { gap: 0.3em; }
+            .sidebar { right: 0.5em; width: 12em; }
+            .author-row { flex-direction: column; align-items: flex-start; }
+            .share-section img { width: 1.2em; height: 1.2em; }
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="_header.html"></div>
+<div class="container">
+    <div class="page-header" id="page-header"></div>
+    <div class="page-content" id="page-content"></div>
+    <div class="vote-section" id="vote-section"></div>
+    <div class="share-section" id="share-section"></div>
+    <div class="other-pages section">
+        <h3 class="section-title">Other Pages</h3>
+        <div id="other-pages" class="scroll-list"></div>
+    </div>
+</div>
+<div w3-include-html="_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageTitle = decodeURIComponent(urlParams.get('name') || 'Eligendi praesentium necessitatibus aut aperiam quia velit nostrum at.');
+    const authorName = faker.name.findName();
+    const category = faker.random.arrayElement(['Guide', 'FAQ', 'Policy', 'Announcement', 'Tutorial']);
+    let favoriteCount = faker.datatype.number({ min: 100, max: 1100 });
+    const readCount = faker.datatype.number({ min: 100, max: 1000 });
+    let usefulCount = faker.datatype.number({ min: 50, max: 500 });
+    let uselessCount = faker.datatype.number({ min: 10, max: 100 });
+    const createTime = faker.date.past().toLocaleString();
+    const updateTime = Math.random() > 0.5 ? faker.date.recent().toLocaleString() : null;
+
+    function renderPageHeader() {
+        const header = document.getElementById('page-header');
+        header.innerHTML = `
+            <div class="page-inner">
+                <div class="page-info">
+                    <h1>${pageTitle}</h1>
+                    <div class="page-meta">
+                        <div class="category">
+                            <a href="page-type.html?name=${encodeURIComponent(category)}">${category}</a> > ${pageTitle}
+                        </div>
+                        <div class="author-row">
+                            <div class="author">
+                                <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
+                                <a href="blog.html?name=${encodeURIComponent(authorName)}">${authorName}</a>
+                            </div>
+                            <div class="stats">
+                                <span>Reads: ${readCount}</span>
+                                ${updateTime ? `<span>Last Edited on: ${updateTime}</span>` : `<span>Published on: ${createTime}</span>`}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="favorite-wrapper">
+                    <i class="fas fa-heart favorite-icon ${Math.random() > 0.5 ? 'favorited' : ''}" onclick="toggleFavorite(this)"></i>
+                    <span>${favoriteCount}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function toggleFavorite(element) {
+        element.classList.toggle('favorited');
+        const span = element.nextElementSibling;
+        favoriteCount = element.classList.contains('favorited') ? favoriteCount + 1 : favoriteCount - 1;
+        span.textContent = favoriteCount;
+    }
+
+    function generatePageContent() {
+        const paragraphs = [];
+        const sectionCount = randomInt(3, 6);
+        for (let i = 0; i < sectionCount; i++) {
+            const subSectionCount = randomInt(1, 3);
+            const subSections = [];
+            for (let j = 0; j < subSectionCount; j++) {
+                const hasImage = Math.random() > 0.7;
+                subSections.push({
+                    title: faker.lorem.sentence(),
+                    content: faker.lorem.paragraphs(1),
+                    image: hasImage ? getPicsumImage(600, 400, `page-sub-${i}-${j}`) : null
+                });
+            }
+            paragraphs.push({
+                title: faker.lorem.sentence(),
+                subSections: subSections
+            });
+        }
+        return paragraphs;
+    }
+
+    function renderPageContent() {
+        const content = document.getElementById('page-content');
+        const paragraphs = generatePageContent();
+        const coverImage = getPicsumImage(1200, 400, `page-cover-${pageTitle}`);
+        let html = `<img src="${coverImage}" alt="Cover Image" class="cover-image">`;
+
+        paragraphs.forEach((section, index) => {
+            html += `<h2 id="section-${index}">${section.title}</h2>`;
+            section.subSections.forEach((sub, subIndex) => {
+                html += `
+                    <h3 id="section-${index}-${subIndex}">${sub.title}</h3>
+                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" onclick="showImageModal(this.src)">` : ''}
+                    <p>${sub.content}</p>
+                `;
+            });
+        });
+
+        content.innerHTML = html;
+
+        const sidebar = document.createElement('div');
+        sidebar.className = 'sidebar';
+        sidebar.innerHTML = `
+            <a href="#page-header">${pageTitle}</a>
+            ${paragraphs.map((section, index) => `
+                <a href="#section-${index}">${section.title}</a>
+                ${section.subSections.map((sub, subIndex) => `
+                    <a href="#section-${index}-${subIndex}" class="sub-item">${sub.title}</a>
+                `).join('')}
+            `).join('')}
+        `;
+        content.appendChild(sidebar);
+
+        updateSidebarOnScroll();
+    }
+
+    function showImageModal(src) {
+        showModal('image-modal', `<img src="${src}" style="max-width: 100%; max-height: 80vh;">`, { style: { width: 'auto', maxWidth: '90%' } });
+    }
+
+    function renderVoteSection() {
+        const voteSection = document.getElementById('vote-section');
+        voteSection.innerHTML = `
+            <h3>Was this page helpful?</h3>
+            <div class="faq-vote">
+                <i class="fas fa-thumbs-up" onclick="vote(this, 'useful')"></i>
+                <span>${usefulCount}</span>
+                <i class="fas fa-thumbs-down" onclick="vote(this, 'useless')"></i>
+                <span>${uselessCount}</span>
+            </div>
+        `;
+    }
+
+    function vote(element, type) {
+        if (element.classList.contains('voted')) return;
+        element.classList.add('voted');
+        if (type === 'useful') {
+            usefulCount++;
+            element.nextElementSibling.textContent = usefulCount;
+        } else {
+            uselessCount++;
+            element.nextElementSibling.textContent = uselessCount;
+        }
+    }
+
+    function renderShareSection() {
+        const share = document.getElementById('share-section');
+        share.innerHTML = `
+            <h3>Share</h3>
+            <img src="https://logo.clearbit.com/facebook.com" alt="Facebook" onclick="shareTo('facebook')">
+            <img src="https://logo.clearbit.com/twitter.com" alt="Twitter" onclick="shareTo('twitter')">
+            <img src="https://logo.clearbit.com/linkedin.com" alt="LinkedIn" onclick="shareTo('linkedin')">
+        `;
+    }
+
+    function shareTo(platform) {
+        const url = encodeURIComponent(window.location.href);
+        const title = encodeURIComponent(pageTitle);
+        let shareUrl;
+        switch (platform) {
+            case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; break;
+            case 'twitter': shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`; break;
+            case 'linkedin': shareUrl = `https://www.linkedin.com/shareArticle?url=${url}&title=${title}`; break;
+        }
+        window.open(shareUrl, '_blank');
+    }
+
+    function updateSidebarOnScroll() {
+        const sections = document.querySelectorAll('h2, h3');
+        const sidebarLinks = document.querySelectorAll('.sidebar a:not(:first-child)');
+        window.addEventListener('scroll', () => {
+            let currentSection = null;
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 100 && rect.bottom >= 0) {
+                    currentSection = section.id;
+                }
+            });
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    }
+
+    function renderOtherPages() {
+        const container = document.getElementById('other-pages');
+        const pages = generateData(pagesFieldConfig, 6);
+        generateCards('other-pages', 'card', pages, pagesFieldConfig);
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            document.title = `${pageTitle} - FASTRESP`;
+            renderPageHeader();
+            renderPageContent();
+            renderVoteSection();
+            renderShareSection();
+            renderOtherPages();
+
+            const header = document.getElementById('page-header');
+            const topHeader = document.querySelector('.header');
+            const initialHeight = header.offsetHeight;
+            header.style.minHeight = `${initialHeight}px`;
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                if (scrollY >= initialHeight) {
+                    header.classList.add('fixed');
+                    topHeader.classList.add('hidden');
+                    document.body.style.paddingTop = `${initialHeight}px`;
+                } else {
+                    header.classList.remove('fixed');
+                    topHeader.classList.remove('hidden');
+                    document.body.style.paddingTop = "7.4em";
+                }
+            });
+        });
+    };
+</script>
+</body>
+</html>
