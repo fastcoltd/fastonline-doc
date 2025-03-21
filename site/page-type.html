@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>文章列表 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        body { padding-top: 8em; }
+        .container { max-width: var(--max-content-width); margin: 0 auto; padding: 1em; }
+
+        .filter-section { display: flex; justify-content: space-between; align-items: center; gap: 1em; margin-bottom: 1.5em; flex-wrap: wrap; background: var(--bg-white); padding: 1em; border-radius: 0.5em; border: 0.0625em solid var(--border-color); box-shadow: 0 0.125em 0.3125em rgba(0,0,0,0.05); }
+        .filter-column { display: flex; align-items: center; gap: 0.5em; }
+        .filter-column label { font-size: var(--font-medium); color: var(--text-secondary); white-space: nowrap; }
+        .filter-column select { padding: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; font-size: var(--font-medium); min-width: 8em; }
+        .search-box { flex: 1; display: flex; align-items: center; gap: 0.5em; max-width: 30em; }
+        .search-box input { flex: 1; padding: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; font-size: var(--font-medium); }
+        .search-box button { padding: 0.5em 1em; background: var(--natural-green); color: var(--font-white); border: none; border-radius: 0.375em; cursor: pointer; font-size: var(--font-medium); }
+        .search-box button:hover { background: var(--font-green); }
+
+        .articles-list { display: flex; flex-direction: column; gap: 0.75em; }
+        .cardHoriz { padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; background: var(--bg-white); display: grid;transition: all 0.2s ease; position: relative; min-height: 6em; }
+        .cardHoriz:hover { border-color: var(--natural-green); box-shadow: 0 0.25em 0.5em rgba(0,0,0,0.1); }
+        .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em; }
+        .title-row a { color: var(--text-primary); font-weight: bold; font-size: var(--font-medium); text-decoration: none; }
+        .title-row a:hover { color: var(--font-green); }
+        .title-row .time { color: var(--text-secondary); font-size: var(--font-small); }
+        .summary { color: var(--text-secondary); font-size: var(--font-medium); line-height: 1.5; margin-bottom: 0.5em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .stats { position: absolute; bottom: 0.5em; right: 1em; display: flex; gap: 1em; align-items: center; }
+        .stats span { display: flex; align-items: center; gap: 0.3em; font-size: var(--font-small); color: var(--text-secondary); }
+        .stats i { font-size: var(--font-medium); }
+        .stats .fa-thumbs-up { color: var(--natural-green); }
+        .stats .fa-thumbs-down { color: darkorange; }
+        .stats .fa-heart { color: var(--vibrant-orange); }
+
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin-top: 2em; font-size: var(--font-small); color: var(--text-primary); }
+        .pagination-btn { padding: 0.3em 1em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.25em; cursor: pointer; }
+        .pagination-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
+        .pagination a { display: inline-block; padding: 0.3em 0.6em; margin: 0 0.3em; border: 0.0625em solid var(--border-color); border-radius: 0.25em; text-decoration: none; color: var(--text-primary); }
+        .pagination a:hover { border-color: var(--natural-green); color: var(--natural-green); }
+        .pagination a.active { font-weight: bold; color: var(--vibrant-orange); border-color: var(--vibrant-orange); }
+
+        @media (max-width: 48em) {
+            .filter-section { flex-direction: column; align-items: flex-start; }
+            .search-box { max-width: 100%; }
+            .title-row { flex-direction: column; align-items: flex-start; gap: 0.3em; }
+            .stats { position: static; margin-top: 0.5em; justify-content: flex-end; }
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="_header.html"></div>
+<div class="container">
+    <div class="filter-section">
+        <div class="filter-column">
+            <label>Category:</label>
+            <select id="category-filter" class="ant-select"></select>
+        </div>
+        <div class="search-box">
+            <input type="text" id="title-search" placeholder="Search by title..." />
+            <button onclick="applyFilters()">Search</button>
+        </div>
+        <div class="filter-column">
+            <label>Sort By:</label>
+            <select id="sort-filter" class="ant-select">
+                <option value="date-desc">Newest First</option>
+                <option value="date-asc">Oldest First</option>
+                <option value="title-asc">Title A-Z</option>
+                <option value="title-desc">Title Z-A</option>
+            </select>
+        </div>
+    </div>
+    <div id="articles-list" class="articles-list"></div>
+    <div class="pagination">
+        <button class="pagination-btn" onclick="changePage(-1)">Previous</button>
+        <span id="pagination-info"></span>
+        <button class="pagination-btn" onclick="changePage(1)">Next</button>
+    </div>
+</div>
+<div w3-include-html="_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let allArticles = [];
+    let filteredArticles = [];
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialCategory = urlParams.get('name') || '';
+
+    function generateCategories() {
+        const baseCategories = ['Guide', 'FAQ', 'Policy', 'Announcement', 'Tutorial'];
+        const additionalCategories = Array(5).fill().map(() => faker.lorem.word().charAt(0).toUpperCase() + faker.lorem.word().slice(1));
+        let categories = [...baseCategories, ...additionalCategories];
+        if (initialCategory && !categories.includes(initialCategory)) {
+            categories.push(initialCategory);
+        }
+        return categories;
+    }
+
+    function populateCategoryFilter(categories) {
+        const categoryFilter = document.getElementById('category-filter');
+        categoryFilter.innerHTML = '<option value="">All Categories</option>';
+        categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.text = cat;
+            categoryFilter.appendChild(option);
+        });
+        if (initialCategory) categoryFilter.value = initialCategory;
+    }
+
+    function generateArticleData() {
+        const categories = generateCategories();
+        const count = faker.datatype.number({ min: 100, max: 500 });
+        const data = [];
+        for (let i = 0; i < count; i++) {
+            const title = faker.lorem.sentence();
+            const updateTime = Math.random() > 0.5 ? faker.date.recent().toLocaleString() : null;
+            data.push({
+                title: title,
+                summary: faker.lorem.sentences(2), // Ensures 1-2 lines
+                category: faker.random.arrayElement(categories),
+                create_time: faker.date.past().toLocaleString(),
+                update_time: updateTime,
+                read_count: faker.datatype.number({ min: 100, max: 1000 }),
+                useful_count: faker.datatype.number({ min: 50, max: 500 }),
+                useless_count: faker.datatype.number({ min: 10, max: 100 }),
+                save_count: faker.datatype.number({ min: 20, max: 200 }),
+                link: `page.html?name=${encodeURIComponent(title)}`
+            });
+        }
+        return data;
+    }
+
+    function applyFilters() {
+        const searchTitle = document.getElementById('title-search').value.toLowerCase();
+        const selectedCategory = document.getElementById('category-filter').value;
+        const sortOption = document.getElementById('sort-filter').value;
+
+        filteredArticles = allArticles.filter(article => {
+            let match = true;
+            if (searchTitle && !article.title.toLowerCase().includes(searchTitle)) match = false;
+            if (selectedCategory && article.category !== selectedCategory) match = false;
+            return match;
+        });
+
+        filteredArticles.sort((a, b) => {
+            if (sortOption === 'date-desc') return new Date(b.update_time || b.create_time) - new Date(a.update_time || a.create_time);
+            if (sortOption === 'date-asc') return new Date(a.update_time || a.create_time) - new Date(b.update_time || b.create_time);
+            if (sortOption === 'title-asc') return a.title.localeCompare(b.title);
+            if (sortOption === 'title-desc') return b.title.localeCompare(a.title);
+            return 0;
+        });
+
+        currentPage = 1;
+        renderArticles();
+    }
+
+    function renderArticles() {
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const articles = filteredArticles.slice(start, end);
+        const container = document.getElementById('articles-list');
+        container.innerHTML = '';
+
+        articles.forEach(article => {
+            const card = document.createElement('div');
+            card.className = 'cardHoriz';
+            card.innerHTML = `
+                <div class="title-row">
+                    <a href="${article.link}">${article.title}</a>
+                    <span class="time">${article.update_time ? `Updated: ${article.update_time}` : `Published: ${article.create_time}`}</span>
+                </div>
+                <div class="summary">${article.summary}</div>
+                <div class="stats">
+                    <span><i class="fas fa-eye"></i> ${article.read_count}</span>
+                    <span><i class="fas fa-thumbs-up"></i> ${article.useful_count}</span>
+                    <span><i class="fas fa-thumbs-down"></i> ${article.useless_count}</span>
+                    <span><i class="fas fa-heart"></i> ${article.save_count}</span>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        updatePagination();
+    }
+
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
+        let paginationHtml = '';
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</a>`;
+            }
+        } else {
+            paginationHtml += `<a href="#" onclick="goToPage(1)" class="${currentPage === 1 ? 'active' : ''}">1</a>`;
+            if (currentPage > 4) paginationHtml += '<span>...</span>';
+            for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
+                paginationHtml += `<a href="#" onclick="goToPage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</a>`;
+            }
+            if (currentPage < totalPages - 3) paginationHtml += '<span>...</span>';
+            paginationHtml += `<a href="#" onclick="goToPage(${totalPages})" class="${currentPage === totalPages ? 'active' : ''}">${totalPages}</a>`;
+        }
+        document.getElementById('pagination-info').innerHTML = paginationHtml;
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        renderArticles();
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
+        currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+        renderArticles();
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            allArticles = generateArticleData();
+            filteredArticles = [...allArticles];
+            const categories = generateCategories();
+            populateCategoryFilter(categories);
+
+            document.getElementById('category-filter').addEventListener('change', applyFilters);
+            document.getElementById('title-search').addEventListener('input', applyFilters);
+            document.getElementById('sort-filter').addEventListener('change', applyFilters);
+
+            applyFilters();
+            document.title = initialCategory ? `${initialCategory} - Articles - FASTRESP` : 'Articles - FASTRESP';
+        });
+    };
+</script>
+</body>
+</html>

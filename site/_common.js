@@ -316,7 +316,8 @@ function generateArticles(containerId, min, max) {
     const count = faker.datatype.number({min: min, max: max});
     for (let i = 0; i < count; i++) {
         const li = document.createElement('li');
-        li.innerHTML = `<a href="#">${faker.lorem.sentence()}</a>`;
+        const title = faker.lorem.sentence()
+        li.innerHTML = `<a href="page.html?name=${title}">${title}</a>`;
         container.appendChild(li);
     }
 }
@@ -401,11 +402,11 @@ function bindAllCardLink(){
     document.querySelectorAll('.card,.cardHoriz').forEach(item => {
         let type = findParentType(item)
         if (systemType[type]){
-            let hasBtn = false;
+            let hasBtn = false, hasBindLink = false;
             let link = `${systemType[type].link}?name=`;
             item.querySelectorAll("p").forEach(p =>{
                 let pid = p.id.toLowerCase()
-                if (pid.toLowerCase().indexOf("name") !== -1 || pid.indexOf("title") !== -1){
+                if ((pid.toLowerCase().indexOf("name") !== -1 || pid.indexOf("title") !== -1) && !hasBindLink){
                     link += encodeURIComponent(p.innerText);
                     p.innerHTML = `<a href="${link}">${p.innerHTML}</a>`
 
@@ -417,6 +418,7 @@ function bindAllCardLink(){
                     //     item.parentNode.insertBefore(cardLink, item)
                     //     item.remove()
                     // }
+                    hasBindLink = true
                 }
             });
 

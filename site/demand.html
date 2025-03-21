@@ -46,8 +46,8 @@
         .bid-images img { width: 3em; height: 3em; object-fit: cover; border-radius: 0.25em; cursor: pointer; }
         .bid-actions { position: absolute; top: 0.5em; right: 1em; display: flex; gap: 0.5em; }
         .bid-actions button { padding: 0.3em 0.8em; border: none; border-radius: 0.25em; cursor: pointer; }
-        .bid-actions .edit { background: var(--natural-green); color: #fff; }
-        .bid-actions .select-winner { background: var(--vibrant-orange); color: #fff; }
+        .bid-actions .edit { background: var(--natural-green); color: #fff; margin: 3em 5em 0 0; }
+        .bid-actions .select-winner { background: var(--vibrant-orange); color: #fff; margin: 3em 5em 0 0;}
         .pagination { display: flex; justify-content: center; align-items: center; gap: 1em; margin: 1em 0; }
         .pagination-btn { padding: 0.3em 1em; background: var(--bg-white); border-color: var(--border-color); color: var(--text-primary); }
         .pagination-btn:hover { border-color: var(--natural-green); color: var(--natural-green); }
@@ -116,11 +116,7 @@
     }
 
     function renderDemandHeader() {
-        if (Math.random() > 0.5) {
-            demandData.owerId = userId;
-        } else {
-            demandData.owerId = Math.floor(Math.random() * 1000);
-        }
+        demandData.owerId = Math.random() > 0.5 ? userId : Math.floor(Math.random() * 1000);
         const header = document.getElementById('demand-header');
         const totalAmount = parseFloat(demandData.price_to.sample.split('$')[1]) * parseInt(demandData.quantity.sample);
         header.innerHTML = `
@@ -185,7 +181,7 @@
                 store_id: Math.floor(Math.random() * 1000),
                 store_name: storeData.name,
                 orders_count: randomInt(10, 500),
-                avatar: storeData.image,
+                avatar: getPicsumImage(50, 50, `items-${Math.floor(Math.random() * 1000)}`),
                 bid_time: faker.date.recent().getTime() / 1000,
                 bid_price: parseFloat(faker.commerce.price(40, 300, 2)),
                 bid_information: faker.lorem.sentence(),
@@ -199,7 +195,7 @@
                 rating: storeData.rating
             };
         });
-        if (Math.random() > 0.2) {
+        if (Math.random() > 0.2 && !isOwner()) {
             const storeData = generateData(storeFieldConfig, 1)[0];
             const bidTimes = randomInt(10, 50);
             const winTimes = Math.floor(bidTimes * Math.random() * 0.8);
@@ -242,7 +238,7 @@
             bidItem.className = `bid-item ${isSelf ? 'self' : ''}`;
             const summary = `
                 <div class="bid-summary">
-                    <p><b>店铺</b>: <a href="store.html?name=${encodeURIComponent(bid.store_name)}"><img src="${bid.avatar}" alt="${bid.store_name}" style="width: 1.5em; height: 1.5em; vertical-align: middle; margin-right: 0.5em;">${bid.store_name}</a></p>
+                    <p><b>店铺</b>: <a href="store.html?name=${encodeURIComponent(bid.store_name)}"><img src="${bid.avatar}" alt="${bid.store_name}" style="width: 1.5em; height: 1.5em; vertical-align: middle; margin-right: 0.5em;border-radius: 1em;">${bid.store_name}</a></p>
                     <p><b>等级</b>: ${bid.rating.sample >= 4.5 ? 'Lv5' : bid.rating.sample >= 4 ? 'Lv4' : 'Lv3'}</p>
                     <p><b>评分</b>: ${generateRating({}, bid.rating, {})}</p>
                     <p><b>订单量</b>: ${bid.orders_count}</p>
@@ -266,7 +262,7 @@
             const actions = `
                 <div class="bid-actions">
                     ${isSelf && bid.status === 'Bidding' ? `<button class="edit" onclick="editBid(${index + start})">编辑</button>` : ''}
-                    ${isOwner() && bid.status === 'Bidding' ? `<button class="select-winner" onclick="selectWinner(${index + start})">选中为中标</button>` : ''}
+                    ${isOwner() ? `<button class="select-winner" onclick="selectWinner(${index + start})">选中为中标</button>` : ''}
                 </div>
             `;
             bidItem.innerHTML = `
