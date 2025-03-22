@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>User Blog - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        body { padding-top: 7.4em; margin: 0; background: #f7f9fc; font-family: Arial, sans-serif; }
+        .container { margin: 0 auto; display: flex; gap: 2em; padding: 2em; }
+
+        .blog-main { flex: 3; padding: 2em; background: var(--bg-white); border-radius: 1em; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .blog-header { display: flex; align-items: center; gap: 2em; margin-bottom: 2em; padding-bottom: 1em; border-bottom: 0.0625em solid var(--border-color); position: relative; }
+        .blog-header img { width: 5em; height: 5em; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .blog-header .info { flex: 1; }
+        .blog-header h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; color: var(--text-primary); font-weight: bold; }
+        .blog-header .stats { display: flex; gap: 1.5em; color: var(--text-secondary); }
+        .blog-header .stats .stars i { color: #ffd700; margin-right: 0.3em; }
+        .blog-header .follow-btn { padding: 0.5em 1.5em; background: var(--natural-green); color: white; border: none; border-radius: 0.5em; cursor: pointer; transition: background 0.3s; }
+        .blog-header .follow-btn.followed { background: var(--font-orange); }
+        .blog-header .follow-btn:hover { background: #45a049; }
+        .blog-header .edit-btn { position: absolute; top: 0.5em; right: 0; font-size: var(--font-large); color: #1890ff; cursor: pointer; }
+
+        .blog-intro { margin-bottom: 2em; position: relative; }
+        .blog-intro .edit-btn { position: absolute; top: 0.5em; right: 0; font-size: var(--font-large); color: #1890ff; cursor: pointer; }
+        .search-bar { display: flex; gap: 0.5em; margin-bottom: 2em; }
+        .search-bar input { flex: 1; padding: 0.75em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; font-size: var(--font-medium); }
+        .search-bar button { padding: 0.75em 1.5em; background: var(--natural-green); color: white; border: none; border-radius: 0.5em; cursor: pointer; }
+
+        .blog-section { margin: 2em 0; }
+        .blog-section h2 { font-size: var(--font-xlarge); margin: 0 0 1em; color: var(--text-primary); font-weight: bold; border-bottom: 0.0625em solid var(--border-color); padding-bottom: 0.5em; }
+        .blog-posts { display: flex; flex-direction: column; gap: 1.5em; }
+        .blog-post { border: 0.0625em solid var(--border-color); border-radius: 0.5em; background: #fff; position: relative; overflow: hidden; transition: box-shadow 0.3s; }
+        .blog-post:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .blog-post .cover-image { width: 100%; height: 150px; object-fit: cover; border-radius: 0.5em 0.5em 0 0; }
+        .blog-post h3 { font-size: var(--font-large); margin: 1em 1.5em 0.5em; position: relative; }
+        .blog-post h3 a { color: var(--natural-green); text-decoration: none; }
+        .blog-post h3 a:hover { text-decoration: underline; }
+        .blog-post h3 .edit-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: var(--font-medium); color: #1890ff; cursor: pointer; }
+        .blog-post .meta { display: flex; justify-content: space-between; font-size: var(--font-small); color: var(--text-secondary); margin: 0.5em 1.5em; }
+        .blog-post .meta.paid-meta { color: #ff9800; }
+        .blog-post .meta .category-tech { color: #1e90ff; }
+        .blog-post .meta .category-life { color: #ff69b4; }
+        .blog-post .meta .category-finance { color: #32cd32; }
+        .blog-post .meta .paid { color: #ff9800; }
+        .blog-post .meta .free { color: #32cd32; }
+        .blog-post .meta .rating i { color: #ffd700; }
+        .blog-post .meta .rating .half-star { position: relative; display: inline-block; width: 1em; overflow: hidden; }
+        .blog-post .meta .rating .half-star::before { content: "\f089"; position: absolute; color: #ffd700; }
+        .blog-post .tags { display: flex; flex-wrap: wrap; gap: 0.5em; margin: 0.5em 1.5em; }
+        .blog-post .tags a { padding: 0.3em 0.75em; background: #e9ecef; border-radius: 1em; font-size: var(--font-small); color: var(--text-secondary); text-decoration: none; }
+        .blog-post .tags a:hover { background: var(--natural-green); color: white; }
+        .blog-post .paid-badge { position: absolute; top: 1em; right: -2em; background: #ff9800; color: white; padding: 0.3em 2em; transform: rotate(45deg); font-size: var(--font-small); text-align: center; width: 8em; }
+        .blog-post .brand-category-meta { display: flex; justify-content: space-between; align-items: center; margin: 1em 1.5em 0.5em; font-size: var(--font-small); }
+        .blog-post .brand-category { display: flex; align-items: center; gap: 1em; }
+        .blog-post .brand { display: flex; align-items: center; gap: 0.5em; }
+        .blog-post .brand img { width: 1.5em; height: 1.5em; border-radius: 50%; }
+        .blog-post .brand a { color: inherit; text-decoration: none; }
+        .blog-post .summary { margin: 0.5em 1.5em; }
+
+        .pagination { display: flex; justify-content: center; gap: 0.5em; margin-top: 2em; }
+        .pagination button { padding: 0.5em 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; background: white; cursor: pointer; }
+        .pagination button.active { background: var(--natural-green); color: white; }
+
+        .blog-sidebar { flex: 1; position: sticky; top: 8em; align-self: flex-start; padding: 1.5em; background: var(--bg-white); border-radius: 1em; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .blog-sidebar .section { margin-bottom: 2em; }
+        .blog-sidebar h3 { font-size: var(--font-large); margin: 0 0 1em; color: var(--natural-green); font-weight: bold; }
+        .blog-sidebar ul { padding-left: 0; list-style: none; }
+        .blog-sidebar li { margin: 0.75em 0; }
+        .blog-sidebar .hot-post a, .blog-sidebar .category a { color: var(--text-primary); text-decoration: none; }
+        .blog-sidebar .hot-post a:hover, .blog-sidebar .category a:hover { color: var(--natural-green); }
+        .blog-sidebar .comment { border-bottom: 0.0625em solid var(--border-color); padding-bottom: 0.5em; }
+        .blog-sidebar .comment strong { color: var(--text-primary); }
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5em; }
+        .tag-cloud a { padding: 0.3em 0.75em; background: #e9ecef; border-radius: 1em; font-size: var(--font-small); color: var(--text-secondary); text-decoration: none; }
+        .tag-cloud a:hover { background: var(--natural-green); color: white; }
+        .categories ul ul { margin-left: 1em; }
+        .store-card { background: #fff; border-radius: 0.5em; padding: 1em; margin-bottom: 2em; text-align: center; }
+        .store-card .avatar { width: 3em; height: 3em; border-radius: 50%; margin: 0 auto 0.5em; }
+        .store-card .name { font-size: var(--font-large); margin: 0 0 0.5em; }
+        .store-card .name a { color: var(--natural-green); text-decoration: none; }
+        .store-card .name a:hover { text-decoration: underline; }
+        .store-card .slogan { font-size: var(--font-small); color: var(--text-secondary); margin: 0 0 0.5em; }
+        .store-card .stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 1em; color: var(--text-secondary); font-size: var(--font-small); }
+        .store-card .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; margin-top: 0.5em; }
+
+        @media (max-width: 48em) {
+            body { padding-top: 1.5em; }
+            .container { flex-direction: column; gap: 1em; padding: 1em; }
+            .blog-main, .blog-sidebar { width: 100%; }
+            .blog-header { flex-direction: column; align-items: flex-start; gap: 1em; }
+            .blog-sidebar { position: relative; top: 0; }
+            .search-bar { flex-direction: column; }
+            .blog-post .paid-badge { top: 0.5em; right: -0.5em; width: 4em; font-size: 0.75em; }
+            .blog-post .cover-image { height: 100px; }
+            .blog-post .brand-category-meta { flex-direction: column; align-items: flex-start; gap: 0.5em; }
+            .store-card .stats { flex-direction: column; gap: 0.5em; }
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="_header.html"></div>
+<div class="container">
+    <div class="blog-main" id="blog-main"></div>
+    <div class="blog-sidebar" id="blog-sidebar"></div>
+</div>
+<div w3-include-html="_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const userName = decodeURIComponent(urlParams.get('name') || faker.name.findName());
+    const initialPage = parseInt(urlParams.get('page')) || 1;
+    const isEditing = Math.random() < 0.3;
+    const hasStore = Math.random() < 0.5;
+
+    function generateUserBlog(postCount) {
+        const blog = {};
+        for (const [key, config] of Object.entries(userBlogFieldConfig)) {
+            if (key === 'author_name') {
+                blog[key] = userName;
+            } else if (key === 'posts_count') {
+                blog[key] = postCount;
+            } else if (config.sample) {
+                blog[key] = config.sample();
+            } else {
+                blog[key] = faker.lorem.word();
+            }
+        }
+        return blog;
+    }
+
+    function generatePosts(count) {
+        const posts = [];
+        for (let i = 0; i < count; i++) {
+            const post = {};
+            for (const [key, config] of Object.entries(postsFieldConfig)) {
+                if (key === 'author') {
+                    post[key] = userName;
+                } else if (key === 'category') {
+                    post[key] = generateArticleCategory();
+                } else if (key === 'tags') {
+                    post[key] = generateTag(1, 3);
+                } else if (config.sample) {
+                    post[key] = config.sample(i);
+                } else {
+                    post[key] = faker.lorem.word();
+                }
+            }
+            post.price = post.paid ? faker.commerce.price(1, 10, 2, '$') : 'Free';
+            post.paidRate = post.paid ? (post.paid_count / (post.read_count || 1) * 100).toFixed(1) + '%' : 'N/A';
+            post.brand = hotBrands[randomInt(0, hotBrands.length - 1)];
+            post.cover = Math.random() > 0.3 ? getPicsumImage(300, 200, `post-${i}`) : null;
+            posts.push(post);
+        }
+        return posts;
+    }
+
+    function generateStore() {
+        const store = {};
+        for (const [key, config] of Object.entries(storeFieldConfig)) {
+            if (config.sample) {
+                store[key] = config.sample();
+            }
+        }
+        const stat = {};
+        for (const [key, config] of Object.entries(storeStatFieldConfig)) {
+            if (config.sample) {
+                stat[key] = config.sample();
+            }
+        }
+        store.image = getPicsumImage(300, 200, `store-${userName}`);
+        store.services = Array(randomInt(1, 3)).fill().map(() => store.services[randomInt(0, store.services.length - 1)]);
+        return { ...store, stats: stat };
+    }
+
+    function generateComments(count) {
+        return Array.from({ length: count }, () => ({
+            author: faker.name.findName(),
+            content: faker.lorem.sentence(randomInt(5, 15)),
+            date: faker.date.recent().toLocaleDateString()
+        }));
+    }
+
+    function getRandomCategories() {
+        const shuffled = articleCategories.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, randomInt(3, 5)).map(cat => ({
+            name: cat.name,
+            sub: cat.sub.sort(() => 0.5 - Math.random()).slice(0, randomInt(3, 5)).map(sub => ({
+                name: sub,
+                count: randomInt(3, 20)
+            }))
+        }));
+    }
+
+    let currentPage = initialPage;
+    const postsPerPage = 10;
+    let allPosts = generatePosts(randomInt(20, 50));
+    let filteredPosts = allPosts;
+    const storeData = hasStore ? generateStore() : null;
+
+    function showEditModal(section) {
+        alert(`Editing ${section} for ${userName}`);
+    }
+
+    function renderBlogMain() {
+        const user = generateUserBlog(allPosts.length);
+        const start = (currentPage - 1) * postsPerPage;
+        const end = Math.min(start + postsPerPage, filteredPosts.length);
+        const paginatedPosts = filteredPosts.slice(start, end);
+        const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+
+        const main = document.getElementById('blog-main');
+        main.innerHTML = `
+            <div class="blog-header">
+                <img src="${getPicsumImage(50, 50, `user-${userName}`)}" alt="${userName}">
+                <div class="info">
+                    <h1>${userName}'s Blog</h1>
+                    <div class="stats">
+                        <span>Posts: ${user.posts_count}</span>
+                        <span class="stars"><i class="fas fa-star"></i> ${user.save_count || 0}</span>
+                        <span>Following: ${user.followingCount || 0}</span>
+                    </div>
+                </div>
+                <button class="follow-btn ${localStorage.getItem(`follow-${userName}`) ? 'followed' : ''}" onclick="toggleFollow(this, '${userName}')">
+                    ${localStorage.getItem(`follow-${userName}`) ? 'Unfollow' : 'Follow'}
+                </button>
+                ${isEditing ? '<i class="fas fa-edit edit-btn" onclick="showEditModal(\'header\')"></i>' : ''}
+            </div>
+            <div class="blog-intro">
+                <p>${user.blog_summary || 'No summary available'}</p>
+                ${isEditing ? '<i class="fas fa-edit edit-btn" onclick="showEditModal(\'about\')"></i>' : ''}
+            </div>
+            <div class="blog-section blog-posts">
+                <h2>Posts</h2>
+                ${paginatedPosts.map(post => `
+                    <div class="blog-post ${post.paid ? 'paid' : ''}">
+                        ${post.cover ? `<img src="${post.cover}" alt="${post.title}" class="cover-image">` : ''}
+                        <h3>
+                            <a href="post.html?name=${encodeURIComponent(post.title)}">${post.title}</a>
+                            ${isEditing ? `<i class="fas fa-edit edit-btn" onclick="window.location.href='/user/post-edit.html?name=${encodeURIComponent(post.title)}'"></i>` : ''}
+                        </h3>
+                        <div class="summary">${post.blog_summary || 'No summary'}</div>
+                        <div class="brand-category-meta">
+                            <div class="brand-category">
+                                <div class="brand">
+                                    <img src="${post.brand.logo}" alt="${post.brand.name}">
+                                    <a href="brand.html?name=${encodeURIComponent(post.brand.name)}" style="color: ${post.brand.themeColor}">${post.brand.name}</a>
+                                </div>
+                                <span class="category-${post.category.split(' - ')[0].toLowerCase()}">
+                                    <a href="post-list.html?type=${encodeURIComponent(post.category)}">${post.category}</a>
+                                </span>
+                            </div>
+                            <span class="${post.paid ? 'paid-meta' : ''}">
+                                ${Array(Math.floor(post.rating || 0)).fill('<i class="fas fa-star"></i>').join('')}
+                                ${post.rating % 1 >= 0.5 ? '<span class="half-star"><i class="fas fa-star-half-alt"></i></span>' : ''}
+                                (${post.rating || 0}) |
+                                Reads: ${post.read_count || 0} |
+                                ${post.paid ? `<span class="paid">Paid (${post.price}, ${post.paidRate})</span>` : '<span class="free">Free</span>'} |
+                                Comments: ${post.comment_count || 0}
+                            </span>
+                        </div>
+                        <div class="tags">
+                            ${post.tags.map(tag => `<a href="tag.html?name=${encodeURIComponent(tag)}">${tag}</a>`).join('')}
+                        </div>
+                        ${post.paid ? '<div class="paid-badge">Paid</div>' : ''}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="pagination">
+                ${Array.from({ length: totalPages }, (_, i) => `
+                    <button class="${currentPage === i + 1 ? 'active' : ''}" onclick="changePage(${i + 1})">${i + 1}</button>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    function renderBlogSidebar() {
+        const user = generateUserBlog(allPosts.length);
+        const hotPosts = allPosts.slice().sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 5);
+        const comments = generateComments(randomInt(3, 5));
+        const tags = allPosts.flatMap(post => post.tags || []).slice(0, 10);
+        const categories = getRandomCategories();
+
+        const sidebar = document.getElementById('blog-sidebar');
+        sidebar.innerHTML = `
+            ${hasStore ? `
+                <div class="store-card">
+                    <img src="${storeData.image}" alt="${storeData.name}" class="avatar">
+                    <div class="name"><a href="store.html?name=${encodeURIComponent(storeData.name)}">${storeData.name}</a></div>
+                    <div class="slogan">${storeData.slogan || 'No slogan available'}</div>
+                    <div class="stats">
+                        <span>Services: ${storeData.services.map(s => `<span style="color: var(--font-orange)">${s}</span>`).join(', ')}</span>
+                        <span>Items: ${storeData.stats.items_count || 0}</span>
+                        <span>Rating: ${storeData.rating || 0}</span>
+                        <span>Sales Amount: ${storeData.stats.sales_amount || '$0'}</span>
+                        <span>Sales: ${storeData.stats.sales_count || 0}</span>
+                    </div>
+                    <div class="tags">
+                        ${storeData.tags.map(tag => `<span class="ant-tag">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            <div class="section">
+                <h3>About ${userName}</h3>
+                <p>${user.blog_summary || 'No summary available'}</p>
+                <p>Joined: ${(user.create_time || '').split(' ')[0]}</p>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search posts..." onkeyup="searchPosts()">
+                <button onclick="searchPosts()">Search</button>
+            </div>
+            <div class="section">
+                <h3>Hot Posts</h3>
+                <ul>
+                    ${hotPosts.map(post => `
+                        <li class="hot-post"><a href="post.html?name=${encodeURIComponent(post.title)}">${post.title}</a></li>
+                    `).join('')}
+                </ul>
+            </div>
+            <div class="section">
+                <h3>Tag Cloud</h3>
+                <div class="tag-cloud">
+                    ${tags.map(tag => `<a href="tag.html?name=${encodeURIComponent(tag)}">${tag}</a>`).join('')}
+                </div>
+            </div>
+            <div class="section categories">
+                <h3>Categories</h3>
+                <ul>
+                    ${categories.map(cat => `
+                        <li>
+                            <a href="post-list.html?type=${encodeURIComponent(cat.name)}">${cat.name}</a>
+                            <ul>
+                                ${cat.sub.map(sub => `
+                                    <li><a href="post-list.html?type=${encodeURIComponent(`${cat.name} - ${sub.name}`)}">${sub.name} (${sub.count})</a></li>
+                                `).join('')}
+                            </ul>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+            <div class="section">
+                <h3>Latest Comments</h3>
+                <ul>
+                    ${comments.map(comment => `
+                        <li class="comment">
+                            <strong>${comment.author}</strong>: ${comment.content}<br>
+                            <small>${comment.date}</small>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    function toggleFollow(button, userName) {
+        const isFollowed = button.classList.toggle('followed');
+        button.textContent = isFollowed ? 'Unfollow' : 'Follow';
+        localStorage.setItem(`follow-${userName}`, isFollowed ? 'true' : '');
+    }
+
+    function searchPosts() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        filteredPosts = allPosts.filter(post =>
+            (post.title || '').toLowerCase().includes(query) ||
+            (post.blog_summary || '').toLowerCase().includes(query) ||
+            (post.category || '').toLowerCase().includes(query) ||
+            (post.tags || []).some(tag => tag.toLowerCase().includes(query))
+        );
+        currentPage = 1;
+        updateURL();
+        renderBlogMain();
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        updateURL();
+        renderBlogMain();
+    }
+
+    function updateURL() {
+        const newURL = `${window.location.pathname}?name=${encodeURIComponent(userName)}&page=${currentPage}`;
+        window.history.pushState({ page: currentPage }, '', newURL);
+    }
+
+    window.onpopstate = function(event) {
+        const params = new URLSearchParams(window.location.search);
+        currentPage = parseInt(params.get('page')) || 1;
+        renderBlogMain();
+    };
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            document.title = `${userName}'s Blog - FASTRESP`;
+            renderBlogMain();
+            renderBlogSidebar();
+        });
+    };
+</script>
+</body>
+</html>
