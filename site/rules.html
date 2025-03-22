@@ -29,11 +29,13 @@
         .toc-sidebar .sub-item { font-size: var(--font-medium); padding-left: 1em; font-weight: normal; } /* 二级标题样式 */
 
         @media (max-width: 48em) {
-            body, .container { padding: 0.5em; }
+            body, .container,.page-content { padding: 0.5em; }
+            section{padding:0; }
             .container { flex-direction: column; gap: 1em; align-items: flex-start; max-width: 100%; }
             .page-content { width: 100%; }
             .page-content h1 { font-size: var(--font-large); }
-            .toc-sidebar { position: relative; top: 0; transform: none; width: 100%; max-height: 50vh; }
+            .toc-sidebar { display: none }
+            .page-content ul:last-child{padding-bottom: 6em;}
         }
     </style>
 </head>
@@ -56,7 +58,8 @@
         const sections = [
             { id: 'platform', title: 'Platform Rules' },
             { id: 'customer', title: 'Customer Rules' },
-            { id: 'store', title: 'Store Rules' }
+            { id: 'store', title: 'Store Rules' },
+            { id: 'Posts', title: 'Post Rules' }
         ];
 
         const lastUpdate = `February ${randomInt(1, 28)}, 2025`;
@@ -71,7 +74,7 @@
             contentHtml += `<section id="${section.id}"><h2>${sectionNum}. ${section.title}</h2>`;
             tocHtml += `<a href="#${section.id}">${sectionNum}. ${section.title}</a>`;
 
-            const subSectionCount = randomInt(30, 50);
+            const subSectionCount = randomInt(20, 30);
             for (let i = 0; i < subSectionCount; i++) {
                 const subNum = `${sectionNum}.${i + 1}`;
                 const subTitle = faker.lorem.sentence(randomInt(3, 8));
@@ -116,12 +119,12 @@
                     const targetId = link.getAttribute('href').substring(1);
                     const targetElement = document.getElementById(targetId);
                     if (targetElement) {
+                        window.location.href = window.location.href.split("#")[0] + `#${targetId}`
                         const offsetTop = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight - 120;
                         window.scrollTo({
                             top: offsetTop,
                             behavior: 'smooth'
                         });
-                        window.location.href = window.location.href.split("#")[0] + `#${targetId}`
                     }
                 });
             });
