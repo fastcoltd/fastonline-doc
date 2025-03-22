@@ -78,7 +78,7 @@ let storeFieldConfig = {
             return `${all}`;
         },
         sample: () => {
-            const count = randomInt(1, 5);
+            const count = randomInt(2, 5);
             const shuffled = hotBrands.sort(() => 0.5 - Math.random());
             return shuffled.slice(0, count).map(brand => brand.name);
         }

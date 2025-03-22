@@ -10,9 +10,9 @@
     <link rel="stylesheet" href="_site.css">
     <style>
         body { padding-top: 7.4em; margin: 0; background: #f7f9fc; font-family: Arial, sans-serif; }
-        .container { margin: 0 auto; display: flex; gap: 2em; padding: 2em; }
+        .container { margin: 0 auto; display: flex; gap: 2em; padding: 1em; }
 
-        .blog-main { flex: 3; padding: 2em; background: var(--bg-white); border-radius: 1em; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .blog-main { padding: 0.5em; background: var(--bg-white); border-radius: 1em; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         .blog-header { display: flex; align-items: center; gap: 2em; margin-bottom: 2em; padding-bottom: 1em; border-bottom: 0.0625em solid var(--border-color); position: relative; }
         .blog-header img { width: 5em; height: 5em; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .blog-header .info { flex: 1; }
@@ -39,13 +39,12 @@
         .blog-post h3 { font-size: var(--font-large); margin: 1em 1.5em 0.5em; position: relative; }
         .blog-post h3 a { color: var(--natural-green); text-decoration: none; }
         .blog-post h3 a:hover { text-decoration: underline; }
-        .blog-post h3 .edit-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: var(--font-medium); color: #1890ff; cursor: pointer; }
+        .blog-post h3 .edit-btn { position: absolute; right: 2em; top: 80%; transform: translateY(-50%); font-size: var(--font-medium); color: #1890ff; cursor: pointer; }
         .blog-post .meta { display: flex; justify-content: space-between; font-size: var(--font-small); color: var(--text-secondary); margin: 0.5em 1.5em; }
-        .blog-post .meta.paid-meta { color: #ff9800; }
         .blog-post .meta .category-tech { color: #1e90ff; }
         .blog-post .meta .category-life { color: #ff69b4; }
         .blog-post .meta .category-finance { color: #32cd32; }
-        .blog-post .meta .paid { color: #ff9800; }
+        .paid { color: #ff9800; font-weight: bold }
         .blog-post .meta .free { color: #32cd32; }
         .blog-post .meta .rating i { color: #ffd700; }
         .blog-post .meta .rating .half-star { position: relative; display: inline-block; width: 1em; overflow: hidden; }
@@ -65,8 +64,8 @@
         .pagination button { padding: 0.5em 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; background: white; cursor: pointer; }
         .pagination button.active { background: var(--natural-green); color: white; }
 
-        .blog-sidebar { flex: 1; position: sticky; top: 8em; align-self: flex-start; padding: 1.5em; background: var(--bg-white); border-radius: 1em; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .blog-sidebar .section { margin-bottom: 2em; }
+        .blog-sidebar { flex: 1; position: sticky; top: 8em; align-self: flex-start; padding: 0 1em 0 1em; background: var(--bg-white); border-radius: 1em; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .blog-sidebar .section { margin-bottom: 1em; }
         .blog-sidebar h3 { font-size: var(--font-large); margin: 0 0 1em; color: var(--natural-green); font-weight: bold; }
         .blog-sidebar ul { padding-left: 0; list-style: none; }
         .blog-sidebar li { margin: 0.75em 0; }
@@ -78,14 +77,17 @@
         .tag-cloud a { padding: 0.3em 0.75em; background: #e9ecef; border-radius: 1em; font-size: var(--font-small); color: var(--text-secondary); text-decoration: none; }
         .tag-cloud a:hover { background: var(--natural-green); color: white; }
         .categories ul ul { margin-left: 1em; }
-        .store-card { background: #fff; border-radius: 0.5em; padding: 1em; margin-bottom: 2em; text-align: center; }
-        .store-card .avatar { width: 3em; height: 3em; border-radius: 50%; margin: 0 auto 0.5em; }
-        .store-card .name { font-size: var(--font-large); margin: 0 0 0.5em; }
+        .store-card { background: #fff; border: 1px solid #ff9800; border-radius: 0.5em; padding: 1em; margin-bottom: 2em; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);position: relative;overflow: hidden }
+        .store-card .avatar { width: 4em; height: 4em; border-radius: 50%; margin: 0 auto 0.5em; border: 2px solid #ff9800; }
+        .store-card .name { font-size: var(--font-xlarge); margin: 0 0 0.5em; font-weight: bold; }
         .store-card .name a { color: var(--natural-green); text-decoration: none; }
         .store-card .name a:hover { text-decoration: underline; }
-        .store-card .slogan { font-size: var(--font-small); color: var(--text-secondary); margin: 0 0 0.5em; }
-        .store-card .stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 1em; color: var(--text-secondary); font-size: var(--font-small); }
-        .store-card .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; margin-top: 0.5em; }
+        .store-card .slogan { font-size: var(--font-medium); color: #666; margin: 0 0 1em; font-style: italic; }
+        .store-card .stats { display: flex; flex-direction: column; gap: 0.5em; color: var(--text-secondary); font-size: var(--font-small); margin-bottom: 1em; }
+        .store-card .stats .services span { color: var(--font-orange); }
+        .store-card .stats .rating { display: initial;justify-content: center; align-items: center;}
+        .store-card .stats .rating i { color: #ffd700;font-size: 1.5em }
+        .store-card .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; }
 
         @media (max-width: 48em) {
             body { padding-top: 1.5em; }
@@ -97,7 +99,7 @@
             .blog-post .paid-badge { top: 0.5em; right: -0.5em; width: 4em; font-size: 0.75em; }
             .blog-post .cover-image { height: 100px; }
             .blog-post .brand-category-meta { flex-direction: column; align-items: flex-start; gap: 0.5em; }
-            .store-card .stats { flex-direction: column; gap: 0.5em; }
+            .store-card .avatar { width: 3em; height: 3em; }
         }
     </style>
 </head>
@@ -169,20 +171,13 @@
     }
 
     function generateStore() {
-        const store = {};
-        for (const [key, config] of Object.entries(storeFieldConfig)) {
-            if (config.sample) {
-                store[key] = config.sample();
-            }
-        }
-        const stat = {};
-        for (const [key, config] of Object.entries(storeStatFieldConfig)) {
-            if (config.sample) {
-                stat[key] = config.sample();
-            }
-        }
+        const store = generateData(storeFieldConfig, 1)[0];
+        const stat = generateData(storeStatFieldConfig, 1)[0];
         store.image = getPicsumImage(300, 200, `store-${userName}`);
-        store.services = Array(randomInt(1, 3)).fill().map(() => store.services[randomInt(0, store.services.length - 1)]);
+        store.services = Array(randomInt(1, 3)).fill().map(() => services[randomInt(0, services.length - 1)]['name']);
+        console.log(store.services)
+        store.tags = Array(randomInt(2, 3)).fill().map(() => ecommerceTags[randomInt(0, ecommerceTags.length - 1)]);
+        store.tagColors = store.tags.map(() => tagColors[randomInt(0, tagColors.length - 1)]);
         return { ...store, stats: stat };
     }
 
@@ -246,7 +241,7 @@
             <div class="blog-section blog-posts">
                 <h2>Posts</h2>
                 ${paginatedPosts.map(post => `
-                    <div class="blog-post ${post.paid ? 'paid' : ''}">
+                    <div class="blog-post">
                         ${post.cover ? `<img src="${post.cover}" alt="${post.title}" class="cover-image">` : ''}
                         <h3>
                             <a href="post.html?name=${encodeURIComponent(post.title)}">${post.title}</a>
@@ -263,7 +258,7 @@
                                     <a href="post-list.html?type=${encodeURIComponent(post.category)}">${post.category}</a>
                                 </span>
                             </div>
-                            <span class="${post.paid ? 'paid-meta' : ''}">
+                            <span>
                                 ${Array(Math.floor(post.rating || 0)).fill('<i class="fas fa-star"></i>').join('')}
                                 ${post.rating % 1 >= 0.5 ? '<span class="half-star"><i class="fas fa-star-half-alt"></i></span>' : ''}
                                 (${post.rating || 0}) |
@@ -275,7 +270,7 @@
                         <div class="tags">
                             ${post.tags.map(tag => `<a href="tag.html?name=${encodeURIComponent(tag)}">${tag}</a>`).join('')}
                         </div>
-                        ${post.paid ? '<div class="paid-badge">Paid</div>' : ''}
+                        ${post.paid ? '<div class="right-bage" style="background: var(--font-orange)">Paid</div>' : ''}
                     </div>
                 `).join('')}
             </div>
@@ -294,6 +289,7 @@
         const tags = allPosts.flatMap(post => post.tags || []).slice(0, 10);
         const categories = getRandomCategories();
 
+
         const sidebar = document.getElementById('blog-sidebar');
         sidebar.innerHTML = `
             ${hasStore ? `
@@ -302,15 +298,22 @@
                     <div class="name"><a href="store.html?name=${encodeURIComponent(storeData.name)}">${storeData.name}</a></div>
                     <div class="slogan">${storeData.slogan || 'No slogan available'}</div>
                     <div class="stats">
-                        <span>Services: ${storeData.services.map(s => `<span style="color: var(--font-orange)">${s}</span>`).join(', ')}</span>
-                        <span>Items: ${storeData.stats.items_count || 0}</span>
-                        <span>Rating: ${storeData.rating || 0}</span>
-                        <span>Sales Amount: ${storeData.stats.sales_amount || '$0'}</span>
-                        <span>Sales: ${storeData.stats.sales_count || 0}</span>
+                        <div class="services">${storeData.services.map(s => `<span>${s}</span>`).join(' | ')}</div>
+                        <div style="color: var(--font-green)">${storeData.brands.sample.map(s => `<span>${s}</span>`).join(' | ')}</div>
+                        <div class="rating">
+                            ${Array(Math.floor(storeData.rating.sample || 0)).fill('<i class="fas fa-star"></i>').join(' ')}
+                            ${storeData.rating.sample % 1 >= 0.5 ? '<span class="half-star"><i class="fas fa-star-half-alt"></i></span>' : ''}
+                            (${storeData.rating.sample || 0})
+                        </div>
+                        <p>Items: ${randomInt(10,50)} |
+                        Amount: ${storeData.stats.sales_amount.sample || '$0'} |
+                        Sales: ${storeData.stats.sales_count || 0}
+                        </p>
                     </div>
                     <div class="tags">
-                        ${storeData.tags.map(tag => `<span class="ant-tag">${tag}</span>`).join('')}
+                        ${storeData.tags.map((tag, index) => `<span class="ant-tag ${tagColors[randomInt(0, tagColors.length -1)]}">${tag}</span>`).join('')}
                     </div>
+                    <div class="right-bage" style="background: var(--font-green);">Store</div>
                 </div>
             ` : ''}
             <div class="section">
@@ -331,7 +334,7 @@
                 </ul>
             </div>
             <div class="section">
-                <h3>Tag Cloud</h3>
+                <h3>Tag List</h3>
                 <div class="tag-cloud">
                     ${tags.map(tag => `<a href="tag.html?name=${encodeURIComponent(tag)}">${tag}</a>`).join('')}
                 </div>
