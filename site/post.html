@@ -16,10 +16,12 @@
         .post-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start;}
         .post-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; }
         .post-meta { display: flex; flex-direction: column; gap: 0.5em; width: 100%; }
-        .category { color: var(--font-green); }
-        .author-row { display: flex; gap:1em; justify-content: space-between; align-items: center; width: 100%; }
+        .category {}
+        .author-row { display: flex; gap:1em;align-items: center; width: 100%; }
         .author { display: flex; align-items: center; gap: 0.5em; }
         .author img { width: 2em; height: 2em; border-radius: 50%; }
+        .store-info { display: flex; align-items: center; gap: 0.5em; }
+        .store-info img { width: 2em; height: 2em; border-radius: 50%; }
         .brands-tags-stats { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5em; }
         .brands-tags { display: flex; flex-wrap: wrap; gap: 0.5em; }
         .brand-item { display: flex; align-items: center; gap: 0.5em; cursor: pointer; }
@@ -28,16 +30,16 @@
         .favorite-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.3em; position: absolute; right: 1em; top: 1em; }
         .favorite-wrapper span { margin: 3em 1.3em 0 1em; }
         .stats { display: flex; gap: 1em; color: var(--text-secondary); }
-
-        .post-content { padding: 0.5em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); transition: background 0.3s; }
+        .post-content-container { display: flex; gap: 2em; border-bottom: 0.0625em solid var(--border-color);}
+        .post-content { flex: 0 0 80%; padding: 0.5em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); transition: background 0.3s; }
         .post-content img { max-width: 100%; cursor: pointer; }
         .paid-content-wrapper { position: relative; }
         .paid-section { filter: blur(5px); }
         .paid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; color: #fff; font-size: var(--font-large); cursor: pointer; }
+        .content-sidebar {position: sticky; margin: 1em; max-height: 60vh; overflow-y: auto; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; }
+        .content-sidebar a { display: block; margin: 0.5em 0; color: var(--text-primary); }
+        .content-sidebar a:hover { color: var(--natural-green); }
         .theme-toggle { position: fixed; top: 50%; right: 1em; z-index: 100; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 50%; padding: 0.5em; cursor: pointer; }
-        .sidebar { position: fixed; top: 18em; right: 3em; width: 15em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em 0 0 0.5em; padding: 1em; z-index: 90; max-height: 80vh; overflow-y: auto; }
-        .sidebar a { display: block; margin: 0.5em 0; color: var(--text-primary); }
-        .sidebar a:hover { color: var(--natural-green); }
         .share-section { margin: 1em 0; display: flex; gap: 1em; }
         .share-section img { width: 2em; border-radius: 1em; height: 2em; cursor: pointer; }
         .comments-section { margin: 1em 0; }
@@ -54,16 +56,19 @@
         .scroll-arrow.left { left: 0em; }
         .scroll-arrow.right { right: 0em; }
         .scroll-arrow:hover { color: var(--natural-green); opacity: 1; }
-        .ant-tag{cursor: pointer}
+        .ant-tag { cursor: pointer; }
 
         @media (max-width: 48em) {
             body, .container, .post-header { padding-top: 1.5em !important; margin: 0 !important; }
             .post-info h1 { font-size: var(--font-large); }
             .post-meta { gap: 0.3em; }
-            .sidebar { right: 0.5em; width: 12em; }
+            .content-sidebar { position: relative; top: 0; }
             .theme-toggle { right: 0.5em; }
             .stats-rating { flex-direction: column; align-items: flex-start; }
             .author-row { flex-direction: column; align-items: flex-start; }
+            .post-content-container { flex-direction: column; }
+            .post-content { flex: 0 0 100%; }
+            .content-sidebar { flex: 0 0 100%; }
         }
     </style>
 </head>
@@ -71,7 +76,10 @@
 <div w3-include-html="_header.html"></div>
 <div class="container">
     <div class="post-header" id="post-header"></div>
-    <div class="post-content" id="post-content"></div>
+    <div class="post-content-container">
+        <div class="post-content" id="post-content"></div>
+        <div class="content-sidebar" id="content-sidebar"></div>
+    </div>
     <div class="share-section" id="share-section"></div>
     <div class="comments-section" id="comments-section"></div>
     <div class="related-items section">
@@ -115,21 +123,26 @@
                     <div class="post-meta">
                         <div class="category">
                             <a href="post-list.html?type=${encodeURIComponent(categories.name)}">${categories.name}</a> >
-                            <a href="post-list.html?type=${encodeURIComponent(subCategory)}">${subCategory}</a>
+                            <a href="post-list.html?type=${encodeURIComponent(subCategory)}">${subCategory}</a> >
+                            ${postTitle}
                         </div>
                         <div class="author-row">
                             <div class="author">
-                                <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
-                                <a href="blog.html?name=${encodeURIComponent(authorName)}">${authorName}</a>
+                                <lable>Blog:</lable> <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
+                                <a href="blog.html?name=${encodeURIComponent(authorName)}" style="color: var(--font-green);font-weight: bold">${authorName}</a>
                             </div>
-                            <div class="brands-tags-stats">
-                                <div class="stats">
-                                    <span>Reads: ${readCount}</span>
-                                    ${isPaid ? `<span>Paid: ${paidCount}</span>` : ''}
+                            ${storeName ? `
+                                <div class="store-info">
+                                    <lablel>Store:</lable> <img src="${getPicsumImage(50, 50, `store-${storeName}`)}" alt="${storeName}">
+                                    <a href="store.html?name=${encodeURIComponent(storeName)}" style="color: var(--font-orange);font-weight: bold">${storeName}</a>
                                 </div>
+                            ` : ''}
+                        </div>
+                        <div class="author-row">
+                            <div class="brands-tags-stats">
                                 <div class="brands-tags">
                                     ${brands.map(brand => `
-                                        <div class="brand-item" onclick="window.location.href='brand.html?name=${encodeURIComponent(brand.name)}'">
+                                        <div class="brand-item">
                                             <img src="${brand.logo}" alt="${brand.name}">
                                             <span style="color: ${brand.themeColor}">${brand.name}</span>
                                         </div>
@@ -138,6 +151,10 @@
                                 </div>
                                 <div class="stats-rating">
                                     <div class="rating-wrapper">${generateRating({ position: 'left' }, { sample: rating, count: ratingCount }, {})}</div>
+                                </div>
+                                <div class="stats">
+                                    <span>Reads: ${readCount}</span>
+                                    ${isPaid ? `<span>Paid: ${paidCount}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -160,7 +177,7 @@
 
     function generatePostContent() {
         const paragraphs = [];
-        for (let i = 0; i < randomInt(5, 10); i++) {
+        for (let i = 0; i < randomInt(8, 30); i++) {
             const hasImage = Math.random() > 0.7;
             paragraphs.push({
                 title: faker.lorem.sentence(),
@@ -173,8 +190,9 @@
 
     function renderPostContent() {
         const content = document.getElementById('post-content');
+        const sidebar = document.getElementById('content-sidebar');
         const paragraphs = generatePostContent();
-        const freeCount = isPaid ? Math.max(1, Math.floor(paragraphs.length / 2)) : paragraphs.length; // 付费文章至少有1段免费内容
+        const freeCount = isPaid ? Math.max(1, Math.floor(paragraphs.length / 2)) : paragraphs.length;
         let freeHtml = '';
         let paidHtml = '';
 
@@ -201,15 +219,12 @@
             ` : paidHtml}
         `;
 
-        const sidebar = document.createElement('div');
-        sidebar.className = 'sidebar';
         sidebar.innerHTML = `
             <a href="#post-header">${postTitle}</a>
             ${paragraphs.map((para, index) => `<a href="#para-${index}" style="padding-left: 1em">${para.title}</a>`).join('')}
             <a href="#comments-section">Comments</a>
             <a href="#related-items">Related Items</a>
         `;
-        content.appendChild(sidebar);
 
         const themeToggle = document.createElement('i');
         themeToggle.className = 'fas fa-palette theme-toggle';
@@ -252,7 +267,7 @@
 
     function renderShareSection() {
         const share = document.getElementById('share-section');
-        share.innerHTML = `
+        document.getElementById('share-section').innerHTML = `
             <h3>Share</h3>
             <img src="https://logo.clearbit.com/facebook.com" alt="Facebook" onclick="shareTo('facebook')">
             <img src="https://logo.clearbit.com/twitter.com" alt="Twitter" onclick="shareTo('twitter')">
@@ -364,7 +379,6 @@
         commentsSection.innerHTML += selfComment;
     }
 
-
     function showRatingModal(rating) {
         showModal('rating-modal', `
             <h3>Rating Details</h3>
@@ -460,10 +474,11 @@
                 }
             });
         });
-        setTimeout(()=>{
+        setTimeout(() => {
             generateCaptcha();
-        }, 500)
+        }, 500);
     };
 </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92487c4fdec36762',t:'MTc0MjY3NTgzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
