@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="_site.css">
     <style>
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
-        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em;}
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
         .page-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
         .page-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
         .page-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start; position: relative; }
         .page-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; }
         .page-meta { display: flex; flex-direction: column; gap: 0.5em; width: 100%; }
-        .category { color: var(--font-green); }
         .author-row { display: flex; gap: 1em; justify-content: space-between; align-items: center; width: 100%; }
         .author { display: flex; align-items: center; gap: 0.5em; }
         .author img { width: 2em; height: 2em; border-radius: 50%; }
@@ -24,24 +23,47 @@
         .favorite-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.3em; position: absolute; right: 1em; top: 1em; transition: none; }
         .page-header.fixed .favorite-wrapper { position: absolute; right: 1em; top: 1em; margin: 0; }
 
-        .page-content { padding: 0.5em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); }
+        /* 左右结构样式 */
+        .content-wrapper { display: flex; width: 100%; gap: 1em; padding: 0.5em; }
+        .toc-sidebar { width: 20%; min-width: 12em; position: sticky; top: 10em; align-self: flex-start; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; height: auto; min-height: 20em; max-height: 60vh; overflow-y: auto; transition: top 0.3s ease; z-index: 5; }
+        .toc-sidebar.fixed { top: calc(8em + 2em); }
+        .toc-sidebar h3 { font-size: var(--font-large); margin: 0 0 0.5em; color: var(--natural-green); border-bottom: 0.0625em solid var(--natural-green); padding-bottom: 0.3em; }
+        .toc-sidebar a { display: block; margin: 0.3em 0; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--font-medium); transition: color 0.2s; }
+        .toc-sidebar a:hover { color: var(--natural-green); }
+        .toc-sidebar a.active { color: var(--natural-green); font-weight: bold; position: relative; }
+        .toc-sidebar a.active::before { content: "▶"; position: absolute; left: -1em; color: var(--natural-green); font-size: var(--font-small); }
+        .toc-sidebar .sub-item { padding-left: 1em; font-size: var(--font-small); }
+
+        .page-content { flex: 1; padding: 0.5em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); }
         .page-content img { max-width: 100%; cursor: pointer; }
         .cover-image { width: 100%; height: auto; max-height: 400px; object-fit: cover; border-radius: 0.5em; margin-bottom: 1em; }
-        .vote-section { margin: 1em 0; display: flex; gap: 1em; align-items: center; }
-        .vote-section .fas { font-size: var(--font-xlarge); cursor: pointer; }
+        .vote-section { margin: 2em 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 0.0625em solid var(--border-color); padding-top: 1em; }
+        .vote-section h3 { margin: 0; display: flex; align-items: center; }
+        .vote-section .faq-vote { display: flex; align-items: center; gap: 0.5em; flex-wrap: nowrap; }
+        .vote-section .fas { font-size: var(--font-xlarge); cursor: pointer; display: flex; align-items: center; }
         .vote-section .voted { color: #1890ff; font-weight: bold; }
         .vote-section .fas.fa-thumbs-up.voted { color: var(--natural-green); }
         .vote-section .fas.fa-thumbs-down.voted { color: darkorange; }
-        .vote-section span { margin: 0 0.5em; }
-
-        .sidebar { position: fixed; top: 18em; right: 3em; width: 15em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em 0 0 0.5em; padding: 1em; z-index: 90; max-height: 80vh; overflow-y: auto; }
-        .sidebar a { display: block; margin: 0.5em 0; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sidebar a:hover { color: var(--natural-green); }
-        .sidebar a.active { color: var(--natural-green); font-weight: bold; }
-        .sidebar .sub-item { padding-left: 1em; }
-
-        .share-section img { width: 1.5em; height: 1.5em; border-radius: 0.5em; cursor: pointer; margin-right: 0.5em; }
-
+        .vote-section span { margin: 0 0.5em; display: flex; align-items: center; }
+        .share-section {
+            margin: 2em 0 0;
+            border-top: 0.0625em solid var(--border-color);
+            padding-top: 1em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            flex-wrap: nowrap; /* 不换行 */
+        }
+        .share-section h3 {
+            margin: 0 0.5em 0 0; /* 调整标题间距，避免换行 */
+        }
+        .share-section img {
+            width: 1.5em;
+            height: 1.5em;
+            border-radius: 0.5em;
+            cursor: pointer;
+            margin-right: 0.5em;
+        }
         .other-pages { padding: 1em 0; }
         .other-pages .scroll-list { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 0.5em; scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none; }
         .other-pages .scroll-list::-webkit-scrollbar { display: none; }
@@ -50,7 +72,9 @@
             body, .container, .page-header { padding-top: 1.5em !important; margin: 0 !important; }
             .page-info h1 { font-size: var(--font-large); }
             .page-meta { gap: 0.3em; }
-            .sidebar { right: 0.5em; width: 12em; }
+            .content-wrapper { flex-direction: column; gap: 0.5em; }
+            .toc-sidebar { position: relative; top: 0; width: 100%; max-height: 50vh; min-height: 15em; }
+            .toc-sidebar.fixed { position: relative; top: 0; }
             .author-row { flex-direction: column; align-items: flex-start; }
             .share-section img { width: 1.2em; height: 1.2em; }
             .page-header.fixed .favorite-wrapper { right: 0.5em; top: 0.5em; }
@@ -61,9 +85,12 @@
 <div w3-include-html="_header.html"></div>
 <div class="container">
     <div class="page-header" id="page-header"></div>
-    <div class="page-content" id="page-content"></div>
-    <div class="vote-section" id="vote-section"></div>
-    <div class="share-section" id="share-section"></div>
+    <div class="content-wrapper">
+        <div class="toc-sidebar" id="toc-sidebar">
+            <h3>Table of Contents</h3>
+        </div>
+        <div class="page-content" id="page-content"></div>
+    </div>
     <div class="other-pages section">
         <h3 class="section-title">Other Pages</h3>
         <div id="other-pages" class="scroll-list"></div>
@@ -96,8 +123,8 @@
                 <div class="page-info">
                     <h1>${pageTitle}</h1>
                     <div class="page-meta">
-                        <div class="category">
-                            <a href="page-type.html?name=${encodeURIComponent(category)}">${category}</a> > ${pageTitle}
+                        <div>
+                            <a href="page-type.html?name=${encodeURIComponent(category)}" >${category}</a> > ${pageTitle}
                         </div>
                         <div class="author-row">
                             <div class="author">
@@ -128,15 +155,15 @@
 
     function generatePageContent() {
         const paragraphs = [];
-        const sectionCount = randomInt(3, 6);
+        const sectionCount = randomInt(6, 10);
         for (let i = 0; i < sectionCount; i++) {
-            const subSectionCount = randomInt(1, 3);
+            const subSectionCount = randomInt(2, 4);
             const subSections = [];
             for (let j = 0; j < subSectionCount; j++) {
-                const hasImage = Math.random() > 0.7;
+                const hasImage = Math.random() > 0.5;
                 subSections.push({
                     title: faker.lorem.sentence(),
-                    content: faker.lorem.paragraphs(1),
+                    content: faker.lorem.paragraphs(randomInt(2, 4)),
                     image: hasImage ? getPicsumImage(600, 400, `page-sub-${i}-${j}`) : null
                 });
             }
@@ -150,54 +177,51 @@
 
     function renderPageContent() {
         const content = document.getElementById('page-content');
+        const tocSidebar = document.getElementById('toc-sidebar');
         const paragraphs = generatePageContent();
         const coverImage = getPicsumImage(1200, 400, `page-cover-${pageTitle}`);
-        let html = `<img src="${coverImage}" alt="Cover Image" class="cover-image">`;
+        let contentHtml = `<img src="${coverImage}" alt="Cover Image" class="cover-image">`;
+        let tocHtml = `<h3>Table of Contents</h3><a href="#page-header">${pageTitle}</a>`;
 
         paragraphs.forEach((section, index) => {
-            html += `<h2 id="section-${index}">${section.title}</h2>`;
+            contentHtml += `<h2 id="section-${index}">${section.title}</h2>`;
+            tocHtml += `<a href="#section-${index}">${section.title}</a>`;
             section.subSections.forEach((sub, subIndex) => {
-                html += `
+                contentHtml += `
                     <h3 id="section-${index}-${subIndex}">${sub.title}</h3>
                     ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" onclick="showImageModal(this.src)">` : ''}
                     <p>${sub.content}</p>
                 `;
+                tocHtml += `<a href="#section-${index}-${subIndex}" class="sub-item">${sub.title}</a>`;
             });
         });
 
-        content.innerHTML = html;
-
-        const sidebar = document.createElement('div');
-        sidebar.className = 'sidebar';
-        sidebar.innerHTML = `
-            <a href="#page-header">${pageTitle}</a>
-            ${paragraphs.map((section, index) => `
-                <a href="#section-${index}">${section.title}</a>
-                ${section.subSections.map((sub, subIndex) => `
-                    <a href="#section-${index}-${subIndex}" class="sub-item">${sub.title}</a>
-                `).join('')}
-            `).join('')}
+        contentHtml += `
+            <div class="vote-section" id="vote-section">
+                <h3>Was this page helpful?</h3>
+                <div class="faq-vote">
+                    <i class="fas fa-thumbs-up" onclick="vote(this, 'useful')"></i>
+                    <span>${usefulCount}</span>
+                    <i class="fas fa-thumbs-down" onclick="vote(this, 'useless')"></i>
+                    <span>${uselessCount}</span>
+                </div>
+            </div>
+            <div class="share-section" id="share-section">
+                <h3>Share</h3>
+                <img src="https://logo.clearbit.com/facebook.com" alt="Facebook" onclick="shareTo('facebook')">
+                <img src="https://logo.clearbit.com/twitter.com" alt="Twitter" onclick="shareTo('twitter')">
+                <img src="https://logo.clearbit.com/linkedin.com" alt="LinkedIn" onclick="shareTo('linkedin')">
+            </div>
         `;
-        content.appendChild(sidebar);
 
-        updateSidebarOnScroll();
+        content.innerHTML = contentHtml;
+        tocSidebar.innerHTML = tocHtml;
+
+        updateTocOnScroll();
     }
 
     function showImageModal(src) {
         showModal('image-modal', `<img src="${src}" style="max-width: 100%; max-height: 80vh;">`, { style: { width: 'auto', maxWidth: '90%' } });
-    }
-
-    function renderVoteSection() {
-        const voteSection = document.getElementById('vote-section');
-        voteSection.innerHTML = `
-            <h3>Was this page helpful?</h3>
-            <div class="faq-vote">
-                <i class="fas fa-thumbs-up" onclick="vote(this, 'useful')"></i>
-                <span>${usefulCount}</span>
-                <i class="fas fa-thumbs-down" onclick="vote(this, 'useless')"></i>
-                <span>${uselessCount}</span>
-            </div>
-        `;
     }
 
     function vote(element, type) {
@@ -212,16 +236,6 @@
         }
     }
 
-    function renderShareSection() {
-        const share = document.getElementById('share-section');
-        share.innerHTML = `
-            <h3>Share</h3>
-            <img src="https://logo.clearbit.com/facebook.com" alt="Facebook" onclick="shareTo('facebook')">
-            <img src="https://logo.clearbit.com/twitter.com" alt="Twitter" onclick="shareTo('twitter')">
-            <img src="https://logo.clearbit.com/linkedin.com" alt="LinkedIn" onclick="shareTo('linkedin')">
-        `;
-    }
-
     function shareTo(platform) {
         const url = encodeURIComponent(window.location.href);
         const title = encodeURIComponent(pageTitle);
@@ -234,23 +248,44 @@
         window.open(shareUrl, '_blank');
     }
 
-    function updateSidebarOnScroll() {
+    function updateTocOnScroll() {
         const sections = document.querySelectorAll('h2, h3');
-        const sidebarLinks = document.querySelectorAll('.sidebar a:not(:first-child)');
+        const tocLinks = document.querySelectorAll('.toc-sidebar a:not(:first-child)');
+        const tocSidebar = document.getElementById('toc-sidebar');
+        const header = document.getElementById('page-header');
+        const topHeader = document.querySelector('.header');
+        const initialHeight = header.offsetHeight;
+
         window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
             let currentSection = null;
+
             sections.forEach(section => {
                 const rect = section.getBoundingClientRect();
                 if (rect.top <= 100 && rect.bottom >= 0) {
                     currentSection = section.id;
                 }
             });
-            sidebarLinks.forEach(link => {
+            tocLinks.forEach(link => {
                 link.classList.remove('active');
                 if (link.getAttribute('href') === `#${currentSection}`) {
                     link.classList.add('active');
                 }
             });
+
+            if (scrollY >= initialHeight) {
+                header.classList.add('fixed');
+                topHeader.classList.add('hidden');
+                document.body.style.paddingTop = `${initialHeight}px`;
+                tocSidebar.style.top = `calc(${initialHeight}px + 1em)`;
+                tocSidebar.classList.add('fixed');
+            } else {
+                header.classList.remove('fixed');
+                topHeader.classList.remove('hidden');
+                document.body.style.paddingTop = '7.4em';
+                tocSidebar.style.top = '10em';
+                tocSidebar.classList.remove('fixed');
+            }
         });
     }
 
@@ -265,28 +300,14 @@
             document.title = `${pageTitle} - FASTRESP`;
             renderPageHeader();
             renderPageContent();
-            renderVoteSection();
-            renderShareSection();
             renderOtherPages();
 
             const header = document.getElementById('page-header');
             const topHeader = document.querySelector('.header');
             const initialHeight = header.offsetHeight;
             header.style.minHeight = `${initialHeight}px`;
-            window.addEventListener('scroll', () => {
-                const scrollY = window.scrollY;
-                if (scrollY >= initialHeight) {
-                    header.classList.add('fixed');
-                    topHeader.classList.add('hidden');
-                    document.body.style.paddingTop = `${initialHeight}px`;
-                } else {
-                    header.classList.remove('fixed');
-                    topHeader.classList.remove('hidden');
-                    document.body.style.paddingTop = "7.4em";
-                }
-            });
         });
     };
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92436d1cf99abf66',t:'MTc0MjYyMjc4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
