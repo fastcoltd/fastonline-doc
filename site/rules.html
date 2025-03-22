@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fastresp's Rules of Service - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        body { padding-top: 1em; height: auto; overflow: auto !important; margin: 0; }
+        section{padding: 1em;}
+        .container {top: 6em;margin: 0 auto; position: relative; display: flex; gap: 2em; align-items: center; min-height: 100vh; padding: 1em; }
+
+        .page-content {flex: 1; padding: 1em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); width: 960px; }
+        .page-content h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; color: var(--text-primary); font-weight: bold; text-align: center; }
+        .page-content .last-update { font-size: var(--font-medium); color: var(--text-secondary); text-align: center; margin-bottom: 1em; }
+        .page-content h2 { font-size: var(--font-xlarge); margin: 1em 0 0.5em; color: var(--text-primary); font-weight: bold; }
+        .page-content h3 { font-size: var(--font-large); margin: 0.75em 0 0.5em; color: var(--text-primary); font-weight: bold; }
+        .page-content ul { margin: 0.5em 0; padding-left: 0; list-style-type: none; }
+        .page-content li { margin: 0.5em 0; color: var(--text-secondary); }
+
+        .toc-sidebar { width: 20%; min-width: 15em; position: sticky; top: 50%; transform: translateY(-50%); align-self: flex-start; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; max-height: 80vh; overflow-y: auto; z-index: 5; }
+        .toc-sidebar a { display: block; margin: 0.5em 0; color: var(--text-primary); font-size: var(--font-large); font-weight: bold; transition: color 0.2s; }
+        .toc-sidebar a:hover { color: var(--natural-green); }
+        .toc-sidebar a.active { color: var(--natural-green); }
+        .toc-sidebar .sub-item { font-size: var(--font-medium); padding-left: 1em; font-weight: normal; } /* 二级标题样式 */
+
+        @media (max-width: 48em) {
+            body, .container { padding: 0.5em; }
+            .container { flex-direction: column; gap: 1em; align-items: flex-start; max-width: 100%; }
+            .page-content { width: 100%; }
+            .page-content h1 { font-size: var(--font-large); }
+            .toc-sidebar { position: relative; top: 0; transform: none; width: 100%; max-height: 50vh; }
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="_header.html"></div>
+<div class="container">
+    <div class="page-content" id="page-content"></div>
+    <div class="toc-sidebar" id="toc-sidebar"></div>
+</div>
+<div w3-include-html="_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateRules() {
+        const sections = [
+            { id: 'platform', title: 'Platform Rules' },
+            { id: 'customer', title: 'Customer Rules' },
+            { id: 'store', title: 'Store Rules' }
+        ];
+
+        const lastUpdate = `February ${randomInt(1, 28)}, 2025`;
+        let contentHtml = `
+        <h1>Fastresp's Rules of Service</h1>
+        <div class="last-update">Last update: ${lastUpdate}</div>
+    `;
+        let tocHtml = '';
+
+        sections.forEach((section, index) => {
+            const sectionNum = index + 1;
+            contentHtml += `<section id="${section.id}"><h2>${sectionNum}. ${section.title}</h2>`;
+            tocHtml += `<a href="#${section.id}">${sectionNum}. ${section.title}</a>`;
+
+            const subSectionCount = randomInt(30, 50);
+            for (let i = 0; i < subSectionCount; i++) {
+                const subNum = `${sectionNum}.${i + 1}`;
+                const subTitle = faker.lorem.sentence(randomInt(3, 8));
+                contentHtml += `<h3 id="${section.id}-${i}">${subNum} ${subTitle}</h3><ul>`;
+                tocHtml += `<a href="#${section.id}-${i}" class="sub-item">${subNum} ${subTitle}</a>`;
+                const itemCount = randomInt(1, 5);
+                for (let j = 0; j < itemCount; j++) {
+                    const itemNum = `${subNum}.${j + 1}`;
+                    const sentenceCount = randomInt(1, 3);
+                    let itemContent = '';
+                    for (let k = 0; k < sentenceCount; k++) {
+                        itemContent += faker.lorem.sentence(randomInt(5, 15)) + ' ';
+                    }
+                    contentHtml += `<li>${itemNum} ${itemContent.trim()}</li>`;
+                }
+                contentHtml += `</ul>`;
+            }
+            contentHtml += `</section>`;
+        });
+
+        return { contentHtml, tocHtml };
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            const content = document.getElementById('page-content');
+            const tocSidebar = document.getElementById('toc-sidebar');
+            const rules = generateRules();
+
+            content.innerHTML = rules.contentHtml;
+            tocSidebar.innerHTML = rules.tocHtml;
+
+            // 导航条跳转和高亮
+            const sections = document.querySelectorAll('h2, h3');
+            const tocLinks = document.querySelectorAll('.toc-sidebar a');
+            const headerHeight = document.querySelector('header')?.offsetHeight || 0; // 获取 header 高度（如果有）
+
+            // 点击跳转
+            tocLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        const offsetTop = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight - 120;
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // 滚动联动高亮
+            window.addEventListener('scroll', () => {
+                let currentSection = null;
+
+                // 找到当前可见的章节
+                sections.forEach(section => {
+                    const rect = section.getBoundingClientRect();
+                    // 如果章节顶部在视口上方 100px 内且底部在视口中，则视为当前章节
+                    if (rect.top <= 100 && rect.bottom > 0) {
+                        currentSection = section.id;
+                    }
+                });
+
+                // 高亮对应的导航项
+                tocLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${currentSection}`) {
+                        link.classList.add('active');
+                        // 确保高亮项在目录可视范围内
+                        link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    };
+</script>
+</body>
+</html>
