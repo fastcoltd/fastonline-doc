@@ -24,11 +24,11 @@
         .page-header.fixed .favorite-wrapper { position: absolute; right: 1em; top: 1em; margin: 0; }
 
         /* 左右结构样式 */
-        .content-wrapper { display: flex; width: 100%; gap: 1em; padding: 0.5em; }
+        .page-content-wrapper { display: flex; width: 100%; gap: 1em; padding: 0.5em; }
         .toc-sidebar { width: 20%; margin-top: 0.5em;min-width: 12em; position: sticky; top: 10em; align-self: flex-start; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; height: auto; min-height: 20em; max-height: 60vh; overflow-y: auto; transition: top 0.3s ease; z-index: 5; }
         .toc-sidebar.fixed { top: calc(8em + 2em); }
         .toc-sidebar h3 { font-size: var(--font-large); margin: 0 0 0.5em; color: var(--natural-green); border-bottom: 0.0625em solid var(--natural-green); padding-bottom: 0.3em; }
-        .toc-sidebar a { display: block; margin: 0.3em 0; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--font-medium); transition: color 0.2s; }
+        .toc-sidebar a { display: block; margin: 0.3em 0.3em; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--font-medium); transition: color 0.2s; }
         .toc-sidebar a:hover { color: var(--natural-green); }
         .toc-sidebar a.active { color: var(--natural-green); font-weight: bold; position: relative; }
         .toc-sidebar a.active::before { content: "▶"; position: absolute; left: -1em; color: var(--natural-green); font-size: var(--font-small); }
@@ -72,7 +72,7 @@
             body, .container, .page-header { padding-top: 1.5em !important; margin: 0 !important; }
             .page-info h1 { font-size: var(--font-large); }
             .page-meta { gap: 0.3em; }
-            .content-wrapper { flex-direction: column; gap: 0.5em; }
+            .page-content-wrapper { flex-direction: column; gap: 0.5em; }
             .toc-sidebar { position: relative; top: 0; width: 100%; max-height: 50vh; min-height: 15em; }
             .toc-sidebar.fixed { position: relative; top: 0; }
             .author-row { flex-direction: column; align-items: flex-start; }
@@ -85,7 +85,7 @@
 <div w3-include-html="_header.html"></div>
 <div class="container">
     <div class="page-header" id="page-header"></div>
-    <div class="content-wrapper">
+    <div class="page-content-wrapper">
         <div class="toc-sidebar" id="toc-sidebar">
             <h3>Table of Contents</h3>
         </div>
@@ -155,9 +155,9 @@
 
     function generatePageContent() {
         const paragraphs = [];
-        const sectionCount = randomInt(6, 10);
+        const sectionCount = randomInt(4, 8);
         for (let i = 0; i < sectionCount; i++) {
-            const subSectionCount = randomInt(2, 4);
+            const subSectionCount = randomInt(3, 6);
             const subSections = [];
             for (let j = 0; j < subSectionCount; j++) {
                 const hasImage = Math.random() > 0.5;
