@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FAQ详情 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
+        .page-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
+        .page-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .page-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start; position: relative; }
+        .page-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; }
+        .page-meta { display: flex; flex-direction: column; gap: 0.5em; width: 100%; }
+        .category-brand { display: flex; align-items: center; gap: 1em; }
+        .category-brand .category { color: var(--font-orange); }
+        .author-row { display: flex; gap: 1em; justify-content: space-between; align-items: center; width: 100%; }
+        .author { display: flex; align-items: center; gap: 0.5em; }
+        .author img { width: 2em; height: 2em; border-radius: 50%; }
+        .stats { display: flex; gap: 1em; color: var(--text-secondary); }
+        .favorite-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.3em; position: absolute; right: 1em; top: 1em; transition: none; }
+        .page-header.fixed .favorite-wrapper { position: absolute; right: 1em; top: 1em; margin: 0; }
+
+        .page-content { padding: 0.5em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); width: 100%; }
+        .vote-section { margin: 2em 0; display: flex; flex-direction: column; gap: 1em; align-items: center; justify-content: center; border-top: 0.0625em solid var(--border-color); padding-top: 1em; }
+        .vote-section h3 { margin: 0; display: flex; align-items: center; }
+        .vote-section .faq-vote { display: flex; align-items: center; gap: 0.5em; flex-wrap: nowrap; }
+        .vote-section .fas { font-size: var(--font-xlarge); cursor: pointer; display: flex; align-items: center; }
+        .vote-section .voted { color: #1890ff; font-weight: bold; }
+        .vote-section .fas.fa-thumbs-up.voted { color: var(--natural-green); }
+        .vote-section .fas.fa-thumbs-down.voted { color: darkorange; }
+        .vote-section span { margin: 0 0.5em; display: flex; align-items: center; }
+        .share-section { margin: 2em 0 0; border-top: 0.0625em solid var(--border-color); padding-top: 1em; display: flex; align-items: center; gap: 0.5em; flex-wrap: nowrap; }
+        .share-section h3 { margin: 0 0.5em 0 0; }
+        .share-section img { width: 1.5em; height: 1.5em; border-radius: 0.5em; cursor: pointer; margin-right: 0.5em; }
+
+        @media (max-width: 48em) {
+            body, .container, .page-header { padding-top: 1.5em !important; margin: 0 !important; }
+            .page-info h1 { font-size: var(--font-large); }
+            .page-meta { gap: 0.3em; }
+            .category-brand { flex-direction: column; align-items: flex-start; gap: 0.3em; }
+            .author-row { flex-direction: column; align-items: flex-start; }
+            .share-section img { width: 1.2em; height: 1.2em; }
+            .page-header.fixed .favorite-wrapper { right: 0.5em; top: 0.5em; }
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="_header.html"></div>
+<div class="container">
+    <div class="page-header" id="page-header"></div>
+    <div class="page-content" id="page-content"></div>
+</div>
+<div w3-include-html="_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const faqTitle = decodeURIComponent(urlParams.get('name') || 'How do I reset my password?');
+    const authorName = faker.name.findName();
+    const category = faker.random.arrayElement(['Account Issues', 'Payment Problems', 'Shipping Delays', 'Product Questions', 'Technical Support']);
+    let favoriteCount = faker.datatype.number({ min: 100, max: 1100 });
+    const readCount = faker.datatype.number({ min: 100, max: 1000 });
+    let usefulCount = faker.datatype.number({ min: 50, max: 500 });
+    let uselessCount = faker.datatype.number({ min: 10, max: 100 });
+    const createTime = faker.date.past().toLocaleString();
+    const updateTime = Math.random() > 0.5 ? faker.date.recent().toLocaleString() : null;
+
+    // 从 hotBrands 中随机选择一个品牌
+    const randomBrand = hotBrands[Math.floor(Math.random() * hotBrands.length)];
+    const brandName = randomBrand.name;
+    const brandLogo = randomBrand.logo;
+    const brandThemeColor = randomBrand.themeColor;
+
+    function renderPageHeader() {
+        const header = document.getElementById('page-header');
+        header.innerHTML = `
+            <div class="page-inner">
+                <div class="page-info">
+                    <h1>${faqTitle}</h1>
+                    <div class="page-meta">
+                        <div class="category-brand">
+                            <span class="category"><a href="faq-list.html?name=${encodeURIComponent(category)}&brandName=${encodeURIComponent(brandName)}">${category}</a></span>
+                            <span>Brand: <span style="color: ${brandThemeColor};">${brandName}</span></span>
+                        </div>
+                        <div class="author-row">
+                            <div class="author">
+                                <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
+                                <a href="blog.html?name=${encodeURIComponent(authorName)}">${authorName}</a>
+                            </div>
+                            <div class="stats">
+                                <span>Reads: ${readCount}</span>
+                                ${updateTime ? `<span>Last Edited on: ${updateTime}</span>` : `<span>Published on: ${createTime}</span>`}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="favorite-wrapper">
+                    <i class="fas fa-heart favorite-icon ${Math.random() > 0.5 ? 'favorited' : ''}" onclick="toggleFavorite(this)"></i>
+                    <span>${favoriteCount}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function toggleFavorite(element) {
+        element.classList.toggle('favorited');
+        const span = element.nextElementSibling;
+        favoriteCount = element.classList.contains('favorited') ? favoriteCount + 1 : favoriteCount - 1;
+        span.textContent = favoriteCount;
+    }
+
+    function generatePageContent() {
+        const matchedFaq = realFaqs.find(faq => faq.title === faqTitle) || {
+            title: faqTitle,
+            content: faker.lorem.paragraphs(3)
+        };
+        return {
+            answer: matchedFaq.content
+        };
+    }
+
+    function renderPageContent() {
+        const content = document.getElementById('page-content');
+        const faq = generatePageContent();
+        let contentHtml = `
+            <p>${faq.answer}</p>
+            <div class="vote-section" id="vote-section">
+                <h3>Was this page helpful?</h3>
+                <div class="faq-vote">
+                    <i class="fas fa-thumbs-up" onclick="vote(this, 'useful')"></i>
+                    <span>${usefulCount}</span>
+                    <i class="fas fa-thumbs-down" onclick="vote(this, 'useless')"></i>
+                    <span>${uselessCount}</span>
+                </div>
+            </div>
+            <div class="share-section" id="share-section">
+                <h3>Share</h3>
+                <img src="https://logo.clearbit.com/facebook.com" alt="Facebook" onclick="shareTo('facebook')">
+                <img src="https://logo.clearbit.com/twitter.com" alt="Twitter" onclick="shareTo('twitter')">
+                <img src="https://logo.clearbit.com/linkedin.com" alt="LinkedIn" onclick="shareTo('linkedin')">
+            </div>
+        `;
+
+        content.innerHTML = contentHtml;
+    }
+
+    function showImageModal(src) {
+        showModal('image-modal', `<img src="${src}" style="max-width: 100%; max-height: 80vh;">`, { style: { width: 'auto', maxWidth: '90%' } });
+    }
+
+    function vote(element, type) {
+        if (element.classList.contains('voted')) return;
+        element.classList.add('voted');
+        if (type === 'useful') {
+            usefulCount++;
+            element.nextElementSibling.textContent = usefulCount;
+        } else {
+            uselessCount++;
+            element.nextElementSibling.textContent = uselessCount;
+        }
+    }
+
+    function shareTo(platform) {
+        const url = encodeURIComponent(window.location.href);
+        const title = encodeURIComponent(faqTitle);
+        let shareUrl;
+        switch (platform) {
+            case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; break;
+            case 'twitter': shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`; break;
+            case 'linkedin': shareUrl = `https://www.linkedin.com/shareArticle?url=${url}&title=${title}`; break;
+        }
+        window.open(shareUrl, '_blank');
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            document.title = `${faqTitle} - FASTRESP`;
+            renderPageHeader();
+            renderPageContent();
+
+            const header = document.getElementById('page-header');
+            const topHeader = document.querySelector('.header');
+            const initialHeight = header.offsetHeight;
+            header.style.minHeight = `${initialHeight}px`;
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                if (scrollY >= initialHeight) {
+                    header.classList.add('fixed');
+                    topHeader.classList.add('hidden');
+                    document.body.style.paddingTop = `${initialHeight}px`;
+                } else {
+                    header.classList.remove('fixed');
+                    topHeader.classList.remove('hidden');
+                    document.body.style.paddingTop = "7.4em";
+                }
+            });
+        });
+    };
+</script>
+</body>
+</html>
