@@ -10,65 +10,70 @@
     <link rel="stylesheet" href="_site.css">
     <style>
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
-        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em;}
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
         .post-header { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
-        .post-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
-        .post-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start;}
-        .post-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; }
-        .post-meta { display: flex; flex-direction: column; gap: 0.5em; width: 100%; }
-        .category {}
-        .author-row { display: flex; gap:1em;align-items: center; width: 100%; }
-        .author { display: flex; align-items: center; gap: 0.5em; }
-        .author img { width: 2em; height: 2em; border-radius: 50%; }
-        .store-info { display: flex; align-items: center; gap: 0.5em; }
-        .store-info img { width: 2em; height: 2em; border-radius: 50%; }
-        .brands-tags-stats { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5em; }
-        .brands-tags { display: flex; flex-wrap: wrap; gap: 0.5em; }
+        .post-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 0.5em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .post-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: flex-start; }
+        .post-info h1 { font-size: var(--font-xxlarge); margin: 0 0 0em; font-weight: 700; color: var(--text-primary); }
+        .post-meta { display: flex; flex-direction: column; width: 100%; }
+        .category a { margin-right: 0.5em; }
+        .author-row { display: flex; gap: 1.5em; align-items: center; width: 100%; }
+        .author { display: flex; align-items: center; gap: 0.75em; }
+        .author img { width: 2.5em; height: 2.5em; border-radius: 50%; border: 1px solid var(--border-color); }
+        .store-info { display: flex; align-items: center; gap: 0.75em; }
+        .store-info img { width: 2.5em; height: 2.5em; border-radius: 50%; border: 1px solid var(--border-color); }
+        .brands-tags-stats { display: flex; align-items: center; flex-wrap: wrap; gap: 1em; }
+        .brands-tags { display: flex; flex-wrap: wrap; gap: 0.75em; }
         .brand-item { display: flex; align-items: center; gap: 0.5em; cursor: pointer; }
         .brand-item img { width: 1.5em; height: 1.5em; border-radius: 50%; }
         .stats-rating { display: flex; align-items: center; gap: 1em; flex-wrap: wrap; }
         .favorite-wrapper { display: flex; flex-direction: column; align-items: center; gap: 0.3em; position: absolute; right: 1em; top: 1em; }
-        .favorite-wrapper span { margin: 3em 1.3em 0 1em; }
-        .stats { display: flex; gap: 1em; color: var(--text-secondary); }
-        .post-content-container { display: flex; gap: 2em; border-bottom: 0.0625em solid var(--border-color);}
-        .post-content { flex: 0 0 80%; padding: 0.5em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); transition: background 0.3s; }
-        .post-content img { max-width: 100%; cursor: pointer; }
-        .paid-content-wrapper { position: relative; }
+        .favorite-wrapper span { margin: 0; font-size: var(--font-small); color: var(--text-secondary); }
+        .stats { display: flex; gap: 1em; color: var(--text-secondary); font-size: var(--font-small); }
+
+        .post-content-container { display: flex; gap: 2em; border-bottom: 0.0625em solid var(--border-color); padding-bottom: 2em; }
+        .post-content { flex: 0 0 80%; padding: 1.5em 0 0 1.5em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); transition: background 0.3s; }
+        .post-content p { margin: 0 0 1.5em; color: var(--text-primary); text-align: justify; }
+        .post-content img { max-width: 100%; height: auto; border-radius: 0.5em; margin: 1em 0; display: block; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); cursor: pointer; }
+        .paid-content-wrapper { position: relative; margin-top: 2em; }
         .paid-section { filter: blur(5px); }
-        .paid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; color: #fff; font-size: var(--font-large); cursor: pointer; }
-        .content-sidebar {position: sticky; margin: 1em; max-height: 60vh; overflow-y: auto; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; }
-        .content-sidebar a { display: block; margin: 0.5em 0; color: var(--text-primary); }
+        .paid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; color: #fff; font-size: var(--font-large); cursor: pointer; border-radius: 0.5em; }
+
+        .content-sidebar { position: sticky; top: 8em; max-height: calc(100vh - 10em); overflow-y: auto; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1.5em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.05); }
+        .content-sidebar a { display: block; margin: 0.75em 0; color: var(--text-primary); font-size: var(--font-small); text-decoration: none; padding-left: 1em; position: relative; transition: color 0.2s; }
+        .content-sidebar a:before { content: "•"; position: absolute; left: 0; color: var(--natural-green); }
         .content-sidebar a:hover { color: var(--natural-green); }
+
         .theme-toggle { position: fixed; top: 50%; right: 1em; z-index: 100; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 50%; padding: 0.5em; cursor: pointer; }
-        .share-section { margin: 1em 0; display: flex; gap: 1em; }
-        .share-section img { width: 2em; border-radius: 1em; height: 2em; cursor: pointer; }
-        .comments-section { margin: 1em 0; }
+        .share-section { margin: 2em 0; display: flex; align-items: center; gap: 1em; }
+        .share-section h3 { margin: 0 1em 0 0; font-size: var(--font-large); color: var(--text-primary); }
+        .share-section img { width: 2em; height: 2em; border-radius: 1em; cursor: pointer; transition: transform 0.2s; }
+        .share-section img:hover { transform: scale(1.1); }
+        .comments-section { margin: 2em 0; }
         .comment-list { margin-bottom: 1em; }
-        .comment-item { display: flex; gap: 1em; padding: 0.5em 0; border-bottom: 0.0625em solid var(--border-color); }
+        .comment-item { display: flex; gap: 1em; padding: 1em 0; border-bottom: 0.0625em solid var(--border-color); }
         .comment-item img { width: 2em; height: 2em; border-radius: 50%; }
         .comment-content { flex: 1; }
-        .self-comment { margin-top: 1em; padding: 1em; background: var(--bg-light); border-radius: 0.5em; }
+        .self-comment { margin-top: 1em; padding: 1.5em; background: var(--bg-light); border-radius: 0.5em; }
         .self-comment img { width: 2em; height: 2em; border-radius: 50%; }
-        .self-comment textarea { width: 100%; padding: 0.5em; margin: 0.5em 0; }
-        .captcha { display: flex; align-items: center; gap: 0.5em; margin: 0.5em 0; }
+        .self-comment textarea { width: 100%; padding: 0.75em; margin: 0.75em 0; border: 1px solid var(--border-color); border-radius: 0.375em; resize: vertical; }
+        .captcha { display: flex; align-items: center; gap: 0.5em; margin: 0.75em 0; }
         .related-items .scroll-list { display: flex; flex-wrap: nowrap; overflow-x: hidden; gap: 0.5em; position: relative; }
         .scroll-arrow { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2em; cursor: pointer; color: var(--text-primary); z-index: 10; transition: color 0.2s, opacity 0.2s; opacity: 0.7; }
         .scroll-arrow.left { left: 0em; }
         .scroll-arrow.right { right: 0em; }
         .scroll-arrow:hover { color: var(--natural-green); opacity: 1; }
-        .ant-tag { cursor: pointer; }
+        .ant-tag { cursor: pointer; padding: 0.25em 0.5em; margin-right: 0.5em; }
 
         @media (max-width: 48em) {
             body, .container, .post-header { padding-top: 1.5em !important; margin: 0 !important; }
             .post-info h1 { font-size: var(--font-large); }
-            .post-meta { gap: 0.3em; }
-            .content-sidebar { position: relative; top: 0; }
+            .author-row { flex-direction: column; align-items: flex-start; gap: 0.75em; }
+            .post-content-container { flex-direction: column; }
+            .post-content { flex: 0 0 100%; padding: 1em; }
+            .content-sidebar { flex: 0 0 100%; position: relative; top: 0; margin: 0 0 1em; max-height: none; }
             .theme-toggle { right: 0.5em; }
             .stats-rating { flex-direction: column; align-items: flex-start; }
-            .author-row { flex-direction: column; align-items: flex-start; }
-            .post-content-container { flex-direction: column; }
-            .post-content { flex: 0 0 100%; }
-            .content-sidebar { flex: 0 0 100%; }
         }
     </style>
 </head>
@@ -128,12 +133,12 @@
                         </div>
                         <div class="author-row">
                             <div class="author">
-                                <lable>Blog:</lable> <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
+                                <label>Blog:</label> <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
                                 <a href="blog.html?name=${encodeURIComponent(authorName)}" style="color: var(--font-green);font-weight: bold">${authorName}</a>
                             </div>
                             ${storeName ? `
                                 <div class="store-info">
-                                    <lablel>Store:</lable> <img src="${getPicsumImage(50, 50, `store-${storeName}`)}" alt="${storeName}">
+                                    <label>Store:</label> <img src="${getPicsumImage(50, 50, `store-${storeName}`)}" alt="${storeName}">
                                     <a href="store.html?name=${encodeURIComponent(storeName)}" style="color: var(--font-orange);font-weight: bold">${storeName}</a>
                                 </div>
                             ` : ''}
@@ -177,11 +182,11 @@
 
     function generatePostContent() {
         const paragraphs = [];
-        for (let i = 0; i < randomInt(8, 30); i++) {
+        for (let i = 0; i < randomInt(10, 30); i++) {
             const hasImage = Math.random() > 0.7;
             paragraphs.push({
                 title: faker.lorem.sentence(),
-                content: faker.lorem.paragraphs(1),
+                content: faker.lorem.paragraphs(5),
                 image: hasImage ? getPicsumImage(600, 400, `post-${i}`) : null
             });
         }
@@ -221,7 +226,7 @@
 
         sidebar.innerHTML = `
             <a href="#post-header">${postTitle}</a>
-            ${paragraphs.map((para, index) => `<a href="#para-${index}" style="padding-left: 1em">${para.title}</a>`).join('')}
+            ${paragraphs.map((para, index) => `<a href="#para-${index}">${para.title}</a>`).join('')}
             <a href="#comments-section">Comments</a>
             <a href="#related-items">Related Items</a>
         `;
@@ -266,7 +271,6 @@
     }
 
     function renderShareSection() {
-        const share = document.getElementById('share-section');
         document.getElementById('share-section').innerHTML = `
             <h3>Share</h3>
             <img src="https://logo.clearbit.com/facebook.com" alt="Facebook" onclick="shareTo('facebook')">
@@ -365,8 +369,8 @@
                     <img src="${getPicsumImage(50, 50, 'self')}" alt="You">
                     <strong>${faker.name.findName()}</strong>
                 </div>
-                <div class="rating-wrapper" id="self-rating-overall" >${generateRating({}, { sample: 0, count: 0 }, {})}</div>
-                <div class="rating-wrapper" id="self-rating-clarity" >${generateRating({}, { sample: 0, count: 0 }, {})}</div>
+                <div class="rating-wrapper" id="self-rating-overall">${generateRating({}, { sample: 0, count: 0 }, {})}</div>
+                <div class="rating-wrapper" id="self-rating-clarity">${generateRating({}, { sample: 0, count: 0 }, {})}</div>
                 <div class="rating-wrapper" id="self-rating-depth">${generateRating({}, { sample: 0, count: 0 }, {})}</div>
                 <textarea placeholder="Write your comment..."></textarea>
                 <div class="captcha">
@@ -440,7 +444,7 @@
     let scrollPosition = 0;
     function scrollItems(direction) {
         const container = document.getElementById('related-items');
-        const cardWidth = container.querySelector('.card').offsetWidth + 8; // Including gap
+        const cardWidth = container.querySelector('.card').offsetWidth + 8;
         const maxScroll = container.scrollWidth - container.clientWidth;
         scrollPosition = Math.max(0, Math.min(maxScroll, scrollPosition + direction * cardWidth * 3));
         container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
@@ -465,12 +469,10 @@
                     header.classList.add('fixed');
                     topHeader.classList.add('hidden');
                     document.body.style.paddingTop = `${initialHeight}px`;
-                    updateFavoritePosition();
                 } else {
                     header.classList.remove('fixed');
                     topHeader.classList.remove('hidden');
                     document.body.style.paddingTop = "7.4em";
-                    updateFavoritePosition();
                 }
             });
         });
@@ -479,6 +481,5 @@
         }, 500);
     };
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92487c4fdec36762',t:'MTc0MjY3NTgzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
