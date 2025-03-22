@@ -57,8 +57,9 @@
     function generateRules() {
         const sections = [
             { id: 'platform', title: 'Platform Rules' },
-            { id: 'customer', title: 'Customer Rules' },
-            { id: 'store', title: 'Store Rules' },
+            { id: 'store', title: 'Seller Rules' },
+            { id: 'customer', title: 'Buyer Rules' },
+            { id: 'demand', title: 'Demand Rules' },
             { id: 'Posts', title: 'Post Rules' }
         ];
 
@@ -77,7 +78,7 @@
             const subSectionCount = randomInt(20, 30);
             for (let i = 0; i < subSectionCount; i++) {
                 const subNum = `${sectionNum}.${i + 1}`;
-                const subTitle = faker.lorem.sentence(randomInt(3, 8));
+                const subTitle = faker.lorem.sentence(randomInt(1, 5));
                 contentHtml += `<h3 id="${section.id}-${i}">${subNum} ${subTitle}</h3><ul>`;
                 tocHtml += `<a href="#${section.id}-${i}" class="sub-item">${subNum} ${subTitle}</a>`;
                 const itemCount = randomInt(1, 5);
