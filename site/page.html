@@ -25,7 +25,7 @@
 
         /* 左右结构样式 */
         .content-wrapper { display: flex; width: 100%; gap: 1em; padding: 0.5em; }
-        .toc-sidebar { width: 20%; min-width: 12em; position: sticky; top: 10em; align-self: flex-start; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; height: auto; min-height: 20em; max-height: 60vh; overflow-y: auto; transition: top 0.3s ease; z-index: 5; }
+        .toc-sidebar { width: 20%; margin-top: 0.5em;min-width: 12em; position: sticky; top: 10em; align-self: flex-start; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; height: auto; min-height: 20em; max-height: 60vh; overflow-y: auto; transition: top 0.3s ease; z-index: 5; }
         .toc-sidebar.fixed { top: calc(8em + 2em); }
         .toc-sidebar h3 { font-size: var(--font-large); margin: 0 0 0.5em; color: var(--natural-green); border-bottom: 0.0625em solid var(--natural-green); padding-bottom: 0.3em; }
         .toc-sidebar a { display: block; margin: 0.3em 0; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--font-medium); transition: color 0.2s; }
@@ -180,7 +180,7 @@
         const tocSidebar = document.getElementById('toc-sidebar');
         const paragraphs = generatePageContent();
         const coverImage = getPicsumImage(1200, 400, `page-cover-${pageTitle}`);
-        let contentHtml = `<img src="${coverImage}" alt="Cover Image" class="cover-image">`;
+        let contentHtml = ``;
         let tocHtml = `<h3>Table of Contents</h3><a href="#page-header">${pageTitle}</a>`;
 
         paragraphs.forEach((section, index) => {
