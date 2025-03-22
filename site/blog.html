@@ -250,13 +250,13 @@
                         <div class="summary">${post.blog_summary || 'No summary'}</div>
                         <div class="brand-category-meta">
                             <div class="brand-category">
-                                <div class="brand">
-                                    <img src="${post.brand.logo}" alt="${post.brand.name}">
-                                    <a href="brand.html?name=${encodeURIComponent(post.brand.name)}" style="color: ${post.brand.themeColor}">${post.brand.name}</a>
-                                </div>
-                                <span class="category-${post.category.split(' - ')[0].toLowerCase()}">
+                                <span class="category-${post.category.split(' - ')[0].toLowerCase()}" style="font-weight: bold">
                                     <a href="post-list.html?type=${encodeURIComponent(post.category)}">${post.category}</a>
                                 </span>
+                                <div class="brand">
+                                    <img src="${post.brand.logo}" alt="${post.brand.name}">
+                                    <a href="brand.html?name=${encodeURIComponent(post.brand.name)}">${post.brand.name}</a>
+                                </div>
                             </div>
                             <span>
                                 ${Array(Math.floor(post.rating || 0)).fill('<i class="fas fa-star"></i>').join('')}
