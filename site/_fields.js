@@ -33,7 +33,7 @@ let itemFieldConfig = {
     service: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '服务', style: {}, sample: () => {return generateServices()} },
     lastUpdate: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '最后更新', style: {}, sample: () => `2025-03-01 12:00:11` },
     tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '要求', style: {}, sample: () => {return generateTag(1,3)} },
-    attributes: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '属性', style: {}, sample: () => {return generateAttr(2,5)}},
+    attributes: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '属性', style: {}, sample: () => {return generateAttr(1,3)}},
 
     // 新增字段（面向客户展示）
     original_price: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '原价', format: (d, v) => `<span style="color: #A9A9A9; text-decoration: line-through">${v}</span>`, style: {}, sample: () => faker.commerce.price(60, 250, 2, "$")},
@@ -79,7 +79,7 @@ let storeFieldConfig = {
             return `${all}`;
         },
         sample: () => {
-            const count = randomInt(2, 5);
+            const count = randomInt(1, 3);
             const shuffled = hotBrands.sort(() => 0.5 - Math.random());
             return shuffled.slice(0, count).map(brand => brand.name);
         }
@@ -167,7 +167,7 @@ let campaignFieldConfig = {
             return `${all}`
         },
         sample: () => {
-            return Array(randomInt(5, 8)).fill().map(() => ({
+            return Array(randomInt(3, 5)).fill().map(() => ({
                 name: faker.commerce.productName(),
                 stock: faker.datatype.number({ min: 10, max: 100 })
             }));
@@ -190,7 +190,7 @@ let ordersCommentFieldConfig = {
     brandName: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '品牌', style: {}, sample: () => {return generateBrand()} },
     service: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '服务', style: {}, sample: () => {return generateServices()} },
     itemName: { card: true, cardSq: true, cardHoriz: true, type: 'text',label: 'Item', style: {}, sample: () => faker.commerce.productName() },
-    rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
+    rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => 0, sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
     content: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '内容', style: {}, sample: () => faker.lorem.paragraph() },
 
     // 新增字段（面向客户展示）

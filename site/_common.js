@@ -220,7 +220,7 @@ function generateRating(item, value, style) {
                     <span class="star-bg">${starOutlined.repeat(5)}</span>
                     <span class="star-filled">${filledStarsHtml}</span>
                 </span>
-                <span class="rating-count">${value} (${count || 0})</span>
+                ${count <= 0 ? `<span class="rating-count">${value}</span>` : `<span class="rating-count">${value} (${count || 0})</span>`}
             </p>`;
     return contentHtml;
 }
