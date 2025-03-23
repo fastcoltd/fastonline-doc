@@ -54,7 +54,6 @@
         .blog-post .tags a:hover { background: var(--natural-green); color: white; }
         .blog-post .tag-read-bottom{display: flex; justify-content: space-between;}
         .blog-post .tag-read-bottom .read-more a{padding-right: 1em;}
-        .blog-post .tag-read-bottom .read-more a:hover{font-weight: bold}
         .blog-post .paid-badge { position: absolute; top: 1em; right: -2em; background: #ff9800; color: white; padding: 0.3em 2em; transform: rotate(45deg); font-size: var(--font-small); text-align: center; width: 8em; }
         .blog-post .brand-category-meta { display: flex; justify-content: space-between; align-items: center; margin: 1em 1.5em 0.5em; font-size: var(--font-small); }
         .blog-post .brand-category { display: flex; align-items: center; gap: 1em; }
@@ -92,6 +91,7 @@
         .store-card .stats .rating i { color: #ffd700;font-size: 1.5em }
         .store-card .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; }
 
+        .fas {color: var(--font-orange)}
         @media (max-width: 48em) {
             body { padding-top: 1.5em; }
             .container { flex-direction: column; gap: 1em; padding: 1em; }
@@ -169,7 +169,7 @@
             post.price = post.paid ? faker.commerce.price(1, 10, 2, '$') : 'Free';
             post.paidRate = post.paid ? (post.paid_count / (post.read_count || 1) * 100).toFixed(1) + '%' : 'N/A';
             post.brand = hotBrands[randomInt(0, hotBrands.length - 1)];
-            post.cover = Math.random() > 0.3 ? getPicsumImage(300, 200, `post-${i}`) : null;
+            post.cover = Math.random() > 0.6 ? getPicsumImage(300, 200, `post-${i}`) : null;
             posts.push(post);
         }
         return posts;
