@@ -9,23 +9,19 @@
     <link rel="stylesheet" href="_style.css">
     <link rel="stylesheet" href="_site.css">
     <style>
-        body { padding-top: 7.4em !important; transition: padding-top 0.3s ease; }
-        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
+        body { padding-top: 7.4em !important; transition: padding-top 0.3s ease; overflow-x: hidden; }
+        .container { max-width: var(--max-content-width); margin: 0 auto; padding: 0; display: flex; flex-direction: row; gap: 1em; }
 
-        /* 店铺信息头部 */
-        .store-header { position: sticky; top: 0; background: var(--bg-white); z-index: 10; padding: 1em; border-bottom: 0.0625em solid var(--border-color); transition: all 0.3s ease; }
-        .store-header.fixed { position: fixed; width: 100%; top: 0; left: 0; right: 0; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); padding: 0.5em; }
-        .store-inner { display: flex; gap: 1em; max-width: var(--max-content-width); margin: 0 auto; }
-        .store-left { flex: 70%; }
-        .store-right { flex: 30%; }
-        .store-basic { display: flex; align-items: center; gap: 1em; }
+        /* 左侧固定侧边栏 */
+        .store-sidebar { flex: 0 0 25%; max-width: 25%; position: sticky; top: 7.4em; height: calc(100vh - 7.4em); overflow-y: auto; background: var(--bg-white); padding: 0.5em; border-right: 0.0625em solid var(--border-color); box-shadow: 0 0.125em 0.3125em var(--shadow-dark); }
+        .store-sidebar-inner { display: flex; flex-direction: column; gap: 1em; padding-bottom: 2em; }
+        .store-basic { flex-direction: column; align-items: center; gap: 1em;text-align: center; }
         .store-logo { position: relative; }
-        .store-logo img { width: 6em; height: 6em; border-radius: 50%; }
+        .store-logo img { width: 5em; height: 5em; border-radius: 50%; }
         .online-status-dot { width: 0.5em; height: 0.5em; border-radius: 50%; position: absolute; bottom: 0; right: 0; }
-        .store-info {margin-left: 0.5em;}
+        .store-info { margin-left: 0; text-align: center; }
         .store-info h1 { font-size: var(--font-xlarge); margin: 0; }
-        .store-info p { margin: 0.5em 1em 0 0;}
-        .store-detail { margin-top: 0.5em; }
+        .store-info p { margin: 0.5em 0 0 0; font-size: var(--font-medium); display: block; }
         .store-group { display: flex; align-items: center; gap: 1em; font-size: var(--font-medium); margin: 0.25em 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .store-group i { margin-right: 0.5em; }
         .store-summary { max-height: 5em; overflow: hidden; transition: max-height 0.8s ease; }
@@ -36,33 +32,34 @@
         .team-member span { text-align: center; font-size: var(--font-small); }
         .online-dot { width: 0.5em; height: 0.5em; border-radius: 50%; position: absolute; top: 0.5em; right: 0.5em; }
         .store-services a { color: var(--font-orange); margin-right: 0.5em; }
-        .tab-bar { display: none; padding: 0.5em 0; }
-        .store-header.fixed .tab-bar { display: block; width: 100%; top: calc(3em + 0.0625em); left: 0; right: 0; background: var(--bg-white); }
-        .store-header.fixed .store-right > *:not(.chart-data) { display: none; }
-        .store-header.fixed .store-left > *:not(.store-basic):not(.store-summary):not(.store-aftersales):not(.store-team) { display: none; }
-        .tab-inner { max-width: var(--max-content-width); margin: 0 auto; display: flex; gap: 2em; }
-        .attr-tab { cursor: pointer; font-size: var(--font-medium); padding-bottom: 0.2em; }
-        .attr-tab.active { color: var(--natural-green); border-bottom: 2px solid var(--natural-green); font-weight: bold; }
-
-        /* 右侧样式 */
         .response-time { font-size: var(--font-medium); white-space: nowrap; margin: 0.25em 0; }
         .rating-overview { margin-top: 0.5em; }
-        .rating-group { display: flex; align-items: center; gap: 1em; white-space: nowrap; }
-        .rating-bar { display: flex; align-items: center; gap: 0.5em; margin: 0.25em 0; }
-        .rating-bar progress { height: 0.5em; }
+        .rating-group { display: flex; align-items: center; gap: 1em; white-space: nowrap; justify-content: center; }
+        .rating-bar { display: flex; align-items: center; gap: 0.5em; margin: 0.25em 0; width: 100%; }
+        .rating-bar progress { height: 1.5em; width: 80%; }
         .store-charts { margin-top: 0.5em; }
-        .chart-tabs { display: flex; gap: 1em; }
+        .chart-tabs { display: flex; gap: 1em; float: right;}
         .chart-tab { cursor: pointer; padding: 0.5em; }
         .chart-tab.active { border-bottom: 2px solid var(--natural-green); color: var(--natural-green); }
         .chart-container { height: 12em; }
-        .chart-data { display: none; font-size: var(--font-small); } /* 默认隐藏 */
-        .store-header.fixed .chart-data { display: block; } /* 置顶时显示 */
+        .chart-data { display: none; font-size: var(--font-small); }
+        .store-sidebar.fixed .chart-data { display: block; }
+
+        /* 右侧主内容 */
+        .store-main { flex: 0 0 75%; max-width: 75%; padding: 0.5em; background: var(--bg-white); }
+        .store-main-header { position: static; background: var(--bg-white); z-index: 10; padding: 0.5em 0; border-bottom: 0.0625em solid var(--border-color); }
+        .tab-inner { display: flex; gap: 2em; }
+        .attr-tab { cursor: pointer; font-size: var(--font-medium); padding-bottom: 0.2em; }
+        .attr-tab.active { color: var(--natural-green); border-bottom: 2px solid var(--natural-green); font-weight: bold; }
+        .store-section { margin-top: 1em; }
 
         /* 商品筛选和列表 */
-        .filter-bar { display: flex; gap: 1em; flex-wrap: wrap; padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; }
+        .filter-bar { display: flex; gap: 1em; flex-wrap: wrap; padding: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; max-width: 100%;  }
         .filter-item { cursor: pointer; padding: 0.5em 1em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; }
+        .filter-item[data-tag] { font-size: var(--font-small); padding: 0.3em 0.8em; }
         .filter-item.active { background: var(--natural-green); color: var(--font-white); }
         .filter-search { display: flex; gap: 0.5em; }
+        .card { flex: 0 0 calc(20% - 0.5em); max-width: calc(20% - 0.5em); }
         .pagination { display: flex; gap: 0.5em; justify-content: center; margin-top: 1em; }
         .pagination span { cursor: pointer; padding: 0.5em; }
         .pagination span.active { color: var(--natural-green); font-weight: bold; }
@@ -70,6 +67,7 @@
         /* FAQ 和评价 */
         .faq-list, .review-list { margin-top: 1em; }
         .faq-item, .review-item { margin-bottom: 1em; padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; }
+        .faq-item, .review-item p { margin: 0.5em 0; }
         .review-header { display: flex; align-items: center; gap: 0.5em; justify-content: space-between; }
         .review-user { display: flex; align-items: center; gap: 0.5em; }
         .review-user img { width: 2em; height: 2em; border-radius: 50%; }
@@ -82,32 +80,46 @@
         /* 移动端适配 */
         @media (max-width: 48em) {
             body { padding-top: 5em !important; }
-            .store-inner { flex-direction: column; }
-            .store-left, .store-right { flex: 100%; }
+            .container { flex-direction: column; padding: 0 0.5em; }
+            .store-sidebar { flex: 100%; max-width: 100%; position: static; height: auto; border-right: none; border-bottom: 0.0625em solid var(--border-color); }
+            .store-main { flex: 100%; max-width: 100%; }
             .store-group, .rating-group { flex-wrap: wrap; }
             .chart-container { height: 10em; }
-            .store-header.fixed .tab-bar { top: calc(2.5em + 0.0625em); }
-            .team-member { width: 100%; }
+            .team-member { width: calc(50% - 1em); }
+            .card { flex: 0 0 calc(50% - 0.5em); max-width: calc(50% - 0.5em); }
+            .filter-bar { flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
 <div w3-include-html="_header.html"></div>
 <div class="container">
-    <div class="store-header" id="store-header"></div>
-    <div class="section" id="store-items">
-        <div class="filter-bar" id="item-filter"></div>
-        <div id="item-list" class="card-list"></div>
-        <div class="pagination" id="item-pagination"></div>
-    </div>
-    <div class="section" id="store-faqs">
-        <h3 class="section-title">店铺常见问题</h3>
-        <div class="faq-list" id="faq-list"></div>
-    </div>
-    <div class="section" id="store-reviews">
-        <h3 class="section-title">店铺评价</h3>
-        <div class="review-list" id="review-list"></div>
-        <div class="show-more"><button class="btn-solid-medium" onclick="loadMoreReviews()">显示更多评价</button></div>
+    <!-- 左侧固定侧边栏 -->
+    <div class="store-sidebar" id="store-sidebar"></div>
+
+    <!-- 右侧主内容 -->
+    <div class="store-main">
+        <div class="store-main-header" id="store-main-header">
+            <div class="tab-inner">
+                <span class="attr-tab" data-section="store-items" onclick="scrollToSection('store-items')">商品</span>
+                <span class="attr-tab" data-section="store-faqs" onclick="scrollToSection('store-faqs')">常见问题</span>
+                <span class="attr-tab" data-section="store-reviews" onclick="scrollToSection('store-reviews')">评价</span>
+            </div>
+        </div>
+        <div class="store-section" id="store-items">
+            <div class="filter-bar" id="item-filter"></div>
+            <div id="item-list" class="card-list"></div>
+            <div class="pagination" id="item-pagination"></div>
+        </div>
+        <div class="store-section" id="store-faqs">
+            <h3 class="section-title">店铺常见问题</h3>
+            <div class="faq-list" id="faq-list"></div>
+        </div>
+        <div class="store-section" id="store-reviews">
+            <h3 class="section-title">店铺评价</h3>
+            <div class="review-list" id="review-list"></div>
+            <div class="show-more"><button class="btn-solid-medium" onclick="loadMoreReviews()">显示更多评价</button></div>
+        </div>
     </div>
 </div>
 <div w3-include-html="_footer.html"></div>
@@ -125,17 +137,17 @@
     const storeName = urlParams.get('name') || 'Demo Store';
     const storeData = generateData(storeFieldConfig, 1)[0];
     let currentPage = 1;
-    const itemsPerPage = 12;
+    const itemsPerPage = 10; // 修改为一页 10 个
     let reviewPage = 1;
     let overviewChartInstance, salesChartInstance;
 
-    // 渲染店铺头部
-    function renderStoreHeader() {
-        const header = document.getElementById('store-header');
+    // 渲染左侧店铺信息
+    function renderStoreSidebar() {
+        const sidebar = document.getElementById('store-sidebar');
         const staffCount = randomInt(1, 3);
         const staffData = generateData(storeStaffFieldConfig, staffCount);
         const servicesData = services.slice(0, randomInt(3, 5));
-        const aftersalesContent = Array(randomInt(3, 5)).fill().map(() => faker.lorem.paragraph()).join('<br>');
+        const aftersalesContent = Array(randomInt(1, 3)).fill().map(() => faker.lorem.paragraph()).join('<br>');
         const deposit = randomInt(500, 5000);
         const tags = generateTag(1, 3);
         const todayData = {
@@ -149,103 +161,95 @@
         };
 
         let storeOnline = false;
-        staffData.map((s, i) => {
-            let online = s.online_status.sample == '在线';
-            if (online){
-                storeOnline = true
-            }
-        })
-        header.innerHTML = `
-            <div class="store-inner">
-                <div class="store-left">
-                    <div class="store-basic">
-                        <div class="store-logo">
-                            <img src="${storeData.image}" alt="${storeName}">
-                            <span class="online-status-dot" style="background: ${storeOnline ? '#32CD32' : '#A9A9A9'}"></span>
-                        </div>
-                        <div class="store-info">
-                            <h1>${storeName}</h1>
-                            <p>
-                                <span><i class="fas fa-map-marker-alt"></i> Sao Tome and Principe</span>
-                                <span><i class="fas fa-clock"></i>  GMT+9</span>
-                           </p>
-                            <p>
-                                <span><i class="fas fa-language"></i> 中文</span>
-                                <span><i class="fas fa-briefcase"></i> 工作时间: 9:00 - 20:00</span>
-                                <span><i class="fas fa-shield-alt"></i> 保证金: <b style="color: var(--font-orange)">$${deposit}</b></span>
-                                <span> 认证: <i class="fas fa-check-circle" style="color: ${storeData.verified.sample === '已认证' ? 'var(--font-green)' : ''}"> ${storeData.verified.sample}</i></span>
-                                <span>${tags.map((tag, i) => `<span class="${tagColors[i % tagColors.length]}">${tag}</span>`).join(' ')}</span>
-                            </p>
-                            <p>${storeData.slogan}</p>
-                        </div>
+        staffData.forEach(s => {
+            if (s.online_status.sample === '在线') storeOnline = true;
+        });
+
+        const getRatingColor = (rating) => {
+            if (rating >= 4.5) return '#32CD32'; // 绿色
+            if (rating >= 4.0) return '#FF9900'; // 橙色
+            return '#FF4500'; // 红色
+        };
+
+        let timeZone = randomInt(-12,12)
+        timeZone = timeZone < 0 ? `GMT${timeZone}` : `GMT+${timeZone}`
+        sidebar.innerHTML = `
+            <div class="store-sidebar-inner">
+                <div class="store-basic">
+                    <div class="store-logo">
+                        <img src="${storeData.image}" alt="${storeName}">
+                        <span class="online-status-dot" style="background: ${storeOnline ? '#32CD32' : '#A9A9A9'}"></span>
                     </div>
-                    <div class="store-summary" id="store-summary">
-                        <b>About Store</b>
-                        <p>${storeData.about_me}</p>
-                    </div>
-                    ${staffCount > 1 ? `
-                        <div class="store-team">
-                            <h4>团队信息</h4>
-                            <div style="display: flex; flex-wrap: wrap; gap: 1em;">
-                                ${staffData.map((s, i) => `
-                                    <div class="team-member">
-                                        <img src="${s.avatar}" alt="${s.nick_name}">
-                                        <span>${s.nick_name}<br>${s.title}</span>
-                                        <span class="online-dot" style="background: ${s.online_status.sample == '在线' ? '#32CD32' : '#A9A9A9'}"></span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>` : ''}
-                    <div class="store-services">
-                        <h4>服务</h4>
-                        ${servicesData.map(s => `<a href="store.html?name=${storeName}&services=${s.name}">${s.name}</a>`).join('')}
-                    </div>
-                    <div class="store-aftersales">
-                        <h4>售后规则</h4>
-                        <p>${aftersalesContent.split('<br>')[0]} ... <span class="toggle-summary" onclick="showModal('aftersales-modal', '${aftersalesContent}', { className: 'aftersales-modal' })">展开更多</span></p>
+                    <div class="store-info">
+                        <h1>${storeName}</h1>
+                        <p><i class="fas fa-map-marker-alt"></i> ${faker.address.country()} <i class="fas fa-clock"></i> ${timeZone}</p>
+                        <p>
+                            <i class="fas fa-shield-alt"></i> 保证金: <b style="color: var(--font-orange)">$${deposit}</b>
+                            <i class="fas fa-check-circle" style="color: ${storeData.verified.sample === '已认证' ? 'var(--font-green)' : ''}"> ${storeData.verified.sample}</i>
+                        </p>
+                        <p>
+                           <i class="fas fa-briefcase"></i> 时间: 9:00 - 20:00 <i class="fas fa-language"></i> 中文
+                        </p>
+                        <p>${tags.map((tag, i) => `<span class="${tagColors[i % tagColors.length]}">${tag}</span>`).join(' ')}</p>
                     </div>
                 </div>
-                <div class="store-right">
-                    <div class="response-time">平均响应时间: ${randomInt(1, 5)}小时 (${new Date().toLocaleTimeString('zh-CN', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit' })} 本地时间)</div>
-                    <div class="rating-overview">
-                        <div class="rating-group">
-                            <span>总评分: 4.3 (90)</span>
-                            <span>服务: 4.1</span>
-                            <span>物流: 4.6</span>
-                            <span>商品: 4.4</span>
-                        </div>
-                        ${[5, 4, 3, 2, 1].map(i => {
-                        const count = faker.datatype.number({ min: 10, max: 100 });
-                        return `<div class="rating-bar">${i}星 <progress value="${count}" max="100"></progress> ${count}</div>`;
-                    }).join('')}
-                    </div>
-                    <div class="store-charts">
-                        <div class="chart-tabs">
-                            <span class="chart-tab" data-days="7" onclick="renderChart(7)">7天</span>
-                            <span class="chart-tab" data-days="14" onclick="renderChart(14)">14天</span>
-                            <span class="chart-tab active" data-days="30" onclick="renderChart(30)">30天</span>
-                        </div>
-                        <h4>概况</h4>
-                        <canvas id="overview-chart" class="chart-container"></canvas>
-                        <h4>销售</h4>
-                        <canvas id="sales-chart" class="chart-container"></canvas>
-                    </div>
-                    <div class="chart-data">
-                        <p>好评率: ${todayData.rating.toFixed(1)}%</p>
-                        <p>响应率: ${todayData.responseRate.toFixed(1)}%</p>
-                        <p>供货充足率: ${todayData.stockRate.toFixed(1)}%</p>
-                        <p>销售量: ${todayData.sales}</p>
-                        <p>换货量: ${todayData.exchanges}</p>
-                        <p>退款量: ${todayData.refunds.toFixed(1)}</p>
-                        <p>新增库存量: ${todayData.newStock}</p>
-                    </div>
+                <div class="store-summary" id="store-summary">
+                    <b>About Store</b>
+                    <p>${storeData.about_me}</p>
                 </div>
-            </div>
-            <div class="tab-bar">
-                <div class="tab-inner">
-                    <span class="attr-tab" data-section="store-items" onclick="scrollToSection('store-items')">商品</span>
-                    <span class="attr-tab" data-section="store-faqs" onclick="scrollToSection('store-faqs')">常见问题</span>
-                    <span class="attr-tab" data-section="store-reviews" onclick="scrollToSection('store-reviews')">评价</span>
+                ${staffCount > 1 ? `
+                    <div class="store-team">
+                        <h4>Our team</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 1em;">
+                            ${staffData.map(s => `
+                                <div class="team-member">
+                                    <img src="${s.avatar}" alt="${s.nick_name}">
+                                    <span>${s.nick_name}<br>${s.title}</span>
+                                    <span class="online-dot" style="background: ${s.online_status.sample === '在线' ? '#32CD32' : '#A9A9A9'}"></span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>` : ''}
+                <div class="store-services">
+                    <h4>服务</h4>
+                    ${servicesData.map(s => `<a href="store.html?name=${storeName}&services=${s.name}">${s.name}</a>`).join('')}
+                </div>
+                <div class="store-aftersales">
+                    <h4>售后规则</h4>
+                    <p>${aftersalesContent.split('<br>')[0]} ... <span class="toggle-summary" onclick="showModal('aftersales-modal', '${aftersalesContent}', { className: 'aftersales-modal' })">展开更多</span></p>
+                </div>
+                <div class="response-time">响应时间: ${randomInt(1, 5)}小时 (${new Date().toLocaleTimeString('zh-CN', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit' })} 本地时间)</div>
+                <div class="rating-overview">
+                    <div class="rating-group">
+                        <span>评分: <span style="color: ${getRatingColor(4.3)}">4.3</span> (90)</span>
+                        <span>服务: <span style="color: ${getRatingColor(4.1)}">4.1</span></span>
+                        <span>物流: <span style="color: ${getRatingColor(4.6)}">4.6</span></span>
+                        <span>商品: <span style="color: ${getRatingColor(4.4)}">4.4</span></span>
+                    </div>
+                    ${[5, 4, 3, 2, 1].map(i => {
+            const count = faker.datatype.number({ min: 10, max: 100 });
+            return `<div class="rating-bar">${i}星 <progress value="${count}" max="100"></progress> ${count}</div>`;
+        }).join('')}
+                </div>
+                <div class="store-charts">
+                    <div class="chart-tabs">
+                        <span class="chart-tab" data-days="7" onclick="renderChart(7)">7天</span>
+                        <span class="chart-tab" data-days="14" onclick="renderChart(14)">14天</span>
+                        <span class="chart-tab active" data-days="30" onclick="renderChart(30)">30天</span>
+                    </div>
+                    <h4>概况</h4>
+                    <canvas id="overview-chart" class="chart-container"></canvas>
+                    <h4>销售</h4>
+                    <canvas id="sales-chart" class="chart-container"></canvas>
+                </div>
+                <div class="chart-data">
+                    <p>好评率: ${todayData.rating.toFixed(1)}%</p>
+                    <p>响应率: ${todayData.responseRate.toFixed(1)}%</p>
+                    <p>供货充足率: ${todayData.stockRate.toFixed(1)}%</p>
+                    <p>销售量: ${todayData.sales}</p>
+                    <p>换货量: ${todayData.exchanges}</p>
+                    <p>退款量: ${todayData.refunds.toFixed(1)}</p>
+                    <p>新增库存量: ${todayData.newStock}</p>
                 </div>
             </div>
         `;
@@ -324,19 +328,24 @@
         const selectedBrand = document.querySelector('.filter-item[data-brand].active')?.dataset.brand || '';
         const selectedTags = Array.from(document.querySelectorAll('.filter-item[data-tag].active')).map(el => el.dataset.tag);
         const searchText = document.getElementById('search-item').value.toLowerCase();
-        const brandNames = hotBrands.map(b => b.name);
+
+        const filterBrands = Array.from(document.querySelectorAll('.filter-item[data-brand]')).map(el => el.dataset.brand);
+        const filterTags = Array.from(document.querySelectorAll('.filter-item[data-tag]')).map(el => el.dataset.tag);
+
         const items = generateData(itemFieldConfig, randomInt(10, 100)).map(item => ({
             ...item,
-            brandName: brandNames[Math.floor(Math.random() * brandNames.length)] // 只从筛选品牌中选
+            brandName: filterBrands[Math.floor(Math.random() * filterBrands.length)],
+            tags: Array(randomInt(1, 3)).fill().map(() => filterTags[Math.floor(Math.random() * filterTags.length)])
         })).filter(item => {
-            return (!selectedBrand || item.brandName.includes(selectedBrand)) &&
+            return (!selectedBrand || item.brandName === selectedBrand) &&
                 (!selectedTags.length || selectedTags.every(t => item.tags.includes(t))) &&
                 (!searchText || item.name.toLowerCase().includes(searchText));
         });
+
         const totalPages = Math.ceil(items.length / itemsPerPage);
         const start = (currentPage - 1) * itemsPerPage;
         const itemList = document.getElementById('item-list');
-        itemList.innerHTML = ''; // 清空之前内容
+        itemList.innerHTML = '';
         generateCards('item-list', 'card', items.slice(start, start + itemsPerPage), itemFieldConfig);
 
         let title = `店铺 - ${storeName}`;
@@ -402,8 +411,7 @@
                     ${Math.random() > 0.5 ? '<span class="text-success"><i class="fas fa-user-check"></i> 回头客</span>' : ''}
                 </div>
                 <hr>
-                <div class="rating-wrapper">${generateRating(review, review.rating)}</div>
-                <p>${Math.floor(Math.random() * 365)}天前</p>
+                <div class="rating-wrapper" style="display: inline">${generateRating(review, review.rating)} ${Math.floor(Math.random() * 365)} 天前</div>
                 <p>${faker.lorem.paragraphs(randomInt(1, 3))}</p>
                 <p>商品: <img src="${review.item_image}" alt="${review.itemName}" style="width: 2em; height: 2em;"> ${review.itemName} - 数量: ${faker.datatype.number({ min: 1, max: 5 })} - 价格: ${review.item_price} - ${Math.floor(Math.random() * 365)}天前</p>
                 <p><img src="${storeData.image}" alt="${storeName}" style="width: 1.5em; height: 1.5em;"> ${storeName} <i class="fas fa-chevron-down" onclick="toggleReply(this)"></i></p>
@@ -419,7 +427,7 @@
 
     function sortReviews(type) {
         if (type === 'time') {
-            reviews.sort(() => 0); // 示例，实际应基于时间字段
+            reviews.sort(() => 0);
         } else {
             reviews.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
         }
@@ -457,8 +465,7 @@
                     ${Math.random() > 0.5 ? '<span class="text-success"><i class="fas fa-user-check"></i> 回头客</span>' : ''}
                 </div>
                 <hr>
-                <div class="rating-wrapper">${generateRating(review, review.rating)}</div>
-                <p>${Math.floor(Math.random() * 365)}天前</p>
+                <div class="rating-wrapper" style="display: inline">${generateRating(review, review.rating)} ${Math.floor(Math.random() * 365)} 天前</div>
                 <p>${faker.lorem.sentences(randomInt(2, 3))}</p>
                 <p>商品: <img src="${review.image}" alt="${review.itemName}" style="width: 2em; height: 2em;"> ${review.itemName} - 数量: ${faker.datatype.number({ min: 1, max: 5 })} - 价格: ${review.price} - ${Math.floor(Math.random() * 365)}天前</p>
                 <p><img src="${storeData.image}" alt="${storeName}" style="width: 1.5em; height: 1.5em;"> ${storeName} <i class="fas fa-chevron-down" onclick="toggleReply(this)"></i></p>
@@ -481,11 +488,11 @@
     function scrollToSection(sectionId) {
         const section = document.getElementById(sectionId);
         if (section) {
-            const header = document.getElementById('store-header');
+            const header = document.getElementById('store-main-header');
             const headerHeight = header.offsetHeight;
             const topHeader = document.querySelector('.header');
-            const topHeaderHeight = window.scrollY > 0 ? 0 : topHeader.offsetHeight;
-            const offsetTop = section.getBoundingClientRect().top + window.scrollY - (headerHeight + topHeaderHeight + 70);
+            const topHeaderHeight = topHeader.offsetHeight;
+            const offsetTop = section.getBoundingClientRect().top + window.scrollY - (headerHeight + topHeaderHeight + 10);
             window.scrollTo({ top: offsetTop, behavior: 'smooth' });
             updateActiveTab(sectionId);
         }
@@ -497,9 +504,9 @@
     }
 
     function updateActiveTabOnScroll() {
-        const sections = document.querySelectorAll('.section');
-        const headerHeight = document.getElementById('store-header').offsetHeight;
-        const scrollPosition = window.scrollY + headerHeight + 70;
+        const sections = document.querySelectorAll('.store-section');
+        const headerHeight = document.getElementById('store-main-header').offsetHeight;
+        const scrollPosition = window.scrollY + headerHeight + 10;
         let activeSectionId = null;
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
@@ -513,32 +520,19 @@
 
     window.onload = () => {
         w3.includeHTML(() => {
-            const header = document.getElementById('store-header');
+            const header = document.getElementById('store-main-header');
             const initialHeight = header.offsetHeight;
-            header.style.minHeight = `${initialHeight}px`;
 
-            renderStoreHeader();
+            renderStoreSidebar();
             renderStoreItems();
             renderStoreFaqs();
             renderStoreReviews();
 
             window.addEventListener('scroll', () => {
-                const scrollY = window.scrollY;
-                const topHeader = document.querySelector('.header');
-                if (scrollY >= initialHeight) {
-                    header.classList.add('fixed');
-                    topHeader.classList.add('hidden');
-                    document.body.style.paddingTop = `${initialHeight}px`;
-                } else {
-                    header.classList.remove('fixed');
-                    topHeader.classList.remove('hidden');
-                    document.body.style.paddingTop = '7.4em';
-                }
                 updateActiveTabOnScroll();
             });
         });
     };
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'924eb68a2fffbfef',t:'MTc0Mjc0MTEzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
