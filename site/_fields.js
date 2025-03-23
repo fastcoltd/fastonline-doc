@@ -132,15 +132,17 @@ let demandFieldConfig = {
 };
 
 let postsFieldConfig = {
-    favorite: {card: true, cardSq: true, cardHoriz: true, type: 'favorite', style: {}, customClass: 'fas fa-heart favorite-icon', onClick: (item, element) => { element.classList.toggle('favorited'); }, sample: () => faker.datatype.boolean()},
     image: { card: true, cardSq: true, cardHoriz: true, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `article${i}`) },
     title: { card: true, cardSq: true, cardHoriz: true, type: 'text', style: {}, sample: () => faker.lorem.sentence() },
-    rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
-    author: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '作者', style: {}, sample: () => faker.name.findName() },
+    author: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '作者', style: {}, format: (d, v)=>{
+            return `<a href="blog.html?name=${v}" style="color: var(--font-green)">${v}</a>`
+        },sample: () => faker.name.findName() },
+    favorite: {card: true, cardSq: true, cardHoriz: true, type: 'favorite', style: {}, customClass: 'fas fa-heart favorite-icon', onClick: (item, element) => { element.classList.toggle('favorited'); }, sample: () => faker.datatype.boolean()},
     brandName: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '品牌', style: {}, sample: () => {return generateBrand()} },
-    category: {card: true, cardSq: true, cardHoriz: true, type: 'text', label: '分类', format: (d, v) => `<b style="color: var(--font-green)">${v}</b>`, style: {}, sample: () => {return generateArticleCategory()}},
+    category: {card: true, cardSq: true, cardHoriz: true, type: 'text', label: '分类', format: (d, v) => `${v}</b>`, style: {}, sample: () => {return generateArticleCategory()}},
     blog_summary: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '摘要', style: {}, sample: () => faker.lorem.paragraph() },
     paid: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '付费', style: {}, format: (d, v) => { return v ? `<span style="color: var(--font-orange)">付费</span>` : `<span style="color: var(--font-green)">免费</span>`; }, sample: () => faker.datatype.boolean() },
+    rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
     tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '要求', style: {}, sample: () => {return generateTag(1,3)} },
     viewNow: { card: true, cardSq: false, cardHoriz: true, type: 'button', value: 'View', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
 
