@@ -53,12 +53,13 @@ let itemFieldConfig = {
 // 热门店铺字段配置，添加“进入”按钮
 let storeFieldConfig = {
     favorite: {card: true, cardSq: true, cardHoriz: true, type: 'favorite', style: {}, customClass: 'fas fa-heart favorite-icon', onClick: (item, element) => { element.classList.toggle('favorited'); }, sample: () => faker.datatype.boolean()},
-    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `store-${i}`) },
+    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `store-${randomInt(0,1000)}`) },
     name: { card: true, cardSq: true, cardHoriz: true, type: 'text', style: {}, sample: () => faker.company.companyName() },
     sales: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 300, max: 1000 }) },
     salesTotal: { card: false, cardSq: false, cardHoriz: true, type: 'price', label: '销售额', style: {}, sample: () => faker.commerce.price(5000, 200000, 2, "$") },
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
-    slogan: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '标语', style: {}, sample: () => faker.company.catchPhrase() },
+    slogan: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '标语', style: {}, sample: () => faker.lorem.paragraph(2) },
+    about_me: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '关于我', style: {}, sample: () => faker.lorem.paragraph(3) },
     services: {
         card: true, cardSq: true, cardHoriz: true, type: 'text', label: '服务', style: {},
         format: (t, d, v) => {
@@ -193,8 +194,10 @@ let ordersCommentFieldConfig = {
     content: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '内容', style: {}, sample: () => faker.lorem.paragraph() },
 
     // 新增字段（面向客户展示）
+    item_price: { card: false, cardSq: false, cardHoriz: false, type: 'price', label: '价格', style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
+    item_image: { card: false, cardSq: false, cardHoriz: false, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `item_image${i}`) },
     like_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '点赞数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 50 })},
-    un_like_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '反对数', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 10 })}
+    un_like_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '反对数', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 10 })},
 };
 
 const faqFieldConfig = {
@@ -303,9 +306,9 @@ let storeStaffFieldConfig = {
         style: {},
         sample: () => faker.datatype.number({ min: 0, max: 1 })
     },
-    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '职位', style: {}, sample: () => faker.name.jobTitle() },
+    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '职位', style: {}, sample: () => storeTitles[randomInt(0, storeTitles.length -1)] },
     username: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '用户名', style: {}, sample: () => faker.internet.userName() },
-    nick_name: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '昵称', style: {}, sample: () => faker.name.findName() },
+    nick_name: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '昵称', style: {}, sample: () => faker.name.firstName() },
     avatar: { card: true, cardSq: true, cardHoriz: true, type: 'image', label: '头像', style: {}, sample: i => getPicsumImage(50, 50, `staff-${i}`) },
     phone: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '电话', style: {}, sample: () => faker.phone.phoneNumber() },
     telegram: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: 'Telegram', style: {}, sample: () => faker.internet.userName() },
@@ -320,6 +323,8 @@ let storeStaffFieldConfig = {
         style: {},
         sample: () => faker.random.arrayElements(['订单管理', '商品管理', '客户服务'], faker.datatype.number({ min: 1, max: 3 }))
     },
+
+    online_status: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '在线状态', format: (d, v) => `<span style="color: ${v === '在线' ? '#32CD32' : '#A9A9A9'}">${v}</span>`, style: {}, sample: () => faker.datatype.boolean() ? '在线' : '离线'},
 };
 
 // store_faq 配置（合并 store_faq_lang）

@@ -268,6 +268,8 @@ const demandStatusColors = {
     'Abandoned': '#FF4500'        // Orange-Red (Org-Red)
 };
 
+const storeTitles = ["CEO", "CFO", "Service", "COO", "CTO", "Manager","Marketing", "Inventory"];
+
 const articleCategories = [
     { name: 'Technology', sub: ['Artificial Intelligence', 'Blockchain', 'Cloud Computing', 'Internet of Things', '5G Technology', 'Big Data', 'Virtual Reality'] },
     { name: 'Lifestyle', sub: ['Health & Wellness', 'Food & Cooking', 'Home Decor', 'Fashion Trends', 'Travel Tips', 'Pet Care', 'Sustainable Living'] },
