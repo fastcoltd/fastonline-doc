@@ -121,12 +121,10 @@
 <script src="_member.js"></script>
 <script src="_common.js"></script>
 <script>
-    function randomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
     const urlParams = new URLSearchParams(window.location.search);
     const userName = decodeURIComponent(urlParams.get('name') || faker.name.findName());
+    const typeName = decodeURIComponent(urlParams.get('type') || '');
+    const tagName = decodeURIComponent(urlParams.get('tag') || '');
     const initialPage = parseInt(urlParams.get('page')) || 1;
     const isEditing = Math.random() < 0.3;
     const hasStore = Math.random() < 0.5;
@@ -224,7 +222,16 @@
         const paginatedPosts = filteredPosts.slice(start, end);
         const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
 
+        let titleName = typeName ? `Type: <em style="color: var(--font-green)">${typeName}</em>'s posts list` : 'Posts'
+        titleName = tagName ? `Tag: <em style="color: var(--font-green)">${tagName}</em>'s posts list` : titleName
         const main = document.getElementById('blog-main');
+        if (tagName){
+            paginatedPosts.forEach(item =>{
+                if(!item.tags.includes(tagName)){
+                    item.tags.push(tagName)
+                }
+            })
+        }
         main.innerHTML = `
             <div class="blog-header">
                 <img src="${getPicsumImage(50, 50, `user-${userName}`)}" alt="${userName}">
@@ -247,7 +254,7 @@
                 ${isEditing ? '<i class="fas fa-edit edit-btn" onclick="showEditModal(\'about\')"></i>' : ''}
             </div>
             <div class="blog-section blog-posts">
-                <h2>Posts</h2>
+                <h2>${titleName}</h2>
                 ${paginatedPosts.map(post => `
                     <div class="blog-post">
                         ${post.cover ? `<img src="${post.cover}" alt="${post.title}" class="cover-image">` : ''}
@@ -259,7 +266,7 @@
                         <div class="brand-category-meta">
                             <div class="brand-category">
                                 <span class="category-${post.category.split(' - ')[0].toLowerCase()}" style="font-weight: bold">
-                                    <a href="post-list.html?type=${encodeURIComponent(post.category)}">${post.category}</a>
+                                    <a href="blog.html?name=${userName}type=${encodeURIComponent(typeName ?? post.category)}">${typeName ?? post.category}</a>
                                 </span>
                                 <div class="brand">
                                     <img src="${post.brand.logo}" alt="${post.brand.name}">
@@ -277,7 +284,7 @@
                         </div>
                         <div class="tag-read-bottom">
                             <div class="tags">
-                                ${post.tags.map(tag => `<a href="tag.html?name=${encodeURIComponent(tag)}">${tag}</a>`).join('')}
+                                ${post.tags.map(tag => `<a style="${tagName == tag ? 'color: var(--font-white);background:var(--font-green)' : ''}" href="blog.html?name=${encodeURIComponent(userName)}&tag=${encodeURIComponent(tag)}">${tag}</a>`).join('')}
                             </div>
                             <div class="read-more">
                                 <a href="post.html?name=${post.title}">Read All</a>
@@ -301,7 +308,6 @@
         const comments = generateComments(randomInt(3, 5));
         const tags = allPosts.flatMap(post => post.tags || []).slice(0, 10);
         const categories = getRandomCategories();
-
 
         const sidebar = document.getElementById('blog-sidebar');
         sidebar.innerHTML = `
@@ -349,7 +355,7 @@
             <div class="section">
                 <h3>Tag List</h3>
                 <div class="tag-cloud">
-                    ${tags.map(tag => `<a href="tag.html?name=${encodeURIComponent(tag)}">${tag}</a>`).join('')}
+                    ${tags.map(tag => `<a href="blog.html?name=${encodeURIComponent(userName)}&tag=${encodeURIComponent(tag)}">${tag}</a>`).join('')}
                 </div>
             </div>
             <div class="section categories">
@@ -357,10 +363,10 @@
                 <ul>
                     ${categories.map(cat => `
                         <li>
-                            <a href="post-list.html?type=${encodeURIComponent(cat.name)}">${cat.name}</a>
+                            <a href="blog.html?name=${userName}&type=${encodeURIComponent(cat.name)}">${cat.name}</a>
                             <ul>
                                 ${cat.sub.map(sub => `
-                                    <li><a href="post-list.html?type=${encodeURIComponent(`${cat.name} - ${sub.name}`)}">${sub.name} (${sub.count})</a></li>
+                                    <li><a href="blog.html?name=${userName}&type=${encodeURIComponent(`${cat.name} - ${sub.name}`)}">${sub.name} (${sub.count})</a></li>
                                 `).join('')}
                             </ul>
                         </li>
@@ -419,7 +425,7 @@
 
     window.onload = () => {
         w3.includeHTML(() => {
-            document.title = `${userName}'s Blog - FASTRESP`;
+            document.title = `${typeName ? `${typeName} - ` : '' }${userName}'s Blog - FASTRESP`;
             renderBlogMain();
             renderBlogSidebar();
         });
