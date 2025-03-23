@@ -52,6 +52,9 @@
         .blog-post .tags { display: flex; flex-wrap: wrap; gap: 0.5em; margin: 0.5em 1.5em; }
         .blog-post .tags a { padding: 0.3em 0.75em; background: #e9ecef; border-radius: 1em; font-size: var(--font-small); color: var(--text-secondary); text-decoration: none; }
         .blog-post .tags a:hover { background: var(--natural-green); color: white; }
+        .blog-post .tag-read-bottom{display: flex; justify-content: space-between;}
+        .blog-post .tag-read-bottom .read-more a{padding-right: 1em;}
+        .blog-post .tag-read-bottom .read-more a:hover{font-weight: bold}
         .blog-post .paid-badge { position: absolute; top: 1em; right: -2em; background: #ff9800; color: white; padding: 0.3em 2em; transform: rotate(45deg); font-size: var(--font-small); text-align: center; width: 8em; }
         .blog-post .brand-category-meta { display: flex; justify-content: space-between; align-items: center; margin: 1em 1.5em 0.5em; font-size: var(--font-small); }
         .blog-post .brand-category { display: flex; align-items: center; gap: 1em; }
@@ -141,6 +144,10 @@
                 blog[key] = faker.lorem.word();
             }
         }
+        blog['paid'] = {
+            total: `$${randomInt(100,5000).toFixed(2)}`,
+            paidRate:  `${parseFloat(Math.random() * 100).toFixed(2)}%`,
+        }
         return blog;
     }
 
@@ -225,8 +232,9 @@
                     <h1>${userName}'s Blog</h1>
                     <div class="stats">
                         <span>Posts: ${user.posts_count}</span>
-                        <span class="stars"><i class="fas fa-star"></i> ${user.save_count || 0}</span>
+                        <span >Followers ${user.save_count || 0}</span>
                         <span>Following: ${user.followingCount || 0}</span>
+                        ${`<span>Paid: <span class="paid">${user.paid.total}, ${user.paid.paidRate}</span></span>` }
                     </div>
                 </div>
                 <button class="follow-btn ${localStorage.getItem(`follow-${userName}`) ? 'followed' : ''}" onclick="toggleFollow(this, '${userName}')">
@@ -267,8 +275,13 @@
                                 Comments: ${post.comment_count || 0}
                             </span>
                         </div>
-                        <div class="tags">
-                            ${post.tags.map(tag => `<a href="tag.html?name=${encodeURIComponent(tag)}">${tag}</a>`).join('')}
+                        <div class="tag-read-bottom">
+                            <div class="tags">
+                                ${post.tags.map(tag => `<a href="tag.html?name=${encodeURIComponent(tag)}">${tag}</a>`).join('')}
+                            </div>
+                            <div class="read-more">
+                                <a href="post.html?name=${post.title}">Read All</a>
+                            </div>
                         </div>
                         ${post.paid ? '<div class="right-bage" style="background: var(--font-orange)">Paid</div>' : ''}
                     </div>
@@ -313,7 +326,7 @@
                     <div class="tags">
                         ${storeData.tags.map((tag, index) => `<span class="ant-tag ${tagColors[randomInt(0, tagColors.length -1)]}">${tag}</span>`).join('')}
                     </div>
-                    <div class="right-bage" style="background: var(--font-green);">Store</div>
+                    <div class="right-bage" style="background: var(--font-green);">Selling</div>
                 </div>
             ` : ''}
             <div class="section">
