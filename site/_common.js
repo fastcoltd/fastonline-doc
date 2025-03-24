@@ -331,6 +331,9 @@ function findParentType(item){
     let type
     let parentClass = item.closest('.card-list')?.id;
     if (!parentClass){
+        parentClass = item.closest('.similar-items')?.id;
+    }
+    if (!parentClass){
         parentClass = item.closest('.scroll-list')?.id;
     }
     if (!parentClass){
