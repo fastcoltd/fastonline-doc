@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="_style.css">
     <link rel="stylesheet" href="_site.css">
     <style>
-        body { padding-top: 7.4em; overflow-x: hidden; transition: padding-top 0.3s ease; }
+        html { overflow: auto!important; height: auto; }
+        body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
         .page-container { max-width: var(--max-content-width); margin: 0 auto; }
 
         /* 头部和导航 */
@@ -23,6 +24,7 @@
 
         .item-top { display: flex; flex-direction: column; gap: 1em; padding: 1em; background: var(--bg-white); border-radius: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: relative; z-index: 20; }
         .item-top.fixed { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: var(--max-content-width); box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+
         .item-info { flex: none; }
         .item-info-left { float: left; margin-right: 1em; }
         .item-info-left img { width: 8em; height: 8em; object-fit: cover; border-radius: 50%; }
@@ -42,10 +44,28 @@
         .favorite-count { position: absolute; top: 3.5em; right: 2em; font-size: var(--font-small); font-weight: bold; }
 
         /* 商品介绍 + sidebar */
-        .content-section { display: flex; flex-direction: row; gap: 0.5em; padding-top: 0.5em; }
+        .content-section { display: flex; flex-direction: row; padding-top: 0.5em; }
         .item-content { flex: 0 0 75%; background: var(--bg-white); border-radius: 0.5em; padding-bottom: 2em;}
-        .item-sidebar { flex: 0 0 25%; position: sticky; top: 1em; height: 60vh; border-radius: 0.5em; background: var(--bg-white); padding: 0.5em; border-left: 0.0625em solid var(--border-color); overflow-y: auto; scrollbar-width: none;}
         .item-description, .item-faqs, .store-info, .item-reviews { padding: 1em 1em; }
+
+        .item-sidebar {
+            flex: 0 0 25%;
+            position: sticky;
+            top: 1em; /* 默认顶部距离 */
+            height: 60vh;
+            border-radius: 0.5em;
+            background: var(--bg-white);
+            padding: 0.5em;
+            border-left: 0.0625em solid var(--border-color);
+            overflow-y: auto;
+            scrollbar-width: none;
+            z-index: 10; /* 确保高于 item-top 的 z-index: 20 */
+        }
+
+        /* 置顶时调整 item-sidebar 的 top 值 */
+        .item-top.fixed + .content-section .item-sidebar {
+            top: calc(0em + var(--item-top-height, 0px)); /* 动态调整 */
+        }
 
         /* 店铺信息 */
         .store-info { padding-top: 1em; }
@@ -74,16 +94,16 @@
         .review-reply.expanded { display: block; }
         .review-store { cursor: pointer; padding-top: 1em; margin-bottom: 0; border-top: 0.0625em solid var(--border-color); }
         .show-more { text-align: center; margin-top: 1em; }
-        .item-sidebar-inner { display: flex; flex-direction: column; gap: 1em; }
-        .action-area { display: flex; justify-content: flex-end; gap: 1em; }
-        .action-area i { font-size: 1.5em; cursor: pointer; }
-        .stats-area { padding: 1em 0; }
+        .item-sidebar-inner { display: flex; flex-direction: column; }
+        .action-area {}
+        .action-area i { position:absolute; font-size: 1.5em; top: 1em; cursor: pointer; }
+        .stats-area { padding: 0; }
         .rating-group { display: flex; align-items: center; gap: 1em; justify-content: center; }
         .rating-bar { display: flex; align-items: center; gap: 0.5em; margin: 0.25em 0; width: 100%; }
         .rating-bar progress { height: 1.5em; width: 83%; }
-        .chart-tabs { display: flex; gap: 1em; justify-content: flex-end; cursor: pointer; }
+        .chart-tabs { display: flex; margin-top:1em; gap: 1em; justify-content: flex-end; cursor: pointer; }
         .chart-tab.active { border-bottom: 2px solid var(--natural-green); color: var(--natural-green); }
-        .chart-container { height: 12em; margin-top: 0.5em; }
+        .chart-container { height: 15em; margin-bottom: 1em; }
 
         /* 关联商品 */
         .similar-items { padding: 1em 0; }
@@ -97,11 +117,16 @@
             .item-top.fixed { width: 100%; left: 0; transform: none; }
             .item-info { flex: 100%; }
             .item-info-left { float: none; margin: 0 auto 1em; text-align: center; }
-            .item-info-left img { width: 100%; max-width: 12em; height: auto; }
+            .item-info-left img { width: 100%; width: 6em; max-width: 12em; height: auto; }
             .shopping-area { align-self: stretch; }
             .content-section { flex-direction: column; }
             .item-content, .item-sidebar { flex: 100%; }
-            .item-sidebar { position: static; border-left: none; border-top: 0.0625em solid var(--border-color); height: auto; }
+            .item-sidebar {
+                position: static;
+                border-left: none;
+                border-top: 0.0625em solid var(--border-color);
+                height: auto;
+            }
             .similar-items .card { flex: 0 0 calc(50% - 0.5em); max-width: calc(50% - 0.5em); }
         }
     </style>
@@ -165,14 +190,13 @@
         document.getElementById('item-info-left').innerHTML = `<img src="${itemData.image}" alt="${itemName}">`;
         document.getElementById('item-info-right').innerHTML = `
         <h1>${itemName}</h1>
-        <p>价格: <span style="color: red; font-weight: bold">${itemData.price}</span>
+        <p>Price: <span style="color: red; font-weight: bold">${itemData.price}</span>
             ${itemData.original_price ? `<span style="color: #A9A9A9; text-decoration: line-through">${itemData.original_price.sample}</span>` : ''}
             库存: ${itemData.stock_quantity.sample} (${itemData.last_restock_time.sample})
             发货: <span style="color: ${shippingType === 'Automatic' ? '#32CD32' : '#4682B4'}">${shippingType}</span></p>
         ${wholesaleData.length ? `
             <div class="item-wholesale">
                 批发价: ${wholesaleData.map(w => `<div class="wholesale-block"><span>${w.quantity.sample}~${w.quantity.sample + 100}</span>: <b>${w.unit_price}</b></div>`).join('')}
-
                 <div class="shopping-area">
                     <p id="total-price" style="display: none;justify-content: center;"></p>
                     <div class="quantity-input">
@@ -180,19 +204,21 @@
                         <input type="number" id="quantity" value="1" min="1" maxlength="5" onchange="updateTotal()">
                         <button class="btn-small" onclick="changeQuantity(1)">+</button>
                     </div>
-                    <button class="btn-orange-solid-large" onclick="buyNow()" style="padding: 0.2em 3em;">购买</button>
+                    <button class="btn-orange-solid-large" onclick="buyNow()" style="padding: 0.2em 5.4em;">购买</button>
                 </div>
             </div>` : ''}
-        <i class="fas fa-heart favorite-btn" onclick="toggleFavorite()"></i>
-        <span class="favorite-count">${itemData.save_count.sample}</span>
+
+            <div class="action-area">
+                <i class="fas fa-heart favorite-btn" style="right: 4em;" onclick="toggleFavorite()"></i>
+                <i class="fas fa-share-alt" style="right: 2.5em;"></i>
+                <i class="fas fa-ellipsis-v" style="right: 1em;"></i>
+            </div>
     `;
     }
 
     function toggleFavorite() {
         const btn = document.querySelector('.favorite-btn');
         btn.classList.toggle('favorited');
-        const count = document.querySelector('.favorite-count');
-        count.textContent = btn.classList.contains('favorited') ? parseInt(count.textContent) + 1 : parseInt(count.textContent) - 1;
     }
 
     function renderItemDescription() {
@@ -357,16 +383,12 @@
     function renderItemSidebar() {
         document.getElementById('item-sidebar').innerHTML = `
             <div class="item-sidebar-inner">
-                <div class="action-area">
-                    <i class="fas fa-heart" onclick="toggleFavorite()"></i>
-                    <i class="fas fa-share-alt"></i>
-                    <div class="dropdown">
-                        <i class="fas fa-ellipsis-v"></i>
-                        <div class="dropdown-menu"></div>
-                    </div>
-                </div>
+                <h2 style="text-align: center">Item's Statistics</h2>
                 <div class="stats-area">
                     <div class="rating-overview">
+                        <div class="rating-group">
+                            ${generateRating(storeData, storeData.rating)}
+                        </div>
                         <div class="rating-group">
                             <span>评分: <span style="color: ${getRatingColor(4.3)}">4.3</span> (90)</span>
                             <span>服务: <span style="color: ${getRatingColor(4.1)}">4.1</span></span>
@@ -374,21 +396,23 @@
                             <span>商品: <span style="color: ${getRatingColor(4.4)}">4.4</span></span>
                         </div>
                         ${[5, 4, 3, 2, 1].map(i => {
-            const count = faker.datatype.number({ min: 10, max: 100 });
-            return `<div class="rating-bar">${i}星 <progress value="${count}" max="100"></progress> ${count}</div>`;
-        }).join('')}
+                            const count = faker.datatype.number({ min: 10, max: 100 });
+                            return `<div class="rating-bar">${i}星 <progress value="${count}" max="100"></progress> ${count}</div>`;
+                        }).join('')}
+                        </div>
+                        <div class="chart-tabs">
+                            <span class="chart-tab" data-days="7" onclick="renderChart(7)">7天</span>
+                            <span class="chart-tab" data-days="14" onclick="renderChart(14)">14天</span>
+                            <span class="chart-tab active" data-days="30" onclick="renderChart(30)">30天</span>
+                        </div>
+                        <h4>Overview</h4>
+                        <canvas id="overview-chart" class="chart-container"></canvas>
+                        <h4>Sales Count</h4>
+                        <canvas id="sales-chart" class="chart-container"></canvas>
                     </div>
-                    <div class="chart-tabs">
-                        <span class="chart-tab" data-days="7" onclick="renderChart(7)">7天</span>
-                        <span class="chart-tab" data-days="14" onclick="renderChart(14)">14天</span>
-                        <span class="chart-tab active" data-days="30" onclick="renderChart(30)">30天</span>
-                    </div>
-                    <canvas id="overview-chart" class="chart-container"></canvas>
-                    <canvas id="sales-chart" class="chart-container"></canvas>
                 </div>
-            </div>
-        `;
-        renderChart(30);
+            `;
+        renderChart(7);
     }
 
     function getRatingColor(rating) {
@@ -437,7 +461,7 @@
         const price = parseFloat(itemData.price.replace('$', ''));
         const total = (price * quantity).toFixed(2);
         document.getElementById('total-price').style.display = 'block';
-        document.getElementById('total-price').innerHTML = `总价: <b style="color: red;">$${total}</b>`;
+        document.getElementById('total-price').innerHTML = `Total price: <b style="color: red;">$${total}</b>`;
     }
 
     function buyNow() {
@@ -453,17 +477,20 @@
 
     function handleScroll() {
         const header = document.querySelector('.header');
+        const breadcrumbTop = document.getElementById('breadcrumb-wrapper');
         const itemTop = document.getElementById('item-top');
         const scrollY = window.scrollY;
-        const headerHeight = header ? header.offsetHeight : 0;
+        const headerHeight = itemTop.offsetHeight + breadcrumbTop.offsetHeight;
         if (scrollY > headerHeight) {
             header.classList.add('hidden');
             itemTop.classList.add('fixed');
             document.body.style.paddingTop = `${itemTop.offsetHeight}px`;
+            document.documentElement.style.setProperty('--item-top-height', `${itemTop.offsetHeight}px`);
         } else {
             header.classList.remove('hidden');
             itemTop.classList.remove('fixed');
             document.body.style.paddingTop = '7.4em';
+            document.documentElement.style.setProperty('--item-top-height', '0px');
         }
     }
 
@@ -477,7 +504,11 @@
             renderItemReviews();
             renderItemSidebar();
             renderSimilarItems();
-            window.addEventListener('scroll', handleScroll);
+
+            setTimeout(() =>{
+                window.addEventListener('scroll', handleScroll);
+                handleScroll(); // 初始调用
+            }, 300)
         });
     };
 </script>
