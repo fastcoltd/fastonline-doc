@@ -9,132 +9,126 @@
     <link rel="stylesheet" href="_style.css">
     <link rel="stylesheet" href="_site.css">
     <style>
-        body { padding-top: 7.4em !important; transition: padding-top 0.3s ease; overflow-x: hidden; }
-        .container { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; display: flex; flex-direction: row; gap: 1em; }
-        .item-main { flex: 0 0 75%; padding: 0.5em; background: var(--bg-white); max-width: 75%; }
-        .item-sidebar { flex: 0 0 25%; position: sticky; top: 7.4em; background: var(--bg-white); padding: 0.5em; border-left: 0.0625em solid var(--border-color); box-shadow: 0 0.125em 0.3125em var(--shadow-dark); height: calc(100vh - 8.5em); overflow-y: auto; }
-        .breadcrumb { margin-bottom: 1em; font-size: var(--font-medium); }
-        .breadcrumb a { color: var(--natural-green); margin-right: 0.5em; }
+        body { padding-top: 7.4em; overflow-x: hidden; transition: padding-top 0.3s ease; }
+        .page-container { max-width: var(--max-content-width); margin: 0 auto; }
+
+        /* 头部和导航 */
+        .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; transition: opacity 0.3s; }
+        .header.hidden { opacity: 0; height: 0; overflow: hidden; }
+
+        /* 商品信息 + 购物功能 */
+        .breadcrumb-wrapper { background: var(--bg-white); padding: 0.5em; margin: 0.5em 0;border-radius: 0.5em; }
+        .breadcrumb a { color: var(--natural-green); margin-right: 0.2em; }
         .breadcrumb span { color: var(--text-secondary); }
 
-        /* 商品信息 */
-        .item-info { position: relative; padding: 1em; border-bottom: 0.0625em solid var(--border-color); }
-        .item-info-header { display: flex; align-items: center; gap: 1em; }
-        .item-info-header img { width: 5em; height: 5em; object-fit: cover; border-radius: 0.5em; }
-        .item-info-header h1 { font-size: var(--font-xlarge); margin: 0; }
-        .item-info-details { margin-top: 0.5em; }
-        .item-info-details p { margin: 0.25em 0; font-size: var(--font-medium); }
-        .item-wholesale { display: flex; gap: 0.5em; flex-wrap: wrap; align-items: center; margin-top: 0.5em; }
-        .wholesale-block {border: 0.0625em solid var(--border-color); border-radius: 0.375em; font-size: var(--font-small); padding: 0.5em;}
+        .item-top { display: flex; flex-direction: column; gap: 1em; padding: 1em; background: var(--bg-white); border-radius: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: relative; z-index: 20; }
+        .item-top.fixed { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: var(--max-content-width); box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .item-info { flex: none; }
+        .item-info-left { float: left; margin-right: 1em; }
+        .item-info-left img { width: 8em; height: 8em; object-fit: cover; border-radius: 50%; }
+        .item-info-right { overflow: hidden; }
+        .item-info-right h1 { margin-bottom: 0em; }
+        .item-info-right p { margin: 0.5em; }
+        .item-wholesale { display: flex; gap: 0.5em; flex-wrap: wrap; align-items: center; }
+        .wholesale-block { border: 0.0625em solid var(--border-color); border-radius: 0.375em; font-size: var(--font-small); padding: 0.5em; }
+        .shopping-area { display:flex;position: absolute;right: 1em; justify-content: center;align-content: center;align-items: center; padding: 0; white-space: nowrap; gap: 1em;}
+        .quantity-input { display: flex; align-items: center; justify-content:center; padding: 0.2em; margin-bottom: 0em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; overflow: hidden; }
+        .quantity-input p {align-items: center;  }
+        .quantity-input button { border: none; background: var(--bg-light); cursor: pointer; }
+        .quantity-input input { width: 5em; height: 2em; border: none; text-align: center; font-size: var(--font-medium); outline: none; }
+        .quantity-input input::-webkit-outer-spin-button, .quantity-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .favorite-btn { position: absolute; top: 1em; right: 1em; font-size: 1.5em; cursor: pointer; }
-        .favorited { color: #FF0000; border: none; -webkit-text-stroke: inherit; }
-        .favorite-count { position: absolute; top: 3.5em; right: 2em; font-size: var(--font-small); font-weight:bold; text-align: center; }
+        .favorited { color: #FF0000; }
+        .favorite-count { position: absolute; top: 3.5em; right: 2em; font-size: var(--font-small); font-weight: bold; }
 
-        /* 商品介绍 */
-        .item-description { padding: 1em; }
-        .desc-section { margin-bottom: 1em; }
-        .desc-section h3 { font-size: var(--font-large); margin-bottom: 0.5em; }
-        .attr-tags, .field-tags { display: flex; flex-wrap: wrap; gap: 0.5em; }
-        .sample-images { display: flex; gap: 0.5em; overflow-x: auto; }
-        .sample-images img { width: 10em; height: 7em; object-fit: cover; cursor: pointer; border-radius: 0.5em; }
-        .item-show-carousel { position: relative; height: 15em; overflow: hidden; }
-        .carousel-inner { display: flex; transition: transform 0.5s ease; }
-        .carousel-item { flex: 0 0 100%; display: flex; gap: 1em; padding: 0.5em; }
-        .carousel-item img { width: 50%; height: 100%; object-fit: cover; border-radius: 0.5em; }
-        .carousel-item-content { width: 50%; }
-        .carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2em; cursor: pointer; color: var(--text-primary); }
-        .carousel-arrow.left { left: 0.5em; }
-        .carousel-arrow.right { right: 0.5em; }
-        .aftersales-rules ul { list-style: none; padding: 0; max-height: 2em; overflow: hidden; transition: max-height 0.3s ease; }
-        .aftersales-rules.expanded ul { max-height: none; }
-        .aftersales-rules li { margin: 0.25em 0; }
-
-        /* FAQs */
-        .item-faqs { padding: 1em; }
+        /* 商品介绍 + sidebar */
+        .content-section { display: flex; flex-direction: row; gap: 0.5em; padding-top: 0.5em; }
+        .item-content { flex: 0 0 75%; background: var(--bg-white); border-radius: 0.5em; padding-bottom: 2em;}
+        .item-sidebar { flex: 0 0 25%; position: sticky; top: 1em; height: 60vh; border-radius: 0.5em; background: var(--bg-white); padding: 0.5em; border-left: 0.0625em solid var(--border-color); overflow-y: auto; scrollbar-width: none;}
+        .item-description, .item-faqs, .store-info, .item-reviews { padding: 1em 1em; }
 
         /* 店铺信息 */
-        .store-info { padding: 1em; }
-        .store-basic, .store-security, .store-stats { margin-bottom: 1em; }
-        .store-logo { position: relative; width: 5em; height: 5em; margin-bottom: 0.5em; }
+        .store-info { padding-top: 1em; }
+        .store-content { display: flex; padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; align-items: center; gap: 1em; }
+        .store-logo { position: relative; width: 5em; height: 5em; flex-shrink: 0; }
         .store-logo img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
         .online-dot { width: 0.5em; height: 0.5em; border-radius: 50%; position: absolute; bottom: 0; right: 0; }
+        .store-details { flex: 1; display: flex; flex-direction: column; gap: 0em; }
+        .store-details p { margin: 0; font-size: var(--font-medium); }
 
-        /* 商品评价 */
+        .desc-section { margin-bottom: 1em; }
+        .desc-section h3 { font-size: var(--font-medium); margin-bottom: 0.5em; font-weight: bold; }
+        .attr-content { padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; }
+        .attr-tags, .field-tags { display: flex; flex-wrap: wrap; gap: 0.5em; margin: 0.5em 0; }
+        .sample-images { display: flex; gap: 0.5em; overflow-x: auto; scrollbar-width: none; }
+        .sample-images img { width: 10em; height: 7em; object-fit: cover; cursor: pointer; border-radius: 0.5em; }
+        .aftersales-rules { border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; }
+        .aftersales-rules ul { list-style: disc; padding-left: 1.5em; max-height: 2em; overflow: hidden; transition: max-height 0.3s ease; }
+        .aftersales-rules.expanded ul { max-height: none; }
         .faq-list, .review-list { margin-top: 1em; }
         .faq-item, .review-item { margin-bottom: 1em; padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; }
-        .review-header { display: flex; align-items: center; gap: 0.5em; justify-content: space-between; }
+        .review-header { display: flex; justify-content: space-between; align-items: center; }
         .review-user { display: flex; align-items: center; gap: 0.5em; }
         .review-user img { width: 2em; height: 2em; border-radius: 50%; }
-        .review-sort select { padding: 0.3em; }
-        .review-item hr { margin: 0.5em 0; }
-        .review-reply { display: none; margin: 0.5em 0; color: var(--font-black) }
+        .review-reply { display: none; margin: 0.5em 0; }
         .review-reply.expanded { display: block; }
-        .review-store {cursor: pointer;padding-top: 1em;margin-bottom:0em;border-top: 0.0625em solid var(--border-color); }
-        .rating-wrapper { display: flex; align-items: center; gap: 0.5em; }
+        .review-store { cursor: pointer; padding-top: 1em; margin-bottom: 0; border-top: 0.0625em solid var(--border-color); }
         .show-more { text-align: center; margin-top: 1em; }
-
-        /* 右边板块 */
         .item-sidebar-inner { display: flex; flex-direction: column; gap: 1em; }
         .action-area { display: flex; justify-content: flex-end; gap: 1em; }
         .action-area i { font-size: 1.5em; cursor: pointer; }
-        .dropdown { position: relative; }
-        .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.375em; padding: 0.5em; }
-        .dropdown:hover .dropdown-menu { display: block; }
-        .shopping-area { padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; }
-        .quantity-input { display: flex; align-items: center; gap: 0.5em; margin-bottom: 1em; }
-        .quantity-input button { width: 2em; height: 2em; }
-        .stats-area { padding: 1em; }
-        .rating-group { display: flex; align-items: center; gap: 1em; white-space: nowrap; justify-content: center; }
+        .stats-area { padding: 1em 0; }
+        .rating-group { display: flex; align-items: center; gap: 1em; justify-content: center; }
         .rating-bar { display: flex; align-items: center; gap: 0.5em; margin: 0.25em 0; width: 100%; }
-        .rating-bar progress { height: 1.5em; width: 80%; }
-        .chart-tabs { display: flex; gap: 1em; justify-content: flex-end; cursor: pointer}
+        .rating-bar progress { height: 1.5em; width: 83%; }
+        .chart-tabs { display: flex; gap: 1em; justify-content: flex-end; cursor: pointer; }
         .chart-tab.active { border-bottom: 2px solid var(--natural-green); color: var(--natural-green); }
-        .chart-container { height: 12em; margin-top: 1em; }
+        .chart-container { height: 12em; margin-top: 0.5em; }
 
-        /* 相似商品 */
-        .similar-items { padding-top: 1em; width: 100%; margin: 0 auto; max-width: var(--max-content-width)}
-        .similar-items .scroll-list { display: flex; gap: 0.5em;  overflow-x: auto; scrollbar-width: none;}
-
-        /* 置顶条 */
-        .floating-item-bar { display: flex;  top: 0; left: 0;flex: 0 0 75%; margin: 0 auto; max-width: var(--max-content-width);position: fixed;
-            background: var(--bg-white); z-index: 20; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1);
-            border-bottom: 0.0625em solid var(--border-color); padding: 0.5em 1em;
-        }
-        .floating-item-info { display: flex; align-items: center; gap: 1em; font-size: var(--font-medium); }
-        .floating-item-info img { width: 3em; height: 3em; object-fit: cover; border-radius: 0.5em; }
-        .floating-item-nav { display: flex; gap: 2em; margin-top: 0.5em; }
-        .floating-item-nav a { text-decoration: none; color: var(--text-primary); padding-bottom: 0.2em; }
-        .floating-item-nav a.active { color: var(--natural-green); border-bottom: 2px solid var(--natural-green); }
-        .floating-shopping { display: none; align-items: center; gap: 1em; margin-top: 0.5em; }
+        /* 关联商品 */
+        .similar-items { padding: 1em 0; }
+        .similar-items .scroll-list { display: flex; gap: 0.5em; overflow-x: auto; scrollbar-width: none; }
 
         /* 移动端适配 */
         @media (max-width: 48em) {
-            body { padding-top: 5em !important; }
-            .container { flex-direction: column; }
-            .item-main, .item-sidebar { flex: 100%; max-width: 100%; }
-            .item-sidebar { position: static; height: auto; border-left: none; border-top: 0.0625em solid var(--border-color); }
-            .shopping-area { display: none; }
-            .floating-item-bar { display: block; }
-            .floating-shopping { display: flex; }
+            body { padding-top: 5em; }
+            .page-container { padding: 0; }
+            .item-top { flex-direction: column; }
+            .item-top.fixed { width: 100%; left: 0; transform: none; }
+            .item-info { flex: 100%; }
+            .item-info-left { float: none; margin: 0 auto 1em; text-align: center; }
+            .item-info-left img { width: 100%; max-width: 12em; height: auto; }
+            .shopping-area { align-self: stretch; }
+            .content-section { flex-direction: column; }
+            .item-content, .item-sidebar { flex: 100%; }
+            .item-sidebar { position: static; border-left: none; border-top: 0.0625em solid var(--border-color); height: auto; }
             .similar-items .card { flex: 0 0 calc(50% - 0.5em); max-width: calc(50% - 0.5em); }
         }
     </style>
 </head>
 <body>
-<div w3-include-html="_header.html"></div>
-<div class="container">
-    <div class="item-main">
+<div class="header" w3-include-html="_header.html"></div>
+<div class="page-container">
+    <div class="breadcrumb-wrapper" id="breadcrumb-wrapper">
         <div class="breadcrumb" id="breadcrumb"></div>
-        <div class="item-info" id="item-info"></div>
-        <div class="item-description" id="item-description"></div>
-        <div class="item-faqs" id="item-faqs"></div>
-        <div class="store-info" id="store-info"></div>
-        <div class="item-reviews" id="item-reviews"></div>
     </div>
-    <div class="item-sidebar" id="item-sidebar"></div>
+    <div class="item-top" id="item-top">
+        <div class="item-info">
+            <div class="item-info-left" id="item-info-left"></div>
+            <div class="item-info-right" id="item-info-right"></div>
+        </div>
+    </div>
+    <div class="content-section">
+        <div class="item-content">
+            <div class="item-description" id="item-description"></div>
+            <div class="item-faqs" id="item-faqs"></div>
+            <div class="store-info" id="store-info"></div>
+            <div class="item-reviews" id="item-reviews"></div>
+        </div>
+        <div class="item-sidebar" id="item-sidebar"></div>
+    </div>
+    <div class="similar-items" id="similar-items"></div>
 </div>
-<div class="similar-items" id="similar-items"></div>
-<div class="floating-item-bar" id="floating-item-bar"></div>
 <div w3-include-html="_footer.html"></div>
 
 <script src="https://www.w3schools.com/lib/w3.js"></script>
@@ -158,40 +152,40 @@
         const brand = itemData.brandName.replace(/<b[^>]*>(.*?)<\/b>/, '$1');
         const service = itemData.service.replace(/<b[^>]*>(.*?)<\/b>/, '$1');
         document.getElementById('breadcrumb').innerHTML = `
-            <a href="index.html">Home</a> >
-            <a href="brand.html?name=${brand}">${brand}</a> >
-            <a href="item-list.html?services=${service}&brandName=${brand}">${service}</a> >
-            <span>${itemName}</span>
-        `;
+        <a href="index.html">Home</a> >
+        <a href="brand.html?name=${brand}">${brand}</a> >
+        <a href="item-list.html?services=${service}&brandName=${brand}">${service}</a>>
+        <span style="margin-right: 0.5em">${itemName}</span>
+    `;
     }
-
-    const getRatingColor = (rating) => {
-        if (rating >= 4.5) return '#32CD32';
-        if (rating >= 4.0) return '#FF9900';
-        return '#FF4500';
-    };
 
     function renderItemInfo() {
         const wholesaleData = generateData(itemWholesaleFieldConfig, randomInt(1, 5));
         const shippingType = faker.random.arrayElement(['Automatic', 'Manual']);
-        document.getElementById('item-info').innerHTML = `
-            <div class="item-info-header">
-                <img src="${itemData.image}" alt="${itemName}">
-                <h1>${itemName}</h1>
-            </div>
-            <div class="item-info-details">
-                <p>价格: <span style="color: red; font-weight: bold">${itemData.price}</span>
-                    ${itemData.original_price ? `<span style="color: #A9A9A9; text-decoration: line-through">${itemData.original_price.sample}</span>` : ''}</p>
-                <p>库存: ${itemData.stock_quantity.sample} ( ${itemData.last_restock_time.sample})
-                    发货: <span style="color: ${shippingType === 'Automatic' ? '#32CD32' : '#4682B4'}">${shippingType}</span></p>
-                ${wholesaleData.length ? `
-                    <div class="item-wholesale">
-                        批发价: ${wholesaleData.map(w => `<div class="wholesale-block"><span>${w.quantity.sample}~${w.quantity.sample + 100}</span>: <b>${w.unit_price}</b></div>`).join('')}
-                    </div>` : ''}
-            </div>
-            <i class="fas fa-heart favorite-btn" onclick="toggleFavorite()"></i>
-            <span class="favorite-count">${itemData.save_count.sample}</span>
-        `;
+        document.getElementById('item-info-left').innerHTML = `<img src="${itemData.image}" alt="${itemName}">`;
+        document.getElementById('item-info-right').innerHTML = `
+        <h1>${itemName}</h1>
+        <p>价格: <span style="color: red; font-weight: bold">${itemData.price}</span>
+            ${itemData.original_price ? `<span style="color: #A9A9A9; text-decoration: line-through">${itemData.original_price.sample}</span>` : ''}
+            库存: ${itemData.stock_quantity.sample} (${itemData.last_restock_time.sample})
+            发货: <span style="color: ${shippingType === 'Automatic' ? '#32CD32' : '#4682B4'}">${shippingType}</span></p>
+        ${wholesaleData.length ? `
+            <div class="item-wholesale">
+                批发价: ${wholesaleData.map(w => `<div class="wholesale-block"><span>${w.quantity.sample}~${w.quantity.sample + 100}</span>: <b>${w.unit_price}</b></div>`).join('')}
+
+                <div class="shopping-area">
+                    <p id="total-price" style="display: none;justify-content: center;"></p>
+                    <div class="quantity-input">
+                        <button class="btn-small" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" id="quantity" value="1" min="1" maxlength="5" onchange="updateTotal()">
+                        <button class="btn-small" onclick="changeQuantity(1)">+</button>
+                    </div>
+                    <button class="btn-orange-solid-large" onclick="buyNow()" style="padding: 0.2em 3em;">购买</button>
+                </div>
+            </div>` : ''}
+        <i class="fas fa-heart favorite-btn" onclick="toggleFavorite()"></i>
+        <span class="favorite-count">${itemData.save_count.sample}</span>
+    `;
     }
 
     function toggleFavorite() {
@@ -206,83 +200,35 @@
         const attrs = generateAttr(3, 5);
         const fields = fieldsList.sort(() => 0.5 - Math.random()).slice(0, randomInt(3, 10));
         const samplePics = Array(randomInt(2, 5)).fill().map((_, i) => getPicsumImage(300, 200, `sample-${i}`));
-        const detailContent = Array(randomInt(2, 5)).fill().map((_, i) => `<p>${faker.lorem.paragraphs(randomInt(1, 5))}</p>`);
-        const showItems = generateData(itemShowFieldConfig, randomInt(1, 5));
+        const detailContent = Array(randomInt(2, 10)).fill().map(() => `<p>${faker.lorem.paragraphs()}</p>`).join("");
         const aftersalesRules = Array(randomInt(2, 5)).fill().map(() => faker.lorem.sentence());
         document.getElementById('item-description').innerHTML = `
-            <h2>Item Details</h2>
             <div class="desc-section">
-                <h3>商品属性</h3>
-                <div class="attr-tags">
-                    Tags:${tags.map((t, i) => `<span class="${tagColors[tags.length % tagColors.length]}">${t}</span>`).join('')}
-                </div>
-                <div class="attr-tags">
-                    Atrributies: ${Object.entries(attrs).map(([k, v], i) => `<span class="${tagColors[randomInt(0, 5) % tagColors.length]}">${k}: ${v}</span>`).join('')}
-                </div>
-                <div class="field-tags">
-                    Item Fileds: ${fields.map((f, i) => `<span class="${tagColors[fields.length % tagColors.length]}">${f}</span>`).join('')}
+                <h3>Key Specs</h3>
+                <div class="attr-content">
+                    <div class="attr-tags">Tags: ${tags.map((t, i) => `<span class="ant-tag ${tagColors[tags.length % tagColors.length]}">${t}</span>`).join('')}</div>
+                    <div class="attr-tags">Attributes: ${Object.entries(attrs).map(([k, v], i) => `<span class="ant-tag ${tagColors[randomInt(0, 5) % tagColors.length]}">${k}: <b>${v}</b></span>`).join('')}</div>
+                    <div class="field-tags">Fields: ${fields.map((f, i) => `<span class="ant-tag ${tagColors[fields.length % tagColors.length]}">${f}</span>`).join('')}</div>
                 </div>
             </div>
             ${samplePics.length ? `
                 <div class="desc-section">
-                    <h3>样品图</h3>
-                    <div class="sample-images">
-                        ${samplePics.map(p => `<img src="${p}" alt="Sample" onclick="showModal('image-modal', '<img src=${p}>')">`).join('')}
-                    </div>
+                    <h3>Screenshots</h3>
+                    <div class="sample-images">${samplePics.map(p => `<img src="${p}" alt="Sample" onclick="showModal('image-modal', '<img src=${p}>')">`).join('')}</div>
                 </div>` : ''}
             <div class="desc-section">
-                <h3>商品详情</h3>
+                <h3>Description</h3>
                 <p>${detailContent}</p>
             </div>
             <div class="desc-section">
-                <h3>商品秀</h3>
-                <div class="item-show-carousel" id="item-show-carousel">
-                    <div class="carousel-inner">
-                        ${showItems.map(item => `
-                            <div class="carousel-item">
-                                <img src="${item.image}" alt="${item.title}">
-                                <div class="carousel-item-content">
-                                    <h4>${item.title}</h4>
-                                    <p>${item.summary}</p>
-                                    <p>更新: ${item.update_time}</p>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <i class="fas fa-chevron-left carousel-arrow left" onclick="carouselMove('prev')"></i>
-                    <i class="fas fa-chevron-right carousel-arrow right" onclick="carouselMove('next')"></i>
+                <h3>Rules</h3>
+                <div class="aftersales-rules" id="aftersales-rules">
+                    <p>售后时间: ${faker.datatype.number({ min: 24, max: 720 })}小时</p>
+                    <ul>${aftersalesRules.map(r => `<li>${r}</li>`).join('')}</ul>
+                    <a class="toggle-summary" onclick="toggleAftersales()">Show More</a>
                 </div>
             </div>
-            <div class="desc-section aftersales-rules" id="aftersales-rules">
-                <h3>售后规则</h3>
-                <p>售后时间: ${faker.datatype.number({ min: 24, max: 720 })}小时</p>
-                <ul>
-                    ${aftersalesRules.map(r => `<li>${r}</li>`).join('')}
-                </ul>
-                <a class="toggle-summary" onclick="toggleAftersales()">Show More</a>
-            </div>
         `;
-        initCarousel();
-    }
-
-    let carouselIndex = 0;
-    function initCarousel() {
-        const items = document.querySelectorAll('.carousel-item');
-        setInterval(() => {
-            carouselMove('next');
-        }, 5000);
-    }
-
-    function carouselMove(direction) {
-        const inner = document.querySelector('.carousel-inner');
-        const items = document.querySelectorAll('.carousel-item');
-        const total = items.length;
-        if (direction === 'next') {
-            carouselIndex = (carouselIndex + 1) % total;
-        } else {
-            carouselIndex = (carouselIndex - 1 + total) % total;
-        }
-        inner.style.transform = `translateX(-${carouselIndex * 100}%)`;
     }
 
     function toggleAftersales() {
@@ -294,52 +240,50 @@
     function renderItemFaqs() {
         const faqs = generateData(storeFaqFieldConfig, randomInt(1, 3));
         document.getElementById('item-faqs').innerHTML = `
-            <h2>商品FAQs</h2>
-            <div class="faq-list">
-                ${faqs.map(faq => `
-                    <div class="faq-item">
-                        <div class="faq-question" onclick="toggleAnswer(this)">
-                            <span class="faq-question-text">${faq.question}</span>
-                            <span><i class="fas fa-chevron-down faq-toggle"></i><i class="fas fa-chevron-up faq-toggle"></i></span>
-                        </div>
-                        <div class="faq-answer">${faq.answer}</div>
+            <h2>FAQs</h2>
+            <div class="faq-list">${faqs.map(faq => `
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleAnswer(this)">
+                        <span class="faq-question-text">${faq.question}</span>
+                        <span><i class="fas fa-chevron-down faq-toggle"></i><i class="fas fa-chevron-up faq-toggle"></i></span>
                     </div>
-                `).join('')}
-            </div>
+                    <div class="faq-answer">${faq.answer}</div>
+                </div>`).join('')}</div>
         `;
+    }
+
+    function toggleAnswer(element) {
+        element.closest('.faq-item').classList.toggle('expanded');
     }
 
     function renderStoreInfo() {
         const deposit = randomInt(500, 5000);
         const languages = Array(randomInt(1, 3)).fill().map(() => faker.random.arrayElement(['English', 'Chinese', 'Spanish']));
         document.getElementById('store-info').innerHTML = `
-            <h2>店铺信息</h2>
-            <div class="store-basic">
+            <h2>Store</h2>
+            <div class="store-content">
                 <div class="store-logo">
                     <img src="${storeData.image}" alt="${storeData.name}">
-                    <span class="online-dot" style="background: ${storeData.online_status === '在线' ? '#32CD32' : '#A9A9A9'}"></span>
+                    <span class="online-dot" style="background: ${storeData.online_status.sample === '在线' ? '#32CD32' : '#A9A9A9'}"></span>
                 </div>
-                <p>${storeData.name}</p>
-                <p><i class="fas fa-map-marker-alt"></i> ${faker.address.country()} <i class="fas fa-clock"></i> GMT+${randomInt(0, 12)}</p>
-                <p><i class="fas fa-briefcase"></i> ${faker.datatype.number({ min: 8, max: 10 })}:00 - ${faker.datatype.number({ min: 18, max: 22 })}:00</p>
-                <p><i class="fas fa-language"></i> ${languages.join(', ')}</p>
-            </div>
-            <div class="store-security">
-                <p><i class="fas fa-shield-alt"></i> 保证金: <b style="color: var(--font-orange)">$${deposit}</b></p>
-                <p><i class="fas fa-check-circle" style="color: ${storeData.verified.sample === '已认证' ? 'var(--font-green)' : ''}"></i> ${storeData.verified.sample}</p>
-            </div>
-            <div class="store-stats">
-                <p>综合评分: ${generateRating(storeData, storeData.rating)}</p>
-                <p>销量: ${storeData.sales}</p>
+                <a href="store.html?name=${storeData.name}">
+                    <div class="store-details">
+                        <p style="font-weight: bold;font-size: var(--font-large)">${storeData.name}</p>
+                        <p><i class="fas fa-check-circle" style="color: ${storeData.verified.sample === '已认证' ? 'var(--font-green)' : ''}"></i> ${storeData.verified.sample} <i class="fas fa-shield-alt"></i> 保证金: <b>$${deposit}</b></p>
+    <!--                    <p><i class="fas fa-map-marker-alt"></i> ${faker.address.country()} <i class="fas fa-briefcase"></i> ${faker.datatype.number({ min: 8, max: 10 })}:00 - ${faker.datatype.number({ min: 18, max: 22 })}:00 <i class="fas fa-language"></i> ${languages.join(', ')}</p>-->
+                        <div style="display: flex;gap: 0.5em;">销量: ${storeData.sales} ${generateRating(storeData, storeData.rating)}</div>
+                    </div>
+                </a>
             </div>
         `;
     }
+
 
     function renderItemReviews() {
         if (!reviews.length) reviews = generateData(ordersCommentFieldConfig, randomInt(10, 500));
         const total = reviews.length;
         document.getElementById('item-reviews').innerHTML = `
-            <h2>商品评价</h2>
+            <h2>Reviews</h2>
             <div class="review-header">
                 <span>1-${Math.min(reviewsPerPage, total)} out of ${total} Reviews</span>
                 <div class="review-sort">
@@ -376,7 +320,7 @@
                 <div class="rating-wrapper">${generateRating(review, review.rating)} <span>${timeValue} ago</span></div>
                 <p>${faker.lorem.paragraphs(randomInt(2, 3))}</p>
                 <p>商品: <img src="${itemData.image}" alt="${itemName}" style="width: 2em; height: 2em; border-radius: 1em;">
-                    <a href="item.html?name=${itemName}">${itemName}</a> - 数量: ${review.quantity} - 金额: ${review.total} - ${timeValue} ago</p>
+                    <a href="item.html?name=${itemName}">${itemName}</a> - 数量: ${review.quantity} - <span style="color: var(--font-orange)">${review.total}</span> - ${timeValue} ago</p>
                 <p class="review-store" onclick="toggleReply(this)">
                     <img src="${storeData.image}" alt="${storeData.name}" style="width: 1.5em; height: 1.5em; border-radius: 1em;">
                     <b>${storeData.name}</b> <i class="fas fa-chevron-down" style="float: right; margin-right: 2em;"></i>
@@ -391,16 +335,9 @@
     }
 
     function sortReviews(type) {
-        if (type === 'time') {
-            reviews.sort(() => 0);
-        } else {
-            reviews.sort((a, b) => parseFloat(b.price.replace('$', '')) - parseFloat(a.price.replace('$', '')));
-        }
+        if (type === 'time') reviews.sort(() => 0);
+        else reviews.sort((a, b) => parseFloat(b.total.replace('$', '')) - parseFloat(a.total.replace('$', '')));
         renderItemReviews();
-    }
-
-    function toggleAnswer(element) {
-        element.closest('.faq-item').classList.toggle('expanded');
     }
 
     function toggleReply(element) {
@@ -410,25 +347,14 @@
         element.querySelector('i').classList.toggle('fa-chevron-up');
     }
 
-    function voteReview(element, type, index) {
-        element.classList.toggle(type === 'yes' ? 'text-success' : 'text-danger');
-    }
-
     function loadMoreReviews() {
         reviewPage++;
         const start = (reviewPage - 1) * reviewsPerPage;
         const newReviews = reviews.slice(start, start + reviewsPerPage);
-        const container = document.getElementById('review-list');
-        newReviews.forEach((r, i) => container.innerHTML += renderReview(r, i));
+        document.getElementById('review-list').innerHTML += newReviews.map((r, i) => renderReview(r, i)).join('');
     }
 
     function renderItemSidebar() {
-        const complaintFields = ['complaint_content', 'store_reply'].map(f => `
-            <div>
-                <label>${complaintFieldConfig[f].label}</label>
-                <textarea class="ant-input" rows="3" placeholder="请输入${complaintFieldConfig[f].label}"></textarea>
-            </div>
-        `).join('');
         document.getElementById('item-sidebar').innerHTML = `
             <div class="item-sidebar-inner">
                 <div class="action-area">
@@ -436,18 +362,8 @@
                     <i class="fas fa-share-alt"></i>
                     <div class="dropdown">
                         <i class="fas fa-ellipsis-v"></i>
-                        <div class="dropdown-menu">
-                        </div>
+                        <div class="dropdown-menu"></div>
                     </div>
-                </div>
-                <div class="shopping-area">
-                    <p id="total-price" style="display: none;"></p>
-                    <div class="quantity-input">
-                        <button class="btn-small" onclick="changeQuantity(-1)">-</button>
-                        <input type="number" id="quantity" value="1" min="1" onchange="updateTotal()">
-                        <button class="btn-small" onclick="changeQuantity(1)">+</button>
-                    </div>
-                    <button class="btn-solid-large" style="width: 100%;" onclick="buyNow()">购买</button>
                 </div>
                 <div class="stats-area">
                     <div class="rating-overview">
@@ -458,9 +374,9 @@
                             <span>商品: <span style="color: ${getRatingColor(4.4)}">4.4</span></span>
                         </div>
                         ${[5, 4, 3, 2, 1].map(i => {
-                            const count = faker.datatype.number({ min: 10, max: 100 });
-                            return `<div class="rating-bar">${i}星 <progress value="${count}" max="100"></progress> ${count}</div>`;
-                        }).join('')}
+            const count = faker.datatype.number({ min: 10, max: 100 });
+            return `<div class="rating-bar">${i}星 <progress value="${count}" max="100"></progress> ${count}</div>`;
+        }).join('')}
                     </div>
                     <div class="chart-tabs">
                         <span class="chart-tab" data-days="7" onclick="renderChart(7)">7天</span>
@@ -473,6 +389,12 @@
             </div>
         `;
         renderChart(30);
+    }
+
+    function getRatingColor(rating) {
+        if (rating >= 4.5) return '#32CD32';
+        if (rating >= 4.0) return '#FF9900';
+        return '#FF4500';
     }
 
     function renderChart(days) {
@@ -498,8 +420,8 @@
         };
         if (overviewChartInstance) overviewChartInstance.destroy();
         if (salesChartInstance) salesChartInstance.destroy();
-        overviewChartInstance = new Chart(overviewCtx, { type: 'line', data: overviewData, options: { scales: { y: { beginAtZero: true } } } });
-        salesChartInstance = new Chart(salesCtx, { type: 'line', data: salesData, options: { scales: { y: { beginAtZero: true } } } });
+        overviewChartInstance = new Chart(overviewCtx, { type: 'line', data: overviewData, options: { scales: { y: { beginAtZero: true } }, elements: { line: { tension: 0.5 } } } });
+        salesChartInstance = new Chart(salesCtx, { type: 'line', data: salesData, options: { scales: { y: { beginAtZero: true } }, elements: { line: { tension: 0.5 } } } });
         document.querySelectorAll('.chart-tab').forEach(tab => tab.classList.remove('active'));
         document.querySelector(`.chart-tab[data-days="${days}"]`).classList.add('active');
     }
@@ -514,115 +436,47 @@
         quantity = parseInt(document.getElementById('quantity').value) || 1;
         const price = parseFloat(itemData.price.replace('$', ''));
         const total = (price * quantity).toFixed(2);
-        const totalEl = document.getElementById('total-price');
-        totalEl.style.display = 'block';
-        totalEl.textContent = `总价: $${total}`;
+        document.getElementById('total-price').style.display = 'block';
+        document.getElementById('total-price').innerHTML = `总价: <b style="color: red;">$${total}</b>`;
     }
 
     function buyNow() {
         alert(`购买 ${quantity} 件 ${itemName}，总价: $${(parseFloat(itemData.price.replace('$', '')) * quantity).toFixed(2)}`);
     }
 
-    function submitReport() {
-        alert('举报已提交');
-        hideModal('report-modal');
-    }
-
     function renderSimilarItems() {
-        const similarItems = generateData(itemFieldConfig, 12).map(item => ({
-            ...item,
-            brandName: itemData.brandName,
-            service: itemData.service
-        }));
+        const similarItems = generateData(itemFieldConfig, 6).map(item => ({ ...item, brandName: itemData.brandName, service: itemData.service }));
         const container = document.getElementById('similar-items');
-        container.innerHTML = `<h2>相似商品</h2><div class="scroll-list" id="similar-list"></div>`;
+        container.innerHTML = `<h2>Similar Items</h2><div class="scroll-list" id="similar-list"></div>`;
         generateCards('similar-list', 'card', similarItems, itemFieldConfig);
-    }
-
-    function renderFloatingBar() {
-        document.getElementById('floating-item-bar').innerHTML = `
-            <div class="floating-item-info">
-                <img src="${itemData.image}" alt="${itemName}">
-                <span>${itemName}</span>
-                ${generateRating(itemData, itemData.rating)}
-                <span style="color: red; font-weight: bold">${itemData.price}</span>
-                ${itemData.original_price ? `<span style="color: #A9A9A9; text-decoration: line-through">${itemData.original_price.sample}</span>` : ''}
-                <span>库存: ${itemData.stock_quantity.sample} ( ${itemData.last_restock_time.sample})</span>
-            </div>
-            <div class="floating-shopping">
-                <span id="floating-total" style="display: none;"></span>
-                <div class="quantity-input">
-                    <button class="btn-small" onclick="changeQuantity(-1)">-</button>
-                    <input type="number" id="floating-quantity" value="1" min="1" onchange="updateTotal()">
-                    <button class="btn-small" onclick="changeQuantity(1)">+</button>
-                </div>
-                <button class="btn-solid-medium" onclick="buyNow()">购买</button>
-            </div>
-            <div class="floating-item-nav">
-                <a href="#item-info" data-section="item-info">商品信息</a>
-                <a href="#item-description" data-section="item-description">商品介绍</a>
-                <a href="#item-faqs" data-section="item-faqs">FAQs</a>
-                <a href="#store-info" data-section="store-info">店铺</a>
-                <a href="#item-reviews" data-section="item-reviews">评价</a>
-                <a href="#similar-items" data-section="similar-items">相似商品</a>
-            </div>
-        `;
-        setupNavLinks();
     }
 
     function handleScroll() {
         const header = document.querySelector('.header');
-        const bar = document.getElementById('floating-item-bar');
+        const itemTop = document.getElementById('item-top');
         const scrollY = window.scrollY;
-        if (scrollY > header.offsetHeight) {
+        const headerHeight = header ? header.offsetHeight : 0;
+        if (scrollY > headerHeight) {
             header.classList.add('hidden');
-            bar.style.display = 'block';
-            document.body.style.paddingTop = '0';
+            itemTop.classList.add('fixed');
+            document.body.style.paddingTop = `${itemTop.offsetHeight}px`;
         } else {
             header.classList.remove('hidden');
-            bar.style.display = 'none';
+            itemTop.classList.remove('fixed');
             document.body.style.paddingTop = '7.4em';
         }
-        updateActiveNav();
-    }
-
-    function updateActiveNav() {
-        const sections = ['item-info', 'item-description', 'item-faqs', 'store-info', 'item-reviews', 'similar-items'];
-        const scrollY = window.scrollY + 50;
-        sections.forEach(id => {
-            const section = document.getElementById(id);
-            const navLink = document.querySelector(`.floating-item-nav a[data-section="${id}"]`);
-            if (section.offsetTop <= scrollY && section.offsetTop + section.offsetHeight > scrollY) {
-                navLink.classList.add('active');
-            } else {
-                navLink.classList.remove('active');
-            }
-        });
-    }
-
-    function setupNavLinks() {
-        document.querySelectorAll('.floating-item-nav a').forEach(link => {
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                const sectionId = link.getAttribute('href').substring(1);
-                const section = document.getElementById(sectionId);
-                const offsetTop = section.getBoundingClientRect().top + window.scrollY - 50;
-                window.scrollTo({ top: offsetTop, behavior: 'smooth' });
-            });
-        });
     }
 
     window.onload = () => {
         w3.includeHTML(() => {
-            renderBreadcrumb();
             renderItemInfo();
+            renderBreadcrumb();
             renderItemDescription();
             renderItemFaqs();
             renderStoreInfo();
             renderItemReviews();
             renderItemSidebar();
             renderSimilarItems();
-            renderFloatingBar();
             window.addEventListener('scroll', handleScroll);
         });
     };

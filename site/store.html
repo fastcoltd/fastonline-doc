@@ -340,8 +340,8 @@
 
         if (overviewChartInstance) overviewChartInstance.destroy();
         if (salesChartInstance) salesChartInstance.destroy();
-        overviewChartInstance = new Chart(overviewCtx, { type: 'line', data: overviewData, options: { scales: { y: { beginAtZero: true } } } });
-        salesChartInstance = new Chart(salesCtx, { type: 'line', data: salesData, options: { scales: { y: { beginAtZero: true } } } });
+        overviewChartInstance = new Chart(overviewCtx, { type: 'line', data: overviewData, options: { scales: { y: {beginAtZero: true } }, elements: {line: {tension: 0.5}} } });
+        salesChartInstance = new Chart(salesCtx, { type: 'line', data: salesData, options: { scales: { y: { beginAtZero: true } }, elements: {line: {tension: 0.5}} } });
 
         document.querySelectorAll('.chart-tab').forEach(tab => tab.classList.remove('active'));
         document.querySelector(`.chart-tab[data-days="${days}"]`).classList.add('active');

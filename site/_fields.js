@@ -74,7 +74,7 @@ let itemShowFieldConfig = {
     language: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '语言', style: {}, sample: () => faker.random.arrayElement(['en_US', 'zh_CN']) },
     title: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '标题', style: {}, sample: () => faker.lorem.sentence() },
     summary: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '摘要', style: {}, sample: () => faker.lorem.paragraph() },
-    show_data: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '展示数据', style: {}, sample: () => JSON.stringify([faker.lorem.word(), faker.lorem.word()]) },
+    show_data: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '展示数据', style: {}, sample: () => Array(randomInt(2, 5)).fill().map((_, i) => getPicsumImage(300, 200, `sample-${i}`)) },
     create_time: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '创建时间', style: {}, sample: () => faker.date.past().toLocaleString() },
     update_time: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '更新时间', style: {}, sample: () => faker.date.recent().toLocaleString() }
 };
