@@ -80,6 +80,51 @@
         .rating-wrapper { display: flex; align-items: center; gap: 0.5em; }
         .show-more { text-align: center; margin-top: 1em; }
 
+        .floating-store-bar {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--bg-white);
+            z-index: 20;
+            box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1);
+            border-bottom: 0.0625em solid var(--border-color);
+        }
+
+        .store-bar-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: var(--font-small);
+            color: var(--text-primary);
+            flex-wrap: wrap;
+            gap: 0.5em;margin: 1em 0 0 2em;
+        }
+
+        .store-bar-nav {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1em;
+            font-size: var(--font-small);
+            color: var(--text-secondary);
+            overflow-x: auto; /* 确保导航在小屏幕上可滚动 */
+            white-space: nowrap;
+        }
+
+        .store-bar-nav a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: 0.25em 0.5em;
+            transition: color 0.2s;
+        }
+
+        .store-bar-nav a.active {
+            color: var(--natural-green);
+            font-weight: bold;
+            border-bottom: 2px solid var(--natural-green); font-weight: bold;
+        }
+
         /* Footer */
         footer { position: relative; z-index: 11; }
 
@@ -96,6 +141,22 @@
             .filter-bar { flex-wrap: nowrap; overflow-x: auto; padding: 0.3em; }
             .filter-item { padding: 0.3em 0.8em; font-size: var(--font-small); }
             .filter-search { flex-shrink: 0; }
+
+            .floating-store-bar.active {
+                display: block; /* 滚动到指定位置时显示 */
+            }
+
+            .store-main-header.hidden {
+                display: none; /* 隐藏原始头部 */
+            }
+
+            .store-bar-info {
+                justify-content: flex-start; /* 左对齐，适应小屏幕 */
+            }
+
+            .store-bar-nav {
+                padding-bottom: 0.3em; /* 增加底部间距 */
+            }
         }
     </style>
 </head>
@@ -104,6 +165,7 @@
 <div class="container">
     <!-- 左侧固定侧边栏 -->
     <div class="store-sidebar" id="store-sidebar"></div>
+    <div class="floating-store-bar" id="floating-store-bar"></div>
 
     <!-- 右侧主内容 -->
     <div class="store-main">
@@ -126,7 +188,7 @@
         <div class="store-section" id="store-reviews">
             <h3 class="section-title">Comments</h3>
             <div class="review-list" id="review-list"></div>
-            <div class="show-more"><button class="btn-solid-medium" onclick="loadMoreReviews()">显示更多评价</button></div>
+            <div class="show-more"><button class="btn-solid-medium" onclick="loadMoreReviews()">Show More Reviews</button></div>
         </div>
     </div>
 </div>
@@ -237,9 +299,8 @@
                         <span class="chart-tab" data-days="14" onclick="renderChart(14)">14天</span>
                         <span class="chart-tab active" data-days="30" onclick="renderChart(30)">30天</span>
                     </div>
-                    <h4>概况</h4>
+                    <h4>店铺概况</h4>
                     <canvas id="overview-chart" class="chart-container"></canvas>
-                    <h4>销售</h4>
                     <canvas id="sales-chart" class="chart-container"></canvas>
                 </div>
             </div>
@@ -508,6 +569,79 @@
         if (activeSectionId) updateActiveTab(activeSectionId);
     }
 
+    function renderFloatingStoreBar() {
+        const floatingBar = document.getElementById('floating-store-bar');
+        const deposit = randomInt(500, 5000); // 从 sidebar 中获取保证金
+        const rating = 4.3; // 示例评分，可从实际数据中获取
+        const verified = storeData.verified.sample === '已认证' ? '已认证' : '未认证'; // 认证状态
+
+        floatingBar.innerHTML = `
+        <div class="store-bar-info">
+            <span style="font-weight: bold;font-size: var(--font-large)"> ${storeName} </span>
+            <span>评分: ${rating}</span>
+            <span><i class="fas fa-shield-alt"></i> 保证金: <b style="color: var(--font-orange)">$${deposit}</b></span>
+            <span><i class="fas fa-check-circle" style="color: ${storeData.verified.sample === '已认证' ? 'var(--font-green)' : ''}"> ${storeData.verified.sample}</i></span>
+        </div>
+        <div class="store-bar-nav">
+            <a href="#store-sidebar" data-section="store-sidebar">店铺信息</a>
+            <a href="#store-items" data-section="store-items">商品信息</a>
+            <a href="#store-faqs" data-section="store-faqs">FAQs</a>
+            <a href="#store-reviews" data-section="store-reviews">评论</a>
+        </div>
+    `;
+    }
+
+    // 处理滚动时的悬浮条显示和导航高亮
+    function handleScroll() {
+        const sidebar = document.getElementById('store-sidebar');
+        const header = document.getElementById('store-main-header');
+        const floatingBar = document.getElementById('floating-store-bar');
+        const scrollY = window.scrollY;
+        const sidebarBottom = sidebar.offsetTop + sidebar.offsetHeight;
+
+        // 仅在移动端 (≤ 768px) 执行
+        if (window.innerWidth <= 768) {
+            if (scrollY > sidebarBottom) {
+                floatingBar.classList.add('active');
+                header.classList.add('hidden');
+            } else {
+                floatingBar.classList.remove('active');
+                header.classList.remove('hidden');
+            }
+        }
+
+        // 导航高亮
+        const sections = ['store-sidebar', 'store-items', 'store-faqs', 'store-reviews'];
+        sections.forEach(section => {
+            const element = document.getElementById(section);
+            if (element) {
+                const rect = element.getBoundingClientRect();
+                const navLink = floatingBar.querySelector(`a[data-section="${section}"]`);
+                if (rect.top <= window.innerHeight / 2 && rect.bottom >= 0) {
+                    navLink.classList.add('active');
+                } else {
+                    navLink.classList.remove('active');
+                }
+            }
+        });
+    }
+
+    // 设置导航点击跳转
+    function setupNavLinks() {
+        const navLinks = document.querySelectorAll('.store-bar-nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('href').substring(1);
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const offsetTop = section.getBoundingClientRect().top + window.scrollY - 10;
+                    window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                }
+            });
+        });
+    }
+
     window.onload = () => {
         w3.includeHTML(() => {
             const topHeader = document.querySelector('.header');
@@ -518,6 +652,7 @@
             renderStoreItems();
             renderStoreFaqs();
             renderStoreReviews();
+            renderFloatingStoreBar(); // 渲染悬浮条
 
             window.addEventListener('scroll', () => {
                 const scrollY = window.scrollY;
@@ -531,7 +666,10 @@
                     sideBar.style.height = "";
                 }
                 updateActiveTabOnScroll();
+                handleScroll(); // 处理悬浮条和导航
             });
+
+            setupNavLinks(); // 设置导航点击事件
         });
     };
 </script>
