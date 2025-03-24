@@ -180,7 +180,7 @@
                         <span class="online-status-dot" style="background: ${storeOnline ? '#32CD32' : '#A9A9A9'}"></span>
                     </div>
                     <div class="store-info">
-                        <h1>${storeName}</h1>
+                        <h1><a href="store.html?name=${storeName}">${storeName}</a></h1>
                         <p><i class="fas fa-map-marker-alt"></i> ${faker.address.country()} <i class="fas fa-clock"></i> ${timeZone}</p>
                         <p>
                             <i class="fas fa-shield-alt"></i> 保证金: <b style="color: var(--font-orange)">$${deposit}</b>
@@ -450,8 +450,8 @@
                 <hr>
                 <div class="rating-wrapper">${generateRating(review, review.rating)} <span>${Math.floor(Math.random() * 365)} 天前</span></div>
                 <p>${faker.lorem.paragraphs(randomInt(1, 3))}</p>
-                <p>商品: <img src="${review.item_image}" alt="${review.itemName}" style="width: 2em; height: 2em;"> ${review.itemName} - 数量: ${faker.datatype.number({ min: 1, max: 5 })} - 价格: ${review.item_price} - ${Math.floor(Math.random() * 365)}天前</p>
-                <p  class="review-store" onclick="toggleReply(this)"><img src="${storeData.image}" alt="${storeName}" style="width: 1.5em; height: 1.5em;"> <b>${storeName}</b> <i class="fas fa-chevron-down" style="float: right;margin-right: 2em;"></i></p>
+                <p>商品: <img src="${review.item_image}" alt="${review.itemName}" style="width: 2em; height: 2em;border-radius: 1em;"> <a href="item.html?name=${review.itemName}"> ${review.itemName}</a> - 数量: ${faker.datatype.number({ min: 1, max: 5 })} - 价格: ${review.item_price} - ${Math.floor(Math.random() * 365)}天前</p>
+                <p  class="review-store" onclick="toggleReply(this)"><img src="${storeData.image}" alt="${storeName}" style="width: 1.5em; height: 1.5em;border-radius: 1em;"> <b>${storeName}</b> <i class="fas fa-chevron-down" style="float: right;margin-right: 2em;"></i></p>
                 <div class="review-reply">${faker.lorem.paragraphs()}</div>
             `;
 
