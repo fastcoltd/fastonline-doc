@@ -233,6 +233,11 @@
         };
 
         let timeZone = randomInt(-12, 12);
+        let country = faker.address.country()
+        let lang= languages.filter((l) =>{
+            return l.country.toLowerCase() == country.toLowerCase()
+        })
+        lang = lang.length <= 0 ? {"name": "English"} : lang[0]
         timeZone = timeZone < 0 ? `GMT${timeZone}` : `GMT+${timeZone}`;
         sidebar.innerHTML = `
             <div class="store-sidebar-inner">
@@ -243,13 +248,13 @@
                     </div>
                     <div class="store-info">
                         <h1><a href="store.html?name=${storeName}">${storeName}</a></h1>
-                        <p><i class="fas fa-map-marker-alt"></i> ${faker.address.country()} <i class="fas fa-clock"></i> ${timeZone}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> ${country}  <i class="fas fa-language"></i> ${lang['name']}</p>
                         <p>
                             <i class="fas fa-shield-alt"></i> 保证金: <b style="color: var(--font-orange)">$${deposit}</b>
                             <i class="fas fa-check-circle" style="color: ${storeData.verified.sample === '已认证' ? 'var(--font-green)' : ''}"> ${storeData.verified.sample}</i>
                         </p>
                         <p>
-                           <i class="fas fa-briefcase"></i> 时间: 9:00 - 20:00 <i class="fas fa-language"></i> 中文
+                           <i class="fas fa-briefcase"></i> 时间: 9:00 - 20:00 <i class="fas fa-clock"></i> ${timeZone}
                         </p>
                         <p>${tags.map((tag, i) => `<span class="${tagColors[i % tagColors.length]}">${tag}</span>`).join(' ')}</p>
                     </div>
