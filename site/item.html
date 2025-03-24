@@ -22,8 +22,38 @@
         .breadcrumb a { color: var(--natural-green); margin-right: 0.2em; }
         .breadcrumb span { color: var(--text-secondary); }
 
-        .item-top { display: flex; flex-direction: column; gap: 1em; padding: 1em; background: var(--bg-white); border-radius: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: relative; z-index: 20; }
-        .item-top.fixed { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: var(--max-content-width); box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
+        .item-top { display: flex; flex-direction: column; padding: 0.5em; background: var(--bg-white); border-radius: 0.5em; border-bottom: 0.0625em solid var(--border-color); position: relative; z-index: 20; }
+        .item-top.fixed {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: var(--max-content-width);
+            background: var(--bg-white);
+            z-index: 30;
+            border-bottom: 0.0625em solid var(--border-color);
+        }
+        .item-top.fixed::before { /* 两边白色背景延伸 */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100vw; /* 向左延伸 */
+            right: -100vw; /* 向右延伸 */
+            height: 100%;
+            background: var(--bg-white);
+            z-index: -1;
+            border-bottom: 0.0625em solid var(--border-color);
+        }
+        .item-top.fixed::after { /* 下方分割线 */
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0.0625em;
+            background: var(--border-color);
+            border-bottom: 0.0625em solid var(--border-color);
+        }
 
         .item-info { flex: none; }
         .item-info-left { float: left; margin-right: 1em; }
@@ -42,6 +72,29 @@
         .favorite-btn { position: absolute; top: 1em; right: 1em; font-size: 1.5em; cursor: pointer; }
         .favorited { color: #FF0000; }
         .favorite-count { position: absolute; top: 3.5em; right: 2em; font-size: var(--font-small); font-weight: bold; }
+
+        /* 新增页签样式 */
+        .item-tabs {
+            display: none; /* 默认隐藏 */
+            margin-top: 0em;
+            display: flex;
+            gap: 1em;
+            padding-bottom: 0em;
+        }
+        .item-top.fixed .item-tabs {
+            display: flex; /* 置顶时显示 */
+        }
+        .item-tab {
+            cursor: pointer;
+            padding: 0.5em 0.5em 0 0.5em ;
+            font-size: var(--font-medium);
+            color: var(--text-secondary);
+        }
+        .item-tab.active {
+            font-weight: bold;
+            color: var(--natural-green);
+            border-bottom: 2px solid var(--natural-green);
+        }
 
         /* 商品介绍 + sidebar */
         .content-section { display: flex; flex-direction: row; padding-top: 0.5em; }
@@ -142,6 +195,7 @@
             <div class="item-info-left" id="item-info-left"></div>
             <div class="item-info-right" id="item-info-right"></div>
         </div>
+        <div class="item-tabs" id="item-tabs"></div> <!-- 新增页签容器 -->
     </div>
     <div class="content-section">
         <div class="item-content">
@@ -229,6 +283,7 @@
         const detailContent = Array(randomInt(2, 10)).fill().map(() => `<p>${faker.lorem.paragraphs()}</p>`).join("");
         const aftersalesRules = Array(randomInt(2, 5)).fill().map(() => faker.lorem.sentence());
         document.getElementById('item-description').innerHTML = `
+            <h2>Information</h2>
             <div class="desc-section">
                 <h3>Key Specs</h3>
                 <div class="attr-content">
@@ -303,7 +358,6 @@
             </div>
         `;
     }
-
 
     function renderItemReviews() {
         if (!reviews.length) reviews = generateData(ordersCommentFieldConfig, randomInt(10, 500));
@@ -396,9 +450,9 @@
                             <span>商品: <span style="color: ${getRatingColor(4.4)}">4.4</span></span>
                         </div>
                         ${[5, 4, 3, 2, 1].map(i => {
-                            const count = faker.datatype.number({ min: 10, max: 100 });
-                            return `<div class="rating-bar">${i}星 <progress value="${count}" max="100"></progress> ${count}</div>`;
-                        }).join('')}
+            const count = faker.datatype.number({ min: 10, max: 100 });
+            return `<div class="rating-bar">${i}星 <progress value="${count}" max="100"></progress> ${count}</div>`;
+        }).join('')}
                         </div>
                         <div class="chart-tabs">
                             <span class="chart-tab" data-days="7" onclick="renderChart(7)">7天</span>
@@ -475,12 +529,45 @@
         generateCards('similar-list', 'card', similarItems, itemFieldConfig);
     }
 
+    // 新增渲染页签函数
+    function renderItemTabs() {
+        const tabsContainer = document.getElementById('item-tabs');
+        let sections = document.querySelectorAll('.item-content h2 , .similar-items h2');
+        tabsContainer.innerHTML = Array.from(sections).map((h2, index) => {
+            const id = `section-${index}`;
+            h2.id = id; // 为每个 h2 添加唯一 ID
+            return `<span class="item-tab" data-section="${id}">${h2.textContent}</span>`;
+        }).join('');
+
+        // 点击跳转
+        document.querySelectorAll('.item-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const sectionId = tab.getAttribute('data-section');
+                const section = document.getElementById(sectionId);
+                window.scrollTo({
+                    top: section.offsetTop - document.getElementById('item-top').offsetHeight - 10,
+                    behavior: 'smooth'
+                });
+                setActiveTab(sectionId);
+            });
+        });
+    }
+
+    // 设置激活的页签
+    function setActiveTab(sectionId) {
+        document.querySelectorAll('.item-tab').forEach(tab => tab.classList.remove('active'));
+        const activeTab = document.querySelector(`.item-tab[data-section="${sectionId}"]`);
+        if (activeTab) activeTab.classList.add('active');
+    }
+
+    // 处理滚动时自动选中页签
     function handleScroll() {
         const header = document.querySelector('.header');
         const breadcrumbTop = document.getElementById('breadcrumb-wrapper');
         const itemTop = document.getElementById('item-top');
         const scrollY = window.scrollY;
         const headerHeight = itemTop.offsetHeight + breadcrumbTop.offsetHeight;
+
         if (scrollY > headerHeight) {
             header.classList.add('hidden');
             itemTop.classList.add('fixed');
@@ -492,6 +579,17 @@
             document.body.style.paddingTop = '7.4em';
             document.documentElement.style.setProperty('--item-top-height', '0px');
         }
+
+        // 滚动时自动选中页签
+        const sections = document.querySelectorAll('.item-content h2');
+        let currentSection = null;
+        sections.forEach(section => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top <= itemTop.offsetHeight + 50 && rect.bottom > 0) {
+                currentSection = section.id;
+            }
+        });
+        if (currentSection) setActiveTab(currentSection);
     }
 
     window.onload = () => {
@@ -504,13 +602,15 @@
             renderItemReviews();
             renderItemSidebar();
             renderSimilarItems();
+            renderItemTabs(); // 渲染页签
 
-            setTimeout(() =>{
+            setTimeout(() => {
                 window.addEventListener('scroll', handleScroll);
                 handleScroll(); // 初始调用
-            }, 300)
+                setActiveTab('section-0'); // 默认选中第一个页签
+            }, 300);
         });
     };
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9259e8169a4ded80',t:'MTc0Mjg1ODUwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
