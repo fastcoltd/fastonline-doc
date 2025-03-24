@@ -264,6 +264,8 @@ let ordersCommentFieldConfig = {
     content: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '内容', style: {}, sample: () => faker.lorem.paragraph() },
 
     // 新增字段（面向客户展示）
+    total: { card: false, cardSq: false, cardHoriz: false, type: 'price', label: '总价', style: {}, sample: () => faker.commerce.price(100, 1000, 2, "$") },
+    quantity: { card: false, cardSq: false, cardHoriz: false, type: 'price', label: '总价', style: {}, sample: () => faker.datatype.number({ min: 1, max: 500 }) },
     item_price: { card: false, cardSq: false, cardHoriz: false, type: 'price', label: '价格', style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
     item_image: { card: false, cardSq: false, cardHoriz: false, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `item_image${i}`) },
     like_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '点赞数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 50 })},

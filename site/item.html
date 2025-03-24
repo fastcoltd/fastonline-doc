@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>商品详情 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        body { padding-top: 7.4em !important; transition: padding-top 0.3s ease; overflow-x: hidden; }
+        .container { max-width: var(--max-content-width); margin: 0 auto; padding: 0.5em; display: flex; flex-direction: row; gap: 1em; }
+        .item-main { flex: 0 0 75%; padding: 0.5em; background: var(--bg-white); max-width: 75%; }
+        .item-sidebar { flex: 0 0 25%; position: sticky; top: 7.4em; background: var(--bg-white); padding: 0.5em; border-left: 0.0625em solid var(--border-color); box-shadow: 0 0.125em 0.3125em var(--shadow-dark); height: calc(100vh - 8.5em); overflow-y: auto; }
+        .breadcrumb { margin-bottom: 1em; font-size: var(--font-medium); }
+        .breadcrumb a { color: var(--natural-green); margin-right: 0.5em; }
+        .breadcrumb span { color: var(--text-secondary); }
+
+        /* 商品信息 */
+        .item-info { position: relative; padding: 1em; border-bottom: 0.0625em solid var(--border-color); }
+        .item-info-header { display: flex; align-items: center; gap: 1em; }
+        .item-info-header img { width: 5em; height: 5em; object-fit: cover; border-radius: 0.5em; }
+        .item-info-header h1 { font-size: var(--font-xlarge); margin: 0; }
+        .item-info-details { margin-top: 0.5em; }
+        .item-info-details p { margin: 0.25em 0; font-size: var(--font-medium); }
+        .item-wholesale { display: flex; gap: 0.5em; flex-wrap: wrap; align-items: center; margin-top: 0.5em; }
+        .wholesale-block {border: 0.0625em solid var(--border-color); border-radius: 0.375em; font-size: var(--font-small); padding: 0.5em;}
+        .favorite-btn { position: absolute; top: 1em; right: 1em; font-size: 1.5em; cursor: pointer; }
+        .favorited { color: #FF0000; border: none; -webkit-text-stroke: inherit; }
+        .favorite-count { position: absolute; top: 3.5em; right: 2em; font-size: var(--font-small); font-weight:bold; text-align: center; }
+
+        /* 商品介绍 */
+        .item-description { padding: 1em; }
+        .desc-section { margin-bottom: 1em; }
+        .desc-section h3 { font-size: var(--font-large); margin-bottom: 0.5em; }
+        .attr-tags, .field-tags { display: flex; flex-wrap: wrap; gap: 0.5em; }
+        .sample-images { display: flex; gap: 0.5em; overflow-x: auto; }
+        .sample-images img { width: 10em; height: 7em; object-fit: cover; cursor: pointer; border-radius: 0.5em; }
+        .item-show-carousel { position: relative; height: 15em; overflow: hidden; }
+        .carousel-inner { display: flex; transition: transform 0.5s ease; }
+        .carousel-item { flex: 0 0 100%; display: flex; gap: 1em; padding: 0.5em; }
+        .carousel-item img { width: 50%; height: 100%; object-fit: cover; border-radius: 0.5em; }
+        .carousel-item-content { width: 50%; }
+        .carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2em; cursor: pointer; color: var(--text-primary); }
+        .carousel-arrow.left { left: 0.5em; }
+        .carousel-arrow.right { right: 0.5em; }
+        .aftersales-rules ul { list-style: none; padding: 0; max-height: 2em; overflow: hidden; transition: max-height 0.3s ease; }
+        .aftersales-rules.expanded ul { max-height: none; }
+        .aftersales-rules li { margin: 0.25em 0; }
+
+        /* FAQs */
+        .item-faqs { padding: 1em; }
+
+        /* 店铺信息 */
+        .store-info { padding: 1em; }
+        .store-basic, .store-security, .store-stats { margin-bottom: 1em; }
+        .store-logo { position: relative; width: 5em; height: 5em; margin-bottom: 0.5em; }
+        .store-logo img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .online-dot { width: 0.5em; height: 0.5em; border-radius: 50%; position: absolute; bottom: 0; right: 0; }
+
+        /* 商品评价 */
+        .faq-list, .review-list { margin-top: 1em; }
+        .faq-item, .review-item { margin-bottom: 1em; padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; }
+        .review-header { display: flex; align-items: center; gap: 0.5em; justify-content: space-between; }
+        .review-user { display: flex; align-items: center; gap: 0.5em; }
+        .review-user img { width: 2em; height: 2em; border-radius: 50%; }
+        .review-sort select { padding: 0.3em; }
+        .review-item hr { margin: 0.5em 0; }
+        .review-reply { display: none; margin: 0.5em 0; color: var(--font-black) }
+        .review-reply.expanded { display: block; }
+        .review-store {cursor: pointer;padding-top: 1em;margin-bottom:0em;border-top: 0.0625em solid var(--border-color); }
+        .rating-wrapper { display: flex; align-items: center; gap: 0.5em; }
+        .show-more { text-align: center; margin-top: 1em; }
+
+        /* 右边板块 */
+        .item-sidebar-inner { display: flex; flex-direction: column; gap: 1em; }
+        .action-area { display: flex; justify-content: flex-end; gap: 1em; }
+        .action-area i { font-size: 1.5em; cursor: pointer; }
+        .dropdown { position: relative; }
+        .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.375em; padding: 0.5em; }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .shopping-area { padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; }
+        .quantity-input { display: flex; align-items: center; gap: 0.5em; margin-bottom: 1em; }
+        .quantity-input button { width: 2em; height: 2em; }
+        .stats-area { padding: 1em; }
+        .rating-group { display: flex; align-items: center; gap: 1em; white-space: nowrap; justify-content: center; }
+        .rating-bar { display: flex; align-items: center; gap: 0.5em; margin: 0.25em 0; width: 100%; }
+        .rating-bar progress { height: 1.5em; width: 80%; }
+        .chart-tabs { display: flex; gap: 1em; justify-content: flex-end; cursor: pointer}
+        .chart-tab.active { border-bottom: 2px solid var(--natural-green); color: var(--natural-green); }
+        .chart-container { height: 12em; margin-top: 1em; }
+
+        /* 相似商品 */
+        .similar-items { padding-top: 1em; width: 100%; margin: 0 auto; max-width: var(--max-content-width)}
+        .similar-items .scroll-list { display: flex; gap: 0.5em;  overflow-x: auto; scrollbar-width: none;}
+
+        /* 置顶条 */
+        .floating-item-bar { display: none;  top: 0; left: 0;width: 100%; margin: 0 auto; max-width: var(--max-content-width);position: fixed;
+            background: var(--bg-white); z-index: 20; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1);
+            border-bottom: 0.0625em solid var(--border-color); padding: 0.5em 1em;
+        }
+        .floating-item-info { display: flex; align-items: center; gap: 1em; font-size: var(--font-medium); }
+        .floating-item-info img { width: 3em; height: 3em; object-fit: cover; border-radius: 0.5em; }
+        .floating-item-nav { display: flex; gap: 2em; margin-top: 0.5em; }
+        .floating-item-nav a { text-decoration: none; color: var(--text-primary); padding-bottom: 0.2em; }
+        .floating-item-nav a.active { color: var(--natural-green); border-bottom: 2px solid var(--natural-green); }
+        .floating-shopping { display: none; align-items: center; gap: 1em; margin-top: 0.5em; }
+
+        /* 移动端适配 */
+        @media (max-width: 48em) {
+            body { padding-top: 5em !important; }
+            .container { flex-direction: column; }
+            .item-main, .item-sidebar { flex: 100%; max-width: 100%; }
+            .item-sidebar { position: static; height: auto; border-left: none; border-top: 0.0625em solid var(--border-color); }
+            .shopping-area { display: none; }
+            .floating-item-bar { display: block; }
+            .floating-shopping { display: flex; }
+            .similar-items .card { flex: 0 0 calc(50% - 0.5em); max-width: calc(50% - 0.5em); }
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="_header.html"></div>
+<div class="container">
+    <div class="item-main">
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <div class="item-info" id="item-info"></div>
+        <div class="item-description" id="item-description"></div>
+        <div class="item-faqs" id="item-faqs"></div>
+        <div class="store-info" id="store-info"></div>
+        <div class="item-reviews" id="item-reviews"></div>
+    </div>
+    <div class="item-sidebar" id="item-sidebar"></div>
+</div>
+<div class="similar-items" id="similar-items"></div>
+<div class="floating-item-bar" id="floating-item-bar"></div>
+<div w3-include-html="_footer.html"></div>
+
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_common.js"></script>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemName = urlParams.get('name') || 'Demo Item';
+    const itemData = generateData(itemFieldConfig, 1)[0];
+    const storeData = generateData(storeFieldConfig, 1)[0];
+    let quantity = 1;
+    let reviews = [];
+    let reviewPage = 1;
+    const reviewsPerPage = 5;
+    let overviewChartInstance, salesChartInstance;
+
+    function renderBreadcrumb() {
+        const brand = itemData.brandName.replace(/<b[^>]*>(.*?)<\/b>/, '$1');
+        const service = itemData.service.replace(/<b[^>]*>(.*?)<\/b>/, '$1');
+        document.getElementById('breadcrumb').innerHTML = `
+            <a href="index.html">Home</a> >
+            <a href="brand.html?name=${brand}">${brand}</a> >
+            <a href="item-list.html?services=${service}&brandName=${brand}">${service}</a> >
+            <span>${itemName}</span>
+        `;
+    }
+
+    const getRatingColor = (rating) => {
+        if (rating >= 4.5) return '#32CD32';
+        if (rating >= 4.0) return '#FF9900';
+        return '#FF4500';
+    };
+
+    function renderItemInfo() {
+        const wholesaleData = generateData(itemWholesaleFieldConfig, randomInt(1, 5));
+        const shippingType = faker.random.arrayElement(['Automatic', 'Manual']);
+        document.getElementById('item-info').innerHTML = `
+            <div class="item-info-header">
+                <img src="${itemData.image}" alt="${itemName}">
+                <h1>${itemName}</h1>
+            </div>
+            <div class="item-info-details">
+                <p>价格: <span style="color: red; font-weight: bold">${itemData.price}</span>
+                    ${itemData.original_price ? `<span style="color: #A9A9A9; text-decoration: line-through">${itemData.original_price.sample}</span>` : ''}</p>
+                <p>库存: ${itemData.stock_quantity.sample} ( ${itemData.last_restock_time.sample})
+                    发货: <span style="color: ${shippingType === 'Automatic' ? '#32CD32' : '#4682B4'}">${shippingType}</span></p>
+                ${wholesaleData.length ? `
+                    <div class="item-wholesale">
+                        批发价: ${wholesaleData.map(w => `<div class="wholesale-block"><span>${w.quantity.sample}~${w.quantity.sample + 100}</span>: <b>${w.unit_price}</b></div>`).join('')}
+                    </div>` : ''}
+            </div>
+            <i class="fas fa-heart favorite-btn" onclick="toggleFavorite()"></i>
+            <span class="favorite-count">${itemData.save_count.sample}</span>
+        `;
+    }
+
+    function toggleFavorite() {
+        const btn = document.querySelector('.favorite-btn');
+        btn.classList.toggle('favorited');
+        const count = document.querySelector('.favorite-count');
+        count.textContent = btn.classList.contains('favorited') ? parseInt(count.textContent) + 1 : parseInt(count.textContent) - 1;
+    }
+
+    function renderItemDescription() {
+        const tags = generateTag(1, 3);
+        const attrs = generateAttr(3, 5);
+        const fields = fieldsList.sort(() => 0.5 - Math.random()).slice(0, randomInt(3, 10));
+        const samplePics = Array(randomInt(2, 5)).fill().map((_, i) => getPicsumImage(300, 200, `sample-${i}`));
+        const detailContent = Array(randomInt(2, 5)).fill().map((_, i) => `<p>${faker.lorem.paragraphs(randomInt(1, 5))}</p>`);
+        const showItems = generateData(itemShowFieldConfig, randomInt(1, 5));
+        const aftersalesRules = Array(randomInt(2, 5)).fill().map(() => faker.lorem.sentence());
+        document.getElementById('item-description').innerHTML = `
+            <h2>Item Details</h2>
+            <div class="desc-section">
+                <h3>商品属性</h3>
+                <div class="attr-tags">
+                    Tags:${tags.map((t, i) => `<span class="${tagColors[tags.length % tagColors.length]}">${t}</span>`).join('')}
+                </div>
+                <div class="attr-tags">
+                    Atrributies: ${Object.entries(attrs).map(([k, v], i) => `<span class="${tagColors[randomInt(0, 5) % tagColors.length]}">${k}: ${v}</span>`).join('')}
+                </div>
+                <div class="field-tags">
+                    Item Fileds: ${fields.map((f, i) => `<span class="${tagColors[fields.length % tagColors.length]}">${f}</span>`).join('')}
+                </div>
+            </div>
+            ${samplePics.length ? `
+                <div class="desc-section">
+                    <h3>样品图</h3>
+                    <div class="sample-images">
+                        ${samplePics.map(p => `<img src="${p}" alt="Sample" onclick="showModal('image-modal', '<img src=${p}>')">`).join('')}
+                    </div>
+                </div>` : ''}
+            <div class="desc-section">
+                <h3>商品详情</h3>
+                <p>${detailContent}</p>
+            </div>
+            <div class="desc-section">
+                <h3>商品秀</h3>
+                <div class="item-show-carousel" id="item-show-carousel">
+                    <div class="carousel-inner">
+                        ${showItems.map(item => `
+                            <div class="carousel-item">
+                                <img src="${item.image}" alt="${item.title}">
+                                <div class="carousel-item-content">
+                                    <h4>${item.title}</h4>
+                                    <p>${item.summary}</p>
+                                    <p>更新: ${item.update_time}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <i class="fas fa-chevron-left carousel-arrow left" onclick="carouselMove('prev')"></i>
+                    <i class="fas fa-chevron-right carousel-arrow right" onclick="carouselMove('next')"></i>
+                </div>
+            </div>
+            <div class="desc-section aftersales-rules" id="aftersales-rules">
+                <h3>售后规则</h3>
+                <p>售后时间: ${faker.datatype.number({ min: 24, max: 720 })}小时</p>
+                <ul>
+                    ${aftersalesRules.map(r => `<li>${r}</li>`).join('')}
+                </ul>
+                <a class="toggle-summary" onclick="toggleAftersales()">Show More</a>
+            </div>
+        `;
+        initCarousel();
+    }
+
+    let carouselIndex = 0;
+    function initCarousel() {
+        const items = document.querySelectorAll('.carousel-item');
+        setInterval(() => {
+            carouselMove('next');
+        }, 5000);
+    }
+
+    function carouselMove(direction) {
+        const inner = document.querySelector('.carousel-inner');
+        const items = document.querySelectorAll('.carousel-item');
+        const total = items.length;
+        if (direction === 'next') {
+            carouselIndex = (carouselIndex + 1) % total;
+        } else {
+            carouselIndex = (carouselIndex - 1 + total) % total;
+        }
+        inner.style.transform = `translateX(-${carouselIndex * 100}%)`;
+    }
+
+    function toggleAftersales() {
+        const section = document.getElementById('aftersales-rules');
+        section.classList.toggle('expanded');
+        section.querySelector('.toggle-summary').textContent = section.classList.contains('expanded') ? 'Show Less' : 'Show More';
+    }
+
+    function renderItemFaqs() {
+        const faqs = generateData(storeFaqFieldConfig, randomInt(1, 3));
+        document.getElementById('item-faqs').innerHTML = `
+            <h2>商品FAQs</h2>
+            <div class="faq-list">
+                ${faqs.map(faq => `
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleAnswer(this)">
+                            <span class="faq-question-text">${faq.question}</span>
+                            <span><i class="fas fa-chevron-down faq-toggle"></i><i class="fas fa-chevron-up faq-toggle"></i></span>
+                        </div>
+                        <div class="faq-answer">${faq.answer}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    function renderStoreInfo() {
+        const deposit = randomInt(500, 5000);
+        const languages = Array(randomInt(1, 3)).fill().map(() => faker.random.arrayElement(['English', 'Chinese', 'Spanish']));
+        document.getElementById('store-info').innerHTML = `
+            <h2>店铺信息</h2>
+            <div class="store-basic">
+                <div class="store-logo">
+                    <img src="${storeData.image}" alt="${storeData.name}">
+                    <span class="online-dot" style="background: ${storeData.online_status === '在线' ? '#32CD32' : '#A9A9A9'}"></span>
+                </div>
+                <p>${storeData.name}</p>
+                <p><i class="fas fa-map-marker-alt"></i> ${faker.address.country()} <i class="fas fa-clock"></i> GMT+${randomInt(0, 12)}</p>
+                <p><i class="fas fa-briefcase"></i> ${faker.datatype.number({ min: 8, max: 10 })}:00 - ${faker.datatype.number({ min: 18, max: 22 })}:00</p>
+                <p><i class="fas fa-language"></i> ${languages.join(', ')}</p>
+            </div>
+            <div class="store-security">
+                <p><i class="fas fa-shield-alt"></i> 保证金: <b style="color: var(--font-orange)">$${deposit}</b></p>
+                <p><i class="fas fa-check-circle" style="color: ${storeData.verified.sample === '已认证' ? 'var(--font-green)' : ''}"></i> ${storeData.verified.sample}</p>
+            </div>
+            <div class="store-stats">
+                <p>综合评分: ${generateRating(storeData, storeData.rating)}</p>
+                <p>销量: ${storeData.sales}</p>
+            </div>
+        `;
+    }
+
+    function renderItemReviews() {
+        if (!reviews.length) reviews = generateData(ordersCommentFieldConfig, randomInt(10, 500));
+        const total = reviews.length;
+        document.getElementById('item-reviews').innerHTML = `
+            <h2>商品评价</h2>
+            <div class="review-header">
+                <span>1-${Math.min(reviewsPerPage, total)} out of ${total} Reviews</span>
+                <div class="review-sort">
+                    <select class="ant-select" onchange="sortReviews(this.value)">
+                        <option value="time">按最近时间</option>
+                        <option value="amount">按订单金额降序</option>
+                    </select>
+                </div>
+            </div>
+            <div class="review-list" id="review-list">
+                ${reviews.slice(0, reviewsPerPage).map((r, i) => renderReview(r, i)).join('')}
+            </div>
+            ${total > reviewsPerPage ? `<div class="show-more"><button class="btn-solid-medium" onclick="loadMoreReviews()">Show More Reviews</button></div>` : ''}
+        `;
+    }
+
+    function renderReview(review, index) {
+        const timeAgo = faker.random.arrayElement(['seconds', 'minutes', 'hours', 'days', 'months', 'years']);
+        const timeValue = timeAgo === 'seconds' ? faker.datatype.number({ min: 1, max: 59 }) + ' s' :
+            timeAgo === 'minutes' ? faker.datatype.number({ min: 1, max: 59 }) + ' min' :
+                timeAgo === 'hours' ? faker.datatype.number({ min: 1, max: 23 }) + ' hr' :
+                    timeAgo === 'days' ? faker.datatype.number({ min: 1, max: 30 }) + ' days' :
+                        timeAgo === 'months' ? faker.datatype.number({ min: 1, max: 11 }) + ' mo' :
+                            faker.datatype.number({ min: 1, max: 5 }) + ' yr';
+        return `
+            <div class="review-item">
+                <div class="review-user">
+                    <img src="${getPicsumImage(50, 50, `user-${index}`)}" alt="User">
+                    <span>${faker.address.country()}</span>
+                    <span>${faker.name.firstName()}</span>
+                    ${Math.random() > 0.5 ? '<span class="text-success"><i class="fas fa-user-check"></i> Repeat Client</span>' : ''}
+                </div>
+                <hr>
+                <div class="rating-wrapper">${generateRating(review, review.rating)} <span>${timeValue} ago</span></div>
+                <p>${faker.lorem.paragraphs(randomInt(2, 3))}</p>
+                <p>商品: <img src="${itemData.image}" alt="${itemName}" style="width: 2em; height: 2em; border-radius: 1em;">
+                    <a href="item.html?name=${itemName}">${itemName}</a> - 数量: ${review.quantity} - 金额: ${review.total} - ${timeValue} ago</p>
+                <p class="review-store" onclick="toggleReply(this)">
+                    <img src="${storeData.image}" alt="${storeData.name}" style="width: 1.5em; height: 1.5em; border-radius: 1em;">
+                    <b>${storeData.name}</b> <i class="fas fa-chevron-down" style="float: right; margin-right: 2em;"></i>
+                </p>
+                <div class="review-reply">${faker.lorem.paragraph()}</div>
+            </div>
+            <p style="margin-bottom:2em;">Helpful?
+                <span><i class="fas fa-thumbs-up" onclick="voteReview(this, 'yes', ${index})"></i> Yes</span>
+                <span><i class="fas fa-thumbs-down" onclick="voteReview(this, 'no', ${index})"></i> No</span>
+            </p>
+        `;
+    }
+
+    function sortReviews(type) {
+        if (type === 'time') {
+            reviews.sort(() => 0);
+        } else {
+            reviews.sort((a, b) => parseFloat(b.price.replace('$', '')) - parseFloat(a.price.replace('$', '')));
+        }
+        renderItemReviews();
+    }
+
+    function toggleAnswer(element) {
+        element.closest('.faq-item').classList.toggle('expanded');
+    }
+
+    function toggleReply(element) {
+        const reply = element.closest('.review-item').querySelector('.review-reply');
+        reply.classList.toggle('expanded');
+        element.querySelector('i').classList.toggle('fa-chevron-down');
+        element.querySelector('i').classList.toggle('fa-chevron-up');
+    }
+
+    function voteReview(element, type, index) {
+        element.classList.toggle(type === 'yes' ? 'text-success' : 'text-danger');
+    }
+
+    function loadMoreReviews() {
+        reviewPage++;
+        const start = (reviewPage - 1) * reviewsPerPage;
+        const newReviews = reviews.slice(start, start + reviewsPerPage);
+        const container = document.getElementById('review-list');
+        newReviews.forEach((r, i) => container.innerHTML += renderReview(r, i));
+    }
+
+    function renderItemSidebar() {
+        const complaintFields = ['complaint_content', 'store_reply'].map(f => `
+            <div>
+                <label>${complaintFieldConfig[f].label}</label>
+                <textarea class="ant-input" rows="3" placeholder="请输入${complaintFieldConfig[f].label}"></textarea>
+            </div>
+        `).join('');
+        document.getElementById('item-sidebar').innerHTML = `
+            <div class="item-sidebar-inner">
+                <div class="action-area">
+                    <i class="fas fa-heart" onclick="toggleFavorite()"></i>
+                    <i class="fas fa-share-alt"></i>
+                    <div class="dropdown">
+                        <i class="fas fa-ellipsis-v"></i>
+                        <div class="dropdown-menu">
+                        </div>
+                    </div>
+                </div>
+                <div class="shopping-area">
+                    <p id="total-price" style="display: none;"></p>
+                    <div class="quantity-input">
+                        <button class="btn-small" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" id="quantity" value="1" min="1" onchange="updateTotal()">
+                        <button class="btn-small" onclick="changeQuantity(1)">+</button>
+                    </div>
+                    <button class="btn-solid-large" style="width: 100%;" onclick="buyNow()">购买</button>
+                </div>
+                <div class="stats-area">
+                    <div class="rating-overview">
+                        <div class="rating-group">
+                            <span>评分: <span style="color: ${getRatingColor(4.3)}">4.3</span> (90)</span>
+                            <span>服务: <span style="color: ${getRatingColor(4.1)}">4.1</span></span>
+                            <span>物流: <span style="color: ${getRatingColor(4.6)}">4.6</span></span>
+                            <span>商品: <span style="color: ${getRatingColor(4.4)}">4.4</span></span>
+                        </div>
+                        ${[5, 4, 3, 2, 1].map(i => {
+                            const count = faker.datatype.number({ min: 10, max: 100 });
+                            return `<div class="rating-bar">${i}星 <progress value="${count}" max="100"></progress> ${count}</div>`;
+                        }).join('')}
+                    </div>
+                    <div class="chart-tabs">
+                        <span class="chart-tab" data-days="7" onclick="renderChart(7)">7天</span>
+                        <span class="chart-tab" data-days="14" onclick="renderChart(14)">14天</span>
+                        <span class="chart-tab active" data-days="30" onclick="renderChart(30)">30天</span>
+                    </div>
+                    <canvas id="overview-chart" class="chart-container"></canvas>
+                    <canvas id="sales-chart" class="chart-container"></canvas>
+                </div>
+            </div>
+        `;
+        renderChart(30);
+    }
+
+    function renderChart(days) {
+        const overviewCtx = document.getElementById('overview-chart')?.getContext('2d');
+        const salesCtx = document.getElementById('sales-chart')?.getContext('2d');
+        if (!overviewCtx || !salesCtx) return;
+        const labels = Array(days).fill().map((_, i) => `${days - i}d`);
+        const overviewData = {
+            labels,
+            datasets: [
+                { label: '好评率', data: Array(days).fill().map(() => faker.datatype.float({ min: 80, max: 100 })), borderColor: '#32CD32' },
+                { label: '响应率', data: Array(days).fill().map(() => faker.datatype.float({ min: 70, max: 100 })), borderColor: '#4682B4' },
+                { label: '充足率', data: Array(days).fill().map(() => faker.datatype.float({ min: 60, max: 100 })), borderColor: '#FFD700' }
+            ]
+        };
+        const salesData = {
+            labels,
+            datasets: [
+                { label: '销售量', data: Array(days).fill().map(() => faker.datatype.number({ min: 50, max: 200 })), borderColor: '#FF4500' },
+                { label: '退款量', data: Array(days).fill().map(() => faker.datatype.number({ min: 0, max: 50 })), borderColor: '#800080' },
+                { label: '新增量', data: Array(days).fill().map(() => faker.datatype.number({ min: 0, max: 200 })), borderColor: '#00CED1' }
+            ]
+        };
+        if (overviewChartInstance) overviewChartInstance.destroy();
+        if (salesChartInstance) salesChartInstance.destroy();
+        overviewChartInstance = new Chart(overviewCtx, { type: 'line', data: overviewData, options: { scales: { y: { beginAtZero: true } } } });
+        salesChartInstance = new Chart(salesCtx, { type: 'line', data: salesData, options: { scales: { y: { beginAtZero: true } } } });
+        document.querySelectorAll('.chart-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelector(`.chart-tab[data-days="${days}"]`).classList.add('active');
+    }
+
+    function changeQuantity(delta) {
+        quantity = Math.max(1, quantity + delta);
+        document.getElementById('quantity').value = quantity;
+        updateTotal();
+    }
+
+    function updateTotal() {
+        quantity = parseInt(document.getElementById('quantity').value) || 1;
+        const price = parseFloat(itemData.price.replace('$', ''));
+        const total = (price * quantity).toFixed(2);
+        const totalEl = document.getElementById('total-price');
+        totalEl.style.display = 'block';
+        totalEl.textContent = `总价: $${total}`;
+    }
+
+    function buyNow() {
+        alert(`购买 ${quantity} 件 ${itemName}，总价: $${(parseFloat(itemData.price.replace('$', '')) * quantity).toFixed(2)}`);
+    }
+
+    function submitReport() {
+        alert('举报已提交');
+        hideModal('report-modal');
+    }
+
+    function renderSimilarItems() {
+        const similarItems = generateData(itemFieldConfig, 12).map(item => ({
+            ...item,
+            brandName: itemData.brandName,
+            service: itemData.service
+        }));
+        const container = document.getElementById('similar-items');
+        container.innerHTML = `<h2>相似商品</h2><div class="scroll-list" id="similar-list"></div>`;
+        generateCards('similar-list', 'card', similarItems, itemFieldConfig);
+    }
+
+    function renderFloatingBar() {
+        document.getElementById('floating-item-bar').innerHTML = `
+            <div class="floating-item-info">
+                <img src="${itemData.image}" alt="${itemName}">
+                <span>${itemName}</span>
+                ${generateRating(itemData, itemData.rating)}
+                <span style="color: red; font-weight: bold">${itemData.price}</span>
+                ${itemData.original_price ? `<span style="color: #A9A9A9; text-decoration: line-through">${itemData.original_price}</span>` : ''}
+                <span>库存: ${itemData.stock_quantity}</span>
+            </div>
+            <div class="floating-shopping">
+                <span id="floating-total" style="display: none;"></span>
+                <div class="quantity-input">
+                    <button class="btn-small" onclick="changeQuantity(-1)">-</button>
+                    <input type="number" id="floating-quantity" value="1" min="1" onchange="updateTotal()">
+                    <button class="btn-small" onclick="changeQuantity(1)">+</button>
+                </div>
+                <button class="btn-solid-medium" onclick="buyNow()">购买</button>
+            </div>
+            <div class="floating-item-nav">
+                <a href="#item-info" data-section="item-info">商品信息</a>
+                <a href="#item-description" data-section="item-description">商品介绍</a>
+                <a href="#item-faqs" data-section="item-faqs">FAQs</a>
+                <a href="#store-info" data-section="store-info">店铺</a>
+                <a href="#item-reviews" data-section="item-reviews">评价</a>
+                <a href="#similar-items" data-section="similar-items">相似商品</a>
+            </div>
+        `;
+        setupNavLinks();
+    }
+
+    function handleScroll() {
+        const header = document.querySelector('.header');
+        const bar = document.getElementById('floating-item-bar');
+        const scrollY = window.scrollY;
+        if (scrollY > header.offsetHeight) {
+            header.classList.add('hidden');
+            bar.style.display = 'block';
+            document.body.style.paddingTop = '0';
+        } else {
+            header.classList.remove('hidden');
+            bar.style.display = 'none';
+            document.body.style.paddingTop = '7.4em';
+        }
+        updateActiveNav();
+    }
+
+    function updateActiveNav() {
+        const sections = ['item-info', 'item-description', 'item-faqs', 'store-info', 'item-reviews', 'similar-items'];
+        const scrollY = window.scrollY + 50;
+        sections.forEach(id => {
+            const section = document.getElementById(id);
+            const navLink = document.querySelector(`.floating-item-nav a[data-section="${id}"]`);
+            if (section.offsetTop <= scrollY && section.offsetTop + section.offsetHeight > scrollY) {
+                navLink.classList.add('active');
+            } else {
+                navLink.classList.remove('active');
+            }
+        });
+    }
+
+    function setupNavLinks() {
+        document.querySelectorAll('.floating-item-nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('href').substring(1);
+                const section = document.getElementById(sectionId);
+                const offsetTop = section.getBoundingClientRect().top + window.scrollY - 50;
+                window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+            });
+        });
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            renderBreadcrumb();
+            renderItemInfo();
+            renderItemDescription();
+            renderItemFaqs();
+            renderStoreInfo();
+            renderItemReviews();
+            renderItemSidebar();
+            renderSimilarItems();
+            renderFloatingBar();
+            window.addEventListener('scroll', handleScroll);
+        });
+    };
+</script>
+</body>
+</html>
