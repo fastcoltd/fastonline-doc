@@ -394,32 +394,9 @@
             </div>
         `;
         reviews.slice(0, 10).forEach((review, index) => {
-            const reviewItem = document.createElement('div');
-            reviewItem.className = 'review-item';
-            reviewItem.innerHTML = `
-                <div class="review-user">
-                    <img src="${review.image}" alt="User">
-                    <span>${faker.address.country()}</span>
-                    <span>${faker.name.firstName()}</span>
-                    ${Math.random() > 0.5 ? '<span class="text-success"><i class="fas fa-user-check"></i> Repeat Client</span>' : ''}
-                </div>
-                <hr>
-                <div class="rating-wrapper">${generateRating(review, review.rating)} <span>${Math.floor(Math.random() * 365)} 天前</span></div>
-                <p>${faker.lorem.paragraphs(randomInt(1, 3))}</p>
-                <p>商品: <img src="${review.item_image}" alt="${review.itemName}" style="width: 2em; height: 2em;"> ${review.itemName} - 数量: ${faker.datatype.number({ min: 1, max: 5 })} - 价格: ${review.item_price} - ${Math.floor(Math.random() * 365)}天前</p>
-                <p  class="review-store" onclick="toggleReply(this)"><img src="${storeData.image}" alt="${storeName}" style="width: 1.5em; height: 1.5em;"> <b>${storeName}</b> <i class="fas fa-chevron-down" style="float: right;margin-right: 2em;"></i></p>
-                <div class="review-reply">${faker.lorem.paragraphs()}</div>
-            `;
-            container.appendChild(reviewItem);
-
-            const useful = document.createElement('div');
-            useful.style = "margin-bottom:2em;"
-            useful.innerHTML = `<p>有用吗?
-                    <span><i class="fas fa-thumbs-up" onclick="voteReview(this, 'yes', ${index})"></i> 是</span>
-                    <span><i class="fas fa-thumbs-down" onclick="voteReview(this, 'no', ${index})"></i> 否</span>
-                </p>`
-
-            container.appendChild(useful);
+            renderReviews(review, index).forEach( item => {
+                container.appendChild(item);
+            })
         });
     }
 
@@ -453,28 +430,42 @@
         const newReviews = reviews.slice(start, start + 10);
         const container = document.getElementById('review-list');
         newReviews.forEach((review, index) => {
-            const reviewItem = document.createElement('div');
-            reviewItem.className = 'review-item';
-            reviewItem.innerHTML = `
+            renderReviews(review, index).forEach( item => {
+                container.appendChild(item);
+            })
+        });
+    }
+
+    function renderReviews(review, index){
+        let reviewsList = []
+        const reviewItem = document.createElement('div');
+        reviewItem.className = 'review-item';
+        reviewItem.innerHTML = `
                 <div class="review-user">
                     <img src="${review.image}" alt="User">
                     <span>${faker.address.country()}</span>
-                    <span>${faker.name.findName()}</span>
+                    <span>${faker.name.firstName()}</span>
                     ${Math.random() > 0.5 ? '<span class="text-success"><i class="fas fa-user-check"></i> Repeat Client</span>' : ''}
                 </div>
                 <hr>
                 <div class="rating-wrapper">${generateRating(review, review.rating)} <span>${Math.floor(Math.random() * 365)} 天前</span></div>
-                <p>${faker.lorem.sentences(randomInt(2, 3))}</p>
-                <p>商品: <img src="${review.image}" alt="${review.itemName}" style="width: 2em; height: 2em;"> ${review.itemName} - 数量: ${faker.datatype.number({ min: 1, max: 5 })} - 价格: ${review.price} - ${Math.floor(Math.random() * 365)}天前</p>
-                <p><img src="${storeData.image}" alt="${storeName}" style="width: 1.5em; height: 1.5em;"> <b>${storeName}</b> <i class="fas fa-chevron-down" onclick="toggleReply(this)"></i></p>
-                <div class="review-reply">${faker.lorem.sentence()}</div>
-                <p>有用吗?
-                    <span><i class="fas fa-thumbs-up" onclick="voteReview(this, 'yes', ${start + index})"></i> 是</span>
-                    <span><i class="fas fa-thumbs-down" onclick="voteReview(this, 'no', ${start + index})"></i> 否</span>
-                </p>
+                <p>${faker.lorem.paragraphs(randomInt(1, 3))}</p>
+                <p>商品: <img src="${review.item_image}" alt="${review.itemName}" style="width: 2em; height: 2em;"> ${review.itemName} - 数量: ${faker.datatype.number({ min: 1, max: 5 })} - 价格: ${review.item_price} - ${Math.floor(Math.random() * 365)}天前</p>
+                <p  class="review-store" onclick="toggleReply(this)"><img src="${storeData.image}" alt="${storeName}" style="width: 1.5em; height: 1.5em;"> <b>${storeName}</b> <i class="fas fa-chevron-down" style="float: right;margin-right: 2em;"></i></p>
+                <div class="review-reply">${faker.lorem.paragraphs()}</div>
             `;
-            container.appendChild(reviewItem);
-        });
+
+        reviewsList.push(reviewItem)
+
+        const useful = document.createElement('div');
+        useful.style = "margin-bottom:2em;"
+        useful.innerHTML = `<p>有用吗?
+                    <span><i class="fas fa-thumbs-up" onclick="voteReview(this, 'yes', ${index})"></i> 是</span>
+                    <span><i class="fas fa-thumbs-down" onclick="voteReview(this, 'no', ${index})"></i> 否</span>
+                </p>`
+
+        reviewsList.push(useful)
+        return reviewsList
     }
 
     function toggleSummary() {
