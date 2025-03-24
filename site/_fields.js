@@ -45,9 +45,79 @@ let itemFieldConfig = {
     replacement_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '换货数', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 10 })},
     comment_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '评论数', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 10, max: 50 })},
     save_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '收藏数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 20, max: 100 })},
+    after_sales_time: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '售后时间', format: (d, v) => `<span style="color: #666">${v}</span>`, style: {}, sample: () => faker.date.recent().toLocaleDateString()},
     last_restock_time: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '最后补货时间', format: (d, v) => `<span style="color: #666">${v}</span>`, style: {}, sample: () => faker.date.recent().toLocaleDateString()},
     delivery_type: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '配送方式', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.random.arrayElement(['快递', '自提', '同城配送'])},
+
+    seo_keywords: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: 'SEO关键词', style: {}, sample: () => faker.lorem.words(5) },
+    seo_description: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: 'SEO描述', style: {}, sample: () => faker.lorem.sentence() },
+    after_sales_rules: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '售后规则', format: (d, v) => `<span style="color: #666">${v}</span>`, style: {}, sample: () => faker.lorem.paragraph() },
+    sample_pics: { card: false, cardSq: false, cardHoriz: false, type: 'image', label: '样品图片', style: {}, sample: i => `[${getPicsumImage(300, 200, `sample-${i}`)}]` },
+    content: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '商品内容', style: {}, sample: () => faker.lorem.paragraphs(3) },
+
     buyNow: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: 'Buy Now', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
+};
+
+let itemShowFieldConfig = {
+    id: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: 'ID', style: {}, sample: () => faker.datatype.number({ min: 1, max: 10000 }) },
+    item_id: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '商品ID', style: {}, sample: () => faker.datatype.number({ min: 1, max: 10000 }) },
+    status: {
+        card: true, cardSq: true, cardHoriz: true,
+        type: 'text',
+        label: '状态',
+        format: (d, v) => `<span style="color: ${v === 0 ? '#A9A9A9' : '#32CD32'}">${v === 0 ? '禁用' : '启用'}</span>`,
+        style: {},
+        sample: () => faker.datatype.number({ min: 0, max: 1 })
+    },
+    sort_index: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '排序', style: {}, sample: () => faker.datatype.number({ min: 0, max: 100 }) },
+    version: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '版本', style: {}, sample: () => faker.datatype.number({ min: 0, max: 5 }) },
+    language: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '语言', style: {}, sample: () => faker.random.arrayElement(['en_US', 'zh_CN']) },
+    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '标题', style: {}, sample: () => faker.lorem.sentence() },
+    summary: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '摘要', style: {}, sample: () => faker.lorem.paragraph() },
+    show_data: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '展示数据', style: {}, sample: () => JSON.stringify([faker.lorem.word(), faker.lorem.word()]) },
+    create_time: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '创建时间', style: {}, sample: () => faker.date.past().toLocaleString() },
+    update_time: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '更新时间', style: {}, sample: () => faker.date.recent().toLocaleString() }
+};
+
+let itemStatLogFieldConfig = {
+    id: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: 'ID', style: {}, sample: () => faker.datatype.number({ min: 1, max: 10000 }) },
+    date: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '日期', style: {}, sample: () => faker.date.recent().toLocaleDateString() },
+    store_id: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '店铺ID', style: {}, sample: () => faker.datatype.number({ min: 1, max: 500 }) },
+    item_id: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '商品ID', style: {}, sample: () => faker.datatype.number({ min: 1, max: 10000 }) },
+    visit_count: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '访问量', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 100, max: 1000 }) },
+    orders_count: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '订单数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 50, max: 200 }) },
+    sales_amount: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '总销售额', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.commerce.price(1000, 5000, 2, "$") },
+    refund_amount: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '退款金额', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.commerce.price(0, 100, 2, "$") },
+    sales_count: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '销售数量', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 100, max: 500 }) },
+    replacement_count: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '换货数', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 10 }) },
+    refund_count: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '退货数', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 10 }) },
+    comment_count: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '评论数', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 10, max: 50 }) },
+    rating_count: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '评分次数', style: {}, sample: () => faker.datatype.number({ min: 50, max: 300 }) },
+    rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
+    save_count: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '收藏数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 20, max: 100 }) },
+    ticket_count: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '票据数', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 20 }) },
+    subscribe_count: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '订阅数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 50 }) },
+    deal_avg_count: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '平均订单数', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.datatype.float({ min: 0, max: 100, precision: 0.01 }) },
+    deal_avg_money: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '平均订单金额', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.commerce.price(10, 1000, 2, "$") },
+    update_time: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '更新时间', style: {}, sample: () => faker.date.recent().toLocaleString() }
+};
+
+let itemWholesaleFieldConfig = {
+    id: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: 'ID', style: {}, sample: () => faker.datatype.number({ min: 1, max: 10000 }) },
+    item_id: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '商品ID', style: {}, sample: () => faker.datatype.number({ min: 1, max: 10000 }) },
+    status: {
+        card: true, cardSq: true, cardHoriz: true,
+        type: 'text',
+        label: '状态',
+        format: (d, v) => `<span style="color: ${v === 0 ? '#A9A9A9' : '#32CD32'}">${v === 0 ? '禁用' : '启用'}</span>`,
+        style: {},
+        sample: () => faker.datatype.number({ min: 0, max: 1 })
+    },
+    quantity: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '批发数量', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 10, max: 100 }) },
+    discount: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '折扣', format: (d, v) => `<span style="color: #32CD32">${(v * 100).toFixed(0)}%</span>`, style: {}, sample: () => faker.datatype.float({ min: 0.1, max: 0.5, precision: 0.01 }) },
+    unit_price: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '批发单价', style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
+    create_time: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '创建时间', style: {}, sample: () => faker.date.past().toLocaleString() },
+    update_time: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '更新时间', style: {}, sample: () => faker.date.recent().toLocaleString() }
 };
 
 // 热门店铺字段配置，添加“进入”按钮
@@ -944,6 +1014,9 @@ function generateServices(){
 window.brandFieldConfig = brandFieldConfig;
 window.servicesFieldConfig = servicesFieldConfig;
 window.itemFieldConfig = itemFieldConfig;
+window.itemStatLogFieldConfig = itemStatLogFieldConfig;
+window.itemShowFieldConfig = itemShowFieldConfig;
+window.itemWholesaleFieldConfig = itemWholesaleFieldConfig;
 window.storeFieldConfig = storeFieldConfig;
 window.demandFieldConfig = demandFieldConfig;
 window.postsFieldConfig = postsFieldConfig;

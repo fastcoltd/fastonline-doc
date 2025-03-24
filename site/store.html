@@ -258,6 +258,7 @@
                         </p>
                         <p>${tags.map((tag, i) => `<span class="${tagColors[i % tagColors.length]}">${tag}</span>`).join(' ')}</p>
                     </div>
+                    <i id="store-favorite" class="fas fa-heart favorite-icon"></i>
                 </div>
                 <div class="store-summary" id="store-summary">
                     <b>About Store</b>
@@ -369,8 +370,10 @@
                 el.style.background = '';
                 el.style.color = el.getAttribute('brandColor');
                 el.classList.remove('active');
+                el.querySelector('i')?.remove()
             });
             element.classList.add('active');
+            // element.innerHTML = `<i class="fas fa-check-circle">&nbsp;</i>${element.innerHTML}`
             let color = element.getAttribute('brandColor');
             let background = element.style.background || 'var(--font-white)';
             element.style = `background:${color}; color:${background}`;
