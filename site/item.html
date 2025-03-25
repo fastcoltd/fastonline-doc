@@ -103,8 +103,8 @@
 
         .item-sidebar {
             flex: 0 0 25%;
-            position: sticky;
-            top: 1em; /* 默认顶部距离 */
+            right: calc((100% - var(--max-content-width)) / 2); /* 靠右对齐，与 page-container 一致 */
+            width: calc(var(--max-content-width) * 0.25); /* 宽度为 page-container 的 25% */
             height: 60vh;
             border-radius: 0.5em;
             background: var(--bg-white);
@@ -113,6 +113,9 @@
             overflow-y: auto;
             scrollbar-width: none;
             z-index: 10; /* 确保高于 item-top 的 z-index: 20 */
+        }
+        .item-sidebar.hidden {
+            display: none; /* 到达指定位置后立即隐藏 */
         }
 
         /* 置顶时调整 item-sidebar 的 top 值 */
@@ -183,6 +186,7 @@
             }
             .similar-items .card { flex: 0 0 calc(50% - 0.5em); max-width: calc(50% - 0.5em); }
         }
+
     </style>
 </head>
 <body>
@@ -205,7 +209,7 @@
             <div class="store-info" id="store-info"></div>
             <div class="item-reviews" id="item-reviews"></div>
         </div>
-        <div class="item-sidebar" id="item-sidebar"></div>
+        <div class="item-sidebar" id="item-sidebar" style="position:fixed;"></div>
     </div>
     <div class="similar-items" id="similar-items"></div>
 </div>
@@ -566,9 +570,15 @@
         const header = document.querySelector('.header');
         const breadcrumbTop = document.getElementById('breadcrumb-wrapper');
         const itemTop = document.getElementById('item-top');
+        const itemSidebar = document.getElementById('item-sidebar');
+        const contentSection = document.querySelector('.content-section');
         const scrollY = window.scrollY;
         const headerHeight = itemTop.offsetHeight + breadcrumbTop.offsetHeight;
+        const sidebarHeight = itemSidebar.offsetHeight;
+        const contentSectionHeight = contentSection.offsetHeight;
+        const contentSectionTop = contentSection.getBoundingClientRect().top + window.scrollY;
 
+        // 处理 item-top 的固定和隐藏
         if (scrollY > headerHeight) {
             header.classList.add('hidden');
             itemTop.classList.add('fixed');
@@ -579,6 +589,14 @@
             itemTop.classList.remove('fixed');
             document.body.style.paddingTop = '7.4em';
             document.documentElement.style.setProperty('--item-top-height', '0px');
+        }
+
+        // 处理 item-sidebar 的显示/隐藏
+        const triggerPoint = contentSectionTop + contentSectionHeight - sidebarHeight - headerHeight;
+        if (scrollY >= triggerPoint) {
+            itemSidebar.style = ""
+        } else {
+            itemSidebar.style = "position:fixed;"
         }
 
         // 滚动时自动选中页签
@@ -592,7 +610,6 @@
         });
         if (currentSection) setActiveTab(currentSection);
     }
-
     window.onload = () => {
         w3.includeHTML(() => {
             renderItemInfo();
