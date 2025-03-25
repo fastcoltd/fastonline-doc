@@ -22,7 +22,7 @@ let itemFieldConfig = {
     favorite: {card: true, cardSq: true, cardHoriz: true, type: 'favorite', style: {}, customClass: 'fas fa-heart favorite-icon', onClick: (item, element) => {
         element.classList.toggle('favorited');
     }, sample: () => faker.datatype.boolean()},
-    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `items-${i}`) },
+    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `items-${randomInt(0,1000)}`) },
     name: { card: true, cardSq: true, cardHoriz: true, type: 'text', style: {}, sample: () => faker.commerce.productName() },
     price: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '价格', style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
     stock: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '库存', style: {}, sample: () => faker.datatype.number({ min: 10, max: 100 }) },
@@ -52,7 +52,7 @@ let itemFieldConfig = {
     seo_keywords: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: 'SEO关键词', style: {}, sample: () => faker.lorem.words(5) },
     seo_description: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: 'SEO描述', style: {}, sample: () => faker.lorem.sentence() },
     after_sales_rules: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '售后规则', format: (d, v) => `<span style="color: #666">${v}</span>`, style: {}, sample: () => faker.lorem.paragraph() },
-    sample_pics: { card: false, cardSq: false, cardHoriz: false, type: 'image', label: '样品图片', style: {}, sample: i => `[${getPicsumImage(300, 200, `sample-${i}`)}]` },
+    sample_pics: { card: false, cardSq: false, cardHoriz: false, type: 'image', label: '样品图片', style: {}, sample: i => `[${getPicsumImage(300, 200, `sample-${randomInt(0,1000)}`)}]` },
     content: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '商品内容', style: {}, sample: () => faker.lorem.paragraphs(3) },
 
     buyNow: { card: true, cardSq: true, cardHoriz: true, type: 'button', value: 'Buy Now', style: { width: '100%', display: 'block', marginTop: '0.625em' } },
