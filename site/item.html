@@ -341,31 +341,6 @@
     `;
     }
 
-    // 修改 tooltip 显示和隐藏函数，添加延迟
-    function showBadgeTooltip(element, description, name) {
-        // 清除之前的定时器，避免重复触发
-        clearTimeout(element.tooltipTimeout);
-
-        // 300ms 后显示 tooltip
-        element.tooltipTimeout = setTimeout(() => {
-            const tooltip = element.querySelector('.badge-tooltip');
-            if (tooltip) {
-                tooltip.style.display = 'block';
-            }
-        }, 300);
-    }
-
-    function hideBadgeTooltip(element) {
-        // 清除定时器
-        clearTimeout(element.tooltipTimeout);
-
-        // 立即隐藏 tooltip
-        const tooltip = element.querySelector('.badge-tooltip');
-        if (tooltip) {
-            tooltip.style.display = 'none';
-        }
-    }
-
     function toggleFavorite(element) {
         element.classList.toggle('favorited');
     }

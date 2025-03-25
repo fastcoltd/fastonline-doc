@@ -327,6 +327,28 @@ function generateArticles(containerId, min, max) {
     }
 }
 
+function showBadgeTooltip(element, description, name) {
+    clearTimeout(element.tooltipTimeout);
+    // 300ms 后显示 tooltip
+    element.tooltipTimeout = setTimeout(() => {
+        const tooltip = element.querySelector('.badge-tooltip');
+        if (tooltip) {
+            tooltip.style.display = 'block';
+        }
+    }, 300);
+}
+
+function hideBadgeTooltip(element) {
+    // 清除定时器
+    clearTimeout(element.tooltipTimeout);
+
+    // 立即隐藏 tooltip
+    const tooltip = element.querySelector('.badge-tooltip');
+    if (tooltip) {
+        tooltip.style.display = 'none';
+    }
+}
+
 function findParentType(item){
     let type
     let parentClass = item.closest('.card-list')?.id;
