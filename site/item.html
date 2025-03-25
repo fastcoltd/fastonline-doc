@@ -297,9 +297,24 @@
     function renderItemInfo() {
         const wholesaleData = generateData(itemWholesaleFieldConfig, randomInt(1, 5));
         const shippingType = faker.random.arrayElement(['Automatic', 'Manual']);
+
+        const badgeCount = randomInt(0, 3);
+        const selectedBadges = ecommerceBadges.Item
+            .sort(() => 0.5 - Math.random())
+            .slice(0, badgeCount);
+
+        const badgesHtml = selectedBadges.map(badge => `
+        <span class="badge"
+              onmouseover="showBadgeTooltip(this, '${badge.description.replace(/'/g, "\\'")}', '${badge.name}')"
+              onmouseout="hideBadgeTooltip(this)" style="color: ${badge.textColor};background: ${badge.backgroundColor}">
+            ${badge.icon} ${badge.name}
+            <span class="badge-tooltip">${badge.description}</span>
+        </span>
+    `).join('');
+
         document.getElementById('item-info-left').innerHTML = `<img src="${itemData.image}" alt="${itemName}">`;
         document.getElementById('item-info-right').innerHTML = `
-        <h1>${itemName}</h1>
+        <h1>${itemName}${badgesHtml}</h1>
         <p>Price: <span style="color: red; font-weight: bold">${itemData.price}</span>
             ${itemData.original_price ? `<span style="color: #A9A9A9; text-decoration: line-through">${itemData.original_price.sample}</span>` : ''}
             库存: ${itemData.stock_quantity.sample} (${itemData.last_restock_time.sample})
@@ -324,6 +339,31 @@
                 <i class="fas fa-ellipsis-h" onclick="renderFeedbackPopup()"></i>
             </div>
     `;
+    }
+
+    // 修改 tooltip 显示和隐藏函数，添加延迟
+    function showBadgeTooltip(element, description, name) {
+        // 清除之前的定时器，避免重复触发
+        clearTimeout(element.tooltipTimeout);
+
+        // 300ms 后显示 tooltip
+        element.tooltipTimeout = setTimeout(() => {
+            const tooltip = element.querySelector('.badge-tooltip');
+            if (tooltip) {
+                tooltip.style.display = 'block';
+            }
+        }, 300);
+    }
+
+    function hideBadgeTooltip(element) {
+        // 清除定时器
+        clearTimeout(element.tooltipTimeout);
+
+        // 立即隐藏 tooltip
+        const tooltip = element.querySelector('.badge-tooltip');
+        if (tooltip) {
+            tooltip.style.display = 'none';
+        }
     }
 
     function toggleFavorite(element) {

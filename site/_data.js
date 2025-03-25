@@ -219,6 +219,7 @@ const fieldsList = ["username", "password", "email", "2faEnabled", "2faCode", "r
 
 // 电商标签（30个一级标签）
 const tagColors = ['ant-tag-blue', 'ant-tag-green', 'ant-tag-orange', 'ant-tag-red', 'ant-tag-purple', 'ant-tag-cyan'];
+
 const ecommerceTags = [
     "COD", // Cash on Delivery
     "No Deductible", // 不计免赔
@@ -251,6 +252,69 @@ const ecommerceTags = [
     "Classic Style", // 经典款式
     "Rare Stock" // 稀缺库存
 ];
+
+const ecommerceBadges = {
+    Store : [
+        {name: "Top Seller", description: "Awarded to stores with the highest sales volume this month.", icon: "🏆", textColor: "#FFFFFF", backgroundColor: "#FFD700"},
+        {name: "Verified Vendor", description: "Certified by the platform for authenticity and reliability.", icon: "✅", textColor: "#FFFFFF", backgroundColor: "#32CD32"},
+        {name: "Fast Dispatch", description: "Ships virtual goods or services within 24 hours.", icon: "🚀", textColor: "#000000", backgroundColor: "#1E90FF"},
+        {name: "Premium Partner", description: "Exclusive partnership with the platform for premium offerings.", icon: "🌟", textColor: "#FFFFFF", backgroundColor: "#8A2BE2"},
+        {name: "5-Star Rated", description: "Maintains a consistent 5-star rating from buyers.", icon: "⭐", textColor: "#000000", backgroundColor: "#FFFF00"},
+        {name: "Eco Advocate", description: "Supports sustainable practices in virtual services.", icon: "🌍", textColor: "#FFFFFF", backgroundColor: "#228B22"},
+        {name: "New Store", description: "Recently joined the platform, offering fresh content.", icon: "🆕", textColor: "#FFFFFF", backgroundColor: "#FF4500"},
+        {name: "Loyal Member", description: "Active on the platform for over a year.", icon: "🎖️", textColor: "#FFFFFF", backgroundColor: "#4682B4"},
+        {name: "Exclusive Deals", description: "Offers special discounts for VIP members.", icon: "💎", textColor: "#FFFFFF", backgroundColor: "#FF69B4"},
+        {name: "Community Favorite", description: "Highly recommended by the community for quality service.", icon: "❤️", textColor: "#FFFFFF", backgroundColor: "#DC143C"}
+    ],
+    Item: [
+        {name: "Best Seller", description: "Top-performing virtual product or service this month.", icon: "🔥", textColor: "#FFFFFF", backgroundColor: "#FF4500"},
+        {name: "Limited Edition", description: "Exclusive virtual item available for a short time.", icon: "⏳", textColor: "#FFFFFF", backgroundColor: "#8B0000"},
+        {name: "High Demand", description: "Currently trending with high purchase rates.", icon: "📈", textColor: "#FFFFFF", backgroundColor: "#1E90FF"},
+        {name: "Buyer’s Pick", description: "Chosen as a favorite by frequent buyers.", icon: "👍", textColor: "#FFFFFF", backgroundColor: "#FFD700"},
+        {name: "New Arrival", description: "Freshly added to the platform’s offerings.", icon: "✨", textColor: "#FFFFFF", backgroundColor: "#00CED1"},
+        {name: "Pro Certified", description: "Endorsed by industry experts for quality.", icon: "🏅", textColor: "#FFFFFF", backgroundColor: "#32CD32"},
+        {name: "Value Deal", description: "Offers exceptional quality at a low price.", icon: "💰", textColor: "#FFFFFF", backgroundColor: "#228B22"},
+        {name: "Customizable", description: "Can be tailored to buyer preferences.", icon: "🎨", textColor: "#FFFFFF", backgroundColor: "#FF69B4"},
+        {name: "Instant Access", description: "Available immediately after purchase.", icon: "⚡", textColor: "#FFFFFF", backgroundColor: "#FF8C00"},
+        {name: "Exclusive Content", description: "Unique virtual product only available here.", icon: "🔒", textColor: "#FFFFFF", backgroundColor: "#4B0082"}
+    ],
+    Blog: [
+        {name: "Editor’s Choice", description: "Handpicked by our team for outstanding content.", icon: "✍️", textColor: "#FFFFFF", backgroundColor: "#FFD700"},
+        {name: "Viral Post", description: "Gained massive traction across the community.", icon: "📢", textColor: "#FFFFFF", backgroundColor: "#FF4500"},
+        {name: "Insightful", description: "Offers deep and valuable perspectives.", icon: "💡", textColor: "#FFFFFF", backgroundColor: "#1E90FF"},
+        {name: "Fresh Take", description: "Recently published with a unique angle.", icon: "🌿", textColor: "#FFFFFF", backgroundColor: "#32CD32"},
+        {name: "Community Voice", description: "Reflects the thoughts of our active users.", icon: "🗣️", textColor: "#FFFFFF", backgroundColor: "#DC143C"},
+        {name: "Expert Written", description: "Authored by a recognized professional.", icon: "👩‍🏫", textColor: "#FFFFFF", backgroundColor: "#8A2BE2"},
+        {name: "Trendsetter", description: "Sets the tone for upcoming discussions.", icon: "📈", textColor: "#FFFFFF", backgroundColor: "#FF69B4"},
+        {name: "Highly Engaged", description: "Sparks the most comments and shares.", icon: "💬", textColor: "#FFFFFF", backgroundColor: "#4682B4"},
+        {name: "Timeless Read", description: "Content that remains relevant over time.", icon: "⏰", textColor: "#FFFFFF", backgroundColor: "#228B22"},
+        {name: "Exclusive Insight", description: "Premium content for paid subscribers.", icon: "🔐", textColor: "#FFFFFF", backgroundColor: "#4B0082"}
+    ],
+    Posts: [
+        {name: "Featured Story", description: "Highlighted as a must-read by our editors.", icon: "📖", textColor: "#FFFFFF", backgroundColor: "#FFD700"},
+        {name: "Hot Topic", description: "Covers a currently buzzing subject.", icon: "🔥", textColor: "#FFFFFF", backgroundColor: "#FF4500"},
+        {name: "Research Backed", description: "Supported by data and thorough research.", icon: "📊", textColor: "#FFFFFF", backgroundColor: "#1E90FF"},
+        {name: "New Perspective", description: "Brings a fresh viewpoint to the table.", icon: "👁️", textColor: "#FFFFFF", backgroundColor: "#32CD32"},
+        {name: "Member Exclusive", description: "Available only to paying members.", icon: "🎫", textColor: "#FFFFFF", backgroundColor: "#8A2BE2"},
+        {name: "In-Depth", description: "Provides a comprehensive deep dive.", icon: "🔍", textColor: "#FFFFFF", backgroundColor: "#4682B4"},
+        {name: "Quick Read", description: "Short, impactful, and to the point.", icon: "⏱️", textColor: "#FFFFFF", backgroundColor: "#FF69B4"},
+        {name: "Award Winner", description: "Recognized in our community awards.", icon: "🏆", textColor: "#000000", backgroundColor: "#FFFF00"},
+        {name: "Evergreen", description: "Content with lasting value and appeal.", icon: "🌲", textColor: "#FFFFFF", backgroundColor: "#228B22"},
+        {name: "Crowd Favorite", description: "Loved by readers based on votes.", icon: "❤️", textColor: "#FFFFFF", backgroundColor: "#DC143C"}
+    ],
+    User: [
+        {name: "VIP Member", description: "Subscribed to our premium membership plan.", icon: "👑", textColor: "#FFFFFF", backgroundColor: "#FFD700"},
+        {name: "Frequent Shopper", description: "Makes regular purchases on the platform.", icon: "🛒", textColor: "#FFFFFF", backgroundColor: "#32CD32"},
+        {name: "Top Reviewer", description: "Consistently leaves detailed feedback.", icon: "✍️", textColor: "#FFFFFF", backgroundColor: "#1E90FF"},
+        {name: "Early Adopter", description: "Among the first to try new features or items.", icon: "🚀", textColor: "#FFFFFF", backgroundColor: "#FF4500"},
+        {name: "Loyal Fan", description: "Active buyer for over two years.", icon: "🎖️", textColor: "#FFFFFF", backgroundColor: "#4682B4"},
+        {name: "Big Spender", description: "Spends over $500 annually on the platform.", icon: "💸", textColor: "#FFFFFF", backgroundColor: "#FF8C00"},
+        {name: "Content Supporter", description: "Regularly backs premium content creators.", icon: "🎉", textColor: "#FFFFFF", backgroundColor: "#FF69B4"},
+        {name: "Community Leader", description: "Actively participates in forums and events.", icon: "👥", textColor: "#FFFFFF", backgroundColor: "#DC143C"},
+        {name: "Verified Buyer", description: "Confirmed identity for trusted transactions.", icon: "✅", textColor: "#FFFFFF", backgroundColor: "#228B22"},
+        {name: "Referral Star", description: "Invited multiple friends to join the platform.", icon: "🌟", textColor: "#FFFFFF", backgroundColor: "#8A2BE2"}
+    ]
+};
 
 const demandStatusColors = {
     'Approved': '#32CD32',        // Green (Grn)
