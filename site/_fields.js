@@ -124,7 +124,10 @@ let itemWholesaleFieldConfig = {
 let storeFieldConfig = {
     favorite: {card: true, cardSq: true, cardHoriz: true, type: 'favorite', style: {}, customClass: 'fas fa-heart favorite-icon', onClick: (item, element) => { element.classList.toggle('favorited'); }, sample: () => faker.datatype.boolean()},
     image: { card: true, cardSq: true, cardHoriz: true, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `store-${randomInt(0,1000)}`) },
-    name: { card: true, cardSq: true, cardHoriz: true, type: 'text', style: {}, sample: () => faker.company.companyName() },
+    name: { card: true, cardSq: true, cardHoriz: true, type: 'text', style: {}, sample: () => {
+        let name = faker.company.companyName()
+        return name.length > 12 ? name.substring(0,12): name;
+    } },
     sales: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '销量', style: {}, sample: () => faker.datatype.number({ min: 300, max: 1000 }) },
     salesTotal: { card: false, cardSq: false, cardHoriz: true, type: 'price', label: '销售额', style: {}, sample: () => faker.commerce.price(5000, 200000, 2, "$") },
     rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => faker.datatype.number({ min: 50, max: 300 }), sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },

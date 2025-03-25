@@ -29,7 +29,7 @@
         .demand-info .requirements { gap: 1em; flex-wrap: nowrap; }
         .demand-status { display: flex; position: absolute; top: 7.4em; right: -1.8em; padding: 0.5em; width: 13em; height: 2.5em !important; overflow: hidden; text-align: center; text-overflow: ellipsis; justify-content: center; white-space: nowrap; font-size: var(--font-small); color: #fff; transform: rotate(45deg); transform-origin: top right; }
         .owner-info { display: flex; align-items: center; gap: 1em; margin-bottom: 0.5em; }
-        .owner-info img { width: 2em; height: 2em; border-radius: 50%; }
+        .owner-info img { width: 4em; height: 4em; border-radius: 50%; }
         .edit-btn { position: absolute; top: 2em; right: 6em; padding: 0.3em 2em; background: var(--vibrant-orange); color: #fff; border: none; border-radius: 0.25em; cursor: pointer; }
         .section { }
         .section:last-child { margin-bottom: 0em; }
@@ -116,6 +116,7 @@
     }
 
     function renderDemandHeader() {
+        const badgesHtml = generateBadge('User', 0, 2);
         demandData.owerId = Math.random() > 0.5 ? userId : Math.floor(Math.random() * 1000);
         const header = document.getElementById('demand-header');
         const totalAmount = parseFloat(demandData.price_to.sample.split('$')[1]) * parseInt(demandData.quantity.sample);
@@ -125,7 +126,7 @@
                 <div class="owner-info">
                     <img src="${ownerData.avatar}" alt="${ownerData.nickname}">
                     <div>
-                        <p><b>发布者</b>: ${ownerData.nickname} (${ownerData.username})</p>
+                        <h2>${ownerData.nickname}${badgesHtml}</h2>
                         <p><b>发布需求</b>: ${ownerData.demandCount} <b>成交次数</b>: ${ownerData.dealCount} <b>成交率</b>: ${ownerData.dealRate}% <b>VIP等级</b>: <span style="color: #FFD700">Lv${ownerData.vipLevel}</span></p>
                     </div>
                 </div>

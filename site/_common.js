@@ -327,6 +327,19 @@ function generateArticles(containerId, min, max) {
     }
 }
 
+function generateBadge(type, min, max){
+    const selectedBadges = ecommerceBadges[type].sort(() => 0.5 - Math.random()).slice(0, randomInt(min, max));
+    const badgesHtml = selectedBadges.map(badge => `
+            <span class="badge"
+                  onmouseover="showBadgeTooltip(this, '${badge.description.replace(/'/g, "\\'")}', '${badge.name}')"
+                  onmouseout="hideBadgeTooltip(this)" style="color: ${badge.textColor};background: ${badge.backgroundColor}">
+                ${badge.icon} ${badge.name}
+                <span class="badge-tooltip">${badge.description}</span>
+            </span>
+        `).join('');
+    return badgesHtml;
+}
+
 function showBadgeTooltip(element, description, name) {
     clearTimeout(element.tooltipTimeout);
     // 300ms 后显示 tooltip

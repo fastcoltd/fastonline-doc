@@ -120,11 +120,12 @@
     const paidCount = isPaid ? faker.datatype.number({ min: 0, max: 50 }) : 0;
 
     function renderPostHeader() {
+        const badgesHtml = generateBadge('Posts', 0, 2);
         const header = document.getElementById('post-header');
         header.innerHTML = `
             <div class="post-inner">
                 <div class="post-info">
-                    <h1>${postTitle}</h1>
+                    <h1>${postTitle}${badgesHtml}</h1>
                     <div class="post-meta">
                         <div class="category">
                             <a href="post-list.html?type=${encodeURIComponent(categories.name)}">${categories.name}</a> >

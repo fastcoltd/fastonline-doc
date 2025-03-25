@@ -298,20 +298,7 @@
         const wholesaleData = generateData(itemWholesaleFieldConfig, randomInt(1, 5));
         const shippingType = faker.random.arrayElement(['Automatic', 'Manual']);
 
-        const badgeCount = randomInt(0, 3);
-        const selectedBadges = ecommerceBadges.Item
-            .sort(() => 0.5 - Math.random())
-            .slice(0, badgeCount);
-
-        const badgesHtml = selectedBadges.map(badge => `
-        <span class="badge"
-              onmouseover="showBadgeTooltip(this, '${badge.description.replace(/'/g, "\\'")}', '${badge.name}')"
-              onmouseout="hideBadgeTooltip(this)" style="color: ${badge.textColor};background: ${badge.backgroundColor}">
-            ${badge.icon} ${badge.name}
-            <span class="badge-tooltip">${badge.description}</span>
-        </span>
-    `).join('');
-
+        const badgesHtml = generateBadge('Item',0,3);
         document.getElementById('item-info-left').innerHTML = `<img src="${itemData.image}" alt="${itemName}">`;
         document.getElementById('item-info-right').innerHTML = `
         <h1>${itemName}${badgesHtml}</h1>
@@ -493,6 +480,7 @@
 
     function renderStoreInfo() {
         const deposit = randomInt(500, 5000);
+        const badgesHtml = generateBadge('Store', 0, 2);
         const languages = Array(randomInt(1, 3)).fill().map(() => faker.random.arrayElement(['English', 'Chinese', 'Spanish']));
         document.getElementById('store-info').innerHTML = `
             <h2>Store</h2>
@@ -503,7 +491,7 @@
                 </div>
                 <a href="store.html?name=${storeData.name}">
                     <div class="store-details">
-                        <p style="font-weight: bold;font-size: var(--font-large)">${storeData.name}</p>
+                        <p style="font-weight: bold;font-size: var(--font-large)">${storeData.name}${badgesHtml}</p>
                         <p><i class="fas fa-check-circle" style="color: ${storeData.verified.sample === '已认证' ? 'var(--font-green)' : ''}"></i> ${storeData.verified.sample} <i class="fas fa-shield-alt"></i> 保证金: <b>$${deposit}</b></p>
     <!--                    <p><i class="fas fa-map-marker-alt"></i> ${faker.address.country()} <i class="fas fa-briefcase"></i> ${faker.datatype.number({ min: 8, max: 10 })}:00 - ${faker.datatype.number({ min: 18, max: 22 })}:00 <i class="fas fa-language"></i> ${languages.join(', ')}</p>-->
                         <div style="display: flex;gap: 0.5em;">销量: ${storeData.sales} ${generateRating(storeData, storeData.rating)}</div>

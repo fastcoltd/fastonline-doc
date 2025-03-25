@@ -222,6 +222,7 @@
         const paginatedPosts = filteredPosts.slice(start, end);
         const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
 
+        const badgesHtml = generateBadge('Blog', 0,3);
         let titleName = typeName ? `Type: <em style="color: var(--font-green)">${typeName}</em>'s posts list` : 'Posts'
         titleName = tagName ? `Tag: <em style="color: var(--font-green)">${tagName}</em>'s posts list` : titleName
         const main = document.getElementById('blog-main');
@@ -236,7 +237,7 @@
             <div class="blog-header">
                 <img src="${getPicsumImage(50, 50, `user-${userName}`)}" alt="${userName}">
                 <div class="info">
-                    <h1>${userName}'s Blog</h1>
+                    <h1>${userName}'s Blog ${badgesHtml}</h1>
                     <div class="stats">
                         <span>Posts: ${user.posts_count}</span>
                         <span >Followers ${user.save_count || 0}</span>

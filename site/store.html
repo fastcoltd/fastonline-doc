@@ -239,6 +239,7 @@
         })
         lang = lang.length <= 0 ? {"name": "English"} : lang[0]
         timeZone = timeZone < 0 ? `GMT${timeZone}` : `GMT+${timeZone}`;
+        const badgesHtml = generateBadge('Store', 0, 2);
         sidebar.innerHTML = `
             <div class="store-sidebar-inner">
                 <div class="store-basic">
@@ -256,6 +257,7 @@
                         <p>
                            <i class="fas fa-briefcase"></i> 时间: 9:00 - 20:00 <i class="fas fa-clock"></i> ${timeZone}
                         </p>
+                        ${badgesHtml ? `<p>${badgesHtml}</p>` : ''}
                         <p>${tags.map((tag, i) => `<span class="${tagColors[i % tagColors.length]}">${tag}</span>`).join(' ')}</p>
                     </div>
                     <i id="store-favorite" class="fas fa-heart favorite-icon"></i>
