@@ -49,11 +49,6 @@
         .share-section h3 { margin: 0 1em 0 0; font-size: var(--font-large); color: var(--text-primary); }
         .share-section img { width: 2em; height: 2em; border-radius: 1em; cursor: pointer; transition: transform 0.2s; }
         .share-section img:hover { transform: scale(1.1); }
-        .comments-section { margin: 2em 0; }
-        .comment-list { margin-bottom: 1em; }
-        .comment-item { display: flex; gap: 1em; padding: 1em 0; border-bottom: 0.0625em solid var(--border-color); }
-        .comment-item img { width: 2em; height: 2em; border-radius: 50%; }
-        .comment-content { flex: 1; }
         .self-comment { margin-top: 1em; padding: 1.5em; background: var(--bg-light); border-radius: 0.5em; }
         .self-comment img { width: 2em; height: 2em; border-radius: 50%; }
         .self-comment textarea { width: 100%; padding: 0.75em; margin: 0.75em 0; border: 1px solid var(--border-color); border-radius: 0.375em; resize: vertical; }
@@ -64,6 +59,18 @@
         .scroll-arrow.right { right: 0em; }
         .scroll-arrow:hover { color: var(--natural-green); opacity: 1; }
         .ant-tag { cursor: pointer; padding: 0.25em 0.5em; margin-right: 0.5em; }
+
+        .comments-section { padding: 1em 1em; }
+        .review-list { margin-top: 1em; }
+        .review-item { margin-bottom: 1em; padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.5em; }
+        .review-header { display: flex; justify-content: space-between; align-items: center; }
+        .review-user { display: flex; align-items: center; gap: 0.5em; }
+        .review-user img { width: 2em; height: 2em; border-radius: 50%; }
+        .review-reply { display: none; margin: 0.5em 0; }
+        .review-reply.expanded { display: block; }
+        .review-store { cursor: pointer; padding-top: 1em; margin-bottom: 0; border-top: 0.0625em solid var(--border-color); }
+        .rating-wrapper { display: flex; align-items: center; gap: 0.5em; }
+        .show-more { text-align: center; margin-top: 1em; }
 
         @media (max-width: 48em) {
             body, .container, .post-header { padding-top: 1.5em !important; margin: 0 !important; }
@@ -105,6 +112,7 @@
     const postTitle = decodeURIComponent(urlParams.get('name') || 'Sunt suscipit blanditiis optio ut asperiores vel.');
     const isPaid = Math.random() > 0.5;
     const authorName = faker.name.findName();
+    const authorAvatar = getPicsumImage(50, 50, `author-${authorName}`);
     const storeChance = Math.random() > 0.5;
     const storeName = storeChance ? faker.company.companyName() : null;
     const categories = articleCategories[Math.floor(Math.random() * articleCategories.length)];
@@ -118,6 +126,10 @@
     let favoriteCount = faker.datatype.number({ min: 100, max: 1100 });
     const readCount = faker.datatype.number({ min: 100, max: 1000 });
     const paidCount = isPaid ? faker.datatype.number({ min: 0, max: 50 }) : 0;
+
+    let reviews = [];
+    let reviewPage = 1;
+    const reviewsPerPage = 5;
 
     function renderPostHeader() {
         const badgesHtml = generateBadge('Posts', 0, 2);
@@ -134,7 +146,7 @@
                         </div>
                         <div class="author-row">
                             <div class="author">
-                                <label>Blog:</label> <img src="${getPicsumImage(50, 50, `author-${authorName}`)}" alt="${authorName}">
+                                <label>Blog:</label> <img src="${authorAvatar}" alt="${authorName}">
                                 <a href="blog.html?name=${encodeURIComponent(authorName)}" style="color: var(--font-green);font-weight: bold">${authorName}</a>
                             </div>
                             ${storeName ? `
@@ -292,78 +304,62 @@
         window.open(shareUrl, '_blank');
     }
 
-    function renderComments() {
+    function renderItemReviews() {
+        if (!reviews.length) reviews = generateData(ordersCommentFieldConfig, randomInt(10, 500));
+        const total = reviews.length;
+        document.getElementById('comments-section').innerHTML = `
+            <h2>Reviews</h2>
+            <div class="review-header">
+                <span>1-${Math.min(reviewsPerPage, total)} out of ${total} Reviews</span>
+                <div class="review-sort">
+                    <select class="ant-select" onchange="sortReviews(this.value)">
+                        <option value="time">按最近时间</option>
+                        <option value="amount">按评价降序</option>
+                    </select>
+                </div>
+            </div>
+            <div class="review-list" id="review-list">
+                ${reviews.slice(0, reviewsPerPage).map((r, i) => renderReview(r, i)).join('')}
+            </div>
+            ${total > reviewsPerPage ? `<div class="show-more"><button class="btn-solid-medium" onclick="loadMoreReviews()">Show More Reviews</button></div>` : ''}
+        `;
+
+        renderComment()
+    }
+
+    function renderReview(review, index) {
+        const timeAgo = faker.random.arrayElement(['seconds', 'minutes', 'hours', 'days', 'months', 'years']);
+        const timeValue = timeAgo === 'seconds' ? faker.datatype.number({ min: 1, max: 59 }) + ' s' :
+            timeAgo === 'minutes' ? faker.datatype.number({ min: 1, max: 59 }) + ' min' :
+                timeAgo === 'hours' ? faker.datatype.number({ min: 1, max: 23 }) + ' hr' :
+                    timeAgo === 'days' ? faker.datatype.number({ min: 1, max: 30 }) + ' days' :
+                        timeAgo === 'months' ? faker.datatype.number({ min: 1, max: 11 }) + ' mo' :
+                            faker.datatype.number({ min: 1, max: 5 }) + ' yr';
+        return `
+            <div class="review-item">
+                <div class="review-user">
+                    <img src="${getPicsumImage(50, 50, `user-${index}`)}" alt="User">
+                    <span>${faker.address.country()}</span>
+                    <span>${faker.name.firstName()}</span>
+                </div>
+                <hr>
+                <div class="rating-wrapper">${generateRating(review, review.rating)} <span>${timeValue} ago</span></div>
+                <p>${faker.lorem.paragraphs(randomInt(2, 3))}</p>
+                <p class="review-store" onclick="toggleReply(this)">
+                    <img src="${authorAvatar}" alt="${authorName}" style="width: 1.5em; height: 1.5em; border-radius: 1em;">
+                    <b>${authorName}</b> <i class="fas fa-chevron-down" style="float: right; margin-right: 2em;"></i>
+                </p>
+                <div class="review-reply">${faker.lorem.paragraph()}</div>
+            </div>
+            <p style="margin-bottom:2em;">Helpful?
+                <span><i class="fas fa-thumbs-up" onclick="voteReview(this, 'yes', ${index})"></i> Yes</span>
+                <span><i class="fas fa-thumbs-down" onclick="voteReview(this, 'no', ${index})"></i> No</span>
+            </p>
+        `;
+    }
+
+    function renderComment() {
         const commentsSection = document.getElementById('comments-section');
-        const commentCount = faker.datatype.number({ min: 50, max: 200 });
-        const commentsPerPage = 10;
-        const totalPages = Math.ceil(commentCount / commentsPerPage);
-        const comments = Array(commentCount).fill().map(() => ({
-            user: faker.name.findName(),
-            avatar: getPicsumImage(50, 50, `comment-${Math.random()}`),
-            rating: {
-                overall: faker.datatype.float({ min: 3, max: 5, precision: 0.1 }),
-                clarity: faker.datatype.float({ min: 3, max: 5, precision: 0.1 }),
-                depth: faker.datatype.float({ min: 3, max: 5, precision: 0.1 }),
-                usefulness: faker.datatype.float({ min: 3, max: 5, precision: 0.1 })
-            },
-            content: faker.lorem.paragraph()
-        }));
-        let currentPage = 1;
-
-        function renderCommentList(page) {
-            const start = (page - 1) * commentsPerPage;
-            const end = start + commentsPerPage;
-            const pageComments = comments.slice(start, end);
-            let html = `
-                <h3>Comments (${commentCount})</h3>
-                <div class="comment-list">
-                    ${pageComments.map(comment => `
-                        <div class="comment-item">
-                            <img src="${comment.avatar}" alt="${comment.user}">
-                            <div class="comment-content">
-                                <strong>${comment.user}</strong>
-                                <div class="rating-wrapper" onclick="showRatingModal(${JSON.stringify(comment.rating).replace(/"/g, '"')})">${generateRating({}, { sample: comment.rating.overall, count: 0 }, {})}</div>
-                                <p>${comment.content}</p>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="pagination">
-                    <button class="ant-btn pagination-btn" onclick="changeCommentPage(-1)">Previous</button>
-                    <span id="pagination-info"></span>
-                    <button class="ant-btn pagination-btn" onclick="changeCommentPage(1)">Next</button>
-                </div>
-            `;
-            commentsSection.innerHTML = html;
-            updateCommentPagination(totalPages);
-        }
-
-        function updateCommentPagination(totalPages) {
-            let paginationHtml = '';
-            if (totalPages <= 7) {
-                for (let i = 1; i <= totalPages; i++) {
-                    paginationHtml += `<a href="#" onclick="renderCommentList(${i}); return false;" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
-                }
-            } else {
-                paginationHtml += `<a href="#" onclick="renderCommentList(1); return false;" ${currentPage === 1 ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>1</a>`;
-                if (currentPage > 4) paginationHtml += '<span>...</span>';
-                for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
-                    paginationHtml += `<a href="#" onclick="renderCommentList(${i}); return false;" ${i === currentPage ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${i}</a>`;
-                }
-                if (currentPage < totalPages - 3) paginationHtml += '<span>...</span>';
-                paginationHtml += `<a href="#" onclick="renderCommentList(${totalPages}); return false;" ${currentPage === totalPages ? 'style="font-weight: bold; color: var(--vibrant-orange);"' : ''}>${totalPages}</a>`;
-            }
-            document.getElementById('pagination-info').innerHTML = paginationHtml;
-        }
-
-        function changeCommentPage(delta) {
-            const totalPages = Math.ceil(commentCount / commentsPerPage);
-            currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
-            renderCommentList(currentPage);
-        }
-
-        renderCommentList(currentPage);
-
         const selfComment = `
             <div class="self-comment">
                 <div style="display: flex; align-items: center; gap: 0.5em;">
@@ -382,6 +378,26 @@
             </div>
         `;
         commentsSection.innerHTML += selfComment;
+    }
+
+    function sortReviews(type) {
+        if (type === 'time') reviews.sort(() => 0);
+        else reviews.sort((a, b) => parseFloat(b.total.replace('$', '')) - parseFloat(a.total.replace('$', '')));
+        renderItemReviews();
+    }
+
+    function toggleReply(element) {
+        const reply = element.closest('.review-item').querySelector('.review-reply');
+        reply.classList.toggle('expanded');
+        element.querySelector('i').classList.toggle('fa-chevron-down');
+        element.querySelector('i').classList.toggle('fa-chevron-up');
+    }
+
+    function loadMoreReviews() {
+        reviewPage++;
+        const start = (reviewPage - 1) * reviewsPerPage;
+        const newReviews = reviews.slice(start, start + reviewsPerPage);
+        document.getElementById('review-list').innerHTML += newReviews.map((r, i) => renderReview(r, i)).join('');
     }
 
     function showRatingModal(rating) {
@@ -457,7 +473,7 @@
             renderPostHeader();
             renderPostContent();
             renderShareSection();
-            renderComments();
+            renderItemReviews();
             renderRelatedItems();
 
             const header = document.getElementById('post-header');
