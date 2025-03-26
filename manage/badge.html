@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 徽章管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <script src="_chat.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
+    <style>
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-sattus { width: 8%; min-width: 60px; }
+        .col-language { width: 10%; min-width: 80px; }
+        .col-badge-name { width: 12%; min-width: 100px; }
+        .col-custom-url { width: 12%; min-width: 100px; }
+        .col-icon { width: 10%; min-width: 80px; }
+        .col-use-type { width: 10%; min-width: 80px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 12%; min-width: 100px; }
+        .icon-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
+        .icon-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('badge.html')">
+                                    <span class="ant-tabs-tab-btn">徽章</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
+                                <div class="task-list">
+                                    <div class="table-header"></div>
+                                    <div id="badge-list">加载中...</div>
+                                    <div class="pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="" alt="放大图片">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 模拟徽章名称
+    const badgeNames = {
+        'zh_CN': ['新手徽章', '活跃用户', '金牌卖家', '优质内容', '忠诚客户', '快速响应', '创意之星', '团队合作', '年度最佳', '服务标兵'],
+        'en_US': ['Newbie Badge', 'Active User', 'Gold Seller', 'Quality Content', 'Loyal Customer', 'Fast Responder', 'Creative Star', 'Team Player', 'Annual Best', 'Service Champion'],
+        'fr_FR': ['Badge Débutant', 'Utilisateur Actif', 'Vendeur Or', 'Contenu de Qualité', 'Client Fidèle', 'Réponse Rapide', 'Étoile Créative', 'Joueur d\'Équipe', 'Meilleur Annuel', 'Champion du Service'],
+        'es_ES': ['Insignia de Novato', 'Usuario Activo', 'Vendedor Oro', 'Contenido de Calidad', 'Cliente Leal', 'Respuesta Rápida', 'Estrella Creativa', 'Jugador en Equipo', 'Mejor Anual', 'Campeón de Servicio'],
+        'vi_VN': ['Huy hiệu Người mới', 'Người dùng Hoạt động', 'Người bán Vàng', 'Nội dung Chất lượng', 'Khách hàng Trung thành', 'Phản hồi Nhanh', 'Ngôi sao Sáng tạo', 'Đồng đội', 'Tốt nhất Năm', 'Nhà vô địch Dịch vụ'],
+        'ru_RU': ['Значок Новичка', 'Активный Пользователь', 'Золотой Продавец', 'Качественный Контент', 'Лояльный Клиент', 'Быстрый Ответ', 'Творческая Звезда', 'Командный Игрок', 'Лучший за Год', 'Чемпион по Сервису']
+    };
+
+    const useTypes = [
+        { value: 0, label: 'store' },
+        { value: 1, label: 'item' },
+        { value: 2, label: 'user' },
+        { value: 3, label: 'blog' },
+        { value: 4, label: 'posts' }
+    ];
+
+    window.tableConfig = {
+        tableName: 'badge',
+        tableTitle: '徽章',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            // 主表 badge 字段
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'sattus', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用 (DDL中拼写为 sattus)
+            { name: 'sort_index', generator: () => randomInt(0, 255) },
+            { name: 'use_type', generator: () => randomInt(0, 4) }, // store, item, user, blog, posts
+            { name: 'weight', generator: () => randomInt(1, 100) },
+            { name: 'custom_url', generator: id => `/badge/${id}-${randomInt(1000, 9999)}` },
+            { name: 'extra_data', generator: () => '{}' },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
+            { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
+            // 多语言表 badge_lang 字段
+            { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) },
+            { name: 'badge_id', isLangField: true, generator: id => id },
+            { name: 'language', isLangField: true, generator: (id, lang) => lang },
+            { name: 'seo_keywords', isLangField: true, generator: (id, lang) => `${getRandomItem(badgeNames[lang])}, badge ${id}` },
+            { name: 'seo_description', isLangField: true, generator: (id, lang) => `Explore ${getRandomItem(badgeNames[lang])} badge details.` },
+            { name: 'badge_name', isLangField: true, generator: (id, lang) => `${getRandomItem(badgeNames[lang])} ${id % 10}` },
+            { name: 'icon', isLangField: true, generator: () => getRandomImage('badge') },
+            { name: 'summary', isLangField: true, generator: (id, lang) => `Summary of ${getRandomItem(badgeNames[lang])} badge.` }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'sattus', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
+            { label: '批量修改排序', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'sort_index', label: '排序索引', type: 'number', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i * 10, label: `${i * 10}` })) } },
+            { label: '批量修改使用类型', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'use_type', label: '使用类型', type: 'select', options: useTypes } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'sattus', label: '状态', className: 'col-sattus', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
+            { name: 'language', label: '语言', className: 'col-language', isLangField: true },
+            { name: 'badge_name', label: '徽章名称', className: 'col-badge-name', isLangField: true },
+            { name: 'custom_url', label: '自定义URL', className: 'col-custom-url' },
+            { name: 'icon', label: '图标', className: 'col-icon', formatter: v => v ? `<div class="icon-preview"><img src="${v}" alt="图标" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="icon-preview"><span class="placeholder" onclick="alert(\'图标不存在\')">无</span></div>', isLangField: true },
+            { name: 'use_type', label: '使用类型', className: 'col-use-type', formatter: v => useTypes[v]?.label || '未知' },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'sattus', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.sattus === parseInt(value)) },
+            { id: 'sort_index', type: 'number', placeholder: '排序索引', filter: (data, value) => value ? data.filter(d => d.sort_index === parseInt(value)) : data },
+            { id: 'use_type', type: 'select', options: [{ value: '', label: '全部类型' }, ...useTypes], filter: (data, value) => value === '' ? data : data.filter(d => d.use_type === parseInt(value)) },
+            { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'zh_CN', label: '中文' }, { value: 'en_US', label: '英语' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.badge_id === d.id && l.language === value)) : data },
+            { id: 'badge_name', type: 'text', placeholder: '搜索徽章名称', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.badge_id === d.id && l.badge_name.toLowerCase().includes(value.toLowerCase()))) : data },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        langFields: {
+            foreignKey: 'badge_id',
+            languages: ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
+        },
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'sattus', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'sort_index', label: '排序索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'use_type', label: '使用类型', type: 'select', options: useTypes, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'weight', label: '权重', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'extra_data', label: '额外数据', type: 'textarea', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            },
+            {
+                id: 'lang',
+                title: '多语言信息',
+                fields: [
+                    { name: 'language', label: '语言', type: 'select', options: ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                    { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'badge_name', label: '徽章名称', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'icon', label: '图标', type: 'file', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'summary', label: '摘要', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            }
+        ]
+    };
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTRESP - 徽章概览</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
+    <link rel="stylesheet" href="_style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="_common.js"></script>
+    <script src="_chat.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
+    <style>
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 10%; min-width: 80px; }
+        .col-type { width: 12%; min-width: 100px; }
+        .col-relation-name { width: 12%; min-width: 100px; }
+        .col-relation-id { width: 12%; min-width: 100px; }
+        .col-badge-name { width: 12%; min-width: 100px; }
+        .col-badge-id { width: 12%; min-width: 100px; }
+        .col-create-time { width: 15%; min-width: 120px; }
+        .col-actions { width: 12%; min-width: 100px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="header" w3-include-html="_header.html"></div>
+    <div class="content-wrapper">
+        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav" role="tablist">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('badge_overview.html')">
+                                    <span class="ant-tabs-tab-btn">徽章数据列表</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ant-tabs-content-holder">
+                        <div class="ant-tabs-content ant-tabs-content-top">
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
+                                <div class="task-list">
+                                    <div class="table-header"></div>
+                                    <div id="badge_overview-list">加载中...</div>
+                                    <div class="pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" w3-include-html="_footer.html"></div>
+</div>
+
+<script>
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 类型选项及颜色映射
+    const typeOptions = [
+        { value: '店铺', label: '店铺', color: 'blue' },
+        { value: '商品', label: '商品', color: 'green' },
+        { value: '品牌', label: '品牌', color: 'orange' },
+        { value: '用户', label: '用户', color: 'purple' },
+        { value: '博客', label: '博客', color: 'pink' },
+        { value: '文章', label: '文章', color: 'cyan' },
+        { value: '评价', label: '评价', color: 'red' }
+    ];
+
+    // 模拟关联名称
+    const relationNames = {
+        '店铺': ['TechShop', 'EcoMart', 'GearZone'],
+        '商品': ['Phone X', 'Laptop Pro', 'Smart Watch'],
+        '品牌': ['Google', 'Amazon', 'Apple'],
+        '用户': ['张三', '李四', '王五'],
+        '博客': ['Tech Blog', 'Life Tips', 'Travel Notes'],
+        '文章': ['AI Trends', 'Green Living', 'Gadget Reviews'],
+        '评价': ['5星好评', '快速配送', '质量优异']
+    };
+
+    // 模拟徽章名称
+    const badgeNames = ['新手勋章', '金牌卖家', '活跃用户', '优质内容', '忠诚客户'];
+
+    window.tableConfig = {
+        tableName: 'badge_overview',
+        tableTitle: '徽章数据列表',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'type', generator: () => getRandomItem(typeOptions.map(t => t.value)) },
+            { name: 'relation_name', generator: id => {
+                    const type = tableData[id - 1]?.type || getRandomItem(typeOptions.map(t => t.value));
+                    return getRandomItem(relationNames[type]);
+                }},
+            { name: 'relation_id', generator: () => randomInt(1, 1000) },
+            { name: 'badge_name', generator: () => getRandomItem(badgeNames) }, // DDL 中为 int，语义上应为名称，按实际含义生成
+            { name: 'badge_id', generator: () => randomInt(1, 200) },
+            { name: 'extra_data', generator: () => JSON.stringify({ expire_time: moment().add(randomInt(1, 365), 'days').unix(), top: randomInt(50, 200), sales: randomInt(5000, 20000) }) },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改徽章', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'badge_id', label: '徽章ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `徽章 ${i + 1}` })) } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'type', label: '类型', className: 'col-type', formatter: v => `<span class="ant-tag ant-tag-${typeOptions.find(t => t.value === v)?.color || 'gray'}">${v}</span>` },
+            { name: 'relation_name', label: '关联名称', className: 'col-relation-name' },
+            { name: 'relation_id', label: '关联ID', className: 'col-relation-id' },
+            { name: 'badge_name', label: '徽章名称', className: 'col-badge-name' },
+            { name: 'badge_id', label: '徽章ID', className: 'col-badge-id', formatter: v => `徽章 ${v}` },
+            { name: 'create_time', label: '获得时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'type', type: 'select', options: [{ value: '', label: '全部类型' }, ...typeOptions], filter: (data, value) => value === '' ? data : data.filter(d => d.type === value) },
+            { id: 'badge_id', type: 'select', options: [{ value: '', label: '全部徽章' }, ...Array.from({ length: 15 }, (_, i) => ({ value: `${i + 1}`, label: `徽章 ${i + 1}` }))], filter: (data, value) => value === '' ? data : data.filter(d => d.badge_id === parseInt(value)) },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'type', label: '类型', type: 'select', options: typeOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'badge_id', label: '徽章ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `徽章 ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'relation_name', label: '关联名称', type: 'text', showInAdd: false, showInEdit: false, editableInAdd: true, editableInEdit: true },
+                    { name: 'relation_id', label: '关联ID', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'badge_name', label: '徽章名称', type: 'text', showInAdd: false, showInEdit: false, editableInAdd: true, editableInEdit: true }, // DDL 中为 int，语义上应为名称
+                    { name: 'extra_data', label: '额外数据', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '获得时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            }
+        ]
+    };
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
+</script>
+</body>
+</html>
