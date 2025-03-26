@@ -11,7 +11,7 @@
     <style>
         html { overflow: auto!important; height: auto; }
         body { padding-top: 7.4em !important; height: auto; overflow: auto !important; transition: padding-top 0.3s ease; }
-        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding-top: 8em; }
+        .container { max-width: var(--max-content-width); margin: -8em auto 0 auto; position: relative; padding: 8em 1em 0 1em; }
         .campaign-header { max-width: var(--max-content-width); margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 1em 0em 1em 0em; border-bottom: 0.0625em solid var(--border-color); position: sticky; top: 0; background: var(--bg-white); z-index: 10; transition: box-shadow 0.3s ease; }
         .campaign-header.fixed { max-width: none; position: fixed; width: 100%; top: 0; z-index: 20; border-bottom: 0.0625em solid var(--border-color); left: 0; right: 0; padding: 1em 0em 1em 0em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); }
         .campaign-inner { display: flex; align-items: center; width: 100%; position: relative; }
@@ -101,6 +101,7 @@
     };
 
     function renderCampaignHeader() {
+        const badgesHtml = generateBadge('Campaign', 0, 1);
         const header = document.getElementById('campaign-header');
         const tagsHtml = campaignData.tags.map((tag, idx) =>
             `<span class="ant-tag ${tagColors[idx % tagColors.length]}">${tag}</span>`
@@ -108,7 +109,7 @@
         header.innerHTML = `
     <div class="campaign-inner">
         <div class="campaign-info">
-            <h1><a href="campaign.html${window.location.search}" style="color: var(--natural-green)">${campaignData.title}</a></h1>
+            <h1><a href="campaign.html${window.location.search}" style="color: var(--natural-green)">${campaignData.title}</a>${badgesHtml}</h1>
             <div class="campaign-summary" id="campaign-summary">
                 ${campaignData.summary}
             </div>

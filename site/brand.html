@@ -92,6 +92,7 @@
     };
 
     function renderBrandHeader() {
+        const badgesHtml = generateBadge('Brand', 0, 1);
         const header = document.getElementById('brand-header');
         header.innerHTML = `
     <div class="brand-inner">
@@ -99,7 +100,7 @@
             <img src="${selectedBrand.logo}" alt="${selectedBrand.name}">
         </div>
         <div class="brand-info">
-            <h1><a href="brand.html${window.location.search}" style="color: ${selectedBrand.themeColor}">${selectedBrand.name}</a></h1>
+            <h1><a href="brand.html${window.location.search}" style="color: ${selectedBrand.themeColor}">${selectedBrand.name}</a>${badgesHtml}</h1>
             <p><b>Category</b>: Tech Platform <b>Company</b>: ${selectedBrand.parentCompany}</p>
             <div class="brand-summary" id="brand-summary">
                 ${selectedBrand.description} ${selectedBrand.description} ${selectedBrand.description}

@@ -313,6 +313,30 @@ const ecommerceBadges = {
         {name: "Community Leader", description: "Actively participates in forums and events.", icon: "👥", textColor: "#FFFFFF", backgroundColor: "#DC143C"},
         {name: "Verified Buyer", description: "Confirmed identity for trusted transactions.", icon: "✅", textColor: "#FFFFFF", backgroundColor: "#228B22"},
         {name: "Referral Star", description: "Invited multiple friends to join the platform.", icon: "🌟", textColor: "#FFFFFF", backgroundColor: "#8A2BE2"}
+    ],
+    Brand: [
+        {name: "Global Leader", description: "Recognized as a top brand worldwide in its category.", icon: "🌐", textColor: "#FFFFFF", backgroundColor: "#4169E1"}, // Royal Blue
+        {name: "Innovator Award", description: "Awarded for groundbreaking products or services.", icon: "💡", textColor: "#FFFFFF", backgroundColor: "#FF4500"}, // Orange-Red
+        {name: "Trusted Name", description: "Consistently delivers reliable quality and service.", icon: "🤝", textColor: "#FFFFFF", backgroundColor: "#228B22"}, // Forest Green
+        {name: "Brand of the Year", description: "Voted the best brand by users this year.", icon: "🏆", textColor: "#FFFFFF", backgroundColor: "#FFD700"}, // Gold
+        {name: "Heritage Mark", description: "Celebrating a legacy of over 10 years in the market.", icon: "🕰️", textColor: "#FFFFFF", backgroundColor: "#8B4513"}, // Saddle Brown
+        {name: "Rising Star", description: "A fast-growing brand gaining popularity.", icon: "⭐", textColor: "#FFFFFF", backgroundColor: "#FF69B4"}, // Hot Pink
+        {name: "Customer Obsessed", description: "Known for exceptional customer satisfaction.", icon: "😊", textColor: "#FFFFFF", backgroundColor: "#1E90FF"}, // Dodger Blue
+        {name: "Exclusive Launch", description: "First to debut a unique product on the platform.", icon: "🎉", textColor: "#FFFFFF", backgroundColor: "#00CED1"}, // Dark Turquoise
+        {name: "Tech Pioneer", description: "Leading advancements in technology solutions.", icon: "⚙️", textColor: "#FFFFFF", backgroundColor: "#483D8B"}, // Dark Slate Blue
+        {name: "Social Impact", description: "Makes a positive difference in communities.", icon: "🌍", textColor: "#FFFFFF", backgroundColor: "#32CD32"} // Lime Green
+    ],
+    Campaign: [
+        {name: "Mega Sale", description: "Features the biggest discounts of the season.", icon: "💥", textColor: "#FFFFFF", backgroundColor: "#FF4500"}, // Orange-Red
+        {name: "Launch Success", description: "Achieved record engagement on debut day.", icon: "🚀", textColor: "#FFFFFF", backgroundColor: "#1E90FF"}, // Dodger Blue
+        {name: "Fan Favorite", description: "Most loved campaign based on user votes.", icon: "❤️", textColor: "#FFFFFF", backgroundColor: "#DC143C"}, // Crimson
+        {name: "Limited Run", description: "A short-term campaign with exclusive offers.", icon: "⏳", textColor: "#FFFFFF", backgroundColor: "#8B0000"}, // Dark Red
+        {name: "Viral Hit", description: "Gained massive traction across social media.", icon: "📱", textColor: "#FFFFFF", backgroundColor: "#FF69B4"}, // Hot Pink
+        {name: "Top Conversion", description: "Highest sales conversion rate this month.", icon: "📈", textColor: "#FFFFFF", backgroundColor: "#32CD32"}, // Lime Green
+        {name: "Seasonal Star", description: "Best campaign tied to a holiday or event.", icon: "🎄", textColor: "#FFFFFF", backgroundColor: "#FFD700"}, // Gold
+        {name: "Collab Spotlight", description: "Features a notable brand partnership.", icon: "🤝", textColor: "#FFFFFF", backgroundColor: "#4682B4"}, // Steel Blue
+        {name: "Early Access", description: "Offers exclusive previews to select users.", icon: "🔑", textColor: "#FFFFFF", backgroundColor: "#FF8C00"}, // Dark Orange
+        {name: "Charity Drive", description: "Supports a cause with every purchase.", icon: "🤲", textColor: "#FFFFFF", backgroundColor: "#9932CC"} // Dark Orchid
     ]
 };
 
