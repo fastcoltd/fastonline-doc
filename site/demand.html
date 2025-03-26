@@ -235,12 +235,13 @@
 
         bidList.innerHTML = pageBids.length === 0 ? '<p style="text-align: center; color: var(--text-secondary);">暂无投标信息</p>' : '';
         pageBids.forEach((bid, index) => {
+            const badgesHtml = generateBadge('Store', 0, 1);
             const isSelf = bid.user_id === userId;
             const bidItem = document.createElement('div');
             bidItem.className = `bid-item ${isSelf ? 'self' : ''}`;
             const summary = `
                 <div class="bid-summary">
-                    <p><b>店铺</b>: <a href="store.html?name=${encodeURIComponent(bid.store_name)}"><img src="${bid.avatar}" alt="${bid.store_name}" style="width: 1.5em; height: 1.5em; vertical-align: middle; margin-right: 0.5em;border-radius: 1em;">${bid.store_name}</a></p>
+                    <h4><b>店铺</b>: <a href="store.html?name=${encodeURIComponent(bid.store_name)}"><img src="${bid.avatar}" alt="${bid.store_name}" style="width: 1.5em; height: 1.5em; vertical-align: middle; margin-right: 0.5em;border-radius: 1em;">${bid.store_name}</a>${badgesHtml}</h4>
                     <p><b>等级</b>: ${bid.rating.sample >= 4.5 ? 'Lv5' : bid.rating.sample >= 4 ? 'Lv4' : 'Lv3'}</p>
                     <p><b>评分</b>: ${generateRating({}, bid.rating, {})}</p>
                     <p><b>订单量</b>: ${bid.orders_count}</p>
