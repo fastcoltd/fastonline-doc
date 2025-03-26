@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 标签管理</title>
+    <title>FASTRESP - 标签</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -11,35 +11,18 @@
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="_common.js"></script>
     <script src="_chat.js"></script>
+    <script src="_img.js"></script>
+    <script src="_opt.js"></script>
     <style>
-        .filter-container { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .action-container { margin-bottom: 16px; }
-        .table-header, .task-item { display: flex; width: 100%; }
-        .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
         .col-id { width: 8%; min-width: 60px; }
-        .col-status { width: 8%; min-width: 80px; }
-        .col-custom-url { width: 12%; min-width: 120px; }
-        .col-language { width: 8%; min-width: 80px; }
-        .col-tag-name { width: 12%; min-width: 120px; }
-        .col-seo-keywords { width: 12%; min-width: 120px; }
-        .col-create-time { width: 12%; min-width: 120px; }
-        .col-update-time { width: 12%; min-width: 120px; }
-        .col-actions { width: 10%; min-width: 100px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; }
-        .modal-content h3 { margin: 0 0 16px 0; }
-        .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
-        .ant-tabs-content { min-height: 400px; }
-        .modal-content .ant-form-item { margin-bottom: 16px; }
-        .modal-content .ant-form-item:not(.textarea-item) { display: flex; align-items: center; }
-        .modal-content .ant-form-item:not(.textarea-item) label { margin-right: 8px; width: 120px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item:not(.textarea-item) input, .modal-content .ant-form-item:not(.textarea-item) select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .modal-content .ant-form-item.textarea-item { display: block; }
-        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; color: rgba(0, 0, 0, 0.85); }
-        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        .col-sattus { width: 8%; min-width: 60px; }
+        .col-language { width: 10%; min-width: 80px; }
+        .col-tag-name { width: 12%; min-width: 100px; }
+        .col-custom-url { width: 12%; min-width: 100px; }
+        .col-use-type { width: 10%; min-width: 80px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 12%; min-width: 100px; }
     </style>
 </head>
 <body>
@@ -53,68 +36,22 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">标签管理</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('tag.html')">
+                                    <span class="ant-tabs-tab-btn">标签</span>
+                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                                 </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                             </div>
                         </div>
                     </div>
                     <div class="ant-tabs-content-holder">
                         <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
-                                <!-- 条件筛选区域 -->
-                                <div class="filter-container">
-                                    <select id="statusFilter" class="ant-select">
-                                        <option value="">全部状态</option>
-                                        <option value="0">关闭</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                    <input type="text" id="customUrlFilter" class="ant-input" placeholder="自定义URL">
-                                    <select id="languageFilter" class="ant-select">
-                                        <option value="">全部语言</option>
-                                        <option value="zh_CN">中文</option>
-                                        <option value="en_US">English</option>
-                                    </select>
-                                    <input type="text" id="tagNameFilter" class="ant-input" placeholder="标签名称">
-                                    <input type="datetime-local" id="createTimeStartFilter" class="ant-input">
-                                    <input type="datetime-local" id="createTimeEndFilter" class="ant-input">
-                                    <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
-                                </div>
-                                <!-- 操作区域 -->
-                                <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addTag()">添加</button>
-                                    <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                    <button class="ant-btn" onclick="batchEditStatus()">批量修改状态</button>
-                                </div>
-                                <!-- 数据区域 -->
+                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
+                                <div class="filter-container"></div>
+                                <div class="action-container"></div>
                                 <div class="task-list">
-                                    <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
-                                        <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
-                                        <div class="col-id">ID</div>
-                                        <div class="col-status">状态</div>
-                                        <div class="col-custom-url">自定义URL</div>
-                                        <div class="col-language">语言</div>
-                                        <div class="col-tag-name">标签名称</div>
-                                        <div class="col-seo-keywords">SEO关键词</div>
-                                        <div class="col-create-time">创建时间</div>
-                                        <div class="col-update-time">更新时间</div>
-                                        <div class="col-actions">操作</div>
-                                    </div>
+                                    <div class="table-header"></div>
                                     <div id="tag-list">加载中...</div>
-                                    <div class="pagination">
-                                        <button class="ant-btn" onclick="changePage(-1)">上一页</button>
-                                        <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
-                                        <button class="ant-btn" onclick="jumpToPage()">跳转</button>
-                                        <span id="page-info">第 1 页 / 共 1 页</span>
-                                        <select id="perPage" class="ant-select" onchange="changePerPage()">
-                                            <option value="10">10 条/页</option>
-                                            <option value="20" selected>20 条/页</option>
-                                            <option value="50">50 条/页</option>
-                                            <option value="100">100 条/页</option>
-                                        </select>
-                                        <button class="ant-btn" onclick="changePage(1)">下一页</button>
-                                    </div>
+                                    <div class="pagination"></div>
                                 </div>
                             </div>
                         </div>
@@ -124,429 +61,125 @@
         </div>
     </div>
     <div id="footer" w3-include-html="_footer.html"></div>
-
-    <!-- 添加/编辑弹窗 -->
-    <div id="tagModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加标签</h3>
-            <form id="tagForm">
-                <div class="ant-form-item" id="idField" style="display: none;">
-                    <label>ID:</label>
-                    <input type="number" id="modalId" disabled>
-                </div>
-                <div class="ant-tabs ant-tabs-top">
-                    <div class="ant-tabs-nav">
-                        <div class="ant-tabs-nav-wrap">
-                            <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="basic">
-                                    <span class="ant-tabs-tab-btn">基本信息</span>
-                                </div>
-                                <div class="ant-tabs-tab" data-tab="lang">
-                                    <span class="ant-tabs-tab-btn">多语言信息</span>
-                                </div>
-                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ant-tabs-content-holder">
-                        <div class="ant-tabs-content">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active" id="basic">
-                                <div class="ant-form-item">
-                                    <label>状态:</label>
-                                    <select id="modalStatus">
-                                        <option value="0">关闭</option>
-                                        <option value="1">启用</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>自定义URL:</label>
-                                    <input type="text" id="modalCustomUrl" maxlength="64">
-                                </div>
-                                <div class="ant-form-item" id="createTimeField" style="display: none;">
-                                    <label>创建时间:</label>
-                                    <input type="datetime-local" id="modalCreateTime" disabled>
-                                </div>
-                                <div class="ant-form-item" id="updateTimeField" style="display: none;">
-                                    <label>更新时间:</label>
-                                    <input type="datetime-local" id="modalUpdateTime" disabled>
-                                </div>
-                            </div>
-                            <div class="ant-tabs-tabpane" id="lang" style="display: none;">
-                                <div class="ant-form-item">
-                                    <label>语言:</label>
-                                    <select id="modalLanguage">
-                                        <option value="zh_CN">中文</option>
-                                        <option value="en_US">English</option>
-                                    </select>
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>SEO关键词:</label>
-                                    <input type="text" id="modalSeoKeywords" maxlength="256">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>SEO描述:</label>
-                                    <input type="text" id="modalSeoDescription" maxlength="256">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>标签名称:</label>
-                                    <input type="text" id="modalTagName" maxlength="64">
-                                </div>
-                                <div class="ant-form-item">
-                                    <label>概述:</label>
-                                    <input type="text" id="modalSummary" maxlength="256">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveTag()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 批量修改状态弹窗 -->
-    <div id="statusModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeStatusModal()">×</button>
-            <h3>批量修改状态</h3>
-            <form id="statusForm">
-                <div class="ant-form-item">
-                    <label>选中的ID:</label>
-                    <input type="text" id="selectedIds" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>新状态:</label>
-                    <select id="newStatus">
-                        <option value="0">关闭</option>
-                        <option value="1">启用</option>
-                    </select>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeStatusModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchStatus()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
 </div>
 
 <script>
-    let tagData = [];
-    let tagLangData = [];
-    let page = 1, perPage = 20;
-
-    // 生成样本数据
-    function generateSampleData() {
-        tagData = [];
-        tagLangData = [];
-        const languages = ['zh_CN', 'en_US'];
-        for (let i = 1; i <= 200; i++) {
-            const createTime = moment().subtract(Math.floor(Math.random() * 60), 'days').unix();
-            const updateTime = moment().subtract(Math.floor(Math.random() * 30), 'days').unix();
-            tagData.push({
-                id: i,
-                status: Math.floor(Math.random() * 2),
-                custom_url: `tag-${i}`,
-                create_time: createTime,
-                update_time: updateTime
-            });
-
-            languages.forEach(lang => {
-                tagLangData.push({
-                    id: tagLangData.length + 1,
-                    tag_id: i,
-                    language: lang,
-                    seo_keywords: lang === 'zh_CN' ? `标签${i},关键词${i}` : `Tag${i},Keyword${i}`,
-                    seo_description: lang === 'zh_CN' ? `标签${i}的SEO描述` : `SEO description for Tag ${i}`,
-                    tag_name: lang === 'zh_CN' ? `标签 ${i}` : `Tag ${i}`,
-                    summary: lang === 'zh_CN' ? `标签 ${i} 概述` : `Summary for Tag ${i}`
-                });
-            });
-        }
-        renderTagList();
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // 渲染列表
-    function renderTagList() {
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const paginatedData = tagData.slice(start, end);
-        const listContainer = document.getElementById('tag-list');
-        listContainer.innerHTML = '';
-
-        paginatedData.forEach(tag => {
-            const langEntries = tagLangData.filter(item => item.tag_id === tag.id);
-            langEntries.forEach(langEntry => {
-                const statusTag = tag.status === 0 ? '<span class="ant-tag ant-tag-blue">关闭</span>' :
-                    '<span class="ant-tag ant-tag-green">启用</span>';
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'task-item';
-                itemDiv.style = 'border-bottom: 1px solid #ddd;';
-                itemDiv.innerHTML = `
-                    <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${langEntry.id}"></div>
-                    <div class="col-id">${tag.id}</div>
-                    <div class="col-status">${statusTag}</div>
-                    <div class="col-custom-url">${tag.custom_url}</div>
-                    <div class="col-language">${langEntry.language}</div>
-                    <div class="col-tag-name">${langEntry.tag_name}</div>
-                    <div class="col-seo-keywords">${langEntry.seo_keywords}</div>
-                    <div class="col-create-time">${moment.unix(tag.create_time).format('YYYY-MM-DD HH:mm')}</div>
-                    <div class="col-update-time">${moment.unix(tag.update_time).format('YYYY-MM-DD HH:mm')}</div>
-                    <div class="col-actions">
-                        <button class="ant-btn" onclick="editTag(${langEntry.id})">编辑</button>
-                        <button class="ant-btn ant-btn-danger" onclick="deleteTag(${langEntry.id})">删除</button>
-                    </div>
-                `;
-                listContainer.appendChild(itemDiv);
-            });
-        });
-
-        const totalPages = Math.ceil(tagData.length / perPage);
-        document.getElementById('page-info').textContent = `第 ${page} 页 / 共 ${totalPages} 页`;
-        document.getElementById('pageJump').max = totalPages;
-    }
-
-    // 筛选
-    function applyFilters() {
-        let filteredTags = [...tagData];
-        let filteredLangs = [...tagLangData];
-        const status = document.getElementById('statusFilter').value;
-        const customUrl = document.getElementById('customUrlFilter').value.toLowerCase();
-        const language = document.getElementById('languageFilter').value;
-        const tagName = document.getElementById('tagNameFilter').value.toLowerCase();
-        const createTimeStart = document.getElementById('createTimeStartFilter').value;
-        const createTimeEnd = document.getElementById('createTimeEndFilter').value;
-
-        if (status) filteredTags = filteredTags.filter(item => item.status === parseInt(status));
-        if (customUrl) filteredTags = filteredTags.filter(item => item.custom_url.toLowerCase().includes(customUrl));
-        if (createTimeStart) filteredTags = filteredTags.filter(item => moment.unix(item.create_time).isSameOrAfter(createTimeStart));
-        if (createTimeEnd) filteredTags = filteredTags.filter(item => moment.unix(item.create_time).isSameOrBefore(createTimeEnd));
-        if (language) filteredLangs = filteredLangs.filter(item => item.language === language);
-        if (tagName) filteredLangs = filteredLangs.filter(item => item.tag_name.toLowerCase().includes(tagName));
-
-        const tagIds = new Set(filteredTags.map(t => t.id));
-        filteredLangs = filteredLangs.filter(lang => tagIds.has(lang.tag_id));
-        tagData = filteredTags.filter(t => filteredLangs.some(l => l.tag_id === t.id));
-        page = 1;
-        renderTagList();
-    }
-
-    // 分页
-    function changePage(delta) {
-        const totalPages = Math.ceil(tagData.length / perPage);
-        page += delta;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        renderTagList();
-    }
-
-    function jumpToPage() {
-        const newPage = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(tagData.length / perPage);
-        if (newPage >= 1 && newPage <= totalPages) {
-            page = newPage;
-            renderTagList();
-        } else {
-            alert('请输入有效的页码');
-        }
-    }
-
-    function changePerPage() {
-        perPage = parseInt(document.getElementById('perPage').value);
-        page = 1;
-        renderTagList();
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll').checked;
-        document.querySelectorAll('.select-item').forEach(checkbox => checkbox.checked = selectAll);
-    }
-
-    // 添加
-    function addTag() {
-        isEditing = false;
-        editId = null;
-        document.getElementById('modalTitle').textContent = '添加标签';
-        document.getElementById('idField').style.display = 'none';
-        document.getElementById('modalStatus').value = '0';
-        document.getElementById('modalCustomUrl').value = '';
-        document.getElementById('createTimeField').style.display = 'none';
-        document.getElementById('updateTimeField').style.display = 'none';
-        document.getElementById('modalLanguage').value = 'zh_CN';
-        document.getElementById('modalLanguage').disabled = false;
-        document.getElementById('modalSeoKeywords').value = '';
-        document.getElementById('modalSeoDescription').value = '';
-        document.getElementById('modalTagName').value = '';
-        document.getElementById('modalSummary').value = '';
-        setupTabs();
-        document.getElementById('tagModal').style.display = 'block';
-    }
-
-    // 编辑
-    let isEditing = false;
-    let editId = null;
-    function editTag(id) {
-        isEditing = true;
-        editId = id;
-        const langEntry = tagLangData.find(item => item.id === id);
-        const tag = tagData.find(item => item.id === langEntry.tag_id);
-        document.getElementById('modalTitle').textContent = '编辑标签';
-        document.getElementById('idField').style.display = 'block';
-        document.getElementById('modalId').value = tag.id;
-        document.getElementById('modalStatus').value = tag.status;
-        document.getElementById('modalCustomUrl').value = tag.custom_url;
-        document.getElementById('createTimeField').style.display = 'block';
-        document.getElementById('modalCreateTime').value = moment.unix(tag.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('updateTimeField').style.display = 'block';
-        document.getElementById('modalUpdateTime').value = moment.unix(tag.update_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalLanguage').value = langEntry.language;
-        document.getElementById('modalLanguage').disabled = true;
-        document.getElementById('modalSeoKeywords').value = langEntry.seo_keywords;
-        document.getElementById('modalSeoDescription').value = langEntry.seo_description || '';
-        document.getElementById('modalTagName').value = langEntry.tag_name;
-        document.getElementById('modalSummary').value = langEntry.summary;
-        setupTabs();
-        document.getElementById('tagModal').style.display = 'block';
-    }
-
-    // Tab 设置
-    function setupTabs() {
-        const tabButtons = document.querySelectorAll('#tagModal .ant-tabs-tab');
-        const tabPanes = document.querySelectorAll('#tagModal .ant-tabs-tabpane');
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tabButtons.forEach(btn => btn.classList.remove('ant-tabs-tab-active'));
-                button.classList.add('ant-tabs-tab-active');
-                const tabId = button.getAttribute('data-tab');
-                tabPanes.forEach(pane => {
-                    pane.style.display = pane.id === tabId ? 'block' : 'none';
-                });
-                document.querySelector('#tagModal .ant-tabs-ink-bar').style.left = `${button.offsetLeft}px`;
-                document.querySelector('#tagModal .ant-tabs-ink-bar').style.width = `${button.offsetWidth}px`;
-            });
-        });
-        tabButtons[0].classList.add('ant-tabs-tab-active');
-        tabPanes.forEach(pane => pane.style.display = pane.id === 'basic' ? 'block' : 'none');
-    }
-
-    // 保存
-    function saveTag() {
-        const tagId = isEditing ? parseInt(document.getElementById('modalId').value) : tagData.length + 1;
-        const langId = isEditing ? editId : tagLangData.length + 1;
-        const now = moment().unix();
-
-        let tag = tagData.find(item => item.id === tagId);
-        if (!tag) {
-            tag = {
-                id: tagId,
-                status: parseInt(document.getElementById('modalStatus').value),
-                custom_url: document.getElementById('modalCustomUrl').value,
-                create_time: now,
-                update_time: now
-            };
-            tagData.push(tag);
-        } else {
-            tag.status = parseInt(document.getElementById('modalStatus').value);
-            tag.custom_url = document.getElementById('modalCustomUrl').value;
-            tag.update_time = now;
-        }
-
-        let langEntry = tagLangData.find(item => item.id === langId);
-        if (!langEntry) {
-            langEntry = {
-                id: langId,
-                tag_id: tagId,
-                language: document.getElementById('modalLanguage').value,
-                seo_keywords: document.getElementById('modalSeoKeywords').value,
-                seo_description: document.getElementById('modalSeoDescription').value || '',
-                tag_name: document.getElementById('modalTagName').value,
-                summary: document.getElementById('modalSummary').value
-            };
-            tagLangData.push(langEntry);
-        } else {
-            langEntry.seo_keywords = document.getElementById('modalSeoKeywords').value;
-            langEntry.seo_description = document.getElementById('modalSeoDescription').value || '';
-            langEntry.tag_name = document.getElementById('modalTagName').value;
-            langEntry.summary = document.getElementById('modalSummary').value;
-        }
-
-        closeModal();
-        renderTagList();
-    }
-
-    // 删除
-    function deleteTag(id) {
-        if (confirm('确定要删除此标签吗？')) {
-            const langEntry = tagLangData.find(item => item.id === id);
-            tagLangData = tagLangData.filter(item => item.id !== id);
-            if (!tagLangData.some(item => item.tag_id === langEntry.tag_id)) {
-                tagData = tagData.filter(item => item.id !== langEntry.tag_id);
-            }
-            renderTagList();
-        }
-    }
-
-    // 批量删除
-    function batchDelete() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的标签');
-            return;
-        }
-        if (confirm(`确定要删除 ${selectedIds.length} 个标签吗？`)) {
-            const tagIdsToDelete = new Set();
-            selectedIds.forEach(id => {
-                const langEntry = tagLangData.find(item => item.id === id);
-                if (langEntry) tagIdsToDelete.add(langEntry.tag_id);
-                tagLangData = tagLangData.filter(item => item.id !== id);
-            });
-            tagData = tagData.filter(item => !tagIdsToDelete.has(item.id));
-            renderTagList();
-        }
-    }
-
-    // 批量修改状态
-    function batchEditStatus() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要修改状态的标签');
-            return;
-        }
-        document.getElementById('selectedIds').value = selectedIds.join(', ');
-        document.getElementById('statusModal').style.display = 'block';
-    }
-
-    function saveBatchStatus() {
-        const newStatus = parseInt(document.getElementById('newStatus').value);
-        const selectedIds = document.getElementById('selectedIds').value.split(', ').map(id => parseInt(id));
-        const tagIds = new Set();
-        selectedIds.forEach(id => {
-            const langEntry = tagLangData.find(item => item.id === id);
-            if (langEntry) tagIds.add(langEntry.tag_id);
-        });
-        tagData = tagData.map(item => tagIds.has(item.id) ? { ...item, status: newStatus, update_time: moment().unix() } : item);
-        closeStatusModal();
-        renderTagList();
-    }
-
-    function closeModal() {
-        document.getElementById('tagModal').style.display = 'none';
-    }
-
-    function closeStatusModal() {
-        document.getElementById('statusModal').style.display = 'none';
-    }
-
-    window.onload = () => {
-        w3.includeHTML(() => {
-            initMenus();
-            generateSampleData();
-        });
+    // 标签名称
+    const tagNames = {
+        'zh_CN': ['热销', '新品', '折扣', '推荐', '优质', '原创', '热门', '特价', '限时', '精选'],
+        'en_US': ['Hot Sale', 'New Arrival', 'Discount', 'Recommended', 'Premium', 'Original', 'Trending', 'Special Offer', 'Limited Time', 'Featured'],
+        'fr_FR': ['Vente Chaude', 'Nouveau', 'Remise', 'Recommandé', 'Premium', 'Original', 'Tendance', 'Offre Spéciale', 'Temps Limité', 'Sélectionné'],
+        'es_ES': ['Venta Caliente', 'Nuevo', 'Descuento', 'Recomendado', 'Premium', 'Original', 'Tendencia', 'Oferta Especial', 'Tiempo Limitado', 'Destacado'],
+        'vi_VN': ['Bán Chạy', 'Hàng Mới', 'Giảm Giá', 'Đề Xuất', 'Cao Cấp', 'Nguyên Bản', 'Xu Hướng', 'Ưu Đãi Đặc Biệt', 'Thời Gian Có Hạn', 'Nổi Bật'],
+        'ru_RU': ['Горячая Распродажа', 'Новинка', 'Скидка', 'Рекомендовано', 'Премиум', 'Оригинал', 'Тренд', 'Специальное Предложение', 'Ограниченное Время', 'Избранное']
     };
+
+    // use_type 选项及颜色映射
+    const useTypes = [
+        { value: 0, label: '店铺', color: 'blue' },
+        { value: 1, label: '商品', color: 'green' },
+        { value: 2, label: '文章', color: 'cyan' },
+        { value: 3, label: '需求', color: 'purple' },
+        { value: 4, label: '专辑', color: 'orange' }
+    ];
+
+    window.tableConfig = {
+        tableName: 'tag',
+        tableTitle: '标签',
+        sampleCount: 200,
+        defaultPerPage: 20,
+        fields: [
+            // 主表 tag 字段
+            { name: 'id', isSystemField: true, generator: id => id },
+            { name: 'sattus', generator: () => randomInt(0, 1) }, // 0:禁用, 1:启用 (DDL中拼写为 sattus)
+            { name: 'sort_index', generator: () => randomInt(0, 255) },
+            { name: 'use_type', generator: () => randomInt(0, 4) }, // 店铺, 商品, 文章, 需求, 专辑
+            { name: 'custom_url', generator: id => `/tag/${id}-${randomInt(1000, 9999)}` },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
+            { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
+            // 多语言表 tag_lang 字段
+            { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) },
+            { name: 'tag_id', isLangField: true, generator: id => id },
+            { name: 'language', isLangField: true, generator: (id, lang) => lang },
+            { name: 'seo_keywords', isLangField: true, generator: (id, lang) => `${getRandomItem(tagNames[lang])}, tag ${id}` },
+            { name: 'seo_description', isLangField: true, generator: (id, lang) => `Explore ${getRandomItem(tagNames[lang])} tag details.` },
+            { name: 'tag_name', isLangField: true, generator: (id, lang) => `${getRandomItem(tagNames[lang])} ${id % 10}` },
+            { name: 'summary', isLangField: true, generator: (id, lang) => `Summary of ${getRandomItem(tagNames[lang])} tag.` }
+        ],
+        actionButtons: [
+            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
+            { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'sattus', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }] } },
+            { label: '批量修改排序', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'sort_index', label: '排序索引', type: 'number', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i * 10, label: `${i * 10}` })) } },
+            { label: '批量修改使用类型', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'use_type', label: '使用类型', type: 'select', options: useTypes } }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'sattus', label: '状态', className: 'col-sattus', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
+            { name: 'language', label: '语言', className: 'col-language', isLangField: true },
+            { name: 'tag_name', label: '标签名称', className: 'col-tag-name', isLangField: true },
+            { name: 'custom_url', label: '自定义URL', className: 'col-custom-url' },
+            { name: 'use_type', label: '使用类型', className: 'col-use-type', formatter: v => `<span class="ant-tag ant-tag-${useTypes[v]?.color || 'gray'}">${useTypes[v]?.label || '未知'}</span>` },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
+            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
+                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+            ` }
+        ],
+        filterFields: [
+            { id: 'sattus', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.sattus === parseInt(value)) },
+            { id: 'sort_index', type: 'number', placeholder: '排序索引', filter: (data, value) => value ? data.filter(d => d.sort_index === parseInt(value)) : data },
+            { id: 'use_type', type: 'select', options: [{ value: '', label: '全部类型' }, ...useTypes], filter: (data, value) => value === '' ? data : data.filter(d => d.use_type === parseInt(value)) },
+            { id: 'language', type: 'select', options: [{ value: '', label: '全部语言' }, { value: 'zh_CN', label: '中文' }, { value: 'en_US', label: '英语' }, { value: 'fr_FR', label: '法语' }, { value: 'es_ES', label: '西班牙语' }, { value: 'vi_VN', label: '越南语' }, { value: 'ru_RU', label: '俄语' }], filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.tag_id === d.id && l.language === value)) : data },
+            { id: 'tag_name', type: 'text', placeholder: '搜索标签名称', filter: (data, value) => value ? data.filter(d => tableLangData.some(l => l.tag_id === d.id && l.tag_name.toLowerCase().includes(value.toLowerCase()))) : data },
+            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
+            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        ],
+        langFields: {
+            foreignKey: 'tag_id',
+            languages: ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU']
+        },
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    { name: 'sattus', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'sort_index', label: '排序索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'use_type', label: '使用类型', type: 'select', options: useTypes, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                ]
+            },
+            {
+                id: 'lang',
+                title: '多语言信息',
+                fields: [
+                    { name: 'language', label: '语言', type: 'select', options: ['zh_CN', 'en_US', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                    { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'tag_name', label: '标签名称', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'summary', label: '摘要', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
+                ]
+            }
+        ]
+    };
+
+    // 支持 Enter 键触发查询
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+            applyFilters();
+        }
+    });
 </script>
 </body>
 </html>
