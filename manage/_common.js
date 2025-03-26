@@ -193,7 +193,7 @@ function initMenus() {
                 const isActive = menu.id === menuId;
                 menu.classList.toggle('active', isActive);
                 if (isActive) {
-                    menu.querySelectorAll('.sidebar-menu-item').forEach(subItem => subItem.classList.add('expand'));
+                    menu.querySelectorAll('.sidebar-menu-item:first-child').forEach(subItem => subItem.classList.add('expand'));
                 } else {
                     menu.querySelectorAll('.sidebar-menu-item').forEach(subItem => subItem.classList.remove('expand'));
                 }
@@ -223,7 +223,7 @@ function initMenus() {
             const isActive = menu.id === menuId;
             menu.classList.toggle('active', isActive);
             if (isActive) {
-                menu.querySelectorAll('.sidebar-menu-item').forEach(item => item.classList.add('expand'));
+                menu.querySelectorAll('.sidebar-menu-item:first-child').forEach(item => item.classList.add('expand'));
             } else {
                 menu.querySelectorAll('.sidebar-menu-item').forEach(item => item.classList.remove('expand'));
             }
