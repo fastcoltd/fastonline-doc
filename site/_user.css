@@ -1,0 +1,49 @@
+/* _user.css */
+
+/* 头部登录后样式 */
+.balance {font-size: var(--font-large); font-weight: bold; color: var(--vibrant-orange); padding: 0.5em 1em; border-radius: 0.375em; transition: color 0.2s;}
+.balance:hover {color: var(--natural-green);}
+.messages-wrapper {position: relative; display: inline-flex; align-items: center;}
+.messages {font-size: var(--font-xlarge); padding: 0.5em 1em; position: relative; color: var(--text-primary); transition: color 0.2s;}
+.messages:hover {color: var(--natural-green);}
+.message-count {position: absolute; top: 0.2em; right: 0.2em; background: var(--red); color: var(--font-white); font-size: var(--font-small); width: 1.5em; height: 1.5em; line-height: 1.5em; text-align: center; border-radius: 50%;}
+.messages-tooltip {display: none; position: absolute; top: calc(100% + 0.1em); right: -5em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.375em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); z-index: 1001; padding: 0.5em; white-space: nowrap; text-align: center;}
+.messages-tooltip::before {content: ''; position: absolute; top: -1em; right: 6em; border: 0.5em solid transparent; border-bottom-color: var(--border-color);}
+.messages-tooltip::after {content: ''; position: absolute; top: -0.875em; right: 6em; border: 0.5em solid transparent; border-bottom-color: var(--bg-white);}
+.messages-wrapper:hover .messages-tooltip {display: flex; gap: 0.5em;}
+.message-item {padding: 0.3em 0.5em; margin: 0!important; font-size: var(--font-medium); color: var(--text-primary);}
+.message-item:hover {color: var(--natural-green); background: var(--bg-light);}
+.user-avatar-wrapper {position: relative; display: inline-flex; align-items: center;}
+.user-avatar {display: block; padding: 0.5em;}
+.user-avatar img {width: 2em; height: 2em; border-radius: 50%; transition: transform 0.2s;}
+.user-avatar:hover img {transform: scale(1.1);}
+.user-menu {display: none; position: absolute; top: calc(100% + 0.2em); right: 0; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.375em; box-shadow: 0 0.125em 0.3125em rgba(0, 0, 0, 0.1); z-index: 1001; min-width: 12em; max-width: 12em; text-align: left;}
+.user-menu::before {content: ''; position: absolute; top: -1em; right: 1.8em; border: 0.5em solid transparent; border-bottom-color: var(--border-color);}
+.user-menu::after {content: ''; position: absolute; top: -0.875em; right: 1.8em; border: 0.5em solid transparent; border-bottom-color: var(--bg-white);}
+.user-avatar-wrapper:hover .user-menu {display: block;}
+.user-menu a {display: flex; margin: 0!important; align-items: center; justify-content: center; padding: 0.5em 1em; font-size: var(--font-medium); color: var(--text-primary);}
+.user-menu a i {margin-right: 0.5em;}
+.user-menu a:hover {color: var(--natural-green); background: var(--bg-light);}
+
+/* 充值弹窗样式 */
+.topup-content {display: flex; gap: 1em;}
+.payment-methods {flex: 1;}
+.payment-option {background: var(--bg-white); border: 0.0625em solid var(--border-color); color: var(--text-primary); transition: background 0.2s, color 0.2s;}
+.payment-option:hover {background: var(--bg-light); color: var(--natural-green);}
+.payment-details {flex: 2; padding: 1em; border-left: 0.0625em solid var(--border-color);}
+
+/* 移动端适配 */
+@media (max-width: 48em) {
+    .header-actions {flex-direction: row; align-items: center;}
+    .balance {font-size: var(--font-medium); padding: 0.3em 0.5em;}
+    .messages {font-size: var(--font-medium); padding: 0.3em 0.5em;}
+    .message-count {top: 0em; right: 0em; width: 1em; height: 1em; line-height: 1em; font-size: var(--font-xsmall);}
+    .messages-tooltip {top: calc(100% + 0.25em); right: -1em; max-width: 10em; flex-direction: column; gap: 0.5em;}
+    .messages-tooltip::before, .messages-tooltip::after {right: 1.5em;}
+    .user-avatar img {width: 1.5em; height: 1.5em;}
+    .user-menu {min-width: 12em; max-width: 12em; right: -1em;}
+    .user-menu::before, .user-menu::after {right: 1.5em;}
+    .topup-content {flex-direction: column;}
+    .payment-methods, .payment-details {flex: none; width: 100%;}
+    .payment-details {border-left: none; border-top: 0.0625em solid var(--border-color); padding: 0.5em;}
+}
