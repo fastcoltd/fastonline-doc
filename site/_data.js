@@ -10,6 +10,33 @@ const systemType = {
     "pages": {"link": "page.html", "list_link": "page-type.html"},
 }
 
+const dropdownMenus = {
+    Resources: [
+        { text: "Tutorials", href: "page-type.html?name=Tutorials" },
+        { text: "Guides", href: "page-type.html?name=Guides" },
+        { text: "Tools", href: "page-type.html?name=Tools" },
+        { text: "FAQs", href: "page-type.html?name=FAQs" },
+        { text: "Whitepapers", href: "page-type.html?name=Whitepapers" },
+        { text: "Case Studies", href: "page-type.html?name=Case Studies" },
+        { text: "Webinars", href: "page-type.html?name=Webinars" },
+        { text: "Templates", href: "page-type.html?name=Templates" },
+        { text: "Documentation", href: "page-type.html?name=Documentation" },
+        { text: "Support Forums", href: "page-type.html?name=Support Forums" }
+    ],
+    Posts: [
+        { text: "Blog", href: "post-list.html?type=Blog", desc: "Explore the latest articles, insights, and expert opinions on various topics." },
+        { text: "News", href: "post-list.html?type=News", desc: "Stay updated with breaking industry news and global trends affecting your interests." },
+        { text: "Reviews", href: "post-list.html?type=Reviews", desc: "Read in-depth reviews of products, services, and platforms to make informed decisions." },
+        { text: "Community", href: "post-list.html?type=Community", desc: "Join discussions, share ideas, and connect with users in our vibrant community hub." },
+        { text: "Interviews", href: "post-list.html?type=Interviews", desc: "Dive into exclusive interviews with industry leaders and experts sharing their insights." },
+        { text: "Tips & Tricks", href: "post-list.html?type=Tips & Tricks", desc: "Discover practical tips and clever tricks to enhance your skills and productivity." },
+        { text: "Industry Updates", href: "post-list.html?type=Industry Updates", desc: "Get detailed analysis and updates on market trends and emerging industry developments." },
+        { text: "User Stories", href: "post-list.html?type=User Stories", desc: "Learn from real user experiences and success stories from our diverse community." },
+        { text: "Events", href: "post-list.html?type=Events", desc: "Find upcoming event previews and detailed recaps of past workshops and conferences." },
+        { text: "Announcements", href: "post-list.html?type=Announcements", desc: "Catch up on the latest platform announcements, updates, and important notifications." }
+    ]
+};
+
 // 热门平台样本数据：全球 Top 50 科技平台（真实数据）
 const hotBrands = [
     { logo: 'https://logo.clearbit.com/facebook.com', name: 'Facebook', link: 'brand.html?name=Facebook', home: 'https://facebook.com', parentCompany: 'Meta', description: 'Social networking platform for connecting people globally.', themeColor: '#1877F2' }, // Facebook Blue
@@ -159,7 +186,6 @@ const hotBrands = [
     { logo: 'https://logo.clearbit.com/tableau.com', name: 'Tableau', link: 'brand.html?name=Tableau', home: 'https://tableau.com', parentCompany: 'Salesforce', description: 'Data visualization and analytics.', themeColor: '#E97627' }, // Tableau Orange
     { logo: 'https://logo.clearbit.com/powerbi.microsoft.com', name: 'Power BI', link: 'brand.html?name=Power BI', home: 'https://powerbi.microsoft.com', parentCompany: 'Microsoft', description: 'Business intelligence by Microsoft.', themeColor: '#F2C811' }, // Power BI Yellow
 ];
-
 
 // 电商属性/属性值数据（50个属性类型，每个至少10个属性值）
 const ecommerceAttributes = {

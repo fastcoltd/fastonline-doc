@@ -1,12 +1,44 @@
+const paymentMethods = [
+    { name: 'Digital', feeType: 'fixed', fee: 2, minAmount: 10 },
+    { name: 'PayPal', feeType: 'percent', fee: 0.029, minAmount: 20 },
+    { name: 'Alipay', feeType: 'fixed', fee: 1.5, minAmount: 15 },
+    { name: 'Stripe', feeType: 'percent', fee: 0.025, minAmount: 25 }
+];
+let userMenuConfig = [
+    { text: "我的店铺", icon: "fas fa-store", show: ()=> hasStore() , href: "#" , sub: [
+            { text: "店铺概览", icon: "fas fa-user", href: "#" },
+            { text: "订单管理", icon: "fas fa-list", href: "#" },
+            { text: "库存管理", icon: "fas fa-shopping-cart", href: "#" },
+            { text: "商品管理", icon: "fas fa-shopping-cart", href: "#" },
+            { text: "提现管理", icon: "fas fa-wallet", href: "#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
+            { text: "店铺设置", icon: "fas fa-cogs", href: "#" },
+            { text: "博客管理", icon: "fas fa-blog", href: "#" },
+            { text: "店铺员工", icon: "fas fa-comment", href: "#" },
+        ]
+    },
+    { text: "我的订单", icon: "fas fa-shopping-cart", show: true, href: "#" },
+    { text: "我的需求", icon: "fas fa-list", show: true, href: "#" },
+    { text: "Top-Up", icon: "fas fa-wallet", show: true, href: "#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
+    { text: "资金记录", icon: "fas fa-money-bill", show: true, href: "#" },
+    { text: "我的消息", icon: "fas fa-comment", show: true, href: "#" },
+    { text: "我的收藏", icon: "fas fa-heart", show: true, href: "#" },
+    { text: "我的评论", icon: "fas fa-comment", show: true, href: "#" },
+    { text: "Profile", icon: "fas fa-user", show: true, href: "#" },
+    { text: "个人设置", icon: "fas fa-cog", show: true, href: "#" },
+    { text: "Logout", icon: "fas fa-sign-out-alt", show: true, href: "#", onclick: "logout()" }
+];
+
 // _member.js
 let signInRegisterStyle = { width: '35em' };
 
 // 本地存储用户登录信息
 function saveUserLoginInfo(username) {
+    let store = generateData(storeFieldConfig, 1)[0]
     const userData = {
         username: username,
         balance: faker.commerce.price(100, 1000, 2),
-        messages: { user: 6, tickets: 5, system: 5 }
+        messages: { chat: randomInt(0,50), tickets: randomInt(20,50), system: randomInt(0,10) },
+        store: randomInt(0,1) > 0 ? store : null
     };
     localStorage.setItem('userData', JSON.stringify(userData));
     updateHeaderUI();
@@ -15,6 +47,28 @@ function saveUserLoginInfo(username) {
 // 从本地存储获取用户信息
 function getUserLoginInfo() {
     return JSON.parse(localStorage.getItem('userData')) || null;
+}
+
+function hasStore(){
+    return getUserLoginInfo()?.store;
+}
+
+// 生成用户菜单
+function generateUserMenu() {
+    let menuHtml = '';
+    userMenuConfig.forEach(item => {
+        let show = typeof item.show == 'function' ? item.show() : item.show;
+        if (show){
+            const style = item.style ? ` style=${style}` : '';
+            const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
+            menuHtml += `
+            <a href="${item.href}"${style}${onclickAttr}>
+                <i class="${item.icon}"></i> ${item.text}
+            </a>
+        `;
+        }
+    });
+    return menuHtml;
 }
 
 // 更新头部 UI
@@ -41,15 +95,25 @@ function updateHeaderUI() {
         if (demands) headerActions.appendChild(demands.cloneNode(true));
         if (resources) headerActions.appendChild(resources.cloneNode(true));
         if (posts) headerActions.appendChild(posts.cloneNode(true));
-        if (becomeSeller) headerActions.appendChild(becomeSeller.cloneNode(true));
+        if (becomeSeller) {
+            if (userData.store){
+                let storeMenu = document.createElement("a")
+                storeMenu.href = `store.html?name=${userData.store.name}`
+                storeMenu.innerHTML = `<i class="fa fa-store"></i> ${userData.store.name}`
+                storeMenu.className = 'userStore'
+                headerActions.appendChild(storeMenu);
+            }else{
+                headerActions.appendChild(becomeSeller.cloneNode(true));
+            }
+        }
 
         headerActions.innerHTML += `
             <div class="user-actions">
                 <a href="#" class="balance" onclick="showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })">$${userData.balance}</a>
                 <div class="messages-wrapper">
-                    <a href="#" class="messages"><i class="fas fa-envelope"></i><span class="message-count">${userData.messages.user + userData.messages.tickets + userData.messages.system}</span></a>
+                    <a href="#" class="messages"><i class="fas fa-envelope"></i><span class="message-count">${userData.messages.chat + userData.messages.tickets + userData.messages.system}</span></a>
                     <div class="messages-tooltip">
-                        <a href="#" class="message-item">消息: ${userData.messages.user}</a>
+                        <a href="#" class="message-item">消息: ${userData.messages.chat}</a>
                         <a href="#" class="message-item">工单: ${userData.messages.tickets}</a>
                         <a href="#" class="message-item">系统: ${userData.messages.system}</a>
                     </div>
@@ -57,15 +121,7 @@ function updateHeaderUI() {
                 <div class="user-avatar-wrapper">
                     <a href="#" class="user-avatar"><img src="${getPicsumImage(40, 40, userData.username)}" alt="${userData.username}"></a>
                     <div class="user-menu">
-                        <a href="#"><i class="fas fa-user"></i> Profile</a>
-                        <a href="#"><i class="fas fa-shopping-cart"></i> 我的订单</a>
-                        <a href="#"><i class="fas fa-list"></i> 我的需求</a>
-                        <a href="#"><i class="fas fa-blog"></i> 我的博客</a>
-                        <a href="#" onclick="showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })"><i class="fas fa-wallet"></i> Top-Up</a>
-                        <a href="#"><i class="fas fa-money-bill"></i> 资金记录</a>
-                        <a href="#"><i class="fas fa-heart"></i> 我的收藏</a>
-                        <a href="#"><i class="fas fa-comment"></i> 我的评论</a>
-                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        ${generateUserMenu()}
                     </div>
                 </div>
             </div>
@@ -86,8 +142,8 @@ function generateLoginModal() {
     return `
         <span class="modal-close" onclick="hideModal('login-modal')">×</span>
         <h3 style="font-size: var(--font-xlarge); color: var(--text-primary); margin-bottom: 1.5em; text-align: center;">Sign In to FASTRESP</h3>
-        <input type="text" id="login-username" placeholder="Username" class="ant-input" value="fastresp-test" style="margin-bottom: 1.25em; padding: 0.75em; color: var(--text-primary);">
-        <input type="password" id="login-password" placeholder="Password" class="ant-input" value="test1234" style="margin-bottom: 1.25em; padding: 0.75em; color: var(--text-primary);">
+        <input type="text" id="login-username" placeholder="Username" value="fastresp" class="ant-input" style="margin-bottom: 1.25em; padding: 0.75em; color: var(--text-primary);">
+        <input type="password" id="login-password" placeholder="Password" value="fasstresp" class="ant-input" style="margin-bottom: 1.25em; padding: 0.75em; color: var(--text-primary);">
         <div style="display: flex; justify-content: space-between; margin-bottom: 1.5em; font-size: var(--font-medium); color: var(--text-primary);">
             <label><input type="checkbox" style="margin-right: 0.5em;"> Remember me</label>
             <a href="#" class="see-all">Reset Password</a>
@@ -174,14 +230,6 @@ function generateRegisterModal() {
     `;
 }
 
-// 充值弹窗
-const paymentMethods = [
-    { name: 'Digital', feeType: 'fixed', fee: 2, minAmount: 10 },
-    { name: 'PayPal', feeType: 'percent', fee: 0.029, minAmount: 20 },
-    { name: 'Alipay', feeType: 'fixed', fee: 1.5, minAmount: 15 },
-    { name: 'Stripe', feeType: 'percent', fee: 0.025, minAmount: 25 }
-];
-
 function generateTopUpModal() {
     return `
         <span class="modal-close" onclick="hideModal('topup-modal')">×</span>
@@ -244,8 +292,33 @@ document.addEventListener('click', function(e) {
     }
 });
 
+function generateDropdownMenus() {
+    const resourcesMenu = document.getElementById('resources-menu');
+    const postsMenu = document.getElementById('posts-menu');
+
+    // 生成 Resources 下拉菜单
+    dropdownMenus.Resources.forEach(item => {
+        const link = document.createElement('a');
+        link.href = item.href;
+        link.textContent = item.text;
+        resourcesMenu.appendChild(link);
+    });
+
+    // 生成 Posts 下拉菜单（包含描述）
+    dropdownMenus.Posts.forEach(item => {
+        const link = document.createElement('a');
+        link.href = item.href;
+        link.innerHTML = `${item.text}<span class="dropdown-desc">${item.desc}</span>`;
+        postsMenu.appendChild(link);
+    });
+}
+
 // 初始化
 window.addEventListener("load", function() {
+    w3.includeHTML(() => {
+        generateDropdownMenus();
+    })
+
     setTimeout(() => {
         const footerLinks = document.querySelectorAll('.footer-right a:not([target])');
         if (footerLinks) {
