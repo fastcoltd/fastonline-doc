@@ -355,7 +355,7 @@
         const brands = hotBrands.slice(0, randomInt(3, 5));
         const tags = generateTag(1, 6);
         filter.innerHTML = `
-            ${brands.map(b => `<div class="filter-item" data-brand="${b.name}" style="color: ${b.themeColor}" brandColor="${b.themeColor}" onclick="toggleFilter(this, 'brand')">${b.name}</div>`).join('')}
+            ${brands.map(b => `<div class="filter-item" data-brand="${b.name}" style="color: ${b.themeColor}" data-color="${b.themeColor}" onclick="toggleFilter(this, 'brand')">${b.name}</div>`).join('')}
             Tags:
             ${tags.map((t, i) => `<div class="filter-item ${tagColors[i % tagColors.length]}" data-tag="${t}" onclick="toggleFilter(this, 'tag')">${t}</div>`).join('')}
             <div class="filter-search">
@@ -370,13 +370,13 @@
         if (type === 'brand') {
             document.querySelectorAll('.filter-item[data-brand]').forEach(el => {
                 el.style.background = '';
-                el.style.color = el.getAttribute('brandColor');
+                el.style.color = el.getAttribute('data-color');
                 el.classList.remove('active');
                 el.querySelector('i')?.remove()
             });
             element.classList.add('active');
             // element.innerHTML = `<i class="fas fa-check-circle">&nbsp;</i>${element.innerHTML}`
-            let color = element.getAttribute('brandColor');
+            let color = element.getAttribute('data-color');
             let background = element.style.background || 'var(--font-white)';
             element.style = `background:${color}; color:${background}`;
         } else {
@@ -391,7 +391,10 @@
         const selectedTags = Array.from(document.querySelectorAll('.filter-item[data-tag].active')).map(el => el.dataset.tag);
         const searchText = document.getElementById('search-item').value.toLowerCase();
 
-        const filterBrands = Array.from(document.querySelectorAll('.filter-item[data-brand]')).map(el => el.dataset.brand);
+        const filterBrands = Array.from(document.querySelectorAll('.filter-item[data-brand]')).map(el => {
+            return `<b style="color: ${el.dataset.color}">${el.dataset.brand}</b>`
+        })
+        const filterBrandColors = Array.from(document.querySelectorAll('.filter-item[data-brand]')).map(el => el.dataset.color);
         const filterTags = Array.from(document.querySelectorAll('.filter-item[data-tag]')).map(el => el.dataset.tag);
 
         const items = generateData(itemFieldConfig, randomInt(30, 100)).map(item => ({
@@ -399,7 +402,7 @@
             brandName: filterBrands[Math.floor(Math.random() * filterBrands.length)],
             tags: Array(randomInt(1, 3)).fill().map(() => filterTags[Math.floor(Math.random() * filterTags.length)])
         })).filter(item => {
-            return (!selectedBrand || item.brandName === selectedBrand) &&
+            return (!selectedBrand || item.brandName.indexOf(selectedBrand) !== -1) &&
                 (!selectedTags.length || selectedTags.every(t => item.tags.includes(t))) &&
                 (!searchText || item.name.toLowerCase().includes(searchText));
         });
