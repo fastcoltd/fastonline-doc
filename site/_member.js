@@ -5,26 +5,29 @@ const paymentMethods = [
     { name: 'Stripe', feeType: 'percent', fee: 0.025, minAmount: 25 }
 ];
 let userMenuConfig = [
-    { text: "我的店铺", icon: "fas fa-store", show: ()=> hasStore() , href: "#" , sub: [
-            { text: "店铺概览", icon: "fas fa-user", href: "#" },
-            { text: "订单管理", icon: "fas fa-list", href: "#" },
-            { text: "库存管理", icon: "fas fa-shopping-cart", href: "#" },
-            { text: "商品管理", icon: "fas fa-shopping-cart", href: "#" },
+    { text: "店铺管理", style: `color:var(--font-green)`, icon: "fas fa-store", show: ()=> hasStore() , href: "store/overview.html" , sub: [
+            { text: "店铺概览", icon: "fas fa-user", href: "store/overview.html" },
+            { text: "订单管理", icon: "fas fa-list", href: "store/order-list.html" },
+            { text: "库存管理", icon: "fas fa-shopping-cart", href: "store/stock-manage.html" },
+            { text: "商品管理", icon: "fas fa-shopping-cart", href: "store/item-manage.html" },
+            { text: "商品FAQ", icon: "fas fa-blog", href: "store/item-faq.html" },
             { text: "提现管理", icon: "fas fa-wallet", href: "#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
-            { text: "店铺设置", icon: "fas fa-cogs", href: "#" },
-            { text: "博客管理", icon: "fas fa-blog", href: "#" },
-            { text: "店铺员工", icon: "fas fa-comment", href: "#" },
+            { text: "博客设置", icon: "fas fa-blog", href: "store/blog.html" },
+            { text: "文章管理", icon: "fas fa-blog", href: "store/posts-manage.html" },
+            { text: "店铺员工", icon: "fas fa-comment", href: "store/staff.html" },
+            { text: "店铺KYC", icon: "fas fa-cogs", href: "store/kyc.html" },
+            { text: "店铺设置", icon: "fas fa-cogs", href: "store/setting.html" },
         ]
     },
-    { text: "我的订单", icon: "fas fa-shopping-cart", show: true, href: "#" },
-    { text: "我的需求", icon: "fas fa-list", show: true, href: "#" },
+    { text: "我的订单", icon: "fas fa-shopping-cart", show: true, href: "users/my-orders.html" },
+    { text: "我的需求", icon: "fas fa-list", show: true, href: "users/my-demands.html" },
     { text: "Top-Up", icon: "fas fa-wallet", show: true, href: "#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
-    { text: "资金记录", icon: "fas fa-money-bill", show: true, href: "#" },
-    { text: "我的消息", icon: "fas fa-comment", show: true, href: "#" },
-    { text: "我的收藏", icon: "fas fa-heart", show: true, href: "#" },
-    { text: "我的评论", icon: "fas fa-comment", show: true, href: "#" },
-    { text: "Profile", icon: "fas fa-user", show: true, href: "#" },
-    { text: "个人设置", icon: "fas fa-cog", show: true, href: "#" },
+    { text: "资金记录", icon: "fas fa-money-bill", show: true, href: "user/my-transactions.html" },
+    { text: "我的消息", icon: "fas fa-comment", show: true, href: "users/my-message.html" },
+    { text: "我的收藏", icon: "fas fa-heart", show: true, href: "user/save-list.html" },
+    { text: "我的评论", icon: "fas fa-comment", show: true, href: "user/my-comment.html" },
+    { text: "Profile", icon: "fas fa-user", show: true, href: "user/profile.html" },
+    { text: "个人设置", icon: "fas fa-cog", show: true, href: "user/setting.html" },
     { text: "Logout", icon: "fas fa-sign-out-alt", show: true, href: "#", onclick: "logout()" }
 ];
 
@@ -59,7 +62,7 @@ function generateUserMenu() {
     userMenuConfig.forEach(item => {
         let show = typeof item.show == 'function' ? item.show() : item.show;
         if (show){
-            const style = item.style ? ` style=${style}` : '';
+            const style = item.style ? ` style=${item.style}` : '';
             const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
             menuHtml += `
             <a href="${item.href}"${style}${onclickAttr}>
@@ -81,6 +84,7 @@ function updateHeaderUI() {
         window.originalHeaderContent = headerActions.innerHTML;
     }
 
+    let haveStore = hasStore()
     if (userData) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(window.originalHeaderContent, 'text/html');
@@ -96,7 +100,7 @@ function updateHeaderUI() {
         if (resources) headerActions.appendChild(resources.cloneNode(true));
         if (posts) headerActions.appendChild(posts.cloneNode(true));
         if (becomeSeller) {
-            if (userData.store){
+            if (haveStore){
                 let storeMenu = document.createElement("a")
                 storeMenu.href = `store.html?name=${userData.store.name}`
                 storeMenu.innerHTML = `<i class="fa fa-store"></i> ${userData.store.name}`
@@ -113,9 +117,9 @@ function updateHeaderUI() {
                 <div class="messages-wrapper">
                     <a href="#" class="messages"><i class="fas fa-envelope"></i><span class="message-count">${userData.messages.chat + userData.messages.tickets + userData.messages.system}</span></a>
                     <div class="messages-tooltip">
-                        <a href="#" class="message-item">消息: ${userData.messages.chat}</a>
-                        <a href="#" class="message-item">工单: ${userData.messages.tickets}</a>
-                        <a href="#" class="message-item">系统: ${userData.messages.system}</a>
+                        <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中聊天')">聊天: ${userData.messages.chat}</a>
+                        <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中工单')">工单: ${userData.messages.tickets}</a>
+                        <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中系统')">系统: ${userData.messages.system}</a>
                     </div>
                 </div>
                 <div class="user-avatar-wrapper">
