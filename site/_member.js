@@ -5,29 +5,28 @@ const paymentMethods = [
     { name: 'Stripe', feeType: 'percent', fee: 0.025, minAmount: 25 }
 ];
 let userMenuConfig = [
-    { text: "店铺管理", style: `color:var(--font-green)`, icon: "fas fa-store", show: ()=> hasStore() , href: "store/overview.html" , sub: [
-            { text: "店铺概览", icon: "fas fa-user", href: "store/overview.html" },
-            { text: "订单管理", icon: "fas fa-list", href: "store/order-list.html" },
-            { text: "库存管理", icon: "fas fa-shopping-cart", href: "store/stock-manage.html" },
-            { text: "商品管理", icon: "fas fa-shopping-cart", href: "store/item-manage.html" },
-            { text: "商品FAQ", icon: "fas fa-blog", href: "store/item-faq.html" },
-            { text: "提现管理", icon: "fas fa-wallet", href: "#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
+    { text: "店铺管理", style: `color:var(--natural-green)`, icon: "fas fa-store", show: () => userHasStore(), href: "store/overview.html", sub: [
+            { text: "店铺概览", icon: "fas fa-tachometer-alt", href: "store/overview.html" },
+            { text: "订单管理", icon: "fas fa-box-open", href: "store/order-list.html" },
+            { text: "库存管理", icon: "fas fa-warehouse", href: "store/stock-manage.html" },
+            { text: "商品管理", icon: "fas fa-shopping-bag", href: "store/item-manage.html" },
+            { text: "商品FAQ", icon: "fas fa-question-circle", href: "store/item-faq.html" },
+            { text: "提现管理", icon: "fas fa-money-check-alt", href: "#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
             { text: "博客设置", icon: "fas fa-blog", href: "store/blog.html" },
-            { text: "文章管理", icon: "fas fa-blog", href: "store/posts-manage.html" },
-            { text: "店铺员工", icon: "fas fa-comment", href: "store/staff.html" },
-            { text: "店铺KYC", icon: "fas fa-cogs", href: "store/kyc.html" },
-            { text: "店铺消息", icon: "fas fa-comment", show: true, href: "store/message.html" },
+            { text: "文章管理", icon: "fas fa-newspaper", href: "store/posts-manage.html" },
+            { text: "店铺员工", icon: "fas fa-users", href: "store/staff.html" },
+            { text: "店铺KYC", icon: "fas fa-id-card", href: "store/kyc.html" },
+            { text: "店铺消息", icon: "fas fa-envelope", show: true, href: "store/message.html" },
             { text: "店铺设置", icon: "fas fa-cogs", href: "store/setting.html" },
-        ]
-    },
-    { text: "我的订单", icon: "fas fa-shopping-cart", show: true, href: "user/my-orders.html" },
-    { text: "我的需求", icon: "fas fa-list", show: true, href: "user/my-demands.html" },
+        ]},
+    { text: "我的订单", icon: "fas fa-box-open", show: true, href: "user/my-orders.html" },
+    { text: "我的需求", icon: "fas fa-clipboard-list", show: true, href: "user/my-demands.html" },
     { text: "Top-Up", icon: "fas fa-wallet", show: true, href: "#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
-    { text: "资金记录", icon: "fas fa-money-bill", show: true, href: "user/my-transactions.html" },
-    { text: "我的消息", icon: "fas fa-comment", show: true, href: "user/my-message.html" },
+    { text: "资金记录", icon: "fas fa-money-check-alt", show: true, href: "user/my-transactions.html" },
+    { text: "我的消息", icon: "fas fa-envelope", show: true, href: "user/my-message.html" },
     { text: "我的收藏", icon: "fas fa-heart", show: true, href: "user/save-list.html" },
-    { text: "我的评论", icon: "fas fa-comment", show: true, href: "user/my-comment.html" },
-    { text: "Profile", icon: "fas fa-user", show: true, href: "user/profile.html" },
+    { text: "我的评论", icon: "fas fa-comment-alt", show: true, href: "user/my-comment.html" },
+    { text: "Profile", icon: "fas fa-user-circle", show: true, href: "user/profile.html" },
     { text: "个人设置", icon: "fas fa-cog", show: true, href: "user/setting.html" },
     { text: "Logout", icon: "fas fa-sign-out-alt", show: true, href: "#", onclick: "logout()" }
 ];
@@ -37,12 +36,13 @@ let signInRegisterStyle = { width: '35em' };
 
 // 本地存储用户登录信息
 function saveUserLoginInfo(username) {
-    let store = generateData(storeFieldConfig, 1)[0]
+    let store = generateData(storeFieldConfig, 1)[0];
     const userData = {
         username: username,
         balance: faker.commerce.price(100, 1000, 2),
-        messages: { chat: randomInt(0,50), tickets: randomInt(20,50), system: randomInt(0,10) },
-        store: randomInt(0,1) > 0 ? store : null
+        messages: { chat: randomInt(0, 50), tickets: randomInt(20, 50), system: randomInt(0, 10) },
+        storeMessages: { newOrders: randomInt(0, 10), newTickets: randomInt(0, 5), inquiries: randomInt(0, 20), stockAlerts: randomInt(0, 3), system: randomInt(0, 5) },
+        store: randomInt(0, 1) > 0 ? store : null
     };
     localStorage.setItem('userData', JSON.stringify(userData));
     updateHeaderUI();
@@ -53,7 +53,7 @@ function getUserLoginInfo() {
     return JSON.parse(localStorage.getItem('userData')) || null;
 }
 
-function hasStore(){
+function userHasStore(){
     return getUserLoginInfo()?.store;
 }
 
@@ -61,21 +61,32 @@ function hasStore(){
 function generateUserMenu() {
     let menuHtml = '';
     userMenuConfig.forEach(item => {
-        let show = typeof item.show == 'function' ? item.show() : item.show;
-        if (show){
-            const style = item.style ? ` style=${item.style}` : '';
+        let show = typeof item.show === 'function' ? item.show() : item.show;
+        if (show) {
+            const style = item.style ? ` style="${item.style}"` : '';
             const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
             menuHtml += `
-            <a href="${item.href}"${style}${onclickAttr}>
-                <i class="${item.icon}"></i> ${item.text}
-            </a>
-        `;
+                <a href="${item.href}"${style}${onclickAttr}>
+                    <i class="${item.icon}"></i> ${item.text}
+                </a>
+            `;
+            if (item.sub && item.sub.length > 0) {
+                menuHtml += '<div class="user-sub-menu">';
+                item.sub.forEach(subItem => {
+                    const subOnclickAttr = subItem.onclick ? ` onclick="${subItem.onclick}"` : '';
+                    menuHtml += `
+                        <a href="${subItem.href}"${subOnclickAttr}>
+                            <i class="${subItem.icon}"></i> ${subItem.text}
+                        </a>
+                    `;
+                });
+                menuHtml += '</div>';
+            }
         }
     });
     return menuHtml;
 }
 
-// 更新头部 UI
 function updateHeaderUI() {
     const userData = getUserLoginInfo();
     const headerActions = document.getElementById('header-actions');
@@ -85,7 +96,7 @@ function updateHeaderUI() {
         window.originalHeaderContent = headerActions.innerHTML;
     }
 
-    let haveStore = hasStore()
+    let haveStore = userHasStore();
     if (userData) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(window.originalHeaderContent, 'text/html');
@@ -101,30 +112,36 @@ function updateHeaderUI() {
         if (resources) headerActions.appendChild(resources.cloneNode(true));
         if (posts) headerActions.appendChild(posts.cloneNode(true));
         if (becomeSeller) {
-            if (haveStore){
-                let storeMenu = document.createElement("a")
-                storeMenu.href = `store.html?name=${userData.store.name}`
-                storeMenu.innerHTML = `<i class="fa fa-store"></i> ${userData.store.name}`
-                storeMenu.className = 'userStore'
+            if (haveStore) {
+                let storeMenu = document.createElement("a");
+                storeMenu.href = `store.html?name=${userData.store.name}`;
+                storeMenu.innerHTML = `<i class="fas fa-store"></i> ${userData.store.name}`;
+                storeMenu.className = 'userStore';
                 headerActions.appendChild(storeMenu);
-            }else{
-                headerActions.appendChild(becomeSeller.cloneNode(true));
+            } else {
+                let becomeSellerLink = becomeSeller.cloneNode(true);
+                becomeSellerLink.title = "创建店铺（需完成KYC）";
+                becomeSellerLink.style.color = "var(--vibrant-orange)";
+                headerActions.appendChild(becomeSellerLink);
             }
         }
+
+        const totalMessages = haveStore
+            ? (userData.storeMessages.newOrders + userData.storeMessages.newTickets + userData.storeMessages.inquiries + userData.storeMessages.stockAlerts + userData.storeMessages.system)
+            : (userData.messages.chat + userData.messages.tickets + userData.messages.system);
+        const messageClass = totalMessages > 0 ? 'messages has-messages' : 'messages';
 
         headerActions.innerHTML += `
             <div class="user-actions">
                 <a href="#" class="balance" onclick="showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })">$${userData.balance}</a>
                 <div class="messages-wrapper">
-                    <a href="#" class="messages"><i class="fas fa-envelope"></i><span class="message-count">${userData.messages.chat + userData.messages.tickets + userData.messages.system}</span></a>
+                    <a href="#" class="${messageClass}" onclick="clearMessages(this)"><i class="fas fa-envelope"></i><span class="message-count">${totalMessages}</span></a>
                     <div class="messages-tooltip">
-                        <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中聊天')">聊天: ${userData.messages.chat}</a>
-                        <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中工单')">工单: ${userData.messages.tickets}</a>
-                        <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中系统')">系统: ${userData.messages.system}</a>
+                        ${generateMessagesTooltip(userData, haveStore)}
                     </div>
                 </div>
-                <div class="user-avatar-wrapper">
-                    <a href="#" class="user-avatar"><img src="${getPicsumImage(40, 40, userData.username)}" alt="${userData.username}"></a>
+                <div class="user-avatar-wrapper${haveStore ? ' has-store' : ''}">
+                    <a href="/user/index.html" class="user-avatar"><img src="${getPicsumImage(40, 40, userData.username)}" alt="${userData.username}"></a>
                     <div class="user-menu">
                         ${generateUserMenu()}
                     </div>
@@ -134,6 +151,34 @@ function updateHeaderUI() {
     } else {
         headerActions.innerHTML = window.originalHeaderContent;
     }
+}
+
+// 新增函数：生成消息弹窗内容
+function generateMessagesTooltip(userData, haveStore) {
+    let tooltipHtml = '';
+    if (haveStore) {
+        tooltipHtml += `
+            <a href="#" class="message-item" onclick="alert('查看新订单')">新订单: ${userData.storeMessages.newOrders > 0 ? `<b style="color: red;">${userData.storeMessages.newOrders}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="alert('查看新工单')">新工单: ${userData.storeMessages.newTickets > 0 ? `<b style="color: red;">${userData.storeMessages.newTickets}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="alert('查看新咨询')">新咨询: ${userData.storeMessages.inquiries > 0 ? `<b style="color: red;">${userData.storeMessages.inquiries}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="alert('查看库存告警')">库存告警: ${userData.storeMessages.stockAlerts > 0 ? `<b style="color: red;">${userData.storeMessages.stockAlerts}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="alert('查看店铺系统通知')">系统通知: ${userData.storeMessages.system > 0 ? `<b style="color: red;">${userData.storeMessages.system}</b>` : 0}</a>
+        `;
+    } else {
+        tooltipHtml += `
+            <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中聊天')">聊天: ${userData.messages.chat > 0 ? `<b style="color: red;">${userData.messages.chat}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中工单')">工单: ${userData.messages.tickets > 0 ? `<b style="color: red;">${userData.messages.tickets}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中系统')">系统: ${userData.messages.system > 0 ? `<b style="color: red;">${userData.messages.system}</b>` : 0}</a>
+        `;
+    }
+    return tooltipHtml;
+}
+
+// 新增函数：点击消息图标后清除数字
+function clearMessages(element) {
+    const countElement = element.querySelector('.message-count');
+    if (countElement) countElement.textContent = '0';
+    element.classList.remove('has-messages');
 }
 
 // 退出登录
