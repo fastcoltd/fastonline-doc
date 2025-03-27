@@ -148,13 +148,13 @@ let storeFieldConfig = {
     brands: {
         card: true, cardSq: true, cardHoriz: true,type: 'text', label: '品牌',style: {},
         format: (t, d, v) => {
-            let all = v.map(brand => `<a href="store.html?name=${t.name}&brandName=${brand}" style="color: var(--font-green);">${brand}</a>`).join('，');
+            let all = v.map(brand => `<a href="store.html?name=${t.name}&brandName=${brand.name}" style="color: ${brand.themeColor}">${brand.name}</a>`).join('，');
             return `${all}`;
         },
         sample: () => {
             const count = randomInt(1, 3);
             const shuffled = hotBrands.sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count).map(brand => brand.name);
+            return shuffled.slice(0, count).map(brand => brand);
         }
     },
 
@@ -1007,7 +1007,11 @@ function generateArticleCategory(){
 
 function generateBrand(){
     let choose = hotBrands[Math.floor(Math.random() * hotBrands.length)]
-    return `<b style="color: ${choose.themeColor};">${choose['name']}</b>`;
+    return generateBrandColor(choose.name, choose.themeColor);
+}
+
+function generateBrandColor(name, color){
+    return `<b style="color: ${color};">${name}</b>`;
 }
 
 function generateServices(){
