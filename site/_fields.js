@@ -325,7 +325,7 @@ let ordersFieldConfig = {
         label: '状态',
         format: (d, v) => `<span style="color: ${v === 0 ? '#A9A9A9' : '#32CD32'}">${v === 0 ? '未完成' : '已完成'}</span>`,
         style: {},
-        sample: () => faker.datatype.number({ min: 0, max: 1 })
+        sample: () => faker.datatype.number({ min: 0, max: 5 })
     },
     price: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '单价', style: {}, sample: () => faker.commerce.price(10, 500, 2, "$") },
     original_price: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '原价', format: (d, v) => `<span style="color: #A9A9A9; text-decoration: line-through">${v}</span>`, style: {}, sample: () => faker.commerce.price(15, 600, 2, "$") },
