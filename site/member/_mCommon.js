@@ -3,7 +3,7 @@ function generateSidebarMenu() {
     const currentPath = window.location.pathname.split('/').pop();
     let menuHtml = '';
     memberMenuConfig.forEach(item => {
-        let show = typeof item.show === 'function' ? item.show() : item.show;
+        let show = typeof item.memberSidebar === 'function' ? item.memberSidebar() : item.memberSidebar;
         if (show) {
             const isActive = currentPath === item.href.split('/').pop();
             const style = item.style ? ` style="${item.style}"` : '';
