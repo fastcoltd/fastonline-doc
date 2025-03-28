@@ -6,8 +6,8 @@ const paymentMethods = [
 ];
 let userMenuConfig = [
     { text: "店铺管理", style: `color:var(--natural-green)`, icon: "fas fa-store", show: () => userHasStore(), href: "store/overview.html", sub: [
-            { text: "店铺概览", icon: "fas fa-tachometer-alt", href: "store/overview.html" },
-            { text: "订单管理", icon: "fas fa-box-open", href: "store/order-list.html" },
+            { text: "店铺中心", icon: "fas fa-tachometer-alt", href: "store/overview.html" },
+            { text: "店铺订单", icon: "fas fa-box-open", href: "store/order-list.html" },
             { text: "库存管理", icon: "fas fa-warehouse", href: "store/stock-manage.html" },
             { text: "商品管理", icon: "fas fa-shopping-bag", href: "store/item-manage.html" },
             { text: "商品FAQ", icon: "fas fa-question-circle", href: "store/item-faq.html" },
@@ -18,16 +18,18 @@ let userMenuConfig = [
             { text: "店铺KYC", icon: "fas fa-id-card", href: "store/kyc.html" },
             { text: "店铺消息", icon: "fas fa-envelope", show: true, href: "store/message.html" },
             { text: "店铺设置", icon: "fas fa-cogs", href: "store/setting.html" },
+            { text: "店铺日志", icon: "fas fa-list-alt", href: "store/logs.html" },
         ]},
-    { text: "我的订单", icon: "fas fa-box-open", show: true, href: "user/my-orders.html" },
-    { text: "我的需求", icon: "fas fa-clipboard-list", show: true, href: "user/my-demands.html" },
+    { text: "我的订单", icon: "fas fa-box-open", show: true, href: "user/orders.html" },
+    { text: "我的需求", icon: "fas fa-clipboard-list", show: true, href: "user/demands.html" },
     { text: "Top-Up", icon: "fas fa-wallet", show: true, href: "#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
-    { text: "资金记录", icon: "fas fa-money-check-alt", show: true, href: "user/my-transactions.html" },
-    { text: "我的消息", icon: "fas fa-envelope", show: true, href: "user/my-message.html" },
+    { text: "资金记录", icon: "fas fa-money-check-alt", show: true, href: "user/transactions.html" },
+    { text: "我的消息", icon: "fas fa-envelope", show: true, href: "user/message.html" },
     { text: "我的收藏", icon: "fas fa-heart", show: true, href: "user/save-list.html" },
-    { text: "我的评论", icon: "fas fa-comment-alt", show: true, href: "user/my-comment.html" },
+    { text: "我的评论", icon: "fas fa-comment-alt", show: true, href: "user/reviews.html" },
     { text: "Profile", icon: "fas fa-user-circle", show: true, href: "user/profile.html" },
-    { text: "个人设置", icon: "fas fa-cog", show: true, href: "user/setting.html" },
+    { text: "账户设置", icon: "fas fa-cog", show: true, href: "user/setting.html" },
+    { text: "账户日志", icon: "fas fa-list-alt", show: true, href: "user/logs.html" },
     { text: "Logout", icon: "fas fa-sign-out-alt", show: true, href: "#", onclick: "logout()" }
 ];
 
