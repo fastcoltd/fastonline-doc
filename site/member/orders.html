@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的订单 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../_site.css">
+    <link rel="stylesheet" href="_member.css">
+    <style>
+        .member-container {max-width: var(--max-content-width); margin: 0 auto; padding: 1.5em;}
+        .orders-table {width: 100%; border-collapse: collapse; margin-bottom: 1em;}
+        .orders-table th, .orders-table td {padding: 0.75em; text-align: left; border-bottom: 0.0625em solid var(--border-color);}
+        .orders-table th {background: var(--bg-light); font-weight: bold;}
+        .orders-table .operation-area {display: flex; gap: 0.5em;}
+        .orders-table .operation-area button {padding: 0.25em 0.75em; font-size: var(--font-small);}
+        .pagination-controls {display: flex; justify-content: space-between; align-items: center; gap: 1em;}
+        .pagination-controls select {padding: 0.5em;}
+        .pagination-controls input {width: 4em; padding: 0.5em;}
+    </style>
+</head>
+<body>
+<div w3-include-html="../_header.html"></div>
+<div w3-include-html="_sidebar.html"></div>
+<div class="member-container">
+    <div class="member-section">
+        <h2 class="member-section-title">我的订单</h2>
+        <div class="orders-filter" id="orders-filter"></div>
+        <table class="orders-table" id="orders-table">
+            <thead id="orders-table-header"></thead>
+            <tbody id="orders-table-body"></tbody>
+        </table>
+        <div class="pagination-controls" id="orders-pagination"></div>
+    </div>
+</div>
+<div w3-include-html="../_footer.html"></div>
+
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="../_location.js"></script>
+<script src="../_common.js"></script>
+<script src="../_member.js"></script>
+<script src="_mCommon.js"></script>
+<script src="../_fields.js"></script>
+<script src="../_data.js"></script>
+<script>
+    // 用户订单字段配置，避免与 field.js 冲突
+    const userOrdersFieldConfig = {
+        id: { display: true, label: '订单ID', format: v => v, sample: () => faker.datatype.number({ min: 100000, max: 999999 }) },
+        itemName: { display: true, label: '商品名称', format: (v, item) => {
+                if (item.demand_id) return `需求: ${faker.commerce.productName()}`;
+                if (item.item_id) return faker.commerce.productName();
+                if (item.posts_id) return `帖子: ${faker.lorem.sentence()}`;
+                return '未知';
+            }, sample: () => faker.random.arrayElement([null, null, null]) },
+        brandName: { display: true, label: '品牌', format: v => v ? hotBrands.find(b => b.name === v)?.name || v : '无', sample: () => hotBrands[Math.floor(Math.random() * hotBrands.length)].name },
+        service: { display: true, label: '服务', format: v => v || '无', sample: () => services[Math.floor(Math.random() * services.length)].name },
+        orders_type: { display: true, label: '类型', format: v => `<span style="color: ${v === 1 ? '#32CD32' : v === 2 ? '#FFD700' : '#4682B4'}">${v === 1 ? '自动' : v === 2 ? '预付' : '市场'}</span>`, sample: () => faker.random.arrayElement([1, 2, 3]) },
+        status: { display: true, label: '状态', format: v => `<span style="color: ${v === 0 ? '#A9A9A9' : '#32CD32'}">${v === 0 ? '未完成' : '已完成'}</span>`, sample: () => faker.datatype.number({ min: 0, max: 1 }) },
+        amount: { display: true, label: '总金额', format: v => v, sample: () => faker.commerce.price(50, 2000, 2, "$") },
+        paid_time: { display: true, label: '支付时间', format: v => v, sample: () => faker.date.recent().toLocaleString() },
+        operation: { display: true, label: '操作', format: (v, item) => {
+                let actions = '';
+                if (item.status === 0) actions += '<button class="btn-small" onclick="raiseTicket(' + item.id + ')">提交工单</button>';
+                actions += '<button class="btn-small" onclick="viewDetails(' + item.id + ')">查看</button>';
+                if (item.status === 1) actions += '<button class="btn-small" onclick="downloadInvoice(' + item.id + ')">下载</button>';
+                return `<div class="operation-area">${actions}</div>`;
+            }, sample: () => null }
+    };
+
+    // 分页和数据管理
+    let currentPage = 1;
+    let pageSize = 5;
+    let allOrders = [];
+    let filteredOrders = [];
+
+    function initOrdersPage() {
+        allOrders = generateOrdersData(20); // 生成20条订单
+        filteredOrders = [...allOrders];
+        renderFilterForm();
+        renderTableHeader();
+        renderTableBody();
+        renderPagination();
+    }
+
+    function generateOrdersData(count) {
+        return Array(count).fill().map(() => {
+            const item = {};
+            Object.keys(userOrdersFieldConfig).forEach(key => {
+                if (key === 'itemName') {
+                    const type = faker.random.arrayElement(['demand_id', 'item_id', 'posts_id']);
+                    item[type] = faker.datatype.number({ min: 1, max: 10000 });
+                } else {
+                    item[key] = userOrdersFieldConfig[key].sample();
+                }
+            });
+            return item;
+        });
+    }
+
+    function renderFilterForm() {
+        const filterDiv = document.getElementById('orders-filter');
+        filterDiv.innerHTML = `
+                <input type="text" id="filter-search" placeholder="订单ID/商品名">
+                <select id="filter-brand">
+                    <option value="">品牌</option>
+                    ${hotBrands.map(b => `<option value="${b.name}">${b.name}</option>`).join('')}
+                </select>
+                <select id="filter-service">
+                    <option value="">服务</option>
+                    ${services.map(s => `<option value="${s.name}">${s.name}</option>`).join('')}
+                </select>
+                <select id="filter-type">
+                    <option value="">订单类型</option>
+                    <option value="1">自动</option>
+                    <option value="2">预付</option>
+                    <option value="3">市场</option>
+                </select>
+                <select id="filter-status">
+                    <option value="">订单状态</option>
+                    <option value="0">未完成</option>
+                    <option value="1">已完成</option>
+                </select>
+                <input type="date" id="filter-date-start" placeholder="开始日期">
+                <input type="date" id="filter-date-end" placeholder="结束日期">
+                <button class="btn-solid-medium" onclick="applyFilters()">查询</button>
+                <button class="btn-orange-medium" onclick="resetFilters()">重置</button>
+            `;
+    }
+
+    function applyFilters() {
+        const search = document.getElementById('filter-search').value.toLowerCase();
+        const brand = document.getElementById('filter-brand').value;
+        const service = document.getElementById('filter-service').value;
+        const typeFilter = document.getElementById('filter-type').value;
+        const statusFilter = document.getElementById('filter-status').value;
+        const dateStart = document.getElementById('filter-date-start').value;
+        const dateEnd = document.getElementById('filter-date-end').value;
+
+        filteredOrders = allOrders.filter(order => {
+            let match = true;
+            if (search && !order.id.toString().includes(search) && !userOrdersFieldConfig.itemName.format(null, order).toLowerCase().includes(search)) match = false;
+            if (brand && order.brandName !== brand) match = false;
+            if (service && order.service !== service) match = false;
+            if (typeFilter && order.orders_type !== parseInt(typeFilter)) match = false;
+            if (statusFilter && order.status !== parseInt(statusFilter)) match = false;
+            if (dateStart && new Date(order.paid_time) < new Date(dateStart)) match = false;
+            if (dateEnd && new Date(order.paid_time) > new Date(dateEnd)) match = false;
+            return match;
+        });
+
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function resetFilters() {
+        document.getElementById('filter-search').value = '';
+        document.getElementById('filter-brand').value = '';
+        document.getElementById('filter-service').value = '';
+        document.getElementById('filter-type').value = '';
+        document.getElementById('filter-status').value = '';
+        document.getElementById('filter-date-start').value = '';
+        document.getElementById('filter-date-end').value = '';
+        filteredOrders = [...allOrders];
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function renderTableHeader() {
+        const header = document.getElementById('orders-table-header');
+        header.innerHTML = '<tr>' + Object.entries(userOrdersFieldConfig)
+            .filter(([_, config]) => config.display)
+            .map(([_, config]) => `<th>${config.label}</th>`).join('') + '</tr>';
+    }
+
+    function renderTableBody() {
+        const body = document.getElementById('orders-table-body');
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const paginatedOrders = filteredOrders.slice(start, end);
+        body.innerHTML = paginatedOrders.map(order => `
+                <tr>
+                    ${Object.entries(userOrdersFieldConfig)
+            .filter(([_, config]) => config.display)
+            .map(([key, config]) => `<td>${config.format(order[key], order)}</td>`).join('')}
+                </tr>
+            `).join('');
+    }
+
+    function renderPagination() {
+        const totalPages = Math.ceil(filteredOrders.length / pageSize);
+        const paginationDiv = document.getElementById('orders-pagination');
+        paginationDiv.innerHTML = `
+                <div>
+                    <button class="btn-small pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
+                    <span>第 ${currentPage} 页 / 共 ${totalPages} 页</span>
+                    <button class="btn-small pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
+                </div>
+                <div>
+                    <select id="page-size" onchange="changePageSize()">
+                        <option value="5" ${pageSize === 5 ? 'selected' : ''}>5条/页</option>
+                        <option value="10" ${pageSize === 10 ? 'selected' : ''}>10条/页</option>
+                        <option value="20" ${pageSize === 20 ? 'selected' : ''}>20条/页</option>
+                    </select>
+                    <input type="number" id="jump-page" min="1" max="${totalPages}" placeholder="页">
+                    <button class="btn-small" onclick="jumpToPage()">跳转</button>
+                </div>
+            `;
+    }
+
+    function changePage(newPage) {
+        const totalPages = Math.ceil(filteredOrders.length / pageSize);
+        if (newPage >= 1 && newPage <= totalPages) {
+            currentPage = newPage;
+            renderTableBody();
+            renderPagination();
+        }
+    }
+
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('page-size').value);
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function jumpToPage() {
+        const totalPages = Math.ceil(filteredOrders.length / pageSize);
+        const page = parseInt(document.getElementById('jump-page').value);
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderTableBody();
+            renderPagination();
+        }
+    }
+
+    function raiseTicket(orderId) { alert(`提交工单 for 订单 ${orderId}`); }
+    function viewDetails(orderId) { alert(`查看订单 ${orderId} 详情`); }
+    function downloadInvoice(orderId) { alert(`下载订单 ${orderId} 发票`); }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initOrdersPage();
+        });
+    };
+</script>
+</body>
+</html>
