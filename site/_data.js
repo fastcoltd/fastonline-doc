@@ -10,6 +10,24 @@ const systemType = {
     "pages": {"link": "page.html", "list_link": "page-type.html"},
 }
 
+const reviewDimensions = {
+    item_id: [
+        { key: 'quality', label: '商品质量' },
+        { key: 'delivery', label: '商品匹配' },
+        { key: 'service', label: '服务态度' }
+    ],
+    demand_id: [
+        { key: 'match', label: '需求匹配' },
+        { key: 'response', label: '响应速度' },
+        { key: 'price', label: '物有所值' }
+    ],
+    posts_id: [
+        { key: 'content', label: '内容价值' },
+        { key: 'usefulness', label: '实用特性' },
+        { key: 'clarity', label: '逻辑清晰' }
+    ]
+};
+
 const dropdownMenus = {
     Resources: [
         { text: "Tutorials", href: "/site/page-type.html?name=Tutorials" },
