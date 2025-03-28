@@ -24,6 +24,29 @@
         </div>
     </div>
 </div>
+<div id="review-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>订单评价</h3>
+            <button class="modal-close" onclick="closeReviewModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="order-info">
+                <div class="order-item-image">
+                    <img id="review-item-image" src="" alt="商品图片">
+                </div>
+                <div class="order-details">
+                    <p id="review-item-name" class="item-name"></p>
+                    <p>数量: <span id="review-quantity"></span></p>
+                    <p>价格: <span id="review-price"></span></p>
+                </div>
+            </div>
+            <div class="review-content" id="review-content">
+            </div>
+        </div>
+    </div>
+</div>
+
 <div w3-include-html="../_footer.html"></div>
 
 <script src="https://www.w3schools.com/lib/w3.js"></script>
@@ -245,13 +268,122 @@
     }
 
     function raiseTicket(orderId) { alert(`工单 for 订单 ${orderId}`); }
-    function raiseComment(orderId) { alert(`Reviews for 订单 ${orderId}`); }
     function viewDetails(orderId) { alert(`查看订单 ${orderId} 详情`); }
     function downloadInvoice(orderId) { alert(`下载订单 ${orderId} 发票`); }
 
+    function raiseComment(orderId) {
+        const order = allOrders.find(o => o.id === orderId);
+        if (!order) return;
+
+        // 随机决定是否已评价
+        const hasReviewed = Math.random() > 0.5;
+        const modal = document.getElementById('review-modal');
+        const content = document.getElementById('review-content');
+
+        // 设置商品信息
+        document.getElementById('review-item-name').innerHTML = userOrdersFieldConfig.itemName.format(null, order);
+        document.getElementById('review-quantity').textContent = order.quantity;
+        document.getElementById('review-price').innerHTML = order.amount;
+        document.getElementById('review-item-image').src = 'https://picsum.photos/200/200?random=' + orderId;
+
+        if (hasReviewed) {
+            // 已评价状态
+            const rating = Math.floor(Math.random() * 5) + 1;
+            const comment = faker.lorem.paragraph();
+            content.innerHTML = `
+            <div class="rating-section">
+                <div class="stars">
+                    ${Array(5).fill().map((_, i) => `
+                        <i class="fa fa-star ${i < rating ? 'active' : ''}"></i>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="review-display">${comment}</div>
+            <div class="review-actions">
+                <button class="btn-small btn-orange-medium" onclick="deleteReview(${orderId})">删除评价</button>
+            </div>
+        `;
+        } else {
+            // 未评价状态
+            let currentRating = 0;
+            content.innerHTML = `
+            <div class="rating-section">
+                <div class="stars" id="rating-stars">
+                    ${Array(5).fill().map((_, i) => `
+                        <i class="fa fa-star" data-rating="${i + 1}"></i>
+                    `).join('')}
+                </div>
+            </div>
+            <textarea class="review-text" id="review-text" placeholder="请输入您的评价..."></textarea>
+            <div class="review-actions">
+                <button class="btn-small btn-solid-medium" onclick="submitReview(${orderId})">提交评价</button>
+            </div>
+        `;
+
+            // 添加星星评分交互
+            const stars = document.querySelectorAll('#rating-stars .fa-star');
+            stars.forEach(star => {
+                star.addEventListener('mouseover', () => {
+                    const rating = parseInt(star.dataset.rating);
+                    stars.forEach((s, i) => {
+                        s.classList.toggle('active', i < rating);
+                    });
+                });
+                star.addEventListener('click', () => {
+                    currentRating = parseInt(star.dataset.rating);
+                });
+                star.addEventListener('mouseout', () => {
+                    stars.forEach((s, i) => {
+                        s.classList.toggle('active', i < currentRating);
+                    });
+                });
+            });
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closeReviewModal() {
+        document.getElementById('review-modal').style.display = 'none';
+    }
+
+    function submitReview(orderId) {
+        const ratingStars = document.querySelectorAll('#rating-stars .fa-star.active').length;
+        const comment = document.getElementById('review-text').value.trim();
+
+        if (ratingStars === 0) {
+            alert('请先选择评分');
+            return;
+        }
+        if (!comment) {
+            alert('请输入评价内容');
+            return;
+        }
+
+        // 这里可以添加提交到服务器的逻辑
+        console.log(`提交评价 - 订单ID: ${orderId}, 评分: ${ratingStars}, 内容: ${comment}`);
+        closeReviewModal();
+    }
+
+    function deleteReview(orderId) {
+        if (confirm('确定要删除此评价吗？')) {
+            // 这里可以添加删除评价的服务器逻辑
+            console.log(`删除评价 - 订单ID: ${orderId}`);
+            closeReviewModal();
+        }
+    }
+
+    // 修改window.onload，确保点击外部关闭弹窗
     window.onload = () => {
         w3.includeHTML(() => {
             initOrdersPage();
+
+            // 添加点击外部关闭弹窗的事件
+            document.getElementById('review-modal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    closeReviewModal();
+                }
+            });
         });
     };
 </script>
