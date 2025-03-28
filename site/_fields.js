@@ -330,7 +330,7 @@ let ordersFieldConfig = {
     price: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '单价', style: {}, sample: () => faker.commerce.price(10, 500, 2, "$") },
     original_price: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '原价', format: (d, v) => `<span style="color: #A9A9A9; text-decoration: line-through">${v}</span>`, style: {}, sample: () => faker.commerce.price(15, 600, 2, "$") },
     quantity: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '数量', style: {}, sample: () => faker.datatype.number({ min: 1, max: 10 }) },
-    coupon: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '优惠券', style: {}, sample: () => faker.random.alphaNumeric(10) },
+    coupon: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '优惠券', style: {}, sample: () => randomInt(0,1)> 0 ? String(faker.random.alphaNumeric(6)).toUpperCase() : '--' },
     coupon_discount: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '折扣', format: (d, v) => `<span style="color: #32CD32">${(v * 100).toFixed(0)}%</span>`, style: {}, sample: () => faker.datatype.float({ min: 0.1, max: 0.5, precision: 0.01 }) },
     amount: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '总金额', style: {}, sample: () => faker.commerce.price(50, 2000, 2, "$") },
     original_amount: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '原始总金额', format: (d, v) => `<span style="color: #A9A9A9">${v}</span>`, style: {}, sample: () => faker.commerce.price(60, 2500, 2, "$") },

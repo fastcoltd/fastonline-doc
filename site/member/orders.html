@@ -40,31 +40,37 @@
         id: { ...ordersFieldConfig.id, label: '订单ID', format: v => v, sample: () => faker.datatype.number({ min: 100000, max: 999999 }) },
         brandName: { label: '品牌', format: v => `<span style="color: ${hotBrands.find(b => b.name === v)?.themeColor || '#000'}">${hotBrands.find(b => b.name === v)?.name || v || '无'}</span> - ${services[Math.floor(Math.random() * services.length)].name}`, sample: () => hotBrands[Math.floor(Math.random() * hotBrands.length)].name },
         itemName: { label: '名称', format: (v, item) => {
-            let randomItem = [
-                (item)=>{
-                    item.item_id = faker.datatype.number({ min: 100000, max: 999999 })
-                },
-                (item)=>{
-                    item.demand_id = faker.datatype.number({ min: 100000, max: 999999 })
-                },
-                (item)=>{
-                    item.posts_id = faker.datatype.number({ min: 100000, max: 999999 })
-                },
-            ];
-            let randomName = faker.commerce.productName()
-            randomItem[randomInt(0, randomItem.length - 1)](item)
-            let name = item.demand_id ? `需求: ${randomName}` : item.item_id ? `商品: ${randomName}` : item.posts_id ? `文章: ${randomName}` : '未知';
-            const url = item.demand_id ? `/site/demand.html?name=${randomName}` : item.item_id ? `/site/item.html?name=${randomName}` : item.posts_id ? `/site/post.html?name=${randomName}` : '#';
-            return `<a href="${url}" class="item-name" data-full="${name}">${name}</a>`;
-        }, sample: () => ({
+                let randomItem = [
+                    (item)=>{
+                        item.item_id = faker.datatype.number({ min: 100000, max: 999999 })
+                    },
+                    (item)=>{
+                        item.demand_id = faker.datatype.number({ min: 100000, max: 999999 })
+                    },
+                    (item)=>{
+                        item.posts_id = faker.datatype.number({ min: 100000, max: 999999 })
+                    },
+                ];
+                let randomName = faker.commerce.productName()
+                randomItem[randomInt(0, randomItem.length - 1)](item)
+                let name = item.demand_id ? `<i class="fa fa-list"></i> ${randomName}` : item.item_id ? `<i class="fa fa-shopping-cart"></i> ${randomName}` : item.posts_id ? `<i class="fa fa-book"></i> ${randomName}` : '未知';
+                const url = item.demand_id ? `/site/demand.html?name=${randomName}` : item.item_id ? `/site/item.html?name=${randomName}` : item.posts_id ? `/site/post.html?name=${randomName}` : '#';
+                return `<a href="${url}" class="item-name">${name}</a>`;
+            }, sample: () => ({
         }) },
         quantity: { ...ordersFieldConfig.quantity, label: '数量', sample: () => faker.datatype.number({ min: 1, max: 1000 }) },
-        amount: { ...ordersFieldConfig.amount, label: '金额', sample: () => faker.commerce.price(50, 2000, 2, "$") },
+        coupon: { ...ordersFieldConfig.coupon, format: v => v},
+        amount: { ...ordersFieldConfig.amount, label: '金额', format: v => `<span style="color:var(--font-orange)">${v}</span>`, sample: () => faker.commerce.price(50, 2000, 2, "$") },
         paid_time: { ...ordersFieldConfig.paid_time, label: '时间', sample: () => faker.date.recent().toLocaleString() },
+        feedback: { label: '反馈', format: (v, item) => {
+                let actions = '';
+                actions += randomInt(0,1) > 0 ? '' : '<button class="btn-small" style="color: red;" onclick="raiseTicket(' + item.id.sample + ')" title="Ticket"><i class="fa fa-paper-plane"></i></button>';
+                actions += randomInt(0,1) > 0 ? '<button class="btn-small" style="color: var(--font-green);" onclick="raiseComment(' + item.id.sample + ')" title="Reviews"><i class="fa fa-star"></i></button>' : '<button class="btn-small" style="color: var(--font-orange);" onclick="raiseComment(' + item.id.sample + ')" title="Reviews"><i class="fa fa-star"></i></button>';
+                return `<div class="operation-area">${actions}</div>`;
+            }, sample: () => null },
         operation: { label: '操作', format: (v, item) => {
                 let actions = '';
-                actions += '<button class="btn-small" onclick="raiseTicket(' + item.id.sample + ')">工单</button>';
-                actions += '<button class="btn-small" onclick="viewDetails(' + item.id.sample + ')">查看</button>';
+                actions += '<button class="btn-small"  onclick="viewDetails(' + item.id.sample + ')">查看</button>';
                 actions += '<button class="btn-small" onclick="downloadInvoice(' + item.id.sample + ')">下载</button>';
                 return `<div class="operation-area">${actions}</div>`;
             }, sample: () => null }
@@ -235,6 +241,7 @@
     }
 
     function raiseTicket(orderId) { alert(`工单 for 订单 ${orderId}`); }
+    function raiseComment(orderId) { alert(`Reviews for 订单 ${orderId}`); }
     function viewDetails(orderId) { alert(`查看订单 ${orderId} 详情`); }
     function downloadInvoice(orderId) { alert(`下载订单 ${orderId} 发票`); }
 
