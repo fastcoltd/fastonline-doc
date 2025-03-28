@@ -32,7 +32,7 @@ let itemFieldConfig = {
     brandName: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '品牌', style: {}, sample: () => {return generateBrand()} },
     service: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '服务', style: {}, sample: () => {return generateServices()} },
     lastUpdate: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '最后更新', style: {}, sample: () => `2025-03-01 12:00:11` },
-    tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '要求', style: {}, sample: () => {return generateTag(1,3)} },
+    tags: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '标签', style: {}, sample: () => {return generateTag(1,3)} },
     attributes: { card: true, cardSq: true, cardHoriz: true, type: 'tag', label: '属性', style: {}, sample: () => {return generateAttr(1,3)}},
 
     // 新增字段（面向客户展示）
@@ -256,25 +256,6 @@ let campaignFieldConfig = {
     summary: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '活动简介', format: (d, v) => `<span style="color: #666">${v}</span>`, style: {}, sample: () => faker.lorem.sentence()}
 };
 
-let ordersCommentFieldConfig = {
-    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `review${i}`) },
-    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', style: {}, sample: () => faker.commerce.productName() },
-    store: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: "店铺",style: {}, sample: () => faker.company.companyName() },
-    brandName: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '品牌', style: {}, sample: () => {return generateBrand()} },
-    service: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '服务', style: {}, sample: () => {return generateServices()} },
-    itemName: { card: true, cardSq: true, cardHoriz: true, type: 'text',label: 'Item', style: {}, sample: () => faker.commerce.productName() },
-    rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => 0, sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
-    content: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '内容', style: {}, sample: () => faker.lorem.paragraph() },
-
-    // 新增字段（面向客户展示）
-    total: { card: false, cardSq: false, cardHoriz: false, type: 'price', label: '总价', style: {}, sample: () => faker.commerce.price(100, 1000, 2, "$") },
-    quantity: { card: false, cardSq: false, cardHoriz: false, type: 'price', label: '总价', style: {}, sample: () => faker.datatype.number({ min: 1, max: 500 }) },
-    item_price: { card: false, cardSq: false, cardHoriz: false, type: 'price', label: '价格', style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
-    item_image: { card: false, cardSq: false, cardHoriz: false, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `item_image${i}`) },
-    like_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '点赞数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 50 })},
-    un_like_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '反对数', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 10 })},
-};
-
 const faqFieldConfig = {
     brandName: {
         type: 'tag',
@@ -345,7 +326,6 @@ let ordersFieldConfig = {
     replacement_quantity: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '换货数量', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 3 }) },
 };
 
-// orders_ticket 配置（假设存在此表，基于订单票据逻辑）
 let ordersTicketFieldConfig = {
     id: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '票据ID', style: {}, sample: () => faker.datatype.number({ min: 100000, max: 999999 }) },
     orders_id: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '订单ID', style: {}, sample: () => faker.datatype.number({ min: 100000, max: 999999 }) },
@@ -367,6 +347,46 @@ let ordersTicketFieldConfig = {
     },
     create_time: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '创建时间', style: {}, sample: () => faker.date.recent().toLocaleString() },
     issue_time: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '开具时间', style: {}, sample: () => faker.date.recent().toLocaleString() },
+};
+
+let ordersRefundsFieldConfig = {
+    id: {card: false, cardSq: false, cardHoriz: false, type: 'text', label: 'ID', style: {}, sample: () => faker.datatype.number({min: 1, max: 10000})},
+    orders_id: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '订单ID', style: {}, sample: () => faker.datatype.number({min: 100000, max: 999999})},
+    manage_id: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '管理员ID', style: {}, sample: () => faker.datatype.number({min: 1, max: 100})},
+    store_id: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '店铺ID', style: {}, sample: () => faker.datatype.number({min: 1, max: 500})},
+    quantity: {card: true, cardSq: true, cardHoriz: true, type: 'text', label: '退款数量', style: {}, sample: () => faker.datatype.number({min: 0, max: 100})},
+    refund_amount: {card: true, cardSq: true, cardHoriz: true, type: 'price', label: '退款金额', style: {}, sample: () => faker.commerce.price(0, 1000, 2, "$")},
+    refund_time: {card: true, cardSq: true, cardHoriz: true, type: 'text', label: '退款时间', style: {}, format: (d, v) => `<span style="color: #666">${new Date(v * 1000).toLocaleString()}</span>`, sample: () => Math.floor(faker.date.recent().getTime() / 1000)}
+};
+
+// orders_replacements 配置（订单换货记录）
+let ordersReplacementsFieldConfig = {
+    id: {card: false, cardSq: false, cardHoriz: false, type: 'text', label: 'ID', style: {}, sample: () => faker.datatype.number({min: 1, max: 10000})},
+    orders_id: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '订单ID', style: {}, sample: () => faker.datatype.number({min: 100000, max: 999999})},
+    store_id: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '店铺ID', style: {}, sample: () => faker.datatype.number({min: 1, max: 500})},
+    quantity: {card: true, cardSq: true, cardHoriz: true, type: 'text', label: '换货数量', style: {}, sample: () => faker.datatype.number({min: 0, max: 100})},
+    source_type: {card: true, cardSq: true, cardHoriz: true, type: 'text', label: '来源类型', format: (d, v) => `<span style="color: ${v === 1 ? '#32CD32' : '#4682B4'}">${v === 1 ? '库存' : '已发货'}</span>`, style: {}, sample: () => faker.datatype.number({min: 1, max: 2})},
+    replacement_time: {card: true, cardSq: true, cardHoriz: true, type: 'text', label: '换货时间', style: {}, format: (d, v) => `<span style="color: #666">${new Date(v * 1000).toLocaleString()}</span>`, sample: () => Math.floor(faker.date.recent().getTime() / 1000)},
+    replacement_data: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '换货数据', style: {}, sample: () => JSON.stringify({reason: faker.lorem.sentence()})}
+};
+
+let ordersCommentFieldConfig = {
+    image: { card: true, cardSq: true, cardHoriz: true, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `review${i}`) },
+    title: { card: true, cardSq: true, cardHoriz: true, type: 'text', style: {}, sample: () => faker.commerce.productName() },
+    store: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: "店铺",style: {}, sample: () => faker.company.companyName() },
+    brandName: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '品牌', style: {}, sample: () => {return generateBrand()} },
+    service: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '服务', style: {}, sample: () => {return generateServices()} },
+    itemName: { card: true, cardSq: true, cardHoriz: true, type: 'text',label: 'Item', style: {}, sample: () => faker.commerce.productName() },
+    rating: { card: true, cardSq: true, cardHoriz: true, type: 'rating', label: '评分', style: {}, count: () => 0, sample: () => faker.datatype.float({ min: 4, max: 5, precision: 0.1 }) },
+    content: { card: true, cardSq: true, cardHoriz: true, type: 'text', label: '内容', style: {}, sample: () => faker.lorem.paragraph() },
+
+    // 新增字段（面向客户展示）
+    total: { card: false, cardSq: false, cardHoriz: false, type: 'price', label: '总价', style: {}, sample: () => faker.commerce.price(100, 1000, 2, "$") },
+    quantity: { card: false, cardSq: false, cardHoriz: false, type: 'price', label: '总价', style: {}, sample: () => faker.datatype.number({ min: 1, max: 500 }) },
+    item_price: { card: false, cardSq: false, cardHoriz: false, type: 'price', label: '价格', style: {}, sample: () => faker.commerce.price(50, 200, 2, "$") },
+    item_image: { card: false, cardSq: false, cardHoriz: false, type: 'image', style: {}, sample: i => getPicsumImage(300, 200, `item_image${i}`) },
+    like_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '点赞数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 50 })},
+    un_like_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '反对数', format: (d, v) => `<span style="color: #FF4500">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 0, max: 10 })},
 };
 
 // store_staff 配置
@@ -968,8 +988,6 @@ let paymentDisputeFieldConfig = {
     system_response: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '系统回复', style: {}, sample: () => faker.lorem.paragraph() },
 };
 
-
-
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -1031,6 +1049,8 @@ window.demandFieldConfig = demandFieldConfig;
 window.postsFieldConfig = postsFieldConfig;
 window.campaignFieldConfig = campaignFieldConfig;
 window.ordersCommentFieldConfig = ordersCommentFieldConfig;
+window.ordersRefundsFieldConfig = ordersRefundsFieldConfig;
+window.ordersReplacementsFieldConfig = ordersReplacementsFieldConfig;
 window.aftersalesFieldConfig = aftersalesFieldConfig;
 window.aftersalesTypeFieldConfig = aftersalesTypeFieldConfig;
 window.paymentFieldConfig = paymentFieldConfig;

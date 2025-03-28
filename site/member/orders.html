@@ -47,8 +47,42 @@
     </div>
 </div>
 
-<div w3-include-html="../_footer.html"></div>
+<div id="order-details-dialog" class="dialog" style="display: none;">
+    <div class="dialog-content order-details-dialog-content">
+        <div class="dialog-header">
+            <h3>订单详情</h3>
+            <button class="dialog-close" onclick="closeOrderDetailsModal()">×</button>
+        </div>
+        <div class="dialog-body">
+            <div class="order-info-section">
+                <h4>订单信息</h4>
+                <div id="order-basic-info" class="order-info-content"></div>
+                <div id="order-item-info" class="order-item-content"></div>
+            </div>
+            <div class="order-actions">
+                <button class="btn-small" onclick="downloadInvoiceModal()"><i class="fa fa-download"></i> 下载订单</button>
+                <button class="btn-small" onclick="raiseTicketModal()"><i class="fa fa-paper-plane"></i> 提交工单</button>
+                <button class="btn-small" onclick="raiseCommentModal()"><i class="fa fa-star"></i> 评价</button>
+            </div>
+            <div id="order-refund-section" class="order-extra-section" style="display: none;">
+                <h4>退款记录</h4>
+                <table class="extra-table" id="refund-table">
+                    <thead><tr><th>退款ID</th><th>金额</th><th>状态</th><th>申请时间</th><th>处理时间</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="order-replacement-section" class="order-extra-section" style="display: none;">
+                <h4>换货记录</h4>
+                <table class="extra-table" id="replacement-table">
+                    <thead><tr><th>换货ID</th><th>数量</th><th>状态</th><th>申请时间</th><th>完成时间</th><th>操作</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
+<div w3-include-html="../_footer.html"></div>
 <script src="https://www.w3schools.com/lib/w3.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
 <script src="../_location.js"></script>
@@ -115,10 +149,6 @@
         renderTableHeader();
         renderTableBody();
         renderPagination();
-    }
-
-    function randomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function generateOrdersData(count) {
@@ -260,7 +290,6 @@
     }
 
     function raiseTicket(orderId) { alert(`工单 for 订单 ${orderId}`); }
-    function viewDetails(orderId) { alert(`查看订单 ${orderId} 详情`); }
     function downloadInvoice(orderId) { alert(`下载订单 ${orderId} 发票`); }
 
     function raiseComment(orderId) {
@@ -393,16 +422,189 @@
         }
     }
 
+    function viewDetails(orderId) {
+        const order = allOrders.find(o => o.id.sample === orderId);
+        if (!order) return;
+
+        const dialog = document.getElementById('order-details-dialog');
+        const basicInfo = document.getElementById('order-basic-info');
+        const itemInfo = document.getElementById('order-item-info');
+
+        // 订单基本信息
+        const orderFields = Object.entries(ordersFieldConfig)
+            .filter(([_, config]) => config.cardHoriz && typeof config.format === 'function')
+            .map(([key, config]) => {
+                if (config.label){
+                    let v = order[key] ?? config.sample()
+                    return `<span class="tag">${config.label}: ${config.format(config, v)}</span>`
+                }
+            }).join('');
+        basicInfo.innerHTML = `<p>${orderFields}</p>`;
+
+        // 根据订单类型显示详细信息
+        let typeInfo = '';
+        if (order.item_id) {
+            let item = generateData(itemFieldConfig, 1)[0]
+            let itemFields = ``
+            Object.keys(item).filter((k) => {
+                let c = item[k]
+                let config = itemFieldConfig[k]
+                return c && undefined != config.label && config.card
+            }).forEach( k => {
+                let config = itemFieldConfig[k]
+                let v = typeof item[k] == 'function' ? item[k]() : item[k]
+                v = v.sample != undefined ? v.sample : v;
+                if (typeof v == 'object'){
+                    let values = []
+                    if (Array.isArray(v)){
+                        values = v
+                    }else{
+                        Object.keys(v).forEach(kk =>{
+                            let vv = v[kk]
+                            values.push(`${kk} : <b>${vv}</b>`)
+                        })
+                    }
+                    let cls = `class="ant-tag ${tagColors[randomInt(0, tagColors.length -1)]}"`
+                    itemFields += `${config.label}:<span ${cls}>` + values.join(`</span><span ${cls}>`) + "</span>"
+                }else{
+                    itemFields += `<span class="ant-tag">${config.label}: ${v}</span>`
+                }
+            })
+
+            typeInfo = `<p>商品信息: ${itemFields}</p>`;
+            renderExtraSections(orderId, 'item');
+        } else if (order.demand_id) {
+            // 需求订单
+            const demandFields = [
+                demandFieldConfig.demandTitle.format = () => (null, { demandTitle: faker.company.companyName() }),
+                demandFieldConfig.brandName.format = () => (null, { brandName: order.brandName }),
+                demandFieldConfig.service.format = () => (null, { service: services[Math.floor(Math.random() * services.length)].name }),
+                demandFieldConfig.demandCount.format = () => (null, { demandCount: faker.datatype.number({ min: 5, max: 20 }) }),
+                ...generateRandomAttributes(demandFieldConfig.attributes, 0, 5),
+                ...generateRandomFields(fieldsList, 3, 8)
+            ].map(field => {
+                let v = field;
+                v = typeof v == 'function' ? v() : v;
+                v = typeof v == 'object' ? Object.values(v)[0] : v;
+                return `<span class="tag">${v}</span>`
+            }).join(' | ');
+            typeInfo = `<p>需求信息: ${demandFields}</p>`;
+        } else if (order.posts_id) {
+            // 帖子订单
+            const postFields = [
+                postsFieldConfig.title.format = () => (null, { title: faker.lorem.sentence() }),
+                postsFieldConfig.author.format = () => (null, { author: faker.name.findName() }),
+                postsFieldConfig.brandName.format = () => (null, { brandName: order.brandName }),
+                postsFieldConfig.paid.format(null, { paid: faker.datatype.boolean() }),
+                ...generateRandomTags(postsFieldConfig.tags, 0, 5),
+                ...generateRandomFields(fieldsList, 3, 8)
+            ].map(field => {
+                let v = field;
+                v = typeof v == 'function' ? v() : v;
+                v = typeof v == 'object' ? Object.values(v)[0] : v;
+                return `<span class="tag">${v}</span>`
+            }).join('');
+            typeInfo = `<p>文章信息: ${postFields}</p>`;
+        }
+        itemInfo.innerHTML = typeInfo;
+
+        dialog.style.display = 'flex';
+    }
+
+    function generateRandomTags(config, min, max) {
+        const count = randomInt(min, max);
+        return Array(count).fill().map(() => undefined == config.format || !typeof config.format == 'function' ? config.sample() : config.format(null, config.sample()));
+    }
+
+    function generateRandomAttributes(config, min, max) {
+        const count = randomInt(min, max);
+        const attrs = config.sample();
+        return Object.entries(attrs).slice(0, count).map(([key, value]) => `${key}: ${value}`);
+    }
+
+    function generateRandomFields(fields, min, max) {
+        const count = randomInt(min, max);
+        const shuffled = fields.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count).map(field => `${field}: ${faker.lorem.word()}`);
+    }
+
+    function renderExtraSections(orderId, type) {
+        if (type === 'item') {
+            // 退款记录
+            const refundCount = randomInt(0, 3);
+            const refundSection = document.getElementById('order-refund-section');
+            const refundTable = document.getElementById('refund-table').querySelector('tbody');
+            refundTable.innerHTML = '';
+            if (refundCount > 0) {
+                refundSection.style.display = 'block';
+                for (let i = 0; i < refundCount; i++) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${faker.datatype.number({ min: 100000, max: 999999 })}</td>
+                    <td>${faker.commerce.price(10, 500, 2, "$")}</td>
+                    <td>${faker.random.arrayElement(['待处理', '已完成', '已拒绝'])}</td>
+                    <td>${faker.date.recent().toLocaleString()}</td>
+                    <td>${faker.date.recent().toLocaleString()}</td>
+                `;
+                    refundTable.appendChild(row);
+                }
+            }
+
+            // 换货记录
+            const replacementCount = randomInt(0, 3);
+            const replacementSection = document.getElementById('order-replacement-section');
+            const replacementTable = document.getElementById('replacement-table').querySelector('tbody');
+            replacementTable.innerHTML = '';
+            if (replacementCount > 0) {
+                replacementSection.style.display = 'block';
+                for (let i = 0; i < replacementCount; i++) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${faker.datatype.number({ min: 100000, max: 999999 })}</td>
+                    <td>${faker.datatype.number({ min: 1, max: 5 })}</td>
+                    <td>${faker.random.arrayElement(['待处理', '已完成', '已拒绝'])}</td>
+                    <td>${faker.date.recent().toLocaleString()}</td>
+                    <td>${faker.date.recent().toLocaleString()}</td>
+                    <td><div class="operation-area"><button class="btn-small" onclick="downloadReplacement(${orderId})"><i class="fa fa-download"></i></button></div></td>
+                `;
+                    replacementTable.appendChild(row);
+                }
+            }
+        }
+    }
+
+    function closeOrderDetailsModal() {
+        document.getElementById('order-details-dialog').style.display = 'none';
+    }
+
+    function downloadInvoiceModal() {
+        alert('下载订单功能待实现');
+    }
+
+    function raiseTicketModal() {
+        alert('提交工单功能待实现');
+    }
+
+    function raiseCommentModal() {
+        raiseComment(1000)
+    }
+
+    function downloadReplacement(orderId) {
+        alert(`下载换货记录 - 订单ID: ${orderId}`);
+    }
+
+    // 更新 window.onload
     window.onload = () => {
         w3.includeHTML(() => {
             initOrdersPage();
-            document.getElementById('review-dialog').addEventListener('click', (e) => {
+            document.getElementById('order-details-dialog').addEventListener('click', (e) => {
                 if (e.target === e.currentTarget) {
-                    closeReviewModal();
+                    closeOrderDetailsModal();
                 }
             });
         });
     };
+
 </script>
 </body>
 </html>
