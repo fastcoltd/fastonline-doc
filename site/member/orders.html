@@ -58,20 +58,24 @@
                 return `<a href="${url}" class="item-name">${name}</a>`;
             }, sample: () => ({
         }) },
-        quantity: { ...ordersFieldConfig.quantity, label: '数量', sample: () => faker.datatype.number({ min: 1, max: 1000 }) },
-        coupon: { ...ordersFieldConfig.coupon, format: v => v},
+        quantity: { ...ordersFieldConfig.quantity, format: v=> v, sample: () => faker.datatype.number({ min: 1, max: 1000 }) },
+        coupon: { ...ordersFieldConfig.coupon, format: v => {
+                return `${v}`
+            }},
         amount: { ...ordersFieldConfig.amount, label: '金额', format: v => `<span style="color:var(--font-orange)">${v}</span>`, sample: () => faker.commerce.price(50, 2000, 2, "$") },
         paid_time: { ...ordersFieldConfig.paid_time, label: '时间', sample: () => faker.date.recent().toLocaleString() },
         feedback: { label: '反馈', format: (v, item) => {
                 let actions = '';
-                actions += randomInt(0,1) > 0 ? '' : '<button class="btn-small" style="color: red;" onclick="raiseTicket(' + item.id.sample + ')" title="Ticket"><i class="fa fa-paper-plane"></i></button>';
-                actions += randomInt(0,1) > 0 ? '<button class="btn-small" style="color: var(--font-green);" onclick="raiseComment(' + item.id.sample + ')" title="Reviews"><i class="fa fa-star"></i></button>' : '<button class="btn-small" style="color: var(--font-orange);" onclick="raiseComment(' + item.id.sample + ')" title="Reviews"><i class="fa fa-star"></i></button>';
+                actions += randomInt(0,1) > 0 ? '<button class="btn-small" onclick="raiseTicket(' + item.id.sample + ')" title="Ticket"><i class="far fa-paper-plane"></i></button>'
+                    : '<button class="btn-small" style="color: red;" onclick="raiseTicket(' + item.id.sample + ')" title="Ticket"><i class="fa fa-paper-plane"></i></button>';
+                actions += randomInt(0,1) > 0 ? '<button class="btn-small" style="color: var(--font-orange);" onclick="raiseComment(' + item.id.sample + ')" title="Reviews"><i class="fas fa-star"></i></button>'
+                    : '<button class="btn-small" onclick="raiseComment(' + item.id.sample + ')" title="Reviews"><i class="far fa-star"></i></button>';
                 return `<div class="operation-area">${actions}</div>`;
             }, sample: () => null },
         operation: { label: '操作', format: (v, item) => {
                 let actions = '';
-                actions += '<button class="btn-small"  onclick="viewDetails(' + item.id.sample + ')">查看</button>';
-                actions += '<button class="btn-small" onclick="downloadInvoice(' + item.id.sample + ')">下载</button>';
+                actions += '<button class="btn-small"  onclick="viewDetails(' + item.id.sample + ')">view</button>';
+                actions += '<button class="btn-small" onclick="downloadInvoice(' + item.id.sample + ')"><i class="fa fa-download downloading"></i></button>';
                 return `<div class="operation-area">${actions}</div>`;
             }, sample: () => null }
     };
