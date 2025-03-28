@@ -315,14 +315,14 @@ function generateArticles(containerId, min, max) {
     const container = document.getElementById(containerId);
     if (containerId.indexOf('about') !== -1){
         const li = document.createElement('li');
-        li.innerHTML = `<a href="rules.html">Rules</a>`;
+        li.innerHTML = `<a href="/site/rules.html">Rules</a>`;
         container.appendChild(li);
     }
     const count = faker.datatype.number({min: min, max: max});
     for (let i = 0; i < count; i++) {
         const li = document.createElement('li');
         const title = faker.lorem.sentence()
-        li.innerHTML = `<a href="page.html?name=${title}">${title}</a>`;
+        li.innerHTML = `<a href="/site/page.html?name=${title}">${title}</a>`;
         container.appendChild(li);
     }
 }

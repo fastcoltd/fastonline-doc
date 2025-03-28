@@ -1,4 +1,12 @@
-// member/_mCommon.js
+const pageConfig = [
+    {page: 10, selected: false},
+    {page: 15, selected: true},
+    {page: 20, selected: false},
+    {page: 30, selected: false},
+    {page: 50, selected: false},
+    {page: 100, selected: false},
+];
+
 function generateSidebarMenu() {
     const currentPath = window.location.pathname.split('/').pop();
     let menuHtml = '';
@@ -9,8 +17,8 @@ function generateSidebarMenu() {
             const style = item.style ? ` style="${item.style}"` : '';
             const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
             menuHtml += `
-                <a href="${item.href}" class="sidebar-item${isActive ? ' active' : ''}"${style}${onclickAttr}>
-                    <i class="${item.icon}"></i> ${item.text}
+                <a href="${item.href}" class="member-sidebar-item${isActive ? ' active' : ''}"${style}${onclickAttr}>
+                    <i class="${item.icon}"></i> <span>${item.text}</span>
                 </a>
             `;
             if (item.sub && item.sub.length > 0) {
@@ -20,7 +28,7 @@ function generateSidebarMenu() {
                     const isSubActive = currentPath === subItem.href.split('/').pop();
                     menuHtml += `
                         <a href="${subItem.href}" class="sidebar-sub-item${isSubActive ? ' active' : ''}"${subOnclickAttr}>
-                            <i class="${subItem.icon}"></i> ${subItem.text}
+                            <i class="${subItem.icon}"></i> <span>${subItem.text}</span>
                         </a>
                     `;
                 });
@@ -31,7 +39,6 @@ function generateSidebarMenu() {
     return menuHtml;
 }
 
-// 在页面加载时生成侧边栏
 window.addEventListener("load", function() {
     w3.includeHTML(() => {
         const sidebarMenu = document.getElementById('sidebar-menu');

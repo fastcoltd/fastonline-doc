@@ -12,28 +12,28 @@ const systemType = {
 
 const dropdownMenus = {
     Resources: [
-        { text: "Tutorials", href: "page-type.html?name=Tutorials" },
-        { text: "Guides", href: "page-type.html?name=Guides" },
-        { text: "Tools", href: "page-type.html?name=Tools" },
-        { text: "FAQs", href: "page-type.html?name=FAQs" },
-        { text: "Whitepapers", href: "page-type.html?name=Whitepapers" },
-        { text: "Case Studies", href: "page-type.html?name=Case Studies" },
-        { text: "Webinars", href: "page-type.html?name=Webinars" },
-        { text: "Templates", href: "page-type.html?name=Templates" },
-        { text: "Documentation", href: "page-type.html?name=Documentation" },
-        { text: "Support Forums", href: "page-type.html?name=Support Forums" }
+        { text: "Tutorials", href: "/site/page-type.html?name=Tutorials" },
+        { text: "Guides", href: "/site/page-type.html?name=Guides" },
+        { text: "Tools", href: "/site/page-type.html?name=Tools" },
+        { text: "FAQs", href: "/site/page-type.html?name=FAQs" },
+        { text: "Whitepapers", href: "/site/page-type.html?name=Whitepapers" },
+        { text: "Case Studies", href: "/site/page-type.html?name=Case Studies" },
+        { text: "Webinars", href: "/site/page-type.html?name=Webinars" },
+        { text: "Templates", href: "/site/page-type.html?name=Templates" },
+        { text: "Documentation", href: "/site/page-type.html?name=Documentation" },
+        { text: "Support Forums", href: "/site/page-type.html?name=Support Forums" }
     ],
     Posts: [
-        { text: "Blog", href: "post-list.html?type=Blog", desc: "Explore the latest articles, insights, and expert opinions on various topics." },
-        { text: "News", href: "post-list.html?type=News", desc: "Stay updated with breaking industry news and global trends affecting your interests." },
-        { text: "Reviews", href: "post-list.html?type=Reviews", desc: "Read in-depth reviews of products, services, and platforms to make informed decisions." },
-        { text: "Community", href: "post-list.html?type=Community", desc: "Join discussions, share ideas, and connect with users in our vibrant community hub." },
-        { text: "Interviews", href: "post-list.html?type=Interviews", desc: "Dive into exclusive interviews with industry leaders and experts sharing their insights." },
-        { text: "Tips & Tricks", href: "post-list.html?type=Tips & Tricks", desc: "Discover practical tips and clever tricks to enhance your skills and productivity." },
-        { text: "Industry Updates", href: "post-list.html?type=Industry Updates", desc: "Get detailed analysis and updates on market trends and emerging industry developments." },
-        { text: "User Stories", href: "post-list.html?type=User Stories", desc: "Learn from real user experiences and success stories from our diverse community." },
-        { text: "Events", href: "post-list.html?type=Events", desc: "Find upcoming event previews and detailed recaps of past workshops and conferences." },
-        { text: "Announcements", href: "post-list.html?type=Announcements", desc: "Catch up on the latest platform announcements, updates, and important notifications." }
+        { text: "Blog", href: "/site/post-list.html?type=Blog", desc: "Explore the latest articles, insights, and expert opinions on various topics." },
+        { text: "News", href: "/site/post-list.html?type=News", desc: "Stay updated with breaking industry news and global trends affecting your interests." },
+        { text: "Reviews", href: "/site/post-list.html?type=Reviews", desc: "Read in-depth reviews of products, services, and platforms to make informed decisions." },
+        { text: "Community", href: "/site/post-list.html?type=Community", desc: "Join discussions, share ideas, and connect with users in our vibrant community hub." },
+        { text: "Interviews", href: "/site/post-list.html?type=Interviews", desc: "Dive into exclusive interviews with industry leaders and experts sharing their insights." },
+        { text: "Tips & Tricks", href: "/site/post-list.html?type=Tips & Tricks", desc: "Discover practical tips and clever tricks to enhance your skills and productivity." },
+        { text: "Industry Updates", href: "/site/post-list.html?type=Industry Updates", desc: "Get detailed analysis and updates on market trends and emerging industry developments." },
+        { text: "User Stories", href: "/site/post-list.html?type=User Stories", desc: "Learn from real user experiences and success stories from our diverse community." },
+        { text: "Events", href: "/site/post-list.html?type=Events", desc: "Find upcoming event previews and detailed recaps of past workshops and conferences." },
+        { text: "Announcements", href: "/site/post-list.html?type=Announcements", desc: "Catch up on the latest platform announcements, updates, and important notifications." }
     ]
 };
 
@@ -501,7 +501,7 @@ function generateServiceMenu() {
                 subHtml += `<span class="letter-header">${groupLetters.join('')}</span><div class="platform-list">`;
                 groupLetters.forEach(letter => {
                     subByLetter[letter].forEach(item => {
-                        subHtml += `<a href="item-list.html?services=${encodeURIComponent(cat.name)}&brandName=${item.name}" class="platform-item"><img src="${item.logo}" alt="${item.name}" class="platform-logo">${item.name}</a>`;
+                        subHtml += `<a href="/site/item-list.html?services=${encodeURIComponent(cat.name)}&brandName=${item.name}" class="platform-item"><img src="${item.logo}" alt="${item.name}" class="platform-logo">${item.name}</a>`;
                     });
                 });
                 subHtml += '</div></div>';

@@ -27,7 +27,7 @@ let memberMenuConfig = [
     { text: "我的消息", icon: "fas fa-envelope", show: true, memberSidebar: true, store: false, href: "/site/member/message.html" },
     { text: "我的收藏", icon: "fas fa-heart", show: true, memberSidebar: true, store: false, href: "/site/member/save-list.html" },
     { text: "我的评论", icon: "fas fa-comment-alt", show: true, memberSidebar: true, store: false, href: "/site/member/reviews.html" },
-    { text: "Profile", icon: "fas fa-user-circle", show: true, memberSidebar: true, store: false, href: "/site/member/profile.html" },
+    { text: "个人资料", icon: "fas fa-user-circle", show: true, memberSidebar: true, store: false, href: "/site/member/profile.html" },
     { text: "账户设置", icon: "fas fa-cog", show: true, memberSidebar: true, store: false, href: "/site/member/setting.html" },
     { text: "账户日志", icon: "fas fa-list-alt", show: true, memberSidebar: true, store: false, href: "/site/member/logs.html" },
     { text: "Logout", icon: "fas fa-sign-out-alt", show: true, memberSidebar: false, store: false, href: "/site/#", onclick: "logout()" }
@@ -116,7 +116,7 @@ function updateHeaderUI() {
         if (becomeSeller) {
             if (haveStore) {
                 let storeMenu = document.createElement("a");
-                storeMenu.href = `store.html?name=${userData.store.name}`;
+                storeMenu.href = `/site/store.html?name=${userData.store.name}`;
                 storeMenu.innerHTML = `<i class="fas fa-store"></i> ${userData.store.name}`;
                 storeMenu.className = 'userStore';
                 headerActions.appendChild(storeMenu);
