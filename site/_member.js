@@ -135,7 +135,7 @@ function updateHeaderUI() {
             <div class="user-actions">
                 <a href="#" class="balance" onclick="showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })">$${userData.balance}</a>
                 <div class="messages-wrapper">
-                    <a href="#" class="${messageClass}" onclick="clearMessages(this)"><i class="fas fa-envelope"></i><span class="message-count">${totalMessages}</span></a>
+                    <a href="#" class="${messageClass}"><i class="fas fa-envelope"></i><span class="message-count">${totalMessages}</span></a>
                     <div class="messages-tooltip">
                         ${generateMessagesTooltip(userData, haveStore)}
                     </div>
@@ -158,27 +158,36 @@ function generateMessagesTooltip(userData, haveStore) {
     let tooltipHtml = '';
     if (haveStore) {
         tooltipHtml += `
-            <a href="#" class="message-item" onclick="alert('查看新订单')">新订单: ${userData.storeMessages.newOrders > 0 ? `<b style="color: red;">${userData.storeMessages.newOrders}</b>` : 0}</a>
-            <a href="#" class="message-item" onclick="alert('查看新工单')">新工单: ${userData.storeMessages.newTickets > 0 ? `<b style="color: red;">${userData.storeMessages.newTickets}</b>` : 0}</a>
-            <a href="#" class="message-item" onclick="alert('查看新咨询')">新咨询: ${userData.storeMessages.inquiries > 0 ? `<b style="color: red;">${userData.storeMessages.inquiries}</b>` : 0}</a>
-            <a href="#" class="message-item" onclick="alert('查看库存告警')">库存告警: ${userData.storeMessages.stockAlerts > 0 ? `<b style="color: red;">${userData.storeMessages.stockAlerts}</b>` : 0}</a>
-            <a href="#" class="message-item" onclick="alert('查看店铺系统通知')">系统通知: ${userData.storeMessages.system > 0 ? `<b style="color: red;">${userData.storeMessages.system}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="seeMessage(this)">新订单: ${userData.storeMessages.newOrders > 0 ? `<b style="color: red;">${userData.storeMessages.newOrders}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="seeMessage(this)">新工单: ${userData.storeMessages.newTickets > 0 ? `<b style="color: red;">${userData.storeMessages.newTickets}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="seeMessage(this)">新咨询: ${userData.storeMessages.inquiries > 0 ? `<b style="color: red;">${userData.storeMessages.inquiries}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="seeMessage(this)">库存告警: ${userData.storeMessages.stockAlerts > 0 ? `<b style="color: red;">${userData.storeMessages.stockAlerts}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="seeMessage(this)">系统通知: ${userData.storeMessages.system > 0 ? `<b style="color: red;">${userData.storeMessages.system}</b>` : 0}</a>
         `;
     } else {
         tooltipHtml += `
-            <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中聊天')">聊天: ${userData.messages.chat > 0 ? `<b style="color: red;">${userData.messages.chat}</b>` : 0}</a>
-            <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中工单')">工单: ${userData.messages.tickets > 0 ? `<b style="color: red;">${userData.messages.tickets}</b>` : 0}</a>
-            <a href="#" class="message-item" onclick="alert('弹窗显示消息系统，选中系统')">系统: ${userData.messages.system > 0 ? `<b style="color: red;">${userData.messages.system}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="seeMessage(this)">聊天: ${userData.messages.chat > 0 ? `<b style="color: red;">${userData.messages.chat}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="seeMessage(this)">工单: ${userData.messages.tickets > 0 ? `<b style="color: red;">${userData.messages.tickets}</b>` : 0}</a>
+            <a href="#" class="message-item" onclick="seeMessage(this)">系统: ${userData.messages.system > 0 ? `<b style="color: red;">${userData.messages.system}</b>` : 0}</a>
         `;
     }
     return tooltipHtml;
 }
 
-// 新增函数：点击消息图标后清除数字
-function clearMessages(element) {
-    const countElement = element.querySelector('.message-count');
-    if (countElement) countElement.textContent = '0';
-    element.classList.remove('has-messages');
+function seeMessage(o){
+    let message = o.innerText
+    let count = message.trim().split(":")[1]
+    o.innerHTML = message.replaceAll(count, " 0")
+
+    // alert(`see ${message}`)
+
+    let total = document.querySelector('.message-count').innerText;
+    let rest = total - count;
+    if (rest <= 0){
+        document.querySelector('.messages').classList.remove('has-messages');
+    }else{
+        document.querySelector('.message-count').innerText = rest
+    }
 }
 
 // 退出登录
