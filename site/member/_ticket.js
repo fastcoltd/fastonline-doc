@@ -5,6 +5,14 @@ const platformNames = ['客服小明', '客服小红', '客服小刚'];
 const storeName = '快购商店';
 const buyerName = '张三';
 
+function formatTimestamp(date) {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    return `${hours}:${minutes} ${day}/${month}`;
+}
+
 function openTicketDialog(orderId) {
     const order = allOrders.find(o => o.id.sample === orderId);
     if (!order) return;
@@ -57,17 +65,18 @@ function openTicketSubmissionDialog(orderId) {
     body.innerHTML = `
         <div class="submission-form">
             <label>问题类型:</label>
-            <select id="aftersales-type">
-                <option value="refund">退款</option>
-                <option value="exchange">换货</option>
-                <option value="repair">维修</option>
+            <select id="aftersales-type" onchange="updateReasonDropdown()">
+                ${aftersalesConfig.map(config => `<option value="${config.name}">${config.name}</option>`).join('')}
             </select>
             <label>问题原因:</label>
-            <select id="aftersales-subtype">
-                <option value="quality">商品质量问题</option>
-                <option value="delivery">配送问题</option>
-                <option value="other">其他</option>
+            <select id="aftersales-reason">
+                ${aftersalesConfig[0].reasons.map(reason => `<option value="${reason}">${reason}</option>`).join('')}
             </select>
+            <label>申请类型:</label>
+            <div class="radio-group">
+                <label><input type="radio" name="request-type" value="refund"> 退款</label>
+                <label><input type="radio" name="request-type" value="exchange" checked> 换货</label>
+            </div>
             ${detailsField}
             <div class="review-actions">
                 <button class="btn-orange-solid-small" onclick="submitTicket(${orderId})">提交</button>
@@ -81,6 +90,14 @@ function openTicketSubmissionDialog(orderId) {
     document.body.appendChild(dialog);
 }
 
+function updateReasonDropdown() {
+    const typeSelect = document.getElementById('aftersales-type');
+    const reasonSelect = document.getElementById('aftersales-reason');
+    const selectedType = typeSelect.value;
+    const config = aftersalesConfig.find(item => item.name === selectedType);
+    reasonSelect.innerHTML = config.reasons.map(reason => `<option value="${reason}">${reason}</option>`).join('');
+}
+
 function updateAccountStats(unitPrice) {
     const details = document.getElementById('submission-details').value.trim();
     const lines = details.split('\n').filter(line => line.trim() !== '');
@@ -92,12 +109,14 @@ function updateAccountStats(unitPrice) {
 function submitTicket(orderId) {
     const order = allOrders.find(o => o.id.sample === orderId);
     const type = document.getElementById('aftersales-type').value;
-    const subtype = document.getElementById('aftersales-subtype').value;
+    const reason = document.getElementById('aftersales-reason').value;
+    const requestType = document.querySelector('input[name="request-type"]:checked').value;
     const details = document.getElementById('submission-details').value.trim();
-    let message = `【工单提交】售后类型: ${type}, 子项: ${subtype}`;
+    const timestamp = formatTimestamp(new Date());
+    let message = `【工单提交】<br>申请类型: <strong style="color: ${requestType === 'refund' ? '#FF4500' : '#1E90FF'}">${requestType === 'refund' ? '退款' : '换货'}</strong><br>原因: <span style="color: red">${reason}</span>`;
 
     if (order.posts_id) {
-        message += details ? `, 问题描述: ${details}` : '';
+        message += details ? `<br>问题描述: ${details}` : '';
     } else if (order.demand_id || order.item_id) {
         if (!details) {
             alert('问题账号为必填项');
@@ -109,8 +128,10 @@ function submitTicket(orderId) {
         const amount = (count * unitPrice).toFixed(2);
         const blob = new Blob([details], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
-        message += `, 问题信息: <a href="${url}" target="_blank" class="download-link">下载<i class="fa fa-download downloading"></i></a>, 数量: ${count}, 金额: $${amount}`;
+        message += `<br>问题信息: <a href="${url}" target="_blank" class="download-link">下载<i class="fa fa-download downloading"></i></a><br>数量: ${count}<br>金额: $${amount}`;
     }
+
+    message += `<div class="template-actions"><button class="btn-small" onclick="respondToRequest(${orderId}, '${requestType}', 'agree', 'buyer', this)">同意</button><button class="btn-small" onclick="openRejectDialog(${orderId}, '${requestType}', 'buyer', this)">拒绝</button></div> <span class="timestamp">${timestamp}</span>`;
 
     submittedTickets.add(orderId);
     closeTicketDialog('ticket-submission-dialog');
@@ -120,6 +141,7 @@ function submitTicket(orderId) {
 function openChatDialog(orderId, initialMessage = null) {
     const order = allOrders.find(o => o.id.sample === orderId);
     if (!order) return;
+    console.log(order)
 
     const dialog = document.createElement('div');
     dialog.className = 'ticket-dialog';
@@ -128,12 +150,17 @@ function openChatDialog(orderId, initialMessage = null) {
     const dialogContent = document.createElement('div');
     dialogContent.className = 'ticket-dialog-content';
 
+    const isBuyer = true; // Simulating buyer role; adjust based on actual role logic
+    const showCloseTicket = isBuyer && Math.random() < 0.5;
     const header = document.createElement('div');
     header.className = 'ticket-dialog-header';
+    const simplifiedTime = order.paid_time; // Simplified to "HH:MM DD/MM"
     header.innerHTML = `
         <h3>工单 - 订单 #${order.id.sample}</h3>
         <div class="order-info">
-            <p>${userOrdersFieldConfig.itemName.format(null, order)} 数量: ${order.quantity.sample} 金额: ${order.amount.sample} 订单时间: ${order.paid_time.sample}</p>
+            <p>${userOrdersFieldConfig.itemName.format(null, order)} 数量: ${order.quantity.sample} 金额: ${order.amount.sample} 订单时间: ${simplifiedTime}
+            ${showCloseTicket ? `<button class="btn-small close-ticket-btn" onclick="openCloseTicketConfirmation(${orderId})">关闭工单</button>` : ''}
+            </p>
         </div>
         <button class="ticket-dialog-close" onclick="closeTicketDialog('ticket-chat-dialog')">×</button>
     `;
@@ -145,6 +172,7 @@ function openChatDialog(orderId, initialMessage = null) {
     chatContainer.className = 'chat-container';
     chatContainer.id = 'chat-container';
 
+    const timestamp = formatTimestamp(new Date());
     const chatMessages = initialMessage
         ? [`<div class="chat-message buyer-message" data-id="${Date.now()}">
                 <div class="avatar-name">
@@ -170,7 +198,7 @@ function openChatDialog(orderId, initialMessage = null) {
             <div class="template-buttons">
                 <button class="btn-small refund-btn" onclick="openRequestDialog(${orderId}, 'refund')">申请退款</button>
                 ${!order.posts_id ? `<button class="btn-small exchange-btn" onclick="openRequestDialog(${orderId}, 'exchange')">申请换货</button>` : ''}
-                <button class="btn-small close-btn" onclick="openRequestDialog(${orderId}, 'close')">申请关闭</button>
+                ${!showCloseTicket ? `<button class="btn-small close-btn" onclick="openRequestDialog(${orderId}, 'close')">申请关闭</button>` : ''}
                 <button class="btn-small support-btn" onclick="requestSupport(${orderId})">申请客服介入</button>
             </div>
         </div>
@@ -227,9 +255,10 @@ function generateChatMessages(order) {
     const requiredTypes = ['refund', order.posts_id ? '' : 'exchange', 'close', 'support'].filter(Boolean);
 
     requiredTypes.forEach(type => {
+        const timestamp = formatTimestamp(new Date(Date.now() - randomInt(0, 86400000))); // Random time within last 24 hours
         const content = templates[type] + (type !== 'support'
-            ? `<div class="template-actions"><button class="btn-small" onclick="respondToRequest(${order.id.sample}, '${type}', 'agree', 'buyer', this)">同意</button><button class="btn-small" onclick="openRejectDialog(${order.id.sample}, '${type}', 'buyer', this)">拒绝</button></div>`
-            : '');
+            ? `<div class="template-actions"><button class="btn-small" onclick="respondToRequest(${order.id.sample}, '${type}', 'agree', 'buyer', this)">同意</button><button class="btn-small" onclick="openRejectDialog(${order.id.sample}, '${type}', 'buyer', this)">拒绝</button></div> <span class="timestamp">${timestamp}</span>`
+            : ` <span class="timestamp">${timestamp}</span>`);
         messages.push(`
             <div class="chat-message buyer-message" data-id="${Date.now() + messages.length}">
                 <div class="avatar-name">
@@ -246,12 +275,15 @@ function generateChatMessages(order) {
     const totalMessages = randomInt(20, 30);
     for (let i = messages.length; i < totalMessages; i++) {
         const role = roles[randomInt(0, roles.length - 1)];
+        const timestamp = formatTimestamp(new Date(Date.now() - randomInt(0, 86400000))); // Random time within last 24 hours
         let content = role === 'system' ? `System: ${faker.lorem.sentence()}` : faker.lorem.sentence();
         if (role === 'buyer' && randomInt(0, 3) === 0) {
             const type = faker.random.arrayElement(requiredTypes);
             content = templates[type] + (type !== 'support'
-                ? `<div class="template-actions"><button class="btn-small" onclick="respondToRequest(${order.id.sample}, '${type}', 'agree', 'buyer', this)">同意</button><button class="btn-small" onclick="openRejectDialog(${order.id.sample}, '${type}', 'buyer', this)">拒绝</button></div>`
-                : '');
+                ? `<div class="template-actions"><button class="btn-small" onclick="respondToRequest(${order.id.sample}, '${type}', 'agree', 'buyer', this)">同意</button><button class="btn-small" onclick="openRejectDialog(${order.id.sample}, '${type}', 'buyer', this)">拒绝</button></div> <span class="timestamp">${timestamp}</span>`
+                : ` <span class="timestamp">${timestamp}</span>`);
+        } else {
+            content += ` <span class="timestamp">${timestamp}</span>`;
         }
 
         const avatar = role === 'system' ? '' : `https://picsum.photos/50/50?random=${i}`;
@@ -324,6 +356,7 @@ function previewFile(orderId) {
 
 function sendMessage(orderId, type) {
     const chatContainer = document.getElementById('chat-container');
+    const timestamp = formatTimestamp(new Date());
     let content = '';
     switch (type) {
         case 'text':
@@ -349,6 +382,7 @@ function sendMessage(orderId, type) {
             break;
     }
 
+    content += ` <span class="timestamp">${timestamp}</span>`;
     chatContainer.innerHTML += `
         <div class="chat-message buyer-message" data-id="${Date.now()}">
             <div class="avatar-name">
@@ -376,11 +410,27 @@ function openRequestDialog(orderId, type) {
         bodyContent = '<p>确认关闭工单？</p>';
     } else if (order.posts_id && type === 'refund') {
         bodyContent = `
+            <label>问题类型:</label>
+            <select id="request-type" onchange="updateRequestReasonDropdown()">
+                ${aftersalesConfig.map(config => `<option value="${config.name}">${config.name}</option>`).join('')}
+            </select>
+            <label>问题原因:</label>
+            <select id="request-reason">
+                ${aftersalesConfig[0].reasons.map(reason => `<option value="${reason}">${reason}</option>`).join('')}
+            </select>
             <label>退款金额:</label>
             <input type="number" id="request-amount" min="0" max="${maxAmount}" step="0.01" value="0" placeholder="请输入退款金额">
         `;
     } else if ((order.demand_id || order.item_id) && (type === 'refund' || type === 'exchange')) {
         bodyContent = `
+            <label>问题类型:</label>
+            <select id="request-type" onchange="updateRequestReasonDropdown()">
+                ${aftersalesConfig.map(config => `<option value="${config.name}">${config.name}</option>`).join('')}
+            </select>
+            <label>问题原因:</label>
+            <select id="request-reason">
+                ${aftersalesConfig[0].reasons.map(reason => `<option value="${reason}">${reason}</option>`).join('')}
+            </select>
             <label>问题账号:</label>
             <textarea id="request-details" placeholder="请输入问题账号，每行一个..." rows="5" oninput="updateRequestStats(${unitPrice})"></textarea>
             <div id="request-stats">数量: 0 金额: $0.00</div>
@@ -404,6 +454,14 @@ function openRequestDialog(orderId, type) {
     document.body.appendChild(dialog);
 }
 
+function updateRequestReasonDropdown() {
+    const typeSelect = document.getElementById('request-type');
+    const reasonSelect = document.getElementById('request-reason');
+    const selectedType = typeSelect.value;
+    const config = aftersalesConfig.find(item => item.name === selectedType);
+    reasonSelect.innerHTML = config.reasons.map(reason => `<option value="${reason}">${reason}</option>`).join('');
+}
+
 function updateRequestStats(unitPrice) {
     const details = document.getElementById('request-details').value.trim();
     const lines = details.split('\n').filter(line => line.trim() !== '');
@@ -415,18 +473,21 @@ function updateRequestStats(unitPrice) {
 function submitRequest(orderId, type) {
     const order = allOrders.find(o => o.id.sample === orderId);
     const chatContainer = document.getElementById('chat-container');
+    const timestamp = formatTimestamp(new Date());
     let message = '';
     if (type === 'close') {
-        message = `<span class="request-close">【关闭申请】</span>买家请求关闭工单<div class="template-actions"><button class="btn-small" onclick="respondToRequest(${orderId}, '${type}', 'agree', 'buyer', this)">同意</button><button class="btn-small" onclick="openRejectDialog(${orderId}, '${type}', 'buyer', this)">拒绝</button></div>`;
+        message = `<span class="request-close">【关闭申请】</span>买家请求关闭工单<div class="template-actions"><button class="btn-small" onclick="respondToRequest(${orderId}, '${type}', 'agree', 'buyer', this)">同意</button><button class="btn-small" onclick="openRejectDialog(${orderId}, '${type}', 'buyer', this)">拒绝</button></div> <span class="timestamp">${timestamp}</span>`;
     } else if (order.posts_id && type === 'refund') {
         const amount = document.getElementById('request-amount').value;
+        const reason = document.getElementById('request-reason').value;
         if (!amount || amount <= 0) {
             alert('请输入有效的退款金额');
             return;
         }
-        message = `<span class="request-refund">【退款申请】</span>买家申请退款，退款金额：$${amount}<div class="template-actions"><button class="btn-small" onclick="openConfirmRefundDialog(${orderId}, '${type}', 'agree', 'buyer', this, ${amount})">同意</button><button class="btn-small" onclick="openRejectDialog(${orderId}, '${type}', 'buyer', this)">拒绝</button></div>`;
+        message = `<span class="request-refund">【退款申请】</span>买家申请退款, 退款金额：$${amount}<br>理由: <span style="color: red">${reason}</span> <div class="template-actions"><button class="btn-small" onclick="openConfirmRefundDialog(${orderId}, '${type}', 'agree', 'buyer', this, ${amount})">同意</button><button class="btn-small" onclick="openRejectDialog(${orderId}, '${type}', 'buyer', this)">拒绝</button></div> <span class="timestamp">${timestamp}</span>`;
     } else if ((order.demand_id || order.item_id) && (type === 'refund' || type === 'exchange')) {
         const details = document.getElementById('request-details').value.trim();
+        const reason = document.getElementById('request-reason').value;
         if (!details) {
             alert('请输入问题账号');
             return;
@@ -438,11 +499,11 @@ function submitRequest(orderId, type) {
         const blob = new Blob([details], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         message = type === 'refund'
-            ? `<span class="request-refund">【退款申请】</span>买家申请退款，问题信息: <a href="${url}" target="_blank" class="download-link">下载<i class="fa fa-download downloading"></i></a>, 退款数量：${count}，退款金额：$${amount}`
-            : `<span class="request-exchange">【换货申请】</span>买家申请换货，问题信息: <a href="${url}" target="_blank" class="download-link">下载<i class="fa fa-download downloading"></i></a>, 换货数量：${count}`;
+            ? `<span class="request-refund">【退款申请】</span>买家申请退款<br>问题信息: <a href="${url}" target="_blank" class="download-link">下载<i class="fa fa-download downloading"></i></a><br>退款数量：${count}<br>退款金额：$${amount}<br>理由: ${reason}`
+            : `<span class="request-exchange">【换货申请】</span>买家申请换货<br>问题信息: <a href="${url}" target="_blank" class="download-link">下载<i class="fa fa-download downloading"></i></a><br>换货数量：${count}<br>理由: <span style="color: red">${reason}</span>`;
         message += type === 'refund'
-            ? `<div class="template-actions"><button class="btn-small" onclick="openConfirmRefundDialog(${orderId}, '${type}', 'agree', 'buyer', this, ${amount})">同意</button><button class="btn-small" onclick="openRejectDialog(${orderId}, '${type}', 'buyer', this)">拒绝</button></div>`
-            : `<div class="template-actions"><button class="btn-small" onclick="respondToRequest(${orderId}, '${type}', 'agree', 'buyer', this)">同意</button><button class="btn-small" onclick="openRejectDialog(${orderId}, '${type}', 'buyer', this)">拒绝</button></div>`;
+            ? `<div class="template-actions"><button class="btn-small" onclick="openConfirmRefundDialog(${orderId}, '${type}', 'agree', 'buyer', this, ${amount})">同意</button><button class="btn-small" onclick="openRejectDialog(${orderId}, '${type}', 'buyer', this)">拒绝</button></div> <span class="timestamp">${timestamp}</span>`
+            : `<div class="template-actions"><button class="btn-small" onclick="respondToRequest(${orderId}, '${type}', 'agree', 'buyer', this)">同意</button><button class="btn-small" onclick="openRejectDialog(${orderId}, '${type}', 'buyer', this)">拒绝</button></div> <span class="timestamp">${timestamp}</span>`;
     }
 
     chatContainer.innerHTML += `
@@ -462,6 +523,7 @@ function submitRequest(orderId, type) {
 
 function requestSupport(orderId) {
     const chatContainer = document.getElementById('chat-container');
+    const timestamp = formatTimestamp(new Date());
     chatContainer.innerHTML += `
         <div class="chat-message buyer-message" data-id="${Date.now()}">
             <div class="avatar-name">
@@ -469,7 +531,7 @@ function requestSupport(orderId) {
                 <span class="chat-name" style="color: #4CAF50">${buyerName}</span>
             </div>
             <div class="chat-content">
-                <div class="chat-bubble"><span class="request-support">【客服介入】</span>买家请求平台客服介入处理</div>
+                <div class="chat-bubble"><span class="request-support">【客服介入】</span>买家请求平台客服介入处理 <span class="timestamp">${timestamp}</span></div>
             </div>
         </div>
     `;
@@ -482,11 +544,12 @@ function respondToRequest(orderId, type, response, sender, button) {
     const bubble = messageElement.querySelector('.chat-bubble');
     const actions = messageElement.querySelector('.template-actions');
     const senderText = sender === 'buyer' ? buyerName : storeName;
+    const timestamp = formatTimestamp(new Date());
 
     if (actions) actions.style.display = 'none';
     bubble.innerHTML += response === 'agree'
-        ? `<div class="response-status" style="color: #32CD32">${senderText}: 已同意</div>`
-        : `<div class="response-status" style="color: #FF4500">${senderText}: 已拒绝</div>`;
+        ? `<div class="response-status" style="color: #32CD32">${senderText}: 已同意 <span class="timestamp">${timestamp}</span></div>`
+        : `<div class="response-status" style="color: #FF4500">${senderText}: 已拒绝 <span class="timestamp">${timestamp}</span></div>`;
 
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
@@ -518,9 +581,10 @@ function confirmRefund(orderId, type, response, sender, button, amount) {
     const bubble = messageElement.querySelector('.chat-bubble');
     const actions = messageElement.querySelector('.template-actions');
     const senderText = sender === 'buyer' ? buyerName : storeName;
+    const timestamp = formatTimestamp(new Date());
 
     if (actions) actions.style.display = 'none';
-    bubble.innerHTML += `<div class="response-status" style="color: #32CD32">${senderText}: 已同意</div>`;
+    bubble.innerHTML += `<div class="response-status" style="color: #32CD32">${senderText}: 已同意 <span class="timestamp">${timestamp}</span></div>`;
 
     document.querySelector('.confirm-refund-dialog').remove();
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -561,12 +625,48 @@ function submitRejectReason(orderId, type, sender, messageId) {
     const bubble = messageElement.querySelector('.chat-bubble');
     const actions = messageElement.querySelector('.template-actions');
     const senderText = sender === 'buyer' ? buyerName : storeName;
+    const timestamp = formatTimestamp(new Date());
 
     if (actions) actions.style.display = 'none';
     bubble.innerHTML += `
-        <div class="response-status">${senderText}: <span style="color: #FF4500">已拒绝</span> 理由: <span style="color: #FF4500">${reason}</span></div>
+        <div class="response-status" style="color: #FF4500">${senderText}: 已拒绝 理由: <span style="color: #FF4500">${reason}</span> <span class="timestamp">${timestamp}</span></div>
     `;
 
     document.querySelector('.reject-dialog').remove();
     chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function openCloseTicketConfirmation(orderId) {
+    const dialog = document.createElement('div');
+    dialog.className = 'close-ticket-dialog';
+    dialog.innerHTML = `
+        <div class="close-ticket-dialog-content">
+            <div class="dialog-header">
+                <h3>确认关闭工单</h3>
+                <button class="dialog-close" onclick="this.parentElement.parentElement.parentElement.remove()">×</button>
+            </div>
+            <div class="dialog-body">
+                <p>确定要关闭此工单吗？</p>
+                <div class="review-actions">
+                    <button class="btn-small" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">取消</button>
+                    <button class="btn-orange-solid-small" onclick="closeTicket(${orderId})">确认</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(dialog);
+}
+
+function closeTicket(orderId) {
+    const chatContainer = document.getElementById('chat-container');
+    const timestamp = formatTimestamp(new Date());
+    chatContainer.innerHTML += `
+        <div class="chat-message system-message" data-id="${Date.now()}">
+            <div class="chat-content">
+                <div class="chat-bubble">工单已关闭 <span class="timestamp">${timestamp}</span></div>
+            </div>
+        </div>
+    `;
+    document.querySelector('.close-ticket-dialog').remove();
+    closeTicketDialog('ticket-chat-dialog');
 }
