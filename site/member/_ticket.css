@@ -1,0 +1,86 @@
+.ticket-dialog {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;}
+.ticket-dialog-content {background: var(--bg-white); border-radius: 0.5em; width: 50%; max-width: 50vw; min-width: 20em; max-height: 80vh; box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2); overflow: hidden; display: flex; flex-direction: column;}
+.ticket-dialog-header {padding: 0.75em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-light); flex-shrink: 0; position: relative;}
+.ticket-dialog-header h3 {margin: 0; font-size: var(--font-large); color: var(--text-primary);}
+.ticket-dialog-header .order-info p {margin: 0.5em 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.ticket-dialog-close {background: none; border: none; font-size: 1.2em; cursor: pointer; color: var(--text-secondary); position: absolute; top: 0.75em; right: 1em;}
+.ticket-dialog-close:hover {color: var(--natural-green);}
+.ticket-dialog-body {flex: 1; padding: 1em; display: flex; flex-direction: column; overflow-y: auto;}
+.submission-form {display: flex; flex-direction: column; gap: 0.5em;}
+.submission-form label {font-weight: bold; color: var(--text-primary);}
+.submission-form select, .submission-form textarea {padding: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; width: 100%;}
+.submission-form textarea {min-height: 6em; resize: vertical;}
+#account-stats {margin-top: 0.5em; color: var(--text-secondary);}
+.chat-container {flex: 1; overflow-y: auto; padding: 1em;}
+.chat-message {margin-bottom: 1em; display: flex; align-items: flex-start;}
+.chat-message.system-message {justify-content: center; color: #FF4500; font-weight: bold; text-align: center;}
+.chat-message .avatar-name {display: flex; flex-direction: column; align-items: center; gap: 0.25em; width: 2em;}
+.chat-message .chat-avatar {width: 3em; height: 3em; border-radius: 50%;}
+.chat-message .chat-name {font-weight: bold; max-width: 4em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+.chat-message.support-message .chat-name {max-width: 4em;}
+.chat-message.system-message .chat-name {display: none;}
+.chat-message .chat-content {display: flex; flex-direction: column; margin-top: 0.5em;}
+.chat-message.buyer-message .chat-bubble {background: var(--bg-light); color: var(--text-primary);}
+.chat-message.store-message .chat-bubble {background: #E0E0E0; color: var(--text-primary);}
+.chat-message.support-message .chat-bubble {background: var(--natural-green); color: var(--font-white);}
+.chat-message.system-message .chat-bubble {background: none; padding: 0; white-space: normal; word-wrap: break-word;}
+.chat-message .chat-bubble {padding: 0.5em 1em; border-radius: 0.375em; white-space: normal; word-wrap: break-word; position: relative; margin: 0 1.5em;}
+.chat-message.buyer-message {flex-direction: row-reverse;}
+.chat-message:not(.system-message) .chat-bubble::before {content: ''; position: absolute; top: 0.5em; width: 0; height: 0; border: 0.5em solid transparent;}
+.chat-message.buyer-message .chat-bubble::before {right: -1em; border-left-color: var(--bg-light);}
+.chat-message.store-message .chat-bubble::before {left: -1em; border-right-color: #E0E0E0;}
+.chat-message.support-message .chat-bubble::before {left: -1em; border-right-color: var(--natural-green);}
+.chat-message .request-refund {color: #FF4500;}
+.chat-message .request-exchange {color: #1E90FF;}
+.chat-message .request-close {color: #FFD700;}
+.chat-message .request-support {color: #32CD32;}
+.chat-input-area {padding: 1em; border-top: 0.0625em solid var(--border-color); flex-shrink: 0; display: flex; flex-direction: column; gap: 0;}
+.message-controls {display: flex; justify-content: space-between; align-items: center; gap: 1em; padding-bottom: 0.5em;}
+.message-tabs {display: flex; gap: 0.5em;}
+.message-tabs .tab {padding: 0.5em 1em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; cursor: pointer; background: var(--bg-light);}
+.message-tabs .tab.active {background: var(--natural-green); color: var(--font-white);}
+.template-buttons {display: flex; gap: 0.5em; flex-wrap: wrap;}
+.refund-btn {background: #FF4500; color: var(--font-white);}
+.exchange-btn {background: #1E90FF; color: var(--font-white);}
+.close-btn {background: #FFD700; color: var(--text-primary);}
+.support-btn {background: #32CD32; color: var(--font-white);}
+.message-content {display: flex; flex-direction: column; gap: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; padding: 0.5em;}
+.input-content {display: none;}
+.input-content.active {display: flex; gap: 0.5em;}
+.input-content.text-input {flex-direction: row; align-items: stretch;}
+.input-content textarea {padding: 0.5em; border: none; border-radius: 0.375em 0 0 0.375em; min-height: 4em; resize: vertical; flex: 1; margin: 0;}
+.input-content .send-btn {width: 6.5em; height: auto; padding: 0; border-radius: 0 0.375em 0.375em 0; display: flex; align-items: center; justify-content: center; margin: 0;}
+#image-preview, #file-preview {padding: 0.5em; border: 0.0625em dashed var(--border-color); border-radius: 0.375em; text-align: center; cursor: pointer; flex: 1;}
+#image-preview img {max-width: 100%;}
+.template-actions {margin-top: 0.5em; display: flex; gap: 0.5em;}
+.response-status {margin-top: 0.5em; font-weight: bold;}
+.download-link {text-decoration: none; color: inherit; color: var(--font-green);}
+.download-link .downloading {margin-left: 0.5em; cursor: pointer;}
+.request-dialog {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1100; display: flex; justify-content: center; align-items: center;}
+.request-dialog-content {background: var(--bg-white); border-radius: 0.5em; width: 30%; max-width: 30vw; min-width: 15em; max-height: 80vh; box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2); overflow: hidden;}
+.request-dialog-content .dialog-header {padding: 0.75em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-light); display: flex; justify-content: space-between; align-items: center;}
+.request-dialog-content .dialog-body {padding: 1em; display: flex; flex-direction: column; gap: 0.5em;}
+.request-dialog-content label {font-weight: bold; color: var(--text-primary);}
+.request-dialog-content input, .request-dialog-content textarea {padding: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.375em;}
+.request-dialog-content textarea {min-height: 6em; resize: vertical;}
+#request-stats {margin-top: 0.5em; color: var(--text-secondary);}
+.reject-dialog {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1200; display: flex; justify-content: center; align-items: center;}
+.reject-dialog-content {background: var(--bg-white); border-radius: 0.5em; width: 30%; max-width: 30vw; min-width: 15em; max-height: 80vh; box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2); overflow: hidden;}
+.reject-dialog-content .dialog-header {padding: 0.75em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-light); display: flex; justify-content: space-between; align-items: center;}
+.reject-dialog-content .dialog-body {padding: 1em; display: flex; flex-direction: column; gap: 0.5em;}
+.reject-dialog-content textarea {padding: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; min-height: 6em; resize: vertical;}
+.confirm-refund-dialog {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1300; display: flex; justify-content: center; align-items: center;}
+.confirm-refund-dialog-content {background: var(--bg-white); border-radius: 0.5em; width: 30%; max-width: 30vw; min-width: 15em; max-height: 80vh; box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2); overflow: hidden;}
+.confirm-refund-dialog-content .dialog-header {padding: 0.75em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-light); display: flex; justify-content: space-between; align-items: center;}
+.confirm-refund-dialog-content .dialog-body {padding: 1em; display: flex; flex-direction: column; gap: 0.5em;}
+@media (max-width: 48em) {
+    .ticket-dialog-content {width: 95%; max-width: 95%;}
+    .request-dialog-content {width: 95%; max-width: 95%;}
+    .reject-dialog-content {width: 95%; max-width: 95%;}
+    .confirm-refund-dialog-content {width: 95%; max-width: 95%;}
+    .message-controls {flex-direction: column; align-items: flex-start;}
+    .template-buttons {flex-direction: column;}
+    .input-content.text-input {flex-direction: column;}
+    .input-content textarea {border-radius: 0.375em; margin-bottom: 0.5em;}
+    .input-content .send-btn {width: 100%; height: auto; border-radius: 0.375em;}
+}
