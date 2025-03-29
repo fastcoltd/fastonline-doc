@@ -267,11 +267,11 @@
             format: (v, item) => `<a href="/site/demand.html?name=${v}" class="demand-name" data-full="${v}">${v}</a>`
         },
         price: {
-            label: '价格 ($)',
-            format: (v, item) => `${item.price_from.toFixed(2)} - ${item.price_to.toFixed(2)}`
+            label: '价格($)',
+            format: (v, item) => `${item.price_to.toFixed(2)}`
         },
         quantity: { label: '数量', format: v => v },
-        bid_count: { label: '竞标人数', format: v => v },
+        bid_count: { label: '竞标数', format: v => v },
         status: {
             label: '状态',
             format: v => `<span style="color: ${demandStatusColors[statusMap[v]] || '#A9A9A9'}">${statusMap[v]}</span>`
@@ -280,9 +280,9 @@
             label: '属性要求',
             format: (v, item) => item.attrs.map(attr => `<span class="ant-tag ${tagColors[Math.floor(Math.random() * tagColors.length)]}">${attr.name}: ${attr.value}</span>`).join('')
         },
-        deposit: { label: '定金 ($)', format: v => v.toFixed(2) },
-        paid_rest_money: { label: '尾款 ($)', format: v => v ? v.toFixed(2) : '未支付' },
-        start_time: { label: '开始时间', format: v => new Date(v * 1000).toLocaleDateString() },
+        deposit: { label: '定金($)', format: v => v.toFixed(2) },
+        paid_rest_money: { label: '尾款($)', format: v => v ? v.toFixed(2) : '未支付' },
+        // start_time: { label: '开始时间', format: v => new Date(v * 1000).toLocaleDateString() },
         operation: {
             label: '操作',
             format: (v, item) => {
@@ -324,7 +324,7 @@
             confirm_time: Math.floor(faker.date.recent().getTime() / 1000)
         };
         demand.demand_name = faker.commerce.productName() + ' Demand';
-        demand.attrs = Array(faker.datatype.number({ min: 1, max: 5 })).fill().map(() => {
+        demand.attrs = Array(faker.datatype.number({ min: 1, max: 3 })).fill().map(() => {
             const attrName = Object.keys(ecommerceAttributes)[Math.floor(Math.random() * Object.keys(ecommerceAttributes).length)];
             const attrValues = ecommerceAttributes[attrName];
             return { name: attrName, value: attrValues[Math.floor(Math.random() * attrValues.length)] };
