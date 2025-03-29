@@ -20,7 +20,7 @@ let memberMenuConfig = [
             { text: "店铺设置", icon: "fas fa-cogs", href: "/site/store/setting.html" },
             { text: "店铺日志", icon: "fas fa-list-alt", href: "/site/store/logs.html" },
         ]},
-    { text: "我的订单", icon: "fas fa-box-open", show: true, memberSidebar: true, store: false, href: "/site/member/orders.html" },
+    { text: "我的订单", icon: "fas fa-shopping-cart", show: true, memberSidebar: true, store: false, href: "/site/member/orders.html" },
     { text: "我的需求", icon: "fas fa-clipboard-list", show: true, memberSidebar: true, store: false, href: "/site/member/demands.html" },
     { text: "Top-Up", icon: "fas fa-wallet", show: true, memberSidebar: false, store: false, href: "/site/#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
     { text: "资金记录", icon: "fas fa-money-check-alt", show: false, memberSidebar: true, store: false, href: "/site/member/transactions.html" },
