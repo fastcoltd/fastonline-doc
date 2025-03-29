@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的需求 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../_site.css">
+    <link rel="stylesheet" href="_member.css">
+    <link rel="stylesheet" href="_ticket.css">
+    <style>
+        .demand-name {
+            max-width: 20em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+        .demand-name:hover::after {
+            content: attr(data-full);
+            position: absolute;
+            background: var(--bg-white);
+            border: 0.0625em solid var(--border-color);
+            padding: 0.5em;
+            z-index: 10;
+            white-space: normal;
+            max-width: 25em;
+            left: 0;
+            top: 100%;
+            box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2);
+        }
+        .dialog {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+        .dialog-content {
+            background: var(--bg-white);
+            border-radius: 0.5em;
+            box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 800px;
+            padding: 1.5em;
+            position: relative;
+        }
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 0.0625em solid var(--border-color);
+            padding-bottom: 0.5em;
+            margin-bottom: 1em;
+        }
+        .dialog-header h3 {
+            margin: 0;
+            font-size: 1.25em;
+            color: var(--font-dark);
+        }
+        .dialog-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--font-gray);
+        }
+        .dialog-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .order-info-section {
+            margin-bottom: 1.5em;
+        }
+        .order-info-section h4 {
+            margin: 0 0 0.5em;
+            color: var(--font-dark);
+            font-size: 1.1em;
+        }
+        .order-info-content p {
+            margin: 0.5em 0;
+            color: var(--font-dark);
+        }
+        .bid-list {
+            margin-top: 1em;
+        }
+        .bid-item {
+            border: 0.0625em solid var(--border-color);
+            padding: 1em;
+            margin-bottom: 0.5em;
+            border-radius: 0.25em;
+        }
+        .bid-item.winner {
+            background: #e6ffe6;
+            border-color: #32CD32;
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.25em 0.5em;
+            margin: 0.25em;
+            border-radius: 0.25em;
+            font-size: 0.875em;
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="../_header.html"></div>
+<div class="member-wrapper">
+    <div w3-include-html="_sidebar.html"></div>
+    <div class="member-container">
+        <div class="member-section">
+            <h2 class="member-section-title">我的需求 <button class="btn-solid-medium" onclick="openCreateDemandModal()">发布需求</button></h2>
+            <div class="orders-filter" id="demands-filter"></div>
+            <table class="orders-table" id="demands-table">
+                <thead id="demands-table-header"></thead>
+                <tbody id="demands-table-body"></tbody>
+            </table>
+            <div class="pagination-controls" id="demands-pagination"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 发布需求弹窗 -->
+<div id="create-demand-dialog" class="dialog" style="display: none;">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <h3>发布需求</h3>
+            <button class="dialog-close" onclick="closeCreateDemandModal()">×</button>
+        </div>
+        <div class="dialog-body">
+            <div class="order-info-section">
+                <label>需求名称:</label>
+                <input type="text" id="create-demand-name" placeholder="请输入需求名称">
+                <label>价格范围 ($):</label>
+                <input type="number" id="create-price-from" min="0" step="0.01" placeholder="最低价格"> ~
+                <input type="number" id="create-price-to" min="0" step="0.01" placeholder="最高价格">
+                <label>数量:</label>
+                <input type="number" id="create-quantity" min="1" placeholder="请输入数量">
+                <label>定金 ($):</label>
+                <input type="number" id="create-deposit" min="0" step="0.01" placeholder="请输入定金">
+                <label>需要样品:</label>
+                <select id="create-samples-need">
+                    <option value="0">不需要</option>
+                    <option value="1">需要</option>
+                </select>
+                <label>售后服务时间 (天):</label>
+                <input type="number" id="create-after-sales-time" min="0" placeholder="请输入售后时间">
+                <label>开始时间:</label>
+                <input type="date" id="create-start-time">
+                <label>结束时间:</label>
+                <input type="date" id="create-end-time">
+                <label>属性要求:</label>
+                <div id="create-attrs"></div>
+                <label>需求详情:</label>
+                <textarea id="create-demand-info" rows="4" placeholder="请输入需求详情"></textarea>
+            </div>
+            <div class="review-actions">
+                <button class="btn-orange-solid-small" onclick="submitDemand()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 查看需求弹窗 -->
+<div id="view-demand-dialog" class="dialog" style="display: none;">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <h3>需求详情</h3>
+            <button class="dialog-close" onclick="closeViewDemandModal()">×</button>
+        </div>
+        <div class="dialog-body">
+            <div class="order-info-section">
+                <h4>需求信息</h4>
+                <div id="view-demand-info" class="order-info-content"></div>
+                <div id="view-demand-actions" class="review-actions"></div>
+            </div>
+            <div class="order-info-section" id="view-winner-section" style="display: none;">
+                <h4>中标者</h4>
+                <div id="view-winner-info" class="bid-item winner"></div>
+            </div>
+            <div class="order-info-section bid-list" id="view-bid-list" style="display: none;">
+                <h4>竞标列表</h4>
+                <div id="view-bids"></div>
+                <div class="pagination-controls" id="bids-pagination"></div>
+            </div>
+            <button class="btn-small" onclick="openLogsModal()"><i class="fa fa-history"></i> 查看操作日志</button>
+        </div>
+    </div>
+</div>
+
+<!-- 竞标详情弹窗 -->
+<div id="bid-detail-dialog" class="dialog" style="display: none;">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <h3>竞标详情</h3>
+            <button class="dialog-close" onclick="closeBidDetailModal()">×</button>
+        </div>
+        <div class="dialog-body">
+            <div id="bid-detail-info" class="order-info-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 操作日志弹窗 -->
+<div id="logs-dialog" class="dialog" style="display: none;">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <h3>操作日志</h3>
+            <button class="dialog-close" onclick="closeLogsModal()">×</button>
+        </div>
+        <div class="dialog-body">
+            <table class="orders-table" id="logs-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>操作类型</th>
+                    <th>用户ID</th>
+                    <th>店铺ID</th>
+                    <th>额外数据</th>
+                    <th>创建时间</th>
+                </tr>
+                </thead>
+                <tbody id="logs-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div w3-include-html="../_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="../_location.js"></script>
+<script src="../_common.js"></script>
+<script src="../_member.js"></script>
+<script src="_mCommon.js"></script>
+<script src="_ticket.js"></script>
+<script src="../_fields.js"></script>
+<script src="../_data.js"></script>
+<script>
+    // 使用 data.js 中的 demandStatusColors、tagColors 和 ecommerceAttributes
+    const statusMap = {
+        0: 'Not Started',
+        1: '审核中',
+        2: '审核拒绝',
+        3: '审核通过',
+        4: '等待开始',
+        5: 'Bidding',
+        6: 'Bid Won',
+        7: 'Final Payment Paid',
+        8: 'Delivered',
+        9: '已取消',
+        10: 'Demand Expired'
+    };
+
+    // 字段配置
+    const demandsConfig = {
+        id: { label: 'ID', format: v => v },
+        demand_name: {
+            label: '需求名称',
+            format: (v, item) => `<a href="/site/demand.html?name=${v}" class="demand-name" data-full="${v}">${v}</a>`
+        },
+        price: {
+            label: '价格 ($)',
+            format: (v, item) => `${item.price_from.toFixed(2)} - ${item.price_to.toFixed(2)}`
+        },
+        quantity: { label: '数量', format: v => v },
+        bid_count: { label: '竞标人数', format: v => v },
+        status: {
+            label: '状态',
+            format: v => `<span style="color: ${demandStatusColors[statusMap[v]] || '#A9A9A9'}">${statusMap[v]}</span>`
+        },
+        attrs: {
+            label: '属性要求',
+            format: (v, item) => item.attrs.map(attr => `<span class="ant-tag ${tagColors[Math.floor(Math.random() * tagColors.length)]}">${attr.name}: ${attr.value}</span>`).join('')
+        },
+        deposit: { label: '定金 ($)', format: v => v.toFixed(2) },
+        paid_rest_money: { label: '尾款 ($)', format: v => v ? v.toFixed(2) : '未支付' },
+        start_time: { label: '开始时间', format: v => new Date(v * 1000).toLocaleDateString() },
+        operation: {
+            label: '操作',
+            format: (v, item) => {
+                let buttons = `<button class="btn-small" onclick="viewDemand(${item.id})"><i class="fa fa-eye"></i> 查看</button>`;
+                if (item.status === 0) buttons += `<button class="btn-small btn-solid-medium" onclick="submitDemandForReview(${item.id})">提交审核</button>`;
+                if (item.status === 6) buttons += `<button class="btn-small btn-orange-solid-small" onclick="payRestMoney(${item.id})">支付尾款</button>`;
+                if (item.status === 8) buttons += `<button class="btn-small" onclick="reviewDemand(${item.id})"><i class="fa fa-star"></i> 评价</button>`;
+                return `<div class="operation-area">${buttons}</div>`;
+            }
+        }
+    };
+
+    // 分页和数据管理
+    let currentPage = 1;
+    let pageSize = pageConfig.find(p => p.selected).page;
+    let filteredDemands = [];
+    const allDemands = Array(randomInt(50, 500)).fill().map(() => {
+        const demand = {
+            id: faker.datatype.number({ min: 1000, max: 999999 }),
+            status: faker.datatype.number({ min: 0, max: 10 }),
+            user_id: faker.datatype.number({ min: 1, max: 1000 }),
+            brand_id: faker.datatype.number({ min: 1, max: 100 }),
+            services_id: faker.datatype.number({ min: 1, max: 50 }),
+            price_from: faker.datatype.float({ min: 10, max: 100, precision: 0.01 }),
+            price_to: faker.datatype.float({ min: 100, max: 1000, precision: 0.01 }),
+            quantity: faker.datatype.number({ min: 1, max: 100 }),
+            deposit: faker.datatype.float({ min: 0, max: 50, precision: 0.01 }),
+            samples_need: faker.datatype.number({ min: 0, max: 1 }),
+            after_sales_time: faker.datatype.number({ min: 0, max: 365 }),
+            start_time: Math.floor(faker.date.soon().getTime() / 1000),
+            end_time: Math.floor(faker.date.future().getTime() / 1000),
+            paid_rest_money: Math.random() > 0.5 ? faker.datatype.float({ min: 50, max: 500, precision: 0.01 }) : 0,
+            paid_time: Math.random() > 0.5 ? Math.floor(faker.date.recent().getTime() / 1000) : 0,
+            choose_store_id: Math.random() > 0.5 ? faker.datatype.number({ min: 1, max: 1000 }) : 0,
+            choose_unit_price: Math.random() > 0.5 ? faker.datatype.float({ min: 10, max: 100, precision: 0.01 }) : 0,
+            choose_time: Math.random() > 0.5 ? Math.floor(faker.date.recent().getTime() / 1000) : 0,
+            amount: faker.datatype.float({ min: 50, max: 1000, precision: 0.01 }),
+            create_time: Math.floor(faker.date.past().getTime() / 1000),
+            confirm_time: Math.floor(faker.date.recent().getTime() / 1000)
+        };
+        demand.demand_name = faker.commerce.productName() + ' Demand';
+        demand.attrs = Array(faker.datatype.number({ min: 1, max: 5 })).fill().map(() => {
+            const attrName = Object.keys(ecommerceAttributes)[Math.floor(Math.random() * Object.keys(ecommerceAttributes).length)];
+            const attrValues = ecommerceAttributes[attrName];
+            return { name: attrName, value: attrValues[Math.floor(Math.random() * attrValues.length)] };
+        });
+        demand.bid_count = faker.datatype.number({ min: 0, max: 15 });
+        return demand;
+    });
+
+    const allBids = allDemands.filter(d => d.status >= 5).map(d => ({
+        id: faker.datatype.number({ min: 1000, max: 999999 }),
+        demand_id: d.id,
+        user_id: faker.datatype.number({ min: 1, max: 1000 }),
+        store_id: faker.datatype.number({ min: 1, max: 1000 }),
+        status: d.choose_store_id === faker.datatype.number({ min: 1, max: 1000 }) ? 1 : 0,
+        bid_time: Math.floor(faker.date.recent().getTime() / 1000),
+        bid_price: faker.datatype.float({ min: d.price_from, max: d.price_to, precision: 0.01 }),
+        bid_information: faker.lorem.sentence(),
+        bid_pics: JSON.stringify(
+            Array(randomInt(1, 3)).fill().map(() => getPicsumImage(50, 50, `bidder-${Math.random()}`))
+        ),
+        bid_win_time: d.choose_store_id === faker.datatype.number({ min: 1, max: 1000 }) ? Math.floor(faker.date.recent().getTime() / 1000) : 0,
+        sample_list: JSON.stringify(
+            Array(randomInt(1, 3)).fill().map(() => fieldsList.sort(() => 0.5 - Math.random()).slice(0, Math.floor(Math.random() * 6) + 3).join("----"))
+        )
+    }));
+
+    const allLogs = allDemands.map(d => ({
+        id: faker.datatype.number({ min: 1000, max: 999999 }),
+        demand_id: d.id,
+        user_id: d.user_id,
+        store_id: d.choose_store_id || 0,
+        log_type: faker.datatype.number({ min: 0, max: 11 }),
+        extra_data: JSON.stringify({ note: faker.lorem.sentence() }),
+        create_time: Math.floor(faker.date.recent().getTime() / 1000)
+    }));
+
+    function initDemandsPage() {
+        filteredDemands = [...allDemands];
+        renderFilterForm();
+        renderTableHeader();
+        renderTableBody();
+        renderPagination();
+    }
+
+    function renderFilterForm() {
+        const filterDiv = document.getElementById('demands-filter');
+        filterDiv.innerHTML = `
+            <input type="text" id="filter-search" placeholder="需求名称">
+            <select id="filter-status">
+                <option value="">状态</option>
+                ${Object.entries(statusMap).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}
+            </select>
+            <input type="date" id="filter-date-start" placeholder="开始日期"> ~ <input type="date" id="filter-date-end" placeholder="结束日期">
+            <button class="btn-solid-medium" onclick="applyFilters()">查询</button>
+            <button class="btn-orange-medium" onclick="resetFilters()">重置</button>
+        `;
+    }
+
+    function applyFilters() {
+        const search = document.getElementById('filter-search').value.toLowerCase();
+        const status = document.getElementById('filter-status').value;
+        const dateStart = document.getElementById('filter-date-start').value;
+        const dateEnd = document.getElementById('filter-date-end').value;
+
+        filteredDemands = allDemands.filter(demand => {
+            let match = true;
+            if (search && !demand.demand_name.toLowerCase().includes(search)) match = false;
+            if (status !== '' && demand.status.toString() !== status) match = false;
+            if (dateStart && demand.start_time < Math.floor(new Date(dateStart).getTime() / 1000)) match = false;
+            if (dateEnd && demand.start_time > Math.floor(new Date(dateEnd).getTime() / 1000)) match = false;
+            return match;
+        });
+
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function resetFilters() {
+        document.getElementById('filter-search').value = '';
+        document.getElementById('filter-status').value = '';
+        document.getElementById('filter-date-start').value = '';
+        document.getElementById('filter-date-end').value = '';
+        filteredDemands = [...allDemands];
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function renderTableHeader() {
+        const header = document.getElementById('demands-table-header');
+        header.innerHTML = '<tr>' + Object.entries(demandsConfig)
+            .map(([_, config]) => `<th>${config.label}</th>`).join('') + '</tr>';
+    }
+
+    function renderTableBody() {
+        const body = document.getElementById('demands-table-body');
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const paginatedDemands = filteredDemands.slice(start, end);
+        body.innerHTML = paginatedDemands.map(demand => `
+            <tr>
+                ${Object.entries(demandsConfig).map(([key, config]) => {
+            const value = demand[key];
+            const formatFn = config.format || (v => v);
+            const formattedValue = key === 'operation' || key === 'demand_name' || key === 'attrs' || key === 'price' ? formatFn(value, demand) : formatFn(value);
+            return `<td>${formattedValue}</td>`;
+        }).join('')}
+            </tr>
+        `).join('');
+    }
+
+    function renderPagination() {
+        let pageOptions = `<select id="page-size" onchange="changePageSize()">`;
+        pageConfig.forEach(item => {
+            pageOptions += `<option value="${item.page}" ${item.page === pageSize ? 'selected' : ''}>${item.page}条/页</option>`;
+        });
+        pageOptions += `</select>`;
+
+        const totalPages = Math.ceil(filteredDemands.length / pageSize);
+        const paginationDiv = document.getElementById('demands-pagination');
+        paginationDiv.innerHTML = `
+            <button class="btn-small pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
+            <span>第 ${currentPage} 页 / 共 ${totalPages} 页</span>
+            <button class="btn-small pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
+            <div class="pagination-options">
+                ${pageOptions}
+                <input type="number" id="jump-page" min="1" max="${totalPages}" placeholder="页">
+                <button class="btn-small" onclick="jumpToPage()">跳转</button>
+            </div>
+        `;
+    }
+
+    function changePage(newPage) {
+        const totalPages = Math.ceil(filteredDemands.length / pageSize);
+        if (newPage >= 1 && newPage <= totalPages) {
+            currentPage = newPage;
+            renderTableBody();
+            renderPagination();
+        }
+    }
+
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('page-size').value);
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function jumpToPage() {
+        const totalPages = Math.ceil(filteredDemands.length / pageSize);
+        const page = parseInt(document.getElementById('jump-page').value);
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderTableBody();
+            renderPagination();
+        }
+    }
+
+    // 发布需求
+    function openCreateDemandModal() {
+        const attrsDiv = document.getElementById('create-attrs');
+        attrsDiv.innerHTML = Object.entries(ecommerceAttributes).map(([name, values]) => `
+            <div>
+                <label>${name}:</label>
+                ${values.map(val => `
+                    <input type="checkbox" name="attr-${name}" value="${val}"> ${val}
+                `).join('')}
+            </div>
+        `).join('');
+        document.getElementById('create-demand-dialog').style.display = 'flex';
+    }
+
+    function closeCreateDemandModal() {
+        document.getElementById('create-demand-dialog').style.display = 'none';
+    }
+
+    function submitDemand() {
+        const demandName = document.getElementById('create-demand-name').value.trim();
+        const priceFrom = parseFloat(document.getElementById('create-price-from').value);
+        const priceTo = parseFloat(document.getElementById('create-price-to').value);
+        const quantity = parseInt(document.getElementById('create-quantity').value);
+        const deposit = parseFloat(document.getElementById('create-deposit').value);
+        const samplesNeed = parseInt(document.getElementById('create-samples-need').value);
+        const afterSalesTime = parseInt(document.getElementById('create-after-sales-time').value);
+        const startTime = Math.floor(new Date(document.getElementById('create-start-time').value).getTime() / 1000);
+        const endTime = Math.floor(new Date(document.getElementById('create-end-time').value).getTime() / 1000);
+        const demandInfo = document.getElementById('create-demand-info').value.trim();
+
+        const attrs = [];
+        Object.keys(ecommerceAttributes).forEach(name => {
+            const selected = Array.from(document.getElementsByName(`attr-${name}`))
+                .filter(input => input.checked)
+                .map(input => ({ name, value: input.value }));
+            attrs.push(...selected);
+        });
+
+        if (!demandName || isNaN(priceFrom) || isNaN(priceTo) || isNaN(quantity) || isNaN(deposit) ||
+            isNaN(samplesNeed) || isNaN(afterSalesTime) || isNaN(startTime) || isNaN(endTime) || !demandInfo) {
+            alert('请填写所有必填字段');
+            return;
+        }
+
+        const newDemand = {
+            id: Math.max(...allDemands.map(d => d.id)) + 1,
+            status: 0,
+            user_id: 1, // 假设当前用户
+            brand_id: 0,
+            services_id: 0,
+            price_from: priceFrom,
+            price_to: priceTo,
+            quantity,
+            deposit,
+            samples_need: samplesNeed,
+            after_sales_time: afterSalesTime,
+            start_time: startTime,
+            end_time: endTime,
+            paid_rest_money: 0,
+            paid_time: 0,
+            choose_store_id: 0,
+            choose_unit_price: 0,
+            choose_time: 0,
+            amount: 0,
+            create_time: Math.floor(Date.now() / 1000),
+            confirm_time: 0,
+            demand_name: demandName,
+            attrs,
+            bid_count: 0
+        };
+        allDemands.push(newDemand);
+        filteredDemands = [...allDemands];
+        renderTableBody();
+        renderPagination();
+        closeCreateDemandModal();
+        console.log('新需求已创建:', newDemand);
+    }
+
+    // 操作函数
+    function submitDemandForReview(id) {
+        const demand = allDemands.find(d => d.id === id);
+        if (demand && demand.status === 0) {
+            demand.status = 1;
+            filteredDemands = filteredDemands.map(d => d.id === id ? demand : d);
+            renderTableBody();
+            console.log(`需求 ID: ${id} 已提交审核`);
+        }
+    }
+
+    function payRestMoney(id) {
+        const demand = allDemands.find(d => d.id === id);
+        if (demand && demand.status === 6 && confirm('确认要支付尾款吗？')) {
+            demand.paid_rest_money = demand.amount - demand.deposit;
+            demand.paid_time = Math.floor(Date.now() / 1000);
+            demand.status = 7;
+            filteredDemands = filteredDemands.map(d => d.id === id ? demand : d);
+            renderTableBody();
+            console.log(`需求 ID: ${id} 已支付尾款`);
+        }
+    }
+
+    function reviewDemand(id) {
+        alert('评价功能待实现，参考 orders.html 中的评价逻辑');
+    }
+
+    // 查看需求
+    let currentViewId = null;
+    let bidsPage = 1;
+    const bidsPageSize = 5;
+
+    function viewDemand(id) {
+        const demand = allDemands.find(d => d.id === id);
+        if (!demand) return;
+
+        currentViewId = id;
+        const bids = allBids.filter(b => b.demand_id === id);
+        const winner = bids.find(b => b.store_id === demand.choose_store_id);
+
+        document.getElementById('view-demand-info').innerHTML = `
+            <p>需求名称: ${demand.demand_name}</p>
+            <p>价格范围: $${demand.price_from.toFixed(2)} - $${demand.price_to.toFixed(2)}</p>
+            <p>数量: ${demand.quantity}</p>
+            <p>定金: $${demand.deposit.toFixed(2)}</p>
+            <p>尾款: $${demand.paid_rest_money ? demand.paid_rest_money.toFixed(2) : '未支付'}</p>
+            <p>状态: <span style="color: ${demandStatusColors[statusMap[demand.status]] || '#A9A9A9'}">${statusMap[demand.status]}</span></p>
+            <p>属性要求: ${demand.attrs.map(attr => `<span class="ant-tag ${tagColors[Math.floor(Math.random() * tagColors.length)]}">${attr.name}: ${attr.value}</span>`).join('')}</p>
+            <p>开始时间: ${new Date(demand.start_time * 1000).toLocaleString()}</p>
+            <p>结束时间: ${new Date(demand.end_time * 1000).toLocaleString()}</p>
+            <p>需求详情: ${demand.demand_information || '暂无'}</p>
+        `;
+
+        let actions = '';
+        if (demand.status === 5) actions += `<button class="btn-small" onclick="chooseBid(${id})">选择竞标者</button>`;
+        if (demand.status === 7) actions += `<button class="btn-small" onclick="downloadBids(${id})"><i class="fa fa-download"></i> 下载投标信息</button>`;
+        document.getElementById('view-demand-actions').innerHTML = actions;
+
+        if (winner) {
+            document.getElementById('view-winner-section').style.display = 'block';
+            document.getElementById('view-winner-info').innerHTML = `
+                <p>店铺ID: ${winner.store_id}</p>
+                <p>竞标价格: $${winner.bid_price.toFixed(2)}</p>
+                <p>竞标信息: ${winner.bid_information}</p>
+                <button class="btn-small" onclick="viewBidDetail(${winner.id})">查看详情</button>
+            `;
+        } else {
+            document.getElementById('view-winner-section').style.display = 'none';
+        }
+
+        if (bids.length > 0) {
+            document.getElementById('view-bid-list').style.display = 'block';
+            renderBids(bids);
+        } else {
+            document.getElementById('view-bid-list').style.display = 'none';
+        }
+
+        document.getElementById('view-demand-dialog').style.display = 'flex';
+    }
+
+    function closeViewDemandModal() {
+        document.getElementById('view-demand-dialog').style.display = 'none';
+        currentViewId = null;
+    }
+
+    function renderBids(bids) {
+        const start = (bidsPage - 1) * bidsPageSize;
+        const end = start + bidsPageSize;
+        const paginatedBids = bids.slice(start, end);
+        const bidsDiv = document.getElementById('view-bids');
+        bidsDiv.innerHTML = paginatedBids.map(bid => `
+            <div class="bid-item ${bid.store_id === allDemands.find(d => d.id === currentViewId)?.choose_store_id ? 'winner' : ''}">
+                <p>店铺ID: ${bid.store_id}</p>
+                <p>竞标价格: $${bid.bid_price.toFixed(2)}</p>
+                <p>竞标时间: ${new Date(bid.bid_time * 1000).toLocaleString()}</p>
+                <button class="btn-small" onclick="viewBidDetail(${bid.id})">查看详情</button>
+                ${allDemands.find(d => d.id === currentViewId)?.status === 5 ? `<button class="btn-small btn-orange-solid-small" onclick="selectBid(${bid.id})">选中</button>` : ''}
+            </div>
+        `).join('');
+
+        const totalBidsPages = Math.ceil(bids.length / bidsPageSize);
+        document.getElementById('bids-pagination').innerHTML = `
+            <button class="btn-small pagination-btn" onclick="changeBidsPage(${bidsPage - 1})" ${bidsPage === 1 ? 'disabled' : ''}>上一页</button>
+            <span>第 ${bidsPage} 页 / 共 ${totalBidsPages} 页</span>
+            <button class="btn-small pagination-btn" onclick="changeBidsPage(${bidsPage + 1})" ${bidsPage === totalBidsPages ? 'disabled' : ''}>下一页</button>
+        `;
+    }
+
+    function changeBidsPage(newPage) {
+        const bids = allBids.filter(b => b.demand_id === currentViewId);
+        const totalBidsPages = Math.ceil(bids.length / bidsPageSize);
+        if (newPage >= 1 && newPage <= totalBidsPages) {
+            bidsPage = newPage;
+            renderBids(bids);
+        }
+    }
+
+    function viewBidDetail(bidId) {
+        const bid = allBids.find(b => b.id === bidId);
+        if (!bid) return;
+
+        document.getElementById('bid-detail-info').innerHTML = `
+            <p>店铺ID: ${bid.store_id}</p>
+            <p>竞标价格: $${bid.bid_price.toFixed(2)}</p>
+            <p>竞标信息: ${bid.bid_information}</p>
+            <p>竞标时间: ${new Date(bid.bid_time * 1000).toLocaleString()}</p>
+            <p>样品列表: ${JSON.parse(bid.sample_list).map(s => s).join('<br/> ')}</p>
+            <p>图片: ${JSON.parse(bid.bid_pics).map(p => `<img src="${p}" alt="Bid Pic" style="width: 100px;">`).join('')}</p>
+        `;
+        document.getElementById('bid-detail-dialog').style.display = 'flex';
+    }
+
+    function closeBidDetailModal() {
+        document.getElementById('bid-detail-dialog').style.display = 'none';
+    }
+
+    function selectBid(bidId) {
+        const demand = allDemands.find(d => d.id === currentViewId);
+        const bid = allBids.find(b => b.id === bidId);
+        if (demand && bid && demand.status === 5 && confirm('确认选中此竞标者吗？')) {
+            demand.choose_store_id = bid.store_id;
+            demand.choose_unit_price = bid.bid_price;
+            demand.choose_time = Math.floor(Date.now() / 1000);
+            demand.status = 6;
+            bid.status = 1;
+            filteredDemands = filteredDemands.map(d => d.id === currentViewId ? demand : d);
+            viewDemand(currentViewId);
+            renderTableBody();
+            console.log(`需求 ID: ${currentViewId} 已选中竞标者: ${bid.store_id}`);
+        }
+    }
+
+    function downloadBids(id) {
+        alert('下载所有投标者提交的商品信息功能待实现');
+    }
+
+    // 操作日志
+    function openLogsModal() {
+        const logs = allLogs.filter(l => l.demand_id === currentViewId);
+        const body = document.getElementById('logs-table-body');
+        body.innerHTML = logs.map(log => `
+            <tr>
+                <td>${log.id}</td>
+                <td>${['发布', '拒绝', '通过', '支付定金', '需求开始', '店铺参与竞标', '选中店铺', '需求取消', '需求过期', '支付尾款', '完成交付', '评价'][log.log_type]}</td>
+                <td>${log.user_id}</td>
+                <td>${log.store_id}</td>
+                <td>${log.extra_data}</td>
+                <td>${new Date(log.create_time * 1000).toLocaleString()}</td>
+            </tr>
+        `).join('');
+        document.getElementById('logs-dialog').style.display = 'flex';
+    }
+
+    function closeLogsModal() {
+        document.getElementById('logs-dialog').style.display = 'none';
+    }
+
+    // 初始化页面
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initDemandsPage();
+            document.getElementById('create-demand-dialog').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeCreateDemandModal();
+            });
+            document.getElementById('view-demand-dialog').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeViewDemandModal();
+            });
+            document.getElementById('bid-detail-dialog').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeBidDetailModal();
+            });
+            document.getElementById('logs-dialog').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeLogsModal();
+            });
+        });
+    };
+</script>
+</body>
+</html>
