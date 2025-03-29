@@ -283,7 +283,6 @@ const faqFieldConfig = {
     favorited: { type: 'favorite', sample: () => Math.random() > 0.5 }
 };
 
-
 // orders 配置（基于 orders 和相关表）
 let ordersFieldConfig = {
     id: { card: false, cardSq: false, cardHoriz: false, type: 'text', label: '订单ID', style: {}, sample: () => faker.datatype.number({ min: 100000, max: 999999 }) },

@@ -244,7 +244,8 @@ function generateData(fieldConfig, count) {
                 continue
             }
 
-            let values = {}, index = 0, keys = Object.keys(config)
+            let values = {}
+            let index = 0, keys = Object.keys(config)
             Object.values(config).forEach(_value =>{
                 let key = keys[index]
                 if (['onClick'].includes(key)){
@@ -264,7 +265,17 @@ function generateData(fieldConfig, count) {
                 index++
             })
             let valueLen = Object.keys(values).length;
-            item[fieldName] = valueLen <= 0 ? "N/A" : valueLen == 1 ? Object.values(values)[0] : values;
+
+            let valuesFunction = {}
+            if (valueLen <= 0){
+                valuesFunction = "N/A";
+            }else if (valueLen == 1){
+                valuesFunction = Object.values(values)[0];
+            }else {
+                valuesFunction = values
+            }
+
+            item[fieldName] = valuesFunction;
         }
         return item;
     });

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>财务日志 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../_site.css">
+    <link rel="stylesheet" href="_member.css">
+    <link rel="stylesheet" href="_ticket.css">
+    <style>
+        .change-info-text {
+            max-width: 15em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+        .change-info-text:hover::after {
+            content: attr(data-full);
+            position: absolute;
+            background: var(--bg-white);
+            border: 0.0625em solid var(--border-color);
+            padding: 0.5em;
+            z-index: 10;
+            white-space: normal;
+            max-width: 20em;
+            left: 0;
+            top: 100%;
+            box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="../_header.html"></div>
+<div class="member-wrapper">
+    <div w3-include-html="_sidebar.html"></div>
+    <div class="member-container">
+        <div class="member-section">
+            <h2 class="member-section-title">我的交易</h2>
+            <div class="orders-filter" id="transactions-filter"></div>
+            <table class="orders-table" id="transactions-table">
+                <thead id="transactions-table-header"></thead>
+                <tbody id="transactions-table-body"></tbody>
+            </table>
+            <div class="pagination-controls" id="transactions-pagination"></div>
+        </div>
+    </div>
+</div>
+
+<div w3-include-html="../_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="../_location.js"></script>
+<script src="../_common.js"></script>
+<script src="../_member.js"></script>
+<script src="_mCommon.js"></script>
+<script src="_ticket.js"></script>
+<script src="../_fields.js"></script>
+<script src="../_data.js"></script>
+<script>
+    // 电商相关的变动类型
+    const transactionTypes = [
+        { value: 0, label: '充值', isIncome: true },
+        { value: 1, label: '购物', isIncome: false },
+        { value: 2, label: '知识付费', isIncome: false },
+        { value: 3, label: '需求定金', isIncome: false },
+        { value: 4, label: '需求尾款', isIncome: false },
+        { value: 5, label: '退款', isIncome: true }
+    ];
+
+    // 生成真实的 change_info
+    function generateChangeInfo(type, amount) {
+        switch (type) {
+            case 0: // 充值
+                return `充值 $${amount.toFixed(2)}`;
+            case 1: // 购物
+                return `购买 ${faker.commerce.productName()} 商品`;
+            case 2: // 知识付费
+                return `${faker.lorem.sentence(3)} 文章付费阅读`;
+            case 3: // 需求定金
+                return `发布 ${faker.company.companyName()} 需求定金`;
+            case 4: // 需求尾款
+                return `支付 ${faker.company.companyName()} 需求尾款`;
+            case 5: // 退款
+                return `${faker.datatype.number({ min: 100000, max: 999999 })} 订单退款`;
+            default:
+                return '未知交易';
+        }
+    }
+
+    // 用户交易字段配置
+    const userTransactionDisplayConfig = {
+        id: { ...userTransactionFieldConfig.id, label: '交易ID', format: v => v },
+        change_type: {
+            ...userTransactionFieldConfig.change_type,
+            label: '变动类型',
+            format: (d, v) => {
+                const type = transactionTypes.find(t => t.value === v);
+                return type ? type.label : '未知类型'; // 如果 v 无效，返回默认值
+            },
+            sample: () => faker.datatype.number({ min: 0, max: 5 })
+        },
+        change_money: {
+            ...userTransactionFieldConfig.change_money,
+            label: '变动金额',
+            format: (d, v, transaction) => {
+                const type = transactionTypes.find(t => t.value === transaction.change_type) || { isIncome: false };
+                const symbol = type.isIncome ? '+' : '-';
+                const color = type.isIncome ? '#32CD32' : '#FF4500'; // 收入绿色，支出红色
+                return `<span style="color: ${color}">${symbol} ${v}</span>`;
+            }
+        },
+        rest_amount: { ...userTransactionFieldConfig.rest_amount, label: '剩余金额', format: v => v },
+        relation_id: { ...userTransactionFieldConfig.relation_id, label: '关联ID', format: v => v },
+        change_info: {
+            ...userTransactionFieldConfig.change_info,
+            label: '变动信息',
+            format: (d, v) => {
+                return `<span class="change-info-text" title="${v}">${v}</span>`
+            },
+            sample: () => {
+                const type = faker.datatype.number({ min: 0, max: 5 });
+                const amount = faker.datatype.float({ min: 10, max: 1000, precision: 0.01 });
+                let a = generateChangeInfo(type, amount);
+                return a
+            }
+        },
+        status: { ...userTransactionFieldConfig.status, label: '状态', format: (d, v) => `<span style="color: ${v === 0 ? '#A9A9A9' : '#32CD32'}">${v === 0 ? '待处理' : '已完成'}</span>` },
+        create_time: { ...userTransactionFieldConfig.create_time, label: '时间', format: v => v }
+    };
+
+    // 分页和数据管理
+    let currentPage = 1;
+    let pageSize = pageConfig.find(p => p.selected).page; // 默认选中15条/页
+    let filteredTransactions = [];
+    const allTransactions = generateData(userTransactionDisplayConfig, randomInt(50, 500)).map(t => {
+        return t;
+    });
+
+    function initTransactionsPage() {
+        filteredTransactions = [...allTransactions];
+        renderFilterForm();
+        renderTableHeader();
+        renderTableBody();
+        renderPagination();
+    }
+
+    function renderFilterForm() {
+        const filterDiv = document.getElementById('transactions-filter');
+        filterDiv.innerHTML = `
+            <input type="text" id="filter-search" placeholder="交易ID/关联ID">
+            <select id="filter-type">
+                <option value="">变动类型</option>
+                ${transactionTypes.map(t => `<option value="${t.value}">${t.label}</option>`).join('')}
+            </select>
+            <select id="filter-status">
+                <option value="">状态</option>
+                <option value="0">待处理</option>
+                <option value="1">已完成</option>
+            </select>
+            <input type="date" id="filter-date-start" placeholder="开始日期"> ~ <input type="date" id="filter-date-end" placeholder="结束日期">
+            <button class="btn-solid-medium" onclick="applyFilters()">查询</button>
+            <button class="btn-orange-medium" onclick="resetFilters()">重置</button>
+        `;
+    }
+
+    function applyFilters() {
+        const search = document.getElementById('filter-search').value.toLowerCase();
+        const type = document.getElementById('filter-type').value;
+        const status = document.getElementById('filter-status').value;
+        const dateStart = document.getElementById('filter-date-start').value;
+        const dateEnd = document.getElementById('filter-date-end').value;
+
+        filteredTransactions = allTransactions.filter(transaction => {
+            let match = true;
+            if (search && !transaction.id.toString().includes(search) && !transaction.relation_id.toString().includes(search)) match = false;
+            if (type !== '' && transaction.change_type.toString() !== type) match = false;
+            if (status !== '' && transaction.status.toString() !== status) match = false;
+            if (dateStart && new Date(transaction.create_time) < new Date(dateStart)) match = false;
+            if (dateEnd && new Date(transaction.create_time) > new Date(dateEnd)) match = false;
+            return match;
+        });
+
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function resetFilters() {
+        document.getElementById('filter-search').value = '';
+        document.getElementById('filter-type').value = '';
+        document.getElementById('filter-status').value = '';
+        document.getElementById('filter-date-start').value = '';
+        document.getElementById('filter-date-end').value = '';
+        filteredTransactions = [...allTransactions];
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function renderTableHeader() {
+        const header = document.getElementById('transactions-table-header');
+        header.innerHTML = '<tr>' + Object.entries(userTransactionDisplayConfig)
+            .map(([_, config]) => `<th>${config.label}</th>`).join('') + '</tr>';
+    }
+
+    function renderTableBody() {
+        const body = document.getElementById('transactions-table-body');
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const paginatedTransactions = filteredTransactions.slice(start, end);
+        body.innerHTML = paginatedTransactions.map(transaction => `
+            <tr>
+                ${Object.entries(userTransactionDisplayConfig).map(([key, config]) => {
+            const value = typeof transaction[key].sample == 'function' ? transaction[key].sample() : transaction[key].sample;
+            const formatFn = config.format || (v => v);
+            // 根据 format 函数签名调整参数
+            let formattedValue = ``;
+
+            if (formatFn.length == 1){
+                formattedValue = formatFn(value)
+            }
+            else if (formatFn.length == 2){
+                formattedValue = formatFn(config, value)
+            }
+            else if (formatFn.length == 3){
+                formattedValue = formatFn(config, value, transaction)
+            }
+
+            return `<td>${formattedValue}</td>`;
+        }).join('')}
+            </tr>
+        `).join('');
+    }
+
+    function renderPagination() {
+        let pageOptions = `<select id="page-size" onchange="changePageSize()">`;
+        pageConfig.forEach(item => {
+            pageOptions += `<option value="${item.page}" ${item.page === pageSize ? 'selected' : ''}>${item.page}条/页</option>`;
+        });
+        pageOptions += `</select>`;
+
+        const totalPages = Math.ceil(filteredTransactions.length / pageSize);
+        const paginationDiv = document.getElementById('transactions-pagination');
+        paginationDiv.innerHTML = `
+            <button class="btn-small pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
+            <span>第 ${currentPage} 页 / 共 ${totalPages} 页</span>
+            <button class="btn-small pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
+            <div class="pagination-options">
+                ${pageOptions}
+                <input type="number" id="jump-page" min="1" max="${totalPages}" placeholder="页">
+                <button class="btn-small" onclick="jumpToPage()">跳转</button>
+            </div>
+        `;
+    }
+
+    function changePage(newPage) {
+        const totalPages = Math.ceil(filteredTransactions.length / pageSize);
+        if (newPage >= 1 && newPage <= totalPages) {
+            currentPage = newPage;
+            renderTableBody();
+            renderPagination();
+        }
+    }
+
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('page-size').value);
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function jumpToPage() {
+        const totalPages = Math.ceil(filteredTransactions.length / pageSize);
+        const page = parseInt(document.getElementById('jump-page').value);
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderTableBody();
+            renderPagination();
+        }
+    }
+
+    // 初始化页面
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initTransactionsPage();
+        });
+    };
+</script>
+</body>
+</html>
