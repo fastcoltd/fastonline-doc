@@ -56,13 +56,13 @@ function openTicketSubmissionDialog(orderId) {
 
     body.innerHTML = `
         <div class="submission-form">
-            <label>售后类型:</label>
+            <label>问题类型:</label>
             <select id="aftersales-type">
                 <option value="refund">退款</option>
                 <option value="exchange">换货</option>
                 <option value="repair">维修</option>
             </select>
-            <label>售后子项:</label>
+            <label>问题原因:</label>
             <select id="aftersales-subtype">
                 <option value="quality">商品质量问题</option>
                 <option value="delivery">配送问题</option>
