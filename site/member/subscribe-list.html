@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的订阅 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../_site.css">
+    <link rel="stylesheet" href="_member.css">
+    <link rel="stylesheet" href="_ticket.css">
+    <style>
+        .item-name {
+            max-width: 25em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+        .item-name:hover::after {
+            content: attr(data-full);
+            position: absolute;
+            background: var(--bg-white);
+            border: 0.0625em solid var(--border-color);
+            padding: 0.5em;
+            z-index: 10;
+            white-space: normal;
+            max-width: 30em;
+            left: 0;
+            top: 100%;
+            box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="../_header.html"></div>
+<div class="member-wrapper">
+    <div w3-include-html="_sidebar.html"></div>
+    <div class="member-container">
+        <div class="member-section">
+            <h2 class="member-section-title">我的订阅</h2>
+            <div class="orders-filter" id="subscribe-filter"></div>
+            <table class="orders-table" id="subscribe-table">
+                <thead id="subscribe-table-header"></thead>
+                <tbody id="subscribe-table-body"></tbody>
+            </table>
+            <div class="pagination-controls" id="subscribe-pagination"></div>
+        </div>
+    </div>
+</div>
+
+<div id="edit-dialog" class="dialog" style="display: none;">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <h3>编辑订阅</h3>
+            <button class="dialog-close" onclick="closeEditModal()">×</button>
+        </div>
+        <div class="dialog-body">
+            <div class="order-info">
+                <div class="order-item-image">
+                    <img id="edit-item-image" src="" alt="商品图片">
+                </div>
+                <div class="order-details">
+                    <p id="edit-item-name" class="item-name"></p>
+                    <p>店铺: <span id="edit-store-name"></span></p>
+                </div>
+            </div>
+            <div class="edit-content">
+                <div class="rating-item">
+                    <label>价格低于 ($):</label>
+                    <input type="number" id="edit-notice-price" min="0" step="0.01" placeholder="输入价格">
+                </div>
+                <div class="rating-item">
+                    <label>库存高于:</label>
+                    <input type="number" id="edit-notice-stock" min="0" placeholder="输入库存数量">
+                </div>
+                <div class="review-actions">
+                    <button class="btn-orange-solid-small" onclick="saveEdit()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div w3-include-html="../_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="../_location.js"></script>
+<script src="../_common.js"></script>
+<script src="../_member.js"></script>
+<script src="_mCommon.js"></script>
+<script src="_ticket.js"></script>
+<script src="../_fields.js"></script>
+<script src="../_data.js"></script>
+<script>
+    // 生成商品和店铺名称
+    function generateItemName(itemId) {
+        const name = faker.commerce.productName();
+        return { name, url: `/site/item.html?name=${encodeURIComponent(name)}` };
+    }
+
+    function generateStoreName(storeId) {
+        const name = faker.company.companyName();
+        return { name, url: `/site/store.html?name=${encodeURIComponent(name)}` };
+    }
+
+    // 字段配置（基于 DDL）
+    const subscribeListConfig = {
+        id: { label: 'ID', format: v => v },
+        store_id: {
+            label: '店铺',
+            format: (v) => {
+                const { name, url } = generateStoreName(v);
+                return `<a href="${url}"><i class="fa fa-store"></i> ${name}</a>`;
+            }
+        },
+        item_id: {
+            label: '商品',
+            format: (v) => {
+                const { name, url } = generateItemName(v);
+                return `<a href="${url}" class="item-name" data-full="${name}"><i class="fa fa-shopping-cart"></i> ${name}</a>`;
+            }
+        },
+        notice_price: { label: '价格低于 ($)', format: v => v.toFixed(2) },
+        notice_stock_num: { label: '库存高于', format: v => v },
+        create_time: { label: '订阅时间', format: v => new Date(v * 1000).toLocaleString() },
+        operation: {
+            label: '操作',
+            format: (v, item) => `
+                <div class="operation-area">
+                    <button class="btn-small btn-red-solid-small" onclick="deleteSubscribe(${item.id})"><i class="fa fa-trash"></i> 删除</button>
+                    <button class="btn-small" onclick="editSubscribe(${item.id})"><i class="fa fa-edit"></i> 编辑</button>
+                </div>
+            `
+        }
+    };
+
+    // 分页和数据管理
+    let currentPage = 1;
+    let pageSize = pageConfig.find(p => p.selected).page; // 默认选中15条/页
+    let filteredSubscribes = [];
+    const allSubscribes = Array(randomInt(50, 500)).fill().map(() => ({
+        id: faker.datatype.number({ min: 1000, max: 999999 }),
+        user_id: faker.datatype.number({ min: 1, max: 1000 }),
+        store_id: faker.datatype.number({ min: 1, max: 1000 }),
+        item_id: faker.datatype.number({ min: 1, max: 100000 }),
+        notice_price: faker.datatype.float({ min: 0, max: 1000, precision: 0.01 }),
+        notice_stock_num: faker.datatype.number({ min: 0, max: 1000 }),
+        create_time: Math.floor(faker.date.recent().getTime() / 1000)
+    }));
+
+    function initSubscribePage() {
+        filteredSubscribes = [...allSubscribes];
+        renderFilterForm();
+        renderTableHeader();
+        renderTableBody();
+        renderPagination();
+    }
+
+    function renderFilterForm() {
+        const filterDiv = document.getElementById('subscribe-filter');
+        filterDiv.innerHTML = `
+            <input type="text" id="filter-search" placeholder="商品名称/店铺名称">
+            <input type="date" id="filter-date-start" placeholder="开始日期"> ~ <input type="date" id="filter-date-end" placeholder="结束日期">
+            <button class="btn-solid-medium" onclick="applyFilters()">查询</button>
+            <button class="btn-orange-medium" onclick="resetFilters()">重置</button>
+        `;
+    }
+
+    function applyFilters() {
+        const search = document.getElementById('filter-search').value.toLowerCase();
+        const dateStart = document.getElementById('filter-date-start').value;
+        const dateEnd = document.getElementById('filter-date-end').value;
+
+        filteredSubscribes = allSubscribes.filter(subscribe => {
+            let match = true;
+            const itemName = generateItemName(subscribe.item_id).name.toLowerCase();
+            const storeName = generateStoreName(subscribe.store_id).name.toLowerCase();
+            if (search && !itemName.includes(search) && !storeName.includes(search)) match = false;
+            if (dateStart && subscribe.create_time < Math.floor(new Date(dateStart).getTime() / 1000)) match = false;
+            if (dateEnd && subscribe.create_time > Math.floor(new Date(dateEnd).getTime() / 1000)) match = false;
+            return match;
+        });
+
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function resetFilters() {
+        document.getElementById('filter-search').value = '';
+        document.getElementById('filter-date-start').value = '';
+        document.getElementById('filter-date-end').value = '';
+        filteredSubscribes = [...allSubscribes];
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function renderTableHeader() {
+        const header = document.getElementById('subscribe-table-header');
+        header.innerHTML = '<tr>' + Object.entries(subscribeListConfig)
+            .map(([_, config]) => `<th>${config.label}</th>`).join('') + '</tr>';
+    }
+
+    function renderTableBody() {
+        const body = document.getElementById('subscribe-table-body');
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const paginatedSubscribes = filteredSubscribes.slice(start, end);
+        body.innerHTML = paginatedSubscribes.map(subscribe => `
+            <tr>
+                ${Object.entries(subscribeListConfig).map(([key, config]) => {
+            const value = subscribe[key];
+            const formatFn = config.format || (v => v);
+            const formattedValue = key === 'item_id' || key === 'store_id' || key === 'operation' ? formatFn(value, subscribe) : formatFn(value);
+            return `<td>${formattedValue}</td>`;
+        }).join('')}
+            </tr>
+        `).join('');
+    }
+
+    function renderPagination() {
+        let pageOptions = `<select id="page-size" onchange="changePageSize()">`;
+        pageConfig.forEach(item => {
+            pageOptions += `<option value="${item.page}" ${item.page === pageSize ? 'selected' : ''}>${item.page}条/页</option>`;
+        });
+        pageOptions += `</select>`;
+
+        const totalPages = Math.ceil(filteredSubscribes.length / pageSize);
+        const paginationDiv = document.getElementById('subscribe-pagination');
+        paginationDiv.innerHTML = `
+            <button class="btn-small pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
+            <span>第 ${currentPage} 页 / 共 ${totalPages} 页</span>
+            <button class="btn-small pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
+            <div class="pagination-options">
+                ${pageOptions}
+                <input type="number" id="jump-page" min="1" max="${totalPages}" placeholder="页">
+                <button class="btn-small" onclick="jumpToPage()">跳转</button>
+            </div>
+        `;
+    }
+
+    function changePage(newPage) {
+        const totalPages = Math.ceil(filteredSubscribes.length / pageSize);
+        if (newPage >= 1 && newPage <= totalPages) {
+            currentPage = newPage;
+            renderTableBody();
+            renderPagination();
+        }
+    }
+
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('page-size').value);
+        currentPage = 1;
+        renderTableBody();
+        renderPagination();
+    }
+
+    function jumpToPage() {
+        const totalPages = Math.ceil(filteredSubscribes.length / pageSize);
+        const page = parseInt(document.getElementById('jump-page').value);
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderTableBody();
+            renderPagination();
+        }
+    }
+
+    function deleteSubscribe(id) {
+        if (confirm(`确定要删除订阅 ID: ${id} 吗？`)) {
+            filteredSubscribes = filteredSubscribes.filter(subscribe => subscribe.id !== id);
+            allSubscribes.splice(allSubscribes.findIndex(subscribe => subscribe.id === id), 1);
+            renderTableBody();
+            renderPagination();
+            console.log(`已删除订阅 ID: ${id}`);
+        }
+    }
+
+    let currentEditId = null;
+
+    function editSubscribe(id) {
+        const subscribe = allSubscribes.find(s => s.id === id);
+        if (!subscribe) return;
+
+        currentEditId = id;
+        const { name } = generateItemName(subscribe.item_id);
+        const { name: storeName } = generateStoreName(subscribe.store_id);
+
+        document.getElementById('edit-item-image').src = `https://picsum.photos/200/200?random=${id}`;
+        document.getElementById('edit-item-name').innerHTML = `<a href="/site/item.html?name=${encodeURIComponent(name)}" class="item-name" data-full="${name}"><i class="fa fa-shopping-cart"></i> ${name}</a>`;
+        document.getElementById('edit-store-name').innerHTML = `<a href="/site/store.html?name=${encodeURIComponent(storeName)}"><i class="fa fa-store"></i> ${storeName}</a>`;
+        document.getElementById('edit-notice-price').value = subscribe.notice_price;
+        document.getElementById('edit-notice-stock').value = subscribe.notice_stock_num;
+
+        document.getElementById('edit-dialog').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('edit-dialog').style.display = 'none';
+        currentEditId = null;
+    }
+
+    function saveEdit() {
+        if (currentEditId === null) return;
+
+        const noticePrice = parseFloat(document.getElementById('edit-notice-price').value);
+        const noticeStock = parseInt(document.getElementById('edit-notice-stock').value);
+
+        if (isNaN(noticePrice) || noticePrice < 0 || isNaN(noticeStock) || noticeStock < 0) {
+            alert('请输入有效的价格和库存数量');
+            return;
+        }
+
+        const subscribe = allSubscribes.find(s => s.id === currentEditId);
+        if (subscribe) {
+            subscribe.notice_price = noticePrice;
+            subscribe.notice_stock_num = noticeStock;
+            filteredSubscribes = filteredSubscribes.map(s => s.id === currentEditId ? subscribe : s);
+            renderTableBody();
+            closeEditModal();
+            console.log(`已更新订阅 ID: ${currentEditId}，价格低于: ${noticePrice}，库存高于: ${noticeStock}`);
+        }
+    }
+
+    // 初始化页面
+    window.onload = () => {
+        w3.includeHTML(() => {
+            initSubscribePage();
+            document.getElementById('edit-dialog').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    closeEditModal();
+                }
+            });
+        });
+    };
+</script>
+</body>
+</html>

@@ -23,13 +23,14 @@ let memberMenuConfig = [
     { text: "我的订单", icon: "fas fa-box-open", show: true, memberSidebar: true, store: false, href: "/site/member/orders.html" },
     { text: "我的需求", icon: "fas fa-clipboard-list", show: true, memberSidebar: true, store: false, href: "/site/member/demands.html" },
     { text: "Top-Up", icon: "fas fa-wallet", show: true, memberSidebar: false, store: false, href: "/site/#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
-    { text: "资金记录", icon: "fas fa-money-check-alt", show: true, memberSidebar: true, store: false, href: "/site/member/transactions.html" },
-    { text: "我的消息", icon: "fas fa-envelope", show: true, memberSidebar: true, store: false, href: "/site/member/message.html" },
-    { text: "我的收藏", icon: "fas fa-heart", show: true, memberSidebar: true, store: false, href: "/site/member/save-list.html" },
-    { text: "我的评论", icon: "fas fa-comment-alt", show: true, memberSidebar: true, store: false, href: "/site/member/reviews.html" },
-    { text: "个人资料", icon: "fas fa-user-circle", show: true, memberSidebar: true, store: false, href: "/site/member/profile.html" },
+    { text: "资金记录", icon: "fas fa-money-check-alt", show: false, memberSidebar: true, store: false, href: "/site/member/transactions.html" },
+    { text: "我的消息", icon: "fas fa-envelope", show: false, memberSidebar: true, store: false, href: "/site/member/message.html" },
+    { text: "我的收藏", icon: "fas fa-heart", show: false, memberSidebar: true, store: false, href: "/site/member/save-list.html" },
+    { text: "我的订阅", icon: "fas fa-bell", show: false, memberSidebar: true, store: false, href: "/site/member/subscribe-list.html" },
+    { text: "我的评论", icon: "fas fa-comment-alt", show: false, memberSidebar: true, store: false, href: "/site/member/reviews.html" },
+    { text: "账户日志", icon: "fas fa-list-alt", show: false, memberSidebar: true, store: false, href: "/site/member/logs.html" },
+    { text: "个人资料", icon: "fas fa-user-circle", show: false, memberSidebar: true, store: false, href: "/site/member/profile.html" },
     { text: "账户设置", icon: "fas fa-cog", show: true, memberSidebar: true, store: false, href: "/site/member/setting.html" },
-    { text: "账户日志", icon: "fas fa-list-alt", show: true, memberSidebar: true, store: false, href: "/site/member/logs.html" },
     { text: "Logout", icon: "fas fa-sign-out-alt", show: true, memberSidebar: false, store: false, href: "/site/#", onclick: "logout()" }
 ];
 
