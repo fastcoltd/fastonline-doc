@@ -360,7 +360,19 @@ function sendMessage(orderId, type) {
     let content = '';
     switch (type) {
         case 'text':
+            let maxLine = 10, maxSize = 300
             content = document.getElementById('chat-text-input').value.trim();
+            let lines = content.split("\n")
+            if (lines.length > maxLine){
+                alert(`content not more than ${maxLine} lines`)
+                return;
+            }
+            if (content.length > maxSize){
+                alert(`content length not more than ${maxSize}`)
+                return;
+            }
+
+            content = content.replaceAll("\n", "<br/>")
             if (!content) return;
             break;
         case 'image':
