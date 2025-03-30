@@ -108,7 +108,7 @@ function updateHeaderUI() {
                     </div>
                 </div>
                 <div class="user-avatar-wrapper${haveStore ? ' has-store' : ''}">
-                    <a href="/member/index.html" class="user-avatar"><img src="${getPicsumImage(40, 40, userData.username)}" alt="${userData.username}"></a>
+                    <a href="/site/member/profile.html" class="user-avatar"><img src="${getPicsumImage(40, 40, userData.username)}" alt="${userData.username}"></a>
                     <div class="user-menu">
                         ${generateUserMenu()}
                     </div>
