@@ -61,17 +61,19 @@
 <script src="../_fields.js"></script>
 <script src="../_data.js"></script>
 <script>
-    // 电商相关的变动类型
     const transactionTypes = [
         { value: 0, label: '充值', isIncome: true },
         { value: 1, label: '购物', isIncome: false },
         { value: 2, label: '知识付费', isIncome: false },
         { value: 3, label: '需求定金', isIncome: false },
         { value: 4, label: '需求尾款', isIncome: false },
-        { value: 5, label: '退款', isIncome: true }
+        { value: 5, label: '退款', isIncome: true },
+        { value: 6, label: '商品销售', isIncome: true },  // 新增
+        { value: 7, label: '投标款', isIncome: true },    // 新增
+        { value: 8, label: '文章收入', isIncome: true }   // 新增
     ];
 
-    // 生成真实的 change_info
+    // 生成真实的 change_info（仅新增三项的生成逻辑）
     function generateChangeInfo(type, amount) {
         switch (type) {
             case 0: // 充值
@@ -86,6 +88,12 @@
                 return `支付 ${faker.company.companyName()} 需求尾款`;
             case 5: // 退款
                 return `${faker.datatype.number({ min: 100000, max: 999999 })} 订单退款`;
+            case 6: // 商品销售
+                return `销售 ${faker.commerce.productName()} 商品收入 $${amount.toFixed(2)}`;
+            case 7: // 投标款
+                return `${faker.company.companyName()} 项目投标款 $${amount.toFixed(2)}`;
+            case 8: // 文章收入
+                return `${faker.lorem.sentence(3)} 文章收入 $${amount.toFixed(2)}`;
             default:
                 return '未知交易';
         }
@@ -99,18 +107,18 @@
             label: '变动类型',
             format: (d, v) => {
                 const type = transactionTypes.find(t => t.value === v);
-                return type ? type.label : '未知类型'; // 如果 v 无效，返回默认值
+                return type ? type.label : '未知类型';
             },
-            sample: () => faker.datatype.number({ min: 0, max: 5 })
+            sample: () => faker.datatype.number({ min: 0, max: 8 }) // 扩展到 8
         },
         change_money: {
             ...userTransactionFieldConfig.change_money,
             label: '变动金额',
             format: (d, v, transaction) => {
-                const type = transactionTypes.find(t => t.value === transaction.change_type) || { isIncome: false };
+                const type = transactionTypes.find(t => t.value === transaction.change_type.sample) || { isIncome: false };
                 const symbol = type.isIncome ? '+' : '-';
-                const color = type.isIncome ? '#32CD32' : '#FF4500'; // 收入绿色，支出红色
-                return `<span style="color: ${color}">${symbol} ${v}</span>`;
+                const color = type.isIncome ? '#32CD32' : '#FF4500';
+                return `<span style="font-weight:bold; color: ${color}">${symbol}${v}</span>`;
             }
         },
         rest_amount: { ...userTransactionFieldConfig.rest_amount, label: '剩余金额', format: v => v },
@@ -118,14 +126,11 @@
         change_info: {
             ...userTransactionFieldConfig.change_info,
             label: '变动信息',
-            format: (d, v) => {
-                return `<span class="change-info-text" title="${v}">${v}</span>`
-            },
+            format: (d, v) => `<span class="change-info-text" data-full="${v}">${v}</span>`,
             sample: () => {
-                const type = faker.datatype.number({ min: 0, max: 5 });
+                const type = faker.datatype.number({ min: 0, max: 8 });
                 const amount = faker.datatype.float({ min: 10, max: 1000, precision: 0.01 });
-                let a = generateChangeInfo(type, amount);
-                return a
+                return generateChangeInfo(type, amount);
             }
         },
         status: { ...userTransactionFieldConfig.status, label: '状态', format: (d, v) => `<span style="color: ${v === 0 ? '#A9A9A9' : '#32CD32'}">${v === 0 ? '待处理' : '已完成'}</span>` },
