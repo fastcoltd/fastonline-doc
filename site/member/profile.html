@@ -40,6 +40,11 @@
                                 <span id="amount" style="color: var(--font-orange);font-weight: bold"></span>
                                 <button class="btn-small" onclick="topUp()">Top Up</button>
                             </div>
+                            <div class="profile-field">
+                                <label>关于我:</label>
+                                <span id="about_me"></span>
+                                <i class="fas fa-edit edit-icon" onclick="editAboutMe()"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -178,7 +183,8 @@
             timezone: 'Asia/Shanghai',
             amount: faker.finance.amount(0, 10000, 2),
             avatar: getPicsumImage(300, 200, 'avatar'),
-            lastUsernameChange: null
+            lastUsernameChange: null,
+            about_me: faker.lorem.words(10).slice(0, 128) || '未设置' // 添加 about_me，限制128字符
         };
 
         const platforms = ['Google', 'Apple'];
@@ -187,12 +193,12 @@
         document.getElementById('username').textContent = userData.username;
         document.getElementById('email').textContent = maskEmail(userData.email);
 
-        let icon
-        if (userData.verified){
-            icon = `<i class="fas fa-check-circle" style="color:green;"></i> 已验证`
+        let icon;
+        if (userData.verified) {
+            icon = `<i class="fas fa-check-circle" style="color:green;"></i> 已验证`;
             document.getElementById('change-email-btn').style.display = 'inline-block';
-        }else{
-            icon = `<i class="fas fa-times-circle" style="color:red;"></i> 未验证`
+        } else {
+            icon = `<i class="fas fa-times-circle" style="color:red;"></i> 未验证`;
             document.getElementById('verify-email-btn').style.display = 'inline-block';
         }
         document.getElementById('email-status').innerHTML = icon;
@@ -207,6 +213,7 @@
         document.getElementById('language').textContent = getFullOption(userData.language, 'language');
         document.getElementById('timezone').textContent = getFullOption(userData.timezone, 'timezone');
         document.getElementById('amount').textContent = `$${userData.amount}`;
+        document.getElementById('about_me').textContent = userData.about_me || '未设置'; // 初始化 about_me
         document.getElementById('avatar-img').src = userData.avatar || '';
         document.getElementById('avatar-img').onerror = () => {
             document.getElementById('avatar-img').style.background = '#e0e0e0';
@@ -352,6 +359,26 @@
         }
     }
 
+    function editAboutMe() {
+        const currentValue = userData.about_me || '';
+        showDialog('编辑关于我', `
+            <textarea id="about-me-input" class="dialog-textarea" maxlength="128" placeholder="最多128个字符">${currentValue}</textarea>
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="saveAboutMe()">保存</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+    }
+
+    function saveAboutMe() {
+        const input = document.getElementById('about-me-input');
+        if (!input) return;
+        const value = input.value.trim();
+        userData.about_me = value.slice(0, 128); // 限制最大128字符
+        document.getElementById('about_me').textContent = value || '未设置';
+        closeDialog();
+    }
+
     function topUp() {
         alert('请前往充值页面完成充值操作');
     }
@@ -379,7 +406,7 @@
             userData.verified = 1;
             document.getElementById('email-status').innerHTML = '<i class="fas fa-check-circle" style="color:green;"></i> 已验证';
             document.getElementById('verify-email-btn').style.display = 'none';
-            document.getElementById('change-email-btn').style.display = 'block';
+            document.getElementById('change-email-btn').style.display = 'inline-block';
             closeDialog();
             alert('邮箱验证成功');
         } else {
@@ -668,6 +695,16 @@
         width: 100%;
         box-sizing: border-box;
         margin: 0;
+    }
+    .dialog-textarea {
+        padding: 0.5em;
+        border: 1px solid var(--border-color);
+        border-radius: 0.375em;
+        font-size: var(--font-medium);
+        width: 100%;
+        height: 100px;
+        box-sizing: border-box;
+        resize: none;
     }
     .dialog-select {
         padding: 0.5em;
