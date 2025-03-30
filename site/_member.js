@@ -1,39 +1,3 @@
-const paymentMethods = [
-    { name: 'Digital', feeType: 'fixed', fee: 2, minAmount: 10 },
-    { name: 'PayPal', feeType: 'percent', fee: 0.029, minAmount: 20 },
-    { name: 'Alipay', feeType: 'fixed', fee: 1.5, minAmount: 15 },
-    { name: 'Stripe', feeType: 'percent', fee: 0.025, minAmount: 25 }
-];
-let memberMenuConfig = [
-    { text: "店铺管理", style: `color:var(--natural-green)`, icon: "fas fa-store", show: () => userHasStore(), memberSidebar: false, storeSidebar: true, href: "/site/store/overview.html", sub: [
-            { text: "店铺中心", icon: "fas fa-tachometer-alt", href: "/site/store/overview.html" },
-            { text: "店铺订单", icon: "fas fa-box-open", href: "/site/store/order-list.html" },
-            { text: "库存管理", icon: "fas fa-warehouse", href: "/site/store/stock-manage.html" },
-            { text: "商品管理", icon: "fas fa-shopping-bag", href: "/site/store/item-manage.html" },
-            { text: "商品FAQ", icon: "fas fa-question-circle", href: "/site/store/item-faq.html" },
-            { text: "提现管理", icon: "fas fa-money-check-alt", href: "/site/#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
-            { text: "博客设置", icon: "fas fa-blog", href: "/site/store/blog.html" },
-            { text: "文章管理", icon: "fas fa-newspaper", href: "/site/store/posts-manage.html" },
-            { text: "店铺员工", icon: "fas fa-users", href: "/site/store/staff.html" },
-            { text: "店铺KYC", icon: "fas fa-id-card", href: "/site/store/kyc.html" },
-            { text: "店铺消息", icon: "fas fa-envelope", href: "/site/store/message.html" },
-            { text: "店铺设置", icon: "fas fa-cogs", href: "/site/store/setting.html" },
-            { text: "店铺日志", icon: "fas fa-list-alt", href: "/site/store/logs.html" },
-        ]},
-    { text: "我的订单", icon: "fas fa-shopping-cart", show: true, memberSidebar: true, store: false, href: "/site/member/orders.html" },
-    { text: "我的需求", icon: "fas fa-clipboard-list", show: true, memberSidebar: true, store: false, href: "/site/member/demands.html" },
-    { text: "Top-Up", icon: "fas fa-wallet", show: true, memberSidebar: false, store: false, href: "/site/#", onclick: "showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })" },
-    { text: "资金记录", icon: "fas fa-money-check-alt", show: false, memberSidebar: true, store: false, href: "/site/member/transactions.html" },
-    { text: "我的消息", icon: "fas fa-envelope", show: false, memberSidebar: true, store: false, href: "/site/member/message.html" },
-    { text: "我的收藏", icon: "fas fa-heart", show: false, memberSidebar: true, store: false, href: "/site/member/save-list.html" },
-    { text: "我的订阅", icon: "fas fa-bell", show: false, memberSidebar: true, store: false, href: "/site/member/subscribe-list.html" },
-    { text: "我的评论", icon: "fas fa-comment-alt", show: false, memberSidebar: true, store: false, href: "/site/member/reviews.html" },
-    { text: "账户日志", icon: "fas fa-list-alt", show: false, memberSidebar: true, store: false, href: "/site/member/logs.html" },
-    { text: "个人资料", icon: "fas fa-user-circle", show: false, memberSidebar: true, store: false, href: "/site/member/profile.html" },
-    { text: "账户设置", icon: "fas fa-cog", show: true, memberSidebar: true, store: false, href: "/site/member/setting.html" },
-    { text: "Logout", icon: "fas fa-sign-out-alt", show: true, memberSidebar: false, store: false, href: "/site/#", onclick: "logout()" }
-];
-
 // _member.js
 let signInRegisterStyle = { width: '35em' };
 
