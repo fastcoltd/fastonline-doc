@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>个人资料 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../_site.css">
+    <link rel="stylesheet" href="_member.css">
+</head>
+<body>
+<div w3-include-html="../_header.html"></div>
+<div class="member-wrapper">
+    <div w3-include-html="_sidebar.html"></div>
+    <div class="member-container">
+        <div class="member-section">
+            <div class="profile-container">
+                <div class="profile-section">
+                    <h3 class="profile-section-title">基本信息</h3>
+                    <div class="profile-basic">
+                        <div class="profile-avatar">
+                            <img id="avatar-img" src="" alt="头像" class="avatar-circle">
+                            <div class="avatar-edit-overlay" onclick="editAvatar()">
+                                <i class="fas fa-edit"></i> 编辑
+                            </div>
+                        </div>
+                        <div class="profile-basic-details">
+                            <div class="profile-field">
+                                <label>用户名:</label>
+                                <span id="username"></span>
+                                <i class="fas fa-edit edit-icon" onclick="editUsername()"></i>
+                            </div>
+                            <div class="profile-field">
+                                <label>昵称:</label>
+                                <span id="nickname"></span>
+                                <i class="fas fa-edit edit-icon" onclick="editField('nickname')"></i>
+                            </div>
+                            <div class="profile-field">
+                                <label>余额:</label>
+                                <span id="amount" style="color: var(--font-orange);font-weight: bold"></span>
+                                <button class="btn-small" onclick="topUp()">Top Up</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">个人信息</h3>
+                    <div class="profile-field-row">
+                        <div class="profile-field">
+                            <label>名字:</label>
+                            <span id="first_name"></span>
+                            <i class="fas fa-edit edit-icon" onclick="editField('first_name')"></i>
+                        </div>
+                        <div class="profile-field">
+                            <label>姓氏:</label>
+                            <span id="last_name"></span>
+                            <i class="fas fa-edit edit-icon" onclick="editField('last_name')"></i>
+                        </div>
+                    </div>
+                    <div class="profile-field-row">
+                        <div class="profile-field">
+                            <label>性别:</label>
+                            <span id="gender"></span>
+                            <i class="fas fa-edit edit-icon" onclick="editDropdown('gender', ['未知', '男', '女'])"></i>
+                        </div>
+                        <div class="profile-field">
+                            <label>生日:</label>
+                            <span id="birth_date"></span>
+                            <i class="fas fa-edit edit-icon" onclick="editField('birth_date', 'date')"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">联系信息</h3>
+                    <div class="profile-field-row">
+                        <div class="profile-field profile-field-full">
+                            <label>邮箱:</label>
+                            <span id="email"></span>
+                            <span id="email-status"></span>
+                            <button id="verify-email-btn" class="btn-small" style="display:none;" onclick="verifyEmail()">现在验证</button>
+                            <button id="change-email-btn" class="btn-small" style="display:none;" onclick="changeEmail()">修改邮箱</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">地区设置</h3>
+                    <div class="profile-field-row">
+                        <div class="profile-field">
+                            <label>国家:</label>
+                            <span id="country"></span>
+                            <i class="fas fa-edit edit-icon" onclick="editField('country')"></i>
+                        </div>
+                        <div class="profile-field">
+                            <label>货币:</label>
+                            <span id="currency"></span>
+                            <i class="fas fa-edit edit-icon" onclick="editSelector('currency')"></i>
+                        </div>
+                    </div>
+                    <div class="profile-field-row">
+                        <div class="profile-field">
+                            <label>语言:</label>
+                            <span id="language"></span>
+                            <i class="fas fa-edit edit-icon" onclick="editSelector('language')"></i>
+                        </div>
+                        <div class="profile-field">
+                            <label>时区:</label>
+                            <span id="timezone"></span>
+                            <i class="fas fa-edit edit-icon" onclick="editSelector('timezone')"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">绑定信息</h3>
+                    <div class="profile-field-row">
+                        <div class="profile-field profile-field-full">
+                            <label>绑定平台:</label>
+                            <span id="user_bind"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="dialog" class="custom-dialog" style="display: none;">
+    <div class="custom-dialog-content">
+        <div class="custom-dialog-header">
+            <h3 id="dialog-title"></h3>
+            <button class="custom-dialog-close" onclick="closeDialog()">×</button>
+        </div>
+        <div class="custom-dialog-body" id="dialog-body"></div>
+    </div>
+</div>
+<div w3-include-html="../_footer.html"></div>
+
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="../_location.js"></script>
+<script src="../_common.js"></script>
+<script src="../_member.js"></script>
+<script src="_mCommon.js"></script>
+<script src="_ticket.js"></script>
+<script src="../_fields.js"></script>
+<script src="../_data.js"></script>
+<script>
+    let userData = {};
+    let countdownTimer;
+
+    function getPicsumImage(width, height, seed) {
+        return `https://picsum.photos/seed/${seed}/${width}/${height}`;
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            try {
+                initProfile();
+            } catch (e) {
+                console.error('初始化失败:', e);
+                alert('页面加载出错，请刷新重试');
+            }
+        });
+    };
+
+    function initProfile() {
+        userData = {
+            id: 1,
+            username: faker.internet.userName(),
+            email: faker.internet.email(),
+            verified: Math.random() > 0.5 ? 1 : 0,
+            nickname: faker.name.findName(),
+            first_name: faker.name.firstName(),
+            last_name: faker.name.lastName(),
+            birth_date: faker.date.past(30).toISOString().split('T')[0],
+            gender: faker.datatype.number({ min: 0, max: 2 }),
+            country: faker.address.country(),
+            currency: 'USD',
+            language: 'en_US',
+            timezone: 'Asia/Shanghai',
+            amount: faker.finance.amount(0, 10000, 2),
+            avatar: getPicsumImage(300, 200, 'avatar'),
+            lastUsernameChange: null
+        };
+
+        const platforms = ['Google', 'Apple'];
+        userData.bindPlatform = platforms[Math.floor(Math.random() * platforms.length)];
+
+        document.getElementById('username').textContent = userData.username;
+        document.getElementById('email').textContent = maskEmail(userData.email);
+
+        let icon
+        if (userData.verified){
+            icon = `<i class="fas fa-check-circle" style="color:green;"></i> 已验证`
+            document.getElementById('change-email-btn').style.display = 'inline-block';
+        }else{
+            icon = `<i class="fas fa-times-circle" style="color:red;"></i> 未验证`
+            document.getElementById('verify-email-btn').style.display = 'inline-block';
+        }
+        document.getElementById('email-status').innerHTML = icon;
+
+        document.getElementById('nickname').textContent = userData.nickname || '未设置';
+        document.getElementById('first_name').textContent = userData.first_name || '未设置';
+        document.getElementById('last_name').textContent = userData.last_name || '未设置';
+        document.getElementById('gender').textContent = ['未知', '男', '女'][userData.gender];
+        document.getElementById('birth_date').textContent = userData.birth_date || '未设置';
+        document.getElementById('country').textContent = userData.country || '未设置';
+        document.getElementById('currency').textContent = getFullOption(userData.currency, 'currency');
+        document.getElementById('language').textContent = getFullOption(userData.language, 'language');
+        document.getElementById('timezone').textContent = getFullOption(userData.timezone, 'timezone');
+        document.getElementById('amount').textContent = `$${userData.amount}`;
+        document.getElementById('avatar-img').src = userData.avatar || '';
+        document.getElementById('avatar-img').onerror = () => {
+            document.getElementById('avatar-img').style.background = '#e0e0e0';
+        };
+        document.getElementById('user_bind').innerHTML = `<img src="${userData.bindPlatform === 'Google' ? 'https://logo.clearbit.com/google.com' : 'https://logo.clearbit.com/apple.com'}" alt="${userData.bindPlatform}" style="width:24px;height:24px;border-radius:50%;"> ${userData.bindPlatform}`;
+    }
+
+    function maskEmail(email) {
+        const [local, domain] = email.split('@');
+        return `${local.slice(0, 6)}${'*'.repeat(Math.max(local.length - 6, 0))}@${domain}`;
+    }
+
+    function getFullOption(code, type) {
+        const data = type === 'currency' ? currencies : type === 'language' ? languages : timezones;
+        const item = data.find(d => d.code === code);
+        return item ? `${item.name} (${item.country})` : code;
+    }
+
+    function editUsername() {
+        const now = new Date();
+        const lastChange = userData.lastUsernameChange ? new Date(userData.lastUsernameChange) : null;
+        const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
+
+        if (lastChange && (now - lastChange) < oneYearInMs) {
+            const nextChangeDate = new Date(lastChange.getTime() + oneYearInMs);
+            alert(`用户名今年已修改过，今年不可再次修改。下次可修改时间为 ${nextChangeDate.toLocaleDateString()}`);
+            return;
+        }
+
+        showDialog('修改用户名', `
+            <p class="dialog-message">Tips: 用户名一年可修改一次</p>
+            <input type="text" id="username-input" value="${userData.username}" class="dialog-input">
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="saveUsername()">保存</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+    }
+
+    function saveUsername() {
+        const input = document.getElementById('username-input');
+        if (!input) return;
+        const value = input.value.trim();
+        if (value && value !== userData.username) {
+            userData.username = value;
+            userData.lastUsernameChange = new Date();
+            document.getElementById('username').textContent = value;
+            closeDialog();
+            alert('用户名修改成功，一年内不可再次修改');
+        } else {
+            closeDialog();
+        }
+    }
+
+    function editField(field, type = 'text') {
+        const span = document.getElementById(field);
+        const currentValue = span.textContent === '未设置' ? '' : span.textContent;
+        span.innerHTML = `<input type="${type}" id="${field}-input" value="${currentValue}">`;
+        span.nextElementSibling.outerHTML = `<button class="btn-small" onclick="saveField('${field}', '${type}')">保存</button>`;
+    }
+
+    function editDropdown(field, options) {
+        const span = document.getElementById(field);
+        const currentValue = span.textContent;
+        span.innerHTML = `<select id="${field}-input">${options.map(opt => `<option value="${opt}" ${opt === currentValue ? 'selected' : ''}>${opt}</option>`).join('')}</select>`;
+        span.nextElementSibling.outerHTML = `<button class="btn-small" onclick="saveField('${field}', 'select')">保存</button>`;
+    }
+
+    function editSelector(field) {
+        const type = field;
+        let data;
+        try {
+            data = type === 'currency' ? currencies : type === 'language' ? languages : timezones;
+        } catch (e) {
+            console.error('无法加载 _location.js 数据:', e);
+            alert('选择器数据加载失败，请检查网络或文件路径');
+            return;
+        }
+        const options = data.map(item => `<option value="${item.code}">${item.name} (${item.country})</option>`).join('');
+        showDialog(`${field}选择`, `
+            <select id="${field}-select" class="dialog-select">
+                <option value="">请选择</option>
+                ${options}
+            </select>
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="saveSelector('${field}')">保存</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+    }
+
+    function saveField(field, type) {
+        const input = document.getElementById(`${field}-input`);
+        if (!input) return;
+        const value = type === 'select' ? input.value : input.value.trim();
+        if (value) {
+            userData[field] = type === 'select' ? ['未知', '男', '女'].indexOf(value) : value;
+            document.getElementById(field).textContent = value;
+        } else {
+            document.getElementById(field).textContent = userData[field] || '未设置';
+        }
+        document.getElementById(field).nextElementSibling.outerHTML = `<i class="fas fa-edit edit-icon" onclick="edit${type === 'select' ? 'Dropdown' : 'Field'}('${field}'${type === 'select' ? ', [\'未知\', \'男\', \'女\']' : ''})"></i>`;
+    }
+
+    function saveSelector(field) {
+        const select = document.getElementById(`${field}-select`);
+        if (!select) return;
+        const value = select.value;
+        if (value) {
+            userData[field] = value;
+            document.getElementById(field).textContent = getFullOption(value, field);
+            closeDialog();
+        } else {
+            alert('请选择一个值');
+        }
+    }
+
+    function editAvatar() {
+        showDialog('修改头像', `
+            <input type="file" id="avatar-upload" accept="image/*" class="dialog-input">
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="uploadAvatar()">上传</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+    }
+
+    function uploadAvatar() {
+        const fileInput = document.getElementById('avatar-upload');
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                userData.avatar = e.target.result;
+                document.getElementById('avatar-img').src = userData.avatar;
+                document.getElementById('avatar-img').style.background = 'none';
+                closeDialog();
+                alert('头像上传成功');
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert('请选择一个图片文件');
+        }
+    }
+
+    function topUp() {
+        alert('请前往充值页面完成充值操作');
+    }
+
+    function verifyEmail() {
+        showDialog('验证邮箱', `
+            <p class="dialog-message">我们已经发送一份绑定校验邮件至 ${maskEmail(userData.email)}</p>
+            <div class="dialog-input-group">
+                <input type="text" id="email-code" placeholder="输入验证码" class="dialog-input">
+                <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 60s</button>
+            </div>
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="confirmEmail()">绑定</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+        startCountdown(60, () => resetCountdownButton('countdown-btn', verifyEmail));
+    }
+
+    function confirmEmail() {
+        const codeInput = document.getElementById('email-code');
+        if (!codeInput) return;
+        const code = codeInput.value;
+        if (code === '123456') {
+            userData.verified = 1;
+            document.getElementById('email-status').innerHTML = '<i class="fas fa-check-circle" style="color:green;"></i> 已验证';
+            document.getElementById('verify-email-btn').style.display = 'none';
+            document.getElementById('change-email-btn').style.display = 'block';
+            closeDialog();
+            alert('邮箱验证成功');
+        } else {
+            alert('验证码错误');
+        }
+    }
+
+    function changeEmail() {
+        if (userData.verified) {
+            showDialog('修改邮箱 - 验证旧邮箱', `
+                <p class="dialog-message">我们已经发送一份修改邮箱的验证码到你的邮箱 ${maskEmail(userData.email)}</p>
+                <div class="dialog-input-group">
+                    <input type="text" id="old-email-code" placeholder="输入验证码" class="dialog-input">
+                    <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 60s</button>
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-orange-solid-small" onclick="verifyOldEmail()">下一步</button>
+                    <button class="btn-small" onclick="closeDialog()">取消</button>
+                </div>
+            `);
+            startCountdown(60, () => resetCountdownButton('countdown-btn', changeEmail));
+        } else {
+            showNewEmailDialog();
+        }
+    }
+
+    function verifyOldEmail() {
+        const codeInput = document.getElementById('old-email-code');
+        if (!codeInput) return;
+        const code = codeInput.value;
+        if (code === '123456') {
+            showNewEmailDialog();
+        } else {
+            alert('验证码错误');
+        }
+    }
+
+    function showNewEmailDialog() {
+        showDialog('修改邮箱 - 输入新邮箱', `
+            <input type="email" id="new-email" placeholder="输入新邮箱" class="dialog-input">
+            <button class="btn-orange-solid-small" id="send-email-code" onclick="sendNewEmailCode()">发送验证码</button>
+            <div id="verify-section" style="display:none;">
+                <div class="dialog-input-group">
+                    <input type="text" id="new-email-code" placeholder="输入验证码" class="dialog-input">
+                    <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 60s</button>
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-orange-solid-small" onclick="confirmNewEmail()">下一步</button>
+                    <button class="btn-small" onclick="closeDialog()">取消</button>
+                </div>
+            </div>
+        `);
+    }
+
+    function sendNewEmailCode() {
+        const newEmailInput = document.getElementById('new-email');
+        if (!newEmailInput) return;
+        const newEmail = newEmailInput.value;
+        if (!newEmail.includes('@')) {
+            alert('请输入有效的邮箱地址');
+            return;
+        }
+        document.getElementById('send-email-code').style.display = 'none';
+        document.getElementById('verify-section').style.display = 'block';
+        const countdownBtn = document.getElementById('countdown-btn');
+        countdownBtn.disabled = true;
+        countdownBtn.textContent = '发送 60s';
+        startCountdown(60, () => resetCountdownButton('countdown-btn', () => sendNewEmailCode()));
+        alert(`验证码已发送至 ${maskEmail(newEmail)}`);
+    }
+
+    function confirmNewEmail() {
+        const newEmailInput = document.getElementById('new-email');
+        const codeInput = document.getElementById('new-email-code');
+        if (!newEmailInput || !codeInput) return;
+        const newEmail = newEmailInput.value;
+        const code = codeInput.value;
+        if (code === '123456') {
+            userData.email = newEmail;
+            userData.verified = 0;
+            document.getElementById('email').textContent = maskEmail(newEmail);
+            // document.getElementById('email-status').innerHTML = '<i class="fas fa-times-circle" style="color:red;"></i> 未验证';
+            document.getElementById('verify-email-btn').style.display = 'none';
+            closeDialog();
+            alert('邮箱修改成功，请重新验证');
+        } else {
+            alert('验证码错误');
+        }
+    }
+
+    function startCountdown(seconds, callback) {
+        clearInterval(countdownTimer);
+        let timeLeft = seconds;
+        const countdownBtn = document.getElementById('countdown-btn');
+        if (!countdownBtn) return;
+        countdownBtn.textContent = `发送 ${timeLeft}s`;
+        countdownBtn.disabled = true;
+        countdownTimer = setInterval(() => {
+            timeLeft--;
+            countdownBtn.textContent = `发送 ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                clearInterval(countdownTimer);
+                callback();
+            }
+        }, 1000);
+    }
+
+    function resetCountdownButton(btnId, resendCallback) {
+        const countdownBtn = document.getElementById(btnId);
+        if (countdownBtn) {
+            countdownBtn.textContent = '发送';
+            countdownBtn.disabled = false;
+            countdownBtn.onclick = resendCallback;
+        }
+    }
+
+    function showDialog(title, content) {
+        const dialog = document.getElementById('dialog');
+        if (!dialog) return;
+        document.getElementById('dialog-title').textContent = title;
+        document.getElementById('dialog-body').innerHTML = content;
+        dialog.style.display = 'flex';
+    }
+
+    function closeDialog() {
+        const dialog = document.getElementById('dialog');
+        if (dialog) {
+            dialog.style.display = 'none';
+            clearInterval(countdownTimer);
+        }
+    }
+</script>
+<style>
+    .profile-container { padding: 1em; }
+    .profile-section {
+        background: var(--bg-white);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5em;
+        padding: 1em;
+        margin-bottom: 1.5em;
+    }
+    .profile-section-title {
+        font-size: var(--font-large);
+        color: var(--text-primary);
+        margin-bottom: 1em;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.5em;
+    }
+    .profile-field-row {
+        display: flex;
+        gap: 1em;
+        flex-wrap: wrap;
+        margin-bottom: 0.5em;
+    }
+    .profile-field {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        min-width: 200px;
+    }
+    .profile-field-full {
+        flex: 2;
+        min-width: 100%;
+    }
+    .profile-field label {
+        width: 100px;
+        font-weight: bold;
+        color: var(--text-primary);
+    }
+    .edit-icon {
+        cursor: pointer;
+        color: var(--natural-green);
+        font-size: var(--icon-size-medium);
+    }
+
+    /* 基本信息左右结构 */
+    .profile-basic {
+        display: flex;
+        gap: 2em;
+        align-items: center;
+    }
+    .profile-avatar {
+        flex: 0 0 auto;
+        position: relative;
+        width: 120px;
+        height: 120px;
+    }
+    .avatar-circle {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #e0e0e0;
+    }
+    .avatar-edit-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+        cursor: pointer;
+        border-radius: 50%;
+        font-size: var(--font-medium);
+    }
+    .profile-avatar:hover .avatar-edit-overlay { opacity: 1; }
+    .profile-basic-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+
+    /* 美化弹窗 */
+    .custom-dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .custom-dialog-content {
+        background: var(--bg-white);
+        border-radius: 0.75em;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .custom-dialog-header {
+        padding: 0.75em 1em;
+        background: var(--bg-light);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .custom-dialog-header h3 {
+        margin: 0;
+        font-size: var(--font-large);
+        color: var(--text-primary);
+    }
+    .custom-dialog-close {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: color 0.2s;
+    }
+    .custom-dialog-close:hover { color: var(--natural-green); }
+    .custom-dialog-body {
+        padding: 1.5em;
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+    .dialog-message {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: var(--font-medium);
+    }
+    .dialog-input {
+        padding: 0.5em;
+        border: 1px solid var(--border-color);
+        border-radius: 0.375em 0 0 0.375em;
+        font-size: var(--font-medium);
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+    }
+    .dialog-select {
+        padding: 0.5em;
+        border: 1px solid var(--border-color);
+        border-radius: 0.375em;
+        font-size: var(--font-medium);
+        width: 100%;
+    }
+    .dialog-input-group {
+        display: flex;
+        align-items: center;
+    }
+    .countdown-btn {
+        padding: 0.5em 1em;
+        border: 1px solid var(--border-color);
+        border-left: none;
+        border-radius: 0 0.375em 0.375em 0;
+        background: var(--bg-light);
+        color: var(--text-secondary);
+        font-size: var(--font-medium);
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .countdown-btn:disabled {
+        color: var(--text-muted);
+        cursor: not-allowed;
+    }
+    .dialog-actions {
+        display: flex;
+        gap: 0.5em;
+        justify-content: flex-end;
+    }
+</style>
+</body>
+</html>

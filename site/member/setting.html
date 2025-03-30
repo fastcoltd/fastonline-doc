@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>设置 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../_site.css">
+    <link rel="stylesheet" href="_member.css">
+</head>
+<body>
+<div w3-include-html="../_header.html"></div>
+<div class="member-wrapper">
+    <div w3-include-html="_sidebar.html"></div>
+    <div class="member-container">
+        <div class="member-section">
+            <div class="settings-container">
+                <div class="settings-section">
+                    <h3 class="settings-section-title">密码管理</h3>
+                    <div class="settings-field-row">
+                        <div class="settings-field settings-field-full">
+                            <label>密码:</label>
+                            <span>****</span>
+                            <i class="fas fa-edit edit-icon" onclick="changePassword()"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3 class="settings-section-title">两步验证</h3>
+                    <div class="settings-field-row">
+                        <div class="settings-field settings-field-full">
+                            <label>两步验证:</label>
+                            <span id="two_factors"></span>
+                            <i id="view-2fa-icon" class="fas fa-eye view-icon" onclick="view2FACode()" style="display:none;"></i>
+                            <button id="enable-2fa-btn" class="btn-small" onclick="enable2FA()" style="display:none;">开启两步验证</button>
+                            <button id="modify-2fa-btn" class="btn-small" onclick="modify2FA()" style="display:none;">修改</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Telegram 绑定</h3>
+                    <div class="settings-field-row">
+                        <div class="settings-field settings-field-full">
+                            <label>Telegram:</label>
+                            <span id="telegram"></span>
+                            <span id="telegram-status"></span>
+                            <a id="telegram-bind-link" href="#" target="_blank" style="display:none;" class="btn-green-small" onmouseover="showTelegramTooltip()" onmouseout="hideTelegramTooltip()">去绑定</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3 class="settings-section-title">API Key</h3>
+                    <div class="settings-field-row">
+                        <div class="settings-field settings-field-full">
+                            <label>API Key:</label>
+                            <span id="api_key"></span>
+                            <i id="view-api-icon" class="fas fa-eye view-icon" onclick="viewApiKey()" style="display:none;"></i>
+                            <button id="generate-api-btn" class="btn-small" onclick="generateApiKey()" style="display:none;">生成</button>
+                            <a id="api-docs-link" href="/site/page.html?api key useage" target="_blank" class="btn-small" style="display:none;">文档</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="dialog" class="custom-dialog" style="display: none;">
+    <div class="custom-dialog-content">
+        <div class="custom-dialog-header">
+            <h3 id="dialog-title"></h3>
+            <button class="custom-dialog-close" onclick="closeDialog()">×</button>
+        </div>
+        <div class="custom-dialog-body" id="dialog-body"></div>
+    </div>
+</div>
+<div id="tooltip" class="custom-tooltip" style="display: none;"></div>
+<div w3-include-html="../_footer.html"></div>
+
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="../_location.js"></script>
+<script src="../_common.js"></script>
+<script src="../_member.js"></script>
+<script src="_mCommon.js"></script>
+<script src="_ticket.js"></script>
+<script src="../_fields.js"></script>
+<script src="../_data.js"></script>
+<script>
+    let userData = {};
+    let countdownTimer;
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            try {
+                initSettings();
+            } catch (e) {
+                console.error('初始化失败:', e);
+                alert('页面加载出错，请刷新重试');
+            }
+        });
+    };
+
+    function initSettings() {
+        userData = {
+            id: 1,
+            email: faker.internet.email(),
+            password: faker.internet.password(),
+            two_factors: Math.random() > 0.5 ? faker.random.alphaNumeric(16, { casing: 'upper' }) : null, // 16位大写
+            telegram: faker.internet.userName(),
+            telegramBound: Math.random() > 0.5,
+            api_key: Math.random() > 0.5 ? faker.random.alphaNumeric(32) : null,
+            twoFaNumericCode: null,
+            twoFaTimestamp: null
+        };
+        if (userData.two_factors) {
+            update2FACode();
+            setInterval(update2FACode, 30000); // 每30秒轮换
+        }
+
+        document.getElementById('two_factors').innerHTML = userData.two_factors ? '<i class="fas fa-check-circle" style="color:green;"></i> 已开启 (***查看)' : '未开启';
+        if (userData.two_factors) document.getElementById('view-2fa-icon').style.display = 'inline-block';
+        document.getElementById(userData.two_factors ? 'modify-2fa-btn' : 'enable-2fa-btn').style.display = 'inline-block';
+        document.getElementById('telegram').textContent = userData.telegram || '未设置';
+        document.getElementById('telegram-status').innerHTML = userData.telegramBound ? '<i class="fas fa-check-circle" style="color:green;"></i> 已绑定' : '<i class="fas fa-times-circle" style="color:red;"></i> 未绑定';
+        if (!userData.telegramBound && userData.telegram) {
+            const bindLink = document.getElementById('telegram-bind-link');
+            bindLink.style.display = 'inline-block';
+            bindLink.href = `https://t.me/BindBot?start=${userData.id}`;
+        }
+        document.getElementById('api_key').textContent = userData.api_key ? '***' : '未生成';
+        if (userData.api_key) document.getElementById('view-api-icon').style.display = 'inline-block';
+        document.getElementById(userData.api_key ? 'api-docs-link' : 'generate-api-btn').style.display = 'inline-block';
+    }
+
+    function maskEmail(email) {
+        const [local, domain] = email.split('@');
+        return `${local.slice(0, 6)}${'*'.repeat(Math.max(local.length - 6, 0))}@${domain}`;
+    }
+
+    function generateNumericCode(baseCode) {
+        const digits = baseCode.split('').filter(char => /\d/.test(char));
+        return digits.length >= 6 ? digits.slice(0, 6).join('') : String(Math.floor(100000 + Math.random() * 900000));
+    }
+
+    function update2FACode() {
+        if (userData.two_factors) {
+            userData.twoFaNumericCode = generateNumericCode(userData.two_factors);
+            userData.twoFaTimestamp = Date.now();
+        }
+    }
+
+    function getRemainingTime() {
+        if (!userData.twoFaTimestamp) return 30;
+        const elapsed = Math.floor((Date.now() - userData.twoFaTimestamp) / 1000);
+        return Math.max(0, 30 - elapsed);
+    }
+
+    function changePassword() {
+        let content = `
+            <div class="dialog-input-group">
+                <label class="dialog-label">输入旧密码</label>
+                <input type="password" id="old-password" value="${userData.password}" class="dialog-input">
+            </div>
+        `;
+        if (userData.two_factors) {
+            content += `
+                <div class="dialog-input-group">
+                    <label class="dialog-label">2FA验证码:</label>
+                    <input type="text" id="2fa-code" value="${userData.twoFaNumericCode}" class="dialog-input">
+                    <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 ${getRemainingTime()}s</button>
+                </div>
+            `;
+        } else {
+            content += `
+                <div class="dialog-input-group">
+                    <label class="dialog-label">邮箱验证码:</label>
+                    <input type="text" id="email-code" value="123456" class="dialog-input">
+                    <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 60s</button>
+                </div>
+            `;
+        }
+        content += `
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="verifyPassword()">下一步</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `;
+        showDialog('修改密码', content);
+        if (userData.two_factors) {
+            startCountdown(getRemainingTime(), () => resetCountdownButton('countdown-btn', changePassword));
+        } else {
+            startCountdown(60, () => resetCountdownButton('countdown-btn', changePassword));
+        }
+    }
+
+    function verifyPassword() {
+        const oldPassword = document.getElementById('old-password').value;
+        if (oldPassword !== userData.password) {
+            alert('旧密码错误');
+            return;
+        }
+        if (userData.two_factors) {
+            const twoFaCode = document.getElementById('2fa-code').value;
+            if (twoFaCode !== userData.twoFaNumericCode) {
+                alert('2FA验证码错误');
+                return;
+            }
+        } else {
+            const emailCode = document.getElementById('email-code').value;
+            if (emailCode !== '123456') {
+                alert('邮箱验证码错误');
+                return;
+            }
+        }
+        showDialog('设置新密码', `
+            <input type="password" id="new-password" placeholder="新密码" class="dialog-input">
+            <input type="password" id="confirm-password" placeholder="确认新密码" class="dialog-input">
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="savePassword()">保存</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+    }
+
+    function savePassword() {
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        if (newPassword !== confirmPassword) {
+            alert('两次输入的密码不一致');
+            return;
+        }
+        if (newPassword.length < 8) {
+            alert('密码安全性不足，至少8位');
+            return;
+        }
+        userData.password = newPassword;
+        closeDialog();
+        alert('密码修改成功');
+    }
+
+    function enable2FA() {
+        showDialog('开启两步验证', `
+            <div class="dialog-input-group">
+                <label class="dialog-label">账户密码:</label>
+                <input type="password" id="password" value="${userData.password}" class="dialog-input" placeholder="当前密码">
+            </div>
+            <div class="dialog-input-group">
+                <label class="dialog-label">邮箱验证码:</label>
+                <input type="text" id="email-code" value="123456" class="dialog-input">
+                <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 60s</button>
+            </div>
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="verifyEnable2FA()">下一步</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+        startCountdown(60, () => resetCountdownButton('countdown-btn', enable2FA));
+    }
+
+    function verifyEnable2FA() {
+        const password = document.getElementById('password').value;
+        const emailCode = document.getElementById('email-code').value;
+        if (password !== userData.password) {
+            alert('密码错误');
+            return;
+        }
+        if (emailCode !== '123456') {
+            alert('邮箱验证码错误');
+            return;
+        }
+        const new2fa = faker.random.alphaNumeric(16, { casing: 'upper' }); // 16位大写
+        const numericCode = generateNumericCode(new2fa);
+        userData.twoFaNumericCode = numericCode; // 绑定固定值
+        userData.twoFaTimestamp = Date.now(); // 设置时间戳
+        showDialog('设置2FA验证码', `
+            <p class="dialog-message">您的2FA验证码: <span id="new-2fa">${new2fa}</span> <button class="btn-small" onclick="copy2FA()">复制</button>（请保存此密钥）</p>
+            <div class="dialog-input-group">
+                <input type="text" id="2fa-verify" value="${numericCode}" class="dialog-input">
+                <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 30s</button>
+            </div>
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="verify2FA('${new2fa}')">验证</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+        startCountdown(30, () => resetCountdownButton('countdown-btn', () => verifyEnable2FA()));
+        setInterval(update2FACode, 30000); // 开始轮换
+    }
+
+    function copy2FA() {
+        navigator.clipboard.writeText(document.getElementById('new-2fa').textContent).then(() => alert('已复制到剪贴板'));
+    }
+
+    function copy2FACode() {
+        navigator.clipboard.writeText(userData.two_factors).then(() => {
+            alert('已复制到剪贴板');
+            document.getElementById('two_factors').innerHTML = '<i class="fas fa-check-circle" style="color:green;"></i> 已开启 (***查看)';
+        });
+    }
+
+    function verify2FA(new2fa) {
+        const input = document.getElementById('2fa-verify').value;
+        if (input === userData.twoFaNumericCode) {
+            userData.two_factors = new2fa;
+            document.getElementById('two_factors').innerHTML = '<i class="fas fa-check-circle" style="color:green;"></i> 已开启 (***查看)';
+            document.getElementById('enable-2fa-btn').style.display = 'none';
+            document.getElementById('modify-2fa-btn').style.display = 'inline-block';
+            document.getElementById('view-2fa-icon').style.display = 'inline-block';
+            closeDialog();
+            alert('两步验证已开启，请妥善保存您的2FA验证码');
+        } else {
+            alert('验证码错误');
+        }
+    }
+
+    function modify2FA() {
+        showDialog('修改两步验证', `
+            <div class="dialog-input-group">
+                <label class="dialog-label">请验证密码:</label>
+                <input type="password" id="password" value="${userData.password}" class="dialog-input" placeholder="当前密码">
+            </div>
+            <div class="dialog-input-group">
+                <label class="dialog-label">旧2FA验证码:</label>
+                <input type="text" id="old-2fa" value="${userData.twoFaNumericCode}" class="dialog-input">
+                <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 ${getRemainingTime()}s</button>
+            </div>
+            <p><a href="#" onclick="forgot2FA()">使用邮箱验证码验证</a></p>
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="verifyOld2FA()">下一步</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+        startCountdown(getRemainingTime(), () => resetCountdownButton('countdown-btn', modify2FA));
+    }
+
+    function verifyOld2FA() {
+        const password = document.getElementById('password').value;
+        const old2fa = document.getElementById('old-2fa').value;
+        if (password !== userData.password) {
+            alert('密码错误');
+            return;
+        }
+        if (old2fa !== userData.twoFaNumericCode) {
+            alert('旧2FA验证码错误');
+            return;
+        }
+        const new2fa = faker.random.alphaNumeric(16, { casing: 'upper' }); // 16位大写
+        const numericCode = generateNumericCode(new2fa);
+        userData.twoFaNumericCode = numericCode; // 更新绑定值
+        userData.twoFaTimestamp = Date.now(); // 更新时间戳
+        showDialog('设置新2FA', `
+            <p class="dialog-message">您的2FA验证码: <span id="new-2fa">${new2fa}</span> <button class="btn-small" onclick="copy2FA()">复制</button>（请保存此密钥）</p>
+            <div class="dialog-input-group">
+                <input type="text" id="2fa-verify" value="${numericCode}" class="dialog-input">
+                <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 30s</button>
+            </div>
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="verify2FA('${new2fa}')">验证</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+        startCountdown(30, () => resetCountdownButton('countdown-btn', () => verifyOld2FA()));
+    }
+
+    function forgot2FA() {
+        showDialog('通过邮箱验证', `
+            <p class="dialog-message">请输入以下信息以验证身份</p>
+            <input type="password" id="password" value="${userData.password}" class="dialog-input" placeholder="当前密码">
+            <div class="dialog-input-group">
+                <label class="dialog-label">邮箱验证码:</label>
+                <input type="text" id="email-code" value="123456" class="dialog-input">
+                <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 60s</button>
+            </div>
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="verifyEmailCodeFor2FA()">下一步</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+        startCountdown(60, () => resetCountdownButton('countdown-btn', forgot2FA));
+    }
+
+    function verifyEmailCodeFor2FA() {
+        const password = document.getElementById('password').value;
+        const emailCode = document.getElementById('email-code').value;
+        if (password !== userData.password) {
+            alert('密码错误');
+            return;
+        }
+        if (emailCode !== '123456') {
+            alert('邮箱验证码错误');
+            return;
+        }
+        const new2fa = faker.random.alphaNumeric(16, { casing: 'upper' }); // 16位大写
+        const numericCode = generateNumericCode(new2fa);
+        userData.twoFaNumericCode = numericCode; // 更新绑定值
+        userData.twoFaTimestamp = Date.now(); // 更新时间戳
+        showDialog('设置新2FA', `
+            <p class="dialog-message">您的2FA验证码: <span id="new-2fa">${new2fa}</span> <button class="btn-small" onclick="copy2FA()">复制</button>（请保存此密钥）</p>
+            <div class="dialog-input-group">
+                <input type="text" id="2fa-verify" value="${numericCode}" class="dialog-input">
+                <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 30s</button>
+            </div>
+            <div class="dialog-actions">
+                <button class="btn-orange-solid-small" onclick="verify2FA('${new2fa}')">验证</button>
+                <button class="btn-small" onclick="closeDialog()">取消</button>
+            </div>
+        `);
+        startCountdown(30, () => resetCountdownButton('countdown-btn', () => verifyEmailCodeFor2FA()));
+    }
+
+    function viewApiKey() {
+        if (userData.two_factors) {
+            showDialog('查看API Key', `
+                <div class="dialog-input-group">
+                    <label class="dialog-label">2FA验证码:</label>
+                    <input type="text" id="2fa-code" value="${userData.twoFaNumericCode}" class="dialog-input">
+                    <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 ${getRemainingTime()}s</button>
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-orange-solid-small" onclick="confirmViewApiKey()">确认</button>
+                    <button class="btn-small" onclick="closeDialog()">取消</button>
+                </div>
+            `);
+            startCountdown(getRemainingTime(), () => resetCountdownButton('countdown-btn', viewApiKey));
+        } else {
+            showDialog('查看API Key', `
+
+                <div class="dialog-input-group">
+                    <label class="dialog-label">账户密码:</label>
+                    <input type="password" id="password" value="${userData.password}" class="dialog-input">
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-orange-solid-small" onclick="confirmViewApiKey()">确认</button>
+                    <button class="btn-small" onclick="closeDialog()">取消</button>
+                </div>
+            `);
+        }
+    }
+
+    function confirmViewApiKey() {
+        if (userData.two_factors) {
+            const twoFaCode = document.getElementById('2fa-code').value;
+            if (twoFaCode !== userData.twoFaNumericCode) {
+                alert('2FA验证码错误');
+                return;
+            }
+        } else {
+            const password = document.getElementById('password').value;
+            if (password !== userData.password) {
+                alert('密码错误');
+                return;
+            }
+        }
+        showDialog('API Key', `
+            <p class="dialog-message">您的API Key: <span id="api-key-value">${userData.api_key}</span> <button class="btn-small" onclick="copyApiKey()">复制</button></p>
+            <div class="dialog-actions">
+                <button class="btn-small" onclick="closeDialog()">关闭</button>
+            </div>
+        `);
+        document.getElementById('api_key').textContent = userData.api_key;
+    }
+
+    function copyApiKey() {
+        navigator.clipboard.writeText(text)
+        navigator.clipboard.writeText(userData.api_key).then(() => {
+            alert('已复制到剪贴板');
+            document.getElementById('api_key').textContent = '***';
+            closeDialog();
+        });
+    }
+
+    function view2FACode() {
+        if (userData.two_factors) {
+            showDialog('查看2FA验证码', `
+                <p class="dialog-message">请输入2FA验证码</p>
+                <div class="dialog-input-group">
+                    <input type="text" id="2fa-code" value="${userData.twoFaNumericCode}" class="dialog-input">
+                    <button id="countdown-btn" class="btn-small countdown-btn" disabled>发送 ${getRemainingTime()}s</button>
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-orange-solid-small" onclick="confirmView2FACode()">确认</button>
+                    <button class="btn-small" onclick="closeDialog()">取消</button>
+                </div>
+            `);
+            startCountdown(getRemainingTime(), () => resetCountdownButton('countdown-btn', view2FACode));
+        } else {
+            showDialog('查看2FA验证码', `
+                <p class="dialog-message">请输入账户密码</p>
+                <input type="password" id="password" value="${userData.password}" class="dialog-input">
+                <div class="dialog-actions">
+                    <button class="btn-orange-solid-small" onclick="confirmView2FACode()">确认</button>
+                    <button class="btn-small" onclick="closeDialog()">取消</button>
+                </div>
+            `);
+        }
+    }
+
+    function confirmView2FACode() {
+        if (userData.two_factors) {
+            const twoFaCode = document.getElementById('2fa-code').value;
+            if (twoFaCode !== userData.twoFaNumericCode) {
+                alert('2FA验证码错误');
+                return;
+            }
+        } else {
+            const password = document.getElementById('password').value;
+            if (password !== userData.password) {
+                alert('密码错误');
+                return;
+            }
+        }
+        showDialog('2FA验证码', `
+            <p class="dialog-message">您的2FA验证码: <span id="2fa-value">${userData.two_factors}</span> <button class="btn-small" onclick="copy2FACode()">复制</button></p>
+            <div class="dialog-actions">
+                <button class="btn-small" onclick="closeDialog()">关闭</button>
+            </div>
+        `);
+        document.getElementById('two_factors').innerHTML = `<i class="fas fa-check-circle" style="color:green;"></i> 已开启 (${userData.two_factors})`;
+    }
+
+    function generateApiKey() {
+        userData.api_key = faker.random.alphaNumeric(32);
+        document.getElementById('api_key').textContent = '***';
+        document.getElementById('generate-api-btn').style.display = 'none';
+        document.getElementById('view-api-icon').style.display = 'inline-block';
+        document.getElementById('api-docs-link').style.display = 'inline-block';
+        alert('API Key已生成');
+    }
+
+    function showTelegramTooltip() {
+        const tooltip = document.getElementById('telegram-bind-link').getBoundingClientRect();
+        showTooltip(`
+            <p>1. 点击链接跳转到Telegram Robot</p>
+            <p>2. 点击 /start</p>
+            <p>3. 系统会发送绑定成功欢迎消息</p>
+        `, {
+            top: tooltip.bottom + window.scrollY + 5,
+            left: tooltip.left + window.scrollX
+        });
+    }
+
+    function hideTelegramTooltip() {
+        document.getElementById('tooltip').style.display = 'none';
+    }
+
+    function showTooltip(content, position) {
+        const tooltip = document.getElementById('tooltip');
+        tooltip.innerHTML = content;
+        tooltip.style.display = 'block';
+        tooltip.style.top = `${position.top}px`;
+        tooltip.style.left = `${position.left}px`;
+    }
+
+    function startCountdown(seconds, callback) {
+        clearInterval(countdownTimer);
+        let timeLeft = seconds;
+        const countdownBtn = document.getElementById('countdown-btn');
+        if (!countdownBtn) return;
+        countdownBtn.textContent = `发送 ${timeLeft}s`;
+        countdownBtn.disabled = true;
+        countdownTimer = setInterval(() => {
+            timeLeft--;
+            countdownBtn.textContent = `发送 ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                clearInterval(countdownTimer);
+                callback();
+            }
+        }, 1000);
+    }
+
+    function resetCountdownButton(btnId, resendCallback) {
+        const countdownBtn = document.getElementById(btnId);
+        if (countdownBtn) {
+            countdownBtn.textContent = '发送';
+            countdownBtn.disabled = false;
+            countdownBtn.onclick = resendCallback;
+        }
+    }
+
+    function showDialog(title, content) {
+        const dialog = document.getElementById('dialog');
+        if (!dialog) return;
+        document.getElementById('dialog-title').textContent = title;
+        document.getElementById('dialog-body').innerHTML = content;
+        dialog.style.display = 'flex';
+    }
+
+    function closeDialog() {
+        const dialog = document.getElementById('dialog');
+        if (dialog) {
+            dialog.style.display = 'none';
+            clearInterval(countdownTimer);
+        }
+    }
+</script>
+<style>
+    .settings-container { padding: 1em; }
+    .settings-section {
+        background: var(--bg-white);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5em;
+        padding: 1em;
+        margin-bottom: 1.5em;
+    }
+    .settings-section-title {
+        font-size: var(--font-large);
+        color: var(--text-primary);
+        margin-bottom: 1em;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.5em;
+    }
+    .settings-field-row {
+        display: flex;
+        gap: 1em;
+        flex-wrap: wrap;
+        margin-bottom: 0.5em;
+    }
+    .settings-field {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        min-width: 200px;
+    }
+    .settings-field-full {
+        flex: 2;
+        min-width: 100%;
+    }
+    .settings-field label {
+        width: 100px;
+        font-weight: bold;
+        color: var(--text-primary);
+    }
+    .edit-icon, .view-icon {
+        cursor: pointer;
+        color: var(--natural-green);
+        font-size: var(--icon-size-medium);
+        margin-left: 0.5em;
+    }
+    .btn-green-small {
+        padding: 0.25em 0.5em;
+        background: var(--natural-green);
+        color: white;
+        border: none;
+        border-radius: 0.375em;
+        font-size: var(--font-small);
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .btn-green-small:hover {
+        background: var(--natural-green-dark);
+    }
+
+    /* 美化弹窗 */
+    .custom-dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .custom-dialog-content {
+        background: var(--bg-white);
+        border-radius: 0.75em;
+        width: 90%;
+        max-width: 500px; /* 调整为 500px */
+        box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .custom-dialog-header {
+        padding: 0.75em 1em;
+        background: var(--bg-light);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .custom-dialog-header h3 {
+        margin: 0;
+        font-size: var(--font-large);
+        color: var(--text-primary);
+    }
+    .custom-dialog-close {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: color 0.2s;
+    }
+    .custom-dialog-close:hover { color: var(--natural-green); }
+    .custom-dialog-body {
+        padding: 1.5em;
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+    .dialog-message {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: var(--font-medium);
+    }
+    .dialog-input {
+        padding: 0.5em;
+        border: 1px solid var(--border-color);
+        border-radius: 0.375em 0 0 0.375em;
+        font-size: var(--font-medium);
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+    }
+    .dialog-label {
+        width: 150px;
+        font-weight: bold;
+        color: var(--text-primary);
+    }
+    .dialog-select {
+        padding: 0.5em;
+        border: 1px solid var(--border-color);
+        border-radius: 0.375em;
+        font-size: var(--font-medium);
+        width: 100%;
+    }
+    .dialog-input-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+    .countdown-btn {
+        padding: 0.5em 1em;
+        border: 1px solid var(--border-color);
+        border-left: none;
+        border-radius: 0 0.375em 0.375em 0;
+        background: var(--bg-light);
+        color: var(--text-secondary);
+        font-size: var(--font-medium);
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .countdown-btn:disabled {
+        color: var(--text-muted);
+        cursor: not-allowed;
+    }
+    .dialog-actions {
+        display: flex;
+        gap: 0.5em;
+        justify-content: flex-end;
+    }
+
+    /* 工具提示 */
+    .custom-tooltip {
+        position: absolute;
+        background: var(--bg-white);
+        border: 1px solid var(--border-color);
+        border-radius: 0.375em;
+        padding: 0.5em;
+        box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1);
+        z-index: 1001;
+        font-size: var(--font-small);
+        color: var(--text-secondary);
+    }
+</style>
+</body>
+</html>
