@@ -350,6 +350,7 @@
         //     format: (v, item) => item.attrs.map(attr => `<span class="ant-tag ${tagColors[Math.floor(Math.random() * tagColors.length)]}">${attr.name}: ${attr.value}</span>`).join('')
         // },
         // paid_rest_money: { label: '尾款($)', format: v => v ? v.toFixed(2) : '未支付' },
+        create_time: { label: '时间', format: v => v },
         operation: {
             label: '操作',
             format: (v, item) => {
@@ -387,10 +388,10 @@
             choose_unit_price: Math.random() > 0.5 ? faker.datatype.float({ min: 10, max: 100, precision: 0.01 }) : 0,
             choose_time: Math.random() > 0.5 ? Math.floor(faker.date.recent().getTime() / 1000) : 0,
             amount: faker.datatype.float({ min: 50, max: 1000, precision: 0.01 }),
-            create_time: Math.floor(faker.date.past().getTime() / 1000),
+            create_time: faker.date.recent().toLocaleString(),
             confirm_time: Math.floor(faker.date.recent().getTime() / 1000)
         };
-        demand.demand_name = faker.commerce.productName() + ' Demand';
+        demand.demand_name = faker.commerce.productName();
         demand.attrs = Array(faker.datatype.number({ min: 1, max: 3 })).fill().map(() => {
             const attrName = Object.keys(ecommerceAttributes)[Math.floor(Math.random() * Object.keys(ecommerceAttributes).length)];
             const attrValues = ecommerceAttributes[attrName];
