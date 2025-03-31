@@ -1,8 +1,9 @@
 // _ticket.js
-
 const submittedTickets = new Set();
-const platformNames = ['客服小明', '客服小红', '客服小刚'];
-const storeName = '快购商店';
+const supportNames = ["Emma", "Zoe", "Ava", "Mia", "Lily", "Sophie", "Grace", "Ella", "Chloe", "Luna"];
+const shopNames = ["Bloom Shop", "Spark Store", "Nest Shop", "Glow Store", "Vibe Shop", "Peak Store", "Brew Shop", "Dash Store", "Flux Shop", "Sage Store"];
+const supportName = supportNames[randomInt(0, shopNames.length -1)];
+const storeName = shopNames[randomInt(0, shopNames.length -1)];
 const buyerName = 'Me';
 
 function formatTimestamp(date) {
@@ -176,7 +177,7 @@ function openChatDialog(orderId, initialMessage = null) {
     const chatMessages = initialMessage
         ? [`<div class="chat-message buyer-message" data-id="${Date.now()}">
                 <div class="avatar-name">
-                    <img src="https://picsum.photos/50/50?random=${Date.now()}" alt="buyer" class="chat-avatar">
+                    <img src="https://picsum.photos/50/50?random=${buyerName}" alt="buyer" class="chat-avatar">
                     <span class="chat-name" style="color: #4CAF50">${buyerName}</span>
                 </div>
                 <div class="chat-content">
@@ -262,7 +263,7 @@ function generateChatMessages(order) {
         messages.push(`
             <div class="chat-message buyer-message" data-id="${Date.now() + messages.length}">
                 <div class="avatar-name">
-                    <img src="https://picsum.photos/50/50?random=${Date.now()}" alt="buyer" class="chat-avatar">
+                    <img src="https://picsum.photos/50/50?random=${buyerName}" alt="buyer" class="chat-avatar">
                     <span class="chat-name" style="color: #4CAF50">${buyerName}</span>
                 </div>
                 <div class="chat-content">
@@ -286,18 +287,18 @@ function generateChatMessages(order) {
             content += ` <span class="timestamp">${timestamp}</span>`;
         }
 
-        const avatar = role === 'system' ? '' : `https://picsum.photos/50/50?random=${i}`;
-        const name = role === 'system' ? '' : role === 'support' ? platformNames[randomInt(0, platformNames.length - 1)] : role === 'store' ? storeName : buyerName;
+        const name = role === 'system' ? '' : role === 'support' ? supportName : role === 'store' ? storeName : buyerName;
+        const avatar = role === 'system' ? '' : `https://picsum.photos/50/50?random=${name}`;
         const nameColor = {
-            system: '#FF4500',
-            store: '#333333',
-            support: '#FF0000',
-            buyer: '#4CAF50'
+            system: 'var(--font-red)',
+            store: 'var(--font-orange)',
+            support: 'var(--font-red)',
+            buyer: 'var(--font-green)'
         }[role];
 
         messages.push(`
             <div class="chat-message ${role}-message" data-id="${Date.now() + i}">
-                <div class="avatar-name">
+                <div class="avatar-name" title="${name}">
                     ${role !== 'system' ? `<img src="${avatar}" alt="${role}" class="chat-avatar">` : ''}
                     ${role !== 'system' ? `<span class="chat-name" style="color: ${nameColor}">${name}</span>` : '<span class="chat-name"></span>'}
                 </div>
@@ -398,7 +399,7 @@ function sendMessage(orderId, type) {
     chatContainer.innerHTML += `
         <div class="chat-message buyer-message" data-id="${Date.now()}">
             <div class="avatar-name">
-                <img src="https://picsum.photos/50/50?random=${Date.now()}" alt="buyer" class="chat-avatar">
+                <img src="https://picsum.photos/50/50?random=${buyerName}" alt="buyer" class="chat-avatar">
                 <span class="chat-name" style="color: #4CAF50">${buyerName}</span>
             </div>
             <div class="chat-content">
@@ -521,7 +522,7 @@ function submitRequest(orderId, type) {
     chatContainer.innerHTML += `
         <div class="chat-message buyer-message" data-id="${Date.now()}">
             <div class="avatar-name">
-                <img src="https://picsum.photos/50/50?random=${Date.now()}" alt="buyer" class="chat-avatar">
+                <img src="https://picsum.photos/50/50?random=${buyerName}" alt="buyer" class="chat-avatar">
                 <span class="chat-name" style="color: #4CAF50">${buyerName}</span>
             </div>
             <div class="chat-content">
@@ -539,7 +540,7 @@ function requestSupport(orderId) {
     chatContainer.innerHTML += `
         <div class="chat-message buyer-message" data-id="${Date.now()}">
             <div class="avatar-name">
-                <img src="https://picsum.photos/50/50?random=${Date.now()}" alt="buyer" class="chat-avatar">
+                <img src="https://picsum.photos/50/50?random=${buyerName}" alt="buyer" class="chat-avatar">
                 <span class="chat-name" style="color: #4CAF50">${buyerName}</span>
             </div>
             <div class="chat-content">

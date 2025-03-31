@@ -12,7 +12,7 @@
         .message-wrapper { display: flex; flex: 1; width: 100%; padding: 0.5em 0; }
         .message-sidebar { width: 20em; background: var(--bg-white); border-right: 0.0625em solid var(--border-color); padding: 0.5em 0.5em 0.5em 0; height: calc(100vh - 14em); display: flex; flex-direction: column; }
         .message-content { flex: 1; padding: 1em; background: var(--bg-white); max-height: calc(100vh - 14em); overflow-y: auto; }
-        .message-tabs { display: flex; gap: 1em; margin-bottom: 1em; }
+        .message-tabs { display: flex; gap: 0.5em; margin-bottom: 1em;text-wrap: nowrap;}
         .message-tab { padding: 0.5em 1em; cursor: pointer; border-bottom: 0.125em solid transparent; }
         .message-tab.active { border-bottom: 0.125em solid var(--natural-green); color: var(--natural-green); font-weight: bold; }
         .message-list { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; }
@@ -27,9 +27,10 @@
         .message-loading { text-align: center; padding: 1em; color: var(--text-secondary); display: none; }
         .message-details { display: flex; flex-direction: column; height: 100%; }
         .chat-dialog { flex: 1; display: flex; flex-direction: column; background: var(--bg-white); border-radius: 0.5em; overflow: hidden; }
-        .chat-dialog-header { padding: 0.75em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-light); display: flex; align-items: center; gap:1em;position: relative;font-weight: bold }
+        .chat-dialog-header { padding: 0.75em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-light); display: flex; align-items: center; gap:1em;position: relative; }
+        .chat-dialog-header h3{font-weight: bold;}
         .chat-dialog-header button{display:flex;position: absolute; right: 1em;top: 1em;}
-        .chat-dialog-body { flex: 1; padding: 1em; overflow-y: auto; display: flex; flex-direction: column; gap: 1em; }
+        .chat-dialog-body { flex: 1; padding: 0 0 1em 0; overflow-y: auto; display: flex; flex-direction: column; gap: 1em; }
         .chat-dialog-footer { padding: 1em; border-top: 0.0625em solid var(--border-color); display: flex; flex-direction: column; gap: 0.5em; }
         .chat-message { display: flex; gap: 0.5em; align-items: center; }
         .chat-message.self { flex-direction: row-reverse; }
@@ -118,9 +119,9 @@
             <div class="message-wrapper">
                 <div class="message-sidebar">
                     <div class="message-tabs" id="message-tabs">
-                        <div class="message-tab active" data-tab="chat">聊天</div>
-                        <div class="message-tab" data-tab="ticket">工单</div>
-                        <div class="message-tab" data-tab="system">系统</div>
+                        <div class="message-tab active" data-tab="chat">聊天(100)</div>
+                        <div class="message-tab" data-tab="ticket">工单(66)</div>
+                        <div class="message-tab" data-tab="system">系统(10)</div>
                     </div>
                     <form action="#" onsubmit="searchMessages(event)">
                         <div class="search-box">
@@ -264,6 +265,8 @@
         function generateTicketMessages(count) {
             return Array(count).fill().map(() => {
                 const order = {};
+                const _supportName = supportNames[randomInt(0, shopNames.length -1)];
+                const _storeName = shopNames[randomInt(0, shopNames.length -1)];
                 Object.keys(userOrdersFieldConfig).forEach(key => {
                     order[key] = userOrdersFieldConfig[key].sample();
                 });
@@ -278,7 +281,7 @@
                     const content = isTemplate ? generateTemplateMessage(sender, order.id) : faker.lorem.sentence();
                     return {
                         sender: sender,
-                        name: sender === '买家' ? 'Me' : sender === '卖家' ? '快购商店' : '平台客服',
+                        name: sender === '买家' ? 'Me' : sender === '卖家' ? _storeName : _supportName,
                         content: content,
                         time: msgTime,
                         isSelf: sender === '买家',
@@ -296,8 +299,8 @@
                     quantity: order.quantity,
                     participants: [
                         { role: '买家', name: 'Me', avatar: getPicsumImage(50, 50, `buyer-${randomInt(0, 1000)}`), online: faker.datatype.boolean() },
-                        { role: '卖家', name: '快购商店', avatar: getPicsumImage(50, 50, `seller-${randomInt(0, 1000)}`), online: faker.datatype.boolean() },
-                        { role: '客服', name: '平台客服', avatar: getPicsumImage(50, 50, `support-${randomInt(0, 1000)}`), online: faker.datatype.boolean() }
+                        { role: '卖家', name: _storeName, avatar: getPicsumImage(50, 50, `seller-${randomInt(0, 1000)}`), online: faker.datatype.boolean() },
+                        { role: '客服', name: _supportName, avatar: getPicsumImage(50, 50, `support-${randomInt(0, 1000)}`), online: faker.datatype.boolean() }
                     ],
                     lastMessage: stripHtml(`${lastMsg.name}: ${lastMsg.content.substring(0, 50)}...`), // 去除 HTML
                     messages: messages
@@ -490,7 +493,7 @@
                     const nameColor = role === 'buyer' ? '#4CAF50' : role === 'store' ? 'var(--font-orange)' : 'var(--font-red)';
                     return `
                         <div class="ticket-chat-message ${role}-message">
-                            <div class="avatar-name">
+                            <div class="avatar-name" title="${msg.name}">
                                 <div class="avatar-container">
                                     <img src="${selectedMessage.participants.find(p => p.role === msg.sender)?.avatar}" class="avatar" alt="${msg.name}">
                                     <span class="status-dot ${selectedMessage.participants.find(p => p.role === msg.sender)?.online ? 'online' : 'offline'}"></span>
