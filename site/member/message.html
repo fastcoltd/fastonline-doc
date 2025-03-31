@@ -13,7 +13,7 @@
         .message-sidebar { width: 20em; background: var(--bg-white); border-right: 0.0625em solid var(--border-color); padding: 0.5em 0.5em 0.5em 0; height: calc(100vh - 14em); display: flex; flex-direction: column; }
         .message-content { flex: 1; padding: 1em; background: var(--bg-white); max-height: calc(100vh - 14em); overflow-y: auto; }
         .message-tabs { display: flex; gap: 0.5em; margin-bottom: 1em;text-wrap: nowrap;}
-        .message-tab { padding: 0.5em 1em; cursor: pointer; border-bottom: 0.125em solid transparent; }
+        .message-tab { padding: 0.5em; cursor: pointer; border-bottom: 0.125em solid transparent; }
         .message-tab.active { border-bottom: 0.125em solid var(--natural-green); color: var(--natural-green); font-weight: bold; }
         .message-list { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; }
         .message-item { padding: 0.55em; border-bottom: 0.0625em solid var(--border-color); cursor: pointer; position: relative; display: flex; align-items: center; gap: 0.5em; }
@@ -204,9 +204,9 @@
         window.allOrders = generateData(userOrdersFieldConfig, randomInt(50, 500));
 
         let allMessages = {
-            chat: generateChatMessages(randomInt(20, 100)),
+            chat: generateChatMessages(randomInt(20, 99)),
             ticket: generateTicketMessages(randomInt(20, 100)),
-            system: generateSystemMessages(randomInt(20, 100))
+            system: generateSystemMessages(randomInt(20, 99))
         };
         let filteredMessages = { ...allMessages };
 
@@ -373,8 +373,26 @@
         function renderTabs() {
             const tabs = document.getElementById('message-tabs');
             if (!tabs) return;
+
+            // 计算每个 tab 的未读消息总数
+            const unreadCounts = {
+                chat: allMessages.chat.reduce((sum, msg) => sum + msg.newCount, 0),
+                ticket: allMessages.ticket.reduce((sum, msg) => sum + msg.newCount, 0),
+                system: allMessages.system.reduce((sum, msg) => sum + (msg.unread ? 1 : 0), 0)
+            };
+
+            tabs.innerHTML = MESSAGE_TYPES.map(type => {
+                const count = unreadCounts[type];
+                const countDisplay = count > 0 ? `(${count})` : '';
+                return `
+                    <div class="message-tab ${type === currentTab ? 'active' : ''}" data-tab="${type}">
+                        ${type === 'chat' ? '聊天' : type === 'ticket' ? '工单' : '系统'}${countDisplay}
+                    </div>
+                `;
+            }).join('');
+
+            // 重新绑定点击事件
             tabs.querySelectorAll('.message-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === currentTab);
                 tab.addEventListener('click', () => {
                     currentTab = tab.dataset.tab;
                     currentPage = 1;
@@ -427,13 +445,15 @@
             list.querySelectorAll('.message-item').forEach(item => {
                 item.addEventListener('click', () => {
                     selectedMessageId = parseInt(item.dataset.id);
-                    if (currentTab === 'system') {
-                        const msg = filteredMessages[currentTab].find(m => m.id === selectedMessageId);
-                        if (msg) msg.unread = false;
-                    } else {
-                        const msg = filteredMessages[currentTab].find(m => m.id === selectedMessageId);
-                        if (msg) msg.newCount = 0;
+                    const msg = filteredMessages[currentTab].find(m => m.id === selectedMessageId);
+                    if (msg) {
+                        if (currentTab === 'system') {
+                            msg.unread = false; // 系统消息标记为已读
+                        } else if (msg.newCount > 0) {
+                            msg.newCount = 0; // 聊天或工单未读数清零
+                        }
                     }
+                    renderTabs(); // 更新 tab 的数字
                     renderMessageList();
                     renderMessageDetails();
                     updateUrl();
@@ -742,6 +762,5 @@
         };
     })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92901a5c9b0dbd0f',t:'MTc0MzQyNjc5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
