@@ -373,7 +373,7 @@ function start2FACountdown() {
 
 // Local Storage for User Data
 function saveUserLoginInfo(username) {
-    let requires2FA = Math.random() < 0.5
+    let requires2FA = Math.random() < 0.8
     let store = generateData(storeFieldConfig, 1)[0];
     const userData = {
         username: username,
