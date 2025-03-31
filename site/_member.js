@@ -381,7 +381,7 @@ function saveUserLoginInfo(username) {
         balance: faker.commerce.price(100, 1000, 2),
         messages: { chat: randomInt(0, 50), tickets: randomInt(20, 50), system: randomInt(0, 10) },
         storeMessages: { newOrders: randomInt(0, 10), newTickets: randomInt(0, 5), inquiries: randomInt(0, 20), stockAlerts: randomInt(0, 3), system: randomInt(0, 5) },
-        store: randomInt(0, 1) > 0 ? store : null,
+        store: Math.random() < 0.8 ? store : null,
         requires2FA: requires2FA // 50% chance to require 2FA
     };
     localStorage.setItem('userData', JSON.stringify(userData));
