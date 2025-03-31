@@ -20,7 +20,7 @@
         .message-item:hover { background: var(--bg-light); }
         .message-item.active { background: var(--natural-green); color: var(--font-white); }
         .message-item-content { flex: 1; max-width: calc(100% - 3em); }
-        .message-title { font-size: var(--font-medium); margin-bottom: 0.25em; display: flex; justify-content: space-between; }
+        .message-title { font-size: var(--font-medium); margin-bottom: 0.25em; display: flex; justify-content: space-between;}
         .message-text { font-size: var(--font-small); color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .message-badge { position: absolute; top: 1.5em; right: 0.5em; background: var(--vibrant-red); color: var(--font-white); border-radius: 50%; width: 1.5em; height: 1.5em; line-height: 1.5em; text-align: center; font-size: var(--font-small); }
         .message-red-dot { position: absolute; top: 2em; right: 1em; background: var(--vibrant-red); width: 0.75em; height: 0.75em; border-radius: 50%; }
@@ -253,7 +253,7 @@
                     id: faker.datatype.number({ min: 1, max: 10000 }),
                     title: faker.name.findName(),
                     time: past,
-                    newCount: randomInt(0, 5),
+                    newCount: Math.random() < 0.3 ? 0 : randomInt(1, 20),
                     avatar: getPicsumImage(50, 50, `chat-${randomInt(0, 1000)}`),
                     online: faker.datatype.boolean(),
                     lastMessage: `${lastMsg.sender}: ${lastMsg.content.substring(0, 50)}...`,
@@ -293,7 +293,7 @@
                     id: faker.datatype.number({ min: 1, max: 10000 }),
                     title: `订单 #${order.id} - ${faker.commerce.productName()}`,
                     time: past,
-                    newCount: randomInt(0, 5),
+                    newCount: Math.random() < 0.5 ? 0 : randomInt(1, 20),
                     orderId: order.id,
                     amount: order.amount,
                     quantity: order.quantity,
