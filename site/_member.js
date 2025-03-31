@@ -483,7 +483,7 @@ function generate2FAModal() {
 function verify2FA() {
     const codeInput = document.getElementById('2fa-code');
     if (codeInput && codeInput.value) {
-        alert('Login successful!');
+        // alert('Login successful!');
         hideModal('2fa-modal');
         updateHeaderUI()
     } else {
