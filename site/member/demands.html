@@ -142,6 +142,19 @@
         #create-attrs {
             margin-bottom: 1em;
         }
+        .red-dot {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .btn-small {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -306,7 +319,7 @@
 <script src="../_fields.js"></script>
 <script src="../_data.js"></script>
 <script>
-    // 使用 data.js 中的 demandStatusColors、tagColors 和 ecommerceAttributes
+    const redDotState = {};
     const statusMap = {
         0: 'Drafts',
         1: '审核中',
@@ -354,14 +367,29 @@
         operation: {
             label: '操作',
             format: (v, item) => {
-                let buttons = `<button class="btn-small" onclick="viewDemand(${item.id})"><i class="fa fa-eye"></i> 查看</button>`;
+                let buttons = '';
+                // Always include the "查看" button
+                const hasRedDot = item.status === 5 && !redDotState[item.id];
+                buttons += `
+                    <button class="btn-small" onclick="viewDemand(${item.id}); removeRedDot(${item.id})">
+                        <i class="fa fa-eye"></i> 查看
+                        ${hasRedDot ? '<span class="red-dot"></span>' : ''}
+                    </button>`;
+
+                // Add other buttons based on status
                 if (item.status === 0) buttons += `<button class="btn-small btn-solid-medium" onclick="submitDemandForReview(${item.id})">提交审核</button>`;
                 if (item.status === 6) buttons += `<button class="btn-small btn-orange-solid-small" onclick="payRestMoney(${item.id})">支付尾款</button>`;
                 if (item.status === 8) buttons += `<button class="btn-small" onclick="reviewDemand(${item.id})"><i class="fa fa-star"></i> 评价</button>`;
+
                 return `<div class="operation-area">${buttons}</div>`;
             }
         }
     };
+
+    function removeRedDot(demandId) {
+        redDotState[demandId] = true; // Mark this demand as having its red dot removed
+        renderTableBody(); // Re-render the table to reflect the change
+    }
 
     // 分页和数据管理
     let currentPage = 1;

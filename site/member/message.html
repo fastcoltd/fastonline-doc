@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的消息 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../_site.css">
+    <link rel="stylesheet" href="_member.css">
+    <link rel="stylesheet" href="_ticket.css">
+    <style>
+        .message-wrapper { display: flex; flex: 1; width: 100%; padding: 0.5em 0; }
+        .message-sidebar { width: 20em; background: var(--bg-white); border-right: 0.0625em solid var(--border-color); padding: 0.5em 0.5em 0.5em 0; height: calc(100vh - 14em); display: flex; flex-direction: column; }
+        .message-content { flex: 1; padding: 1em; background: var(--bg-white); max-height: calc(100vh - 14em); overflow-y: auto; }
+        .message-tabs { display: flex; gap: 1em; margin-bottom: 1em; }
+        .message-tab { padding: 0.5em 1em; cursor: pointer; border-bottom: 0.125em solid transparent; }
+        .message-tab.active { border-bottom: 0.125em solid var(--natural-green); color: var(--natural-green); font-weight: bold; }
+        .message-list { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; }
+        .message-item { padding: 0.55em; border-bottom: 0.0625em solid var(--border-color); cursor: pointer; position: relative; display: flex; align-items: center; gap: 0.5em; }
+        .message-item:hover { background: var(--bg-light); }
+        .message-item.active { background: var(--natural-green); color: var(--font-white); }
+        .message-item-content { flex: 1; max-width: calc(100% - 3em); }
+        .message-title { font-size: var(--font-medium); margin-bottom: 0.25em; display: flex; justify-content: space-between; }
+        .message-text { font-size: var(--font-small); color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .message-badge { position: absolute; top: 1.5em; right: 0.5em; background: var(--vibrant-red); color: var(--font-white); border-radius: 50%; width: 1.5em; height: 1.5em; line-height: 1.5em; text-align: center; font-size: var(--font-small); }
+        .message-red-dot { position: absolute; top: 2em; right: 1em; background: var(--vibrant-red); width: 0.75em; height: 0.75em; border-radius: 50%; }
+        .message-loading { text-align: center; padding: 1em; color: var(--text-secondary); display: none; }
+        .message-details { display: flex; flex-direction: column; height: 100%; }
+        .chat-dialog { flex: 1; display: flex; flex-direction: column; background: var(--bg-white); border-radius: 0.5em; overflow: hidden; }
+        .chat-dialog-header { padding: 0.75em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-light); display: flex; align-items: center; gap: 0.5em; }
+        .chat-dialog-body { flex: 1; padding: 1em; overflow-y: auto; display: flex; flex-direction: column; gap: 1em; }
+        .chat-dialog-footer { padding: 1em; border-top: 0.0625em solid var(--border-color); display: flex; gap: 0.5em; align-items: center; }
+        .chat-message { display: flex; gap: 0.5em; align-items: flex-start; }
+        .chat-message.self { flex-direction: row-reverse; }
+        .chat-user { display: flex; align-items: center; gap: 0.25em; }
+        .chat-buyer { color: var(--natural-green); }
+        .chat-seller { color: var(--vibrant-orange); }
+        .chat-support { color: var(--vibrant-red); }
+        .chat-content { background: var(--bg-white); padding: 0.5em 1em; border-radius: 0.5em; max-width: 70%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .chat-content.self { background: var(--natural-green); color: var(--font-white); }
+        .chat-content.template { background: var(--bg-light); border: 0.0625em solid var(--border-color); }
+        .chat-time { font-size: var(--font-small); color: var(--text-secondary); margin-top: 0.25em; }
+        .search-box { width: 100%; margin: 0.5em 0.5em 0.5em 0; }
+        .search-wrapper { width: calc(100% - 4em); }
+        .chat-input { flex: 1; padding: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.25em; resize: none; }
+        .chat-actions { display: flex; gap: 0.5em; }
+        .system-content { font-size: var(--font-medium); line-height: 1.8; padding: 1em; }
+        .system-content img { max-width: 100%; border-radius: 0.5em; margin: 1em 0; }
+        .system-title { font-size: var(--font-large); font-weight: bold; margin-bottom: 1em; color: var(--text-primary); padding: 0 1em; }
+        .system-signature { text-align: right; font-size: var(--font-small); color: var(--text-secondary); margin-top: 1em; padding: 0 1em; }
+        .dialog { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; justify-content: center; align-items: center; }
+        .dialog-content { background: var(--bg-white); border-radius: 0.5em; width: 90%; max-width: 30em; padding: 1em; box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2); }
+        .dialog-header { padding: 0.75em 0; border-bottom: 0.0625em solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .dialog-body { padding: 1em 0; }
+        .dialog-footer { display: flex; gap: 0.5em; justify-content: flex-end; }
+        /* 新增头像和状态组合样式 */
+        .avatar-container { position: relative; width: 2em; height: 2em; }
+        .avatar { width: 100%; height: 100%; border-radius: 50%; }
+        .status-dot { width: 0.75em; height: 0.75em; border-radius: 50%; position: absolute; right: 0; bottom: 0; border: 0.0625em solid var(--bg-white); }
+        .status-dot.online { background: var(--natural-green); }
+        .status-dot.offline { background: var(--text-secondary); }
+        @media (max-width: 48em) {
+            .message-wrapper { flex-direction: column; }
+            .message-sidebar { width: 100%; border-right: none; border-bottom: 0.0625em solid var(--border-color); height: auto; }
+            .message-content { padding: 0.5em; max-height: none; }
+            .message-list { max-height: 20em; }
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="../_header.html"></div>
+<div class="member-wrapper">
+    <div w3-include-html="_sidebar.html"></div>
+    <div class="member-container">
+        <div class="member-section">
+            <div class="message-wrapper">
+                <div class="message-sidebar">
+                    <div class="message-tabs" id="message-tabs">
+                        <div class="message-tab active" data-tab="chat">聊天</div>
+                        <div class="message-tab" data-tab="ticket">工单</div>
+                        <div class="message-tab" data-tab="system">系统</div>
+                    </div>
+                    <form action="#" method="get" onsubmit="searchMessages(event)">
+                        <div class="search-box">
+                            <div class="search-wrapper">
+                                <input type="text" id="message-search" placeholder="搜索消息...">
+                            </div>
+                            <button><i class="fas fa-search"></i></button>
+                        </div>
+                    </form>
+                    <div class="message-list" id="message-list">
+                        <div class="message-loading" id="message-loading">Loading next page...</div>
+                    </div>
+                </div>
+                <div class="message-content" id="message-content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="../_footer.html"></div>
+<div id="refund-dialog" class="dialog">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <h3>请求退款</h3>
+            <button class="dialog-close" onclick="closeDialog('refund-dialog')">×</button>
+        </div>
+        <div class="dialog-body">
+            <p>退款金额: <span id="refund-amount"></span></p>
+            <textarea placeholder="请输入退款理由..." style="width: 100%; min-height: 6em;"></textarea>
+        </div>
+        <div class="dialog-footer">
+            <button class="btn-solid-small" onclick="submitRefund()">提交</button>
+        </div>
+    </div>
+</div>
+<div id="replacement-dialog" class="dialog">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <h3>请求换货</h3>
+            <button class="dialog-close" onclick="closeDialog('replacement-dialog')">×</button>
+        </div>
+        <div class="dialog-body">
+            <p>换货数量: <input type="number" min="1" style="width: 5em;"></p>
+            <textarea placeholder="请输入换货理由..." style="width: 100%; min-height: 6em;"></textarea>
+        </div>
+        <div class="dialog-footer">
+            <button class="btn-solid-small" onclick="submitReplacement()">提交</button>
+        </div>
+    </div>
+</div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="../_common.js"></script>
+<script src="../_member.js"></script>
+<script src="_mCommon.js"></script>
+<script src="../_fields.js"></script>
+<script src="../_data.js"></script>
+<script>
+    (function() {
+        const MESSAGE_TYPES = ['chat', 'ticket', 'system'];
+        const MESSAGES_PER_PAGE = 20;
+        let currentTab = 'chat';
+        let currentPage = 1;
+        let selectedMessageId = null;
+
+        const userOrdersFieldConfig = {
+            id: { label: '订单ID', format: v => v, sample: () => faker.datatype.number({ min: 100000, max: 999999 }) },
+            brandName: { label: '品牌', format: v => `<span style="color: ${hotBrands.find(b => b.name === v)?.themeColor || '#000'}">${v || '无'}</span>`, sample: () => hotBrands[Math.floor(Math.random() * hotBrands.length)].name },
+            service: { label: '服务', format: v => v, sample: () => services[Math.floor(Math.random() * services.length)].name },
+            itemName: {
+                label: '名称',
+                format: (v, item) => {
+                    const type = faker.random.arrayElement(['demand_id', 'item_id', 'posts_id']);
+                    item[type] = faker.datatype.number({ min: 1, max: 10000 });
+                    const randomName = faker.commerce.productName();
+                    const name = item.demand_id ? `<i class="fa fa-list"></i> ${randomName}` :
+                        item.item_id ? `<i class="fa fa-shopping-cart"></i> ${randomName}` :
+                            item.posts_id ? `<i class="fa fa-book"></i> ${randomName}` : '未知';
+                    const url = item.demand_id ? `/site/demand.html?name=${randomName}` :
+                        item.item_id ? `/site/item.html?name=${randomName}` :
+                            item.posts_id ? `/site/post.html?name=${randomName}` : '#';
+                    return `<a href="${url}" class="item-name">${name}</a>`;
+                },
+                sample: () => ({})
+            },
+            quantity: { label: '数量', format: v => v, sample: () => faker.datatype.number({ min: 1, max: 10 }) },
+            coupon: { label: '优惠券', format: v => v || '--', sample: () => randomInt(0, 1) > 0 ? faker.random.alphaNumeric(6).toUpperCase() : '--' },
+            amount: { label: '金额', format: v => `<span style="color:var(--font-orange)">${v}</span>`, sample: () => faker.commerce.price(50, 2000, 2, "$") },
+            paid_time: {
+                label: '时间',
+                format: v => formatTime(v),
+                sample: () => {
+                    const now = new Date('2025-03-31T00:00:00');
+                    const past = new Date(now);
+                    past.setDate(now.getDate() - randomInt(0, 30));
+                    return past;
+                }
+            }
+        };
+
+        let allMessages = {
+            chat: generateChatMessages(randomInt(20, 100)),
+            ticket: generateTicketMessages(randomInt(20, 100)),
+            system: generateSystemMessages(randomInt(20, 100))
+        };
+        let filteredMessages = { ...allMessages };
+
+        function formatTime(date) {
+            const now = new Date('2025-03-31T00:00:00');
+            const diffMs = now - new Date(date);
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            if (diffMins < 60) return `${diffMins} min ago`;
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            const diffDays = Math.floor(diffHours / 24);
+            if (diffDays < 3) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            return new Date(date).toLocaleString('zh-CN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }).replace(/(\d+)\/(\d+)/, '$2/$1');
+        }
+
+        function generateChatMessages(count) {
+            return Array(count).fill().map(() => {
+                const now = new Date('2025-03-31T00:00:00');
+                const past = new Date(now);
+                past.setDate(now.getDate() - randomInt(0, 30));
+                const messages = Array(randomInt(5, 20)).fill().map(() => {
+                    const msgTime = new Date(now);
+                    msgTime.setDate(now.getDate() - randomInt(0, 30));
+                    return {
+                        sender: faker.name.findName(),
+                        content: faker.lorem.sentence(),
+                        time: msgTime,
+                        isSelf: faker.datatype.boolean()
+                    };
+                });
+                const lastMsg = messages[messages.length - 1];
+                return {
+                    id: faker.datatype.number({ min: 1, max: 10000 }),
+                    title: faker.name.findName(),
+                    time: past,
+                    newCount: randomInt(0, 5),
+                    avatar: getPicsumImage(50, 50, `chat-${randomInt(0, 1000)}`),
+                    online: faker.datatype.boolean(),
+                    lastMessage: `${lastMsg.sender}: ${lastMsg.content.substring(0, 50)}...`,
+                    messages: messages
+                };
+            }).sort((a, b) => new Date(b.time) - new Date(a.time));
+        }
+
+        function generateTicketMessages(count) {
+            return Array(count).fill().map(() => {
+                const order = {};
+                Object.keys(userOrdersFieldConfig).forEach(key => {
+                    order[key] = userOrdersFieldConfig[key].sample();
+                });
+                const now = new Date('2025-03-31T00:00:00');
+                const past = new Date(now);
+                past.setDate(now.getDate() - randomInt(0, 30));
+                const messages = Array(randomInt(5, 20)).fill().map(() => {
+                    const msgTime = new Date(now);
+                    msgTime.setDate(now.getDate() - randomInt(0, 30));
+                    const sender = faker.random.arrayElement(['买家', '卖家', '客服']);
+                    const isTemplate = randomInt(0, 2) === 0;
+                    return {
+                        sender: sender,
+                        name: sender === '买家' ? '我' : faker.name.findName(),
+                        content: isTemplate ? generateTemplateMessage() : faker.lorem.sentence(),
+                        time: msgTime,
+                        isSelf: sender === '买家',
+                        isTemplate: isTemplate
+                    };
+                });
+                const lastMsg = messages[messages.length - 1];
+                return {
+                    id: faker.datatype.number({ min: 1, max: 10000 }),
+                    title: `订单 #${order.id} - ${faker.commerce.productName()}`,
+                    time: past,
+                    newCount: randomInt(0, 5),
+                    orderId: order.id,
+                    amount: order.amount,
+                    quantity: order.quantity,
+                    participants: [
+                        { role: '买家', name: '我', avatar: getPicsumImage(50, 50, `buyer-${randomInt(0, 1000)}`), online: faker.datatype.boolean() },
+                        { role: '卖家', name: faker.name.findName(), avatar: getPicsumImage(50, 50, `seller-${randomInt(0, 1000)}`), online: faker.datatype.boolean() },
+                        { role: '客服', name: '平台客服', avatar: getPicsumImage(50, 50, `support-${randomInt(0, 1000)}`), online: faker.datatype.boolean() }
+                    ],
+                    lastMessage: `${lastMsg.name}: ${lastMsg.content.substring(0, 50)}...`,
+                    messages: messages
+                };
+            }).sort((a, b) => new Date(b.time) - new Date(a.time));
+        }
+
+        function generateTemplateMessage() {
+            const templates = [
+                `请求退款\n金额: $${faker.commerce.price(10, 500, 2)}\n同意 <button class="btn-small" onclick="alert('同意退款')">同意</button> 拒绝 <button class="btn-small" onclick="alert('拒绝退款')">拒绝</button>`,
+                `请求换货\n数量: ${randomInt(1, 5)}\n同意 <button class="btn-small" onclick="alert('同意换货')">同意</button> 拒绝 <button class="btn-small" onclick="alert('拒绝换货')">拒绝</button>`,
+                `拒绝理由: ${faker.lorem.sentence()}`
+            ];
+            return templates[randomInt(0, templates.length - 1)];
+        }
+
+        function generateSystemMessages(count) {
+            return Array(count).fill().map(() => {
+                const now = new Date('2025-03-31T00:00:00');
+                const past = new Date(now);
+                past.setDate(now.getDate() - randomInt(0, 30));
+                return {
+                    id: faker.datatype.number({ min: 1, max: 10000 }),
+                    title: faker.lorem.sentence(5),
+                    time: past,
+                    unread: faker.datatype.boolean(),
+                    content: `<p>${faker.lorem.paragraphs(randomInt(1, 5))}</p>` + (randomInt(0, 1) ? `<img src="${getPicsumImage(300, 200, `system-${randomInt(0, 1000)}`)}" alt="System Image">` : '')
+                };
+            }).sort((a, b) => new Date(b.time) - new Date(a.time));
+        }
+
+        function initMessagePage() {
+            if (!document.getElementById('message-tabs')) {
+                console.error('消息页面元素未加载完成');
+                return;
+            }
+            renderTabs();
+            renderMessageList();
+            renderMessageDetails();
+            setupEventListeners();
+        }
+
+        function renderTabs() {
+            const tabs = document.getElementById('message-tabs');
+            if (!tabs) return;
+            tabs.querySelectorAll('.message-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === currentTab);
+                tab.addEventListener('click', () => {
+                    currentTab = tab.dataset.tab;
+                    currentPage = 1;
+                    selectedMessageId = filteredMessages[currentTab][0]?.id;
+                    renderTabs();
+                    renderMessageList();
+                    renderMessageDetails();
+                });
+            });
+        }
+
+        function renderMessageList() {
+            const list = document.getElementById('message-list');
+            if (!list) return;
+            const loading = document.getElementById('message-loading');
+            const start = (currentPage - 1) * MESSAGES_PER_PAGE;
+            const end = start + MESSAGES_PER_PAGE;
+            const messages = filteredMessages[currentTab].slice(0, end);
+
+            list.innerHTML = messages.map(msg => {
+                let html = `<div class="message-item ${msg.id === selectedMessageId ? 'active' : ''}" data-id="${msg.id}">`;
+                if (currentTab === 'chat') {
+                    const lastMsg = msg.messages[msg.messages.length - 1];
+                    html += `<div class="avatar-container">`;
+                    html += `<img src="${msg.avatar}" class="avatar" alt="${msg.title}">`;
+                    html += `<span class="status-dot ${msg.online ? 'online' : 'offline'}"></span>`;
+                    html += `</div>`;
+                    html += `<div class="message-item-content">`;
+                    html += `<div class="message-title">${msg.title} <span>${formatTime(msg.time)}</span></div>`;
+                    html += `<div class="message-text">${msg.lastMessage}</div>`;
+                    if (msg.newCount > 0) html += `<span class="message-badge">${msg.newCount}</span>`;
+                } else if (currentTab === 'ticket') {
+                    html += `<div class="message-item-content">`;
+                    html += `<div class="message-title">${msg.title}</div>`;
+                    html += `<div class="message-text">${msg.lastMessage} ${formatTime(msg.time)}</div>`;
+                    html += `<div class="message-time">${msg.participants.map(p => `<span class="${p.role === '买家' ? 'chat-buyer' : p.role === '卖家' ? 'chat-seller' : 'chat-support'}">${p.name}</span>`).join(', ')}</div>`;
+                    if (msg.newCount > 0) html += `<span class="message-badge">${msg.newCount}</span>`;
+                } else {
+                    html += `<div class="message-item-content">`;
+                    html += `<div class="message-title">${msg.title}</div>`;
+                    html += `<div class="message-text">${formatTime(msg.time)}</div>`;
+                    if (msg.unread) html += `<span class="message-red-dot"></span>`;
+                }
+                html += `</div>`;
+                html += `</div>`;
+                return html;
+            }).join('') + '<div class="message-loading" id="message-loading">Loading next page...</div>';
+
+            list.querySelectorAll('.message-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    selectedMessageId = parseInt(item.dataset.id);
+                    if (currentTab === 'system') {
+                        const msg = filteredMessages[currentTab].find(m => m.id === selectedMessageId);
+                        if (msg) msg.unread = false;
+                    } else {
+                        const msg = filteredMessages[currentTab].find(m => m.id === selectedMessageId);
+                        if (msg) msg.newCount = 0;
+                    }
+                    renderMessageList();
+                    renderMessageDetails();
+                });
+            });
+
+            const newLoading = list.querySelector('#message-loading');
+            newLoading.style.display = end < filteredMessages[currentTab].length ? 'block' : 'none';
+        }
+
+        function renderMessageDetails() {
+            const content = document.getElementById('message-content');
+            if (!content) return;
+            const selectedMessage = filteredMessages[currentTab].find(m => m.id === selectedMessageId) || filteredMessages[currentTab][0];
+            if (!selectedMessage) {
+                content.innerHTML = `<div class="message-details"><div class="message-tips">暂无消息</div></div>`;
+                return;
+            }
+
+            let html = '<div class="message-details">';
+            if (currentTab === 'chat') {
+                html += `<div class="chat-dialog">`;
+                html += `<div class="chat-dialog-header">`;
+                html += `<div class="avatar-container">`;
+                html += `<img src="${selectedMessage.avatar}" class="avatar" alt="${selectedMessage.title}">`;
+                html += `<span class="status-dot ${selectedMessage.online ? 'online' : 'offline'}"></span>`;
+                html += `</div>`;
+                html += `<span>${selectedMessage.title} | 消息保留7天</span>`;
+                html += `</div>`;
+                html += `<div class="chat-dialog-body">`;
+                html += selectedMessage.messages.map(msg => `
+                    <div class="chat-message ${msg.isSelf ? 'self' : ''}">
+                        <div class="avatar-container">
+                            <img src="${selectedMessage.avatar}" class="avatar" alt="${msg.sender}">
+                            <span class="status-dot ${selectedMessage.online ? 'online' : 'offline'}"></span>
+                        </div>
+                        <div class="chat-content ${msg.isSelf ? 'self' : ''}">${msg.content}</div>
+                        <div class="chat-time">${formatTime(msg.time)}</div>
+                    </div>
+                `).join('');
+                html += `</div>`;
+                html += `<div class="chat-dialog-footer"><textarea class="chat-input" placeholder="输入消息..."></textarea><button class="btn-solid-small" onclick="sendChatMessage(${selectedMessage.id})">发送</button></div>`;
+                html += `</div>`;
+            } else if (currentTab === 'ticket') {
+                html += `<div class="chat-dialog">`;
+                html += `<div class="chat-dialog-header"><span>订单 #${selectedMessage.orderId} - ${selectedMessage.title.split(' - ')[1]} 金额: ${selectedMessage.amount} | 数量: ${selectedMessage.quantity} | 时间: ${formatTime(selectedMessage.time)} | 消息保留30天</span></div>`;
+                html += `<div class="chat-dialog-body">`;
+                html += selectedMessage.messages.map(msg => `
+                    <div class="chat-message ${msg.isSelf ? 'self' : ''}">
+                        <div class="avatar-container">
+                            <img src="${selectedMessage.participants.find(p => p.role === msg.sender)?.avatar}" class="avatar" alt="${msg.name}">
+                            <span class="status-dot ${selectedMessage.participants.find(p => p.role === msg.sender)?.online ? 'online' : 'offline'}"></span>
+                        </div>
+                        <div class="chat-content ${msg.isSelf ? 'self' : msg.isTemplate ? 'template' : ''}">
+                            <div class="chat-user"><span class="${msg.sender === '买家' ? 'chat-buyer' : msg.sender === '卖家' ? 'chat-seller' : 'chat-support'}">${msg.name}</span></div>
+                            ${msg.content}
+                        </div>
+                        <div class="chat-time">${formatTime(msg.time)}</div>
+                    </div>
+                `).join('');
+                html += `</div>`;
+                html += `<div class="chat-dialog-footer">`;
+                html += `<textarea class="chat-input" placeholder="输入消息..."></textarea>`;
+                html += `<div class="chat-actions">`;
+                html += `<button class="btn-small" onclick="requestRefund(${selectedMessage.id})" title="请求退款"><i class="fas fa-undo"></i></button>`;
+                html += `<button class="btn-small" onclick="requestReplacement(${selectedMessage.id})" title="请求换货"><i class="fas fa-exchange-alt"></i></button>`;
+                html += `<button class="btn-small" title="上传文件"><i class="fas fa-file-upload"></i></button>`;
+                html += `<button class="btn-small" title="发送图片"><i class="fas fa-image"></i></button>`;
+                html += `<button class="btn-solid-small" onclick="sendTicketMessage(${selectedMessage.id})">发送</button>`;
+                html += `</div>`;
+                html += `</div>`;
+                html += `</div>`;
+            } else if (currentTab === 'system') {
+                html += `<div class="system-title">${selectedMessage.title}</div>`;
+                html += `<div class="system-content">${selectedMessage.content}`;
+                html += `<div class="system-signature">FASTRESP Team<br>${formatTime(selectedMessage.time)}</div>`;
+                html += `</div>`;
+            }
+            html += `</div>`;
+            content.innerHTML = html;
+
+            const chatBody = content.querySelector('.chat-dialog-body');
+            if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function sendChatMessage(messageId) {
+            const input = document.querySelector('.chat-input');
+            const content = input.value.trim();
+            if (content) {
+                const msg = filteredMessages[currentTab].find(m => m.id === messageId);
+                if (msg) {
+                    msg.messages.push({
+                        sender: '我',
+                        content: content,
+                        time: new Date('2025-03-31T00:00:00'),
+                        isSelf: true
+                    });
+                    msg.lastMessage = `我: ${content.substring(0, 50)}...`;
+                    input.value = '';
+                    renderMessageList();
+                    renderMessageDetails();
+                }
+            }
+        }
+
+        function sendTicketMessage(messageId) {
+            const input = document.querySelector('.chat-input');
+            const content = input.value.trim();
+            if (content) {
+                const msg = filteredMessages[currentTab].find(m => m.id === messageId);
+                if (msg) {
+                    msg.messages.push({
+                        sender: '买家',
+                        name: '我',
+                        content: content,
+                        time: new Date('2025-03-31T00:00:00'),
+                        isSelf: true,
+                        isTemplate: false
+                    });
+                    msg.lastMessage = `我: ${content.substring(0, 50)}...`;
+                    input.value = '';
+                    renderMessageList();
+                    renderMessageDetails();
+                }
+            }
+        }
+
+        function requestRefund(messageId) {
+            const msg = filteredMessages[currentTab].find(m => m.id === messageId);
+            if (msg) {
+                document.getElementById('refund-amount').textContent = msg.amount;
+                document.getElementById('refund-dialog').style.display = 'flex';
+            }
+        }
+
+        function requestReplacement(messageId) {
+            document.getElementById('replacement-dialog').style.display = 'flex';
+        }
+
+        function submitRefund() {
+            alert('退款请求已提交');
+            closeDialog('refund-dialog');
+        }
+
+        function submitReplacement() {
+            alert('换货请求已提交');
+            closeDialog('replacement-dialog');
+        }
+
+        function closeDialog(dialogId) {
+            document.getElementById(dialogId).style.display = 'none';
+        }
+
+        function searchMessages(event) {
+            event.preventDefault();
+            const search = document.getElementById('message-search').value.toLowerCase();
+            filteredMessages[currentTab] = allMessages[currentTab].filter(msg =>
+                msg.title.toLowerCase().includes(search) ||
+                (msg.lastMessage && msg.lastMessage.toLowerCase().includes(search))
+            );
+            currentPage = 1;
+            selectedMessageId = filteredMessages[currentTab][0]?.id;
+            renderMessageList();
+            renderMessageDetails();
+        }
+
+        function setupEventListeners() {
+            const list = document.getElementById('message-list');
+            if (!list) return;
+            list.addEventListener('scroll', () => {
+                const loading = document.getElementById('message-loading');
+                const totalMessages = filteredMessages[currentTab].length;
+                const loadedMessages = currentPage * MESSAGES_PER_PAGE;
+
+                if (list.scrollTop + list.clientHeight >= list.scrollHeight - 10) {
+                    if (loadedMessages < totalMessages) {
+                        loading.style.display = 'block';
+                        setTimeout(() => {
+                            currentPage++;
+                            renderMessageList();
+                            loading.style.display = loadedMessages + MESSAGES_PER_PAGE < totalMessages ? 'block' : 'none';
+                        }, 500);
+                    } else {
+                        loading.style.display = 'none';
+                    }
+                } else {
+                    loading.style.display = 'none';
+                }
+            });
+        }
+
+        window.onload = () => {
+            w3.includeHTML(() => {
+                initMessagePage();
+            });
+        };
+    })();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92901a5c9b0dbd0f',t:'MTc0MzQyNjc5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
