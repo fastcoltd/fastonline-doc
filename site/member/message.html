@@ -27,16 +27,18 @@
         .message-loading { text-align: center; padding: 1em; color: var(--text-secondary); display: none; }
         .message-details { display: flex; flex-direction: column; height: 100%; }
         .chat-dialog { flex: 1; display: flex; flex-direction: column; background: var(--bg-white); border-radius: 0.5em; overflow: hidden; }
-        .chat-dialog-header { padding: 0.75em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-light); display: flex; align-items: center; gap: 0.5em; position: relative; }
+        .chat-dialog-header { padding: 0.75em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-light); display: flex; align-items: center; gap:1em;position: relative;font-weight: bold }
+        .chat-dialog-header button{display:flex;position: absolute; right: 1em;top: 1em;}
         .chat-dialog-body { flex: 1; padding: 1em; overflow-y: auto; display: flex; flex-direction: column; gap: 1em; }
-        .chat-dialog-footer { padding: 1em; border-top: 0.0625em solid var(--border-color); display: flex; gap: 0.5em; align-items: center; }
-        .chat-message { display: flex; gap: 0.5em; align-items: flex-start; }
+        .chat-dialog-footer { padding: 1em; border-top: 0.0625em solid var(--border-color); display: flex; flex-direction: column; gap: 0.5em; }
+        .chat-message { display: flex; gap: 0.5em; align-items: center; }
         .chat-message.self { flex-direction: row-reverse; }
         .chat-user { display: flex; align-items: center; gap: 0.25em; }
         .chat-buyer { color: var(--natural-green); }
         .chat-seller { color: var(--vibrant-orange); }
         .chat-support { color: var(--vibrant-red); }
-        .chat-content { background: var(--bg-white); padding: 0.5em 1em; border-radius: 0.5em; max-width: 70%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .chat-content { background: var(--bg-chat); padding: 0.5em 1em; border-radius: 0.5em; max-width: 70%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .chat-content::before {right: -1em; border-left-color: var(--bg-chat);}
         .chat-content.self { background: var(--natural-green); color: var(--font-white); }
         .chat-time { font-size: var(--font-small); color: var(--text-secondary); margin-top: 0.25em; }
         .search-box { width: 100%; margin: 0.5em 0.5em 0.5em 0; }
@@ -51,7 +53,7 @@
         .status-dot { width: 0.75em; height: 0.75em; border-radius: 50%; position: absolute; right: 0; bottom: 0; border: 0.0625em solid var(--bg-white); }
         .status-dot.online { background: var(--natural-green); }
         .status-dot.offline { background: var(--text-secondary); }
-        /* 从 _ticket.css 引入并调整的工单样式 */
+        /* 工单样式 */
         .ticket-chat-container { flex: 1; overflow-y: auto; padding: 1em; }
         .ticket-chat-message { margin-bottom: 1em; display: flex; align-items: flex-start; }
         .ticket-chat-message.system-message { justify-content: center; color: #FF4500; font-weight: bold; text-align: center; }
@@ -60,35 +62,39 @@
         .ticket-chat-message .chat-name { font-weight: bold; max-width: 4em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .ticket-chat-message.support-message .chat-name { max-width: 4em; }
         .ticket-chat-message.system-message .chat-name { display: none; }
-        .ticket-chat-message .chat-content { display: flex; flex-direction: column; margin-top: 0.5em; }
-        .ticket-chat-message.buyer-message .chat-bubble { background: var(--bg-light); color: var(--text-primary); }
+        .ticket-chat-message .chat-content { display: flex; flex-direction: column; }
+        .ticket-chat-message.buyer-message .chat-bubble { background: var(--bg-light); color: var(--font-green);}
         .ticket-chat-message.store-message .chat-bubble { background: #E0E0E0; color: var(--text-primary); }
-        .ticket-chat-message.support-message .chat-bubble { background: var(--natural-green); color: var(--font-white); }
+        .ticket-chat-message.support-message .chat-bubble { background: var(--bg-chat); color: var(--font-red); }
         .ticket-chat-message.system-message .chat-bubble { background: none; padding: 0; white-space: normal; word-wrap: break-word; }
-        .ticket-chat-message .chat-bubble { padding: 0.5em 1em; border-radius: 0.375em; white-space: normal; word-wrap: break-word; position: relative; margin: 0 1.5em; }
+        .ticket-chat-message .chat-bubble { padding: 0.5em 1em; border-radius: 0.375em; white-space: normal; word-wrap: break-word; position: relative; margin: 0 1em; }
         .ticket-chat-message.buyer-message { flex-direction: row-reverse; }
         .ticket-chat-message:not(.system-message) .chat-bubble::before { content: ''; position: absolute; top: 0.5em; width: 0; height: 0; border: 0.5em solid transparent; }
         .ticket-chat-message.buyer-message .chat-bubble::before { right: -1em; border-left-color: var(--bg-light); }
         .ticket-chat-message.store-message .chat-bubble::before { left: -1em; border-right-color: #E0E0E0; }
-        .ticket-chat-message.support-message .chat-bubble::before { left: -1em; border-right-color: var(--natural-green); }
+        .ticket-chat-message.support-message .chat-bubble::before { left: -1em; border-right-color: var(--bg-chat); }
         .ticket-chat-message .request-refund { color: #FF4500; }
         .ticket-chat-message .request-exchange { color: #1E90FF; }
         .ticket-chat-message .request-close { color: #FFD700; }
         .ticket-chat-message .request-support { color: #32CD32; }
+        .ticket-chat-message .chat-content { background: none;box-shadow: none }
         .ticket-message-controls { display: flex; justify-content: space-between; align-items: center; gap: 1em; padding-bottom: 0.5em; }
         .ticket-message-tabs { display: flex; gap: 0.5em; }
         .ticket-message-tabs .tab { padding: 0.5em 1em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; cursor: pointer; background: var(--bg-light); }
         .ticket-message-tabs .tab.active { background: var(--natural-green); color: var(--font-white); }
         .ticket-template-buttons { display: flex; gap: 0.5em; flex-wrap: wrap; }
+        .ticket-template-buttons .refund-btn { background: #FF4500; color: var(--font-white); }
+        .ticket-template-buttons .exchange-btn { background: #1E90FF; color: var(--font-white); }
+        .ticket-template-buttons .support-btn { background: #32CD32; color: var(--font-white); }
         .ticket-input-content { display: none; }
         .ticket-input-content.active { display: flex; gap: 0.5em; }
         .ticket-input-content.text-input { flex-direction: row; align-items: stretch; }
         .ticket-input-content textarea { padding: 0.5em; border: none; border-radius: 0.375em 0 0 0.375em; min-height: 4em; resize: vertical; flex: 1; margin: 0; }
-        .ticket-input-content .send-btn { width: 6.5em; height: auto; padding: 0; border-radius: 0 0.375em 0.375em 0; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .ticket-input-content .send-btn { width: 10%; height: auto; padding: 0; border-radius: 0 0.375em 0.375em 0; display: flex; align-items: center; justify-content: center; margin: 0; }
         .ticket-template-actions { margin-top: 0.5em; display: flex; gap: 0.5em; }
         .ticket-response-status { margin-top: 0.5em; font-weight: bold; }
         .ticket-timestamp { color: var(--text-secondary); margin-left: 0.5em; font-size: small; text-shadow: 1px 1px 2px var(--font-green); }
-        .close-ticket-btn { background: #FF4500; color: var(--font-white); border: none; padding: 0.25em 0.5em; border-radius: 0.375em; cursor: pointer; margin-left: 0.5em; vertical-align: middle; }
+        .close-ticket-btn { background: #FF4500; color: var(--font-white); border: none; padding: 0.25em 0.5em; border-radius: 0.375em; cursor: pointer; }
         .close-ticket-btn:hover { background: #D63B00; }
         @media (max-width: 48em) {
             .message-wrapper { flex-direction: column; }
@@ -116,7 +122,7 @@
                         <div class="message-tab" data-tab="ticket">工单</div>
                         <div class="message-tab" data-tab="system">系统</div>
                     </div>
-                    <form action="#" method="get" onsubmit="searchMessages(event)">
+                    <form action="#" onsubmit="searchMessages(event)">
                         <div class="search-box">
                             <div class="search-wrapper">
                                 <input type="text" id="message-search" placeholder="搜索消息...">
@@ -141,7 +147,7 @@
 <script src="_mCommon.js"></script>
 <script src="../_fields.js"></script>
 <script src="../_data.js"></script>
-<script src="_ticket.js"></script> <!-- 引入 _ticket.js -->
+<script src="_ticket.js"></script>
 <script>
     (function() {
         const MESSAGE_TYPES = ['chat', 'ticket', 'system'];
@@ -151,39 +157,50 @@
         let selectedMessageId = null;
 
         const userOrdersFieldConfig = {
-            id: { label: '订单ID', format: v => v, sample: () => faker.datatype.number({ min: 100000, max: 999999 }) },
-            brandName: { label: '品牌', format: v => `<span style="color: ${hotBrands.find(b => b.name === v)?.themeColor || '#000'}">${v || '无'}</span>`, sample: () => hotBrands[Math.floor(Math.random() * hotBrands.length)].name },
-            service: { label: '服务', format: v => v, sample: () => services[Math.floor(Math.random() * services.length)].name },
-            itemName: {
-                label: '名称',
-                format: (v, item) => {
-                    const type = faker.random.arrayElement(['demand_id', 'item_id', 'posts_id']);
-                    item[type] = faker.datatype.number({ min: 1, max: 10000 });
-                    const randomName = faker.commerce.productName();
-                    const name = item.demand_id ? `<i class="fa fa-list"></i> ${randomName}` :
-                        item.item_id ? `<i class="fa fa-shopping-cart"></i> ${randomName}` :
-                            item.posts_id ? `<i class="fa fa-book"></i> ${randomName}` : '未知';
-                    const url = item.demand_id ? `/site/demand.html?name=${randomName}` :
-                        item.item_id ? `/site/item.html?name=${randomName}` :
-                            item.posts_id ? `/site/post.html?name=${randomName}` : '#';
+            id: { ...ordersFieldConfig.id, label: '订单ID', format: v => v, sample: () => faker.datatype.number({ min: 100000, max: 999999 }) },
+            brandName: { label: '品牌', format: v => `<span style="color: ${hotBrands.find(b => b.name === v)?.themeColor || '#000'}">${hotBrands.find(b => b.name === v)?.name || v || '无'}</span> - ${services[Math.floor(Math.random() * services.length)].name}`, sample: () => hotBrands[Math.floor(Math.random() * hotBrands.length)].name },
+            itemName: { label: '名称', format: (v, item) => {
+                    let randomItem = [
+                        (item) => { item.item_id = faker.datatype.number({ min: 100000, max: 999999 }) },
+                        (item) => { item.demand_id = faker.datatype.number({ min: 100000, max: 999999 }) },
+                        (item) => { item.posts_id = faker.datatype.number({ min: 100000, max: 999999 }) },
+                    ];
+                    let randomName = faker.commerce.productName();
+                    randomItem[randomInt(0, randomItem.length - 1)](item);
+                    let name = item.demand_id ? `<i class="fa fa-list"></i> ${randomName}` : item.item_id ? `<i class="fa fa-shopping-cart"></i> ${randomName}` : item.posts_id ? `<i class="fa fa-book"></i> ${randomName}` : '未知';
+                    const url = item.demand_id ? `/site/demand.html?name=${randomName}` : item.item_id ? `/site/item.html?name=${randomName}` : item.posts_id ? `/site/post.html?name=${randomName}` : '#';
                     return `<a href="${url}" class="item-name">${name}</a>`;
-                },
-                sample: () => ({})
-            },
-            quantity: { label: '数量', format: v => v, sample: () => faker.datatype.number({ min: 1, max: 10 }) },
-            coupon: { label: '优惠券', format: v => v || '--', sample: () => randomInt(0, 1) > 0 ? faker.random.alphaNumeric(6).toUpperCase() : '--' },
-            amount: { label: '金额', format: v => `<span style="color:var(--font-orange)">${v}</span>`, sample: () => faker.commerce.price(50, 2000, 2, "$") },
-            paid_time: {
-                label: '时间',
-                format: v => formatTime(v),
-                sample: () => {
-                    const now = new Date('2025-03-31T00:00:00');
-                    const past = new Date(now);
-                    past.setDate(now.getDate() - randomInt(0, 30));
-                    return past;
-                }
-            }
+                }, sample: () => ({}) },
+            quantity: { ...ordersFieldConfig.quantity, format: v => v, sample: () => faker.datatype.number({ min: 1, max: 1000 }) },
+            coupon: { ...ordersFieldConfig.coupon, format: v => `${v}` },
+            amount: { ...ordersFieldConfig.amount, label: '金额', format: v => `<span style="color:var(--font-orange)">${v}</span>`, sample: () => faker.commerce.price(50, 2000, 2, "$") },
+            paid_time: { ...ordersFieldConfig.paid_time, label: '时间', sample: () => faker.date.recent().toLocaleString() },
+            feedback: { label: '反馈', format: (v, item) => {
+                    let actions = '';
+                    const hasTicketRedDot = Math.random() > 0.6 && !redDotState.ticket[item.id.sample];
+                    const hasCommentRedDot = Math.random() > 0.8 && !redDotState.comment[item.id.sample];
+                    actions += Math.random() > 0.5 ? `` : `
+                    <button class="btn-small" style="color: ${randomInt(0, 1) > 0 ? '' : 'red'}" onclick="raiseTicket(${item.id.sample}); removeRedDot(this,${item.id.sample}, 'ticket')" title="Ticket">
+                        <i class="${randomInt(0, 1) > 0 ? 'far' : 'fa'} fa-paper-plane"></i>
+                        ${hasTicketRedDot ? '<span class="red-dot"></span>' : ''}
+                    </button>`;
+                    actions += Math.random() > 0.5 ? `` : `
+                    <button class="btn-small" style="color: ${randomInt(0, 1) > 0 ? 'var(--font-orange)' : ''}" onclick="raiseComment(${item.id.sample}); removeRedDot(this,${item.id.sample}, 'comment')" title="Reviews">
+                        <i class="${randomInt(0, 1) > 0 ? 'fas' : 'far'} fa-star"></i>
+                        ${hasCommentRedDot ? '<span class="red-dot"></span>' : ''}
+                    </button>`;
+                    actions = actions.length <= 0 ? '--' : actions;
+                    return `<div class="operation-area">${actions}</div>`;
+                }, sample: () => null },
+            operation: { label: '操作', format: (v, item) => {
+                    let actions = '';
+                    actions += '<button class="btn-small" onclick="viewDetails(' + item.id.sample + ')">view</button>';
+                    actions += '<button class="btn-small" onclick="downloadInvoice(' + item.id.sample + ')"><i class="fa fa-download downloading"></i></button>';
+                    return `<div class="operation-area">${actions}</div>`;
+                }, sample: () => null }
         };
+
+        window.allOrders = generateData(userOrdersFieldConfig, randomInt(50, 500));
 
         let allMessages = {
             chat: generateChatMessages(randomInt(20, 100)),
@@ -207,6 +224,12 @@
 
         function randomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function stripHtml(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            return temp.textContent || temp.innerText || '';
         }
 
         function generateChatMessages(count) {
@@ -255,7 +278,7 @@
                     const content = isTemplate ? generateTemplateMessage(sender, order.id) : faker.lorem.sentence();
                     return {
                         sender: sender,
-                        name: sender === '买家' ? '我' : sender === '卖家' ? '快购商店' : '平台客服',
+                        name: sender === '买家' ? 'Me' : sender === '卖家' ? '快购商店' : '平台客服',
                         content: content,
                         time: msgTime,
                         isSelf: sender === '买家',
@@ -272,11 +295,11 @@
                     amount: order.amount,
                     quantity: order.quantity,
                     participants: [
-                        { role: '买家', name: '我', avatar: getPicsumImage(50, 50, `buyer-${randomInt(0, 1000)}`), online: faker.datatype.boolean() },
+                        { role: '买家', name: 'Me', avatar: getPicsumImage(50, 50, `buyer-${randomInt(0, 1000)}`), online: faker.datatype.boolean() },
                         { role: '卖家', name: '快购商店', avatar: getPicsumImage(50, 50, `seller-${randomInt(0, 1000)}`), online: faker.datatype.boolean() },
                         { role: '客服', name: '平台客服', avatar: getPicsumImage(50, 50, `support-${randomInt(0, 1000)}`), online: faker.datatype.boolean() }
                     ],
-                    lastMessage: `${lastMsg.name}: ${lastMsg.content.substring(0, 50)}...`,
+                    lastMessage: stripHtml(`${lastMsg.name}: ${lastMsg.content.substring(0, 50)}...`), // 去除 HTML
                     messages: messages
                 };
             }).sort((a, b) => new Date(b.time) - new Date(a.time));
@@ -311,10 +334,37 @@
                 console.error('消息页面元素未加载完成');
                 return;
             }
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            const id = urlParams.get('id');
+            if (tab && MESSAGE_TYPES.includes(tab)) {
+                currentTab = tab;
+                if (id) {
+                    selectedMessageId = parseInt(id);
+                    ensureMessageExists(currentTab, selectedMessageId);
+                }
+            }
+            if (!selectedMessageId) {
+                selectedMessageId = filteredMessages[currentTab][0]?.id;
+            }
             renderTabs();
             renderMessageList();
             renderMessageDetails();
+            updateUrl();
             setupEventListeners();
+        }
+
+        function ensureMessageExists(tab, id) {
+            if (!filteredMessages[tab].some(msg => msg.id === id)) {
+                const newMessage = tab === 'chat' ? generateChatMessages(1)[0] :
+                    tab === 'ticket' ? generateTicketMessages(1)[0] :
+                        generateSystemMessages(1)[0];
+                newMessage.id = id;
+                filteredMessages[tab].push(newMessage);
+                allMessages[tab].push(newMessage);
+                filteredMessages[tab].sort((a, b) => new Date(b.time) - new Date(a.time));
+                allMessages[tab].sort((a, b) => new Date(b.time) - new Date(a.time));
+            }
         }
 
         function renderTabs() {
@@ -329,6 +379,7 @@
                     renderTabs();
                     renderMessageList();
                     renderMessageDetails();
+                    updateUrl();
                 });
             });
         }
@@ -382,6 +433,7 @@
                     }
                     renderMessageList();
                     renderMessageDetails();
+                    updateUrl();
                 });
             });
 
@@ -406,7 +458,7 @@
                 html += `<img src="${selectedMessage.avatar}" class="avatar" alt="${selectedMessage.title}">`;
                 html += `<span class="status-dot ${selectedMessage.online ? 'online' : 'offline'}"></span>`;
                 html += `</div>`;
-                html += `<span>${selectedMessage.title} | 消息保留7天</span>`;
+                html += `<h3>${selectedMessage.title} | 消息保留7天</h3>`;
                 html += `</div>`;
                 html += `<div class="chat-dialog-body">`;
                 html += selectedMessage.messages.map(msg => `
@@ -420,23 +472,22 @@
                     </div>
                 `).join('');
                 html += `</div>`;
-                html += `<div class="chat-dialog-footer"><textarea class="chat-input" placeholder="输入消息..."></textarea><button class="btn-solid-small" onclick="sendChatMessage(${selectedMessage.id})">发送</button></div>`;
+                html += `<div class="chat-dialog-footer" style="flex-direction: row;"><textarea class="chat-input" placeholder="输入消息..."></textarea><button class="btn-solid-small" style="width: 10%;" onclick="sendChatMessage(${selectedMessage.id})">发送</button></div>`;
                 html += `</div>`;
             } else if (currentTab === 'ticket') {
-                const showCloseTicket = Math.random() < 0.5; // 模拟关闭工单按钮显示
-                html += `<div class="chat-dialog">`;
+                const showCloseTicket = Math.random() < 0.5;
+                html += `<div class="chat-dialog" id="ticket-chat-dialog-${selectedMessage.id}">`;
                 html += `<div class="chat-dialog-header">`;
-                html += `<h3>工单 - 订单 #${selectedMessage.orderId}</h3>`;
-                html += `<div class="order-info">`;
-                html += `<p>金额: ${selectedMessage.amount} 数量: ${selectedMessage.quantity} 订单时间: ${formatTime(selectedMessage.time)} ${showCloseTicket ? `<button class="btn-small close-ticket-btn" onclick="openCloseTicketConfirmation(${selectedMessage.orderId})">关闭工单</button>` : ''}</p>`;
+                html += `<h3>工单 - 订单 #${selectedMessage.orderId} 金额: ${selectedMessage.amount} 数量: ${selectedMessage.quantity} 订单时间: ${formatTime(selectedMessage.time)}</h3>`;
+                html += `<div>`;
+                html += `${showCloseTicket ? `<button class="btn-small close-ticket-btn" onclick="openCloseTicketConfirmation(${selectedMessage.orderId})">关闭工单</button>` : ''}`;
                 html += `</div>`;
-                html += `<button class="ticket-dialog-close" onclick="closeTicketDialog('ticket-chat-dialog-${selectedMessage.id}')">×</button>`;
                 html += `</div>`;
                 html += `<div class="chat-dialog-body">`;
                 html += `<div class="ticket-chat-container">`;
                 html += selectedMessage.messages.map(msg => {
                     const role = msg.sender === '买家' ? 'buyer' : msg.sender === '卖家' ? 'store' : 'support';
-                    const nameColor = role === 'buyer' ? '#4CAF50' : role === 'store' ? '#333333' : '#FF0000';
+                    const nameColor = role === 'buyer' ? '#4CAF50' : role === 'store' ? 'var(--font-orange)' : 'var(--font-red)';
                     return `
                         <div class="ticket-chat-message ${role}-message">
                             <div class="avatar-name">
@@ -467,28 +518,30 @@
                 html += `<button class="btn-small support-btn" onclick="requestSupport(${selectedMessage.orderId})">申请客服介入</button>`;
                 html += `</div>`;
                 html += `</div>`;
-                html += `<div class="message-content">`;
-                html += `<div id="text-input-${selectedMessage.id}" class="ticket-input-content active">`;
+                html += `<div class="ticket-input-content active" id="text-input-${selectedMessage.id}">`;
                 html += `<textarea id="chat-text-input-${selectedMessage.id}" placeholder="请输入消息..."></textarea>`;
                 html += `<button class="btn-orange-solid-small send-btn" onclick="sendTicketMessage(${selectedMessage.id}, 'text')">发送</button>`;
                 html += `</div>`;
-                html += `<div id="image-input-${selectedMessage.id}" class="ticket-input-content">`;
+                html += `<div class="ticket-input-content" id="image-input-${selectedMessage.id}">`;
                 html += `<input type="file" id="chat-image-input-${selectedMessage.id}" accept="image/*" onchange="previewImage(${selectedMessage.id})" style="display: none;">`;
                 html += `<div id="image-preview-${selectedMessage.id}" onclick="document.getElementById('chat-image-input-${selectedMessage.id}').click()">点击选择图片</div>`;
                 html += `<button class="btn-orange-solid-small send-btn" onclick="sendTicketMessage(${selectedMessage.id}, 'image')">发送</button>`;
                 html += `</div>`;
-                html += `<div id="file-input-${selectedMessage.id}" class="ticket-input-content">`;
+                html += `<div class="ticket-input-content" id="file-input-${selectedMessage.id}">`;
                 html += `<input type="file" id="chat-file-input-${selectedMessage.id}" accept=".txt,.xls,.xlsx" onchange="previewFile(${selectedMessage.id})" style="display: none;">`;
                 html += `<div id="file-preview-${selectedMessage.id}" onclick="document.getElementById('chat-file-input-${selectedMessage.id}').click()">点击选择文件</div>`;
                 html += `<button class="btn-orange-solid-small send-btn" onclick="sendTicketMessage(${selectedMessage.id}, 'file')">发送</button>`;
                 html += `</div>`;
                 html += `</div>`;
                 html += `</div>`;
-                html += `</div>`;
             } else if (currentTab === 'system') {
-                html += `<div class="system-title">${selectedMessage.title}</div>`;
+                html += `<div class="chat-dialog">`;
+                html += `<div class="chat-dialog-header">`;
+                html += `<h3>${selectedMessage.title}</h3>`;
+                html += `</div>`;
                 html += `<div class="system-content">${selectedMessage.content}`;
                 html += `<div class="system-signature">FASTRESP Team<br>${formatTime(selectedMessage.time)}</div>`;
+                html += `</div>`;
                 html += `</div>`;
             }
             html += `</div>`;
@@ -608,7 +661,7 @@
                 isSelf: true,
                 isTemplate: false
             });
-            msg.lastMessage = `我: ${content.substring(0, 50)}...`;
+            msg.lastMessage = stripHtml(`我: ${content.substring(0, 50)}...`);
             renderMessageList();
         }
 
@@ -628,7 +681,15 @@
                     input.value = '';
                     renderMessageList();
                     renderMessageDetails();
+                    updateUrl();
                 }
+            }
+        }
+
+        function updateUrl() {
+            if (selectedMessageId) {
+                const url = `/site/member/message.html?tab=${currentTab}&id=${selectedMessageId}`;
+                window.history.pushState({}, document.title, url);
             }
         }
 
@@ -643,6 +704,7 @@
             selectedMessageId = filteredMessages[currentTab][0]?.id;
             renderMessageList();
             renderMessageDetails();
+            updateUrl();
         }
 
         function setupEventListeners() {

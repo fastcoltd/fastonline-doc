@@ -98,11 +98,12 @@ function updateHeaderUI() {
             : (userData.messages.chat + userData.messages.tickets + userData.messages.system);
         const messageClass = totalMessages > 0 ? 'messages has-messages' : 'messages';
 
+        const messageUrl = haveStore ? '/site/store/message.html' : `/site/member/message.html`
         headerActions.innerHTML += `
             <div class="user-actions">
                 <a href="#" class="balance" onclick="showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })">$${userData.balance}</a>
                 <div class="messages-wrapper">
-                    <a href="#" class="${messageClass}"><i class="fas fa-envelope"></i><span class="message-count">${totalMessages}</span></a>
+                    <a href="${messageUrl}" class="${messageClass}"><i class="fas fa-envelope"></i><span class="message-count">${totalMessages}</span></a>
                     <div class="messages-tooltip">
                         ${generateMessagesTooltip(userData, haveStore)}
                     </div>

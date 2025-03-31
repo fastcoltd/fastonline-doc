@@ -72,7 +72,7 @@ function openTicketSubmissionDialog(orderId) {
             <select id="aftersales-reason">
                 ${aftersalesConfig[0].reasons.map(reason => `<option value="${reason}">${reason}</option>`).join('')}
             </select>
-            <label>申请类型:</label>
+            <label>申请:</label>
             <div class="radio-group">
                 <label><input type="radio" name="request-type" value="refund"> 退款</label>
                 <label><input type="radio" name="request-type" value="exchange" checked> 换货</label>
@@ -113,7 +113,7 @@ function submitTicket(orderId) {
     const requestType = document.querySelector('input[name="request-type"]:checked').value;
     const details = document.getElementById('submission-details').value.trim();
     const timestamp = formatTimestamp(new Date());
-    let message = `【工单提交】<br>申请类型: <strong style="color: ${requestType === 'refund' ? '#FF4500' : '#1E90FF'}">${requestType === 'refund' ? '退款' : '换货'}</strong><br>原因: <span style="color: red">${reason}</span>`;
+    let message = `【工单提交】<br>申请: <strong style="color: ${requestType === 'refund' ? '#FF4500' : '#1E90FF'}">${requestType === 'refund' ? '退款' : '换货'}</strong><br>原因: <span style="color: red">${reason}</span>`;
 
     if (order.posts_id) {
         message += details ? `<br>问题描述: ${details}` : '';
