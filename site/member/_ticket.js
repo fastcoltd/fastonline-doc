@@ -3,7 +3,7 @@
 const submittedTickets = new Set();
 const platformNames = ['客服小明', '客服小红', '客服小刚'];
 const storeName = '快购商店';
-const buyerName = '张三';
+const buyerName = 'Me';
 
 function formatTimestamp(date) {
     const hours = String(date.getHours()).padStart(2, '0');
@@ -151,7 +151,7 @@ function openChatDialog(orderId, initialMessage = null) {
     dialogContent.className = 'ticket-dialog-content';
 
     const isBuyer = true; // Simulating buyer role; adjust based on actual role logic
-    const showCloseTicket = isBuyer && Math.random() < 0.5;
+    const showCloseTicket = isBuyer && Math.random() < 0.8;
     const header = document.createElement('div');
     header.className = 'ticket-dialog-header';
     const simplifiedTime = order.paid_time; // Simplified to "HH:MM DD/MM"

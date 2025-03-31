@@ -16,24 +16,24 @@
 .chat-message.system-message {justify-content: center; color: #FF4500; font-weight: bold; text-align: center;}
 .chat-message .avatar-name {display: flex; flex-direction: column; align-items: center; gap: 0.25em; width: 2em;}
 .chat-message .chat-avatar {width: 3em; height: 3em; border-radius: 50%;}
-.chat-message .chat-name {font-weight: bold; max-width: 4em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+.chat-message .chat-name {max-width: 4em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
 .chat-message.support-message .chat-name {max-width: 4em;}
 .chat-message.system-message .chat-name {display: none;}
 .chat-message .chat-content {display: flex; flex-direction: column; margin-top: 0.5em;}
-.chat-message.buyer-message .chat-bubble {background: var(--bg-light); color: var(--text-primary);}
-.chat-message.store-message .chat-bubble {background: #E0E0E0; color: var(--text-primary);}
-.chat-message.support-message .chat-bubble {background: var(--natural-green); color: var(--font-white);}
+.chat-message.buyer-message .chat-bubble {background: var(--bg-chat); color: var(--font-green);}
+.chat-message.store-message .chat-bubble {background: var(--bg-chat); color: var(--text-primary);}
+.chat-message.support-message .chat-bubble {background: var(--bg-chat); color: var(--font-red);}
 .chat-message.system-message .chat-bubble {background: none; padding: 0; white-space: normal; word-wrap: break-word;}
 .chat-message .chat-bubble {padding: 0.5em 1em; border-radius: 0.375em; white-space: normal; word-wrap: break-word; position: relative; margin: 0 1.5em;}
 .chat-message.buyer-message {flex-direction: row-reverse;}
 .chat-message:not(.system-message) .chat-bubble::before {content: ''; position: absolute; top: 0.5em; width: 0; height: 0; border: 0.5em solid transparent;}
-.chat-message.buyer-message .chat-bubble::before {right: -1em; border-left-color: var(--bg-light);}
-.chat-message.store-message .chat-bubble::before {left: -1em; border-right-color: #E0E0E0;}
-.chat-message.support-message .chat-bubble::before {left: -1em; border-right-color: var(--natural-green);}
+.chat-message.buyer-message .chat-bubble::before {right: -1em; border-left-color: var(--bg-chat);}
+.chat-message.store-message .chat-bubble::before {left: -1em; border-right-color: var(--bg-chat);}
+.chat-message.support-message .chat-bubble::before {left: -1em; border-right-color: var(--bg-chat);}
 .chat-message .request-refund {color: #FF4500;}
 .chat-message .request-exchange {color: #1E90FF;}
-.chat-message .request-close {color: #FFD700;}
-.chat-message .request-support {color: #32CD32;}
+.chat-message .request-close {color: var(--font-orange);}
+.chat-message .request-support {color: var(--font-green);}
 .chat-input-area {padding: 1em; border-top: 0.0625em solid var(--border-color); flex-shrink: 0; display: flex; flex-direction: column; gap: 0;}
 .message-controls {display: flex; justify-content: space-between; align-items: center; gap: 1em; padding-bottom: 0.5em;}
 .message-tabs {display: flex; gap: 0.5em;}
@@ -73,12 +73,9 @@
 .confirm-refund-dialog-content {background: var(--bg-white); border-radius: 0.5em; width: 30%; max-width: 30vw; min-width: 15em; max-height: 80vh; box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2); overflow: hidden;}
 .confirm-refund-dialog-content .dialog-header {padding: 0.75em 1em; border-bottom: 0.0625em solid var(--border-color); background: var(--bg-light); display: flex; justify-content: space-between; align-items: center;}
 .confirm-refund-dialog-content .dialog-body {padding: 1em; display: flex; flex-direction: column; gap: 0.5em;}
-.timestamp {
-    color: var(--text-secondary);
-    margin-left: 0.5em;
-    font-size: small;
-    text-shadow: 1px 1px 2px var(--font-green);
-}
+.order-info{padding: 0em; margin-bottom:0em;border-bottom:none;}
+.order-info p button {position: absolute;right: 4em;}
+.timestamp { color: inherit;margin-left: 0.5em; font-size: var(--font-xsmall);}
 @media (max-width: 48em) {
     .ticket-dialog-content {width: 95%; max-width: 95%;}
     .request-dialog-content {width: 95%; max-width: 95%;}
