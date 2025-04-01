@@ -40,14 +40,14 @@
         .store-apply-tag-close {cursor: pointer; color: var(--text-danger); font-weight: bold; transition: color 0.2s;}
         .store-apply-tag-close:hover {color: var(--primary-color);}
         .store-apply-agreement {text-align: center;}
-        .store-apply-popup-agreement {display: flex; align-items: center; justify-content: center; font-size: var(--font-small); color: var(--text-primary); margin-bottom: 0.5em;}
-        .store-apply-agreement .btn-solid-large {width: 100%; max-width: 20em; padding: 0.75em 1.5em; font-size: var(--font-medium); margin-bottom: 0.5em;}
+        .store-apply-popup-agreement {display: flex; align-items: center; gap: 1em; justify-content: flex-start; font-size: var(--font-small); color: var(--text-primary); margin-bottom: 0.5em;}
+        .store-apply-agreement .btn-solid-large {width: 100%; padding: 0.75em 1.5em; font-size: var(--font-medium); margin-bottom: 0.5em;}
 
         .tox-editor-header{padding: 0!important;}
         .tox-statusbar{display: none!important;}
         /* 移动端适配 */
         @media (max-width: 48em) {
-            .store-apply-form {padding: 1em;}
+            .store-apply-form {padding: 1em;max-width: 100%;}
             .store-apply-section {margin-bottom: 0.5em;}
             .store-apply-row {flex-direction: column; gap: 0.5em;}
             .store-apply-item {margin-bottom: 0.5em;}
@@ -62,9 +62,14 @@
             .store-apply-contact-input input {width: 100%;}
             .store-apply-contact-input button {width: 100%; padding: 0.5em;}
             .store-apply-tags {flex-wrap: wrap;}
-            .store-apply-popup-agreement {flex-direction: column; text-align: center;}
-            .store-apply-popup-agreement input {margin-right: 0; margin-bottom: 0.5em;}
+            .store-apply-popup-agreement {flex-direction: row; justify-content: flex-start; text-align: center;}
+            .store-apply-popup-agreement input {margin-right: 0.5em;}
             .store-apply-agreement .btn-solid-large {max-width: 100%; padding: 0.5em 1em;}
+
+
+            .tox-editor-header{padding: 0!important;scrollbar-width:none!important;}
+            .tox-statusbar{display: none!important;}
+            .tox .tox-toolbar--scrolling{scrollbar-width:none!important;}
         }
     </style>
 </head>
@@ -74,7 +79,7 @@
 
 <!-- 主内容 -->
 <div class="container store-apply-container">
-    <h2 class="section-title">申请成为卖家</h2>
+    <h2 class="section-title">Apply to become a seller</h2>
     <hr class="store-apply-divider">
     <form id="store-apply-form" action="/site/store/submit-application" method="post" class="store-apply-form" enctype="multipart/form-data">
         <!-- Logo -->
@@ -82,11 +87,11 @@
             <div class="store-apply-item store-apply-logo">
                 <div class="store-apply-logo-selector">
                     <div class="store-apply-logo-circle" id="logo-circle">
-                        <img src="/site/store/logo-demo.jpg" alt="点击选择Logo">
+                        <img src="/site/store/logo-demo.jpg" title="点击选择Logo">
                         <input type="file" id="logo" name="logo" accept="image/*" hidden>
                     </div>
                     <div class="store-apply-logo-preview">
-                        <img id="logo-preview-square" src="/site/store/logo-demo.jpg" alt="预览">
+                        <img id="logo-preview-square" src="/site/store/logo-demo.jpg" title="预览">
                     </div>
                 </div>
             </div>
