@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>店铺申请 - FASTRESP</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_style.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <style>
+        .store-apply-container {display: flex; flex-direction: column; align-items: center; width: 100%;}
+        .section-title {font-size: var(--font-xlarge); font-weight: bold; margin: 1em; color: var(--text-primary); text-align: center;}
+        .store-apply-divider {width: 100%; max-width: 80%; border: 0; border-top: 0.0625em solid var(--border-color); margin: 0 auto;}
+        .store-apply-form {max-width: 80%; width: 100%; padding: 1em 2em; background: var(--bg-white); border-radius: 0.5em; box-shadow: 0 0.125em 0.25em rgba(0, 0, 0, 0.1);}
+        .store-apply-section {margin-bottom: 1em;}
+        .store-apply-row {display: flex; gap: 1.5em; flex-wrap: nowrap; margin-bottom: 0.5em;}
+        .store-apply-item {flex: 1; display: flex; flex-direction: column; min-width: 0; margin-bottom: 0.5em;}
+        .store-apply-item label {font-size: var(--font-medium); color: var(--text-primary); font-weight: 500; display: flex; align-items: center; gap: 0.5em; white-space: nowrap;}
+        .store-apply-item input, .store-apply-item select, .store-apply-item textarea {width: 100%; padding: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; font-size: var(--font-medium); color: var(--text-primary); outline: none; background: var(--bg-white); transition: border-color 0.2s;}
+        .store-apply-item input:focus, .store-apply-item select:focus, .store-apply-item textarea:focus {border-color: var(--primary-color);}
+        .store-apply-item textarea {resize: vertical; min-height: 4em;}
+        .store-apply-logo-selector {display: flex; gap: 2em; align-items: center;}
+        .store-apply-logo-circle {width: 6em; height: 6em; border-radius: 50%; overflow: hidden; cursor: pointer; border: 0.125em dashed var(--border-color); transition: border-color 0.2s;}
+        .store-apply-logo-circle:hover {border-color: var(--primary-color);}
+        .store-apply-logo-circle img {width: 100%; height: 100%; object-fit: cover;}
+        .store-apply-logo-preview img {width: 8em; height: 4em; object-fit: cover; border-radius: 0.375em; border: 0.0625em solid var(--border-color);}
+        .store-apply-native-lang {display: flex; flex-wrap: nowrap; gap: 0.75em; align-items: center;}
+        .store-apply-native-lang select {flex: 0 0 12em;}
+        .store-apply-contacts {display: flex; flex-wrap: nowrap; gap: 0.75em; align-items: center;}
+        .store-apply-contacts select {flex: 0 0 12em;}
+        .store-apply-contact-input {display: flex; gap: 0.75em; flex: 1; align-items: center;}
+        .store-apply-contact-input input {flex: 1;}
+        .store-apply-contact-input button {padding: 0.5em 1em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; background: var(--bg-white); cursor: pointer; transition: background 0.2s;}
+        .store-apply-contact-input button:hover {background: var(--bg-light);}
+        .store-apply-tags {display: flex; flex-wrap: nowrap; gap: 0.75em; margin-right: 0.75em;}
+        .store-apply-tag {padding: 0.5em 0.75em; background: var(--bg-light); border: 0.0625em solid var(--border-color); border-radius: 1em; display: flex; align-items: center; gap: 0.5em; font-size: var(--font-small); white-space: nowrap;}
+        .store-apply-tag-close {cursor: pointer; color: var(--text-danger); font-weight: bold; transition: color 0.2s;}
+        .store-apply-tag-close:hover {color: var(--primary-color);}
+        .store-apply-agreement {text-align: center;}
+        .store-apply-popup-agreement {display: flex; align-items: center; justify-content: center; font-size: var(--font-small); color: var(--text-primary); margin-bottom: 0.5em;}
+        .store-apply-agreement .btn-solid-large {width: 100%; max-width: 20em; padding: 0.75em 1.5em; font-size: var(--font-medium); margin-bottom: 0.5em;}
+
+        .tox-editor-header{padding: 0!important;}
+        .tox-statusbar{display: none!important;}
+        /* 移动端适配 */
+        @media (max-width: 48em) {
+            .store-apply-form {padding: 1em;}
+            .store-apply-section {margin-bottom: 0.5em;}
+            .store-apply-row {flex-direction: column; gap: 0.5em;}
+            .store-apply-item {margin-bottom: 0.5em;}
+            .store-apply-item label {font-size: var(--font-small); gap: 0.25em;}
+            .store-apply-item input, .store-apply-item select, .store-apply-item textarea {font-size: var(--font-small); padding: 0.5em;}
+            .store-apply-logo-selector {flex-direction: column; gap: 1em;}
+            .store-apply-logo-circle {width: 5em; height: 5em;}
+            .store-apply-logo-preview img {width: 6em; height: 3em;}
+            .store-apply-native-lang, .store-apply-contacts {flex-direction: column; align-items: stretch;}
+            .store-apply-native-lang select, .store-apply-contacts select {flex: 0 0 auto; width: 100%;}
+            .store-apply-contact-input {flex-direction: column;}
+            .store-apply-contact-input input {width: 100%;}
+            .store-apply-contact-input button {width: 100%; padding: 0.5em;}
+            .store-apply-tags {flex-wrap: wrap;}
+            .store-apply-popup-agreement {flex-direction: column; text-align: center;}
+            .store-apply-popup-agreement input {margin-right: 0; margin-bottom: 0.5em;}
+            .store-apply-agreement .btn-solid-large {max-width: 100%; padding: 0.5em 1em;}
+        }
+    </style>
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="/site/_header.html"></div>
+
+<!-- 主内容 -->
+<div class="container store-apply-container">
+    <h2 class="section-title">申请成为卖家</h2>
+    <hr class="store-apply-divider">
+    <form id="store-apply-form" action="/site/store/submit-application" method="post" class="store-apply-form" enctype="multipart/form-data">
+        <!-- Logo -->
+        <div class="store-apply-section">
+            <div class="store-apply-item store-apply-logo">
+                <div class="store-apply-logo-selector">
+                    <div class="store-apply-logo-circle" id="logo-circle">
+                        <img src="/site/store/logo-demo.jpg" alt="点击选择Logo">
+                        <input type="file" id="logo" name="logo" accept="image/*" hidden>
+                    </div>
+                    <div class="store-apply-logo-preview">
+                        <img id="logo-preview-square" src="/site/store/logo-demo.jpg" alt="预览">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="store-apply-section">
+            <div class="store-apply-row">
+                <div class="store-apply-item">
+                    <label for="country">国家: <select id="country" name="country" required></select></label>
+                </div>
+                <div class="store-apply-item">
+                    <label for="timezone">时区: <select id="timezone" name="timezone" required></select></label>
+                </div>
+                <div class="store-apply-item">
+                    <label>母语:
+                        <select id="native_language_select"></select>
+                        <div id="native-lang-tags" class="store-apply-tags"></div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 店铺描述 -->
+        <div class="store-apply-section">
+            <div class="store-apply-row">
+                <div class="store-apply-item">
+                    <label for="name">店铺名称: <input type="text" id="name" name="name" placeholder="请输入店铺名称" required></label>
+                </div>
+                <div class="store-apply-item">
+                    <label for="work_time">在线时间: <input type="text" id="work_time" name="work_time" placeholder="周一至周日 9:00-17:00"></label>
+                </div>
+            </div>
+            <div class="store-apply-item">
+                <label for="slogan">店铺口号: <input type="text" id="slogan" name="slogan" placeholder="请输入店铺口号"></label>
+            </div>
+            <div class="store-apply-item">
+                <label for="summary">店铺简介:</label>
+                <textarea id="summary" name="summary" rows="2" placeholder="简短描述您的店铺" maxlength="128"></textarea>
+            </div>
+            <div class="store-apply-item">
+                <label for="about_me">关于店铺:</label>
+                <textarea id="about_me" name="about_me" rows="2" placeholder="详细介绍您的店铺" maxlength="1024"></textarea>
+            </div>
+            <div class="store-apply-item">
+                <label for="after_sales_rules">售后规则:</label>
+                <textarea id="after_sales_rules" name="after_sales_rules" placeholder="请输入售后规则" maxlength="1024"></textarea>
+            </div>
+            <div class="store-apply-item">
+                <label for="description">详细描述:</label>
+                <textarea id="description" name="description" placeholder="更详细的店铺描述" required></textarea>
+            </div>
+        </div>
+
+        <!-- 联系信息 -->
+        <div class="store-apply-section">
+            <div class="store-apply-item">
+                <label>
+                    联系方式:
+                    <div id="contact-tags" class="store-apply-tags"></div>
+                    <div class="store-apply-contacts">
+                        <select id="contact-type">
+                            <option value="">选择类型</option>
+                            <option value="phone">电话</option>
+                            <option value="email">邮箱</option>
+                            <option value="telegram">Telegram</option>
+                            <option value="whatsapp">WhatsApp</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="twitter">Twitter</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="wechat">微信</option>
+                            <option value="qq">QQ</option>
+                            <option value="skype">Skype</option>
+                            <option value="discord">Discord</option>
+                            <option value="line">Line</option>
+                            <option value="viber">Viber</option>
+                            <option value="signal">Signal</option>
+                        </select>
+                        <div id="contact-input-container" class="store-apply-contact-input"></div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- 协议和提交 -->
+        <div class="store-apply-section store-apply-agreement">
+            <p class="store-apply-popup-agreement">
+                <input type="checkbox" id="agreement" name="agreement" required>
+                <label for="agreement">我同意 <a href="/site/rules.html#store" target="_blank">FASTRESP服务条款</a> 和 <a href="/site/privacy.html" target="_blank">隐私政策</a></label>
+            </p>
+            <button type="submit" class="btn-solid-large">提交申请</button>
+        </div>
+    </form>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="/site/_footer.html"></div>
+
+<!-- 脚本 -->
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="/site/_common.js"></script>
+<script src="/site/_fields.js"></script>
+<script src="/site/_data.js"></script>
+<script src="/site/_location.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
+<script>
+    // 动态加载下拉选项
+    function populateDropdown(id, data, key, labelKey, defaultValue) {
+        const select = document.getElementById(id);
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item[key];
+            let text = ``
+            if (typeof labelKey == 'object'){
+                labelKey.forEach(k => {
+                    text += `${item[k]} `
+                })
+            }else {
+                text = item[labelKey];
+            }
+            option.text = text;
+            if (defaultValue && item[key] === defaultValue) option.selected = true;
+            select.appendChild(option);
+        });
+    }
+
+    // 根据 UA 获取国家、时区、语言
+    function getUserLocation() {
+        const lang = navigator.language || navigator.userLanguage || 'zh-CN';
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Shanghai';
+        const country = lang.split('-')[1] || 'CN';
+        return { lang: lang.split('-')[0], timezone, country };
+    }
+
+    // 添加标签
+    function addTag(containerId, name, value, label, iconClass) {
+        const container = document.getElementById(containerId);
+        const tag = document.createElement('span');
+        tag.className = 'store-apply-tag';
+        tag.innerHTML = `${iconClass ? `<i class="${iconClass}"></i> ` : ''}${label}<span class="store-apply-tag-close">x</span>`;
+        tag.dataset.value = value;
+        tag.dataset.name = name;
+        tag.querySelector('.store-apply-tag-close').onclick = () => tag.remove();
+        container.insertBefore(tag, container.firstChild); // 插入到最前面
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        container.appendChild(input);
+    }
+
+    // Logo 选择和预览
+    const logoCircle = document.getElementById('logo-circle');
+    const logoInput = document.getElementById('logo');
+    logoCircle.addEventListener('click', () => logoInput.click());
+    logoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                logoCircle.querySelector('img').src = event.target.result;
+                document.getElementById('logo-preview-square').src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // 初始化富文本编辑器
+    tinymce.init({
+        selector: '#description, #after_sales_rules',
+        plugins: 'advlist autolink lists link charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime table paste code help wordcount',
+        toolbar: 'undo redo | formatselect | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link table charmap | removeformat | code preview fullscreen help',
+        menubar: false,
+        images_upload_url: false,
+        height: 250,
+        setup: (editor) => {
+            editor.on('init', () => {
+                editor.setContent('');
+            });
+            if (editor.id === 'after_sales_rules') {
+                editor.on('init', () => {
+                    editor.getContainer().style.height = (250 * 0.8) + 'px'; // 60% of 250px
+                });
+            }
+        }
+    });
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            const { lang, timezone, country } = getUserLocation();
+
+            // 加载国家
+            const countries = [...new Set(currencies.map(c => c.country))].sort();
+            populateDropdown('country', countries.map(c => ({ code: c, name: c })), 'code', 'name', country);
+
+            // 加载时区
+            populateDropdown('timezone', timezones, 'code', ['name', 'code'], timezone);
+
+            // 加载母语选择
+            const nativeSelect = document.getElementById('native_language_select');
+            languages.forEach(langItem => {
+                const option = document.createElement('option');
+                option.value = langItem.name;
+                option.text = `${langItem.name} (${langItem.country})`;
+                if (langItem.code === lang) option.selected = true;
+                nativeSelect.appendChild(option);
+            });
+            nativeSelect.addEventListener('change', () => {
+                const value = nativeSelect.value;
+                const label = nativeSelect.options[nativeSelect.selectedIndex].text;
+                if (value && !document.querySelector(`#native-lang-tags .store-apply-tag[data-value="${value}"]`)) {
+                    addTag('native-lang-tags', `native_language[]`, value, value);
+                }
+            });
+
+            // 联系方式动态输入
+            const contactTypeSelect = document.getElementById('contact-type');
+            const contactInputContainer = document.getElementById('contact-input-container');
+            contactTypeSelect.addEventListener('change', () => {
+                const type = contactTypeSelect.value;
+                if (type) {
+                    contactInputContainer.innerHTML = `
+                        <input type="text" id="contact-value" style="width: 15em!important;" placeholder="请输入${contactTypeSelect.options[contactTypeSelect.selectedIndex].text}">
+                        <button type="button" id="confirm-contact">确定</button>
+                    `;
+                    document.getElementById('confirm-contact').addEventListener('click', () => {
+                        const value = document.getElementById('contact-value').value.trim();
+                        if (value) {
+                            const label = `${contactTypeSelect.options[contactTypeSelect.selectedIndex].text}: ${value}`;
+                            const iconMap = {
+                                phone: 'fas fa-phone', email: 'fas fa-envelope', telegram: 'fab fa-telegram', whatsapp: 'fab fa-whatsapp',
+                                facebook: 'fab fa-facebook', twitter: 'fab fa-twitter', instagram: 'fab fa-instagram', linkedin: 'fab fa-linkedin',
+                                wechat: 'fab fa-wechat', qq: 'fab fa-qq', skype: 'fab fa-skype', discord: 'fab fa-discord',
+                                line: 'fab fa-line', viber: 'fab fa-viber', signal: 'fas fa-signal'
+                            };
+                            addTag('contact-tags', `contacts[]`, JSON.stringify({ type, value }), label, iconMap[type]);
+                            contactInputContainer.innerHTML = '';
+                            contactTypeSelect.value = '';
+                        }
+                    });
+                } else {
+                    contactInputContainer.innerHTML = '';
+                }
+            });
+        });
+    };
+
+    // 表单提交验证
+    document.getElementById('store-apply-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!document.getElementById('agreement').checked) {
+            alert('请同意服务条款和隐私政策');
+            return;
+        }
+        console.log('表单提交', new FormData(e.target));
+        showMessageToast({ messageType: 'success', message: '申请已提交！', timeout: 3000 });
+    });
+</script>
+</body>
+</html>
