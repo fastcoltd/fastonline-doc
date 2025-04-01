@@ -548,7 +548,7 @@ window.addEventListener('load', () => {
 
 // Reset 2FA Code Modal (Step 2)
 function generateReset2FACodeModal() {
-    const new2FACode = faker.random.alphaNumeric(16, { casing: 'upper' }).match(/.{1,4}/g).join(' '); // Uppercase 2FA code
+    const new2FACode = faker.random.alphaNumeric(16, { casing: 'upper' }).match(/.{1,4}/g).join(' ').toUpperCase(); // Uppercase 2FA code
     return `
         <i class="fas fa-arrow-left" style="position: absolute; top: 1em; left: 1em; font-size: 1.25em; cursor: pointer; color: var(--text-secondary);" onclick="showModal('reset-2fa-modal', generateReset2FAModal(), { className: 'reset-2fa-modal', style: signInRegisterStyle }); hideModal('reset-2fa-code-modal');"></i>
         <span class="modal-close" onclick="hideModal('reset-2fa-code-modal')">×</span>

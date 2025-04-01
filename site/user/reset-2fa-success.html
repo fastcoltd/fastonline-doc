@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reset 2FA Code Success - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../_style.css">
+    <link rel="stylesheet" href="../_site.css">
+</head>
+<body>
+<div w3-include-html="../_header.html"></div>
+<div class="container">
+    <div class="reset-2fa-code-content" style="padding: 1.5625em; max-width: 35em; margin: 2em auto;">
+        <i class="fas fa-arrow-left" style="position: absolute; top: 1em; left: 1em; font-size: 1.25em; cursor: pointer; color: var(--text-secondary);" onclick="window.location.href='reset-2fa.html'"></i>
+        <h3 style="font-size: var(--font-xlarge); color: var(--text-primary); margin-bottom: 1.5em; text-align: center;">Reset 2FA Code</h3>
+        <div style="margin-bottom: 1.25em; text-align: center;">
+            <img id="qr-code" src="" alt="QR Code" style="display: block; margin: 0 auto 0.5em; width: 150px; height: 150px;">
+            <p style="font-size: var(--font-small); color: var(--text-secondary); margin-bottom: 0.5em;">May use Google Authentication app scan it</p>
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <p id="2fa-secret" style="font-size: var(--font-large); color: var(--text-primary); font-weight: bold; background: var(--bg-light); padding: 0.25em 0.5em; border-radius: 0.25em; margin: 0 0.25em 0 0;"></p>
+                <button style="padding: 0.375em 0.75em; background: var(--natural-green); border: 0.0625em solid var(--natural-green); border-radius: 0.375em; color: var(--font-white); font-size: var(--font-small); cursor: pointer;" onclick="copy2FASecret()">Copy</button>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 1.25em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.375em; overflow: hidden;">
+            <input type="text" id="new-2fa-code" placeholder="Enter 2FA Code" class="ant-input" style="flex: 1; padding: 0.75em; color: var(--text-primary); border: none;">
+            <span id="new-2fa-countdown" style="padding: 0.75em; border-left: 0.0625em solid var(--border-color); background: var(--bg-white); font-size: var(--font-medium); color: var(--text-secondary); min-width: 3em; text-align: center;"></span>
+        </div>
+        <button class="btn-orange-solid-large" style="width: 100%; margin-bottom: 1em;" onclick="verifyAndReset2FA()">Verify & Reset</button>
+        <div style="display: flex; align-items: center; margin: 1em 0; text-align: center;">
+            <div style="flex-grow: 1; height: 1px; background-color: var(--border-color);"></div>
+            <span style="padding: 0 10px; color: var(--text-secondary); font-size: var(--font-medium);">usage</span>
+            <div style="flex-grow: 1; height: 1px; background-color: var(--border-color);"></div>
+        </div>
+        <ol style="margin: 0 0 1em 2em; padding-left: 1.5em; font-size: var(--font-small); color: var(--text-primary); text-align: left;">
+            <li>Download Google Authenticator</li>
+            <li>Copy the 2FA Code above</li>
+            <li>Enter it to get a temporary code</li>
+        </ol>
+        <div style="height: 10em;"></div>
+    </div>
+</div>
+<div w3-include-html="../_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="../_data.js"></script>
+<script src="../_fields.js"></script>
+<script src="../_member.js"></script>
+<script src="../_common.js"></script>
+<script>
+    w3.includeHTML();
+
+    function generate2FASecret() {
+        const secret = faker.random.alphaNumeric(16, { casing: 'upper' }).match(/.{1,4}/g).join('').replace(/\s/g, '').toUpperCase();
+        // 模拟 _member.js 中的 getUserLoginInfo()
+        const username = 'fastresp'; // 假设从登录信息获取
+        const qrData = `otpauth://totp/FASTRESP:${username}?secret=${secret}&issuer=FASTRESP`;
+        document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
+        document.getElementById('2fa-secret').textContent = secret.match(/.{1,4}/g).join(' ');
+        return secret;
+    }
+
+    function copy2FASecret() {
+        const secret = document.getElementById('2fa-secret').textContent.replace(/\s/g, '');
+        navigator.clipboard.writeText(secret).then(() => alert('Copied to clipboard!'));
+    }
+
+    function start2FACodeCountdown() {
+        const countdown = document.getElementById('new-2fa-countdown');
+        let timeLeft = 30;
+        countdown.textContent = `${timeLeft}s`;
+        const interval = setInterval(() => {
+            timeLeft--;
+            countdown.textContent = `${timeLeft}s`;
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                countdown.textContent = 'Expired';
+            }
+        }, 1000);
+    }
+
+    function verifyAndReset2FA() {
+        const code = document.getElementById('new-2fa-code').value;
+
+        // 检查输入（参考 _member.js 中的 verifyAndReset2FA）
+        if (!code) {
+            alert('Please enter a 2FA code');
+            return;
+        }
+
+        // 模拟验证（_member.js 中可能验证 2FA 码）
+        const validCode = '123456'; // 假设 _member.js 使用固定验证码
+        if (code === validCode) {
+            alert('2FA reset successful! Please sign in.');
+            window.location.href = 'login.html';
+        } else {
+            alert('Invalid 2FA code');
+        }
+    }
+
+    window.addEventListener('load', () => {
+        generate2FASecret();
+        start2FACodeCountdown();
+    });
+</script>
+</body>
+</html>

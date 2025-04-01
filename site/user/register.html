@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Join FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../_style.css">
+    <link rel="stylesheet" href="../_site.css">
+</head>
+<body>
+<div w3-include-html="../_header.html"></div>
+<div class="container">
+    <div class="register-content" style="padding: 1.5625em; max-width: 35em; margin: 2em auto;">
+        <h3 style="font-size: var(--font-xlarge); color: var(--text-primary); margin-bottom: 1.5em; text-align: center;">Join FASTRESP</h3>
+        <button class="btn-large" style="width: 100%; background: #4285f4; color: white; margin-bottom: 1em;">
+            <i class="fab fa-google" style="margin-right: 0.5em;"></i> Sign up with Google
+        </button>
+        <button class="btn-large" style="width: 100%; background: #000; color: white; margin-bottom: 1em;">
+            <i class="fab fa-apple" style="margin-right: 0.5em;"></i> Sign up with Apple
+        </button>
+        <div style="display: flex; align-items: center; margin: 1.5em 0; text-align: center;">
+            <div style="flex-grow: 1; height: 1px; background-color: var(--border-color);"></div>
+            <span style="padding: 0 10px; color: var(--text-secondary); font-size: var(--font-medium);">or</span>
+            <div style="flex-grow: 1; height: 1px; background-color: var(--border-color);"></div>
+        </div>
+        <div style="display: flex; gap: 1em; margin-bottom: 1.25em;">
+            <input type="text" id="first-name" placeholder="First Name" class="ant-input" style="width: 50%; padding: 0.75em; color: var(--text-primary);">
+            <input type="text" id="last-name" placeholder="Last Name" class="ant-input" style="width: 50%; padding: 0.75em; color: var(--text-primary);">
+        </div>
+        <input type="email" id="reg-email" placeholder="Email Address" class="ant-input" style="margin-bottom: 1.25em; padding: 0.75em; color: var(--text-primary);">
+        <div style="position: relative; margin-bottom: 1.25em;">
+            <input type="password" id="reg-password" placeholder="Password" class="ant-input" style="padding: 0.75em; color: var(--text-primary);">
+            <i id="toggle-password" class="fas fa-eye" style="position: absolute; right: 1em; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-secondary);"></i>
+        </div>
+        <select id="country" class="ant-input" style="margin-bottom: 1.25em; padding: 0.75em; color: var(--text-primary);">
+            <option value="">Select Country</option>
+            <!-- 假设 _member.js 中的 generateCountryOptions() 返回选项 -->
+            <option value="US">United States</option>
+            <option value="CN">China</option>
+        </select>
+        <div style="margin-bottom: 1.5em; font-size: var(--font-medium); color: var(--text-primary);">
+            <label style="display: flex; align-items: center; margin-bottom: 0.75em;">
+                <input type="checkbox" id="email-opt-in" checked style="margin-right: 0.5em;">
+                Send me emails with tips on how to find talent that fits my needs.
+            </label>
+            <label style="display: flex; align-items: flex-start; white-space: normal;">
+                <input type="checkbox" id="terms-agree" style="margin-right: 0.5em; margin-top: 0.25em;">
+                <span style="flex: 1;">Yes, I understand and agree to the <a href="#" class="see-all" style="white-space: nowrap;">Fastresp Terms of Service</a>, including the <a href="#" class="see-all" style="white-space: nowrap;">User Agreement</a> and <a href="#" class="see-all" style="white-space: nowrap;">Privacy Policy</a>.</span>
+            </label>
+        </div>
+        <button class="btn-orange-solid-large" style="width: 100%; margin-bottom: 1em;" onclick="handleRegister()">Create my account</button>
+        <p style="text-align: center; font-size: var(--font-small); color: var(--text-primary); margin-top: 1.5em;">
+            Already registered to Fastresp? <a href="login.html" class="see-all">Sign in</a>
+        </p>
+    </div>
+</div>
+<div w3-include-html="../_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="../_data.js"></script>
+<script src="../_fields.js"></script>
+<script src="../_member.js"></script>
+<script src="../_common.js"></script>
+<script>
+    w3.includeHTML();
+
+    function handleRegister() {
+        const firstName = document.getElementById('first-name').value;
+        const lastName = document.getElementById('last-name').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const country = document.getElementById('country').value;
+        const termsAgreed = document.getElementById('terms-agree').checked;
+
+        // 检查必填字段（参考 _member.js）
+        if (!firstName) {
+            alert('Please enter your first name');
+            return;
+        }
+        if (!lastName) {
+            alert('Please enter your last name');
+            return;
+        }
+        if (!email) {
+            alert('Please enter your email address');
+            return;
+        }
+        if (!password) {
+            alert('Please enter a password');
+            return;
+        }
+        if (!country) {
+            alert('Please select a country');
+            return;
+        }
+        if (!termsAgreed) {
+            alert('You must agree to the Terms of Service');
+            return;
+        }
+
+        // 密码格式验证（参考 _member.js）
+        const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            alert('Password must be at least 8 characters, include a number, and a special character');
+            return;
+        }
+
+        // 模拟注册成功（_member.js 中可能关闭弹窗）
+        alert('Registration successful! Please sign in.');
+        window.location.href = 'login.html';
+    }
+
+    // 密码显示切换（参考 _member.js 中的 toggle-password 事件）
+    document.getElementById('toggle-password').addEventListener('click', function() {
+        const passwordInput = document.getElementById('reg-password');
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        this.classList.toggle('fa-eye', isPassword);
+        this.classList.toggle('fa-eye-slash', !isPassword);
+    });
+</script>
+</body>
+</html>

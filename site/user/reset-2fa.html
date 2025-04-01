@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reset 2FA Code - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../_style.css">
+    <link rel="stylesheet" href="../_site.css">
+</head>
+<body>
+<div w3-include-html="../_header.html"></div>
+<div class="container">
+    <div class="reset-2fa-content" style="padding: 1.5625em; max-width: 35em; margin: 2em auto;">
+        <i class="fas fa-arrow-left" style="position: absolute; top: 1em; left: 1em; font-size: 1.25em; cursor: pointer; color: var(--text-secondary);" onclick="window.location.href='2fa-verify.html'"></i>
+        <h3 style="font-size: var(--font-xlarge); color: var(--text-primary); margin-bottom: 1.5em; text-align: center;">Reset 2FA Code</h3>
+        <p style="font-size: var(--font-medium); color: var(--text-primary); margin-bottom: 1.25em;">We have sent a 2FA reset email to your email address.</p>
+        <div style="display: flex; align-items: center; margin-bottom: 1.25em; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.375em; overflow: hidden;">
+            <input type="text" id="reset-2fa-code" placeholder="Enter Verification Code" class="ant-input" style="flex: 1; padding: 0.75em; color: var(--text-primary); border: none;">
+            <button id="resend-2fa" style="padding: 0.75em; border: none; border-left: 0.0625em solid var(--border-color); background: var(--bg-white); cursor: pointer; font-size: var(--font-medium); color: var(--text-secondary);" onclick="startCountdown('resend-2fa', 30)">Send 30s</button>
+        </div>
+        <button class="btn-orange-solid-large" style="width: 100%; margin-bottom: 1em;" onclick="verifyReset2FA()">Verify</button>
+        <div style="margin-bottom: 1em; display: flex; flex-direction: column; justify-content: flex-end; min-height: 28em;">
+            <div style="display: flex; align-items: center; margin: 1.5em 0; text-align: center;">
+                <div style="flex-grow: 1; height: 1px; background-color: var(--border-color);"></div>
+                <span style="padding: 0 10px; color: var(--text-secondary); font-size: var(--font-medium);">or</span>
+                <div style="flex-grow: 1; height: 1px; background-color: var(--border-color);"></div>
+            </div>
+            <button class="btn-large" style="width: 100%; background: #4285f4; color: white; margin-bottom: 2em;">
+                <i class="fab fa-google" style="margin-right: 0.5em;"></i> Sign in with Google
+            </button>
+            <button class="btn-large" style="width: 100%; background: #000; color: white; margin-bottom: 2em;">
+                <i class="fab fa-apple" style="margin-right: 0.5em;"></i> Sign in with Apple
+            </button>
+        </div>
+    </div>
+</div>
+<div w3-include-html="../_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="../_data.js"></script>
+<script src="../_fields.js"></script>
+<script src="../_member.js"></script>
+<script src="../_common.js"></script>
+<script>
+    w3.includeHTML();
+
+    function startCountdown(buttonId, seconds) {
+        const button = document.getElementById(buttonId);
+        button.disabled = true;
+        button.textContent = `${seconds}s`;
+        let timeLeft = seconds;
+        const interval = setInterval(() => {
+            timeLeft--;
+            button.textContent = `${timeLeft}s`;
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                button.textContent = 'Send';
+                button.disabled = false;
+            }
+        }, 1000);
+    }
+
+    function verifyReset2FA() {
+        const code = document.getElementById('reset-2fa-code').value;
+
+        // 检查输入（参考 _member.js 中的 verifyReset2FA）
+        if (!code) {
+            alert('Please enter a verification code');
+            return;
+        }
+
+        // 模拟验证（_member.js 中可能显示 reset-2fa-code-modal）
+        const validCode = '123456'; // 假设 _member.js 使用固定验证码
+        if (code === validCode) {
+            window.location.href = 'reset-2fa-success.html';
+        } else {
+            alert('Invalid verification code');
+        }
+    }
+
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            startCountdown('resend-2fa', 30);
+        }, 100);
+    });
+</script>
+</body>
+</html>
