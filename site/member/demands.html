@@ -256,10 +256,11 @@
                 <table>
                     <thead>
                     <tr>
-                        <th>店铺名</th>
-                        <th>竞标价格 ($)</th>
+                        <th>投标者</th>
+                        <th>投标价格 ($)</th>
                         <th>样品数</th>
-                        <th>竞标时间</th>
+                        <th>图片</th>
+                        <th>投标时间</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -935,18 +936,23 @@
         bidsDiv.innerHTML = paginatedBids.map(bid => {
             const storeName = faker.company.companyName();
             const rating = Math.floor(Math.random() * 5) + 1;
+            const ratingCount = randomInt(1, 500);
+            const verified = randomInt(0, 1) > 0
             const badge = generateBadge('Store', 0, 1);
+            const deposit = randomInt(500, 5000);
             return `
             <tr>
                 <td style="white-space: nowrap;">
-                    <img src="${getPicsumImage(30, 30, `store-${bid.store_id}`)}" alt="店铺头像" style="width: 30px; height: 30px; border-radius: 50%; vertical-align: middle; margin-right: 0.5em;">
-                    ${storeName} (${bid.store_id})
+                    <img src="${getPicsumImage(30, 30, `store-${bid.store_id}`)}" alt="店铺头像" style="width: 30px; height: 30px; border-radius: 50%; vertical-align: middle; margin-right: 0.2em;">
+                    <i class="fas fa-check-circle" style="color: ${verified ? 'var(--font-green)' : ''}"></i> <a href="/site/store.html?name=${storeName}" target="_blank"> ${storeName}</a> |
+                    <i class="fas fa-shield-alt"></i><b title="deposit of store" style="color: var(--font-orange)"> $${deposit}</b> |
                     ${Array(rating).fill('<i class="fa fa-star" style="color: #FFD700;"></i>').join('')}
-                    ${Array(5 - rating).fill('<i class="fa fa-star-o" style="color: #FFD700;"></i>').join('')}
+                    ${Array(5 - rating).fill('<i class="fa fa-star-o" style="color: #FFD700;"></i>').join('')}(${ratingCount})
                     ${badge}
                 </td>
                 <td>$${bid.bid_price.toFixed(2)}</td>
                 <td>${randomInt(0, 5)}</td>
+                <td>${randomInt(0, 3)}</td>
                 <td>${new Date(bid.bid_time * 1000).toLocaleString()}</td>
                 <td>
                     <button class="btn-small" onclick="viewBidDetail(${bid.id})">查看详情</button>
