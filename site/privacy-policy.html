@@ -16,7 +16,7 @@
         .page-content { flex: 1; padding: 1em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); width: 960px; position: relative;}
         .page-content h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; color: var(--text-primary); font-weight: bold; text-align: center; }
         .page-content .last-update { font-size: var(--font-medium); color: var(--text-secondary); text-align: center; margin-bottom: 1em; }
-        .page-content h2 { font-size: var(--font-xlarge); margin: 1em 0 0.5em; color: var(--text-primary); font-weight: bold; }
+        .page-content h2 { font-size: var(--font-xlarge); margin: 0.5em 0 0.5em; color: var(--text-primary); font-weight: bold; }
         .page-content h3 { font-size: var(--font-large); margin: 0.75em 0 0.5em; color: var(--text-primary); font-weight: bold; }
         .page-content ul { margin: 0.5em 0; padding-left: 0; list-style-type: none; }
         .page-content li { margin: 0.5em 0; color: var(--text-secondary); }
@@ -309,6 +309,13 @@
                     }
                 });
             });
+
+            const hashId = window.location.hash
+            if (hashId){
+                setTimeout(()=>{
+                    document.querySelector(`a[href="${hashId}"]`)?.click()
+                }, 200)
+            }
 
             window.addEventListener('scroll', () => {
                 let currentSection = null;
