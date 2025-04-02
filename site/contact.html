@@ -10,15 +10,26 @@
     <link rel="stylesheet" href="/site/_style.css">
     <link rel="stylesheet" href="/site/_site.css">
     <style>
-        .contact-container {display: flex; flex-direction: column; align-items: center; width: 100%; padding: 2em;}
-        .contact-title {font-size: var(--font-xlarge); font-weight: bold; margin-bottom: 1em; color: var(--text-primary); text-align: center;}
-        .contact-content {max-width: 80%; width: 100%; background: var(--bg-white); border-radius: 0.5em; padding: 2em; box-shadow: 0 0.125em 0.25em rgba(0, 0, 0, 0.1);}
-        .contact-content p {font-size: var(--font-medium); color: var(--text-primary); margin-bottom: 1em;}
-        .contact-list {list-style: none; padding: 0;}
-        .contact-list li {font-size: var(--font-medium); color: var(--text-primary); margin-bottom: 0.5em; display: flex; align-items: center; gap: 0.5em;}
-        .contact-list li i {font-size: 1.2em;}
-        .contact-list li a {color: var(--primary-color); text-decoration: none;}
-        .contact-list li a:hover {text-decoration: underline;}
+        .contact-container {display: flex; flex-direction: column; align-items: center; width: 100%; padding: 3em 1em;}
+        .contact-title {font-size: var(--font-xlarge); font-weight: bold; color: var(--text-primary); text-align: center; margin-bottom: 1.5em; position: relative;}
+        .contact-title::after {content: ''; width: 4em; height: 0.2em; background: var(--primary-color); position: absolute; bottom: -0.5em; left: 50%; transform: translateX(-50%); border-radius: 0.1em;}
+        .contact-content {max-width: 60em; width: 100%; background: var(--bg-white); border-radius: 0.75em; padding: 2em; box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1); border: 0.0625em solid var(--border-color);}
+        .contact-intro {font-size: var(--font-medium); color: var(--text-secondary); text-align: center; margin-bottom: 2em;}
+        .contact-grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(18em, 1fr)); gap: 1.5em;}
+        .contact-card {display: flex; align-items: center; gap: 1em; padding: 1em; background: var(--bg-light); border-radius: 0.5em; transition: transform 0.3s, box-shadow 0.3s;}
+        .contact-card:hover {transform: translateY(-0.25em); box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.15);}
+        .contact-card i {font-size: 2em; width: 2em; text-align: center;}
+        .contact-card div {flex: 1;}
+        .contact-card-title {font-size: var(--font-medium); font-weight: 500; color: var(--text-primary); margin-bottom: 0.25em;}
+        .contact-card-link {font-size: var(--font-small); color: var(--primary-color); text-decoration: none;}
+        .contact-card-link:hover {text-decoration: underline; color: var(--text-danger);}
+        @media (max-width: 48em) {
+            .contact-container {padding: 2em 0.5em;}
+            .contact-content {padding: 1.5em;}
+            .contact-grid {grid-template-columns: 1fr;}
+            .contact-card {padding: 0.75em;}
+            .contact-card i {font-size: 1.5em;}
+        }
     </style>
 </head>
 <body>
@@ -29,23 +40,107 @@
 <div class="container contact-container">
     <h2 class="contact-title">联系我们</h2>
     <div class="contact-content">
-        <p>如果您有任何问题或需要帮助，请通过以下方式联系我们：</p>
-        <ul class="contact-list">
-            <li><i class="fas fa-envelope" style="color: #007bff;"></i> 邮箱: <a href="mailto:support@fastresp.com">support@fastresp.com</a></li>
-            <li><i class="fab fa-whatsapp" style="color: #25d366;"></i> WhatsApp: <a href="https://wa.me/1234567890" target="_blank">+1 234 567 890</a></li>
-            <li><i class="fab fa-telegram" style="color: #0088cc;"></i> Telegram: <a href="https://t.me/fastresp" target="_blank">@fastresp</a></li>
-            <li><i class="fab fa-facebook" style="color: #3b5998;"></i> Facebook: <a href="https://facebook.com/fastresp" target="_blank">facebook.com/fastresp</a></li>
-            <li><i class="fab fa-twitter" style="color: #1da1f2;"></i> Twitter: <a href="https://twitter.com/fastresp" target="_blank">@fastresp</a></li>
-            <li><i class="fab fa-instagram" style="color: #e1306c;"></i> Instagram: <a href="https://instagram.com/fastresp" target="_blank">@fastresp</a></li>
-            <li><i class="fab fa-linkedin" style="color: #0077b5;"></i> LinkedIn: <a href="https://linkedin.com/company/fastresp" target="_blank">linkedin.com/company/fastresp</a></li>
-            <li><i class="fab fa-wechat" style="color: #7bb32e;"></i> 微信: fastresp_official</li>
-            <li><i class="fab fa-qq" style="color: #ff5722;"></i> QQ: 1234567890</li>
-            <li><i class="fab fa-skype" style="color: #00aff0;"></i> Skype: <a href="skype:fastresp.support?chat" target="_blank">fastresp.support</a></li>
-            <li><i class="fab fa-discord" style="color: #7289da;"></i> Discord: <a href="https://discord.gg/fastresp" target="_blank">discord.gg/fastresp</a></li>
-            <li><i class="fab fa-line" style="color: #00c300;"></i> Line: <a href="https://line.me/ti/p/fastresp" target="_blank">@fastresp</a></li>
-            <li><i class="fab fa-viber" style="color: #665cac;"></i> Viber: <a href="viber://chat?number=+1234567890" target="_blank">+1 234 567 890</a></li>
-            <li><i class="fas fa-signal" style="color: #3a76f0;"></i> Signal: <a href="https://signal.me/#p/+1234567890" target="_blank">+1 234 567 890</a></li>
-        </ul>
+        <p class="contact-intro">有任何问题或需要帮助？通过以下方式与我们联系，我们将尽快回复您！</p>
+        <div class="contact-grid">
+            <div class="contact-card">
+                <i class="fas fa-envelope" style="color: #007bff;"></i>
+                <div>
+                    <div class="contact-card-title">邮箱</div>
+                    <a class="contact-card-link" href="mailto:support@fastresp.com">support@fastresp.com</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-whatsapp" style="color: #25d366;"></i>
+                <div>
+                    <div class="contact-card-title">WhatsApp</div>
+                    <a class="contact-card-link" href="https://wa.me/1234567890" target="_blank">+1 234 567 890</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-telegram" style="color: #0088cc;"></i>
+                <div>
+                    <div class="contact-card-title">Telegram</div>
+                    <a class="contact-card-link" href="https://t.me/fastresp" target="_blank">@fastresp</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-facebook" style="color: #3b5998;"></i>
+                <div>
+                    <div class="contact-card-title">Facebook</div>
+                    <a class="contact-card-link" href="https://facebook.com/fastresp" target="_blank">facebook.com/fastresp</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-twitter" style="color: #1da1f2;"></i>
+                <div>
+                    <div class="contact-card-title">Twitter</div>
+                    <a class="contact-card-link" href="https://twitter.com/fastresp" target="_blank">@fastresp</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-instagram" style="color: #e1306c;"></i>
+                <div>
+                    <div class="contact-card-title">Instagram</div>
+                    <a class="contact-card-link" href="https://instagram.com/fastresp" target="_blank">@fastresp</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-linkedin" style="color: #0077b5;"></i>
+                <div>
+                    <div class="contact-card-title">LinkedIn</div>
+                    <a class="contact-card-link" href="https://linkedin.com/company/fastresp" target="_blank">linkedin.com/company/fastresp</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-wechat" style="color: #7bb32e;"></i>
+                <div>
+                    <div class="contact-card-title">微信</div>
+                    <span class="contact-card-link">fastresp_official</span>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-qq" style="color: #ff5722;"></i>
+                <div>
+                    <div class="contact-card-title">QQ</div>
+                    <span class="contact-card-link">1234567890</span>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-skype" style="color: #00aff0;"></i>
+                <div>
+                    <div class="contact-card-title">Skype</div>
+                    <a class="contact-card-link" href="skype:fastresp.support?chat" target="_blank">fastresp.support</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-discord" style="color: #7289da;"></i>
+                <div>
+                    <div class="contact-card-title">Discord</div>
+                    <a class="contact-card-link" href="https://discord.gg/fastresp" target="_blank">discord.gg/fastresp</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-line" style="color: #00c300;"></i>
+                <div>
+                    <div class="contact-card-title">Line</div>
+                    <a class="contact-card-link" href="https://line.me/ti/p/fastresp" target="_blank">@fastresp</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fab fa-viber" style="color: #665cac;"></i>
+                <div>
+                    <div class="contact-card-title">Viber</div>
+                    <a class="contact-card-link" href="viber://chat?number=+1234567890" target="_blank">+1 234 567 890</a>
+                </div>
+            </div>
+            <div class="contact-card">
+                <i class="fas fa-signal" style="color: #3a76f0;"></i>
+                <div>
+                    <div class="contact-card-title">Signal</div>
+                    <a class="contact-card-link" href="https://signal.me/#p/+1234567890" target="_blank">+1 234 567 890</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -58,8 +153,8 @@
 <script src="/site/_common.js"></script>
 <script src="/site/_fields.js"></script>
 <script src="/site/_data.js"></script>
-<script src="/site/_member.js"></script>
 <script src="/site/_location.js"></script>
+<script src="/site/_member.js"></script>
 <script>
     window.onload = () => {
         w3.includeHTML();
