@@ -562,7 +562,7 @@ window.addEventListener("load", function()  {
         generateArticles('buyer-posts', 5, 8);
         generateArticles('seller-posts', 5, 8);
         generateArticles('resource-posts', 5, 8);
-    }, 500)
+    }, 100)
 
     let contentLen;
     setInterval(()=>{
@@ -573,6 +573,6 @@ window.addEventListener("load", function()  {
             console.log(`bind new content. ${contentLen}`)
             contentLen = document.body.innerText.length
         }
-    }, 500)
+    }, 1000)
 })
 
