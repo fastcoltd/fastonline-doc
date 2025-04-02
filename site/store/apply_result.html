@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>申请结果 - FASTRESP</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_style.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <style>
+        .result-container {display: flex; flex-direction: column; align-items: center; width: 100%; padding: 2em;}
+        .result-title {font-size: var(--font-xlarge); font-weight: bold; margin-bottom: 1em; color: var(--text-primary); text-align: center;}
+        .result-content {max-width: 80%; width: 100%; background: var(--bg-white); border-radius: 0.5em; padding: 2em; box-shadow: 0 0.125em 0.25em rgba(0, 0, 0, 0.1);}
+        .result-content p {font-size: var(--font-medium); color: var(--text-primary); margin-bottom: 1em;}
+        .result-section {margin: 0.5em 0;  border-bottom: 0.0625em solid var(--border-color);}
+        .result-section-title {font-size: var(--font-large); color: var(--primary-color); cursor: pointer; display: flex; align-items: center; gap: 0.5em; justify-content: space-between; text-decoration: underline; padding: 0.5em; border-radius: 0.375em; transition: background-color 0.3s, color 0.3s;}
+        .result-section-title i {transition: transform 0.3s;}
+        .result-section-title.collapsed i.fa-chevron-down {transform: rotate(-90deg);}
+        .result-section-content {display: none; padding: 1em; border: 0.0625em solid var(--border-color); border-radius: 0.375em;}
+        .result-section-content.visible {display: block;}
+        .result-row {display: flex; gap: 1.5em; flex-wrap: nowrap; margin-bottom: 0.5em;}
+        .result-item {font-size: var(--font-medium); color: var(--text-primary); margin-bottom: 0.5em;}
+        .result-item strong {font-weight: 500;}
+        .edit-link {margin-left:1em;color: var(--text-primary); cursor: pointer; text-decoration: underline;}
+        .edit-link:hover {color: var(--font-green);}
+        .notification-list {list-style: none; padding: 0;}
+        .notification-list li {font-size: var(--font-medium); color: var(--text-primary); margin-bottom: 0.5em; display: flex; align-items: center; gap: 0.5em;}
+        .notification-list li i {font-size: 1.2em;}
+        .notification-list li a {color: var(--primary-color); text-decoration: none;}
+        .notification-list li a:hover {text-decoration: underline;}
+        .result-item p{margin: 0 0.5em;}
+    </style>
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="/site/_header.html"></div>
+
+<!-- 主内容 -->
+<div class="container result-container">
+    <h2 class="result-title">Application Submitted</h2>
+    <div class="result-content">
+        <div class="result-section">
+            <p class="result-section-title" onclick="toggleSection(this)">
+                <span>店铺信息</span>
+                <span><i class="fas fa-chevron-down"></i></span>
+            </p>
+            <div class="result-section-content" id="submitted-info"></div>
+        </div>
+        <p>感谢您申请成为 FASTRESP 的卖家！我们会在工作时间（周一至周五 9:00-17:00）内尽快处理您的申请，通常会在 2 小时内完成审核。</p>
+        <p>审核结果将通过以下方式通知您：</p>
+        <ul class="notification-list">
+            <li><i class="fas fa-envelope" style="color: #007bff;"></i> 账号的邮箱 abcd******@gmail.com</li>
+            <li><i class="fas fa-bell" style="color: #28a745;"></i> 用户账号系统消息 (<a href="/site/member/message.html?tab=system">查看消息中心</a>)</li>
+            <li><i class="fab fa-telegram" style="color: #0088cc;"></i> Telegram Bot <a href="https://t.me/fastrespNoticeBot" target="_blank">@fastrespNoticeBot</a>（请点击链接前往绑定并发送 /start 获取通知）</li>
+        </ul>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="/site/_footer.html"></div>
+
+<!-- 脚本 -->
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="/site/_common.js"></script>
+<script src="/site/_fields.js"></script>
+<script src="/site/_data.js"></script>
+<script src="/site/_location.js"></script>
+<script src="/site/_member.js"></script>
+<script>
+    function toggleSection(element) {
+        const content = element.nextElementSibling;
+        content.classList.toggle('visible');
+        element.classList.toggle('collapsed');
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            const submittedData = JSON.parse(sessionStorage.getItem('submittedStoreData') || '{}');
+            const infoContent = document.getElementById('submitted-info');
+            const applyId = submittedData.applyId || 'APPLY' + Math.floor(1000 + Math.random() * 9000);
+
+            // 更新标题
+            const titleSpan = document.querySelector('.result-section-title span:first-child');
+            titleSpan.textContent = `店铺的信息 - Apply ID #${applyId}, ${submittedData.name || '未命名'}, ${submittedData.slogan || '无口号'}`;
+            titleSpan.innerHTML += `<span class="edit-link" onclick="editApplication('${applyId}')"><i class="fas fa-edit"></i> 编辑</span>`;
+
+            const fields = [
+                { key: 'name', label: '店铺名称', row: true },
+                { key: 'work_time', label: '在线时间', row: true },
+                { key: 'slogan', label: '店铺口号' },
+                { key: 'summary', label: '店铺简介' },
+                { key: 'about_me', label: '关于团队' },
+                { key: 'after_sales_rules', label: '售后规则' },
+                { key: 'description', label: '详细描述' },
+                { key: 'country', label: '国家', row: true },
+                { key: 'timezone', label: '时区', row: true },
+                { key: 'native_language[]', label: '母语', row: true },
+                { key: 'contacts[]', label: '联系方式' }
+            ];
+
+            let currentRow = null;
+            fields.forEach(field => {
+                if (submittedData[field.key]) {
+                    if (field.row && !currentRow) {
+                        currentRow = document.createElement('div');
+                        currentRow.className = 'result-row';
+                        infoContent.appendChild(currentRow);
+                    } else if (!field.row && currentRow) {
+                        currentRow = null;
+                    }
+
+                    const item = document.createElement('div');
+                    item.className = 'result-item';
+                    if (field.key === 'contacts[]') {
+                        item.innerHTML = `<b>${field.label}:</b> ${submittedData[field.key].map(c => `${c.type}: ${c.value}`).join(', ')}`;
+                    } else if (field.key === 'native_language[]') {
+                        item.innerHTML = `<b>${field.label}:</b> ${Array.isArray(submittedData[field.key]) ? submittedData[field.key].join(', ') : submittedData[field.key]}`;
+                    } else {
+                        item.innerHTML = `<b>${field.label}:</b> ${submittedData[field.key]}`;
+                    }
+
+                    if (currentRow) {
+                        currentRow.appendChild(item);
+                    } else {
+                        infoContent.appendChild(item);
+                    }
+                }
+            });
+        });
+    };
+
+    function editApplication(applyId) {
+        window.location.href = `/site/store/apply.html?id=${applyId}`;
+    }
+</script>
+</body>
+</html>

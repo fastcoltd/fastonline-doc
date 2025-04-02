@@ -66,7 +66,6 @@
             .store-apply-popup-agreement input {margin-right: 0.5em;}
             .store-apply-agreement .btn-solid-large {max-width: 100%; padding: 0.5em 1em;}
 
-
             .tox-editor-header{padding: 0!important;scrollbar-width:none!important;}
             .tox-statusbar{display: none!important;}
             .tox .tox-toolbar--scrolling{scrollbar-width:none!important;}
@@ -142,7 +141,7 @@
             </div>
             <div class="store-apply-item">
                 <label for="description">详细描述:</label>
-                <textarea id="description" name="description" placeholder="更详细的店铺描述" required></textarea>
+                <textarea id="description" name="description" placeholder="更详细的店铺描述"></textarea>
             </div>
         </div>
 
@@ -150,8 +149,8 @@
         <div class="store-apply-section">
             <div class="store-apply-item">
                 <label>
-                    联系方式:
                     <div id="contact-tags" class="store-apply-tags"></div>
+                    联系方式:
                     <div class="store-apply-contacts">
                         <select id="contact-type">
                             <option value="">选择类型</option>
@@ -183,7 +182,7 @@
                 <input type="checkbox" id="agreement" name="agreement" required>
                 <label for="agreement">我同意 <a href="/site/rules.html#store" target="_blank">FASTRESP服务条款</a> 和 <a href="/site/privacy.html" target="_blank">隐私政策</a></label>
             </p>
-            <button type="submit" class="btn-solid-large">提交申请</button>
+            <button type="submit" class="btn-solid-large" id="submit-button">提交申请</button>
         </div>
     </form>
 </div>
@@ -198,6 +197,7 @@
 <script src="/site/_fields.js"></script>
 <script src="/site/_data.js"></script>
 <script src="/site/_location.js"></script>
+<script src="/site/_member.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
 <script>
     // 动态加载下拉选项
@@ -206,12 +206,12 @@
         data.forEach(item => {
             const option = document.createElement('option');
             option.value = item[key];
-            let text = ``
-            if (typeof labelKey == 'object'){
+            let text = ``;
+            if (typeof labelKey == 'object') {
                 labelKey.forEach(k => {
-                    text += `${item[k]} `
-                })
-            }else {
+                    text += `${item[k]} `;
+                });
+            } else {
                 text = item[labelKey];
             }
             option.text = text;
@@ -237,7 +237,7 @@
         tag.dataset.value = value;
         tag.dataset.name = name;
         tag.querySelector('.store-apply-tag-close').onclick = () => tag.remove();
-        container.insertBefore(tag, container.firstChild); // 插入到最前面
+        container.insertBefore(tag, container.firstChild);
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = name;
@@ -275,7 +275,7 @@
             });
             if (editor.id === 'after_sales_rules') {
                 editor.on('init', () => {
-                    editor.getContainer().style.height = (250 * 0.8) + 'px'; // 60% of 250px
+                    editor.getContainer().style.height = (250 * 0.8) + 'px';
                 });
             }
         }
@@ -338,19 +338,104 @@
                     contactInputContainer.innerHTML = '';
                 }
             });
+
+            // 检查是否有 applyId 参数并填充数据
+            const urlParams = new URLSearchParams(window.location.search);
+            const applyId = urlParams.get('id');
+            if (applyId) {
+                const submittedData = JSON.parse(sessionStorage.getItem('submittedStoreData') || '{}');
+                document.getElementById('submit-button').textContent = '重新提交';
+                document.getElementById('name').value = submittedData.name || '';
+                document.getElementById('work_time').value = submittedData.work_time || '';
+                document.getElementById('slogan').value = submittedData.slogan || '';
+                document.getElementById('summary').value = submittedData.summary || '';
+                document.getElementById('about_me').value = submittedData.about_me || '';
+                tinymce.get('after_sales_rules').setContent(submittedData.after_sales_rules || '');
+                tinymce.get('description').setContent(submittedData.description || '');
+                document.getElementById('country').value = submittedData.country || '';
+                document.getElementById('timezone').value = submittedData.timezone || '';
+
+                if (submittedData['native_language[]']) {
+                    const nativeLangs = Array.isArray(submittedData['native_language[]']) ? submittedData['native_language[]'] : [submittedData['native_language[]']];
+                    nativeLangs.forEach(lang => addTag('native-lang-tags', 'native_language[]', lang, lang));
+                }
+                if (submittedData['contacts[]']) {
+                    submittedData['contacts[]'].forEach(contact => {
+                        const { type, value } = contact;
+                        const iconMap = {
+                            phone: 'fas fa-phone', email: 'fas fa-envelope', telegram: 'fab fa-telegram', whatsapp: 'fab fa-whatsapp',
+                            facebook: 'fab fa-facebook', twitter: 'fab fa-twitter', instagram: 'fab fa-instagram', linkedin: 'fab fa-linkedin',
+                            wechat: 'fab fa-wechat', qq: 'fab fa-qq', skype: 'fab fa-skype', discord: 'fab fa-discord',
+                            line: 'fab fa-line', viber: 'fab fa-viber', signal: 'fas fa-signal'
+                        };
+                        addTag('contact-tags', 'contacts[]', JSON.stringify({ type, value }), `${type}: ${value}`, iconMap[type]);
+                    });
+                }
+            }
         });
     };
 
     // 表单提交验证
     document.getElementById('store-apply-form').addEventListener('submit', (e) => {
         e.preventDefault();
-        if (!document.getElementById('agreement').checked) {
+
+        // 同步 TinyMCE 内容到 textarea
+        tinymce.triggerSave();
+
+        // 手动验证必填字段
+        const name = document.getElementById('name').value.trim();
+        const country = document.getElementById('country').value;
+        const timezone = document.getElementById('timezone').value;
+        const description = document.getElementById('description').value.trim();
+        const agreement = document.getElementById('agreement').checked;
+
+        if (!name) {
+            alert('请填写店铺名称');
+            return;
+        }
+        if (!country) {
+            alert('请选择国家');
+            return;
+        }
+        if (!timezone) {
+            alert('请选择时区');
+            return;
+        }
+        if (!description) {
+            alert('请填写详细描述');
+            return;
+        }
+        if (!agreement) {
             alert('请同意服务条款和隐私政策');
             return;
         }
-        console.log('表单提交', new FormData(e.target));
-        showMessageToast({ messageType: 'success', message: '申请已提交！', timeout: 3000 });
+
+        // 收集表单数据
+        const formData = new FormData(e.target);
+        const submittedData = {};
+        formData.forEach((value, key) => {
+            if (key === 'contacts[]') {
+                if (!submittedData[key]) submittedData[key] = [];
+                submittedData[key].push(JSON.parse(value));
+            } else {
+                submittedData[key] = value;
+            }
+        });
+
+        // 生成 Apply ID
+        const applyId = 'APPLY' + Math.floor(1000 + Math.random() * 9000);
+        submittedData.applyId = applyId;
+
+        // 存储数据到 sessionStorage
+        sessionStorage.setItem('submittedStoreData', JSON.stringify(submittedData));
+
+        // 显示成功提示并跳转
+        showMessageToast({ messageType: 'success', message: '申请已提交！', timeout: 1000 });
+        setTimeout(() => {
+            window.location.href = '/site/store/apply_result.html';
+        }, 1000);
     });
 </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'929f5fd6ea126736',t:'MTc0MzU4NjkyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
