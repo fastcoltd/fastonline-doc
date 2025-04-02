@@ -325,9 +325,15 @@ function initCarousel() {
 function generateArticles(containerId, min, max) {
     const container = document.getElementById(containerId);
     if (containerId.indexOf('about') !== -1){
-        const li = document.createElement('li');
-        li.innerHTML = `<a href="/site/rules.html">Rules</a>`;
-        container.appendChild(li);
+        const siteLinks = [
+            {name: "Service Rules" , link: "/site/rules.html"},
+            {name: "Privacy Policy" , link: "/site/privacy-policy.html"},
+        ]
+        siteLinks.forEach(link => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="${link.link}" title="${link.name}">${link.name}</a>`;
+            container.appendChild(li);
+        })
     }
     const count = faker.datatype.number({min: min, max: max});
     for (let i = 0; i < count; i++) {

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Privacy Policy - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="_style.css">
+    <link rel="stylesheet" href="_site.css">
+    <style>
+        body { padding-top: 1em; height: auto; overflow: auto !important; margin: 0; }
+        section { padding: 1em; }
+        .container { top: 6em; margin: 0 auto; position: relative; display: flex; gap: 2em; align-items: center; padding: 1em; }
+
+        .page-content { flex: 1; padding: 1em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); width: 960px; position: relative;  }
+        .page-content h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; color: var(--text-primary); font-weight: bold; text-align: center; }
+        .page-content .last-update { font-size: var(--font-medium); color: var(--text-secondary); text-align: center; margin-bottom: 1em; }
+        .page-content h2 { font-size: var(--font-xlarge); margin: 1em 0 0.5em; color: var(--text-primary); font-weight: bold; }
+        .page-content h3 { font-size: var(--font-large); margin: 0.75em 0 0.5em; color: var(--text-primary); font-weight: bold; }
+        .page-content ul { margin: 0.5em 0; padding-left: 0; list-style-type: none; }
+        .page-content li { margin: 0.5em 0; color: var(--text-secondary); }
+        /* Ensure last section is not obscured by footer */
+        section:last-child {margin-bottom: 6em; }
+
+        .toc-sidebar { width: 18%; min-width: 15em; position: sticky; top: 53%; transform: translateY(-50%); align-self: flex-start; background: var(--bg-white); border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; max-height: 80vh; overflow-y: auto; z-index: 5; }
+        .toc-sidebar a { display: block; margin: 0.5em 0; color: var(--text-primary); font-size: var(--font-large); font-weight: bold; transition: color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .toc-sidebar a:hover { color: var(--natural-green); font-weight: bold; }
+        .toc-sidebar a.active { color: var(--natural-green); font-weight: bold; }
+        .toc-sidebar .sub-item { font-size: var(--font-medium); padding-left: 1em; font-weight: normal; }
+
+        /* Ensure footer doesn’t overlap content */
+        .footer { position: relative; z-index: 0; }
+
+        @media (max-width: 48em) {
+            body, .container, .page-content { padding: 0.5em; }
+            section { padding: 0; }
+            .container { flex-direction: column; gap: 1em; align-items: flex-start; max-width: 100%; }
+            .page-content { width: 100%; }
+            .page-content h1 { font-size: var(--font-large); }
+            .toc-sidebar { display: none; }
+            section:last-child { padding-bottom: 8em; margin-bottom: 8em; }
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="_header.html"></div>
+<div class="container">
+    <div class="page-content" id="page-content"></div>
+    <div class="toc-sidebar" id="toc-sidebar"></div>
+</div>
+<div w3-include-html="_footer.html"></div>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="_fields.js"></script>
+<script src="_data.js"></script>
+<script src="_location.js"></script>
+<script src="_member.js"></script>
+<script src="_common.js"></script>
+<script>
+    function generatePrivacyPolicy() {
+        const sections = [
+            { id: 'introduction', title: 'Introduction' },
+            { id: 'scope', title: 'Scope and Applicability' },
+            { id: 'data-controller', title: 'Data Controller Information' },
+            { id: 'data-collection', title: 'Information We Collect' },
+            { id: 'legal-basis', title: 'Legal Basis for Processing' },
+            { id: 'data-usage', title: 'How We Use Your Information' },
+            { id: 'data-sharing', title: 'Sharing Your Information' },
+            { id: 'cookies', title: 'Cookies and Tracking Technologies' },
+            { id: 'data-retention', title: 'Data Retention' },
+            { id: 'international-transfers', title: 'International Data Transfers' },
+            { id: 'user-rights', title: 'Your Rights and Choices' },
+            { id: 'security', title: 'Data Security' },
+            { id: 'third-party-links', title: 'Third-Party Links and Services' },
+            { id: 'children', title: 'Children’s Privacy' },
+            { id: 'changes', title: 'Changes to This Policy' },
+            { id: 'contact', title: 'Contact Us' }
+        ];
+
+        const lastUpdate = 'April 02, 2025';
+        let contentHtml = `
+            <h1>Privacy Policy</h1>
+            <div class="last-update">Last update: ${lastUpdate}</div>
+        `;
+        let tocHtml = '';
+
+        sections.forEach((section, index) => {
+            const sectionNum = index + 1;
+            contentHtml += `<section id="${section.id}"><h2>${sectionNum}. ${section.title}</h2>`;
+            tocHtml += `<a href="#${section.id}">${sectionNum}. ${section.title}</a>`;
+
+            if (section.id === 'introduction') {
+                contentHtml += `
+                    <p>FASTRESP ("we," "us," or "our") operates a virtual goods trading platform at <a href="http://fastresp.com">fastresp.com</a> (the "Site"). This Privacy Policy outlines how we collect, use, disclose, and protect your personal information when you use our Site, including features such as user accounts, stores, blogs, articles, comments, payments, demands (bidding), and inventory management.</p>
+                    <p>We are committed to complying with applicable data protection laws worldwide, including the General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA), Personal Information Protection Law (PIPL) of China, and others. By using the Site, you consent to the practices described herein, subject to your rights under applicable law.</p>
+                `;
+            } else if (section.id === 'scope') {
+                contentHtml += `
+                    <p>This policy applies to all users of the Site, including buyers, sellers, and visitors, regardless of location. It covers personal data collected through our website, mobile applications, and related services. It does not apply to data collected offline or by third-party sites linked from our Site.</p>
+                `;
+            } else if (section.id === 'data-controller') {
+                contentHtml += `
+                    <p>FASTRESP, located at 123 Virtual Lane, Digital City, DC 00000, is the data controller responsible for your personal information. For GDPR purposes, our EU representative can be contacted at <a href="mailto:eu-privacy@fastresp.com">eu-privacy@fastresp.com</a>. For China’s PIPL, our local representative is at <a href="mailto:china-privacy@fastresp.com">china-privacy@fastresp.com</a>. For South Korea’s PIPA, our local agent is at <a href="mailto:korea-privacy@fastresp.com">korea-privacy@fastresp.com</a>.</p>
+                `;
+            } else if (section.id === 'data-collection') {
+                contentHtml += `
+                    <h3>${sectionNum}.1 Personal Information You Provide</h3>
+                    <ul>
+                        <li>${sectionNum}.1.1 <b>Account Registration:</b> Username, email address, password, and, for sellers, store name and payment details.</li>
+                        <li>${sectionNum}.1.2 <b>Transactions:</b> Payment information (e.g., credit card details via third-party processors), billing address, and recharge history.</li>
+                        <li>${sectionNum}.1.3 <b>Demands and Bidding:</b> Project descriptions, bid amounts, and related communications.</li>
+                        <li>${sectionNum}.1.4 <b>Content Creation:</b> Comments, blog posts, articles, and associated metadata (e.g., username, timestamps).</li>
+                        <li>${sectionNum}.1.5 <b>Communications:</b> Messages sent via the Site or to our support team.</li>
+                        <li>${sectionNum}.1.6 We obtain separate consent for processing sensitive personal data (e.g., payment information) and marketing communications where required by law (e.g., PIPL, PIPA).</li>
+                    </ul>
+                    <h3>${sectionNum}.2 Information Collected Automatically</h3>
+                    <ul>
+                        <li>${sectionNum}.2.1 <b>Usage Data:</b> Pages visited, items viewed, search queries, time spent, and clickstream data.</li>
+                        <li>${sectionNum}.2.2 <b>Device Information:</b> IP address, browser type, operating system, device identifiers, and geolocation data (approximate, based on IP).</li>
+                        <li>${sectionNum}.2.3 <b>Inventory Data:</b> Stock levels and product details submitted by sellers.</li>
+                    </ul>
+                    <h3>${sectionNum}.3 Information from Third Parties</h3>
+                    <ul>
+                        <li>${sectionNum}.3.1 Social media profile data if you log in via third-party authentication (e.g., Google, Facebook).</li>
+                        <li>${sectionNum}.3.2 Analytics data from partners like Google Analytics.</li>
+                    </ul>
+                `;
+                tocHtml += `
+                    <a href="#${section.id}-1" class="sub-item">${sectionNum}.1 Personal Information You Provide</a>
+                    <a href="#${section.id}-2" class="sub-item">${sectionNum}.2 Information Collected Automatically</a>
+                    <a href="#${section.id}-3" class="sub-item">${sectionNum}.3 Information from Third Parties</a>
+                `;
+            } else if (section.id === 'legal-basis') {
+                contentHtml += `
+                    <p>We process your data based on the following legal grounds:</p>
+                    <ul>
+                        <li>${sectionNum}.1.1 <b>Contract:</b> To fulfill our agreement with you (e.g., account creation, transactions, bidding).</li>
+                        <li>${sectionNum}.1.2 <b>Consent:</b> Where you opt-in (e.g., marketing emails, non-essential cookies).</li>
+                        <li>${sectionNum}.1.3 <b>Legitimate Interests:</b> To improve our services, prevent fraud, and ensure Site functionality.</li>
+                        <li>${sectionNum}.1.4 <b>Legal Obligation:</b> To comply with laws, such as tax reporting or responding to legal requests.</li>
+                    </ul>
+                `;
+            } else if (section.id === 'data-usage') {
+                contentHtml += `
+                    <p>We use your information to:</p>
+                    <ul>
+                        <li>${sectionNum}.1.1 Operate and improve the Site, including user accounts, stores, and bidding systems.</li>
+                        <li>${sectionNum}.1.2 Process payments, manage inventory, and deliver virtual goods.</li>
+                        <li>${sectionNum}.1.3 Publish your comments, articles, and demands as intended.</li>
+                        <li>${sectionNum}.1.4 Send transactional emails (e.g., order confirmations) and, with consent, marketing communications.</li>
+                        <li>${sectionNum}.1.5 Analyze usage trends and personalize content (e.g., recommended items).</li>
+                        <li>${sectionNum}.1.6 Detect and prevent fraud, enforce our Rules of Service, and ensure security.</li>
+                        <li>${sectionNum}.1.7 Comply with legal and regulatory requirements.</li>
+                    </ul>
+                `;
+            } else if (section.id === 'data-sharing') {
+                contentHtml += `
+                    <p>We may share your information with:</p>
+                    <ul>
+                        <li>${sectionNum}.1.1 <b>Service Providers:</b> Third parties for payment processing (e.g., Stripe), hosting, analytics (e.g., Google Analytics), and customer support.</li>
+                        <li>${sectionNum}.1.2 <b>Other Users:</b> Your username, store details, comments, posts, and demands are visible to others as part of Site functionality.</li>
+                        <li>${sectionNum}.1.3 <b>Legal Authorities:</b> When required by law, court order, or to protect our rights, property, or safety.</li>
+                        <li>${sectionNum}.1.4 <b>Business Transfers:</b> In case of a merger, acquisition, or asset sale.</li>
+                        <li>${sectionNum}.1.5 <b>Advertising Partners:</b> With your consent, for personalized ads. You may opt-out via your account settings or by contacting us.</li>
+                    </ul>
+                    <p>We do not sell your personal information to third parties for their own marketing purposes without your explicit consent. California residents can opt-out of data sales via our “Do Not Sell My Personal Information” link on the homepage.</p>
+                `;
+            } else if (section.id === 'cookies') {
+                contentHtml += `
+                    <h3>${sectionNum}.1 What Are Cookies and Tracking Technologies?</h3>
+                    <ul>
+                        <li>${sectionNum}.1.1 Cookies are small files stored on your device. We also use pixels, web beacons, and similar tools to collect data.</li>
+                    </ul>
+                    <h3>${sectionNum}.2 Types of Cookies We Use</h3>
+                    <ul>
+                        <li>${sectionNum}.2.1 <b>Essential Cookies:</b> Required for Site operation (e.g., login, cart, bidding functionality).</li>
+                        <li>${sectionNum}.2.2 <b>Preference Cookies:</b> Store your settings (e.g., language, currency).</li>
+                        <li>${sectionNum}.2.3 <b>Analytics Cookies:</b> Measure usage (e.g., Google Analytics) to improve the Site.</li>
+                        <li>${sectionNum}.2.4 <b>Marketing Cookies:</b> Deliver personalized ads via third-party networks.</li>
+                    </ul>
+                    <h3>${sectionNum}.3 Cookie Duration</h3>
+                    <ul>
+                        <li>${sectionNum}.3.1 <b>Session Cookies:</b> Expire when you close your browser.</li>
+                        <li>${sectionNum}.3.2 <b>Persistent Cookies:</b> Remain until deleted or expired (up to 2 years).</li>
+                    </ul>
+                    <h3>${sectionNum}.4 Managing Cookies</h3>
+                    <ul>
+                        <li>${sectionNum}.4.1 Use our <a href="#" onclick="showCookiePopup()">Cookie Settings</a> popup or your browser settings to manage preferences. Non-essential cookies (e.g., analytics, marketing) are only set with your explicit consent.</li>
+                        <li>${sectionNum}.4.2 Disabling essential cookies may impair Site functionality.</li>
+                        <li>${sectionNum}.4.3 For more, see our <a href="/site/cookie-policy.html">Cookie Policy</a>.</li>
+                    </ul>
+                    <h3>${sectionNum}.5 Third-Party Tracking</h3>
+                    <ul>
+                        <li>${sectionNum}.5.1 Third parties (e.g., ad networks, analytics providers) may use cookies. Review their policies for details.</li>
+                    </ul>
+                `;
+                tocHtml += `
+                    <a href="#${section.id}-1" class="sub-item">${sectionNum}.1 What Are Cookies and Tracking Technologies?</a>
+                    <a href="#${section.id}-2" class="sub-item">${sectionNum}.2 Types of Cookies We Use</a>
+                    <a href="#${section.id}-3" class="sub-item">${sectionNum}.3 Cookie Duration</a>
+                    <a href="#${section.id}-4" class="sub-item">${sectionNum}.4 Managing Cookies</a>
+                    <a href="#${section.id}-5" class="sub-item">${sectionNum}.5 Third-Party Tracking</a>
+                `;
+            } else if (section.id === 'data-retention') {
+                contentHtml += `
+                    <p>We retain your data only as long as necessary:</p>
+                    <ul>
+                        <li>${sectionNum}.1.1 <b>Account Data:</b> Until you delete your account, plus a 30-day grace period, unless legally required longer.</li>
+                        <li>${sectionNum}.1.2 <b>Transaction Data:</b> 7 years for tax and accounting purposes.</li>
+                        <li>${sectionNum}.1.3 <b>Content:</b> Comments and posts remain indefinitely unless removed by you or us.</li>
+                        <li>${sectionNum}.1.4 <b>Analytics Data:</b> Up to 26 months, then anonymized.</li>
+                        <li>${sectionNum}.1.5 Inactive accounts may be deleted after 2 years of inactivity.</li>
+                    </ul>
+                `;
+            } else if (section.id === 'international-transfers') {
+                contentHtml += `
+                    <p>Your data may be transferred to and processed in countries outside your jurisdiction, including the United States, where our servers are located. For China’s PIPL, we comply with Cybersecurity Administration requirements if applicable. We ensure compliance with laws like GDPR through:</p>
+                    <ul>
+                        <li>${sectionNum}.1.1 <b>Standard Contractual Clauses:</b> Agreements with third parties to protect your data.</li>
+                        <li>${sectionNum}.1.2 <b>Adequacy Decisions:</b> Transfers to countries recognized as having adequate protections.</li>
+                        <li>${sectionNum}.1.3 You may request details by contacting us.</li>
+                    </ul>
+                `;
+            } else if (section.id === 'user-rights') {
+                contentHtml += `
+                    <p>Depending on your location, you may have these rights:</p>
+                    <ul>
+                        <li>${sectionNum}.1.1 <b>Access:</b> Obtain a copy of your data.</li>
+                        <li>${sectionNum}.1.2 <b>Rectification:</b> Correct inaccurate data via your account or support.</li>
+                        <li>${sectionNum}.1.3 <b>Erasure:</b> Request deletion, subject to legal retention (e.g., tax records).</li>
+                        <li>${sectionNum}.1.4 <b>Restriction:</b> Limit processing in certain cases (e.g., disputes).</li>
+                        <li>${sectionNum}.1.5 <b>Portability:</b> Receive your data in a machine-readable format.</li>
+                        <li>${sectionNum}.1.6 <b>Object:</b> Opt-out of marketing or processing based on legitimate interests.</li>
+                        <li>${sectionNum}.1.7 <b>Withdraw Consent:</b> Revoke consent at any time (e.g., via Cookie Settings).</li>
+                        <li>${sectionNum}.1.8 <b>CCPA Rights:</b> California residents may request disclosure of data sold/shared and opt-out of sales via our “Do Not Sell My Personal Information” link.</li>
+                        <li>${sectionNum}.1.9 To exercise these rights, email <a href="mailto:privacy@fastresp.com">privacy@fastresp.com</a>. We respond within 30 days (or 45 for CCPA, if extended).</li>
+                        <li>${sectionNum}.1.10 You may lodge a complaint with your local data protection authority (e.g., ICO in the UK, CNIL in France, NPA in China).</li>
+                    </ul>
+                `;
+            } else if (section.id === 'security') {
+                contentHtml += `
+                    <p>We use technical and organizational measures (e.g., encryption, access controls, regular audits) to protect your data. In case of a data breach, we will notify you and relevant authorities immediately, or within 72 hours where required by law (e.g., GDPR, Thailand PDPA, PIPA). However, no system is 100% secure. You are responsible for securing your account credentials.</p>
+                `;
+            } else if (section.id === 'third-party-links') {
+                contentHtml += `
+                    <p>The Site may link to third-party websites (e.g., payment processors, social media). We are not responsible for their privacy practices. Review their policies before use.</p>
+                `;
+            } else if (section.id === 'children') {
+                contentHtml += `
+                    <p>The Site is not intended for children under 16 (or 13 in the US per COPPA). We do not knowingly collect data from children. If we learn of such data, we will delete it. Contact us if you believe a child has provided us with information.</p>
+                `;
+            } else if (section.id === 'changes') {
+                contentHtml += `
+                    <p>We may update this policy as needed. Changes will be posted here with an updated "Last update" date. Material changes will be notified via email or Site banners at least 7 days in advance (30 days for GDPR/CCPA significant changes).</p>
+                `;
+            } else if (section.id === 'contact') {
+                contentHtml += `
+                    <p>For questions, concerns, or to exercise your rights, please contact us using the following details:</p>
+                    <ul>
+                        <li>${sectionNum}.1.1 <b>Email:</b> <a href="mailto:privacy@fastresp.com">privacy@fastresp.com</a></li>
+                        <li>${sectionNum}.1.2 <b>Mail:</b> FASTRESP Privacy Team, 123 Virtual Lane, Digital City, DC 00000</li>
+                        <li>${sectionNum}.1.3 <b>EU Representative (GDPR):</b> <a href="mailto:eu-privacy@fastresp.com">eu-privacy@fastresp.com</a></li>
+                        <li>${sectionNum}.1.4 <b>China Representative (PIPL):</b> <a href="mailto:china-privacy@fastresp.com">china-privacy@fastresp.com</a></li>
+                        <li>${sectionNum}.1.5 <b>South Korea Agent (PIPA):</b> <a href="mailto:korea-privacy@fastresp.com">korea-privacy@fastresp.com</a></li>
+                        <li>${sectionNum}.1.6 <b>Phone:</b> +1-800-FASTRESP (Available 9 AM - 5 PM EST, Monday to Friday)</li>
+                        <li>${sectionNum}.1.7 <b>Data Protection Officer (DPO):</b> For GDPR-related inquiries, contact our DPO at <a href="mailto:dpo@fastresp.com">dpo@fastresp.com</a></li>
+                    </ul>
+                    <p>We aim to respond to all inquiries within 30 days, in compliance with applicable laws. For Southeast Asia (e.g., Thailand, Singapore), contact our regional support at <a href="mailto:sea-privacy@fastresp.com">sea-privacy@fastresp.com</a>.</p>
+                `;
+            }
+
+            contentHtml += `</section>`;
+        });
+
+        return { contentHtml, tocHtml };
+    }
+
+    function showCookiePopup() {
+        if (typeof document.cookie_consent === 'undefined') {
+            const script = document.createElement('script');
+            script.src = '_cookie.js';
+            document.body.appendChild(script);
+        }
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            const content = document.getElementById('page-content');
+            const tocSidebar = document.getElementById('toc-sidebar');
+            const policy = generatePrivacyPolicy();
+
+            content.innerHTML = policy.contentHtml;
+            tocSidebar.innerHTML = policy.tocHtml;
+
+            const sections = document.querySelectorAll('h2, h3');
+            const tocLinks = document.querySelectorAll('.toc-sidebar a');
+            const headerHeight = document.querySelector('header')?.offsetHeight || 0;
+
+            tocLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        window.location.href = window.location.href.split("#")[0] + `#${targetId}`;
+                        const offsetTop = targetElement.getBoundingClientRect().top + window.scrollY - headerHeight - 120;
+                        window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                    }
+                });
+            });
+
+            window.addEventListener('scroll', () => {
+                let currentSection = null;
+                sections.forEach(section => {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 100 && rect.bottom > 0) {
+                        currentSection = section.id;
+                    }
+                });
+                tocLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${currentSection}`) {
+                        link.classList.add('active');
+                        link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    };
+</script>
+</body>
+</html>
