@@ -13,7 +13,7 @@
         section { padding: 1em; }
         .container { top: 6em; margin: 0 auto; position: relative; display: flex; gap: 2em; align-items: center; padding: 1em; }
 
-        .page-content { flex: 1; padding: 1em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); width: 960px; position: relative;  }
+        .page-content { flex: 1; padding: 1em; font-size: var(--font-medium); line-height: 1.8; background: var(--bg-white); width: 960px; position: relative;}
         .page-content h1 { font-size: var(--font-xxlarge); margin: 0 0 0.5em; color: var(--text-primary); font-weight: bold; text-align: center; }
         .page-content .last-update { font-size: var(--font-medium); color: var(--text-secondary); text-align: center; margin-bottom: 1em; }
         .page-content h2 { font-size: var(--font-xlarge); margin: 1em 0 0.5em; color: var(--text-primary); font-weight: bold; }
@@ -105,7 +105,7 @@
                 `;
             } else if (section.id === 'data-collection') {
                 contentHtml += `
-                    <h3>${sectionNum}.1 Personal Information You Provide</h3>
+                    <h3 id="${section.id}-1">${sectionNum}.1 Personal Information You Provide</h3>
                     <ul>
                         <li>${sectionNum}.1.1 <b>Account Registration:</b> Username, email address, password, and, for sellers, store name and payment details.</li>
                         <li>${sectionNum}.1.2 <b>Transactions:</b> Payment information (e.g., credit card details via third-party processors), billing address, and recharge history.</li>
@@ -114,13 +114,13 @@
                         <li>${sectionNum}.1.5 <b>Communications:</b> Messages sent via the Site or to our support team.</li>
                         <li>${sectionNum}.1.6 We obtain separate consent for processing sensitive personal data (e.g., payment information) and marketing communications where required by law (e.g., PIPL, PIPA).</li>
                     </ul>
-                    <h3>${sectionNum}.2 Information Collected Automatically</h3>
+                    <h3 id="${section.id}-2">${sectionNum}.2 Information Collected Automatically</h3>
                     <ul>
                         <li>${sectionNum}.2.1 <b>Usage Data:</b> Pages visited, items viewed, search queries, time spent, and clickstream data.</li>
                         <li>${sectionNum}.2.2 <b>Device Information:</b> IP address, browser type, operating system, device identifiers, and geolocation data (approximate, based on IP).</li>
                         <li>${sectionNum}.2.3 <b>Inventory Data:</b> Stock levels and product details submitted by sellers.</li>
                     </ul>
-                    <h3>${sectionNum}.3 Information from Third Parties</h3>
+                    <h3 id="${section.id}-3">${sectionNum}.3 Information from Third Parties</h3>
                     <ul>
                         <li>${sectionNum}.3.1 Social media profile data if you log in via third-party authentication (e.g., Google, Facebook).</li>
                         <li>${sectionNum}.3.2 Analytics data from partners like Google Analytics.</li>
@@ -168,29 +168,29 @@
                 `;
             } else if (section.id === 'cookies') {
                 contentHtml += `
-                    <h3>${sectionNum}.1 What Are Cookies and Tracking Technologies?</h3>
+                    <h3 id="${section.id}-1">${sectionNum}.1 What Are Cookies and Tracking Technologies?</h3>
                     <ul>
                         <li>${sectionNum}.1.1 Cookies are small files stored on your device. We also use pixels, web beacons, and similar tools to collect data.</li>
                     </ul>
-                    <h3>${sectionNum}.2 Types of Cookies We Use</h3>
+                    <h3 id="${section.id}-2">${sectionNum}.2 Types of Cookies We Use</h3>
                     <ul>
                         <li>${sectionNum}.2.1 <b>Essential Cookies:</b> Required for Site operation (e.g., login, cart, bidding functionality).</li>
                         <li>${sectionNum}.2.2 <b>Preference Cookies:</b> Store your settings (e.g., language, currency).</li>
                         <li>${sectionNum}.2.3 <b>Analytics Cookies:</b> Measure usage (e.g., Google Analytics) to improve the Site.</li>
                         <li>${sectionNum}.2.4 <b>Marketing Cookies:</b> Deliver personalized ads via third-party networks.</li>
                     </ul>
-                    <h3>${sectionNum}.3 Cookie Duration</h3>
+                    <h3 id="${section.id}-3">${sectionNum}.3 Cookie Duration</h3>
                     <ul>
                         <li>${sectionNum}.3.1 <b>Session Cookies:</b> Expire when you close your browser.</li>
                         <li>${sectionNum}.3.2 <b>Persistent Cookies:</b> Remain until deleted or expired (up to 2 years).</li>
                     </ul>
-                    <h3>${sectionNum}.4 Managing Cookies</h3>
+                    <h3 id="${section.id}-4">${sectionNum}.4 Managing Cookies</h3>
                     <ul>
                         <li>${sectionNum}.4.1 Use our <a href="#" onclick="showCookiePopup()">Cookie Settings</a> popup or your browser settings to manage preferences. Non-essential cookies (e.g., analytics, marketing) are only set with your explicit consent.</li>
                         <li>${sectionNum}.4.2 Disabling essential cookies may impair Site functionality.</li>
                         <li>${sectionNum}.4.3 For more, see our <a href="/site/cookie-policy.html">Cookie Policy</a>.</li>
                     </ul>
-                    <h3>${sectionNum}.5 Third-Party Tracking</h3>
+                    <h3 id="${section.id}-5">${sectionNum}.5 Third-Party Tracking</h3>
                     <ul>
                         <li>${sectionNum}.5.1 Third parties (e.g., ad networks, analytics providers) may use cookies. Review their policies for details.</li>
                     </ul>
