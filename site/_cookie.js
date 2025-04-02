@@ -27,11 +27,11 @@
     popup.innerHTML = `
         <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;">
             <div style="flex: 1; min-width: 200px; padding-right: 20px;">
-                <p>We use cookies to enhance your experience, analyze site usage, and deliver personalized content. By continuing to use this site, you consent to our use of cookies as described in our <a href="/site/privacy-policy.html#cookies" style="color: #007bff; text-decoration: underline;">Cookie Policy</a>.</p>
+                <p>We use cookies to enhance your experience, analyze site usage, and deliver personalized content. By continuing to use this site, you consent to our use of cookies as described in our <a href="/site/privacy-policy.html#cookies" style="text-decoration: underline;">Cookie Policy</a>.</p>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; padding-top: 10px;">
-                <button id="accept-cookies" style="background: #007bff; color: #fff; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">Accept All</button>
-                <button id="customize-cookies" style="background: #fff; color: #007bff; border: 1px solid #007bff; padding: 8px 20px; border-radius: 4px; cursor: pointer;">Customize</button>
+                <button id="accept-cookies" style="background: var(--font-green); color: #fff; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">Accept All</button>
+                <button id="customize-cookies" style="background: #fff; color: var(--font-green); border: 1px solid var(--font-green); padding: 8px 20px; border-radius: 4px; cursor: pointer;">Customize</button>
             </div>
         </div>
         <div id="cookie-customize-section" style="display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
@@ -45,7 +45,7 @@
             <label style="display: block; margin-bottom: 10px;">
                 <input type="checkbox" id="marketing-cookies"> Marketing Cookies (Personalized ads and content)
             </label>
-            <button id="save-cookies" style="background: #007bff; color: #fff; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Save Preferences</button>
+            <button id="save-cookies" style="background: var(--font-green); color: #fff; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Save Preferences</button>
         </div>
     `;
 

@@ -548,9 +548,18 @@ function bindAllCardLink(){
     })
 }
 
+function showCookiePopup() {
+    if (typeof document.cookie_consent === 'undefined') {
+        const script = document.createElement('script');
+        script.src = '/site/_cookie.js';
+        document.body.appendChild(script);
+    }
+}
+
 window.addEventListener("load", function()  {
     setTimeout(()=>{
         generateServiceMenu()
+        showCookiePopup()
         generateArticles('about-posts', 5, 8);
         generateArticles('buyer-posts', 5, 8);
         generateArticles('seller-posts', 5, 8);

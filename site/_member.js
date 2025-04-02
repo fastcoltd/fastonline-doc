@@ -68,7 +68,7 @@ function updateHeaderUI() {
         const parser = new DOMParser();
         const doc = parser.parseFromString(window.originalHeaderContent, 'text/html');
         const items = doc.querySelector('a[href="#"]:not(.become-seller):not([onclick])');
-        const demands = doc.querySelector('a[href="demand-list.html"]');
+        const demands = doc.querySelector('a[href="/site/demand-list.html"]');
         const resources = doc.querySelector('.dropdown:nth-child(3)');
         const posts = doc.querySelector('.dropdown:nth-child(4)');
         const becomeSeller = doc.querySelector('.become-seller');
