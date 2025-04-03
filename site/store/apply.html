@@ -345,7 +345,8 @@
             const submittedData = JSON.parse(sessionStorage.getItem('submittedStoreData') || '{}');
             if (!applyId && Object.values(submittedData).length > 0){
                 applyId = submittedData.name
-                history.pushState({}, `Apply Store ${submittedData.name}`, `/site/store/apply.html?id=${applyId}`);
+                window.location.href = `/site/store/apply_result.html`
+                // history.pushState({}, `Apply Store ${submittedData.name}`, `/site/store/apply.html?id=${applyId}`);
             }
             if (applyId) {
                 document.getElementById('submit-button').textContent = '重新提交';
