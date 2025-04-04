@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店铺中心 - FASTRESP</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js" defer></script>
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="/site/_header.html"></div>
+
+<!-- 主内容 -->
+<div class="store-container">
+    <!-- 左侧菜单 -->
+    <div w3-include-html="/site/store/_sidebar.html"></div>
+
+    <!-- 右侧内容 -->
+    <div class="main-content">
+        <h2 style="font-size: 20px; margin-bottom: 24px;">店铺概况</h2>
+        <div class="dashboard-grid" id="store-stats"></div>
+
+        <!-- 热门列表 -->
+        <div class="hot-section">
+            <h2 style="font-size: 20px; margin-bottom: 24px;">热门列表</h2>
+            <div class="hot-container">
+                <div class="hot-card">
+                    <div class="hot-title-container">
+                        <div class="hot-title">热门商品</div>
+                        <div class="time-btn-group hot-time-filter">
+                            <button class="time-btn" data-range="today" onclick="updateHotProducts('today')">今天</button>
+                            <button class="time-btn" data-range="yesterday" onclick="updateHotProducts('yesterday')">昨天</button>
+                            <button class="time-btn active" data-range="3" onclick="updateHotProducts('3')">近3天</button>
+                            <button class="time-btn" data-range="7" onclick="updateHotProducts('7')">近7天</button>
+                        </div>
+                    </div>
+                    <div class="hot-header">
+                        <div>商品</div>
+                        <div>价格</div>
+                        <div>销售额</div>
+                        <div>客单价</div>
+                        <div>售后率</div>
+                    </div>
+                    <div class="hot-data" id="hot-products"></div>
+                </div>
+                <div class="hot-card">
+                    <div class="hot-title-container">
+                        <div class="hot-title" id="low-stock-title">即将售罄</div>
+                    </div>
+                    <div class="hot-header">
+                        <div>商品</div>
+                        <div>库存</div>
+                        <div>日销量</div>
+                        <div>可售天数</div>
+                        <div>补货</div>
+                    </div>
+                    <div class="hot-data" id="low-stock"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计曲线 -->
+        <div class="charts-section">
+            <h2 style="font-size: 20px; margin-bottom: 24px;">统计曲线</h2>
+            <div class="filter-row">
+                <div class="brand-service-filter">
+                    <select class="ant-select" id="brand-filter" onchange="updateProductFilter()">
+                        <option value="all">全部品牌</option>
+                    </select>
+                    <select class="ant-select" id="product-filter"><option value="all">全部商品</option></select>
+                </div>
+                <div class="time-filter">
+                    <div class="time-btn-group">
+                        <button class="time-btn active" data-range="7" onclick="updateCharts(7)">近7天</button>
+                        <button class="time-btn" data-range="14" onclick="updateCharts(14)">14天</button>
+                        <button class="time-btn" data-range="30" onclick="updateCharts(30)">30天</button>
+                        <button class="time-btn" data-range="custom" onclick="showCustomDatePicker()">自定义</button>
+                    </div>
+                </div>
+            </div>
+            <div class="charts-container">
+                <div class="chart-card"><div class="chart-title">销售额/退款额/提现额</div><canvas id="sales-chart"></canvas></div>
+                <div class="chart-card"><div class="chart-title">售后率/工单率/好评率</div><canvas id="rate-chart"></canvas></div>
+                <div class="chart-card"><div class="chart-title">销量/退款量/换货量</div><canvas id="volume-chart"></canvas></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="/site/_footer.html"></div>
+
+<script>
+    const storeStatsData = [
+        { title: '销售额', today: Number(faker.finance.amount(500, 5000, 2)), yesterday: Number(faker.finance.amount(400, 4500, 2)), todayAvgOrder: Number(faker.finance.amount(100, 300, 2)), yesterdayAvgOrder: Number(faker.finance.amount(90, 270, 2)), color: '#f59e0b' },
+        { title: '订单数', todayProduct: faker.random.number({ min: 5, max: 50 }), todayArticle: faker.random.number({ min: 5, max: 50 }), yesterdayProduct: faker.random.number({ min: 4, max: 45 }), yesterdayArticle: faker.random.number({ min: 4, max: 45 }), color: '#8b5cf6' },
+        { title: '售后', todayCount: faker.random.number({ min: 5, max: 20 }), yesterdayCount: faker.random.number({ min: 4, max: 18 }), refundCountToday: faker.random.number({ min: 1, max: 10 }), refundCountYesterday: faker.random.number({ min: 1, max: 8 }), replaceCountToday: faker.random.number({ min: 1, max: 5 }), replaceCountYesterday: faker.random.number({ min: 1, max: 4 }), color: '#ec4899' },
+        { title: '提现', today: Number(faker.finance.amount(100, 1000, 2)), yesterday: Number(faker.finance.amount(80, 900, 2)), withdrawing: Number(faker.finance.amount(50, 500, 2)), color: '#3b82f6' },
+        { title: '工单数', todayClosed: faker.random.number({ min: 5, max: 20 }), todayInProgress: faker.random.number({ min: 5, max: 20 }), yesterdayClosed: faker.random.number({ min: 5, max: 18 }), yesterdayInProgress: faker.random.number({ min: 5, max: 18 }), color: '#4CAF50' }
+    ];
+
+    let hotProductsData = Array.from({ length: 10 }, () => ({
+        name: faker.commerce.productName(),
+        price: `$${faker.finance.amount(50, 500, 2)}`,
+        sales: Number(faker.finance.amount(1000, 20000, 2)),
+        avgOrder: Number(faker.finance.amount(100, 300, 2)),
+        returnRate: faker.random.number({ min: 1, max: 10 }),
+    })).sort((a, b) => b.sales - a.sales);
+
+    const lowStockData = Array.from({ length: 10 }, () => ({
+        name: faker.commerce.productName(),
+        stock: faker.random.number({ min: 1, max: 20 }),
+        dailySales: faker.random.number({ min: 1, max: 10 }),
+        daysLeft: faker.random.number({ min: 1, max: 10, precision: 0.1 }),
+        restock: faker.random.number({ min: 10, max: 50 }),
+    })).sort((a, b) => a.daysLeft - b.daysLeft);
+
+    // 通用的前五名颜色
+    const topFiveColors = ['red', '#d32f2f', '#e91e63', '#f06292', '#f48fb1', '#ffcdd2'];
+
+    function getGrowthPercentage(today, yesterday) {
+        const diff = today - yesterday;
+        const percentage = yesterday === 0 ? 0 : ((diff / yesterday) * 100).toFixed(1);
+        const color = percentage >= 0 ? '#4CAF50' : '#d32f2f';
+        const arrow = percentage >= 0 ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>';
+        return `<span style="color: ${color}; font-size: var(--font-medium);">${arrow} ${Math.abs(percentage)}%</span>`;
+    }
+
+    function initStoreStats() {
+        const statsContainer = document.getElementById('store-stats');
+        storeStatsData.forEach(stat => {
+            const block = document.createElement('div');
+            block.className = 'stat-block';
+            block.style.borderLeft = `4px solid ${stat.color}`;
+            let content = '';
+            if (stat.title === '工单数') {
+                const todayTotal = stat.todayClosed + stat.todayInProgress;
+                const yesterdayTotal = stat.yesterdayClosed + stat.yesterdayInProgress;
+                content = `
+                    <div class="card-title">${stat.title}</div>
+                    <div class="card-content">${todayTotal} (<span style="color: #2196F3; font-size: 0.85em;" title="进行中">${stat.todayInProgress}</span> | <span style="color: #4CAF50; font-size: 0.85em;" title="已关闭">${stat.todayClosed}</span>) ${getGrowthPercentage(todayTotal, yesterdayTotal)}</div>
+                    <div class="card-subtext">昨日: ${yesterdayTotal} (${stat.yesterdayInProgress} | ${stat.yesterdayClosed})</div>
+                `;
+            } else if (stat.title === '订单数') {
+                const todayTotal = stat.todayProduct + stat.todayArticle;
+                const yesterdayTotal = stat.yesterdayProduct + stat.yesterdayArticle;
+                content = `
+                    <div class="card-title">${stat.title}</div>
+                    <div class="card-content" title="商品订单: ${stat.todayProduct} | 文章订单: ${stat.todayArticle}">${todayTotal} ${getGrowthPercentage(todayTotal, yesterdayTotal)}</div>
+                    <div class="card-subtext">昨日: ${yesterdayTotal} (${stat.yesterdayProduct} | ${stat.yesterdayArticle})</div>
+                `;
+            } else if (stat.title === '售后') {
+                const todayGrowth = getGrowthPercentage(stat.todayCount, stat.yesterdayCount);
+                content = `
+                    <div class="card-title">${stat.title}</div>
+                    <div class="card-content">${stat.todayCount} (<span style="color: #2196F3; font-size: 0.85em;" title="退款次数">${stat.refundCountToday}</span> | <span style="color: #4CAF50; font-size: 0.85em;" title="换货次数">${stat.replaceCountToday}</span>) ${todayGrowth}</div>
+                    <div class="card-subtext">昨日: ${stat.yesterdayCount} (${stat.refundCountYesterday} | ${stat.replaceCountYesterday})</div>
+                `;
+            } else if (stat.title === '提现') {
+                content = `
+                    <div class="card-title">${stat.title}</div>
+                    <div class="card-content">$${stat.today.toFixed(2)} ${getGrowthPercentage(stat.today, stat.yesterday)}</div>
+                    <div class="card-subtext">昨日: $${stat.yesterday.toFixed(2)} | <span style="font-weight: bold; font-size: 1.1em; color: var(--store-accent);">提现中: $${stat.withdrawing.toFixed(2)}</span></div>
+                `;
+            } else if (stat.title === '销售额') {
+                content = `
+                    <div class="card-title">${stat.title}</div>
+                    <div class="card-content">$${stat.today.toFixed(2)} (<span style="font-size: 0.85em;">$${stat.todayAvgOrder.toFixed(2)}</span>) ${getGrowthPercentage(stat.today, stat.yesterday)}</div>
+                    <div class="card-subtext">昨日: $${stat.yesterday.toFixed(2)} (<span style="font-size: 0.85em;">$${stat.yesterdayAvgOrder.toFixed(2)}</span>)</div>
+                `;
+            } else {
+                content = `
+                    <div class="card-title">${stat.title}</div>
+                    <div class="card-content">$${stat.today.toFixed(2)} ${getGrowthPercentage(stat.today, stat.yesterday)}</div>
+                    <div class="card-subtext">昨日: $${stat.yesterday.toFixed(2)}</div>
+                `;
+            }
+            block.innerHTML = content;
+            statsContainer.appendChild(block);
+        });
+    }
+
+    // 初始化热门列表
+    function initHotLists() {
+        updateHotProducts('3'); // 默认近3天
+        const lowStockContainer = document.getElementById('low-stock');
+        lowStockContainer.innerHTML = '';
+        const sortedByDailySales = [...lowStockData].sort((a, b) => b.dailySales - a.dailySales); // 日销量降序
+        const sortedByDaysLeft = [...lowStockData].sort((a, b) => a.daysLeft - b.daysLeft); // 可售天数升序
+        lowStockData.forEach((item, index) => {
+            const row = document.createElement('div');
+            row.className = 'hot-row';
+            const dailySalesRank = sortedByDailySales.findIndex(i => i.name === item.name);
+            const dailySalesColor = dailySalesRank < 5 ? topFiveColors[dailySalesRank] : '';
+            const daysLeftRank = sortedByDaysLeft.findIndex(i => i.name === item.name);
+            const daysLeftColor = daysLeftRank < 5 ? topFiveColors[daysLeftRank] : ''; // 升序，取反向颜色
+            row.innerHTML = `
+                    <div><a href="/site/item.html?name=${item.name}" class="hot-link">${item.name}</a></div>
+                    <div>${item.stock}</div>
+                    <div style="color: ${dailySalesColor}; ${dailySalesColor ? 'font-weight: bold;' : '' }">${item.dailySales}</div>
+                    <div style="color: ${daysLeftColor}; ${daysLeftColor ? 'font-weight: bold;' : '' }">${item.daysLeft}</div>
+                    <div><a href="/site/store/stock-restock.html?itemId=${index}&name=${encodeURIComponent(item.name)}" title="补货 ${item.name} 的库存"><i class="fas fa-box"></i></a></div>
+                `;
+            lowStockContainer.appendChild(row);
+        });
+        document.getElementById('low-stock-title').textContent = `即将售罄 (${lowStockData[0].name})`;
+    }
+
+    // 更新热门商品
+    function updateHotProducts(range) {
+        const hotProductsContainer = document.getElementById('hot-products');
+        hotProductsContainer.innerHTML = '';
+        document.querySelectorAll('.hot-time-filter .time-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.hot-time-filter .time-btn[data-range="${range}"]`).classList.add('active');
+        const sortedBySales = [...hotProductsData].sort((a, b) => b.sales - a.sales); // 销售额降序
+        const sortedByAvgOrder = [...hotProductsData].sort((a, b) => b.avgOrder - a.avgOrder); // 客单价降序
+        const sortedByReturnRate = [...hotProductsData].sort((a, b) => b.returnRate - a.returnRate); // 售后率降序
+        hotProductsData.forEach((item, index) => {
+            const row = document.createElement('div');
+            row.className = 'hot-row';
+            const salesRank = sortedBySales.findIndex(i => i.name === item.name);
+            const salesColor = salesRank < 5 ? topFiveColors[salesRank] : '';
+            const avgOrderRank = sortedByAvgOrder.findIndex(i => i.name === item.name);
+            const avgOrderColor = avgOrderRank < 5 ? topFiveColors[avgOrderRank] : '';
+            const returnRateRank = sortedByReturnRate.findIndex(i => i.name === item.name);
+            const returnRateColor = returnRateRank < 5 ? topFiveColors[returnRateRank] : '';
+            row.innerHTML = `
+                    <div><a href="/site/item.html?name=${item.name}" class="hot-link">${item.name}</a></div>
+                    <div>${item.price}</div>
+                    <div style="color: ${salesColor}; ${salesColor ? 'font-weight: bold;' : '' }">${item.sales}</div>
+                    <div style="color: ${avgOrderColor};  ${avgOrderColor ? 'font-weight: bold;' : '' }">${item.avgOrder}</div>
+                    <div style="color: ${returnRateColor}; ${returnRateColor ? 'font-weight: bold;' : '' }">${item.returnRate}%</div>
+                `;
+            hotProductsContainer.appendChild(row);
+        });
+    }
+
+    // 初始化图表
+    let charts = [];
+    function initCharts() {
+        const today = new Date();
+        const days = Array.from({ length: 7 }, (_, i) => {
+            const date = new Date(today);
+            date.setDate(today.getDate() - (6 - i));
+            return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
+        });
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { y: { beginAtZero: true } },
+            elements: { line: { tension: 0.5 } }
+        };
+
+        charts = [
+            new Chart(document.getElementById('sales-chart'), {
+                type: 'line',
+                data: {
+                    labels: days,
+                    datasets: [
+                        { label: '销售额', data: Array.from({ length: 7 }, () => faker.random.number({ min: 1000, max: 5000 })), borderColor: '#2A6EBB' },
+                        { label: '退款额', data: Array.from({ length: 7 }, () => faker.random.number({ min: 100, max: 1000 })), borderColor: '#FFD700' },
+                        { label: '提现额', data: Array.from({ length: 7 }, () => faker.random.number({ min: 500, max: 2000 })), borderColor: '#5A9BD5' },
+                    ],
+                },
+                options: chartOptions,
+            }),
+            new Chart(document.getElementById('rate-chart'), {
+                type: 'line',
+                data: {
+                    labels: days,
+                    datasets: [
+                        { label: '售后率', data: Array.from({ length: 7 }, () => faker.random.number({ min: 1, max: 5 })), borderColor: '#2A6EBB' },
+                        { label: '工单率', data: Array.from({ length: 7 }, () => faker.random.number({ min: 1, max: 4 })), borderColor: '#FFD700' },
+                        { label: '好评率', data: Array.from({ length: 7 }, () => faker.random.number({ min: 85, max: 95 })), borderColor: '#5A9BD5' },
+                    ],
+                },
+                options: chartOptions,
+            }),
+            new Chart(document.getElementById('volume-chart'), {
+                type: 'line',
+                data: {
+                    labels: days,
+                    datasets: [
+                        { label: '销量', data: Array.from({ length: 7 }, () => faker.random.number({ min: 50, max: 100 })), borderColor: '#2A6EBB' },
+                        { label: '退款量', data: Array.from({ length: 7 }, () => faker.random.number({ min: 5, max: 15 })), borderColor: '#FFD700' },
+                        { label: '换货量', data: Array.from({ length: 7 }, () => faker.random.number({ min: 1, max: 10 })), borderColor: '#5A9BD5' },
+                    ],
+                },
+                options: chartOptions,
+            })
+        ];
+    }
+
+    // 更新图表时间范围
+    function updateCharts(days) {
+        const today = new Date();
+        const newLabels = Array.from({ length: days }, (_, i) => {
+            const date = new Date(today);
+            date.setDate(today.getDate() - (days - 1 - i));
+            return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
+        });
+        document.querySelectorAll('.time-filter .time-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.time-filter .time-btn[data-range="${days}"]`).classList.add('active');
+        charts.forEach(chart => {
+            chart.data.labels = newLabels;
+            chart.data.datasets.forEach(dataset => {
+                dataset.data = Array.from({ length: days }, () => faker.random.number({ min: 50, max: 5000 }));
+            });
+            chart.update();
+        });
+    }
+
+    // 显示自定义日期选择器
+    function showCustomDatePicker() {
+        const customBtn = document.querySelector('.time-filter .time-btn[data-range="custom"]');
+        if (!customBtn.querySelector('input')) {
+            const picker = document.createElement('input');
+            picker.type = 'month';
+            picker.style.position = 'absolute';
+            picker.style.left = '0';
+            picker.style.padding = '0.25em 0.75em;';
+            picker.style.top = '0';
+            picker.style.width = '100%';
+            picker.style.height = '100%';
+            picker.style.opacity = '0';
+            picker.style.cursor = 'pointer';
+            customBtn.style.position = 'relative';
+            customBtn.appendChild(picker);
+            picker.click();
+            picker.onchange = () => {
+                const [year, month] = picker.value.split('-');
+                customBtn.textContent = `${year}/${month}`;
+                document.querySelectorAll('.time-filter .time-btn').forEach(btn => btn.classList.remove('active'));
+                customBtn.classList.add('active');
+                const daysInMonth = new Date(year, month, 0).getDate();
+                updateCharts(daysInMonth);
+                picker.remove();
+            };
+        }
+    }
+
+    // 更新商品筛选器
+    function updateProductFilter() {
+        const brandSelect = document.getElementById('brand-filter');
+        const productSelect = document.getElementById('product-filter');
+        const selectedBrand = brandSelect.value;
+        productSelect.innerHTML = '<option value="all">全部商品</option>';
+        if (selectedBrand !== 'all') {
+            const productCount = faker.random.number({ min: 3, max: 50 });
+            for (let i = 0; i < productCount; i++) {
+                const option = document.createElement('option');
+                option.value = `item-${i}`;
+                option.textContent = `${selectedBrand} ${faker.commerce.productName()}`;
+                productSelect.appendChild(option);
+            }
+        }
+    }
+
+    // 初始化品牌筛选器
+    function initBrandFilter() {
+        const brandSelect = document.getElementById('brand-filter');
+        hotBrands.forEach(brand => {
+            const option = document.createElement('option');
+            option.value = brand.name;
+            option.textContent = brand.name;
+            option.style.color = brand.themeColor || '#000000';
+            option.style.fontWeight = 'bold';
+            brandSelect.appendChild(option);
+        });
+        brandSelect.addEventListener('change', () => {
+            const selectedOption = brandSelect.options[brandSelect.selectedIndex];
+            brandSelect.style.color = selectedOption.style.color;
+            brandSelect.style.fontWeight = 'bold';
+        });
+    }
+
+    // 页面加载时初始化
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            InitSidebarContent();
+            initSidebar();
+            initStoreStats();
+            initHotLists();
+            initCharts();
+            initBrandFilter();
+        });
+    });
+</script>
+</body>
+</html>
