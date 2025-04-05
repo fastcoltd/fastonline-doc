@@ -20,7 +20,7 @@ function InitSidebarContent() {
     const nickname = faker.internet.userName();
     document.querySelector('.role').textContent = role === 'owner' ? 'Owner' : 'Support';
     document.querySelector('.role').classList.add(role);
-    document.getElementById('user-nickname').textContent = nickname;
+    document.getElementById('user-nickname').innerHTML = `<b>${nickname}</b>`;
 
     const storeName = faker.company.companyName();
     const storeLink = document.getElementById('store-name');
