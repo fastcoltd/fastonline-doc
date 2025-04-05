@@ -3,20 +3,24 @@
 @import url('/site/_site.css');
 
 /* 容器样式 */
-.store-container {display: flex; max-width: var(--max-content-width); margin: 0 auto; padding: var(--spacing-large); background: var(--store-bg); overflow-x: hidden;}
+.store-container {display: flex; flex-direction: column; max-width: var(--max-content-width); margin: 0 auto; padding: var(--spacing-large); background: var(--store-bg); overflow-x: hidden;}
+.store-messages {width: 100%;}
+.sidebar-main-wrapper {display: flex; flex-direction: row; width: 100%;}
+
 .sidebar {width: 15em; background: var(--bg-white); padding: var(--spacing-large); border-right: 0.0625em solid var(--store-border); border-radius: var(--radius-large) 0 0 var(--radius-large); display: flex; flex-direction: column; height: 100%;}
 .welcome-section {display: flex; align-items: center; gap: var(--spacing-small); margin-bottom: 0; font-size: var(--font-medium); color: var(--store-primary);}
 .welcome-section i {font-size: var(--icon-size-medium);}
 .welcome-section .role.customer-service {color: var(--store-secondary);}
 .welcome-section .role.owner {color: var(--store-accent);}
-.store-info {margin-bottom: var(--spacing-large); text-align: center; font-size: var(--font-small);}
+.store-info {margin-bottom: var(--spacing-medium); text-align: center; font-size: var(--font-medium);font-weight: bold;}
 .store-logo {width: 4em; height: 4em; border-radius: 50%; margin-bottom: var(--spacing-small);}
-.store-info h3 {margin: 0; font-size: var(--font-large); color: var(--store-primary);}
+.store-info h3 {margin: 0; font-size: var(--font-large); color: var(--store-primary); white-space: nowrap;overflow: hidden; text-overflow: ellipsis;}
+
 .store-link {color: var(--store-primary); text-decoration: none;}
 .store-link:hover {color: var(--store-secondary);}
 .balance-rating {display: flex; justify-content: center; align-items: center; gap: var(--spacing-small); margin: var(--spacing-small) 0;}
 .balance-rating .fas.fa-wallet {font-size: var(--icon-size-small);} /* 余额图标颜色和大小 */
-.balance {color: var(--store-accent); font-weight: bold;}
+.store-balance {color: var(--store-accent); }
 .rating {color: var(--system-orange);}
 .store-info .rating .star-bg svg, .store-info .rating .star-filled svg {stroke: var(--system-orange); fill: var(--system-orange);}
 .badges {margin-top: var(--spacing-small); display: flex; flex-wrap: wrap; gap: var(--spacing-small); justify-content: center;}
@@ -74,6 +78,54 @@ canvas {max-width: 100%; height: auto;}
 .time-btn:hover {background: #f5f5f5; border-color: #f97316; color: #f97316;}
 .time-btn.active {background: #f97316; border-color: #f97316; color: #fff;}
 .time-btn:focus {outline: none; border-color: #f97316; box-shadow: 0 0 0 0.125em rgba(249, 115, 22, 0.2);}
+
+/* 店铺消息 */
+.store-message {display: flex; align-items: center; padding: 0.25em 1em; margin-bottom: 0.5em; border-radius: var(--radius-medium); font-size: var(--font-small); position: relative; overflow: hidden;}
+.store-message .message-content {flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.store-message .message-time {margin-left: 1em; font-size: 0.85em; color: #6b7280;}
+.store-message .message-btn {margin-left: 1em; padding: 0.25em 0.75em; background: #fff; border: 1px solid #d9d9d9; border-radius: 0.25em; cursor: pointer;}
+.store-message .message-btn:hover {background: #f5f5f5;}
+.store-message .close-message {margin-left: 1em; cursor: pointer; color: #6b7280;}
+.store-message .close-message:hover {color: #d32f2f;}
+.store-message .scrolling {animation: scroll 10s linear infinite;}
+@keyframes scroll {
+    0% {transform: translateX(0);}
+    40% {transform: translateX(calc(-100% + 100px));}
+    60% {transform: translateX(calc(-100% + 100px));}
+    100% {transform: translateX(0);}
+}
+
+/* 保证金和佣金 */
+.extra-info {display: flex; justify-content: center; gap: 1em; margin-top: var(--spacing-small); font-size: var(--font-medium); color: #374151;}
+.extra-info span {cursor: pointer; display: flex; align-items: center; gap: 0.5em;}
+.extra-info i {color: var(--store-primary);}
+
+/* 通用提示 */
+.tooltip {position: absolute; background: #333; color: #fff; padding: 0.5em; border-radius: 0.25em; font-size: 0.85em; z-index: 1000; max-width: 20em; text-align: center;}
+
+/* 佣金弹窗 */
+.commission-popup {z-index: 1000;}
+.commission-popup.hover-mode {position: absolute; background: none;}
+.commission-popup .popup-content {background: #fff; padding: 1.5em; border-radius: 0.5em; position: relative; max-width: 35em; width: 100%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);}
+.commission-popup.hover-mode .popup-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -10px; /* 移到左侧 */
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-right-color: #fff; /* 向右箭头 */
+}
+.commission-popup:not(.hover-mode) {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center;}
+.commission-popup h3 {margin-top: 0; font-size: 1.25em; color: #f59e0b;}
+.commission-popup h4 {margin: 1em 0 0.5em; font-size: 1em;}
+.commission-popup ul {list-style: none; padding: 0;}
+.commission-popup li {margin: 0.5em 0; display: flex; align-items: center; gap: 0.5em; white-space: nowrap;}
+.commission-popup .action-btn {margin-left: 0.5em; padding: 0.25em 0.75em; background: #4CAF50; color: #fff; border-radius: 0.25em; text-decoration: none; font-size: 0.85em;}
+.commission-popup .action-btn:hover {background: #45a049;}
+.commission-popup .close-btn {position: absolute; top: 0.5em; right: 0.5em; background: none; border: none; font-size: 1.25em; cursor: pointer; color: #6b7280;}
+.commission-popup .close-btn:hover {color: #d32f2f;}
+
 
 /* 移动端适配 */
 @media (max-width: 48em) {

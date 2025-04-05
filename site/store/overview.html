@@ -17,7 +17,7 @@
     <script src="/site/_location.js"></script>
     <script src="/site/_member.js"></script>
     <script src="/site/_common.js"></script>
-    <script src="/site/store/_store.js" defer></script>
+    <script src="/site/store/_store.js"></script>
 </head>
 <body>
 <!-- 头部 -->
@@ -25,76 +25,78 @@
 
 <!-- 主内容 -->
 <div class="store-container">
-    <!-- 左侧菜单 -->
-    <div w3-include-html="/site/store/_sidebar.html"></div>
+    <div class="sidebar-main-wrapper">
+        <!-- 左侧菜单 -->
+        <div w3-include-html="/site/store/_sidebar.html"></div>
 
-    <!-- 右侧内容 -->
-    <div class="main-content">
-        <h2 style="font-size: 20px; margin-bottom: 24px;">店铺概况</h2>
-        <div class="dashboard-grid" id="store-stats"></div>
+        <!-- 右侧内容 -->
+        <div class="main-content">
+            <h2 style="font-size: 20px; margin-bottom: 24px;">店铺概况</h2>
+            <div class="dashboard-grid" id="store-stats"></div>
 
-        <!-- 热门列表 -->
-        <div class="hot-section">
-            <h2 style="font-size: 20px; margin-bottom: 24px;">热门列表</h2>
-            <div class="hot-container">
-                <div class="hot-card">
-                    <div class="hot-title-container">
-                        <div class="hot-title">热门商品</div>
-                        <div class="time-btn-group hot-time-filter">
-                            <button class="time-btn" data-range="today" onclick="updateHotProducts('today')">今天</button>
-                            <button class="time-btn" data-range="yesterday" onclick="updateHotProducts('yesterday')">昨天</button>
-                            <button class="time-btn active" data-range="3" onclick="updateHotProducts('3')">近3天</button>
-                            <button class="time-btn" data-range="7" onclick="updateHotProducts('7')">近7天</button>
+            <!-- 热门列表 -->
+            <div class="hot-section">
+                <h2 style="font-size: 20px; margin-bottom: 24px;">热门列表</h2>
+                <div class="hot-container">
+                    <div class="hot-card">
+                        <div class="hot-title-container">
+                            <div class="hot-title">热门商品</div>
+                            <div class="time-btn-group hot-time-filter">
+                                <button class="time-btn" data-range="today" onclick="updateHotProducts('today')">今天</button>
+                                <button class="time-btn" data-range="yesterday" onclick="updateHotProducts('yesterday')">昨天</button>
+                                <button class="time-btn active" data-range="3" onclick="updateHotProducts('3')">近3天</button>
+                                <button class="time-btn" data-range="7" onclick="updateHotProducts('7')">近7天</button>
+                            </div>
+                        </div>
+                        <div class="hot-header">
+                            <div>商品</div>
+                            <div>价格</div>
+                            <div>销售额</div>
+                            <div>客单价</div>
+                            <div>售后率</div>
+                        </div>
+                        <div class="hot-data" id="hot-products"></div>
+                    </div>
+                    <div class="hot-card">
+                        <div class="hot-title-container">
+                            <div class="hot-title" id="low-stock-title">即将售罄</div>
+                        </div>
+                        <div class="hot-header">
+                            <div>商品</div>
+                            <div>库存</div>
+                            <div>日销量</div>
+                            <div>可售天数</div>
+                            <div>补货</div>
+                        </div>
+                        <div class="hot-data" id="low-stock"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 统计曲线 -->
+            <div class="charts-section">
+                <h2 style="font-size: 20px; margin-bottom: 24px;">统计曲线</h2>
+                <div class="filter-row">
+                    <div class="brand-service-filter">
+                        <select class="ant-select" id="brand-filter" onchange="updateProductFilter()">
+                            <option value="all">全部品牌</option>
+                        </select>
+                        <select class="ant-select" id="product-filter"><option value="all">全部商品</option></select>
+                    </div>
+                    <div class="time-filter">
+                        <div class="time-btn-group">
+                            <button class="time-btn active" data-range="7" onclick="updateCharts(7)">近7天</button>
+                            <button class="time-btn" data-range="14" onclick="updateCharts(14)">14天</button>
+                            <button class="time-btn" data-range="30" onclick="updateCharts(30)">30天</button>
+                            <button class="time-btn" data-range="custom" onclick="showCustomDatePicker()">自定义</button>
                         </div>
                     </div>
-                    <div class="hot-header">
-                        <div>商品</div>
-                        <div>价格</div>
-                        <div>销售额</div>
-                        <div>客单价</div>
-                        <div>售后率</div>
-                    </div>
-                    <div class="hot-data" id="hot-products"></div>
                 </div>
-                <div class="hot-card">
-                    <div class="hot-title-container">
-                        <div class="hot-title" id="low-stock-title">即将售罄</div>
-                    </div>
-                    <div class="hot-header">
-                        <div>商品</div>
-                        <div>库存</div>
-                        <div>日销量</div>
-                        <div>可售天数</div>
-                        <div>补货</div>
-                    </div>
-                    <div class="hot-data" id="low-stock"></div>
+                <div class="charts-container">
+                    <div class="chart-card"><div class="chart-title">销售额/退款额/提现额</div><canvas id="sales-chart"></canvas></div>
+                    <div class="chart-card"><div class="chart-title">售后率/工单率/好评率</div><canvas id="rate-chart"></canvas></div>
+                    <div class="chart-card"><div class="chart-title">销量/退款量/换货量</div><canvas id="volume-chart"></canvas></div>
                 </div>
-            </div>
-        </div>
-
-        <!-- 统计曲线 -->
-        <div class="charts-section">
-            <h2 style="font-size: 20px; margin-bottom: 24px;">统计曲线</h2>
-            <div class="filter-row">
-                <div class="brand-service-filter">
-                    <select class="ant-select" id="brand-filter" onchange="updateProductFilter()">
-                        <option value="all">全部品牌</option>
-                    </select>
-                    <select class="ant-select" id="product-filter"><option value="all">全部商品</option></select>
-                </div>
-                <div class="time-filter">
-                    <div class="time-btn-group">
-                        <button class="time-btn active" data-range="7" onclick="updateCharts(7)">近7天</button>
-                        <button class="time-btn" data-range="14" onclick="updateCharts(14)">14天</button>
-                        <button class="time-btn" data-range="30" onclick="updateCharts(30)">30天</button>
-                        <button class="time-btn" data-range="custom" onclick="showCustomDatePicker()">自定义</button>
-                    </div>
-                </div>
-            </div>
-            <div class="charts-container">
-                <div class="chart-card"><div class="chart-title">销售额/退款额/提现额</div><canvas id="sales-chart"></canvas></div>
-                <div class="chart-card"><div class="chart-title">售后率/工单率/好评率</div><canvas id="rate-chart"></canvas></div>
-                <div class="chart-card"><div class="chart-title">销量/退款量/换货量</div><canvas id="volume-chart"></canvas></div>
             </div>
         </div>
     </div>
@@ -106,10 +108,10 @@
 <script>
     const storeStatsData = [
         { title: '销售额', today: Number(faker.finance.amount(500, 5000, 2)), yesterday: Number(faker.finance.amount(400, 4500, 2)), todayAvgOrder: Number(faker.finance.amount(100, 300, 2)), yesterdayAvgOrder: Number(faker.finance.amount(90, 270, 2)), color: '#f59e0b' },
-        { title: '订单数', todayProduct: faker.random.number({ min: 5, max: 50 }), todayArticle: faker.random.number({ min: 5, max: 50 }), yesterdayProduct: faker.random.number({ min: 4, max: 45 }), yesterdayArticle: faker.random.number({ min: 4, max: 45 }), color: '#8b5cf6' },
-        { title: '售后', todayCount: faker.random.number({ min: 5, max: 20 }), yesterdayCount: faker.random.number({ min: 4, max: 18 }), refundCountToday: faker.random.number({ min: 1, max: 10 }), refundCountYesterday: faker.random.number({ min: 1, max: 8 }), replaceCountToday: faker.random.number({ min: 1, max: 5 }), replaceCountYesterday: faker.random.number({ min: 1, max: 4 }), color: '#ec4899' },
+        { title: '订单数', todayProduct: faker.datatype.number({ min: 5, max: 50 }), todayArticle: faker.datatype.number({ min: 5, max: 50 }), yesterdayProduct: faker.datatype.number({ min: 4, max: 45 }), yesterdayArticle: faker.datatype.number({ min: 4, max: 45 }), color: '#8b5cf6' },
+        { title: '售后', todayCount: faker.datatype.number({ min: 5, max: 20 }), yesterdayCount: faker.datatype.number({ min: 4, max: 18 }), refundCountToday: faker.datatype.number({ min: 1, max: 10 }), refundCountYesterday: faker.datatype.number({ min: 1, max: 8 }), replaceCountToday: faker.datatype.number({ min: 1, max: 5 }), replaceCountYesterday: faker.datatype.number({ min: 1, max: 4 }), color: '#ec4899' },
         { title: '提现', today: Number(faker.finance.amount(100, 1000, 2)), yesterday: Number(faker.finance.amount(80, 900, 2)), withdrawing: Number(faker.finance.amount(50, 500, 2)), color: '#3b82f6' },
-        { title: '工单数', todayClosed: faker.random.number({ min: 5, max: 20 }), todayInProgress: faker.random.number({ min: 5, max: 20 }), yesterdayClosed: faker.random.number({ min: 5, max: 18 }), yesterdayInProgress: faker.random.number({ min: 5, max: 18 }), color: '#4CAF50' }
+        { title: '工单数', todayClosed: faker.datatype.number({ min: 5, max: 20 }), todayInProgress: faker.datatype.number({ min: 5, max: 20 }), yesterdayClosed: faker.datatype.number({ min: 5, max: 18 }), yesterdayInProgress: faker.datatype.number({ min: 5, max: 18 }), color: '#4CAF50' }
     ];
 
     let hotProductsData = Array.from({ length: 10 }, () => ({
@@ -117,15 +119,15 @@
         price: `$${faker.finance.amount(50, 500, 2)}`,
         sales: Number(faker.finance.amount(1000, 20000, 2)),
         avgOrder: Number(faker.finance.amount(100, 300, 2)),
-        returnRate: faker.random.number({ min: 1, max: 10 }),
+        returnRate: faker.datatype.number({ min: 1, max: 10 }),
     })).sort((a, b) => b.sales - a.sales);
 
     const lowStockData = Array.from({ length: 10 }, () => ({
         name: faker.commerce.productName(),
-        stock: faker.random.number({ min: 1, max: 20 }),
-        dailySales: faker.random.number({ min: 1, max: 10 }),
-        daysLeft: faker.random.number({ min: 1, max: 10, precision: 0.1 }),
-        restock: faker.random.number({ min: 10, max: 50 }),
+        stock: faker.datatype.number({ min: 1, max: 20 }),
+        dailySales: faker.datatype.number({ min: 1, max: 10 }),
+        daysLeft: faker.datatype.number({ min: 1, max: 10, precision: 0.1 }),
+        restock: faker.datatype.number({ min: 10, max: 50 }),
     })).sort((a, b) => a.daysLeft - b.daysLeft);
 
     // 通用的前五名颜色
@@ -271,9 +273,9 @@
                 data: {
                     labels: days,
                     datasets: [
-                        { label: '销售额', data: Array.from({ length: 7 }, () => faker.random.number({ min: 1000, max: 5000 })), borderColor: '#2A6EBB' },
-                        { label: '退款额', data: Array.from({ length: 7 }, () => faker.random.number({ min: 100, max: 1000 })), borderColor: '#FFD700' },
-                        { label: '提现额', data: Array.from({ length: 7 }, () => faker.random.number({ min: 500, max: 2000 })), borderColor: '#5A9BD5' },
+                        { label: '销售额', data: Array.from({ length: 7 }, () => faker.datatype.number({ min: 1000, max: 5000 })), borderColor: '#2A6EBB' },
+                        { label: '退款额', data: Array.from({ length: 7 }, () => faker.datatype.number({ min: 100, max: 1000 })), borderColor: '#FFD700' },
+                        { label: '提现额', data: Array.from({ length: 7 }, () => faker.datatype.number({ min: 500, max: 2000 })), borderColor: '#5A9BD5' },
                     ],
                 },
                 options: chartOptions,
@@ -283,9 +285,9 @@
                 data: {
                     labels: days,
                     datasets: [
-                        { label: '售后率', data: Array.from({ length: 7 }, () => faker.random.number({ min: 1, max: 5 })), borderColor: '#2A6EBB' },
-                        { label: '工单率', data: Array.from({ length: 7 }, () => faker.random.number({ min: 1, max: 4 })), borderColor: '#FFD700' },
-                        { label: '好评率', data: Array.from({ length: 7 }, () => faker.random.number({ min: 85, max: 95 })), borderColor: '#5A9BD5' },
+                        { label: '售后率', data: Array.from({ length: 7 }, () => faker.datatype.number({ min: 1, max: 5 })), borderColor: '#2A6EBB' },
+                        { label: '工单率', data: Array.from({ length: 7 }, () => faker.datatype.number({ min: 1, max: 4 })), borderColor: '#FFD700' },
+                        { label: '好评率', data: Array.from({ length: 7 }, () => faker.datatype.number({ min: 85, max: 95 })), borderColor: '#5A9BD5' },
                     ],
                 },
                 options: chartOptions,
@@ -295,9 +297,9 @@
                 data: {
                     labels: days,
                     datasets: [
-                        { label: '销量', data: Array.from({ length: 7 }, () => faker.random.number({ min: 50, max: 100 })), borderColor: '#2A6EBB' },
-                        { label: '退款量', data: Array.from({ length: 7 }, () => faker.random.number({ min: 5, max: 15 })), borderColor: '#FFD700' },
-                        { label: '换货量', data: Array.from({ length: 7 }, () => faker.random.number({ min: 1, max: 10 })), borderColor: '#5A9BD5' },
+                        { label: '销量', data: Array.from({ length: 7 }, () => faker.datatype.number({ min: 50, max: 100 })), borderColor: '#2A6EBB' },
+                        { label: '退款量', data: Array.from({ length: 7 }, () => faker.datatype.number({ min: 5, max: 15 })), borderColor: '#FFD700' },
+                        { label: '换货量', data: Array.from({ length: 7 }, () => faker.datatype.number({ min: 1, max: 10 })), borderColor: '#5A9BD5' },
                     ],
                 },
                 options: chartOptions,
@@ -318,7 +320,7 @@
         charts.forEach(chart => {
             chart.data.labels = newLabels;
             chart.data.datasets.forEach(dataset => {
-                dataset.data = Array.from({ length: days }, () => faker.random.number({ min: 50, max: 5000 }));
+                dataset.data = Array.from({ length: days }, () => faker.datatype.number({ min: 50, max: 5000 }));
             });
             chart.update();
         });
@@ -360,7 +362,7 @@
         const selectedBrand = brandSelect.value;
         productSelect.innerHTML = '<option value="all">全部商品</option>';
         if (selectedBrand !== 'all') {
-            const productCount = faker.random.number({ min: 3, max: 50 });
+            const productCount = faker.datatype.number({ min: 3, max: 50 });
             for (let i = 0; i < productCount; i++) {
                 const option = document.createElement('option');
                 option.value = `item-${i}`;
@@ -397,6 +399,7 @@
             initHotLists();
             initCharts();
             initBrandFilter();
+            initStoreMessages();
         });
     });
 </script>
