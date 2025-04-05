@@ -9,7 +9,7 @@ const messageTemplates = [
     { type: 'review', content: '商品审核失败：{product} 未通过审核，请修改后重新提交。', level: 'medium', color: '#f59e0b', button: { text: '修改', action: '/site/store/items.html?id={id}' }, closable: true, icon: 'fas fa-file-alt' },
     { type: 'violation', content: '违规通知：店铺存在虚假宣传行为，请整改。', level: 'high', color: '#d32f2f', button: { text: '详情', action: '/site/store/violations.html?id={id}' }, closable: true, icon: 'fas fa-ban' },
     { type: 'stock', content: '{product} 库存告警：仅剩 {stock} 件，请及时补货。', level: 'medium', color: '#f59e0b', button: { text: '补货', action: '/site/store/stock-restock.html?id={id}' }, closable: true, icon: 'fas fa-box-open' },
-    { type: 'global', content: '全局通报：平台将于 {date} 进行维护，请提前准备。', level: 'low', color: '#4CAF50', button: null, closable: true, icon: 'fas fa-bullhorn' }
+    { type: 'global', content: '全局通报：平台将于 {date} 进行维护，请提前准备。', level: 'low', color: '#4CAF50', button: null, closable: false, icon: 'fas fa-bullhorn' }
 ];
 
 function initSidebar() {
@@ -208,7 +208,7 @@ function initStoreMessages() {
         msgEl.style.backgroundColor = `${msg.color}22`;
         msgEl.style.borderLeft = `4px solid ${msg.color}`;
         msgEl.innerHTML = `
-            <i class="${msg.icon}" style="color: ${msg.color};margin-right: 0.5em;font-size: var(--font-large);"></i>
+            <i class="${msg.icon}" style="color: ${msg.color};"></i>
             <span class="message-content">${msg.content}</span>
             <span class="message-time">${msg.time}</span>
             ${msg.button ? `<button class="message-btn" onclick="location.href='${msg.button.action}'">${msg.button.text}</button>` : ''}
