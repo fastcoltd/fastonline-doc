@@ -277,13 +277,6 @@
     // 全局变量
     const timeRanges = { 7: 7, 30: 30, 60: 60, 90: 90 };
     let labels = Array.from({ length: 7 }, (_, i) => moment('2025-03-07').subtract(6 - i, 'days').format('YYYY-MM-DD'));
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: { legend: { position: 'bottom' } },
-        scales: { y: { beginAtZero: true } },
-        elements: {line: {tension: 0.5}}
-    };
 
     // 单项统计配置
     const dashboardStatsConfig = [
@@ -501,9 +494,61 @@
         }
     }
 
+    // 图表初始化let charts = [];
+    let activeIndex = null; // 记录当前选中索引
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+                callbacks: {
+                    title: function(tooltipItems) {
+                        return `日期: ${tooltipItems[0].label}`;
+                    },
+                    label: function(context) {
+                        const datasetLabel = context.dataset.label || '';
+                        const value = context.parsed.y;
+                        return `${datasetLabel}: ${value}`;
+                    }
+                }
+            },
+            verticalLine: {
+                id: 'verticalLine',
+                afterDatasetsDraw(chart) {
+                    const { ctx, chartArea } = chart;
+                    if (activeIndex !== null) {
+                        const x = chart.scales.x.getPixelForValue(chart.data.labels[activeIndex]);
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(x, chartArea.top);
+                        ctx.lineTo(x, chartArea.bottom);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = '#ff0000';
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            }
+        },
+        scales: {
+            y: { beginAtZero: true },
+            x: { title: { display: true, text: '日期' } }
+        },
+        elements: { line: { tension: 0.5 } }
+    };
+
     // 图表初始化
-    let charts = [];
     function initCharts() {
+        // 注册竖线插件
+        Chart.register({
+            id: 'verticalLine',
+            afterDatasetsDraw: chartOptions.plugins.verticalLine.afterDatasetsDraw
+        });
+
         charts = [
             new Chart(document.getElementById('salesMoneyChart'), {
                 type: 'line',
@@ -598,6 +643,82 @@
                 options: chartOptions
             })
         ];
+
+        // 添加鼠标事件监听器
+        charts.forEach(chart => {
+            const canvas = chart.canvas;
+            canvas.addEventListener('mousemove', (event) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const index = Math.round(chart.scales.x.getValueForPixel(x));
+                if (index >= 0 && index < chart.data.labels.length) {
+                    activeIndex = index;
+                    syncCharts(activeIndex);
+                }
+            });
+            canvas.addEventListener('mouseout', () => {
+                activeIndex = null;
+                syncCharts(null);
+            });
+        });
+    }
+
+    // 同步图表函数
+    function syncCharts(index) {
+        charts.forEach(chart => {
+            if (index !== null) {
+                const datasetIndex = chart.data.datasets.map((_, i) => i);
+                const newActiveElements = datasetIndex.map(i => ({
+                    datasetIndex: i,
+                    index: index
+                }));
+                chart.tooltip.setActiveElements(newActiveElements);
+            } else {
+                chart.tooltip.setActiveElements([]);
+            }
+            chart.update({ duration: 0 }); // 无动画更新
+        });
+    }
+
+    // 时间范围更新函数
+    function updateTimeRange(value) {
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const today = moment('2025-03-07');
+
+        // 移除所有按钮的 active 状态
+        document.querySelectorAll('.charts-section .time-btn').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.querySelectorAll(`.charts-section .time-btn[data-range="${value}"]`);
+        if (activeBtn) activeBtn.forEach(item => {
+            item.classList.add('active');
+        });
+
+        if (value === 'custom') {
+            startDateInput.style.display = 'inline-block';
+            endDateInput.style.display = 'inline-block';
+        } else {
+            startDateInput.style.display = 'none';
+            endDateInput.style.display = 'none';
+            const days = parseInt(value);
+            const endDate = today;
+            const startDate = today.clone().subtract(days - 1, 'days');
+            startDateInput.value = startDate.format('YYYY-MM-DD');
+            endDateInput.value = endDate.format('YYYY-MM-DD');
+            updateCharts(startDate, endDate);
+        }
+    }
+
+    // 更新图表
+    function updateCharts(startDate, endDate) {
+        const days = endDate.diff(startDate, 'days') + 1;
+        const newLabels = Array.from({ length: days }, (_, i) => startDate.clone().add(i, 'days').format('YYYY-MM-DD'));
+        charts.forEach(chart => {
+            chart.data.labels = newLabels;
+            chart.data.datasets.forEach(dataset => {
+                dataset.data = Array.from({ length: days }, () => Math.floor(Math.random() * 100));
+            });
+            chart.update();
+        });
     }
 
     // 时间范围更新函数

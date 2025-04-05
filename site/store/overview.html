@@ -252,6 +252,8 @@
 
     // 初始化图表
     let charts = [];
+    let activeIndex = null;
+
     function initCharts() {
         const today = new Date();
         const days = Array.from({ length: 7 }, (_, i) => {
@@ -259,13 +261,56 @@
             date.setDate(today.getDate() - (6 - i));
             return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
         });
+
         const chartOptions = {
             responsive: true,
             maintainAspectRatio: true,
-            plugins: { legend: { position: 'bottom' } },
-            scales: { y: { beginAtZero: true } },
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            return `日期: ${tooltipItems[0].label}`;
+                        },
+                        label: function(context) {
+                            const datasetLabel = context.dataset.label || '';
+                            const value = context.parsed.y;
+                            return `${datasetLabel}: ${value}`;
+                        }
+                    }
+                },
+                verticalLine: {
+                    id: 'verticalLine',
+                    afterDatasetsDraw(chart) {
+                        const { ctx, chartArea } = chart;
+                        if (activeIndex !== null) {
+                            const x = chart.scales.x.getPixelForValue(chart.data.labels[activeIndex]);
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.moveTo(x, chartArea.top);
+                            ctx.lineTo(x, chartArea.bottom);
+                            ctx.lineWidth = 1;
+                            ctx.strokeStyle = '#ff0000';
+                            ctx.stroke();
+                            ctx.restore();
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true },
+                x: { title: { display: true, text: '日期' } }
+            },
             elements: { line: { tension: 0.5 } }
         };
+
+        // 注册自定义插件
+        Chart.register({
+            id: 'verticalLine',
+            afterDatasetsDraw: chartOptions.plugins.verticalLine.afterDatasetsDraw
+        });
 
         charts = [
             new Chart(document.getElementById('sales-chart'), {
@@ -305,6 +350,41 @@
                 options: chartOptions,
             })
         ];
+
+        // 添加鼠标事件监听器
+        charts.forEach(chart => {
+            const canvas = chart.canvas;
+            canvas.addEventListener('mousemove', (event) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const index = Math.round(chart.scales.x.getValueForPixel(x));
+                if (index >= 0 && index < chart.data.labels.length) {
+                    activeIndex = index;
+                    syncCharts(activeIndex);
+                }
+            });
+            canvas.addEventListener('mouseout', () => {
+                activeIndex = null;
+                syncCharts(null);
+            });
+        });
+    }
+
+    // 同步图表函数
+    function syncCharts(index) {
+        charts.forEach(chart => {
+            if (index !== null) {
+                const datasetIndex = chart.data.datasets.map((_, i) => i);
+                const newActiveElements = datasetIndex.map(i => ({
+                    datasetIndex: i,
+                    index: index
+                }));
+                chart.tooltip.setActiveElements(newActiveElements);
+            } else {
+                chart.tooltip.setActiveElements([]);
+            }
+            chart.update({ duration: 0 }); // 无动画更新
+        });
     }
 
     // 更新图表时间范围
