@@ -612,6 +612,9 @@ const realFaqs = [
 // 生成服务菜单（调整为横向分组，每 3 个字母）
 function generateServiceMenu() {
     const menu = document.getElementById('menu2');
+    if (undefined == menu){
+        return;
+    }
 
     const menuLevel1 = document.querySelectorAll('.menu2 .level-1');
     if (menuLevel1.length > 0){

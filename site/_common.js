@@ -324,6 +324,9 @@ function initCarousel() {
 
 function generateArticles(containerId, min, max) {
     const container = document.getElementById(containerId);
+    if (undefined == container){
+        return
+    }
     if (containerId.indexOf('about') !== -1){
         const siteLinks = [
             {name: "Service Rules" , link: "/site/rules.html"},

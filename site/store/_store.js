@@ -13,6 +13,7 @@ const messageTemplates = [
 ];
 
 function initSidebar() {
+    document.getElementById('menu2').remove()
     const menu = document.getElementById('store-menu');
     menu.innerHTML = '';
     const currentPage = window.location.pathname;
