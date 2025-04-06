@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KYC认证 - FASTRESP</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_style.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <style>
+        body { padding-top: 4.2em; }
+        .kyc-container { max-width: var(--max-content-width); margin: 0 auto; padding: var(--spacing-large); }
+        .ant-steps { margin-bottom: 2em; }
+        .step-content { background: var(--bg-white); padding: 2em; border-radius: 0.5em; box-shadow: 0 0.125em 0.25em rgba(0, 0, 0, 0.1); }
+        .form-group { margin-bottom: 1em; }
+        .form-group label { display: block; font-size: var(--font-medium); margin-bottom: 0.5em; }
+        .form-group input, .form-group select { width: 100%; padding: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; font-size: var(--font-medium); }
+        .form-row { display: flex; gap: 1em; flex-wrap: wrap; }
+        .form-row .form-group { flex: 1; min-width: 15em; }
+
+        /* 证件信息样式 */
+        .id-upload-section { display: flex; gap: 2em; flex-wrap: wrap; }
+        .upload-area { flex: 1; min-width: 15em; text-align: center; position: relative; }
+        .upload-box { border: 0.0625em dashed var(--border-color); border-radius: 0.5em; padding: 1em; cursor: pointer; height: 10em; display: flex; align-items: center; justify-content: center; background: #fafafa; position: relative; overflow: hidden; }
+        .upload-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .upload-box:hover .overlay { display: flex; }
+        .overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); color: #fff; align-items: center; justify-content: center; font-size: var(--font-medium); }
+        .example-box { border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; height: 10em; display: flex; align-items: center; justify-content: center; background: #f5f5f5; }
+        .example-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        /* 审核状态样式 */
+        .review-status { text-align: center; margin-bottom: 2em; }
+        .review-status i { font-size: 2em; margin-bottom: 0.5em; }
+        .review-status p { font-size: var(--font-medium); color: var(--text-primary); margin: 0.5em 0; }
+        .review-details { border: 0.0625em solid var(--border-color); border-radius: 0.5em; padding: 1em; }
+        .review-details.collapsed { max-height: 0; overflow: hidden; padding: 0; border: none; }
+        .review-details.visible { max-height: none; }
+        .review-section-title { cursor: pointer; font-size: var(--font-large); color: var(--primary-color); text-decoration: underline; padding: 0.5em; }
+        .review-section-title i { transition: transform 0.3s; }
+        .review-section-title.collapsed i.fa-chevron-down { transform: rotate(-90deg); }
+
+        /* 按钮样式 */
+        .btn-group { display: flex; gap: 1em; justify-content: center; margin-top: 2em; }
+        .btn { padding: 0.5em 1em; border-radius: 0.375em; cursor: pointer; font-size: var(--font-medium); }
+        .btn-primary { background: var(--natural-green); color: #fff; border: none; }
+        .btn-secondary { background: #fff; border: 0.0625em solid var(--border-color); color: var(--text-primary); }
+
+        @media (max-width: 48em) {
+            .kyc-container { padding: 1em; }
+            .form-row { flex-direction: column; }
+            .id-upload-section { flex-direction: column; }
+            .upload-area { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="/site/_header.html"></div>
+
+<!-- 主内容 -->
+<div class="kyc-container">
+    <div class="ant-steps" id="kyc-steps"></div>
+    <div class="step-content" id="step-content"></div>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="/site/_footer.html"></div>
+
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/site/_common.js"></script>
+<script src="/site/_fields.js"></script>
+<script src="/site/_data.js"></script>
+<script src="/site/_location.js"></script>
+<script src="/site/_member.js"></script>
+<script>
+    // 从 languages 中提取唯一国家列表
+    const countries = Array.from(new Set(languages.map(l => l.country)))
+        .sort()
+        .map(country => ({
+            code: country.toLowerCase().replace(/\s+/g, '-'), // 简单生成 code，可替换为 ISO 3166-1
+            name: country
+        }));
+
+    const steps = [
+        { title: '基本信息', content: 'step1' },
+        { title: '证件信息', content: 'step2' },
+        { title: '审核', content: 'step3' }
+    ];
+    let currentStep = 0;
+    let kycData = JSON.parse(sessionStorage.getItem('kycData')) || {};
+    const kycStatus = ['待提交', '审核中', '审核通过', '审核拒绝']; // 0: 待提交, 1: 审核中, 2: 通过, 3: 拒绝
+    const kycTypes = [
+        { value: 0, label: '身份证', shape: 'rectangle', example: '/site/assets/id-example.png', handExample: '/site/assets/id-hand-example.png' },
+        { value: 1, label: '护照', shape: 'book', example: '/site/assets/passport-example.png', handExample: '/site/assets/passport-hand-example.png' },
+        { value: 2, label: '驾驶证', shape: 'card', example: '/site/assets/license-example.png', handExample: '/site/assets/license-hand-example.png' }
+    ];
+
+    function renderSteps() {
+        const stepsContainer = document.getElementById('kyc-steps');
+        stepsContainer.innerHTML = steps.map((step, index) => `
+            <div class="ant-steps-item ${index === currentStep ? 'ant-steps-item-active' : ''} ${index < currentStep ? 'ant-steps-item-finish' : ''}">
+                <div class="ant-steps-item-tail"></div>
+                <div class="ant-steps-item-icon">${index + 1}</div>
+                <div class="ant-steps-item-content">
+                    <div class="ant-steps-item-title">${step.title}</div>
+                </div>
+            </div>
+        `).join('');
+        renderStepContent();
+    }
+
+    function renderStepContent() {
+        const content = document.getElementById('step-content');
+        switch (currentStep) {
+            case 0:
+                content.innerHTML = `
+                    <h2>基本信息</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>国家</label>
+                            <select id="country" onchange="updateKycData('country', this.value)">
+                                <option value="">请选择国家</option>
+                                ${countries.map(c => `<option value="${c.code}" ${kycData.country === c.code ? 'selected' : ''}>${c.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>证件类型</label>
+                            <select id="kyc_type" onchange="updateKycData('kyc_type', parseInt(this.value))">
+                                ${kycTypes.map(t => `<option value="${t.value}" ${kycData.kyc_type === t.value ? 'selected' : ''}>${t.label}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>姓</label>
+                            <input type="text" id="last_name" value="${kycData.last_name || ''}" oninput="updateKycData('last_name', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>中间名（可选）</label>
+                            <input type="text" id="middle_name" value="${kycData.middle_name || ''}" oninput="updateKycData('middle_name', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>名</label>
+                            <input type="text" id="first_name" value="${kycData.first_name || ''}" oninput="updateKycData('first_name', this.value)">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>证件号码</label>
+                            <input type="text" id="id_number" value="${kycData.id_number || ''}" oninput="updateKycData('id_number', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>出生日期</label>
+                            <input type="date" id="birth_date" value="${kycData.birth_date || ''}" oninput="updateKycData('birth_date', this.value)">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>证件签发日期</label>
+                            <input type="date" id="start_date" value="${kycData.start_date || ''}" oninput="updateKycData('start_date', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>证件有效期</label>
+                            <input type="date" id="expire_date" value="${kycData.expire_date || ''}" oninput="updateKycData('expire_date', this.value)">
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="nextStep()">下一步</button>
+                    </div>
+                `;
+                break;
+            case 1:
+                const selectedKycType = kycTypes.find(t => t.value === kycData.kyc_type) || kycTypes[0];
+                content.innerHTML = `
+                    <h2>证件信息</h2>
+                    <div class="id-upload-section">
+                        <div class="upload-area">
+                            <label>证件照</label>
+                            <div class="upload-box" id="id-pic-upload" onclick="triggerUpload('id-pic')">
+                                ${kycData.id_pic ? `<img src="${kycData.id_pic}" alt="证件照">` : '<i class="fas fa-upload"></i> 上传证件照'}
+                                <div class="overlay">点击编辑</div>
+                            </div>
+                            <input type="file" id="id-pic" accept="image/*" style="display: none;" onchange="handleFileUpload('id-pic', 'id_pic')">
+                            <div class="example-box">
+                                <img src="${selectedKycType.example}" alt="证件示例">
+                            </div>
+                        </div>
+                        <div class="upload-area">
+                            <label>手持证件照片</label>
+                            <div class="upload-box" id="hands-pic-upload" onclick="triggerUpload('hands-pic')">
+                                ${kycData.hands_pic ? `<img src="${kycData.hands_pic}" alt="手持证件照">` : '<i class="fas fa-upload"></i> 上传手持证件照'}
+                                <div class="overlay">点击编辑</div>
+                            </div>
+                            <input type="file" id="hands-pic" accept="image/*" style="display: none;" onchange="handleFileUpload('hands-pic', 'hands_pic')">
+                            <div class="example-box">
+                                <img src="${selectedKycType.handExample}" alt="手持示例">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="prevStep()">上一步</button>
+                        <button class="btn btn-primary" onclick="nextStep()">下一步</button>
+                    </div>
+                `;
+                break;
+            case 2:
+                const status = kycData.status || 0;
+                content.innerHTML = `
+                    <h2>审核</h2>
+                    <div class="review-status">
+                        <i class="fas ${status === 0 ? 'fa-clock' : status === 1 ? 'fa-spinner' : status === 2 ? 'fa-check-circle' : 'fa-times-circle'}" style="color: ${status === 0 ? '#f59e0b' : status === 1 ? '#f59e0b' : status === 2 ? '#4CAF50' : '#d32f2f'}"></i>
+                        <p>${status === 0 ? '待提交' : status === 1 ? '审核中' : status === 2 ? '审核通过' : '审核拒绝'}</p>
+                        ${status === 0 ? '<p>请确认您的信息并提交审核。</p>' : status === 1 ? '<p>我们已经收到您的KYC验证申请，我们将在2个工作小时内完成审核，请关注店铺动态消息。</p>' : status === 2 ? '<p>恭喜您，您的KYC认证已通过！以下是您的认证信息。</p>' : '<p>很遗憾，您的KYC认证未通过，请查看原因并重新提交。</p>'}
+                        ${status === 3 && kycData.reply_message ? `<p>审核反馈：${kycData.reply_message}</p>` : ''}
+                    </div>
+                    <div class="review-details ${status === 0 ? '' : 'visible'}" id="review-details">
+                        ${renderReviewDetails(status)}
+                    </div>
+                    <div class="btn-group">
+                        ${status === 0 || status === 1 ? '<button class="btn btn-secondary" onclick="prevStep()" ' + (status === 1 ? 'disabled' : '') + '>上一步</button>' : ''}
+                        ${status === 0 ? '<button class="btn btn-primary" onclick="submitKyc()">提交审核</button>' : status === 3 ? '<button class="btn btn-primary" onclick="restartKyc()">重新提交</button>' : ''}
+                    </div>
+                `;
+                if (status !== 0) {
+                    document.querySelector('.review-section-title')?.addEventListener('click', toggleReviewSection);
+                }
+                break;
+        }
+    }
+
+    function renderReviewDetails(status) {
+        if (status === 0) return '';
+        return `
+            <p class="review-section-title ${status === 1 ? 'collapsed' : ''}" onclick="toggleReviewSection(this)">
+                <span>已提交的信息</span>
+                <span><i class="fas fa-chevron-down"></i></span>
+            </p>
+            <div class="result-section-content ${status === 1 ? '' : 'visible'}">
+                <div class="result-row">
+                    <div class="result-item"><b>国家:</b> ${kycData.country ? countries.find(c => c.code === kycData.country)?.name : ''}</div>
+                    <div class="result-item"><b>证件类型:</b> ${kycTypes.find(t => t.value === kycData.kyc_type)?.label || ''}</div>
+                </div>
+                <div class="result-row">
+                    <div class="result-item"><b>姓名:</b> ${kycData.last_name} ${kycData.middle_name || ''} ${kycData.first_name}</div>
+                    <div class="result-item"><b>证件号码:</b> ${kycData.id_number || ''}</div>
+                </div>
+                <div class="result-row">
+                    <div class="result-item"><b>出生日期:</b> ${kycData.birth_date || ''}</div>
+                    <div class="result-item"><b>签发日期:</b> ${kycData.start_date || ''}</div>
+                    <div class="result-item"><b>有效期:</b> ${kycData.expire_date || ''}</div>
+                </div>
+                ${status === 2 ? `
+                    <div class="result-row">
+                        <div class="result-item"><b>证件照:</b> <img src="${kycData.id_pic}" alt="证件照" style="max-width: 10em;"></div>
+                        <div class="result-item"><b>手持证件照:</b> <img src="${kycData.hands_pic}" alt="手持证件照" style="max-width: 10em;"></div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    function toggleReviewSection(element) {
+        const content = element.nextElementSibling;
+        content.classList.toggle('visible');
+        element.classList.toggle('collapsed');
+    }
+
+    function updateKycData(key, value) {
+        kycData[key] = value;
+        sessionStorage.setItem('kycData', JSON.stringify(kycData));
+    }
+
+    function triggerUpload(id) {
+        document.getElementById(id).click();
+    }
+
+    function handleFileUpload(inputId, key) {
+        const file = document.getElementById(inputId).files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imgData = e.target.result;
+                updateKycData(key, imgData);
+                document.getElementById(`${inputId}-upload`).innerHTML = `<img src="${imgData}" alt="${key === 'id_pic' ? '证件照' : '手持证件照'}"><div class="overlay">点击编辑</div>`;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function nextStep() {
+        if (currentStep < steps.length - 1) {
+            if (currentStep === 0 && !validateStep1()) return;
+            if (currentStep === 1 && !validateStep2()) return;
+            currentStep++;
+            renderSteps();
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 0) {
+            currentStep--;
+            renderSteps();
+        }
+    }
+
+    function validateStep1() {
+        const requiredFields = ['country', 'kyc_type', 'last_name', 'first_name', 'id_number', 'birth_date', 'start_date', 'expire_date'];
+        for (let field of requiredFields) {
+            if (!kycData[field]) {
+                alert(`请填写${document.querySelector(`label[for="${field}"]`)?.textContent || field}！`);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function validateStep2() {
+        if (!kycData.id_pic || !kycData.hands_pic) {
+            alert('请上传证件照和手持证件照片！');
+            return false;
+        }
+        return true;
+    }
+
+    function submitKyc() {
+        kycData.status = 1; // 审核中
+        kycData.create_time = Math.floor(Date.now() / 1000);
+        sessionStorage.setItem('kycData', JSON.stringify(kycData));
+        alert('KYC申请已提交！');
+        renderSteps();
+
+        // 模拟审核过程（2秒后随机结果）
+        setTimeout(() => {
+            kycData.status = Math.random() > 0.2 ? 2 : 3; // 80% 通过，20% 拒绝
+            if (kycData.status === 3) kycData.reply_message = '证件照片不清晰，请重新上传。';
+            sessionStorage.setItem('kycData', JSON.stringify(kycData));
+            renderSteps();
+        }, 2000);
+    }
+
+    function restartKyc() {
+        kycData.status = 0;
+        sessionStorage.setItem('kycData', JSON.stringify(kycData));
+        currentStep = 0;
+        renderSteps();
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            renderSteps();
+        });
+    };
+</script>
+</body>
+</html>
