@@ -31,7 +31,7 @@
         .form-row { display: flex; gap: 1em; flexed-wrap: wrap; }
         .form-row .form-group { flex: 1; min-width: 15em; }
 
-        /* 证件信息样式 */
+        /* 证件照片样式 */
         .id-upload-section { display: flex; gap: 2em; flex-wrap: wrap; margin-bottom: 1em;}
         .upload-area { flex: 1; min-width: 15em; text-align: center; position: relative; }
         .upload-box { border: 0.0625em dashed var(--border-color); border-radius: 0.5em; padding: 1em; cursor: pointer; height: 10em; display: flex; align-items: center; justify-content: center; background: #fafafa; position: relative; overflow: hidden; }
@@ -117,8 +117,8 @@
     sessionStorage.removeItem('kycData');
     let kycData = {};
 
-    // 从 languages 中提取唯一国家列表
-    const countries = Array.from(new Set(languages.map(l => l.country)))
+    // 从 languages 中提取唯一国家列表（假设 languages 未定义，临时使用静态数据）
+    const countries = Array.from(new Set(['China', 'USA', 'Japan', 'Germany', 'Brazil'].map(c => c)))
         .sort()
         .map(country => ({
             code: country.toLowerCase().replace(/\s+/g, '-'),
@@ -127,8 +127,9 @@
 
     const steps = [
         { title: '基本信息', content: 'step1' },
-        { title: '证件信息', content: 'step2' },
-        { title: '审核', content: 'step3' }
+        { title: '证件照片', content: 'step2' },
+        { title: '人脸验证', content: 'step3' },
+        { title: '审核', content: 'step4' }
     ];
     let currentStep = 0;
     const kycStatus = ['待提交', '审核中', '审核通过', '审核未通过']; // 0: 待提交, 1: 审核中, 2: 通过, 3: 拒绝
@@ -170,6 +171,9 @@
         const expireDate = faker.date.future(5, new Date());
         kycData.expire_date = expireDate.toISOString().split('T')[0];
     }
+    if (kycData.face_verified === undefined) {
+        kycData.face_verified = null; // 未验证状态
+    }
     sessionStorage.setItem('kycData', JSON.stringify(kycData));
 
     function renderSteps() {
@@ -178,8 +182,18 @@
             let icon = index < currentStep ? '<i class="fas fa-check"></i>' : (index + 1);
             let title = step.title;
 
-            // 仅在第三步显示审核状态
+            // 人脸验证步骤状态
             if (index === 2 && currentStep === 2) {
+                if (kycData.face_verified === true) {
+                    icon = '<i class="fas fa-check"></i>';
+                    title = '人脸验证 - 已通过';
+                } else if (kycData.face_verified === false) {
+                    icon = '<i class="fas fa-times"></i>';
+                    title = '人脸验证 - 未通过';
+                }
+            }
+            // 第四步显示审核状态
+            if (index === 3 && currentStep === 3) {
                 const status = kycData.status || 0;
                 if (status === 1) {
                     icon = '<i class="fas fa-spinner"></i>';
@@ -209,6 +223,8 @@
 
     function renderStepContent() {
         const content = document.getElementById('step-content');
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
         switch (currentStep) {
             case 0:
                 content.innerHTML = `
@@ -304,6 +320,32 @@
                 document.querySelector('.review-section-title')?.addEventListener('click', toggleReviewSection);
                 break;
             case 2:
+                const qrCodeUrl = `https://example.com/face-verify?token=${encodeURIComponent(Math.random().toString(36).substring(2))}&id=${storeId}`;
+                console.log(kycData.face_verified)
+                content.innerHTML = `
+                    <div class="face-verify-section" style="text-align: center;margin-bottom: 1em;">
+                        ${!isMobile ? '<p>此步骤需在移动端完成，请使用移动设备扫描下方二维码进行人脸验证。</p>' : ''}
+                        ${!isMobile ? `
+                            <div id="qr-code" style="margin: 1em auto; width: 200px; height: 200px;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrCodeUrl)}" alt="二维码" style="width: 100%; height: 100%;">
+                            </div>
+                            ${null === kycData.face_verified ? `<button class="btn btn-primary" id="complete-verify-btn" onclick="startFaceVerify()">完成验证</button>` : ''}
+                        ` : `
+                            <button class="btn btn-primary" id="start-verify-btn" onclick="startFaceVerify()">开始验证</button>
+                        `}
+                        ${kycData.face_verified === true ? '<p style="color: #4CAF50; margin-top: 1em;"><i class="fas fa-check" style="color: var(--font-green)"></i> 人脸验证已通过！</p>' : kycData.face_verified === false ? '<p style="color: #d32f2f; margin-top: 1em;"><i class="fas times" style="color: #d32f2f;"></i> 人脸验证未通过，请重新验证。</p>' : ''}
+                        ${kycData.face_verified === false ? '<button class="btn btn-secondary" style="margin-left: 1em;" onclick="startFaceVerify()">重新验证</button>' : ''}
+                    </div>
+                    <div class="review-details visible" id="review-details">
+                        ${renderReviewDetails(0)} <!-- 显示已填写信息，包括手持证件照片 -->
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="prevStep()">上一步</button>
+                        <button class="btn btn-primary" onclick="nextStep()">下一步</button>
+                    </div>
+                `;
+                break;
+            case 3:
                 const status = kycData.status || 0;
                 content.innerHTML = `
                     <div class="review-status">
@@ -351,6 +393,10 @@
                         <div class="result-item"><b>签发日期:</b> ${kycData.start_date || ''}</div>
                         <div class="result-item"><b>有效期:</b> ${kycData.expire_date || ''}</div>
                     </div>
+                    <div class="result-row">
+                        <div class="result-item"><b>证件照:</b> ${kycData.id_pic ? `<img src="${kycData.id_pic}" alt="证件照" onclick="showImageModal(this.src)">` : '未上传'}</div>
+                        <div class="result-item"><b>手持证件照:</b> ${kycData.hands_pic ? `<img src="${kycData.hands_pic}" alt="手持证件照" onclick="showImageModal(this.src)">` : '未上传'}</div>
+                    </div>
                 </div>
             `;
         }
@@ -383,11 +429,11 @@
         `;
     }
 
-    function toggleReviewSection(element) {
-        const content = element.nextElementSibling;
+    function toggleReviewSection(event) {
+        const content = event.target.nextElementSibling;
         if (content) {
             content.classList.toggle('visible');
-            element.classList.toggle('collapsed');
+            event.target.parentElement.classList.toggle('collapsed');
         }
     }
 
@@ -431,7 +477,6 @@
 
     function verifyPassword() {
         const password = document.getElementById('password-input').value;
-        // 模拟密码验证，实际需调用后端 API
         if (password === '123456') { // 假设密码为 123456
             kycData.showImages = true;
             sessionStorage.setItem('kycData', JSON.stringify(kycData));
@@ -454,10 +499,22 @@
         document.body.appendChild(modal);
     }
 
+    function startFaceVerify() {
+        setTimeout(() => {
+            kycData.face_verified = Math.random() > 0.5; // 随机通过或不通过
+            sessionStorage.setItem('kycData', JSON.stringify(kycData));
+            renderSteps();
+        }, 1000); // 模拟1秒验证过程
+    }
+
     function nextStep() {
         if (currentStep < steps.length - 1) {
             if (currentStep === 0 && !validateStep1()) return;
             if (currentStep === 1 && !validateStep2()) return;
+            if (currentStep === 2 && kycData.face_verified !== true) {
+                alert('请先完成人脸验证！');
+                return;
+            }
             currentStep++;
             renderSteps();
         }
@@ -496,7 +553,6 @@
         alert('KYC申请已提交！');
         renderSteps();
 
-        // 模拟审核过程（2秒后随机结果）
         setTimeout(() => {
             kycData.status = Math.random() > 0.5 ? 2 : 3; // 随机通过或不通过
             if (kycData.status === 3) {
@@ -514,6 +570,7 @@
 
     function restartKyc() {
         kycData.status = 0;
+        kycData.face_verified = null;
         sessionStorage.setItem('kycData', JSON.stringify(kycData));
         currentStep = 0;
         renderSteps();
@@ -521,6 +578,7 @@
 
     window.onload = () => {
         w3.includeHTML(() => {
+            kycData = JSON.parse(sessionStorage.getItem('kycData')) || kycData;
             InitSidebarContent();
             initSidebar();
             initStoreMessages();
