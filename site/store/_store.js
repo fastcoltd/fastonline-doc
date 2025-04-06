@@ -1,5 +1,6 @@
 // 店铺中心公用 JS
 const storeId = Math.floor(Math.random() * 10000); // 随机店铺ID
+const storeBadge = generateBadge('Store', 0, 2);
 
 // 消息模板配置
 const messageTemplates = [
@@ -31,9 +32,14 @@ function InitSidebarContent() {
     const roles = ['owner', 'customer-service'];
     const role = roles[Math.floor(Math.random() * roles.length)];
     const nickname = faker.internet.userName();
-    document.querySelector('.role').textContent = role === 'owner' ? 'Owner' : 'Support';
-    document.querySelector('.role').classList.add(role);
-    document.getElementById('user-nickname').innerHTML = `<b>${nickname}</b>`;
+    let title = role === 'owner' ? 'Owner' : 'Support';
+    let nicknameElement = document.getElementById('user-nickname')
+    nicknameElement.classList.add(`${role}`)
+    nicknameElement.classList.add('role')
+    nicknameElement.innerHTML = `<b title="${title} of Store">${nickname}</b>`;
+    let iconRole = document.querySelector('.fa-user-circle');
+    iconRole.classList.add(`role`)
+    iconRole.classList.add(`${role}`)
 
     const storeName = faker.company.companyName();
     const isVerified = Math.random() > 0.5; // 随机认证状态
@@ -47,7 +53,10 @@ function InitSidebarContent() {
 
     document.getElementById('store-balance').textContent = `$${faker.finance.amount(1000, 10000, 2)}`;
     document.getElementById('store-rating').textContent = `${faker.datatype.number({ min: 3, max: 5, precision: 0.1 }).toFixed(1)} (${faker.datatype.number({ min: 50, max: 500 })})`;
-    document.getElementById('store-badges').innerHTML = generateBadge('Store', 0, 2);
+    document.getElementById('store-badges').innerHTML = storeBadge;
+    if (!storeBadge){
+        document.getElementById('store-badges').remove()
+    }
 
     // 添加保证金和佣金（显示图标和数字）
     const margin = faker.finance.amount(50, 500, 2);
