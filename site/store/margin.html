@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保证金管理 - FASTRESP</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.10/antd.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <style>
+        .margin-container { display: flex; flex-direction: column; max-width: var(--max-content-width); margin: 0 auto; padding: var(--spacing-large); background: var(--store-bg); overflow-x: hidden; }
+        .sidebar-main-wrapper { display: flex; flex-direction: row; width: 100%; }
+        .main-content { flex: 1; padding: var(--spacing-large); background: var(--bg-white); border-radius: 0 var(--radius-large) var(--radius-large) 0; overflow: hidden; }
+
+        /* 信息区 */
+        .info-section { background: linear-gradient(135deg, #ffffff, #f9fafb); padding: 1.5em; border-radius: 0.75em; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-bottom: 2em; }
+        .info-section .info-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1em; }
+        .info-section .info-item { font-size: var(--font-large); color: var(--text-primary); }
+        .info-section .info-item span { font-weight: bold; color: var(--store-accent); }
+        .info-section .info-item.warning { color: #d32f2f; font-weight: bold; }
+
+        /* 功能区 */
+        .action-section { background: linear-gradient(135deg, #ffffff, #f9fafb); padding: 1.5em; border-radius: 0.75em; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-bottom: 2em; }
+        .action-section.disabled { background: #f5f5f5; opacity: 0.6; pointer-events: none; }
+        .action-section .title { font-size: var(--font-large); font-weight: bold; color: var(--text-primary); margin-bottom: 1em; }
+        .tier-selector { display: flex; flex-wrap: wrap; gap: 1em; margin-bottom: 1.5em; position: relative; }
+        .tier-selector.flash { animation: flash 0.5s 3; }
+        @keyframes flash {
+            0%, 100% { border: 2px solid transparent; }
+            50% { border: 2px solid #d32f2f; }
+        }
+        .tier-option { padding: 0.5em 1em; border-radius: 0.5em; cursor: pointer; font-size: var(--font-medium); }
+        .tier-option.tier-1 { background: #e6f4ea; color: #1b5e20; }
+        .tier-option.tier-2 { background: #dcedc8; color: #2e7d32; }
+        .tier-option.tier-3 { background: #d7e4bd; color: #388e3c; }
+        .tier-option.tier-4 { background: #ffecb3; color: #e65100; }
+        .tier-option.tier-5 { background: #ffcc80; color: #bf360c; }
+        .tier-option.selected { border: 2px solid var(--natural-green); font-weight: bold; }
+        .input-group { display: flex; align-items: center; gap: 1em; margin-bottom: 1em; }
+        .input-group input { width: 15em; padding: 0.5em; border: 0.0625em solid var(--border-color); border-radius: 0.375em; font-size: var(--font-medium); background: #f5f5f5; }
+        .input-group button { padding: 0.5em 1em; border-radius: 0.375em; background: var(--natural-green); color: #fff; border: none; cursor: pointer; font-size: var(--font-medium); }
+        .tips { background: #e3f2fd; padding: 1em; border-radius: 0.5em; font-size: var(--font-medium); color: var(--text-primary); }
+        .tips .highlight { font-weight: bold; color: var(--store-accent); }
+
+        /* 保证金介绍 */
+        .intro-section { background: linear-gradient(135deg, #ffffff, #f9fafb); padding: 1.5em; border-radius: 0.75em; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .intro-section .title { font-size: var(--font-large); font-weight: bold; color: var(--text-primary); margin-bottom: 1em; }
+        .intro-section .description { font-size: var(--font-medium); color: var(--text-secondary); margin-bottom: 1.5em; line-height: 1.6; }
+        .tier-list { display: flex; flex-wrap: nowrap; gap: 1em; }
+        .tier-card { flex: 1; min-width: 0; padding: 1em; border-radius: 0.5em; transition: all 0.3s; font-size: var(--font-medium); }
+        .tier-card.tier-0 { background: #f5f5f5; color: #d32f2f; }
+        .tier-card.tier-1 { background: #e6f4ea; color: #1b5e20; }
+        .tier-card.tier-2 { background: #dcedc8; color: #2e7d32; }
+        .tier-card.tier-3 { background: #d7e4bd; color: #388e3c; }
+        .tier-card.tier-4 { background: #ffecb3; color: #e65100; }
+        .tier-card.tier-5 { background: #ffcc80; color: #bf360c; }
+        .tier-card.current { border: 2px solid var(--natural-green); font-weight: bold; }
+        .tier-card .tier-name { font-weight: bold; margin-bottom: 0.5em; }
+        .tier-card .tier-amount { margin-bottom: 0.5em; }
+        .tier-card .tier-benefit { font-size: var(--font-small); }
+
+        /* 确认弹窗 */
+        .confirm-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .confirm-modal-content { background: #fff; padding: 2em; border-radius: 0.5em; width: 90%; max-width: 25em; position: relative; text-align: center; }
+        .confirm-modal-content p { font-size: var(--font-medium); margin-bottom: 1.5em; }
+        .confirm-modal-content .highlight { font-weight: bold; color: var(--store-accent); }
+        .confirm-modal-content .btn-group { margin-top: 1em; display: flex; gap: 1em; justify-content: center; }
+        .confirm-modal-content .btn { padding: 0.75em 1.5em; border-radius: 0.5em; font-size: var(--font-medium); transition: all 0.3s; }
+        .confirm-modal-content .btn-secondary { background: #f5f5f5; color: var(--text-primary); border: 1px solid var(--border-color); }
+        .confirm-modal-content .btn-secondary:hover { background: #e0e0e0; }
+        .confirm-modal-content .btn-primary { background: var(--natural-green); color: #fff; border: none; }
+        .confirm-modal-content .btn-primary:hover { background: #2e7d32; }
+
+        @media (max-width: 48em) {
+            .margin-container { padding: 1em; }
+            .tier-selector, .tier-list { flex-direction: column; flex-wrap: wrap; }
+            .input-group { flex-direction: column; }
+            .input-group input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<!-- 头部 -->
+<div w3-include-html="/site/_header.html"></div>
+
+<!-- 主内容 -->
+<div class="store-container margin-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <!-- 左侧菜单 -->
+        <div w3-include-html="/site/store/_sidebar.html"></div>
+
+        <!-- 右侧内容 -->
+        <div class="main-content">
+            <h2 style="font-size: 20px; margin-bottom: 24px;">保证金管理</h2>
+
+            <!-- 信息区 -->
+            <div class="info-section">
+                <div class="info-row">
+                    <div class="info-item">当前保证金：<span id="current-margin">$0 (佣金比例 0%)</span></div>
+                    <div class="info-item">账户余额：<span id="account-balance">$0</span></div>
+                </div>
+            </div>
+
+            <!-- 功能区 -->
+            <div class="action-section" id="action-section">
+                <div class="title">追加保证金</div>
+                <div class="tier-selector" id="tier-selector"></div>
+                <div class="input-group">
+                    <input type="text" id="additional-amount" readonly placeholder="请选择挡位">
+                    <button onclick="confirmAddMargin()">确认追加</button>
+                </div>
+                <div class="tips" id="tips"></div>
+            </div>
+
+            <!-- 保证金介绍 -->
+            <div class="intro-section">
+                <div class="title">保证金介绍</div>
+                <div class="description">
+                    在 FASTRESP 平台上，保证金是保障交易安全的重要机制。作为一个多店铺的互联网服务交易平台，保证金能够有效提升客户对店铺的信任度，降低交易风险。您的保证金将与店铺的成长同步，平台会根据您的销售表现和店铺等级动态调整保证金要求。更高的保证金不仅能降低佣金比例，还能显著提升成交额，为您的店铺带来更多商机。
+                </div>
+                <div class="tier-list" id="tier-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div w3-include-html="/site/_footer.html"></div>
+
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/site/_common.js"></script>
+<script src="/site/_fields.js"></script>
+<script src="/site/_data.js"></script>
+<script src="/site/_location.js"></script>
+<script src="/site/_member.js"></script>
+<script src="/site/store/_store.js"></script>
+<script>
+    // 保证金挡位配置
+    const tiers = [
+        { name: '未缴纳', amount: 0, commissionReduction: 0 },
+        { name: '初级保障', amount: 100, commissionReduction: 2 },
+        { name: '成长保障', amount: 500, commissionReduction: 4 },
+        { name: '进阶保障', amount: 1000, commissionReduction: 6 },
+        { name: '高级保障', amount: 5000, commissionReduction: 8 },
+        { name: '顶级保障', amount: 10000, commissionReduction: 10 }
+    ];
+
+    // 模拟数据
+    let currentMargin = tiers[randomInt(0, tiers.length-1)].amount;
+    let currentTierIndex = tiers.findIndex(tier => currentMargin <= tier.amount);
+    if (currentTierIndex === -1) currentTierIndex = tiers.length - 1;
+    currentMargin = tiers[currentTierIndex].amount;
+    const accountBalance = faker.datatype.number({ min: 1000, max: 20000 });
+    const recentSales = faker.datatype.number({ min: 5000, max: 50000 });
+    const currentCommissionRate = parseFloat(document.querySelector('.commission')?.dataset.commission || 20);
+    let selectedTierIndex = currentTierIndex === 0 ? 1 : currentTierIndex; // 如果未缴纳，默认选中第一个挡位
+    let hasSelectedTier = currentTierIndex !== 0; // 标记是否已选择挡位
+
+    // 初始化信息区
+    function initInfoSection() {
+        document.getElementById('current-margin').textContent = `$${currentMargin} (佣金比例 ${currentCommissionRate - tiers[currentTierIndex].commissionReduction}%)`;
+        document.getElementById('account-balance').textContent = `$${accountBalance}`;
+        if (currentMargin === 0) {
+            document.getElementById('current-margin').parentElement.classList.add('warning');
+        }
+    }
+
+    // 初始化功能区
+    function initActionSection() {
+        const tierSelector = document.getElementById('tier-selector');
+        tiers.forEach((tier, index) => {
+            if (index === 0) return; // 跳过未缴纳挡位
+            if (currentMargin !== 0 && index <= currentTierIndex) return; // 如果已缴纳，跳过当前及以下挡位
+            const tierOption = document.createElement('div');
+            tierOption.className = `tier-option tier-${index} ${index === selectedTierIndex ? 'selected' : ''}`;
+            tierOption.textContent = `${tier.name} ($${tier.amount})`;
+            tierOption.onclick = () => selectTier(index);
+            tierSelector.appendChild(tierOption);
+        });
+
+        // 如果已是最高挡位，禁用功能区
+        if (currentTierIndex === tiers.length - 1) {
+            document.getElementById('action-section').classList.add('disabled');
+            document.getElementById('action-section').innerHTML = '<div class="title">追加保证金</div><p style="color: #6b7280;">您已达到最高挡位，无法继续追加保证金。</p>';
+        } else {
+            updateAdditionalAmount();
+            updateTips();
+        }
+    }
+
+    // 选择挡位
+    function selectTier(index) {
+        const additionalAmount = tiers[index].amount - currentMargin;
+        if (additionalAmount > accountBalance) {
+            const rechargeAmount = additionalAmount - accountBalance;
+            const modal = document.createElement('div');
+            modal.className = 'confirm-modal';
+            modal.innerHTML = `
+                <div class="confirm-modal-content">
+                    <p>余额不足！需要充值 <span class="highlight">$${rechargeAmount}</span> 才能追加到该挡位。</p>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove()">取消</button>
+                        <button class="btn btn-primary" onclick="recharge(${rechargeAmount})">充值</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            return;
+        }
+
+        selectedTierIndex = index;
+        hasSelectedTier = true;
+        document.querySelectorAll('.tier-option').forEach(option => option.classList.remove('selected'));
+        document.querySelector(`.tier-option.tier-${index}`).classList.add('selected');
+        updateAdditionalAmount();
+        updateTips();
+    }
+
+    // 更新追加金额
+    function updateAdditionalAmount() {
+        const additionalAmount = tiers[selectedTierIndex].amount - currentMargin;
+        document.getElementById('additional-amount').value = `$${additionalAmount}`;
+    }
+
+    // 更新提示信息
+    function updateTips() {
+        const commissionReduction = tiers[selectedTierIndex].commissionReduction - tiers[currentTierIndex].commissionReduction;
+        const extraProfit = (recentSales * commissionReduction / 100).toFixed(2);
+        const tips = document.getElementById('tips');
+        tips.innerHTML = `
+            根据您最近的销售额 <span class="highlight">$${recentSales}</span> 情况，追加到该挡位后，您将额外多获得 <span class="highlight">$${extraProfit}</span> 的收益！<br>
+            更高的保证金不仅能降低佣金比例，还能显著提升客户对店铺的信任度，从而有效提升成交额，助力您的店铺快速成长。
+        `;
+    }
+
+    // 初始化保证金介绍
+    function initIntroSection() {
+        const tierList = document.getElementById('tier-list');
+        tiers.forEach((tier, index) => {
+            const tierCard = document.createElement('div');
+            tierCard.className = `tier-card tier-${index} ${index === currentTierIndex ? 'current' : ''}`;
+            tierCard.innerHTML = `
+                <div class="tier-name">${tier.name}</div>
+                <div class="tier-amount">$${tier.amount}</div>
+                <div class="tier-benefit">${index === 0 ? '未缴纳保证金' : `降低佣金 ${tier.commissionReduction}%`}</div>
+            `;
+            tierList.appendChild(tierCard);
+        });
+    }
+
+    // 确认追加保证金
+    function confirmAddMargin() {
+        if (!hasSelectedTier) {
+            const tierSelector = document.getElementById('tier-selector');
+            tierSelector.classList.add('flash');
+            alert('请先选择一个保证金挡位！');
+            return;
+        }
+
+        const additionalAmount = tiers[selectedTierIndex].amount - currentMargin;
+        if (additionalAmount > accountBalance) {
+            const rechargeAmount = additionalAmount - accountBalance;
+            const modal = document.createElement('div');
+            modal.className = 'confirm-modal';
+            modal.innerHTML = `
+                <div class="confirm-modal-content">
+                    <p>余额不足！需要充值 <span class="highlight">$${rechargeAmount}</span> 才能追加到该挡位。</p>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove()">取消</button>
+                        <button class="btn btn-primary" onclick="recharge(${rechargeAmount})">充值</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            return;
+        }
+
+        const modal = document.createElement('div');
+        modal.className = 'confirm-modal';
+        modal.innerHTML = `
+            <div class="confirm-modal-content">
+                <p>系统将从您的账户余额中扣除 <span class="highlight">$${additionalAmount}</span>，确认追加保证金吗？</p>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove()">取消</button>
+                    <button class="btn btn-primary" onclick="addMargin(${additionalAmount})">确认</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    // 充值（模拟）
+    function recharge(amount) {
+        alert(`请充值 $${amount} 以继续追加保证金！跳转到充值页面...`);
+        // 实际应用中，这里应跳转到充值页面，例如：
+        // window.location.href = `/recharge?amount=${amount}`;
+    }
+
+    // 追加保证金
+    function addMargin(amount) {
+        currentMargin = tiers[selectedTierIndex].amount;
+        currentTierIndex = selectedTierIndex;
+        accountBalance -= amount;
+        sessionStorage.setItem('kycData', JSON.stringify({ ...kycData, margin: currentMargin }));
+        document.querySelector('.confirm-modal').remove();
+        alert('保证金追加成功！');
+        initInfoSection();
+        initActionSection();
+        initIntroSection();
+    }
+
+    window.onload = () => {
+        w3.includeHTML(() => {
+            InitSidebarContent();
+            initSidebar();
+            initStoreMessages();
+            initInfoSection();
+            initActionSection();
+            initIntroSection();
+        });
+    };
+</script>
+</body>
+</html>
