@@ -20,8 +20,7 @@
     <style>
         .transaction-data::-webkit-scrollbar {width: 6px;}
         .transaction-data::-webkit-scrollbar-thumb {background: #f59e0b; border-radius: 3px;}
-        .transaction-data .hot-row div:nth-child(2),
-        .transaction-data .hot-row div:nth-child(7) {
+        .transaction-data .hot-row div:nth-child(8) {
             white-space: normal;
             word-break: break-all;
         }
@@ -41,6 +40,62 @@
             background: #f5f5f5;
             border-color: #f97316;
             color: #f97316;
+        }
+        .sortable {
+            cursor: pointer;
+            position: relative;
+            padding-right: 1.5em;
+        }
+        .sortable:hover {
+            color: #f97316;
+        }
+        .sortable .sort-icon {
+            position: absolute;
+            right: 0.3em;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+        .sortable.active .sort-icon {
+            color: #f97316;
+        }
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .pagination .page-btn {
+            padding: 0.25em 0.75em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            color: rgba(0, 0, 0, 0.85);
+            transition: all 0.3s;
+            font-size: 0.875em;
+            height: 1.8em;
+            line-height: 1.5em;
+            min-width: 2em;
+            text-align: center;
+        }
+        .pagination .page-btn:hover {
+            background: #f5f5f5;
+            border-color: #f97316;
+            color: #f97316;
+        }
+        .pagination .page-btn.active {
+            background: #f97316;
+            border-color: #f97316;
+            color: #fff;
+        }
+        .pagination .page-btn.disabled {
+            cursor: not-allowed;
+            color: #d9d9d9;
+            border-color: #d9d9d9;
+        }
+        .pagination .ellipsis {
+            font-size: 0.875em;
+            color: #6b7280;
         }
     </style>
 </head>
@@ -70,7 +125,7 @@
             <h2>订单日志</h2>
             <div class="filter-row">
                 <div class="brand-service-filter">
-                    <input type="text" id="search-input" placeholder="模糊搜索（换货详情/ID）" style="height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                    <input type="text" id="search-input" placeholder="模糊搜索（换货详情/水单ID）" style="height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
                     <select class="ant-select" id="type-filter">
                         <option value="">全部类型</option>
                         <option value="1">退货</option>
@@ -91,21 +146,17 @@
                     <div class="hot-card">
                         <div class="hot-title-container">
                             <h3 class="hot-title">订单日志</h3>
-                            <div class="hot-time-filter">
-                                <button class="time-btn">导出</button>
-                            </div>
                         </div>
                         <div class="hot-header">
-                            <div style="flex: 1; text-align: center;">ID</div>
-                            <div style="flex: 1; text-align: center;">订单ID</div>
+                            <div style="flex: 1; text-align: center;">水单ID</div>
+                            <div style="flex: 1; text-align: center;" class="sortable" data-sort="orders_id">订单ID<i class="fas fa-sort-down sort-icon"></i></div>
                             <div style="flex: 1; text-align: center;">商品</div>
                             <div style="flex: 1; text-align: center;">日志类型</div>
                             <div style="flex: 1; text-align: center;">管理员名称</div>
-                            <div style="flex: 1.5; text-align: center;">店铺名称</div>
-                            <div style="flex: 1; text-align: center;">数量</div>
-                            <div style="flex: 1; text-align: center;">退款金额</div>
+                            <div style="flex: 1; text-align: center;" class="sortable" data-sort="quantity">数量<i class="fas fa-sort-down sort-icon"></i></div>
+                            <div style="flex: 1; text-align: center;" class="sortable" data-sort="refund_amount">退款金额<i class="fas fa-sort-down sort-icon"></i></div>
                             <div style="flex: 2; text-align: center;">换货详情</div>
-                            <div style="flex: 1.5; text-align: center;">日志时间</div>
+                            <div style="flex: 1.5; text-align: center;" class="sortable" data-sort="log_time">日志时间<i class="fas fa-sort-down sort-icon"></i></div>
                         </div>
                         <div class="transaction-data" id="transaction-data">
                             <!-- 数据由JS动态生成 -->
@@ -114,9 +165,9 @@
                 </div>
             </div>
             <div class="filter-row">
-                <button class="time-btn" id="prev-page">上一页</button>
-                <button class="time-btn" id="next-page">下一页</button>
-                <input type="number" id="page-jump" placeholder="跳转" style="width: 60px; height: 1.8em; padding: 0 8px;">
+                <div class="pagination" id="pagination">
+                    <!-- 页码由JS动态生成 -->
+                </div>
                 <select class="ant-select" id="page-size">
                     <option value="10">10条/页</option>
                     <option value="20" selected>20条/页</option>
@@ -153,7 +204,7 @@
     }
 
     // 模拟订单日志数据
-    function generateTransactionData(filters = {}, page = 1, pageSize = 20) {
+    function generateTransactionData(filters = {}, page = 1, pageSize = 20, sortField = 'orders_id', sortOrder = 'asc') {
         const types = [
             { value: 0, text: '未知', color: '#6b7280' },
             { value: 1, text: '退货', color: '#d32f2f' },
@@ -167,7 +218,7 @@
         for (let i = startIndex; i < endIndex; i++) {
             const type = types[Math.floor(Math.random() * types.length)];
             const logTime = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
-            const isItem = Math.random() > 0.5; // 随机选择 item_id 或 posts_id
+            const isItem = Math.random() > 0.5;
             const itemId = isItem ? faker.datatype.number({ min: 1000, max: 9999 }) : 0;
             const postsId = isItem ? 0 : faker.datatype.number({ min: 1000, max: 9999 });
             const replacementData = type.value === 2 ? JSON.stringify([
@@ -183,11 +234,11 @@
                 type_value: type.value,
                 typeColor: type.color,
                 manage_name: faker.internet.userName(),
-                store_name: faker.company.companyName(),
                 quantity: faker.datatype.number({ min: 1, max: 10 }),
                 refund_amount: type.value === 1 ? parseFloat(faker.finance.amount(10, 500, 2)) : 0.00,
                 replacement_data: replacementData,
-                log_time: logTime.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                log_time: logTime,
+                log_time_display: logTime.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
             };
 
             // 应用筛选条件
@@ -200,13 +251,72 @@
 
             data.push(row);
         }
+
+        // 按指定字段排序
+        data.sort((a, b) => {
+            let valA = a[sortField];
+            let valB = b[sortField];
+            if (sortField === 'log_time') {
+                valA = new Date(valA);
+                valB = new Date(valB);
+            }
+            if (sortOrder === 'asc') {
+                return valA > valB ? 1 : -1;
+            } else {
+                return valA < valB ? 1 : -1;
+            }
+        });
+
         return data;
     }
 
+    // 渲染分页
+    function renderPagination(page, pageSize, totalRecords) {
+        const maxPage = Math.ceil(totalRecords / pageSize);
+        const container = document.getElementById('pagination');
+        container.innerHTML = '';
+
+        // 生成页码
+        const pages = [];
+        const range = 2; // 当前页前后显示的页数
+        pages.push(1); // 始终显示第1页
+        if (page > range + 2) {
+            pages.push('...');
+        }
+        for (let i = Math.max(2, page - range); i <= Math.min(maxPage - 1, page + range); i++) {
+            pages.push(i);
+        }
+        if (page < maxPage - range - 1) {
+            pages.push('...');
+        }
+        if (maxPage > 1) {
+            pages.push(maxPage); // 始终显示最后一页
+        }
+
+        pages.forEach(p => {
+            if (p === '...') {
+                const span = document.createElement('span');
+                span.className = 'ellipsis';
+                span.textContent = '...';
+                container.appendChild(span);
+            } else {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${p === page ? 'active' : ''}`;
+                btn.textContent = p;
+                btn.addEventListener('click', () => {
+                    currentPage = p;
+                    renderTransactionData({}, currentPage, sortField, sortOrder);
+                });
+                container.appendChild(btn);
+            }
+        });
+    }
+
     // 渲染订单日志
-    function renderTransactionData(filters = {}, page = 1) {
+    function renderTransactionData(filters = {}, page = 1, sortField = 'orders_id', sortOrder = 'asc') {
         const pageSize = parseInt(document.getElementById('page-size').value) || 20;
-        const data = generateTransactionData(filters, page, pageSize);
+        const totalRecords = 1000;
+        const data = generateTransactionData(filters, page, pageSize, sortField, sortOrder);
         const container = document.getElementById('transaction-data');
         container.innerHTML = '';
         data.forEach(row => {
@@ -218,18 +328,34 @@
                 <div style="flex: 1; text-align: center;"><a class="hot-link" href="${row.product_link}">${row.product_display}</a></div>
                 <div style="flex: 1; text-align: center; color: ${row.typeColor}">${row.type}</div>
                 <div style="flex: 1; text-align: center;">${row.manage_name}</div>
-                <div style="flex: 1.5; text-align: center;">${row.store_name}</div>
                 <div style="flex: 1; text-align: center;">${row.quantity}</div>
                 <div style="flex: 1; text-align: center;">${row.refund_amount.toFixed(2)}</div>
                 <div style="flex: 2; text-align: center;">${row.replacement_data ? `<button class="download-btn" onclick="downloadReplacementData('${row.replacement_data.replace(/'/g, "\\'")}', ${row.id})"><i class="fas fa-download"></i></button>` : ''}</div>
-                <div style="flex: 1.5; text-align: center;">${row.log_time}</div>
+                <div style="flex: 1.5; text-align: center;">${row.log_time_display}</div>
             `;
             container.appendChild(rowEl);
+            });
+
+        // 更新排序图标
+        document.querySelectorAll('.sortable').forEach(el => {
+            const icon = el.querySelector('.sort-icon');
+            if (el.dataset.sort === sortField) {
+                el.classList.add('active');
+                icon.className = `fas ${sortOrder === 'asc' ? 'fa-sort-up' : 'fa-sort-down'} sort-icon`;
+            } else {
+                el.classList.remove('active');
+                icon.className = 'fas fa-sort-down sort-icon';
+            }
         });
+
+        // 渲染分页
+        renderPagination(page, pageSize, totalRecords);
     }
 
     // 初始化数据
     let currentPage = 1;
+    let sortField = 'orders_id';
+    let sortOrder = 'asc';
     renderTransactionData();
 
     // 搜索筛选
@@ -243,7 +369,7 @@
             dateTo: document.getElementById('date-to').value
         };
         currentPage = 1;
-        renderTransactionData(filters, currentPage);
+        renderTransactionData(filters, currentPage, sortField, sortOrder);
     });
 
     // 清空筛选
@@ -255,42 +381,28 @@
         document.getElementById('date-from').value = '';
         document.getElementById('date-to').value = '';
         currentPage = 1;
-        renderTransactionData();
+        renderTransactionData({}, currentPage, sortField, sortOrder);
     });
 
-    // 分页事件
-    document.getElementById('prev-page').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            renderTransactionData({}, currentPage);
-        }
+    // 排序事件
+    document.querySelectorAll('.sortable').forEach(el => {
+        el.addEventListener('click', () => {
+            const newSortField = el.dataset.sort;
+            if (newSortField === sortField) {
+                sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortField = newSortField;
+                sortOrder = 'asc';
+            }
+            currentPage = 1;
+            renderTransactionData({}, currentPage, sortField, sortOrder);
+        });
     });
 
-    document.getElementById('next-page').addEventListener('click', () => {
-        const pageSize = parseInt(document.getElementById('page-size').value) || 20;
-        const totalRecords = 1000;
-        const maxPage = Math.ceil(totalRecords / pageSize);
-        if (currentPage < maxPage) {
-            currentPage++;
-            renderTransactionData({}, currentPage);
-        }
-    });
-
-    document.getElementById('page-jump').addEventListener('change', (e) => {
-        const page = parseInt(e.target.value);
-        const pageSize = parseInt(document.getElementById('page-size').value) || 20;
-        const totalRecords = 1000;
-        const maxPage = Math.ceil(totalRecords / pageSize);
-        if (page > 0 && page <= maxPage) {
-            currentPage = page;
-            renderTransactionData({}, currentPage);
-        }
-        e.target.value = '';
-    });
-
+    // 每页条数变化
     document.getElementById('page-size').addEventListener('change', () => {
         currentPage = 1;
-        renderTransactionData({}, currentPage);
+        renderTransactionData({}, currentPage, sortField, sortOrder);
     });
 </script>
 </body>
