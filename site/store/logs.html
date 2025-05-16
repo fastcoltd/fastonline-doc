@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店铺日志</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .log-filter-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1em;
+            flex-wrap: wrap;
+        }
+        .log-filter-row select, .log-filter-row input[type="date"], .log-filter-row input[type="number"] {
+            padding: 0.25em 0.5em;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25em;
+            font-size: 0.875em;
+            transition: all 0.3s;
+        }
+        .log-filter-row select:hover, .log-filter-row select:focus,
+        .log-filter-row input[type="date"]:hover, .log-filter-row input[type="date"]:focus,
+        .log-filter-row input[type="number"]:hover, .log-filter-row input[type="number"]:focus {
+            border-color: var(--natural-green);
+            outline: none;
+            box-shadow: 0 0 0 0.125em rgba(76, 175, 80, 0.2);
+        }
+        .log-filter-row .btn-solid-medium {
+            padding: 0.3em 1em;
+        }
+        .log-section {
+            display: flex;
+            flex-direction: column;
+        }
+        .log-header {
+            display: flex;
+            background: #f1f5f9;
+            padding: 0.5em 0;
+            font-weight: 500;
+            color: #4b5563;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .log-header div {
+            flex: 1;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .log-row {
+            display: flex;
+            padding: 0.5em 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .log-row div {
+            flex: 1;
+            text-align: center;
+            white-space: nowrap;
+            color: #374151;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .log-row:hover {
+            background: #f5f5f5;
+        }
+        .log-data {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 2em;
+        }
+        .log-pagination {
+            flex-shrink: 0;
+            margin-top: 0.5em;
+            text-align: center;
+            font-size: 0.875em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .log-pagination a {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.25em 0.5em;
+            margin: 0 0.25em;
+        }
+        .log-pagination a:hover {
+            color: var(--natural-green);
+        }
+        .log-pagination a.disabled, .log-pagination a.disabled:hover {
+            color: var(--text-secondary);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .log-pagination a.active {
+            color: var(--natural-green);
+            font-weight: bold;
+        }
+        .log-pagination .ellipsis {
+            margin: 0 0.5em;
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="store-container">
+    <div id="store-messages" class="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div w3-include-html="/site/store/_sidebar.html"></div>
+        <div class="main-content">
+            <h2>我的日志</h2>
+            <div class="log-section">
+                <div class="log-filter-row">
+                    <select id="staff-filter">
+                        <option value="">全部员工</option>
+                    </select>
+                    <select id="module-filter">
+                        <option value="">全部模块</option>
+                        <option value="product">商品</option>
+                        <option value="order">订单</option>
+                        <option value="finance">财务</option>
+                        <option value="user">用户</option>
+                    </select>
+                    <input type="date" id="start-date" placeholder="开始日期">
+                    <input type="date" id="end-date" placeholder="结束日期">
+                    <a href="#" class="btn-solid-medium" id="clear-filters">清空筛选条件</a>
+                    <a href="#" class="btn-solid-medium" id="apply-filters">确定</a>
+                </div>
+                <div class="log-header">
+                    <div>ID</div>
+                    <div>员工</div>
+                    <div>模块</div>
+                    <div>操作</div>
+                    <div>IP</div>
+                    <div>状态</div>
+                    <div>时间</div>
+                </div>
+                <div class="log-data" id="log-data"></div>
+                <div class="log-pagination">
+                    <a href="#" id="prev-page" class="disabled">上一页</a>
+                    <span id="page-links"></span>
+                    <a href="#" id="next-page">下一页</a>
+                    <input type="number" id="jump-page" min="1" placeholder="页码">
+                    <a href="#" class="btn-solid-medium" id="jump-to-page">跳转</a>
+                    <select id="page-size">
+                        <option value="10">10条/页</option>
+                        <option value="20" selected>20条/页</option>
+                        <option value="50">50条/页</option>
+                        <option value="100">100条/页</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+
+            const staffFilter = document.getElementById('staff-filter');
+            for (let i = 1; i <= 100; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `员工 ${i}`;
+                staffFilter.appendChild(option);
+            }
+        });
+    });
+
+    function generateLogData(count) {
+        const modules = ['product', 'order', 'finance', 'user'];
+        const actions = ['create', 'update', 'delete', 'view'];
+        const roles = ['Owner', 'Support'];
+        const statuses = ['成功', '失败'];
+        const logs = [];
+        for (let i = 0; i < count; i++) {
+            const createTime = Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000;
+            const staffId = faker.datatype.number({ min: 1, max: 100 });
+            const staffName = faker.name.findName();
+            const role = roles[Math.floor(Math.random() * roles.length)];
+            const date = new Date(createTime);
+            const gmt6Time = new Date(date.getTime() + 6 * 60 * 60 * 1000);
+            const timeString = gmt6Time.toISOString().slice(0, 16).replace('T', ' ') + ' (gmt+6)';
+            logs.push({
+                id: faker.datatype.number({ min: 1000, max: 9999 }),
+                store_id: storeId,
+                staff_id: staffId,
+                staff_display: `${staffName} (${role})`,
+                create_time: date,
+                create_time_display: timeString,
+                module: modules[Math.floor(Math.random() * modules.length)],
+                action: actions[Math.floor(Math.random() * actions.length)],
+                ip: faker.internet.ip(),
+                status: statuses[Math.floor(Math.random() * statuses.length)]
+            });
+        }
+        return logs;
+    }
+
+    function renderLogs(logs, page = 1, pageSize = 20) {
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        const paginatedLogs = logs.slice(start, end);
+        const logData = document.getElementById('log-data');
+        logData.innerHTML = '';
+        paginatedLogs.forEach(log => {
+            const row = document.createElement('div');
+            row.className = 'log-row';
+            row.innerHTML = `
+                    <div>${log.id}</div>
+                    <div>${log.staff_display}</div>
+                    <div>${log.module}</div>
+                    <div>${log.action}</div>
+                    <div>${log.ip}</div>
+                    <div>${log.status}</div>
+                    <div>${log.create_time_display}</div>
+                `;
+            logData.appendChild(row);
+        });
+
+        const totalPages = Math.ceil(logs.length / pageSize);
+        const pageLinks = document.getElementById('page-links');
+        pageLinks.innerHTML = '';
+        const maxVisiblePages = 3; // Show 3 pages at start and end
+        let pages = [];
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            if (page <= 4) {
+                pages = [1, 2, 3, 4, 5];
+                pages.push('...');
+                pages.push(totalPages - 1, totalPages);
+            } else if (page >= totalPages - 3) {
+                pages = [1, 2];
+                pages.push('...');
+                pages.push(totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+            } else {
+                pages = [1, 2];
+                pages.push('...');
+                pages.push(page - 1, page, page + 1);
+                pages.push('...');
+                pages.push(totalPages - 1, totalPages);
+            }
+        }
+
+        pages.forEach(p => {
+            if (p === '...') {
+                const span = document.createElement('span');
+                span.className = 'ellipsis';
+                span.textContent = '...';
+                pageLinks.appendChild(span);
+            } else {
+                const link = document.createElement('a');
+                link.href = '#';
+                link.textContent = p;
+                link.className = p === page ? 'active' : '';
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = p;
+                    applyFilters();
+                });
+                pageLinks.appendChild(link);
+            }
+        });
+
+        document.getElementById('prev-page').className = page === 1 ? 'disabled' : '';
+        document.getElementById('next-page').className = page === totalPages ? 'disabled' : '';
+        document.getElementById('jump-page').max = totalPages;
+    }
+
+    let allLogs = generateLogData(500);
+    let currentPage = 1;
+    let currentPageSize = 20;
+    let currentFilters = { staff: '', module: '', startDate: '', endDate: '' };
+    let pendingFilters = { staff: '', module: '', startDate: '', endDate: '' };
+
+    function applyFilters() {
+        currentFilters = { ...pendingFilters };
+        let filteredLogs = allLogs;
+        if (currentFilters.staff) {
+            filteredLogs = filteredLogs.filter(log => log.staff_id.toString() === currentFilters.staff);
+        }
+        if (currentFilters.module) {
+            filteredLogs = filteredLogs.filter(log => log.module === currentFilters.module);
+        }
+        if (currentFilters.startDate && currentFilters.endDate) {
+            const start = new Date(currentFilters.startDate);
+            const end = new Date(currentFilters.endDate + 'T23:59:59');
+            filteredLogs = filteredLogs.filter(log => {
+                const time = log.create_time;
+                return time >= start && time <= end;
+            });
+        }
+        renderLogs(filteredLogs, currentPage, currentPageSize);
+    }
+
+    document.getElementById('staff-filter').addEventListener('change', (e) => {
+        pendingFilters.staff = e.target.value;
+    });
+    document.getElementById('module-filter').addEventListener('change', (e) => {
+        pendingFilters.module = e.target.value;
+    });
+    document.getElementById('start-date').addEventListener('change', (e) => {
+        pendingFilters.startDate = e.target.value;
+    });
+    document.getElementById('end-date').addEventListener('change', (e) => {
+        pendingFilters.endDate = e.target.value;
+    });
+    document.getElementById('clear-filters').addEventListener('click', (e) => {
+        e.preventDefault();
+        pendingFilters = { staff: '', module: '', startDate: '', endDate: '' };
+        document.getElementById('staff-filter').value = '';
+        document.getElementById('module-filter').value = '';
+        document.getElementById('start-date').value = '';
+        document.getElementById('end-date').value = '';
+        currentPage = 1;
+        applyFilters();
+    });
+    document.getElementById('apply-filters').addEventListener('click', (e) => {
+        e.preventDefault();
+        currentPage = 1;
+        applyFilters();
+    });
+    document.getElementById('page-size').addEventListener('change', (e) => {
+        currentPageSize = parseInt(e.target.value);
+        currentPage = 1;
+        applyFilters();
+    });
+    document.getElementById('prev-page').addEventListener('click', (e) => {
+        e.preventDefault();
+        if (currentPage > 1) {
+            currentPage--;
+            applyFilters();
+        }
+    });
+    document.getElementById('next-page').addEventListener('click', (e) => {
+        e.preventDefault();
+        const totalPages = Math.ceil(allLogs.length / currentPageSize);
+        if (currentPage < totalPages) {
+            currentPage++;
+            applyFilters();
+        }
+    });
+    document.getElementById('jump-to-page').addEventListener('click', (e) => {
+        e.preventDefault();
+        const jumpPage = parseInt(document.getElementById('jump-page').value);
+        const totalPages = Math.ceil(allLogs.length / currentPageSize);
+        if (jumpPage >= 1 && jumpPage <= totalPages) {
+            currentPage = jumpPage;
+            applyFilters();
+        }
+    });
+
+    applyFilters();
+</script>
+</body>
+</html>
