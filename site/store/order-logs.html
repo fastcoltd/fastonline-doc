@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单日志</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .transaction-data::-webkit-scrollbar {width: 6px;}
+        .transaction-data::-webkit-scrollbar-thumb {background: #f59e0b; border-radius: 3px;}
+        .transaction-data .hot-row div:nth-child(2),
+        .transaction-data .hot-row div:nth-child(7) {
+            white-space: normal;
+            word-break: break-all;
+        }
+        .download-btn {
+            padding: 0.25em 0.75em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            color: rgba(0, 0, 0, 0.85);
+            transition: all 0.3s;
+            font-size: 0.875em;
+            height: 1.8em;
+            line-height: 1.5em;
+        }
+        .download-btn:hover {
+            background: #f5f5f5;
+            border-color: #f97316;
+            color: #f97316;
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="store-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div class="sidebar">
+            <div class="welcome-section">
+                <i class="fas fa-user-circle"></i>
+                <span id="user-nickname"></span>
+            </div>
+            <div class="store-info">
+                <img class="store-logo" src="" alt="Store Logo">
+                <h3><a id="store-name" class="store-link"></a></h3>
+                <div class="balance-rating">
+                    <span><i class="fas fa-wallet"></i> <span id="store-balance"></span></span>
+                    <span class="rating"><i class="fas fa-star"></i> <span id="store-rating"></span></span>
+                </div>
+                <div class="badges" id="store-badges"></div>
+            </div>
+            <div class="divider"></div>
+            <ul class="menu" id="store-menu"></ul>
+        </div>
+        <div class="main-content">
+            <h2>订单日志</h2>
+            <div class="filter-row">
+                <div class="brand-service-filter">
+                    <input type="text" id="search-input" placeholder="模糊搜索（换货详情/ID）" style="height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                    <select class="ant-select" id="type-filter">
+                        <option value="">全部类型</option>
+                        <option value="1">退货</option>
+                        <option value="2">换货</option>
+                    </select>
+                    <input type="number" id="amount-from" placeholder="退款金额从" style="width: 80px; height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                    <input type="number" id="amount-to" placeholder="到" style="width: 80px; height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                    <input type="text" id="date-from" placeholder="开始日期" style="width: 120px; height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                    <input type="text" id="date-to" placeholder="结束日期" style="width: 120px; height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                </div>
+                <div class="brand-service-filter">
+                    <button class="time-btn" id="clear-filter">清空筛选条件</button>
+                    <button class="time-btn" id="search-filter">确定</button>
+                </div>
+            </div>
+            <div class="hot-section">
+                <div class="hot-container">
+                    <div class="hot-card">
+                        <div class="hot-title-container">
+                            <h3 class="hot-title">订单日志</h3>
+                            <div class="hot-time-filter">
+                                <button class="time-btn">导出</button>
+                            </div>
+                        </div>
+                        <div class="hot-header">
+                            <div style="flex: 1; text-align: center;">ID</div>
+                            <div style="flex: 1; text-align: center;">订单ID</div>
+                            <div style="flex: 1; text-align: center;">商品</div>
+                            <div style="flex: 1; text-align: center;">日志类型</div>
+                            <div style="flex: 1; text-align: center;">管理员名称</div>
+                            <div style="flex: 1.5; text-align: center;">店铺名称</div>
+                            <div style="flex: 1; text-align: center;">数量</div>
+                            <div style="flex: 1; text-align: center;">退款金额</div>
+                            <div style="flex: 2; text-align: center;">换货详情</div>
+                            <div style="flex: 1.5; text-align: center;">日志时间</div>
+                        </div>
+                        <div class="transaction-data" id="transaction-data">
+                            <!-- 数据由JS动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-row">
+                <button class="time-btn" id="prev-page">上一页</button>
+                <button class="time-btn" id="next-page">下一页</button>
+                <input type="number" id="page-jump" placeholder="跳转" style="width: 60px; height: 1.8em; padding: 0 8px;">
+                <select class="ant-select" id="page-size">
+                    <option value="10">10条/页</option>
+                    <option value="20" selected>20条/页</option>
+                    <option value="50">50条/页</option>
+                    <option value="100">100条/页</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+        });
+    });
+
+    // 初始化日期选择器
+    flatpickr("#date-from", { dateFormat: "Y-m-d" });
+    flatpickr("#date-to", { dateFormat: "Y-m-d" });
+
+    // 下载换货详情
+    function downloadReplacementData(data, id) {
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `replacement_data_${id}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // 模拟订单日志数据
+    function generateTransactionData(filters = {}, page = 1, pageSize = 20) {
+        const types = [
+            { value: 0, text: '未知', color: '#6b7280' },
+            { value: 1, text: '退货', color: '#d32f2f' },
+            { value: 2, text: '换货', color: '#f59e0b' }
+        ];
+        const totalRecords = 1000; // 模拟总记录数
+        const data = [];
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize, totalRecords);
+
+        for (let i = startIndex; i < endIndex; i++) {
+            const type = types[Math.floor(Math.random() * types.length)];
+            const logTime = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+            const isItem = Math.random() > 0.5; // 随机选择 item_id 或 posts_id
+            const itemId = isItem ? faker.datatype.number({ min: 1000, max: 9999 }) : 0;
+            const postsId = isItem ? 0 : faker.datatype.number({ min: 1000, max: 9999 });
+            const replacementData = type.value === 2 ? JSON.stringify([
+                { item_id: faker.datatype.number({ min: 1000, max: 9999 }), quantity: faker.datatype.number({ min: 1, max: 5 }) },
+                { item_id: faker.datatype.number({ min: 1000, max: 9999 }), quantity: faker.datatype.number({ min: 1, max: 5 }) }
+            ]) : '';
+            const row = {
+                id: faker.datatype.number({ min: 1000, max: 9999 }),
+                orders_id: faker.datatype.number({ min: 10000, max: 99999 }),
+                product_display: isItem ? `商品：${itemId}` : `文章：${postsId}`,
+                product_link: isItem ? `/site/store/item.html?id=${itemId}` : `/site/store/post.html?id=${postsId}`,
+                type: type.text,
+                type_value: type.value,
+                typeColor: type.color,
+                manage_name: faker.internet.userName(),
+                store_name: faker.company.companyName(),
+                quantity: faker.datatype.number({ min: 1, max: 10 }),
+                refund_amount: type.value === 1 ? parseFloat(faker.finance.amount(10, 500, 2)) : 0.00,
+                replacement_data: replacementData,
+                log_time: logTime.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            };
+
+            // 应用筛选条件
+            if (filters.search && !(`${row.id}`.includes(filters.search) || (row.replacement_data && row.replacement_data.toLowerCase().includes(filters.search.toLowerCase())))) continue;
+            if (filters.type && row.type_value !== parseInt(filters.type)) continue;
+            if (filters.amountFrom && row.refund_amount < parseFloat(filters.amountFrom)) continue;
+            if (filters.amountTo && row.refund_amount > parseFloat(filters.amountTo)) continue;
+            if (filters.dateFrom && new Date(logTime) < new Date(filters.dateFrom)) continue;
+            if (filters.dateTo && new Date(logTime) > new Date(filters.dateTo)) continue;
+
+            data.push(row);
+        }
+        return data;
+    }
+
+    // 渲染订单日志
+    function renderTransactionData(filters = {}, page = 1) {
+        const pageSize = parseInt(document.getElementById('page-size').value) || 20;
+        const data = generateTransactionData(filters, page, pageSize);
+        const container = document.getElementById('transaction-data');
+        container.innerHTML = '';
+        data.forEach(row => {
+            const rowEl = document.createElement('div');
+            rowEl.className = 'hot-row';
+            rowEl.innerHTML = `
+                <div style="flex: 1; text-align: center;">${row.id}</div>
+                <div style="flex: 1; text-align: center;"><a class="hot-link" href="/site/store/order.html?id=${row.orders_id}">${row.orders_id}</a></div>
+                <div style="flex: 1; text-align: center;"><a class="hot-link" href="${row.product_link}">${row.product_display}</a></div>
+                <div style="flex: 1; text-align: center; color: ${row.typeColor}">${row.type}</div>
+                <div style="flex: 1; text-align: center;">${row.manage_name}</div>
+                <div style="flex: 1.5; text-align: center;">${row.store_name}</div>
+                <div style="flex: 1; text-align: center;">${row.quantity}</div>
+                <div style="flex: 1; text-align: center;">${row.refund_amount.toFixed(2)}</div>
+                <div style="flex: 2; text-align: center;">${row.replacement_data ? `<button class="download-btn" onclick="downloadReplacementData('${row.replacement_data.replace(/'/g, "\\'")}', ${row.id})"><i class="fas fa-download"></i></button>` : ''}</div>
+                <div style="flex: 1.5; text-align: center;">${row.log_time}</div>
+            `;
+            container.appendChild(rowEl);
+        });
+    }
+
+    // 初始化数据
+    let currentPage = 1;
+    renderTransactionData();
+
+    // 搜索筛选
+    document.getElementById('search-filter').addEventListener('click', () => {
+        const filters = {
+            search: document.getElementById('search-input').value.trim(),
+            type: document.getElementById('type-filter').value,
+            amountFrom: document.getElementById('amount-from').value,
+            amountTo: document.getElementById('amount-to').value,
+            dateFrom: document.getElementById('date-from').value,
+            dateTo: document.getElementById('date-to').value
+        };
+        currentPage = 1;
+        renderTransactionData(filters, currentPage);
+    });
+
+    // 清空筛选
+    document.getElementById('clear-filter').addEventListener('click', () => {
+        document.getElementById('search-input').value = '';
+        document.getElementById('type-filter').value = '';
+        document.getElementById('amount-from').value = '';
+        document.getElementById('amount-to').value = '';
+        document.getElementById('date-from').value = '';
+        document.getElementById('date-to').value = '';
+        currentPage = 1;
+        renderTransactionData();
+    });
+
+    // 分页事件
+    document.getElementById('prev-page').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderTransactionData({}, currentPage);
+        }
+    });
+
+    document.getElementById('next-page').addEventListener('click', () => {
+        const pageSize = parseInt(document.getElementById('page-size').value) || 20;
+        const totalRecords = 1000;
+        const maxPage = Math.ceil(totalRecords / pageSize);
+        if (currentPage < maxPage) {
+            currentPage++;
+            renderTransactionData({}, currentPage);
+        }
+    });
+
+    document.getElementById('page-jump').addEventListener('change', (e) => {
+        const page = parseInt(e.target.value);
+        const pageSize = parseInt(document.getElementById('page-size').value) || 20;
+        const totalRecords = 1000;
+        const maxPage = Math.ceil(totalRecords / pageSize);
+        if (page > 0 && page <= maxPage) {
+            currentPage = page;
+            renderTransactionData({}, currentPage);
+        }
+        e.target.value = '';
+    });
+
+    document.getElementById('page-size').addEventListener('change', () => {
+        currentPage = 1;
+        renderTransactionData({}, currentPage);
+    });
+</script>
+</body>
+</html>
