@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店铺员工</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+            gap: 1.25em;
+            margin-top: 1.25em;
+        }
+        .staff-card {
+            background: linear-gradient(135deg, #ffffff, #f9fafb);
+            padding: 1.25em;
+            border-radius: 0.75em;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .staff-card.disabled {
+            background: #e5e7eb;
+        }
+        .staff-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+        .staff-card .edit-icon, .staff-card .delete-icon {
+            position: absolute;
+            top: 0.5em;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 1.25em;
+        }
+        .staff-card .edit-icon {
+            right: 2em;
+        }
+        .staff-card .delete-icon {
+            right: 0.5em;
+        }
+        .staff-card .edit-icon:hover, .staff-card .delete-icon:hover {
+            color: #f97316;
+        }
+        .staff-card .avatar-container {
+            position: relative;
+            width: 4em;
+            height: 4em;
+            margin-bottom: 0.5em;
+        }
+        .staff-card .avatar-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .staff-card .avatar-container .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .staff-card .avatar-container:hover .overlay {
+            opacity: 1;
+        }
+        .staff-card .avatar-container .overlay i {
+            color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        .staff-card h3 {
+            margin: 0;
+            font-size: 1.25em;
+            color: #1f2937;
+        }
+        .staff-card p {
+            margin: 0.25em 0;
+            color: #6b7280;
+            font-size: 0.875em;
+        }
+        .staff-card .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+            margin-top: 0.5em;
+        }
+        .staff-card .tag {
+            background: #f59e0b;
+            color: #fff;
+            padding: 0.25em 0.5em;
+            border-radius: 0.25em;
+            font-size: 0.75em;
+        }
+        .staff-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .staff-popup .popup-content {
+            background: #fff;
+            padding: 1.5em;
+            border-radius: 0.5em;
+            max-width: 30em;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .staff-popup h3 {
+            margin-top: 0;
+            font-size: 1.25em;
+            color: #f59e0b;
+        }
+        .staff-popup .form-group {
+            margin-bottom: 1em;
+        }
+        .staff-popup label {
+            display: block;
+            margin-bottom: 0.25em;
+            font-size: 0.875em;
+            color: #1f2937;
+        }
+        .staff-popup input,
+        .staff-popup select {
+            width: 100%;
+            padding: 0.5em;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.25em;
+            font-size: 0.875em;
+        }
+        .staff-popup input[readonly] {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+        .staff-popup .permissions-select {
+            height: auto;
+            max-height: 10em;
+        }
+        .staff-popup .action-btn {
+            padding: 0.5em 1em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 0.875em;
+            margin-right: 0.5em;
+        }
+        .staff-popup .action-btn:hover {
+            background: #45a049;
+        }
+        .staff-popup .close-btn {
+            position: absolute;
+            top: 0.5em;
+            right: 0.5em;
+            background: none;
+            border: none;
+            font-size: 1.25em;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .staff-popup .close-btn:hover {
+            color: #d32f2f;
+        }
+        .staff-popup .telegram-hint {
+            color: #d32f2f;
+            font-size: 0.75em;
+            margin-top: 0.25em;
+        }
+        .staff-popup .avatar-preview {
+            width: 4em;
+            height: 4em;
+            border-radius: 50%;
+            margin-top: 0.5em;
+            object-fit: cover;
+            display: none;
+        }
+        .staff-popup .status-option-enabled {
+            color: #4CAF50;
+        }
+        .staff-popup .status-option-disabled {
+            color: #6b7280;
+        }
+        .staff-message {
+            display: flex;
+            align-items: center;
+            padding: 0.25em 1em;
+            margin-bottom: 0.5em;
+            border-radius: var(--radius-medium);
+            font-size: var(--font-small);
+            background-color: #f59e0b22;
+            border-left: 4px solid #f59e0b;
+        }
+        @media (max-width: 48em) {
+            .staff-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="store-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div class="sidebar">
+            <div class="welcome-section">
+                <i class="fas fa-user-circle"></i>
+                <span id="user-nickname"></span>
+            </div>
+            <div class="store-info">
+                <img class="store-logo" src="" alt="Store Logo">
+                <h3><a id="store-name" class="store-link"></a></h3>
+                <div class="balance-rating">
+                    <span><i class="fas fa-wallet"></i> <span id="store-balance"></span></span>
+                    <span class="rating"><i class="fas fa-star"></i> <span id="store-rating"></span></span>
+                </div>
+                <div class="badges" id="store-badges"></div>
+            </div>
+            <div class="divider"></div>
+            <ul class="menu" id="store-menu"></ul>
+        </div>
+        <div class="main-content">
+            <h2>店铺员工</h2>
+            <button class="time-btn" onclick="showAddPopup()">添加员工</button>
+            <div class="staff-message">New staff must be registered platform users. Each store can have up to 5 staff members.</div>
+            <div class="staff-grid" id="staff-grid">
+                <!-- 员工卡片由JS动态生成 -->
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+            generateStaffData();
+            renderStaffData();
+        });
+    });
+
+    // 职位和颜色映射
+    const jobTitles = [
+        { title: '经理', color: '#4CAF50' },
+        { title: '客服', color: '#f59e0b' },
+        { title: '运营', color: '#1e90ff' },
+        { title: '财务', color: '#d32f2f' },
+        { title: '技术支持', color: '#6b7280' }
+    ];
+
+    // 模拟权限列表
+    const allPermissions = [
+        '订单管理', '商品管理', '财务管理', '用户管理', '帖子管理',
+        '库存管理', '促销管理', '客服管理', '数据分析', '店铺设置',
+        '权限分配', '日志查看', '退货处理', '换货处理', '投诉处理'
+    ];
+
+    // 模拟员工数据
+    let staffData = [];
+    function generateStaffData() {
+        const count = Math.floor(Math.random() * 5) + 1; // 1-5个员工
+        staffData = [];
+        for (let i = 0; i < count; i++) {
+            const permCount = Math.floor(Math.random() * 6) + 5; // 5-10个权限
+            const permissions = [];
+            const permIndices = new Set();
+            while (permIndices.size < permCount) {
+                permIndices.add(Math.floor(Math.random() * allPermissions.length));
+            }
+            permIndices.forEach(idx => permissions.push(allPermissions[idx]));
+            const job = jobTitles[Math.floor(Math.random() * jobTitles.length)];
+            staffData.push({
+                id: faker.datatype.number({ min: 1000, max: 9999 }),
+                store_id: faker.datatype.number({ min: 1, max: 1000 }),
+                user_id: faker.datatype.number({ min: 10000, max: 99999 }),
+                status: Math.random() > 0.3 ? 1 : 0,
+                title: job.title,
+                title_color: job.color,
+                nick_name: faker.internet.userName(),
+                avatar: `https://picsum.photos/seed/${Math.random().toString(36).substring(7)}/80/80`,
+                phone: faker.phone.phoneNumber(),
+                telegram: `@${faker.internet.userName()}`,
+                create_time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+                last_login_ip: faker.internet.ip(),
+                last_login_time: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                permissions: permissions
+            });
+        }
+    }
+
+    // 渲染员工卡片
+    function renderStaffData() {
+        const container = document.getElementById('staff-grid');
+        container.innerHTML = '';
+        staffData.forEach(staff => {
+            const card = document.createElement('div');
+            card.className = `staff-card ${staff.status === 0 ? 'disabled' : ''}`;
+            card.innerHTML = `
+                <i class="fas fa-edit edit-icon" onclick="showEditPopup(${staff.id})"></i>
+                <i class="fas fa-trash delete-icon" onclick="showDeleteConfirm(${staff.id})"></i>
+                <div class="avatar-container">
+                    <img src="${staff.avatar}" alt="Avatar">
+                    <div class="overlay" onclick="showEditPopup(${staff.id})">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                </div>
+                <h3>${staff.nick_name}</h3>
+                <p style="color: ${staff.title_color}">职位: ${staff.title}</p>
+                <p>用户ID: ${staff.user_id}</p>
+                <p>电话: ${staff.phone}</p>
+                <p>Telegram: ${staff.telegram}</p>
+                <p>状态: ${staff.status === 1 ? '启用' : '禁用'}</p>
+                <p>创建时间: ${staff.create_time}</p>
+                <p>最后登录: ${staff.last_login_time}</p>
+                <div class="tags">
+                    ${staff.permissions.map(perm => `<span class="tag">${perm}</span>`).join('')}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // 显示添加员工弹窗
+    function showAddPopup() {
+        if (staffData.length >= 5) {
+            const message = document.createElement('div');
+            message.className = 'store-message';
+            message.style.backgroundColor = '#d32f2f22';
+            message.style.borderLeft = '4px solid #d32f2f';
+            message.innerHTML = `<span class="message-content">店铺员工数量已达上限（5人）！</span>`;
+            document.querySelector('.main-content').insertBefore(message, document.querySelector('.staff-grid'));
+            setTimeout(() => message.remove(), 3000);
+            return;
+        }
+
+        const popup = document.createElement('div');
+        popup.className = 'staff-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>添加员工</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>用户ID</label>
+                    <input type="number" id="add-user_id" placeholder="请输入10000-99999的ID">
+                </div>
+                <div class="form-group">
+                    <label>昵称</label>
+                    <input type="text" id="add-nick_name" placeholder="请输入昵称">
+                </div>
+                <div class="form-group">
+                    <label>头像</label>
+                    <input type="file" id="add-avatar" accept="image/*">
+                    <img id="avatar-preview" alt="Avatar Preview">
+                </div>
+                <div class="form-group">
+                    <label>职位</label>
+                    <select id="add-title">
+                        ${jobTitles.map(job => `<option value="${job.title}" style="color: ${job.color}">${job.title}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>电话</label>
+                    <input type="text" id="add-phone" placeholder="请输入电话">
+                </div>
+                <div class="form-group">
+                    <label>Telegram</label>
+                    <input type="text" id="add-telegram" placeholder="请输入Telegram" oninput="checkTelegram(this)">
+                    <span id="telegram-hint" class="telegram-hint" style="display: none;">请通知员工绑定机器人：<a href="https://t.me/xxxxrobot" target="_blank">https://t.me/xxxxrobot</a></span>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="add-status">
+                        <option value="1" class="status-option-enabled">启用</option>
+                        <option value="0" class="status-option-disabled">禁用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>权限</label>
+                    <select id="add-permissions" multiple class="permissions-select">
+                        ${allPermissions.map(perm => `<option value="${perm}">${perm}</option>`).join('')}
+                    </select>
+                </div>
+                <button class="action-btn" onclick="addStaff()">保存</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+
+        // 初始化头像预览
+        const avatarInput = document.getElementById('add-avatar');
+        const avatarPreview = document.getElementById('avatar-preview');
+        avatarPreview.style.display = 'none';
+        avatarInput.addEventListener('change', () => {
+            const file = avatarInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    avatarPreview.src = e.target.result;
+                    avatarPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 初始化 Telegram 提示
+        checkTelegram(document.getElementById('add-telegram'));
+    }
+
+    // 添加员工
+    function addStaff() {
+        const userId = parseInt(document.getElementById('add-user_id').value);
+        if (!userId || userId < 10000 || userId > 99999) {
+            alert('请输入有效的用户ID（10000-99999）');
+            return;
+        }
+        if (staffData.some(staff => staff.user_id === userId)) {
+            alert('该用户ID已存在');
+            return;
+        }
+
+        const nickName = document.getElementById('add-nick_name').value.trim();
+        if (!nickName) {
+            alert('请输入昵称');
+            return;
+        }
+
+        const avatarInput = document.getElementById('add-avatar');
+        const title = document.getElementById('add-title').value;
+        const phone = document.getElementById('add-phone').value.trim();
+        const telegram = document.getElementById('add-telegram').value.trim();
+        const status = parseInt(document.getElementById('add-status').value);
+        const permissionsSelect = document.getElementById('add-permissions');
+        const permissions = Array.from(permissionsSelect.selectedOptions).map(opt => opt.value);
+
+        const newStaff = {
+            id: faker.datatype.number({ min: 1000, max: 9999 }),
+            store_id: faker.datatype.number({ min: 1, max: 1000 }),
+            user_id: userId,
+            status: status,
+            title: title,
+            title_color: jobTitles.find(job => job.title === title).color,
+            nick_name: nickName,
+            avatar: '',
+            phone: phone,
+            telegram: telegram,
+            create_time: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+            last_login_ip: faker.internet.ip(),
+            last_login_time: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+            permissions: permissions
+        };
+
+        if (avatarInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                newStaff.avatar = e.target.result;
+                staffData.push(newStaff);
+                document.querySelector('.staff-popup').remove();
+                renderStaffData();
+            };
+            reader.readAsDataURL(avatarInput.files[0]);
+        } else {
+            newStaff.avatar = 'https://picsum.photos/seed/default/80/80';
+            staffData.push(newStaff);
+            document.querySelector('.staff-popup').remove();
+            renderStaffData();
+        }
+    }
+
+    // 显示编辑弹窗
+    function showEditPopup(staffId) {
+        const staff = staffData.find(s => s.id === staffId);
+        if (!staff) return;
+
+        const popup = document.createElement('div');
+        popup.className = 'staff-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>编辑员工信息</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>用户ID</label>
+                    <input type="text" id="edit-user_id" value="${staff.user_id}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>昵称</label>
+                    <input type="text" id="edit-nick_name" value="${staff.nick_name}">
+                </div>
+                <div class="form-group">
+                    <label>头像</label>
+                    <input type="file" id="edit-avatar" accept="image/*">
+                    <img id="avatar-preview" src="${staff.avatar}" alt="Avatar Preview">
+                </div>
+                <div class="form-group">
+                    <label>职位</label>
+                    <select id="edit-title">
+                        ${jobTitles.map(job => `<option value="${job.title}" style="color: ${job.color}" ${staff.title === job.title ? 'selected' : ''}>${job.title}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>电话</label>
+                    <input type="text" id="edit-phone" value="${staff.phone}">
+                </div>
+                <div class="form-group">
+                    <label>Telegram</label>
+                    <input type="text" id="edit-telegram" value="${staff.telegram}" oninput="checkTelegram(this)">
+                    <span id="telegram-hint" class="telegram-hint" style="display: none;">请通知员工绑定机器人：<a href="https://t.me/xxxxrobot" target="_blank">https://t.me/xxxxrobot</a></span>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="edit-status">
+                        <option value="1" class="status-option-enabled" ${staff.status === 1 ? 'selected' : ''}>启用</option>
+                        <option value="0" class="status-option-disabled" ${staff.status === 0 ? 'selected' : ''}>禁用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>权限</label>
+                    <select id="edit-permissions" multiple class="permissions-select">
+                        ${allPermissions.map(perm => `<option value="${perm}" ${staff.permissions.includes(perm) ? 'selected' : ''}>${perm}</option>`).join('')}
+                    </select>
+                </div>
+                <button class="action-btn" onclick="saveStaff(${staff.id})">保存</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+
+        // 初始化头像预览
+        const avatarInput = document.getElementById('edit-avatar');
+        const avatarPreview = document.getElementById('avatar-preview');
+        avatarPreview.style.display = staff.avatar ? 'block' : 'none';
+        avatarInput.addEventListener('change', () => {
+            const file = avatarInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    avatarPreview.src = e.target.result;
+                    avatarPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 初始化 Telegram 提示
+        checkTelegram(document.getElementById('edit-telegram'));
+    }
+
+    // 检查 Telegram 绑定
+    function checkTelegram(input) {
+        const value = input.value.trim();
+        const hint = document.getElementById('telegram-hint');
+        if (value.startsWith('@') && value.length > 2) {
+            hint.style.display = 'none';
+        } else {
+            hint.style.display = 'block';
+        }
+    }
+
+    // 保存员工信息
+    function saveStaff(staffId) {
+        const staff = staffData.find(s => s.id === staffId);
+        if (!staff) return;
+
+        staff.nick_name = document.getElementById('edit-nick_name').value;
+        const avatarInput = document.getElementById('edit-avatar');
+        if (avatarInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                staff.avatar = e.target.result;
+                renderStaffData();
+            };
+            reader.readAsDataURL(avatarInput.files[0]);
+        }
+        staff.title = document.getElementById('edit-title').value;
+        staff.title_color = jobTitles.find(job => job.title === staff.title).color;
+        staff.phone = document.getElementById('edit-phone').value;
+        staff.telegram = document.getElementById('edit-telegram').value;
+        staff.status = parseInt(document.getElementById('edit-status').value);
+        const permissionsSelect = document.getElementById('edit-permissions');
+        staff.permissions = Array.from(permissionsSelect.selectedOptions).map(opt => opt.value);
+
+        document.querySelector('.staff-popup').remove();
+        if (!avatarInput.files[0]) {
+            renderStaffData();
+        }
+    }
+
+    // 显示删除确认弹窗
+    function showDeleteConfirm(staffId) {
+        const staff = staffData.find(s => s.id === staffId);
+        if (!staff) return;
+
+        const popup = document.createElement('div');
+        popup.className = 'staff-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>确认删除</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <p>确定要删除员工 ${staff.nick_name} 吗？</p>
+                <button class="action-btn" onclick="deleteStaff(${staff.id})">确认</button>
+                <button class="action-btn" style="background: #d32f2f" onclick="this.parentElement.parentElement.remove()">取消</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 删除员工
+    function deleteStaff(staffId) {
+        staffData = staffData.filter(s => s.id !== staffId);
+        document.querySelector('.staff-popup').remove();
+        renderStaffData();
+    }
+</script>
+</body>
+</html>
