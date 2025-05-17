@@ -117,7 +117,7 @@ let memberMenuConfig = [
     { text: "店铺管理", style: `color:var(--natural-green)`, icon: "fas fa-store", show: () => userHasStore(), memberSidebar: false, storeSidebar: true, href: "/site/store/overview.html", sub: [
             { text: "店铺中心", icon: "fas fa-tachometer-alt", href: "/site/store/overview.html" },
             { text: "店铺订单", icon: "fas fa-box-open", href: "/site/store/order-list.html" },
-            { text: "店铺消息", icon: "fas fa-envelope", href: "/site/store/message.html" },
+            { text: "店铺消息", icon: "fas fa-envelope", href: "/site/member/message.html" },
             { text: "库存管理", icon: "fas fa-warehouse", href: "/site/store/stock-manage.html" },
             { text: "商品管理", icon: "fas fa-shopping-bag", href: "/site/store/item-manage.html" },
             { text: "商品FAQ", icon: "fas fa-question-circle", href: "/site/store/item-faq.html" },
