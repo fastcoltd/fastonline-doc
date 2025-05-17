@@ -52,6 +52,8 @@
         .close-btn:hover {color:#d32f2f;}
         .validate-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#32CD32;color:#fff;border:none;font-size:0.875em;margin-left:0.5em;}
         .validate-btn:hover {background:#2E8B57;}
+        .language-set {background:#e6ffed;}
+        .language-unset {background:#f5f5f5;}
     </style>
 </head>
 <body>
@@ -59,9 +61,7 @@
 <div class="store-container">
     <div class="store-messages" id="store-messages"></div>
     <div class="sidebar-main-wrapper">
-
         <div w3-include-html="/site/store/_sidebar.html"></div>
-
         <div class="main-content">
             <h2>店铺信息</h2>
             <div class="tips" id="tips"></div>
@@ -184,6 +184,11 @@
             initializeDropdowns();
             initializeStoreData();
             renderStoreData();
+            // 绑定 view-2fa 事件
+            const view2faBtn = document.getElementById('view-2fa');
+            if (view2faBtn) {
+                view2faBtn.addEventListener('click', show2FAViewPopup);
+            }
         });
     });
 
@@ -207,30 +212,6 @@
         create_time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).getTime() / 1000,
         update_time: new Date().getTime() / 1000
     };
-
-    let storeLangData = {};
-    window.languages.forEach(lang => {
-        const langCode = `${lang.code}_US`;
-        storeLangData[langCode] = {
-            id: faker.datatype.number({ min: 10000, max: 99999 }),
-            store_id: storeData.id,
-            status: storeData.status,
-            version: 1,
-            language: langCode,
-            seo_keywords: faker.lorem.words(5),
-            seo_description: faker.lorem.sentence(10),
-            name: faker.company.companyName(),
-            work_time: 'Mon-Fri 9:00-17:00',
-            slogan: faker.company.catchPhrase(),
-            summary: faker.lorem.sentence(10),
-            about_me: faker.lorem.paragraph(2),
-            after_sales_rules: faker.lorem.paragraph(2),
-            description: faker.lorem.paragraph(3),
-            create_time: storeData.create_time,
-            update_time: storeData.update_time,
-            site_reply: Math.random() > 0.7 ? faker.lorem.sentence(10) : ''
-        };
-    });
 
     // 审核提示
     const auditTips = [
@@ -264,10 +245,37 @@
         languageSelect.innerHTML = `<option value="">请选择语言</option>` +
             window.languages.map(lang => {
                 const langCode = `${lang.code}_US`;
-                const isSet = storeLangData[langCode] ? '已设置' : '未设置';
-                return `<option value="${langCode}">${lang.name} (${langCode}) - ${isSet}</option>`;
+                const isSet = storeLangData[langCode]?.name ? '已设置' : '未设置';
+                const className = isSet === '已设置' ? 'language-set' : 'language-unset';
+                return `<option value="${langCode}" class="${className}">${lang.name} (${langCode}) - ${isSet}</option>`;
             }).join('');
     }
+
+    // 模拟店铺数据（调整多语言数据）
+    let storeLangData = {};
+    window.languages.forEach(lang => {
+        const langCode = `${lang.code}_US`;
+        const isSet = Math.random() > 0.8; // 20% 已设置，80% 未设置
+        storeLangData[langCode] = {
+            id: faker.datatype.number({ min: 10000, max: 99999 }),
+            store_id: storeData.id,
+            status: storeData.status,
+            version: 1,
+            language: langCode,
+            seo_keywords: isSet ? faker.lorem.words(5) : '',
+            seo_description: isSet ? faker.lorem.sentence(10) : '',
+            name: isSet ? faker.company.companyName() : '',
+            work_time: isSet ? 'Mon-Fri 9:00-17:00' : '',
+            slogan: isSet ? faker.company.catchPhrase() : '',
+            summary: isSet ? faker.lorem.sentence(10) : '',
+            about_me: isSet ? faker.lorem.paragraph(2) : '',
+            after_sales_rules: isSet ? faker.lorem.paragraph(2) : '',
+            description: isSet ? faker.lorem.paragraph(3) : '',
+            create_time: storeData.create_time,
+            update_time: storeData.update_time,
+            site_reply: Math.random() > 0.7 ? faker.lorem.sentence(10) : ''
+        };
+    });
 
     // 初始化店铺数据
     function initializeStoreData() {
@@ -406,7 +414,7 @@
                 <h3>生成双重认证代码</h3>
                 <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
                 <p class="twofa-code">${twoFaCode} <button class="copy-btn" onclick="navigator.clipboard.writeText('${twoFaCode}').then(() => alert('已复制！'))">复制</button></p>
-                <div class="qr-code" id="qr-code"></div>
+                <canvas id="qr-code" class="qr-code"></canvas>
                 <div class="form-group">
                     <label>输入两步验证码（30秒周期）</label>
                     <input type="text" id="validate-2fa-code">
