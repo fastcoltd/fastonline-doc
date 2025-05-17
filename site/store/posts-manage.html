@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .post-button {
+            padding: 0.5em 1em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 0.875em;
+            margin-bottom: 1em;
+        }
+        .post-button:hover {
+            background: #45a049;
+        }
+        .transaction-data::-webkit-scrollbar {width: 6px;}
+        .transaction-data::-webkit-scrollbar-thumb {background: #f59e0b; border-radius: 3px;}
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .pagination .page-btn {
+            padding: 0.25em 0.75em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            color: rgba(0, 0, 0, 0.85);
+            transition: all 0.3s;
+            font-size: 0.875em;
+            height: 1.8em;
+            line-height: 1.5em;
+            min-width: 2em;
+            text-align: center;
+        }
+        .pagination .page-btn:hover {
+            background: #f5f5f5;
+            border-color: #f97316;
+            color: #f97316;
+        }
+        .pagination .page-btn.active {
+            background: #f97316;
+            border-color: #f97316;
+            color: #fff;
+        }
+        .pagination .ellipsis {
+            font-size: 0.875em;
+            color: #6b7280;
+        }
+        .post-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .post-popup .popup-content {
+            background: #fff;
+            padding: 1.5em;
+            border-radius: 0.5em;
+            max-width: 40em;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .post-popup h3 {
+            margin-top: 0;
+            font-size: 1.25em;
+            color: #f59e0b;
+        }
+        .post-popup .form-group {
+            margin-bottom: 1em;
+        }
+        .post-popup label {
+            display: block;
+            margin-bottom: 0.25em;
+            font-size: 0.875em;
+            color: #1f2937;
+        }
+        .post-popup input,
+        .post-popup select,
+        .post-popup textarea {
+            width: 100%;
+            padding: 0.5em;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.25em;
+            font-size: 0.875em;
+        }
+        .post-popup textarea {
+            height: 6em;
+            resize: vertical;
+        }
+        .post-popup .action-btn {
+            padding: 0.5em 1em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 0.875em;
+            margin-right: 0.5em;
+        }
+        .post-popup .action-btn:hover {
+            background: #45a049;
+        }
+        .post-popup .close-btn {
+            position: absolute;
+            top: 0.5em;
+            right: 0.5em;
+            background: none;
+            border: none;
+            font-size: 1.25em;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .post-popup .close-btn:hover {
+            color: #d32f2f;
+        }
+        .action-icon {
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 1.25em;
+            margin: 0 0.3em;
+        }
+        .action-icon:hover {
+            color: #f97316;
+        }
+        .reply-btn {
+            padding: 0.25em 0.75em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            color: rgba(0, 0, 0, 0.85);
+            font-size: 0.875em;
+        }
+        .reply-btn:hover {
+            background: #f5f5f5;
+            border-color: #f97316;
+            color: #f97316;
+        }
+        .hot-header div, .hot-row div {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+            min-width: 0;
+        }
+        .sortable {
+            cursor: pointer;
+            position: relative;
+            padding-right: 1em;
+        }
+        .sortable::after {
+            content: '↕';
+            position: absolute;
+            right: 0.2em;
+            font-size: 0.8em;
+        }
+        .sortable.asc::after {
+            content: '↑';
+        }
+        .sortable.desc::after {
+            content: '↓';
+        }
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+        }
+        .tag-checkbox {
+            margin-right: 0.5em;
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="store-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div class="sidebar">
+            <div class="welcome-section">
+                <i class="fas fa-user-circle"></i>
+                <span id="user-nickname"></span>
+            </div>
+            <div class="store-info">
+                <img class="store-logo" src="" alt="Store Logo">
+                <h3><a id="store-name" class="store-link"></a></h3>
+                <div class="balance-rating">
+                    <span><i class="fas fa-wallet"></i> <span id="store-balance"></span></span>
+                    <span class="rating"><i class="fas fa-star"></i> <span id="store-rating"></span></span>
+                </div>
+                <div class="badges" id="store-badges"></div>
+            </div>
+            <div class="divider"></div>
+            <ul class="menu" id="store-menu"></ul>
+        </div>
+        <div class="main-content">
+            <h2>文章管理</h2>
+            <button class="post-button" onclick="showAddPopup()">添加文章</button>
+            <div class="filter-row">
+                <div class="brand-service-filter">
+                    <input type="text" id="search-input" placeholder="模糊搜索（文章标题）" style="height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                    <select class="ant-select" id="language-filter">
+                        <option value="">全部语言</option>
+                    </select>
+                    <select class="ant-select" id="paid-filter">
+                        <option value="">全部</option>
+                        <option value="free">免费</option>
+                        <option value="paid">付费</option>
+                    </select>
+                    <select class="ant-select" id="brand-filter">
+                        <option value="">全部品牌</option>
+                        ${hotBrands.map(brand => `<option value="${brand.name}">${brand.name}</option>`).join('')}
+                    </select>
+                    <input type="text" id="date-from" placeholder="开始日期" style="width: 120px; height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                    <input type="text" id="date-to" placeholder="结束日期" style="width: 120px; height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                </div>
+                <div class="brand-service-filter">
+                    <button class="time-btn" id="clear-filter">清空筛选条件</button>
+                    <button class="time-btn" id="search-filter">确定</button>
+                </div>
+            </div>
+            <div class="hot-section">
+                <div class="hot-container">
+                    <div class="hot-card">
+                        <div class="hot-title-container">
+                            <h3 class="hot-title">文章记录</h3>
+                        </div>
+                        <div class="hot-header">
+                            <div style="flex: 1;">ID</div>
+                            <div style="flex: 1.5;">分类</div>
+                            <div style="flex: 2;">文章标题</div>
+                            <div style="flex: 1.5;">品牌</div>
+                            <div style="flex: 1.5;">付费</div>
+                            <div style="flex: 1.5;">状态</div>
+                            <div style="flex: 1;" class="sortable" data-sort="comment_count">评价数</div>
+                            <div style="flex: 1;" class="sortable" data-sort="rating">评分</div>
+                            <div style="flex: 1;" class="sortable" data-sort="read_count">阅读数</div>
+                            <div style="flex: 1;" class="sortable" data-sort="save_count">收藏数</div>
+                            <div style="flex: 1.5;">创建时间</div>
+                            <div style="flex: 1;">操作</div>
+                        </div>
+                        <div class="transaction-data" id="transaction-data">
+                            <!-- 数据由JS动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="pagination" id="pagination">
+                    <!-- 页码由JS动态生成 -->
+                </div>
+                <select class="ant-select" id="page-size">
+                    <option value="10">10条/页</option>
+                    <option value="20" selected>20条/页</option>
+                    <option value="50">50条/页</option>
+                    <option value="100">100条/页</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+
+            // 初始化语言筛选下拉
+            const languageFilter = document.getElementById('language-filter');
+            if (languageFilter) {
+                languageFilter.innerHTML = `
+                    <option value="">全部语言</option>
+                    ${window.languages.map(lang => `<option value="${lang.code}_US" ${lang.code === 'en' ? 'selected' : ''}>${lang.name} (${lang.code}_US)</option>`).join('')}
+                `;
+            }
+
+            // 初始化日期选择器
+            flatpickr("#date-from", { dateFormat: "Y-m-d" });
+            flatpickr("#date-to", { dateFormat: "Y-m-d" });
+
+            renderPostData();
+            initSortListeners();
+        });
+    });
+
+    // 模拟文章数据
+    let postData = [];
+    const categories = [
+        { id: 1, name: 'Tech' },
+        { id: 2, name: 'Lifestyle' },
+        { id: 3, name: 'News' }
+    ];
+    const blogName = 'MyBlog';
+    function generatePostData() {
+        postData = [];
+        const count = 100; // 模拟100条记录
+        for (let i = 0; i < count; i++) {
+            const category = categories[Math.floor(Math.random() * categories.length)];
+            const langIndex = Math.floor(Math.random() * window.languages.length);
+            const language = `${window.languages[langIndex].code}_US`;
+            const isPaid = Math.random() > 0.5;
+            const status = Math.floor(Math.random() * 3); // 0=禁用, 1=启用, 2=失败
+            const brand = hotBrands[Math.floor(Math.random() * hotBrands.length)];
+            const tagsCount = Math.floor(Math.random() * 5); // 0-4 个标签
+            const tags = [];
+            for (let j = 0; j < tagsCount; j++) {
+                const tag = ecommerceTags[Math.floor(Math.random() * ecommerceTags.length)];
+                if (!tags.includes(tag)) tags.push(tag);
+            }
+            const post = {
+                id: faker.datatype.number({ min: 1000, max: 9999 }),
+                posts_type: category.id,
+                posts_type_name: category.name,
+                blog_id: faker.datatype.number({ min: 1, max: 1000 }),
+                user_id: faker.datatype.number({ min: 1, max: 10000 }),
+                store_id: faker.datatype.number({ min: 1, max: 1000 }),
+                status: status,
+                money: isPaid ? parseFloat(faker.finance.amount(0.99, 9.99, 2)) : 0,
+                custom_url: faker.internet.url(),
+                read_count: faker.datatype.number({ min: 0, max: 10000 }),
+                paid_count: isPaid ? faker.datatype.number({ min: 0, max: 1000 }) : 0,
+                comment_count: faker.datatype.number({ min: 0, max: 500 }),
+                rating: parseFloat(faker.finance.amount(0, 5, 2)),
+                rating_count: faker.datatype.number({ min: 0, max: 100 }),
+                save_count: faker.datatype.number({ min: 0, max: 1000 }),
+                create_time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                language: language,
+                title: faker.lorem.sentence(5),
+                seo_keywords: faker.lorem.words(5),
+                seo_description: faker.lorem.sentence(10),
+                cover_pic: faker.image.imageUrl(),
+                summary: faker.lorem.sentence(10),
+                free_content: faker.lorem.paragraph(2),
+                money_content: isPaid ? faker.lorem.paragraph(3) : '',
+                site_reply: status === 2 ? faker.lorem.sentence(10) : '',
+                brand_name: brand.name,
+                brand_color: brand.themeColor,
+                tags: tags
+            };
+            postData.push(post);
+        }
+    }
+
+    // 显示添加文章弹窗
+    function showAddPopup() {
+        const popup = document.createElement('div');
+        popup.className = 'post-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>添加文章</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>分类</label>
+                    <select id="add-posts_type">
+                        ${categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>品牌</label>
+                    <select id="add-brand_name">
+                        ${hotBrands.map(brand => `<option value="${brand.name}">${brand.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="add-status">
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>自定义URL</label>
+                    <input type="text" id="add-custom_url" placeholder="请输入自定义URL">
+                </div>
+                <div class="form-group">
+                    <label>语言</label>
+                    <select id="add-language">
+                        ${window.languages.map(lang => `<option value="${lang.code}_US" ${lang.code === 'en' ? 'selected' : ''}>${lang.name} (${lang.code}_US)</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>标题</label>
+                    <input type="text" id="add-title" placeholder="请输入标题">
+                </div>
+                <div class="form-group">
+                    <label>SEO关键词</label>
+                    <input type="text" id="add-seo_keywords" placeholder="请输入SEO关键词">
+                </div>
+                <div class="form-group">
+                    <label>SEO描述</label>
+                    <input type="text" id="add-seo_description" placeholder="请输入SEO描述">
+                </div>
+                <div class="form-group">
+                    <label>封面图片</label>
+                    <input type="text" id="add-cover_pic" placeholder="请输入图片URL">
+                </div>
+                <div class="form-group">
+                    <label>摘要</label>
+                    <input type="text" id="add-summary" placeholder="请输入摘要">
+                </div>
+                <div class="form-group">
+                    <label>免费内容</label>
+                    <textarea id="add-free_content" placeholder="请输入免费内容"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>解锁费用</label>
+                    <input type="number" id="add-money" placeholder="请输入费用（如0表示免费）" value="0">
+                </div>
+                <div class="form-group">
+                    <label>付费内容</label>
+                    <textarea id="add-money_content" placeholder="请输入付费内容"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>文章标签 <span id="add-selected-tags"></span></label>
+                    <select id="add-tags" multiple style="height: 100px;">
+                        ${ecommerceTags.map(tag => `<option value="${tag}">${tag}</option>`).join('')}
+                    </select>
+                </div>
+                <button class="action-btn" onclick="addPost()">保存</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    function updateAddTags() {
+        const select = document.getElementById('add-tags');
+        const selectedTagsContainer = document.getElementById('add-selected-tags');
+        selectedTagsContainer.innerHTML = '';
+        const selectedTags = Array.from(select.selectedOptions).map(opt => opt.value);
+        selectedTags.forEach(tag => {
+            const tagEl = document.createElement('span');
+            tagEl.className = 'ant-tag';
+            tagEl.style.backgroundColor = '#f5f5f5';
+            tagEl.style.border = '1px solid #d9d9d9';
+            tagEl.style.padding = '0 7px';
+            tagEl.style.margin = '0 5px 5px 0';
+            tagEl.style.lineHeight = '20px';
+            tagEl.innerHTML = `${tag} <i class="fas fa-times" style="cursor: pointer; margin-left: 5px;" onclick="removeAddTag('${tag.replace(/'/g, "\\'")}')"></i>`;
+            selectedTagsContainer.appendChild(tagEl);
+        });
+        const allOptions = ecommerceTags.map(tag => `<option value="${tag}">${tag}</option>`);
+        select.innerHTML = allOptions.filter(opt => !selectedTags.includes(opt.match(/value="([^"]+)"/)[1])).join('');
+    }
+
+    function removeAddTag(tag) {
+        const select = document.getElementById('add-tags');
+        select.innerHTML += `<option value="${tag}">${tag}</option>`;
+        const selectedTags = Array.from(document.querySelectorAll('#add-tags option:checked')).map(opt => opt.value).filter(t => t !== tag);
+        select.querySelectorAll('option').forEach(opt => opt.selected = selectedTags.includes(opt.value));
+        updateAddTags();
+    }
+
+    document.getElementById('add-tags').addEventListener('change', updateAddTags);
+    function updateEditTags() {
+        const select = document.getElementById('edit-tags');
+        const selectedTagsContainer = document.getElementById('edit-selected-tags');
+        selectedTagsContainer.innerHTML = '';
+        const selectedTags = Array.from(select.selectedOptions).map(opt => opt.value).concat(post.tags);
+        selectedTags.forEach(tag => {
+            const tagEl = document.createElement('span');
+            tagEl.className = 'ant-tag';
+            tagEl.style.backgroundColor = '#f5f5f5';
+            tagEl.style.border = '1px solid #d9d9d9';
+            tagEl.style.padding = '0 7px';
+            tagEl.style.margin = '0 5px 5px 0';
+            tagEl.style.lineHeight = '20px';
+            tagEl.innerHTML = `${tag} <i class="fas fa-times" style="cursor: pointer; margin-left: 5px;" onclick="removeEditTag('${tag.replace(/'/g, "\\'")}')"></i>`;
+            selectedTagsContainer.appendChild(tagEl);
+        });
+        const allOptions = ecommerceTags.map(tag => `<option value="${tag}">${tag}</option>`);
+        select.innerHTML = allOptions.filter(opt => !selectedTags.includes(opt.match(/value="([^"]+)"/)[1])).join('');
+    }
+
+    function removeEditTag(tag) {
+        const select = document.getElementById('edit-tags');
+        select.innerHTML += `<option value="${tag}">${tag}</option>`;
+        const selectedTags = Array.from(document.querySelectorAll('#edit-tags option:checked')).map(opt => opt.value).concat(post.tags).filter(t => t !== tag);
+        select.querySelectorAll('option').forEach(opt => opt.selected = selectedTags.includes(opt.value));
+        post.tags = selectedTags.filter(t => !Array.from(select.options).map(o => o.value).includes(t));
+        updateEditTags();
+    }
+
+    document.getElementById('edit-tags').addEventListener('change', updateEditTags);
+    updateEditTags(); // 初始化已选标签
+
+    // 添加文章
+    function addPost() {
+        const postsType = parseInt(document.getElementById('add-posts_type').value);
+        const brandName = document.getElementById('add-brand_name').value;
+        const brand = hotBrands.find(b => b.name === brandName);
+        const status = parseInt(document.getElementById('add-status').value);
+        const money = parseFloat(document.getElementById('add-money').value) || 0;
+        const customUrl = document.getElementById('add-custom_url').value.trim();
+        const language = document.getElementById('add-language').value;
+        const title = document.getElementById('add-title').value.trim();
+        const seoKeywords = document.getElementById('add-seo_keywords').value.trim();
+        const seoDescription = document.getElementById('add-seo_description').value.trim();
+        const coverPic = document.getElementById('add-cover_pic').value.trim();
+        const summary = document.getElementById('add-summary').value.trim();
+        const freeContent = document.getElementById('add-free_content').value.trim();
+        const moneyContent = document.getElementById('add-money_content').value.trim();
+        const tags = Array.from(document.querySelectorAll('.tag-checkbox:checked')).map(cb => cb.value);
+
+        if (!title || !customUrl || !freeContent || !brandName) {
+            alert('标题、自定义URL、免费内容和品牌不能为空');
+            return;
+        }
+
+        const newPost = {
+            id: faker.datatype.number({ min: 1000, max: 9999 }),
+            posts_type: postsType,
+            posts_type_name: categories.find(cat => cat.id === postsType).name,
+            blog_id: faker.datatype.number({ min: 1, max: 1000 }),
+            user_id: faker.datatype.number({ min: 1, max: 10000 }),
+            store_id: faker.datatype.number({ min: 1, max: 1000 }),
+            status: status,
+            money: money,
+            custom_url: customUrl,
+            read_count: 0,
+            paid_count: 0,
+            comment_count: 0,
+            rating: 0,
+            rating_count: 0,
+            save_count: 0,
+            create_time: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+            language: language,
+            title: title,
+            seo_keywords: seoKeywords,
+            seo_description: seoDescription,
+            cover_pic: coverPic,
+            summary: summary,
+            free_content: freeContent,
+            money_content: moneyContent,
+            site_reply: '',
+            brand_name: brandName,
+            brand_color: brand.themeColor,
+            tags: tags
+        };
+
+        postData.push(newPost);
+        document.querySelector('.post-popup').remove();
+        renderPostData();
+    }
+
+    // 显示编辑文章弹窗
+    function showEditPopup(postId) {
+        const post = postData.find(p => p.id === postId);
+        if (!post) return;
+
+        const popup = document.createElement('div');
+        popup.className = 'post-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>编辑文章</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>分类</label>
+                    <select id="edit-posts_type">
+                        ${categories.map(cat => `<option value="${cat.id}" ${post.posts_type === cat.id ? 'selected' : ''}>${cat.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>品牌</label>
+                    <select id="edit-brand_name">
+                        ${hotBrands.map(brand => `<option value="${brand.name}" ${post.brand_name === brand.name ? 'selected' : ''}>${brand.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="edit-status">
+                        <option value="1" ${post.status === 1 ? 'selected' : ''}>启用</option>
+                        <option value="0" ${post.status === 0 ? 'selected' : ''}>禁用</option>
+                        <option value="2" ${post.status === 2 ? 'selected' : ''}>失败</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>自定义URL</label>
+                    <input type="text" id="edit-custom_url" value="${post.custom_url}">
+                </div>
+                <div class="form-group">
+                    <label>语言</label>
+                    <select id="edit-language">
+                        ${window.languages.map(lang => `<option value="${lang.code}_US" ${post.language === `${lang.code}_US` ? 'selected' : ''}>${lang.name} (${lang.code}_US)</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>标题</label>
+                    <input type="text" id="edit-title" value="${post.title}">
+                </div>
+                <div class="form-group">
+                    <label>SEO关键词</label>
+                    <input type="text" id="edit-seo_keywords" value="${post.seo_keywords}">
+                </div>
+                <div class="form-group">
+                    <label>SEO描述</label>
+                    <input type="text" id="edit-seo_description" value="${post.seo_description}">
+                </div>
+                <div class="form-group">
+                    <label>封面图片</label>
+                    <input type="text" id="edit-cover_pic" value="${post.cover_pic}">
+                </div>
+                <div class="form-group">
+                    <label>摘要</label>
+                    <input type="text" id="edit-summary" value="${post.summary}">
+                </div>
+                <div class="form-group">
+                    <label>免费内容</label>
+                    <textarea id="edit-free_content">${post.free_content}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>解锁费用</label>
+                    <input type="number" id="edit-money" value="${post.money}">
+                </div>
+                <div class="form-group">
+                    <label>付费内容</label>
+                    <textarea id="edit-money_content">${post.money_content}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>文章标签 <span id="edit-selected-tags"></span></label>
+                    <select id="edit-tags" multiple style="height: 100px;">
+                        ${ecommerceTags.filter(tag => !post.tags.includes(tag)).map(tag => `<option value="${tag}">${tag}</option>`).join('')}
+                    </select>
+                </div>
+                <button class="action-btn" onclick="savePost(${post.id})">保存</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 保存编辑文章
+    function savePost(postId) {
+        const post = postData.find(p => p.id === postId);
+        if (!post) return;
+
+        const brandName = document.getElementById('edit-brand_name').value;
+        const brand = hotBrands.find(b => b.name === brandName);
+        post.posts_type = parseInt(document.getElementById('edit-posts_type').value);
+        post.posts_type_name = categories.find(cat => cat.id === post.posts_type).name;
+        post.status = parseInt(document.getElementById('edit-status').value);
+        post.money = parseFloat(document.getElementById('edit-money').value) || 0;
+        post.custom_url = document.getElementById('edit-custom_url').value.trim();
+        post.language = document.getElementById('edit-language').value;
+        post.title = document.getElementById('edit-title').value.trim();
+        post.seo_keywords = document.getElementById('edit-seo_keywords').value.trim();
+        post.seo_description = document.getElementById('edit-seo_description').value.trim();
+        post.cover_pic = document.getElementById('edit-cover_pic').value.trim();
+        post.summary = document.getElementById('edit-summary').value.trim();
+        post.free_content = document.getElementById('edit-free_content').value.trim();
+        post.money_content = document.getElementById('edit-money_content').value.trim();
+        post.brand_name = brandName;
+        post.brand_color = brand.themeColor;
+        post.tags = Array.from(document.querySelectorAll('.tag-checkbox:checked')).map(cb => cb.value);
+
+        if (!post.title || !post.custom_url || !post.free_content || !post.brand_name) {
+            alert('标题、自定义URL、免费内容和品牌不能为空');
+            return;
+        }
+
+        document.querySelector('.post-popup').remove();
+        renderPostData();
+    }
+
+    // 显示查看原因弹窗
+    function showSiteReply(reply) {
+        const popup = document.createElement('div');
+        popup.className = 'post-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>失败原因</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <p>${reply}</p>
+                <button class="action-btn" onclick="this.parentElement.parentElement.remove()">关闭</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 渲染文章记录
+    function renderPostData(filters = {}, page = 1, sortField = null, sortOrder = null) {
+        if (!postData.length) generatePostData();
+        const pageSize = parseInt(document.getElementById('page-size').value) || 20;
+        const totalRecords = postData.length;
+        let data = postData.filter(row => {
+            if (filters.search && !row.title.toLowerCase().includes(filters.search.toLowerCase())) return false;
+            if (filters.language && row.language !== filters.language) return false;
+            if (filters.paid === 'free' && row.money > 0) return false;
+            if (filters.paid === 'paid' && row.money === 0) return false;
+            if (filters.brand && row.brand_name !== filters.brand) return false;
+            if (filters.dateFrom && new Date(row.create_time) < new Date(filters.dateFrom)) return false;
+            if (filters.dateTo && new Date(row.create_time) > new Date(filters.dateTo)) return false;
+            return true;
+        });
+
+        // 排序
+        if (sortField) {
+            data.sort((a, b) => {
+                const valueA = a[sortField];
+                const valueB = b[sortField];
+                return sortOrder === 'asc' ? valueA - valueB : valueB - valueA;
+            });
+        }
+
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize, data.length);
+        const paginatedData = data.slice(startIndex, endIndex);
+
+        const container = document.getElementById('transaction-data');
+        container.innerHTML = '';
+        paginatedData.forEach(row => {
+            const rowEl = document.createElement('div');
+            rowEl.className = 'hot-row';
+            rowEl.innerHTML = `
+                <div style="flex: 1;">${row.id}</div>
+                <div style="flex: 1.5;"><a href="/site/blog.html?name=${blogName}&type=${encodeURIComponent(row.posts_type_name)}">${row.posts_type_name}</a></div>
+                <div style="flex: 2;">${row.title}</div>
+                <div style="flex: 1.5; color: ${row.brand_color};">${row.brand_name}</div>
+                <div style="flex: 1.5;">${row.money > 0 ? `$${row.money.toFixed(2)} (${row.paid_count > 0 ? `<a href="/site/store/order-list.html?keywords=${row.id}&type=posts">${row.paid_count}</a>` : row.paid_count})` : '免费'}</div>
+                <div style="flex: 1.5; color: ${row.status === 1 ? '#4CAF50' : row.status === 2 ? '#d32f2f' : '#6b7280'}">${row.status === 1 ? '启用' : row.status === 2 ? '失败' : '禁用'}${row.status === 2 ? ` <button class="reply-btn" onclick="showSiteReply('${row.site_reply.replace(/'/g, "\\'")}')">查看</button>` : ''}</div>
+                <div style="flex: 1;">${row.comment_count}</div>
+                <div style="flex: 1;">${row.rating.toFixed(2)}</div>
+                <div style="flex: 1;">${row.read_count}</div>
+                <div style="flex: 1;">${row.save_count}</div>
+                <div style="flex: 1.5;">${row.create_time}</div>
+                <div style="flex: 1;">
+                    <a href="/site/post.html?name=${encodeURIComponent(row.title)}"><i class="fas fa-eye action-icon"></i></a>
+                    <i class="fas fa-edit action-icon" onclick="showEditPopup(${row.id})"></i>
+                </div>
+            `;
+            container.appendChild(rowEl);
+        });
+
+        renderPagination(page, pageSize, data.length);
+    }
+
+    // 渲染分页
+    function renderPagination(page, pageSize, totalRecords) {
+        const maxPage = Math.ceil(totalRecords / pageSize);
+        const container = document.getElementById('pagination');
+        container.innerHTML = '';
+
+        const pages = [];
+        const range = 2;
+        pages.push(1);
+        if (page > range + 2) pages.push('...');
+        for (let i = Math.max(2, page - range); i <= Math.min(maxPage - 1, page + range); i++) {
+            pages.push(i);
+        }
+        if (page < maxPage - range - 1) pages.push('...');
+        if (maxPage > 1) pages.push(maxPage);
+
+        pages.forEach(p => {
+            if (p === '...') {
+                const span = document.createElement('span');
+                span.className = 'ellipsis';
+                span.textContent = '...';
+                container.appendChild(span);
+            } else {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${p === page ? 'active' : ''}`;
+                btn.textContent = p;
+                btn.addEventListener('click', () => {
+                    currentPage = p;
+                    renderPostData({}, currentPage, currentSortField, currentSortOrder);
+                });
+                container.appendChild(btn);
+            }
+        });
+    }
+
+    // 初始化排序监听
+    let currentSortField = null;
+    let currentSortOrder = null;
+    function initSortListeners() {
+        const sortables = document.querySelectorAll('.sortable');
+        sortables.forEach(header => {
+            header.addEventListener('click', () => {
+                const field = header.getAttribute('data-sort');
+                if (currentSortField === field) {
+                    currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSortField = field;
+                    currentSortOrder = 'asc';
+                }
+
+                // 更新排序图标
+                sortables.forEach(h => {
+                    h.classList.remove('asc', 'desc');
+                    if (h.getAttribute('data-sort') === field) {
+                        h.classList.add(currentSortOrder);
+                    }
+                });
+
+                renderPostData({}, currentPage, currentSortField, currentSortOrder);
+            });
+        });
+    }
+
+    // 初始化数据
+    let currentPage = 1;
+    renderPostData();
+
+    // 搜索筛选
+    document.getElementById('search-filter').addEventListener('click', () => {
+        const filters = {
+            search: document.getElementById('search-input').value.trim(),
+            language: document.getElementById('language-filter').value,
+            paid: document.getElementById('paid-filter').value,
+            brand: document.getElementById('brand-filter').value,
+            dateFrom: document.getElementById('date-from').value,
+            dateTo: document.getElementById('date-to').value
+        };
+        currentPage = 1;
+        renderPostData(filters, currentPage, currentSortField, currentSortOrder);
+    });
+
+    // 清空筛选
+    document.getElementById('clear-filter').addEventListener('click', () => {
+        document.getElementById('search-input').value = '';
+        document.getElementById('language-filter').value = 'en_US';
+        document.getElementById('paid-filter').value = '';
+        document.getElementById('brand-filter').value = '';
+        document.getElementById('date-from').value = '';
+        document.getElementById('date-to').value = '';
+        currentPage = 1;
+        renderPostData({}, currentPage, currentSortField, currentSortOrder);
+    });
+
+    // 每页条数变化
+    document.getElementById('page-size').addEventListener('change', () => {
+        currentPage = 1;
+        renderPostData({}, currentPage, currentSortField, currentSortOrder);
+    });
+</script>
+</body>
+</html>

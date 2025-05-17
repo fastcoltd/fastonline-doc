@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章分类</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .type-button {
+            padding: 0.5em 1em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 0.875em;
+            margin-bottom: 1em;
+        }
+        .type-button:hover {
+            background: #45a049;
+        }
+        .transaction-data::-webkit-scrollbar {width: 6px;}
+        .transaction-data::-webkit-scrollbar-thumb {background: #f59e0b; border-radius: 3px;}
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .pagination .page-btn {
+            padding: 0.25em 0.75em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            color: rgba(0, 0, 0, 0.85);
+            transition: all 0.3s;
+            font-size: 0.875em;
+            height: 1.8em;
+            line-height: 1.5em;
+            min-width: 2em;
+            text-align: center;
+        }
+        .pagination .page-btn:hover {
+            background: #f5f5f5;
+            border-color: #f97316;
+            color: #f97316;
+        }
+        .pagination .page-btn.active {
+            background: #f97316;
+            border-color: #f97316;
+            color: #fff;
+        }
+        .pagination .ellipsis {
+            font-size: 0.875em;
+            color: #6b7280;
+        }
+        .type-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .type-popup .popup-content {
+            background: #fff;
+            padding: 1.5em;
+            border-radius: 0.5em;
+            max-width: 30em;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .type-popup h3 {
+            margin-top: 0;
+            font-size: 1.25em;
+            color: #f59e0b;
+        }
+        .type-popup .form-group {
+            margin-bottom: 1em;
+        }
+        .type-popup label {
+            display: block;
+            margin-bottom: 0.25em;
+            font-size: 0.875em;
+            color: #1f2937;
+        }
+        .type-popup input,
+        .type-popup select,
+        .type-popup textarea {
+            width: 100%;
+            padding: 0.5em;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.25em;
+            font-size: 0.875em;
+        }
+        .type-popup textarea {
+            height: 6em;
+            resize: vertical;
+        }
+        .type-popup .action-btn {
+            padding: 0.5em 1em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 0.875em;
+            margin-right: 0.5em;
+        }
+        .type-popup .action-btn:hover {
+            background: #45a049;
+        }
+        .type-popup .close-btn {
+            position: absolute;
+            top: 0.5em;
+            right: 0.5em;
+            background: none;
+            border: none;
+            font-size: 1.25em;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .type-popup .close-btn:hover {
+            color: #d32f2f;
+        }
+        .action-icon {
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 1.25em;
+            margin: 0 0.5em;
+        }
+        .action-icon:hover {
+            color: #f97316;
+        }
+        .child-row .type-name {
+            padding-left: 2em; /* 缩进仅应用于分类名称 */
+        }
+        .hot-header div, .hot-row div {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+            min-width: 0; /* 防止内容撑开 */
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="store-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div class="sidebar">
+            <div class="welcome-section">
+                <i class="fas fa-user-circle"></i>
+                <span id="user-nickname"></span>
+            </div>
+            <div class="store-info">
+                <img class="store-logo" src="" alt="Store Logo">
+                <h3><a id="store-name" class="store-link"></a></h3>
+                <div class="balance-rating">
+                    <span><i class="fas fa-wallet"></i> <span id="store-balance"></span></span>
+                    <span class="rating"><i class="fas fa-star"></i> <span id="store-rating"></span></span>
+                </div>
+                <div class="badges" id="store-badges"></div>
+            </div>
+            <div class="divider"></div>
+            <ul class="menu" id="store-menu"></ul>
+        </div>
+        <div class="main-content">
+            <h2>文章分类</h2>
+            <button class="type-button" onclick="showAddPopup()">添加分类</button>
+            <div class="filter-row">
+                <div class="brand-service-filter">
+                    <input type="text" id="search-input" placeholder="模糊搜索（分类名称）" style="height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                    <select class="ant-select" id="language-filter">
+                        <option value="">全部语言</option>
+                    </select>
+                </div>
+                <div class="brand-service-filter">
+                    <button class="time-btn" id="clear-filter">清空筛选条件</button>
+                    <button class="time-btn" id="search-filter">确定</button>
+                </div>
+            </div>
+            <div class="hot-section">
+                <div class="hot-container">
+                    <div class="hot-card">
+                        <div class="hot-title-container">
+                            <h3 class="hot-title">分类记录</h3>
+                        </div>
+                        <div class="hot-header">
+                            <div style="flex: 1;">分类ID</div>
+                            <div style="flex: 1.5;">父分类</div>
+                            <div style="flex: 2;">分类名称</div>
+                            <div style="flex: 1;">语言</div>
+                            <div style="flex: 1;">状态</div>
+                            <div style="flex: 1.5;">自定义URL</div>
+                            <div style="flex: 1.5;">创建时间</div>
+                            <div style="flex: 1;">操作</div>
+                        </div>
+                        <div class="transaction-data" id="transaction-data">
+                            <!-- 数据由JS动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="pagination" id="pagination">
+                    <!-- 页码由JS动态生成 -->
+                </div>
+                <select class="ant-select" id="page-size">
+                    <option value="10">10条/页</option>
+                    <option value="20" selected>20条/页</option>
+                    <option value="50">50条/页</option>
+                    <option value="100">100条/页</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+
+            // 初始化语言筛选下拉
+            const languageFilter = document.getElementById('language-filter');
+            if (languageFilter) {
+                languageFilter.innerHTML = `
+                    <option value="">全部语言</option>
+                    ${window.languages.map(lang => `<option value="${lang.code}_US" ${lang.code === 'en' ? 'selected' : ''}>${lang.name} (${lang.code}_US)</option>`).join('')}
+                `;
+            }
+
+            renderTransactionData();
+        });
+    });
+
+    // 模拟分类数据
+    let typeData = [];
+    const items = [
+        { id: null, name: '无父分类' },
+        { id: 1, name: 'Parent-001' },
+        { id: 2, name: 'Parent-002' },
+        { id: 3, name: 'Parent-003' }
+    ];
+    function generateTypeData() {
+        typeData = [];
+        const parentCount = 5; // 父分类
+        const childCount = 15; // 子分类
+        const languages = window.languages;
+
+        // 生成父分类
+        for (let i = 0; i < parentCount; i++) {
+            const langIndex = Math.floor(Math.random() * languages.length);
+            const language = `${languages[langIndex].code}_US`;
+            const type = {
+                id: i + 1,
+                parent_id: null,
+                status: Math.random() > 0.3 ? 1 : 0,
+                custom_url: faker.internet.url(),
+                create_time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                language: language,
+                type_name: `Parent-${faker.random.word()}`,
+                seo_keywords: faker.lorem.words(5),
+                seo_description: faker.lorem.sentence(10),
+                cover_pic: faker.image.imageUrl(),
+                summary: faker.lorem.sentence(10),
+                type_content: faker.lorem.paragraph(2),
+                is_child: false
+            };
+            typeData.push(type);
+        }
+
+        // 生成子分类
+        for (let i = 0; i < childCount; i++) {
+            const parent = typeData[Math.floor(Math.random() * parentCount)];
+            const langIndex = Math.floor(Math.random() * languages.length);
+            const language = `${languages[langIndex].code}_US`;
+            const type = {
+                id: parentCount + i + 1,
+                parent_id: parent.id,
+                status: Math.random() > 0.3 ? 1 : 0,
+                custom_url: faker.internet.url(),
+                create_time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                language: language,
+                type_name: `Child-${faker.random.word()}`,
+                seo_keywords: faker.lorem.words(5),
+                seo_description: faker.lorem.sentence(10),
+                cover_pic: faker.image.imageUrl(),
+                summary: faker.lorem.sentence(10),
+                type_content: faker.lorem.paragraph(2),
+                is_child: true
+            };
+            typeData.push(type);
+        }
+
+        // 按父分类排序
+        typeData.sort((a, b) => {
+            if (!a.parent_id && !b.parent_id) return a.id - b.id; // 父分类按ID排序
+            if (a.parent_id && b.parent_id) {
+                if (a.parent_id === b.parent_id) return a.id - b.id; // 同父分类的子分类按ID排序
+                return a.parent_id - b.parent_id; // 不同父分类按父ID排序
+            }
+            return a.parent_id ? 1 : -1; // 父分类优先
+        });
+    }
+
+    // 渲染分类记录
+    function renderTransactionData(filters = {}, page = 1) {
+        if (!typeData.length) generateTypeData();
+        const pageSize = parseInt(document.getElementById('page-size').value) || 20;
+        const totalRecords = typeData.length;
+        const data = typeData.filter(row => {
+            if (filters.search && !row.type_name.toLowerCase().includes(filters.search.toLowerCase())) return false;
+            if (filters.language && row.language !== filters.language) return false;
+            return true;
+        });
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize, data.length);
+        const paginatedData = data.slice(startIndex, endIndex);
+
+        const container = document.getElementById('transaction-data');
+        container.innerHTML = '';
+        paginatedData.forEach(row => {
+            const rowEl = document.createElement('div');
+            rowEl.className = `hot-row ${row.is_child ? 'child-row' : ''}`;
+            rowEl.innerHTML = `
+            <div style="flex: 1;">${row.id}</div>
+            <div style="flex: 1.5;">${row.parent_id ? items.find(item => item.id === row.parent_id).name : '无'}</div>
+            <div style="flex: 2;" class="type-name">${row.type_name}</div>
+            <div style="flex: 1;">${row.language}</div>
+            <div style="flex: 1; color: ${row.status === 1 ? '#4CAF50' : '#d32f2f'}">${row.status === 1 ? '启用' : '禁用'}</div>
+            <div style="flex: 1.5;">${row.custom_url}</div>
+            <div style="flex: 1.5;">${row.create_time}</div>
+            <div style="flex: 1;">
+                <i class="fas fa-eye action-icon" onclick="showViewPopup(${row.id})"></i>
+                <i class="fas fa-edit action-icon" onclick="showEditPopup(${row.id})"></i>
+            </div>
+        `;
+            container.appendChild(rowEl);
+        });
+
+        renderPagination(page, pageSize, data.length);
+    }
+
+    // 渲染分页
+    function renderPagination(page, pageSize, totalRecords) {
+        const maxPage = Math.ceil(totalRecords / pageSize);
+        const container = document.getElementById('pagination');
+        container.innerHTML = '';
+
+        const pages = [];
+        const range = 2;
+        pages.push(1);
+        if (page > range + 2) pages.push('...');
+        for (let i = Math.max(2, page - range); i <= Math.min(maxPage - 1, page + range); i++) {
+            pages.push(i);
+        }
+        if (page < maxPage - range - 1) pages.push('...');
+        if (maxPage > 1) pages.push(maxPage);
+
+        pages.forEach(p => {
+            if (p === '...') {
+                const span = document.createElement('span');
+                span.className = 'ellipsis';
+                span.textContent = '...';
+                container.appendChild(span);
+            } else {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${p === page ? 'active' : ''}`;
+                btn.textContent = p;
+                btn.addEventListener('click', () => {
+                    currentPage = p;
+                    renderTransactionData({}, currentPage);
+                });
+                container.appendChild(btn);
+            }
+        });
+    }
+
+    // 显示添加分类弹窗
+    function showAddPopup() {
+        const popup = document.createElement('div');
+        popup.className = 'type-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>添加分类</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>父分类</label>
+                    <select id="add-parent_id">
+                        ${items.map(item => `<option value="${item.id || ''}">${item.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="add-status">
+                        <option value="1" class="status-option-enabled">启用</option>
+                        <option value="0" class="status-option-disabled">禁用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>自定义URL</label>
+                    <input type="text" id="add-custom_url" placeholder="请输入自定义URL">
+                </div>
+                <div class="form-group">
+                    <label>语言</label>
+                    <select id="add-language">
+                        ${window.languages.map(lang => `<option value="${lang.code}_US" ${lang.code === 'en' ? 'selected' : ''}>${lang.name} (${lang.code}_US)</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>分类名称</label>
+                    <input type="text" id="add-type_name" placeholder="请输入分类名称">
+                </div>
+                <div class="form-group">
+                    <label>SEO关键词</label>
+                    <input type="text" id="add-seo_keywords" placeholder="请输入SEO关键词">
+                </div>
+                <div class="form-group">
+                    <label>SEO描述</label>
+                    <input type="text" id="add-seo_description" placeholder="请输入SEO描述">
+                </div>
+                <div class="form-group">
+                    <label>封面图片</label>
+                    <input type="text" id="add-cover_pic" placeholder="请输入图片URL">
+                </div>
+                <div class="form-group">
+                    <label>摘要</label>
+                    <input type="text" id="add-summary" placeholder="请输入摘要">
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+                    <textarea id="add-type_content" placeholder="请输入内容"></textarea>
+                </div>
+                <button class="action-btn" onclick="addType()">保存</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 添加分类
+    function addType() {
+        const parentId = document.getElementById('add-parent_id').value ? parseInt(document.getElementById('add-parent_id').value) : null;
+        const status = parseInt(document.getElementById('add-status').value);
+        const customUrl = document.getElementById('add-custom_url').value.trim();
+        const language = document.getElementById('add-language').value;
+        const typeName = document.getElementById('add-type_name').value.trim();
+        const seoKeywords = document.getElementById('add-seo_keywords').value.trim();
+        const seoDescription = document.getElementById('add-seo_description').value.trim();
+        const coverPic = document.getElementById('add-cover_pic').value.trim();
+        const summary = document.getElementById('add-summary').value.trim();
+        const typeContent = document.getElementById('add-type_content').value.trim();
+
+        if (!typeName || !customUrl) {
+            alert('分类名称和自定义URL不能为空');
+            return;
+        }
+
+        const newType = {
+            id: faker.datatype.number({ min: 1000, max: 9999 }),
+            parent_id: parentId,
+            status: status,
+            custom_url: customUrl,
+            create_time: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+            language: language,
+            type_name: typeName,
+            seo_keywords: seoKeywords,
+            seo_description: seoDescription,
+            cover_pic: coverPic,
+            summary: summary,
+            type_content: typeContent,
+            is_child: !!parentId
+        };
+
+        typeData.push(newType);
+        typeData.sort((a, b) => {
+            if (!a.parent_id && !b.parent_id) return a.id - b.id;
+            if (a.parent_id && b.parent_id) {
+                if (a.parent_id === b.parent_id) return a.id - b.id;
+                return a.parent_id - b.parent_id;
+            }
+            return a.parent_id ? 1 : -1;
+        });
+        document.querySelector('.type-popup').remove();
+        renderTransactionData();
+    }
+
+    // 显示查看分类弹窗
+    function showViewPopup(typeId) {
+        const type = typeData.find(t => t.id === typeId);
+        if (!type) return;
+
+        const popup = document.createElement('div');
+        popup.className = 'type-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>查看分类</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>父分类</label>
+                    <input type="text" value="${type.parent_id ? items.find(item => item.id === type.parent_id).name : '无'}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <input type="text" value="${type.status === 1 ? '启用' : '禁用'}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>自定义URL</label>
+                    <input type="text" value="${type.custom_url}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>语言</label>
+                    <input type="text" value="${type.language}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>分类名称</label>
+                    <input type="text" value="${type.type_name}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>SEO关键词</label>
+                    <input type="text" value="${type.seo_keywords}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>SEO描述</label>
+                    <input type="text" value="${type.seo_description}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>封面图片</label>
+                    <input type="text" value="${type.cover_pic}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>摘要</label>
+                    <input type="text" value="${type.summary}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+                    <textarea readonly>${type.type_content}</textarea>
+                </div>
+                <button class="action-btn" onclick="this.parentElement.parentElement.remove()">关闭</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 显示编辑分类弹窗
+    function showEditPopup(typeId) {
+        const type = typeData.find(t => t.id === typeId);
+        if (!type) return;
+
+        const popup = document.createElement('div');
+        popup.className = 'type-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>编辑分类</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>父分类</label>
+                    <select id="edit-parent_id">
+                        ${items.map(item => `<option value="${item.id || ''}" ${type.parent_id === item.id ? 'selected' : ''}>${item.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="edit-status">
+                        <option value="1" class="status-option-enabled" ${type.status === 1 ? 'selected' : ''}>启用</option>
+                        <option value="0" class="status-option-disabled" ${type.status === 0 ? 'selected' : ''}>禁用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>自定义URL</label>
+                    <input type="text" id="edit-custom_url" value="${type.custom_url}">
+                </div>
+                <div class="form-group">
+                    <label>语言</label>
+                    <select id="edit-language">
+                        ${window.languages.map(lang => `<option value="${lang.code}_US" ${type.language === `${lang.code}_US` ? 'selected' : ''}>${lang.name} (${lang.code}_US)</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>分类名称</label>
+                    <input type="text" id="edit-type_name" value="${type.type_name}">
+                </div>
+                <div class="form-group">
+                    <label>SEO关键词</label>
+                    <input type="text" id="edit-seo_keywords" value="${type.seo_keywords}">
+                </div>
+                <div class="form-group">
+                    <label>SEO描述</label>
+                    <input type="text" id="edit-seo_description" value="${type.seo_description}">
+                </div>
+                <div class="form-group">
+                    <label>封面图片</label>
+                    <input type="text" id="edit-cover_pic" value="${type.cover_pic}">
+                </div>
+                <div class="form-group">
+                    <label>摘要</label>
+                    <input type="text" id="edit-summary" value="${type.summary}">
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+                    <textarea id="edit-type_content">${type.type_content}</textarea>
+                </div>
+                <button class="action-btn" onclick="saveType(${type.id})">保存</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 保存分类
+    function saveType(typeId) {
+        const type = typeData.find(t => t.id === typeId);
+        if (!type) return;
+
+        type.parent_id = document.getElementById('edit-parent_id').value ? parseInt(document.getElementById('edit-parent_id').value) : null;
+        type.status = parseInt(document.getElementById('edit-status').value);
+        type.custom_url = document.getElementById('edit-custom_url').value.trim();
+        type.language = document.getElementById('edit-language').value;
+        type.type_name = document.getElementById('edit-type_name').value.trim();
+        type.seo_keywords = document.getElementById('edit-seo_keywords').value.trim();
+        type.seo_description = document.getElementById('edit-seo_description').value.trim();
+        type.cover_pic = document.getElementById('edit-cover_pic').value.trim();
+        type.summary = document.getElementById('edit-summary').value.trim();
+        type.type_content = document.getElementById('edit-type_content').value.trim();
+        type.is_child = !!type.parent_id;
+
+        if (!type.type_name || !type.custom_url) {
+            alert('分类名称和自定义URL不能为空');
+            return;
+        }
+
+        typeData.sort((a, b) => {
+            if (!a.parent_id && !b.parent_id) return a.id - b.id;
+            if (a.parent_id && b.parent_id) {
+                if (a.parent_id === b.parent_id) return a.id - b.id;
+                return a.parent_id - b.parent_id;
+            }
+            return a.parent_id ? 1 : -1;
+        });
+        document.querySelector('.type-popup').remove();
+        renderTransactionData();
+    }
+
+    // 初始化数据
+    let currentPage = 1;
+    renderTransactionData();
+
+    // 搜索筛选
+    document.getElementById('search-filter').addEventListener('click', () => {
+        const filters = {
+            search: document.getElementById('search-input').value.trim(),
+            language: document.getElementById('language-filter').value
+        };
+        currentPage = 1;
+        renderTransactionData(filters, currentPage);
+    });
+
+    // 清空筛选
+    document.getElementById('clear-filter').addEventListener('click', () => {
+        document.getElementById('search-input').value = '';
+        document.getElementById('language-filter').value = 'en_US';
+        currentPage = 1;
+        renderTransactionData();
+    });
+
+    // 每页条数变化
+    document.getElementById('page-size').addEventListener('change', () => {
+        currentPage = 1;
+        renderTransactionData({}, currentPage);
+    });
+</script>
+</body>
+</html>
