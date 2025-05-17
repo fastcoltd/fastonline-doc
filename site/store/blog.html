@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客设定</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1em;
+            margin-bottom: 2em;
+        }
+        .stats-block {
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.5em;
+            padding: 1em;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .stats-block h4 {
+            margin: 0 0 0.5em;
+            font-size: 1em;
+            color: #1f2937;
+        }
+        .stats-block p {
+            margin: 0;
+            font-size: 1.5em;
+            color: #f59e0b;
+        }
+        .info-section {
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.5em;
+            padding: 1em;
+            position: relative;
+        }
+        .info-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .info-header h3 {
+            margin: 0;
+            font-size: 1.25em;
+            color: #f59e0b;
+        }
+        .info-header i {
+            font-size: 1.25em;
+            color: #6b7280;
+        }
+        .info-content {
+            display: none;
+            margin-top: 1em;
+        }
+        .info-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 1em;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.25em;
+            font-size: 0.875em;
+            color: #1f2937;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5em;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.25em;
+            font-size: 0.875em;
+        }
+        .form-group textarea {
+            height: 6em;
+            resize: vertical;
+        }
+        .action-btn {
+            padding: 0.5em 1em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 0.875em;
+        }
+        .action-btn:hover {
+            background: #45a049;
+        }
+        .tips {
+            background: #fefcbf;
+            border: 1px solid #f6e05e;
+            border-radius: 0.25em;
+            padding: 1em;
+            margin-bottom: 1em;
+        }
+        .tips p {
+            margin: 0;
+            color: #744210;
+        }
+        .logo-container {
+            position: relative;
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 0.5em;
+        }
+        .logo-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.25em;
+        }
+        .logo-edit-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            border: none;
+            border-radius: 0.25em;
+            padding: 0.5em;
+            cursor: pointer;
+            display: none;
+        }
+        .logo-container:hover .logo-edit-btn {
+            display: block;
+        }
+        .mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        .mask-text {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 2em;
+            font-weight: bold;
+            color: #d32f2f;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="store-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div class="sidebar">
+            <div class="welcome-section">
+                <i class="fas fa-user-circle"></i>
+                <span id="user-nickname"></span>
+            </div>
+            <div class="store-info">
+                <img class="store-logo" src="" alt="Store Logo">
+                <h3><a id="store-name" class="store-link"></a></h3>
+                <div class="balance-rating">
+                    <span><i class="fas fa-wallet"></i> <span id="store-balance"></span></span>
+                    <span class="rating"><i class="fas fa-star"></i> <span id="store-rating"></span></span>
+                </div>
+                <div class="badges" id="store-badges"></div>
+            </div>
+            <div class="divider"></div>
+            <ul class="menu" id="store-menu"></ul>
+        </div>
+        <div class="main-content">
+            <h2>博客设定</h2>
+            <div class="stats-container" id="stats-container">
+                <!-- 统计数据动态生成 -->
+            </div>
+            <div class="info-section">
+                <div class="info-header" onclick="toggleInfo()">
+                    <h3>博客基本信息</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="info-content" id="info-content">
+                    <!-- 编辑表单动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+            renderBlogData();
+        });
+    });
+
+    // 模拟博客数据
+    const blogData = {
+        id: faker.datatype.number({ min: 1000, max: 9999 }),
+        user_id: faker.datatype.number({ min: 1, max: 10000 }),
+        store_id: faker.datatype.number({ min: 1, max: 1000 }),
+        version: 1,
+        author_name: faker.name.findName(),
+        blog_status: faker.random.arrayElement([0, 1, 2]), // 未启用、启用、违规关闭
+        blog_url: faker.internet.url().replace(/^https?:\/\//, ''),
+        read_count: faker.datatype.number({ min: 0, max: 10000 }),
+        rating_count: faker.datatype.number({ min: 0, max: 100 }),
+        save_count: faker.datatype.number({ min: 0, max: 1000 }),
+        paid_count: faker.datatype.number({ min: 0, max: 1000 }),
+        posts_count: faker.datatype.number({ min: 0, max: 100 }),
+        risk_post_count: faker.datatype.number({ min: 0, max: 10 }),
+        money_posts_count: faker.datatype.number({ min: 0, max: 50 }),
+        comment_count: faker.datatype.number({ min: 0, max: 500 }),
+        money_amount: parseFloat(faker.finance.amount(0, 1000, 2)),
+        seo_keywords: faker.lorem.words(5),
+        seo_description: faker.lorem.sentence(10),
+        blog_summary: faker.lorem.sentence(20),
+        blog_info: faker.lorem.paragraph(3),
+        blog_logo: faker.image.imageUrl(100, 100, 'logo'),
+        create_time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+        update_time: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+        site_reply: Math.random() > 0.7 ? faker.lorem.sentence(10) : '' // 30% 概率有审核失败回复
+    };
+
+    // 审核失败提示
+    const auditTips = [
+        '禁止包含外部链接，请移除所有非平台链接。',
+        '内容中包含违禁词，请检查并替换敏感词汇。',
+        '禁止上传黄色或不当图片，请更换符合规范的封面图。',
+        '博客简介过于简短，请提供更详细的描述。',
+        'SEO关键词与内容不相关，请调整为更贴合主题的词语。',
+        '博客URL格式不正确，请使用字母、数字或短横线。',
+        '内容涉及政治敏感话题，请修改为中立表述。',
+        '图片分辨率过低，请上传更高清晰度的图片。',
+        '文章内容抄袭，请提交原创内容。',
+        '博客信息中广告成分过多，请减少推广性语言。'
+    ];
+
+    // 渲染博客数据
+    function renderBlogData() {
+        // 渲染统计数据
+        const statsContainer = document.getElementById('stats-container');
+        statsContainer.innerHTML = `
+            <div class="stats-block">
+                <h4>文章数量</h4>
+                <p>${blogData.posts_count}</p>
+            </div>
+            <div class="stats-block">
+                <h4>阅读数</h4>
+                <p>${blogData.read_count}</p>
+            </div>
+            <div class="stats-block">
+                <h4>收藏数</h4>
+                <p>${blogData.save_count}</p>
+            </div>
+            <div class="stats-block">
+                <h4>评论数量</h4>
+                <p>${blogData.comment_count}</p>
+            </div>
+            <div class="stats-block">
+                <h4>付款数</h4>
+                <p>${blogData.paid_count}</p>
+            </div>
+        `;
+
+        // 渲染基本信息
+        const infoContent = document.getElementById('info-content');
+        const tip = blogData.site_reply || auditTips[Math.floor(Math.random() * auditTips.length)];
+        infoContent.innerHTML = `
+            <div class="tips">
+                <p><strong>审核提示：</strong> ${tip}</p>
+            </div>
+            <div class="form-group">
+                <label>博客Logo</label>
+                <div class="logo-container">
+                    <img src="${blogData.blog_logo}" class="logo-preview" id="logo-preview">
+                    <button class="logo-edit-btn" onclick="document.getElementById('blog_logo').click()" ${blogData.blog_status === 2 ? 'disabled' : ''}>编辑</button>
+                    <input type="file" id="blog_logo" accept="image/*" style="display: none;" ${blogData.blog_status === 2 ? 'disabled' : ''}>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>作者名称</label>
+                <input type="text" id="author_name" value="${blogData.author_name}" ${blogData.blog_status === 2 ? 'disabled' : ''}>
+            </div>
+            <div class="form-group">
+                <label>博客状态</label>
+                <select id="blog_status" ${blogData.blog_status === 2 ? 'disabled' : ''}>
+                    <option value="0" ${blogData.blog_status === 0 ? 'selected' : ''}>未启用</option>
+                    <option value="1" ${blogData.blog_status === 1 ? 'selected' : ''}>启用</option>
+<!--                    <option value="2" ${blogData.blog_status === 2 ? 'selected' : ''}>违规关闭</option>-->
+                </select>
+            </div>
+            <div class="form-group">
+                <label>博客URL</label>
+                <input type="text" id="blog_url" value="${blogData.blog_url}" ${blogData.blog_status === 2 ? 'disabled' : ''}>
+            </div>
+            <div class="form-group">
+                <label>SEO关键词</label>
+                <input type="text" id="seo_keywords" value="${blogData.seo_keywords}" ${blogData.blog_status === 2 ? 'disabled' : ''}>
+            </div>
+            <div class="form-group">
+                <label>SEO描述</label>
+                <input type="text" id="seo_description" value="${blogData.seo_description}" ${blogData.blog_status === 2 ? 'disabled' : ''}>
+            </div>
+            <div class="form-group">
+                <label>博客简介</label>
+                <input type="text" id="blog_summary" value="${blogData.blog_summary}" ${blogData.blog_status === 2 ? 'disabled' : ''}>
+            </div>
+            <div class="form-group">
+                <label>博客详情</label>
+                <textarea id="blog_info" ${blogData.blog_status === 2 ? 'disabled' : ''}>${blogData.blog_info}</textarea>
+            </div>
+            ${blogData.blog_status === 2 ? '' : '<button class="action-btn" onclick="saveBlog()">保存并提交审核</button>'}
+            ${blogData.blog_status === 2 ? '<div class="mask"><span class="mask-text">违规关闭</span></div>' : ''}
+        `;
+
+        // 图片预览逻辑
+        const logoInput = document.getElementById('blog_logo');
+        const logoPreview = document.getElementById('logo-preview');
+        if (logoInput && logoPreview) {
+            logoInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        logoPreview.src = e.target.result;
+                        blogData.blog_logo = e.target.result; // 模拟存储图片URL
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    }
+
+    // 切换基本信息折叠状态
+    function toggleInfo() {
+        const content = document.getElementById('info-content');
+        const icon = document.querySelector('.info-header i');
+        content.classList.toggle('active');
+        icon.classList.toggle('fa-chevron-down');
+        icon.classList.toggle('fa-chevron-up');
+    }
+
+    // 保存并提交审核
+    function saveBlog() {
+        blogData.author_name = document.getElementById('author_name').value.trim();
+        blogData.blog_status = parseInt(document.getElementById('blog_status').value);
+        blogData.blog_url = document.getElementById('blog_url').value.trim();
+        blogData.seo_keywords = document.getElementById('seo_keywords').value.trim();
+        blogData.seo_description = document.getElementById('seo_description').value.trim();
+        blogData.blog_summary = document.getElementById('blog_summary').value.trim();
+        blogData.blog_info = document.getElementById('blog_info').value.trim();
+        blogData.update_time = new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        blogData.site_reply = ''; // 清空旧回复，模拟提交审核
+
+        if (!blogData.author_name || !blogData.blog_url || !blogData.seo_keywords || !blogData.seo_description || !blogData.blog_summary || !blogData.blog_info || !blogData.blog_logo) {
+            alert('所有字段均为必填项，请完整填写');
+            return;
+        }
+
+        alert('博客信息已保存并提交审核！');
+        renderBlogData();
+    }
+</script>
+</body>
+</html>
