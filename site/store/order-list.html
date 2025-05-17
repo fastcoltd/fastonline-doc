@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单列表</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.16/antd.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="/site/member/_ticket.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <script src="/site/member/_ticket.js"></script>
+    <style>
+        .tips {background:#fefcbf;border:1px solid #f6e05e;border-radius:0.25em;padding:1em;margin-bottom:1em;}
+        .tips p {margin:0;color:#744210;}
+        .order-list-container {padding:1em;}
+        .order-filter {display:flex;gap:0.5em;margin-bottom:1em;align-items:center;}
+        .order-filter input, .order-filter select {padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;width:100px;}
+        .order-filter .ant-input {padding:0.5em;margin-bottom:0.25em;}
+        .order-filter .filter-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
+        .order-filter .filter-btn:hover {background:#45a049;}
+        .order-filter .clear-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#FF4500;color:#fff;border:none;font-size:0.875em;}
+        .order-filter .clear-btn:hover {background:#D63B00;}
+        .order-table {width:100%;border-collapse:collapse;}
+        .order-table th, .order-table td {padding:0.75em;border:1px solid #d9d9d9;text-align:left;}
+        .order-table th {background:#f5f5f5;font-weight:bold;cursor:pointer;white-space:nowrap;}
+        .order-table th:hover {background:#e5e5e5;}
+        .order-table th .sort-icon {margin-left:0.3em;display:inline-flex;align-items:center;}
+        .order-table th .sort-icon i {font-size:0.75em;color:#6b7280;}
+        .order-table th .sort-icon i.sort-active {color:#4CAF50;}
+        .order-table td {font-size:0.875em;}
+        .order-table td.actions {white-space:nowrap;}
+        .order-table .action-btn {padding:0.3em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.875em;margin-right:0.3em;}
+        .order-table .action-btn:hover {background:#1C86EE;}
+        .order-table .status-待支付 {color:#FFA500;}
+        .order-table .status-已支付 {color:#1E90FF;}
+        .order-table .status-已发货 {color:#800080;}
+        .order-table .status-已完成 {color:#32CD32;}
+        .order-table .status-已取消 {color:#808080;}
+        .pagination {display:flex;gap:0.5em;margin-top:1em;justify-content:center;}
+        .pagination button {padding:0.3em 0.6em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.875em;}
+        .pagination button:disabled {background:#d9d9d9;cursor:not-allowed;}
+        .pagination button.active {background:#4CAF50;}
+        .pagination .ellipsis {padding:0.3em 0.6em;font-size:0.875em;color:#6b7280;}
+        .order-dialog {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:center;}
+        .order-dialog-content {background:#fff;border-radius:0.5em;width:50%;max-width:50vw;min-width:20em;max-height:80vh;box-shadow:0 0.25em 0.5em rgba(0,0,0,0.2);overflow-y:auto;}
+        .order-dialog-header {padding:0.75em 1em;border-bottom:1px solid #d9d9d9;background:#f5f5f5;display:flex;justify-content:space-between;align-items:center;}
+        .order-dialog-header h3 {margin:0;font-size:1.25em;color:#1f2937;}
+        .order-dialog-close {background:none;border:none;font-size:1.2em;cursor:pointer;color:#6b7280;}
+        .order-dialog-close:hover {color:#f59e0b;}
+        .order-dialog-body {padding:1em;}
+        .order-info, .refund-records, .exchange-records {margin-bottom:1em;}
+        .order-info p, .refund-records p, .exchange-records p {margin:0.5em 0;}
+        .order-actions {display:flex;gap:0.5em;}
+        .order-actions button {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
+        .order-actions button:hover {background:#45a049;}
+        .refund-records table, .exchange-records table {width:100%;border-collapse:collapse;margin-top:0.5em;}
+        .refund-records th, .refund-records td, .exchange-records th, .exchange-records td {padding:0.5em;border:1px solid #d9d9d9;text-align:left;font-size:0.875em;}
+        .refund-records th, .exchange-records th {background:#f5f5f5;font-weight:bold;}
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="store-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div w3-include-html="/site/store/_sidebar.html"></div>
+        <div class="main-content">
+            <h2>我的订单</h2>
+            <div class="order-list-container">
+                <div class="order-filter">
+                    <select id="filter-status">
+                        <option value="">全部状态</option>
+                        <option value="待支付">待支付</option>
+                        <option value="已支付">已支付</option>
+                        <option value="已发货">已发货</option>
+                        <option value="已完成">已完成</option>
+                        <option value="已取消">已取消</option>
+                    </select>
+                    <select id="filter-type">
+                        <option value="">商品</option>
+                        <option value="demand">需求</option>
+                        <option value="posts">文章</option>
+                    </select>
+                    <input type="text" id="filter-search" placeholder="订单ID/用户ID/昵称">
+                    <input type="text" id="filter-order-time-start" placeholder="开始时间">
+                    <input type="text" id="filter-order-time-end" placeholder="结束时间">
+                    <input type="number" id="filter-amount-min" placeholder="最小金额" min="0" step="0.01">
+                    <input type="number" id="filter-amount-max" placeholder="最大金额" min="0" step="0.01">
+                    <button class="filter-btn" onclick="applyFilters()">确定</button>
+                    <button class="clear-btn" onclick="clearFilters()">清空条件</button>
+                </div>
+                <table class="order-table">
+                    <thead>
+                    <tr>
+                        <th onclick="sortTable('id.sample')">订单ID <span class="sort-icon" id="sort-id.sample"><i class="fas fa-sort"></i></span></th>
+                        <th>用户信息</th>
+                        <th>商品信息</th>
+                        <th onclick="sortTable('quantity.sample')">数量 <span class="sort-icon" id="sort-quantity.sample"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable('amount.sample')">价格 <span class="sort-icon" id="sort-amount.sample"><i class="fas fa-sort"></i></span></th>
+                        <th>状态</th>
+                        <th>订单时间</th>
+                        <th onclick="sortTable('refund_amount')">退款 <span class="sort-icon" id="sort-refund_amount"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable('exchange_quantity')">换货 <span class="sort-icon" id="sort-exchange_quantity"><i class="fas fa-sort"></i></span></th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="order-table-body"></tbody>
+                </table>
+                <div class="pagination" id="pagination"></div>
+            </div>
+            <div class="order-dialog" id="order-details-dialog" style="display: none;">
+                <div class="order-dialog-content">
+                    <div class="order-dialog-header">
+                        <h3>订单详情</h3>
+                        <button class="order-dialog-close" onclick="closeOrderDialog('order-details-dialog')">×</button>
+                    </div>
+                    <div class="order-dialog-body">
+                        <div class="order-info">
+                            <h4>订单信息</h4>
+                            <p id="detail-order-id"></p>
+                            <p id="detail-user-info"></p>
+                            <p id="detail-item-name"></p>
+                            <p id="detail-quantity"></p>
+                            <p id="detail-price"></p>
+                            <p id="detail-status"></p>
+                            <p id="detail-order-time"></p>
+                            <p id="detail-refunded"></p>
+                            <p id="detail-exchanged"></p>
+                        </div>
+                        <div class="order-actions">
+                            <button class="action-btn" onclick="downloadOrder()"><i class="fas fa-download"></i></button>
+                            <button class="action-btn" id="ticket-btn"><i class="fas fa-ticket-alt"></i></button>
+                        </div>
+                        <div class="refund-records">
+                            <h4>退款记录</h4>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>退款ID</th>
+                                    <th>金额</th>
+                                    <th>状态</th>
+                                    <th>申请时间</th>
+                                    <th>处理时间</th>
+                                </tr>
+                                </thead>
+                                <tbody id="refund-records-body"></tbody>
+                            </table>
+                        </div>
+                        <div class="exchange-records">
+                            <h4>换货记录</h4>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>换货ID</th>
+                                    <th>数量</th>
+                                    <th>状态</th>
+                                    <th>申请时间</th>
+                                    <th>完成时间</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="exchange-records-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+            initializeOrders();
+            initializeFilters();
+            renderOrderList();
+        });
+    });
+
+    // 模拟订单数据
+    let allOrders = Array.from({ length: randomInt(50,500) }, () => {
+        const type = faker.random.arrayElement(['demand', 'item', 'posts']);
+        const refundRecords = Array.from({ length: faker.datatype.number({ min: 0, max: 2 }) }, () => ({
+            id: faker.datatype.number({ min: 1000, max: 9999 }),
+            amount: parseFloat(faker.finance.amount(10, 100, 2)),
+            status: faker.random.arrayElement(['申请中', '已处理', '已拒绝']),
+            apply_time: faker.date.recent(30).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+            process_time: faker.date.recent(15).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+        }));
+        const exchangeRecords = Array.from({ length: faker.datatype.number({ min: 0, max: 2 }) }, () => ({
+            id: faker.datatype.number({ min: 1000, max: 9999 }),
+            quantity: faker.datatype.number({ min: 1, max: 5 }),
+            status: faker.random.arrayElement(['申请中', '已完成', '已拒绝']),
+            apply_time: faker.date.recent(30).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+            complete_time: faker.date.recent(15).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+        }));
+        return {
+            id: { sample: faker.datatype.number({ min: 1000, max: 9999 }) },
+            user_info: faker.name.findName(),
+            item_name: faker.commerce.productName(),
+            quantity: { sample: faker.datatype.number({ min: 1, max: 10 }) },
+            amount: { sample: `$${faker.finance.amount(10, 1000, 2)}` },
+            status: faker.random.arrayElement(['待支付', '已支付', '已发货', '已完成', '已取消']),
+            paid_time: faker.date.recent(30).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+            posts_id: type === 'posts' ? faker.datatype.number({ min: 100, max: 999 }) : null,
+            demand_id: type === 'demand' ? faker.datatype.number({ min: 100, max: 999 }) : null,
+            item_id: type === 'item' ? faker.datatype.number({ min: 100, max: 999 }) : null,
+            refund_records: refundRecords,
+            exchange_records: exchangeRecords,
+            refund_amount: refundRecords.reduce((sum, r) => sum + (r.status === '已处理' ? r.amount : 0), 0).toFixed(2),
+            refund_count: refundRecords.filter(r => r.status === '已处理').length,
+            exchange_quantity: exchangeRecords.reduce((sum, r) => sum + (r.status === '已完成' ? r.quantity : 0), 0),
+            exchange_count: exchangeRecords.filter(r => r.status === '已完成').length
+        };
+    });
+
+    let currentPage = 1;
+    const pageSize = 20;
+    let sortField = null;
+    let sortDirection = 'asc';
+    let currentFilteredOrders = null;
+
+    // 初始化订单数据
+    function initializeOrders() {
+        // 模拟数据已在上方生成
+    }
+
+    // 渲染订单列表
+    function renderOrderList() {
+        const tbody = document.getElementById('order-table-body');
+        const pagination = document.getElementById('pagination');
+
+        const orders = currentFilteredOrders || allOrders;
+        let sortedOrders = [...orders];
+        if (sortField) {
+            sortedOrders.sort((a, b) => {
+                let valA, valB;
+                if (sortField === 'amount.sample') {
+                    valA = parseFloat(a.amount.sample.replace('$', '')) || 0;
+                    valB = parseFloat(b.amount.sample.replace('$', '')) || 0;
+                } else if (['id.sample', 'quantity.sample', 'refund_amount', 'exchange_quantity'].includes(sortField)) {
+                    valA = a[sortField.replace('.', '_')] || a[sortField.split('.')[0]][sortField.split('.')[1]] || 0;
+                    valB = b[sortField.replace('.', '_')] || b[sortField.split('.')[0]][sortField.split('.')[1]] || 0;
+                }
+                return sortDirection === 'asc' ? valA - valB : valB - valA;
+            });
+        }
+
+        const totalPages = Math.ceil(sortedOrders.length / pageSize);
+        const startIndex = (currentPage - 1) * pageSize;
+        const paginatedOrders = sortedOrders.slice(startIndex, startIndex + pageSize);
+
+        tbody.innerHTML = paginatedOrders.map(order => {
+            const itemType = order.posts_id ? '文章' : order.demand_id || order.item_id ? '需求' : '商品';
+            const displayName = `${itemType}：${order.item_name}`;
+            const refundDisplay = order.refund_count > 0 ? `$${order.refund_amount} (${order.refund_count})` : '--';
+            const exchangeDisplay = order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count})` : '--';
+            return `
+                <tr>
+                    <td>${order.id.sample}</td>
+                    <td>${order.user_info}</td>
+                    <td>${displayName}</td>
+                    <td>${order.quantity.sample}</td>
+                    <td>${order.amount.sample}</td>
+                    <td class="status-${order.status}">${order.status}</td>
+                    <td>${order.paid_time}</td>
+                    <td>${refundDisplay}</td>
+                    <td>${exchangeDisplay}</td>
+                    <td class="actions">
+                        <button class="action-btn" onclick="showOrderDetails(${order.id.sample})"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn" onclick="downloadOrder(${order.id.sample})"><i class="fas fa-download"></i></button>
+                        <button class="action-btn" onclick="openChatDialog(${order.id.sample})"><i class="fas fa-ticket-alt"></i></button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        pagination.innerHTML = renderPagination(totalPages);
+        updateSortIndicators();
+    }
+
+    // 渲染分页
+    function renderPagination(totalPages) {
+        if (totalPages <= 1) return '';
+        const pages = [];
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
+            }
+        } else {
+            pages.push(`<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`);
+            for (let i = 1; i <= 3; i++) {
+                pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
+            }
+            if (currentPage > 5) pages.push('<span class="ellipsis">...</span>');
+            for (let i = Math.max(4, currentPage - 1); i <= Math.min(totalPages - 3, currentPage + 1); i++) {
+                if (i > 3 && i < totalPages - 2) {
+                    pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
+                }
+            }
+            if (currentPage < totalPages - 4) pages.push('<span class="ellipsis">...</span>');
+            for (let i = totalPages - 2; i <= totalPages; i++) {
+                pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
+            }
+            pages.push(`<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`);
+        }
+        return pages.join('');
+    }
+
+    // 切换页面
+    function changePage(page) {
+        const totalPages = Math.ceil((currentFilteredOrders || allOrders).length / pageSize);
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderOrderList();
+        }
+    }
+
+    // 排序表格
+    function sortTable(field) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        renderOrderList();
+    }
+
+    // 更新排序指示器
+    function updateSortIndicators() {
+        ['id.sample', 'quantity.sample', 'amount.sample', 'refund_amount', 'exchange_quantity'].forEach(field => {
+            const sortIcon = document.getElementById(`sort-${field.replace('.', '-')}`);
+            if (sortIcon) {
+                const icon = sortIcon.querySelector('i');
+                icon.className = 'fas ' + (sortField === field ? (sortDirection === 'asc' ? 'fa-sort-up sort-active' : 'fa-sort-down sort-active') : 'fa-sort');
+            }
+        });
+    }
+
+    // 应用筛选条件
+    function applyFilters() {
+        const searchFilter = document.getElementById('filter-search').value.trim().toLowerCase();
+        const statusFilter = document.getElementById('filter-status').value;
+        const typeFilter = document.getElementById('filter-type').value;
+        const timeStartFilter = document.getElementById('filter-order-time-start').value.trim();
+        const timeEndFilter = document.getElementById('filter-order-time-end').value.trim();
+        const amountMinFilter = parseFloat(document.getElementById('filter-amount-min').value) || 0;
+        const amountMaxFilter = parseFloat(document.getElementById('filter-amount-max').value) || Infinity;
+
+        currentFilteredOrders = allOrders.filter(order => {
+            const matchesSearch = searchFilter ? (
+                order.id.sample.toString().includes(searchFilter) ||
+                order.user_info.toLowerCase().includes(searchFilter)
+            ) : true;
+            const matchesStatus = statusFilter ? order.status === statusFilter : true;
+            const matchesType = typeFilter ? (
+                typeFilter === 'posts' ? order.posts_id :
+                    typeFilter === 'demand' ? (order.demand_id || order.item_id) :
+                        true
+            ) : true;
+            const orderDate = new Date(order.paid_time.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
+            const startDate = timeStartFilter ? new Date(timeStartFilter) : new Date(0);
+            const endDate = timeEndFilter ? new Date(timeEndFilter) : new Date();
+            const matchesTime = orderDate >= startDate && orderDate <= endDate;
+            const amount = parseFloat(order.amount.sample.replace('$', '')) || 0;
+            const matchesAmount = amount >= amountMinFilter && amount <= amountMaxFilter;
+            return matchesSearch && matchesStatus && matchesType && matchesTime && matchesAmount;
+        });
+
+        currentPage = 1;
+        renderOrderList();
+    }
+
+    // 清空筛选条件
+    function clearFilters() {
+        document.getElementById('filter-search').value = '';
+        document.getElementById('filter-status').value = '';
+        document.getElementById('filter-type').value = '';
+        document.getElementById('filter-order-time-start').value = '';
+        document.getElementById('filter-order-time-end').value = '';
+        document.getElementById('filter-amount-min').value = '';
+        document.getElementById('filter-amount-max').value = '';
+        currentFilteredOrders = null;
+        currentPage = 1;
+        renderOrderList();
+    }
+
+    // 初始化筛选器
+    function initializeFilters() {
+        flatpickr('#filter-order-time-start', { dateFormat: 'Y-m-d' });
+        flatpickr('#filter-order-time-end', { dateFormat: 'Y-m-d' });
+    }
+
+    // 显示订单详情
+    function showOrderDetails(orderId) {
+        const order = allOrders.find(o => o.id.sample === orderId);
+        if (!order) return;
+
+        const itemType = order.posts_id ? '文章' : order.demand_id || order.item_id ? '需求' : '商品';
+        document.getElementById('detail-order-id').textContent = `订单ID: ${order.id.sample}`;
+        document.getElementById('detail-user-info').textContent = `用户信息: ${order.user_info}`;
+        document.getElementById('detail-item-name').textContent = `商品信息: ${itemType}：${order.item_name}`;
+        document.getElementById('detail-quantity').textContent = `数量: ${order.quantity.sample}`;
+        document.getElementById('detail-price').textContent = `价格: ${order.amount.sample}`;
+        document.getElementById('detail-status').textContent = `状态: ${order.status}`;
+        document.getElementById('detail-order-time').textContent = `订单时间: ${order.paid_time}`;
+        document.getElementById('detail-refunded').textContent = `退款: ${order.refund_count > 0 ? `$${order.refund_amount} (${order.refund_count})` : '--'}`;
+        document.getElementById('detail-exchanged').textContent = `换货: ${order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count})` : '--'}`;
+
+        const refundBody = document.getElementById('refund-records-body');
+        refundBody.innerHTML = order.refund_records.map(record => `
+            <tr>
+                <td>${record.id}</td>
+                <td>$${record.amount.toFixed(2)}</td>
+                <td>${record.status}</td>
+                <td>${record.apply_time}</td>
+                <td>${record.process_time}</td>
+            </tr>
+        `).join('');
+
+        const exchangeBody = document.getElementById('exchange-records-body');
+        exchangeBody.innerHTML = order.exchange_records.map(record => `
+            <tr>
+                <td>${record.id}</td>
+                <td>${record.quantity}</td>
+                <td>${record.status}</td>
+                <td>${record.apply_time}</td>
+                <td>${record.complete_time}</td>
+                <td><button class="action-btn" onclick="viewExchangeDetails(${record.id})"><i class="fas fa-eye"></i></button></td>
+            </tr>
+        `).join('');
+
+        document.getElementById('ticket-btn').setAttribute('onclick', `openChatDialog(${orderId})`);
+        document.getElementById('order-details-dialog').style.display = 'flex';
+    }
+
+    // 关闭订单详情弹窗
+    function closeOrderDialog(dialogId) {
+        document.getElementById(dialogId).style.display = 'none';
+    }
+
+    // 下载订单
+    function downloadOrder(orderId) {
+        const order = allOrders.find(o => o.id.sample === orderId);
+        if (!order) return;
+
+        const itemType = order.posts_id ? '文章' : order.demand_id || order.item_id ? '需求' : '商品';
+        const content = `
+订单ID: ${order.id.sample}
+用户信息: ${order.user_info}
+商品信息: ${itemType}：${order.item_name}
+数量: ${order.quantity.sample}
+价格: ${order.amount.sample}
+状态: ${order.status}
+订单时间: ${order.paid_time}
+退款: ${order.refund_count > 0 ? `$${order.refund_amount} (${order.refund_count})` : '--'}
+换货: ${order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count})` : '--'}
+        `;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `order_${orderId}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // 查看换货详情（模拟）
+    function viewExchangeDetails(exchangeId) {
+        alert(`查看换货详情: 换货ID ${exchangeId}`);
+    }
+</script>
+</body>
+</html>
