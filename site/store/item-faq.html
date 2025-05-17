@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品FAQ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .faq-button {
+            padding: 0.5em 1em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 0.875em;
+            margin-bottom: 1em;
+        }
+        .faq-button:hover {
+            background: #45a049;
+        }
+        .transaction-data::-webkit-scrollbar {width: 6px;}
+        .transaction-data::-webkit-scrollbar-thumb {background: #f59e0b; border-radius: 3px;}
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .pagination .page-btn {
+            padding: 0.25em 0.75em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            color: rgba(0, 0, 0, 0.85);
+            transition: all 0.3s;
+            font-size: 0.875em;
+            height: 1.8em;
+            line-height: 1.5em;
+            min-width: 2em;
+            text-align: center;
+        }
+        .pagination .page-btn:hover {
+            background: #f5f5f5;
+            border-color: #f97316;
+            color: #f97316;
+        }
+        .pagination .page-btn.active {
+            background: #f97316;
+            border-color: #f97316;
+            color: #fff;
+        }
+        .pagination .ellipsis {
+            font-size: 0.875em;
+            color: #6b7280;
+        }
+        .faq-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .faq-popup .popup-content {
+            background: #fff;
+            padding: 1.5em;
+            border-radius: 0.5em;
+            max-width: 30em;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .faq-popup h3 {
+            margin-top: 0;
+            font-size: 1.25em;
+            color: #f59e0b;
+        }
+        .faq-popup .form-group {
+            margin-bottom: 1em;
+        }
+        .faq-popup label {
+            display: block;
+            margin-bottom: 0.25em;
+            font-size: 0.875em;
+            color: #1f2937;
+        }
+        .faq-popup input,
+        .faq-popup select,
+        .faq-popup textarea {
+            width: 100%;
+            padding: 0.5em;
+            border: 1px solid #d9d9d9;
+            border-radius: 0.25em;
+            font-size: 0.875em;
+        }
+        .faq-popup textarea {
+            height: 6em;
+            resize: vertical;
+        }
+        .faq-popup .action-btn {
+            padding: 0.5em 1em;
+            border-radius: 0.25em;
+            cursor: pointer;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            font-size: 0.875em;
+            margin-right: 0.5em;
+        }
+        .faq-popup .action-btn:hover {
+            background: #45a049;
+        }
+        .faq-popup .close-btn {
+            position: absolute;
+            top: 0.5em;
+            right: 0.5em;
+            background: none;
+            border: none;
+            font-size: 1.25em;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .faq-popup .close-btn:hover {
+            color: #d32f2f;
+        }
+        .action-icon {
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 1.25em;
+            margin: 0 0.5em;
+        }
+        .action-icon:hover {
+            color: #f97316;
+        }
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="store-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div class="sidebar">
+            <div class="welcome-section">
+                <i class="fas fa-user-circle"></i>
+                <span id="user-nickname"></span>
+            </div>
+            <div class="store-info">
+                <img class="store-logo" src="" alt="Store Logo">
+                <h3><a id="store-name" class="store-link"></a></h3>
+                <div class="balance-rating">
+                    <span><i class="fas fa-wallet"></i> <span id="store-balance"></span></span>
+                    <span class="rating"><i class="fas fa-star"></i> <span id="store-rating"></span></span>
+                </div>
+                <div class="badges" id="store-badges"></div>
+            </div>
+            <div class="divider"></div>
+            <ul class="menu" id="store-menu"></ul>
+        </div>
+        <div class="main-content">
+            <h2>商品FAQ</h2>
+            <button class="faq-button" onclick="showAddPopup()">添加FAQ</button>
+            <div class="filter-row">
+                <div class="brand-service-filter">
+                    <input type="text" id="search-input" placeholder="模糊搜索（问答名称）" style="height: 1.8em; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 0.25em;">
+                    <select class="ant-select" id="item-filter">
+                        <option value="">全部商品</option>
+                        <option value="1">Product-001</option>
+                        <option value="2">Product-002</option>
+                        <option value="3">Product-003</option>
+                    </select>
+                    <select class="ant-select" id="language-filter">
+                        <option value="">全部语言</option>
+                        ${window.languages.map(lang => `<option value="${lang.code}_US" ${lang.code === 'en' ? 'selected' : ''}>${lang.name} (${lang.code}_US)</option>`).join('')}
+                    </select>
+                </div>
+                <div class="brand-service-filter">
+                    <button class="time-btn" id="clear-filter">清空筛选条件</button>
+                    <button class="time-btn" id="search-filter">确定</button>
+                </div>
+            </div>
+            <div class="hot-section">
+                <div class="hot-container">
+                    <div class="hot-card">
+                        <div class="hot-title-container">
+                            <h3 class="hot-title">FAQ记录</h3>
+                        </div>
+                        <div class="hot-header">
+                            <div style="flex: 1; text-align: center;">FAQ ID</div>
+                            <div style="flex: 1.5; text-align: center;">商品名称</div>
+                            <div style="flex: 2; text-align: center;">问题</div>
+                            <div style="flex: 1; text-align: center;">语言</div>
+                            <div style="flex: 1; text-align: center;">状态</div>
+                            <div style="flex: 1; text-align: center;">排序值</div>
+                            <div style="flex: 1.5; text-align: center;">创建时间</div>
+                            <div style="flex: 1; text-align: center;">操作</div>
+                        </div>
+                        <div class="transaction-data" id="transaction-data">
+                            <!-- 数据由JS动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="pagination" id="pagination">
+                    <!-- 页码由JS动态生成 -->
+                </div>
+                <select class="ant-select" id="page-size">
+                    <option value="10">10条/页</option>
+                    <option value="20" selected>20条/页</option>
+                    <option value="50">50条/页</option>
+                    <option value="100">100条/页</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+
+            // 初始化语言筛选下拉
+            const languageFilter = document.getElementById('language-filter');
+            if (languageFilter) {
+                languageFilter.innerHTML = `
+                <option value="">全部语言</option>
+                ${window.languages.map(lang => `<option value="${lang.code}_US" ${lang.code === 'en' ? 'selected' : ''}>${lang.name} (${lang.code}_US)</option>`).join('')}
+            `;
+            }
+            renderTransactionData();
+        });
+    });
+
+    // 模拟FAQ数据
+    let faqData = [];
+    const items = [
+        { id: 1, name: 'Product-001' },
+        { id: 2, name: 'Product-002' },
+        { id: 3, name: 'Product-003' }
+    ];
+    function generateFaqData() {
+        faqData = [];
+        const count = 50; // 模拟50条记录
+        for (let i = 0; i < count; i++) {
+            const item = items[Math.floor(Math.random() * items.length)];
+            const langIndex = Math.floor(Math.random() * window.languages.length);
+            const language = `${window.languages[langIndex].code}_US`; // 转换为 en_US 格式
+            const question = faker.lorem.sentence(5);
+            const faq = {
+                id: faker.datatype.number({ min: 1000, max: 9999 }),
+                store_id: faker.datatype.number({ min: 1, max: 1000 }),
+                item_id: item.id,
+                item_name: item.name,
+                status: Math.random() > 0.3 ? 1 : 0,
+                sort_index: faker.datatype.number({ min: 0, max: 100 }),
+                create_time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                language: language,
+                question: question,
+                answer: faker.lorem.paragraph(2),
+                seo_keywords: faker.lorem.words(5),
+                seo_description: faker.lorem.sentence(10)
+            };
+            faqData.push(faq);
+        }
+    }
+
+    // 渲染FAQ记录
+    function renderTransactionData(filters = {}, page = 1) {
+        if (!faqData.length) generateFaqData();
+        const pageSize = parseInt(document.getElementById('page-size').value) || 20;
+        const totalRecords = faqData.length;
+        const data = faqData.filter(row => {
+            if (filters.search && !row.question.toLowerCase().includes(filters.search.toLowerCase())) return false;
+            if (filters.item && row.item_id !== parseInt(filters.item)) return false;
+            if (filters.language && row.language !== filters.language) return false;
+            return true;
+        });
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize, data.length);
+        const paginatedData = data.slice(startIndex, endIndex);
+
+        const container = document.getElementById('transaction-data');
+        container.innerHTML = '';
+        paginatedData.forEach(row => {
+            const rowEl = document.createElement('div');
+            rowEl.className = 'hot-row';
+            rowEl.innerHTML = `
+                <div style="flex: 1; text-align: center;">${row.id}</div>
+                <div style="flex: 1.5; text-align: center;">${row.item_name}</div>
+                <div style="flex: 2; text-align: center;">${row.question}</div>
+                <div style="flex: 1; text-align: center;">${row.language}</div>
+                <div style="flex: 1; text-align: center; color: ${row.status === 1 ? '#4CAF50' : '#d32f2f'}">${row.status === 1 ? '启用' : '禁用'}</div>
+                <div style="flex: 1; text-align: center;">${row.sort_index}</div>
+                <div style="flex: 1.5; text-align: center;">${row.create_time}</div>
+                <div style="flex: 1; text-align: center;">
+                    <i class="fas fa-eye action-icon" onclick="showViewPopup(${row.id})"></i>
+                    <i class="fas fa-edit action-icon" onclick="showEditPopup(${row.id})"></i>
+                </div>
+            `;
+            container.appendChild(rowEl);
+        });
+
+        renderPagination(page, pageSize, data.length);
+    }
+
+    // 渲染分页
+    function renderPagination(page, pageSize, totalRecords) {
+        const maxPage = Math.ceil(totalRecords / pageSize);
+        const container = document.getElementById('pagination');
+        container.innerHTML = '';
+
+        const pages = [];
+        const range = 2;
+        pages.push(1);
+        if (page > range + 2) pages.push('...');
+        for (let i = Math.max(2, page - range); i <= Math.min(maxPage - 1, page + range); i++) {
+            pages.push(i);
+        }
+        if (page < maxPage - range - 1) pages.push('...');
+        if (maxPage > 1) pages.push(maxPage);
+
+        pages.forEach(p => {
+            if (p === '...') {
+                const span = document.createElement('span');
+                span.className = 'ellipsis';
+                span.textContent = '...';
+                container.appendChild(span);
+            } else {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${p === page ? 'active' : ''}`;
+                btn.textContent = p;
+                btn.addEventListener('click', () => {
+                    currentPage = p;
+                    renderTransactionData({}, currentPage);
+                });
+                container.appendChild(btn);
+            }
+        });
+    }
+
+    // 显示添加FAQ弹窗
+    function showAddPopup() {
+        const popup = document.createElement('div');
+        popup.className = 'faq-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>添加FAQ</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>商品</label>
+                    <select id="add-item_id">
+                        ${items.map(item => `<option value="${item.id}">${item.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="add-status">
+                        <option value="1" class="status-option-enabled">启用</option>
+                        <option value="0" class="status-option-disabled">禁用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>排序值</label>
+                    <input type="number" id="add-sort_index" placeholder="请输入排序值" value="0">
+                </div>
+                <div class="form-group">
+                    <label>语言</label>
+                    <select id="add-language">
+                        ${window.languages.map(lang => `<option value="${lang.code}_US" ${lang.code === 'en' ? 'selected' : ''}>${lang.name} (${lang.code}_US)</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>问题</label>
+                    <input type="text" id="add-question" placeholder="请输入问题">
+                </div>
+                <div class="form-group">
+                    <label>答案</label>
+                    <textarea id="add-answer" placeholder="请输入答案"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>SEO关键词</label>
+                    <input type="text" id="add-seo_keywords" placeholder="请输入SEO关键词">
+                </div>
+                <div class="form-group">
+                    <label>SEO描述</label>
+                    <input type="text" id="add-seo_description" placeholder="请输入SEO描述">
+                </div>
+                <button class="action-btn" onclick="addFaq()">保存</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 添加FAQ
+    function addFaq() {
+        const itemId = parseInt(document.getElementById('add-item_id').value);
+        const status = parseInt(document.getElementById('add-status').value);
+        const sortIndex = parseInt(document.getElementById('add-sort_index').value);
+        const language = document.getElementById('add-language').value;
+        const question = document.getElementById('add-question').value.trim();
+        const answer = document.getElementById('add-answer').value.trim();
+        const seoKeywords = document.getElementById('add-seo_keywords').value.trim();
+        const seoDescription = document.getElementById('add-seo_description').value.trim();
+
+        if (!question || !answer) {
+            alert('问题和答案不能为空');
+            return;
+        }
+
+        const newFaq = {
+            id: faker.datatype.number({ min: 1000, max: 9999 }),
+            store_id: faker.datatype.number({ min: 1, max: 1000 }),
+            item_id: itemId,
+            item_name: items.find(item => item.id === itemId).name,
+            status: status,
+            sort_index: sortIndex,
+            create_time: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+            language: language,
+            question: question,
+            answer: answer,
+            seo_keywords: seoKeywords,
+            seo_description: seoDescription
+        };
+
+        faqData.push(newFaq);
+        document.querySelector('.faq-popup').remove();
+        renderTransactionData();
+    }
+
+    // 显示查看FAQ弹窗
+    function showViewPopup(faqId) {
+        const faq = faqData.find(f => f.id === faqId);
+        if (!faq) return;
+
+        const popup = document.createElement('div');
+        popup.className = 'faq-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>查看FAQ</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>商品</label>
+                    <input type="text" value="${faq.item_name}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <input type="text" value="${faq.status === 1 ? '启用' : '禁用'}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>排序值</label>
+                    <input type="text" value="${faq.sort_index}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>语言</label>
+                    <input type="text" value="${faq.language}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>问题</label>
+                    <input type="text" value="${faq.question}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>答案</label>
+                    <textarea readonly>${faq.answer}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>SEO关键词</label>
+                    <input type="text" value="${faq.seo_keywords}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>SEO描述</label>
+                    <input type="text" value="${faq.seo_description}" readonly>
+                </div>
+                <button class="action-btn" onclick="this.parentElement.parentElement.remove()">关闭</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 显示编辑FAQ弹窗
+    function showEditPopup(faqId) {
+        const faq = faqData.find(f => f.id === faqId);
+        if (!faq) return;
+
+        const popup = document.createElement('div');
+        popup.className = 'faq-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>编辑FAQ</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>商品</label>
+                    <select id="edit-item_id">
+                        ${items.map(item => `<option value="${item.id}" ${faq.item_id === item.id ? 'selected' : ''}>${item.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="edit-status">
+                        <option value="1" class="status-option-enabled" ${faq.status === 1 ? 'selected' : ''}>启用</option>
+                        <option value="0" class="status-option-disabled" ${faq.status === 0 ? 'selected' : ''}>禁用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>排序值</label>
+                    <input type="number" id="edit-sort_index" value="${faq.sort_index}">
+                </div>
+                <div class="form-group">
+                    <label>语言</label>
+                    <select id="edit-language">
+                        ${window.languages.map(lang => `<option value="${lang.code}_US" ${faq.language === `${lang.code}_US` ? 'selected' : ''}>${lang.name} (${lang.code}_US)</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>问题</label>
+                    <input type="text" id="edit-question" value="${faq.question}">
+                </div>
+                <div class="form-group">
+                    <label>答案</label>
+                    <textarea id="edit-answer">${faq.answer}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>SEO关键词</label>
+                    <input type="text" id="edit-seo_keywords" value="${faq.seo_keywords}">
+                </div>
+                <div class="form-group">
+                    <label>SEO描述</label>
+                    <input type="text" id="edit-seo_description" value="${faq.seo_description}">
+                </div>
+                <button class="action-btn" onclick="saveFaq(${faq.id})">保存</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 保存FAQ
+    function saveFaq(faqId) {
+        const faq = faqData.find(f => f.id === faqId);
+        if (!faq) return;
+
+        faq.item_id = parseInt(document.getElementById('edit-item_id').value);
+        faq.item_name = items.find(item => item.id === faq.item_id).name;
+        faq.status = parseInt(document.getElementById('edit-status').value);
+        faq.sort_index = parseInt(document.getElementById('edit-sort_index').value);
+        faq.language = document.getElementById('edit-language').value;
+        faq.question = document.getElementById('edit-question').value.trim();
+        faq.answer = document.getElementById('edit-answer').value.trim();
+        faq.seo_keywords = document.getElementById('edit-seo_keywords').value.trim();
+        faq.seo_description = document.getElementById('edit-seo_description').value.trim();
+
+        if (!faq.question || !faq.answer) {
+            alert('问题和答案不能为空');
+            return;
+        }
+
+        document.querySelector('.faq-popup').remove();
+        renderTransactionData();
+    }
+
+    // 初始化数据
+    let currentPage = 1;
+    renderTransactionData();
+
+    // 搜索筛选
+    document.getElementById('search-filter').addEventListener('click', () => {
+        const filters = {
+            search: document.getElementById('search-input').value.trim(),
+            item: document.getElementById('item-filter').value,
+            language: document.getElementById('language-filter').value
+        };
+        currentPage = 1;
+        renderTransactionData(filters, currentPage);
+    });
+
+    // 清空筛选
+    document.getElementById('clear-filter').addEventListener('click', () => {
+        document.getElementById('search-input').value = '';
+        document.getElementById('item-filter').value = '';
+        document.getElementById('language-filter').value = 'en_US';
+        currentPage = 1;
+        renderTransactionData();
+    });
+
+    // 每页条数变化
+    document.getElementById('page-size').addEventListener('change', () => {
+        currentPage = 1;
+        renderTransactionData({}, currentPage);
+    });
+</script>
+</body>
+</html>
