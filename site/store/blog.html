@@ -64,6 +64,15 @@
             font-size: 1.25em;
             color: #6b7280;
         }
+        .info-header-tips {
+            background: #fefcbf;
+            border: 1px solid #f6e05e;
+            border-radius: 0.25em;
+            padding: 0.5em;
+            margin-top: 0.5em;
+            font-size: 0.875em;
+            color: #744210;
+        }
         .info-content {
             display: none;
             margin-top: 1em;
@@ -198,6 +207,7 @@
                     <h3>博客基本信息</h3>
                     <i class="fas fa-chevron-down"></i>
                 </div>
+                <div id="info-header-tips" class="info-header-tips"></div>
                 <div class="info-content" id="info-content">
                     <!-- 编辑表单动态生成 -->
                 </div>
@@ -285,9 +295,13 @@
             </div>
         `;
 
+        // 渲染审核提示
+        const tip = blogData.site_reply || auditTips[Math.floor(Math.random() * auditTips.length)];
+        const headerTips = document.getElementById('info-header-tips');
+        headerTips.innerHTML = `<p><strong>审核提示：</strong> ${tip}</p>`;
+
         // 渲染基本信息
         const infoContent = document.getElementById('info-content');
-        const tip = blogData.site_reply || auditTips[Math.floor(Math.random() * auditTips.length)];
         infoContent.innerHTML = `
             <div class="tips">
                 <p><strong>审核提示：</strong> ${tip}</p>
@@ -309,7 +323,6 @@
                 <select id="blog_status" ${blogData.blog_status === 2 ? 'disabled' : ''}>
                     <option value="0" ${blogData.blog_status === 0 ? 'selected' : ''}>未启用</option>
                     <option value="1" ${blogData.blog_status === 1 ? 'selected' : ''}>启用</option>
-<!--                    <option value="2" ${blogData.blog_status === 2 ? 'selected' : ''}>违规关闭</option>-->
                 </select>
             </div>
             <div class="form-group">
@@ -357,8 +370,10 @@
     // 切换基本信息折叠状态
     function toggleInfo() {
         const content = document.getElementById('info-content');
+        const headerTips = document.getElementById('info-header-tips');
         const icon = document.querySelector('.info-header i');
         content.classList.toggle('active');
+        headerTips.style.display = content.classList.contains('active') ? 'none' : 'block';
         icon.classList.toggle('fa-chevron-down');
         icon.classList.toggle('fa-chevron-up');
     }
