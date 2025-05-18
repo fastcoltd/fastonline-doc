@@ -300,8 +300,8 @@
         tbody.innerHTML = paginatedOrders.map(order => {
             const itemType = order.posts_id ? '文章' : order.demand_id || order.item_id ? '需求' : '商品';
             const displayName = `${itemType}：${order.item_name}`;
-            const refundDisplay = order.refund_count > 0 ? `$${order.refund_amount} (${order.refund_count}件, ${order.refund_quantity}件)` : '--';
-            const exchangeDisplay = order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count}件)` : '--';
+            const refundDisplay = order.refund_count > 0 ? `$${order.refund_amount} (${order.refund_count}/ ${order.refund_quantity})` : '--';
+            const exchangeDisplay = order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count})` : '--';
             const ratingDisplay = order.rating ? `${order.rating}` : '--';
             return `
                 <tr>
