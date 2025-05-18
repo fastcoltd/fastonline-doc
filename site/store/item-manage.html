@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店铺信息</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .tips {background:#fefcbf;border:1px solid #f6e05e;border-radius:0.25em;padding:1em;margin-bottom:1em;}
+        .tips p {margin:0;color:#744210;}
+        .form-section {background:#fff;border:1px solid #d9d9d9;border-radius:0.5em;padding:1em;margin-bottom:1em;position:relative;}
+        .form-section h3 {margin:0 0 1em;font-size:1.25em;color:#f59e0b;}
+        .form-row {display:flex;gap:1em;margin-bottom:0.75em;}
+        .form-group {flex:1;min-width:0;display:flex;align-items:center;margin-bottom:0.75em;}
+        .form-group label {width:100px;font-size:0.875em;color:#1f2937;white-space:nowrap;text-align:right;margin-right:0.5em;}
+        .form-group input, .form-group select, .form-group textarea {flex:1;padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;margin-bottom:0.25em;}
+        .form-group textarea {height:6em;resize:vertical;}
+        .form-group .ant-input {padding:0.5em;margin-bottom:0.25em;}
+        .action-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
+        .action-btn:hover {background:#45a049;}
+        .logo-container {position:relative;width:100px;height:100px;margin-right:1em;}
+        .logo-preview {width:100%;height:100%;object-fit:cover;border-radius:0.25em;}
+        .logo-edit-btn {position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:0.25em;padding:0.5em;cursor:pointer;display:none;}
+        .logo-container:hover .logo-edit-btn {display:block;}
+        .basic-info {display:flex;align-items:flex-start;}
+        .basic-info-fields {flex:1;}
+        .mask {position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:10;}
+        .mask-text {font-family:'Arial Black',sans-serif;font-size:2em;font-weight:bold;color:#d32f2f;text-shadow:2px 2px 4px rgba(0,0,0,0.5);}
+        .modify-btn, .view-btn {padding:0.3em 0.6em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.75em;margin-left:0.5em;}
+        .modify-btn:hover, .view-btn:hover {background:#1C86EE;}
+        .generate-btn {padding:0.3em 0.6em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.75em;margin-left:0.5em;}
+        .generate-btn:hover {background:#1C86EE;}
+        .popup {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:1000;}
+        .popup-content {background:#fff;padding:1.5em;border-radius:0.5em;max-width:30em;width:100%;box-shadow:0 4px 12px rgba(0,0,0,0.1);position:relative;}
+        .twofa-code {font-family:monospace;word-break:break-all;margin-bottom:1em;}
+        .copy-btn {padding:0.3em 0.6em;border-radius:0.25em;cursor:pointer;background:#6b7280;color:#fff;border:none;font-size:0.75em;margin-left:0.5em;}
+        .copy-btn:hover {background:#4b5563;}
+        .qr-code {width:100px;height:100px;margin:0.5em auto;}
+        .close-btn {position:absolute;top:0.5em;right:0.5em;background:none;border:none;font-size:1.25em;cursor:pointer;color:#6b7280;}
+        .close-btn:hover {color:#d32f2f;}
+        .validate-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#32CD32;color:#fff;border:none;font-size:0.875em;margin-left:0.5em;}
+        .validate-btn:hover {background:#2E8B57;}
+        .language-set {background:#e6ffed;}
+        .language-unset {background:#f5f5f5;}
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="store-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div w3-include-html="/site/store/_sidebar.html"></div>
+        <div class="main-content">
+            <h2>店铺信息</h2>
+            <div class="tips" id="tips"></div>
+            <div class="form-section" id="basic-info-section">
+                <h3>基本信息</h3>
+                <div class="basic-info">
+                    <div class="logo-container">
+                        <img src="" class="logo-preview" id="logo-preview">
+                        <button class="logo-edit-btn" onclick="document.getElementById('logo').click()">编辑</button>
+                        <input type="file" id="logo" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="basic-info-fields">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>国家</label>
+                                <select id="country">
+                                    <option value="">请选择国家</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>时区</label>
+                                <select id="timezone">
+                                    <option value="">请选择时区</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>主要语言</label>
+                                <input type="text" id="native_language">
+                            </div>
+                            <div class="form-group">
+                                <label>自定义URL</label>
+                                <input type="text" id="custom_url">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section" id="security-section">
+                <h3>安全设置</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>店铺密码</label>
+                        <span id="password-status">未设置</span>
+                        <button class="modify-btn" onclick="showPasswordPopup()">修改</button>
+                    </div>
+                    <div class="form-group">
+                        <label>双重认证</label>
+                        <span id="twofa-status">未设置</span>
+                        <button class="view-btn" id="view-2fa" style="display: none;"><i class="fas fa-eye"></i></button>
+                        <button class="generate-btn" id="generate-2fa" style="display: none;">生成2FA代码</button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section" id="lang-info-section">
+                <h3>多语言信息</h3>
+                <div class="form-group">
+                    <label>选择语言</label>
+                    <select id="language-selector">
+                        <option value="">请选择语言</option>
+                    </select>
+                </div>
+                <div id="lang-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>店铺名称</label>
+                            <input type="text" id="lang-name">
+                        </div>
+                        <div class="form-group">
+                            <label>工作时间</label>
+                            <input type="text" id="lang-work_time">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>标语</label>
+                            <input type="text" id="lang-slogan">
+                        </div>
+                        <div class="form-group">
+                            <label>简介</label>
+                            <input type="text" id="lang-summary">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>SEO关键词</label>
+                            <input type="text" id="lang-seo_keywords">
+                        </div>
+                        <div class="form-group">
+                            <label>SEO描述</label>
+                            <input type="text" id="lang-seo_description">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>关于我们</label>
+                        <textarea id="lang-about_me"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>售后规则</label>
+                        <textarea id="lang-after_sales_rules"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>详细描述</label>
+                        <textarea id="lang-description"></textarea>
+                    </div>
+                </div>
+                <button class="action-btn" onclick="saveStore()">保存并提交审核</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+            initializeDropdowns();
+            initializeStoreData();
+            renderStoreData();
+            // 绑定 view-2fa 事件
+            const view2faBtn = document.getElementById('view-2fa');
+            if (view2faBtn) {
+                view2faBtn.addEventListener('click', show2FAViewPopup);
+            }
+        });
+    });
+
+    // 模拟店铺数据
+    let storeData = {
+        id: faker.datatype.number({ min: 1000, max: 9999 }),
+        user_id: faker.datatype.number({ min: 1, max: 10000 }),
+        status: faker.random.arrayElement([0, 1, 2]), // 0=未启用, 1=启用, 2=违规关闭
+        level: faker.datatype.number({ min: 0, max: 5 }),
+        margin: parseFloat(faker.finance.amount(1000, 5000, 2)),
+        commission: parseFloat(faker.finance.amount(0, 0.1, 4)),
+        commission_profit: parseFloat(faker.finance.amount(0, 0.1, 4)),
+        country: faker.random.arrayElement(currencies).country,
+        timezone: faker.random.arrayElement(timezones).code,
+        native_language: faker.random.arrayElement(['English', 'Chinese', 'Spanish']),
+        logo: faker.image.imageUrl(100, 100, 'logo'),
+        custom_url: faker.internet.url().replace(/^https?:\/\//, ''),
+        store_password: faker.internet.password(),
+        two_factors: Math.random() > 0.7 ? faker.random.alphaNumeric(32, { casing: 'upper' }) : '',
+        contacts: JSON.stringify([{ type: 'email', value: faker.internet.email() }]),
+        create_time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).getTime() / 1000,
+        update_time: new Date().getTime() / 1000
+    };
+
+    // 审核提示
+    const auditTips = [
+        '禁止包含外部链接，请移除所有非平台链接。',
+        '内容中包含违禁词，请检查并替换敏感词汇。',
+        '禁止上传不当图片，请更换符合规范的Logo。',
+        '店铺简介过于简短，请提供更详细的描述。',
+        'SEO关键词与内容不相关，请调整为更贴合主题的词语。',
+        '自定义URL格式不正确，请使用字母、数字或短横线。',
+        '内容涉及政治敏感话题，请修改为中立表述。',
+        'Logo图片分辨率过低，请上传更高清晰度的图片。',
+        '店铺描述抄袭，请提交原创内容。',
+        '关于我们内容广告成分过多，请减少推广性语言。'
+    ];
+
+    // 初始化下拉菜单
+    function initializeDropdowns() {
+        const countrySelect = document.getElementById('country');
+        const timezoneSelect = document.getElementById('timezone');
+        const languageSelect = document.getElementById('language-selector');
+
+        // 国家下拉
+        countrySelect.innerHTML = `<option value="">请选择国家</option>` +
+            [...new Set(currencies.map(c => c.country))].sort().map(country => `<option value="${country}">${country}</option>`).join('');
+
+        // 时区下拉
+        timezoneSelect.innerHTML = `<option value="">请选择时区</option>` +
+            timezones.sort((a, b) => a.name.localeCompare(b.name)).map(tz => `<option value="${tz.code}">${tz.name} (${tz.country})</option>`).join('');
+
+        // 语言下拉
+        languageSelect.innerHTML = `<option value="">请选择语言</option>` +
+            window.languages.map(lang => {
+                const langCode = `${lang.code}_US`;
+                const isSet = storeLangData[langCode]?.name ? '已设置' : '未设置';
+                const className = isSet === '已设置' ? 'language-set' : 'language-unset';
+                return `<option value="${langCode}" class="${className}">${lang.name} (${langCode}) - ${isSet}</option>`;
+            }).join('');
+    }
+
+    // 模拟店铺数据（调整多语言数据）
+    let storeLangData = {};
+    window.languages.forEach(lang => {
+        const langCode = `${lang.code}_US`;
+        const isSet = Math.random() > 0.8; // 20% 已设置，80% 未设置
+        storeLangData[langCode] = {
+            id: faker.datatype.number({ min: 10000, max: 99999 }),
+            store_id: storeData.id,
+            status: storeData.status,
+            version: 1,
+            language: langCode,
+            seo_keywords: isSet ? faker.lorem.words(5) : '',
+            seo_description: isSet ? faker.lorem.sentence(10) : '',
+            name: isSet ? faker.company.companyName() : '',
+            work_time: isSet ? 'Mon-Fri 9:00-17:00' : '',
+            slogan: isSet ? faker.company.catchPhrase() : '',
+            summary: isSet ? faker.lorem.sentence(10) : '',
+            about_me: isSet ? faker.lorem.paragraph(2) : '',
+            after_sales_rules: isSet ? faker.lorem.paragraph(2) : '',
+            description: isSet ? faker.lorem.paragraph(3) : '',
+            create_time: storeData.create_time,
+            update_time: storeData.update_time,
+            site_reply: Math.random() > 0.7 ? faker.lorem.sentence(10) : ''
+        };
+    });
+
+    // 初始化店铺数据
+    function initializeStoreData() {
+        const currentLang = document.getElementById('language-selector').value || 'en_US';
+        const langData = storeLangData[currentLang] || {};
+        document.getElementById('country').value = storeData.country;
+        document.getElementById('timezone').value = storeData.timezone;
+        document.getElementById('native_language').value = storeData.native_language;
+        document.getElementById('logo-preview').src = storeData.logo;
+        document.getElementById('custom_url').value = storeData.custom_url;
+        document.getElementById('password-status').textContent = storeData.store_password ? '已设置' : '未设置';
+        document.getElementById('twofa-status').textContent = storeData.two_factors ? '已设置' : '未设置';
+        const view2faBtn = document.getElementById('view-2fa');
+        const generate2faBtn = document.getElementById('generate-2fa');
+        if (view2faBtn) view2faBtn.style.display = storeData.two_factors ? 'inline-block' : 'none';
+        if (generate2faBtn) generate2faBtn.style.display = storeData.two_factors ? 'none' : 'inline-block';
+        document.getElementById('lang-name').value = langData.name || '';
+        document.getElementById('lang-work_time').value = langData.work_time || '';
+        document.getElementById('lang-slogan').value = langData.slogan || '';
+        document.getElementById('lang-summary').value = langData.summary || '';
+        document.getElementById('lang-about_me').value = langData.about_me || '';
+        document.getElementById('lang-after_sales_rules').value = langData.after_sales_rules || '';
+        document.getElementById('lang-seo_keywords').value = langData.seo_keywords || '';
+        document.getElementById('lang-seo_description').value = langData.seo_description || '';
+        document.getElementById('lang-description').value = langData.description || '';
+    }
+
+    // 渲染店铺数据
+    function renderStoreData() {
+        const currentLang = document.getElementById('language-selector').value || 'en_US';
+        const langData = storeLangData[currentLang] || {};
+        const tip = langData.site_reply || auditTips[Math.floor(Math.random() * auditTips.length)];
+        document.getElementById('tips').innerHTML = `<p><strong>审核提示：</strong> ${tip}</p>`;
+
+        initializeStoreData();
+
+        // 违规关闭状态
+        const sections = ['basic-info-section', 'security-section', 'lang-info-section'];
+        sections.forEach(id => {
+            const section = document.getElementById(id);
+            const existingMask = section.querySelector('.mask');
+            if (existingMask) existingMask.remove();
+            if (langData.status === 2) {
+                section.innerHTML += `
+                    <div class="mask">
+                        <span class="mask-text">违规关闭</span>
+                    </div>
+                `;
+                section.querySelectorAll('input, select, textarea, button').forEach(el => el.disabled = true);
+                const actionBtn = section.querySelector('.action-btn');
+                if (actionBtn) actionBtn.style.display = 'none';
+            } else {
+                section.querySelectorAll('input, select, textarea, button').forEach(el => el.disabled = false);
+                const actionBtn = section.querySelector('.action-btn');
+                if (actionBtn) actionBtn.style.display = 'block';
+            }
+        });
+
+        // 图片预览逻辑
+        const logoInput = document.getElementById('logo');
+        const logoPreview = document.getElementById('logo-preview');
+        if (logoInput && logoPreview) {
+            logoInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        logoPreview.src = e.target.result;
+                        storeData.logo = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    }
+
+    // 显示修改密码弹窗
+    function showPasswordPopup() {
+        const popup = document.createElement('div');
+        popup.className = 'popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>修改店铺密码</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>旧密码</label>
+                    <input type="password" id="old-password">
+                </div>
+                <div class="form-group">
+                    <label>新密码</label>
+                    <input type="password" id="new-password">
+                </div>
+                <div class="form-group">
+                    <label>确认新密码</label>
+                    <input type="password" id="confirm-password">
+                </div>
+                <button class="action-btn" onclick="modifyPassword()">确认修改</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 修改密码
+    function modifyPassword() {
+        const oldPassword = document.getElementById('old-password').value.trim();
+        const newPassword = document.getElementById('new-password').value.trim();
+        const confirmPassword = document.getElementById('confirm-password').value.trim();
+
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            alert('请填写所有密码字段');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            alert('新密码和确认密码不一致');
+            return;
+        }
+        if (oldPassword !== storeData.store_password) {
+            alert('旧密码错误');
+            return;
+        }
+
+        storeData.store_password = newPassword;
+        document.getElementById('password-status').textContent = '已设置';
+        alert('密码修改成功！');
+        document.querySelector('.popup').remove();
+    }
+
+    // 显示2FA生成弹窗
+    document.getElementById('generate-2fa').addEventListener('click', () => {
+        const twoFaCode = faker.random.alphaNumeric(32, { casing: 'upper' });
+        storeData.two_factors = twoFaCode;
+        const popup = document.createElement('div');
+        popup.className = 'popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>生成双重认证代码</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <p class="twofa-code">${twoFaCode} <button class="copy-btn" onclick="navigator.clipboard.writeText('${twoFaCode}').then(() => alert('已复制！'))">复制</button></p>
+                <canvas id="qr-code" class="qr-code"></canvas>
+                <div class="form-group">
+                    <label>输入两步验证码（30秒周期）</label>
+                    <input type="text" id="validate-2fa-code">
+                    <button class="validate-btn" onclick="validate2FA()">验证</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(popup);
+        // 确保 DOM 更新后生成 QR 码
+        setTimeout(() => {
+            const qrCodeElement = document.getElementById('qr-code');
+            if (qrCodeElement) {
+                const otpauthUrl = `otpauth://totp/Store:${storeLangData['en_US'].name}?secret=${twoFaCode}&issuer=Store`;
+                QRCode.toCanvas(qrCodeElement, otpauthUrl, { width: 100, height: 100 }, (err) => {
+                    if (err) console.error('QR Code generation failed:', err);
+                });
+            }
+        }, 0);
+        document.getElementById('twofa-status').textContent = '已设置';
+        document.getElementById('generate-2fa').style.display = 'none';
+        document.getElementById('view-2fa').style.display = 'inline-block';
+    });
+
+    // 显示2FA查看弹窗
+    function show2FAViewPopup() {
+        const popup = document.createElement('div');
+        popup.className = 'popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>查看双重认证代码</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="form-group">
+                    <label>输入两步验证码（30秒周期）</label>
+                    <input type="text" id="validate-2fa-code">
+                    <button class="validate-btn" onclick="show2FACode()">验证</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    // 显示2FA代码
+    function show2FACode() {
+        const inputCode = document.getElementById('validate-2fa-code').value.trim();
+        if (inputCode.length > 0) {
+            const popup = document.querySelector('.popup-content');
+            popup.innerHTML = `
+                <h3>双重认证代码</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <p class="twofa-code">${storeData.two_factors} <button class="copy-btn" onclick="navigator.clipboard.writeText('${storeData.two_factors}').then(() => this.parentElement.parentElement.parentElement.remove())">复制</button></p>
+                <div class="form-group">
+                    <label>两步验证码（演示）</label>
+                    <input type="text" value="${inputCode}" readonly>
+                </div>
+            `;
+        } else {
+            alert('请输入有效的2FA代码');
+        }
+    }
+
+    // 验证2FA代码
+    function validate2FA() {
+        const inputCode = document.getElementById('validate-2fa-code').value.trim();
+        if (inputCode.length > 0) {
+            alert('2FA代码验证成功！');
+            document.querySelector('.popup').remove();
+        } else {
+            alert('请输入有效的2FA代码');
+        }
+    }
+
+    // 语言切换
+    document.getElementById('language-selector').addEventListener('change', () => {
+        renderStoreData();
+    });
+
+    // 保存并提交审核
+    function saveStore() {
+        const currentLang = document.getElementById('language-selector').value;
+        if (!currentLang) {
+            alert('请选择一种语言');
+            return;
+        }
+        const langData = storeLangData[currentLang];
+        if (langData.status === 2) {
+            alert('店铺信息处于违规关闭状态，无法编辑或提交审核');
+            return;
+        }
+
+        storeData.country = document.getElementById('country').value;
+        storeData.timezone = document.getElementById('timezone').value;
+        storeData.native_language = document.getElementById('native_language').value.trim();
+        storeData.custom_url = document.getElementById('custom_url').value.trim();
+        storeData.store_password = storeData.store_password || '';
+        storeData.two_factors = storeData.two_factors || '';
+
+        langData.name = document.getElementById('lang-name').value.trim();
+        langData.work_time = document.getElementById('lang-work_time').value.trim();
+        langData.slogan = document.getElementById('lang-slogan').value.trim();
+        langData.summary = document.getElementById('lang-summary').value.trim();
+        langData.about_me = document.getElementById('lang-about_me').value.trim();
+        langData.after_sales_rules = document.getElementById('lang-after_sales_rules').value.trim();
+        langData.seo_keywords = document.getElementById('lang-seo_keywords').value.trim();
+        langData.seo_description = document.getElementById('lang-seo_description').value.trim();
+        langData.description = document.getElementById('lang-description').value.trim();
+        langData.update_time = new Date().getTime() / 1000;
+        langData.site_reply = '';
+
+        if (!storeData.country || !storeData.timezone || !storeData.native_language || !storeData.logo || !storeData.custom_url || !storeData.store_password || !storeData.two_factors ||
+            !langData.name || !langData.work_time || !langData.slogan || !langData.summary || !langData.about_me || !langData.after_sales_rules || !langData.seo_keywords || !langData.seo_description || !langData.description) {
+            alert('所有字段均为必填项，请完整填写');
+            return;
+        }
+
+        alert('店铺信息已保存并提交审核！');
+        renderStoreData();
+    }
+</script>
+</body>
+</html>
