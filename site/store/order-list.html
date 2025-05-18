@@ -45,6 +45,8 @@
         .order-table .action-btn:hover {background:#1C86EE;}
         .order-table .download-aftersales-btn {padding:0.2em;border-radius:0.25em;cursor:pointer;background:#f59e0b;color:#fff;border:none;font-size:0.75em;margin-left:0.3em;}
         .order-table .download-aftersales-btn:hover {background:#d97706;}
+        .order-table .review-btn {padding:0.2em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.75em;margin-left:0.3em;}
+        .order-table .review-btn:hover {background:#1C86EE;}
         .order-table .status-待支付 {color:#FFA500;}
         .order-table .status-已支付 {color:#1E90FF;}
         .order-table .status-已发货 {color:#800080;}
@@ -55,13 +57,13 @@
         .pagination button:disabled {background:#d9d9d9;cursor:not-allowed;}
         .pagination button.active {background:#4CAF50;}
         .pagination .ellipsis {padding:0.3em 0.6em;font-size:0.875em;color:#6b7280;}
-        .order-dialog {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:center;}
-        .order-dialog-content {background:#fff;border-radius:0.5em;width:50%;max-width:50vw;min-width:20em;max-height:80vh;box-shadow:0 0.25em 0.5em rgba(0,0,0,0.2);overflow-y:auto;}
-        .order-dialog-header {padding:0.75em 1em;border-bottom:1px solid #d9d9d9;background:#f5f5f5;display:flex;justify-content:space-between;align-items:center;}
-        .order-dialog-header h3 {margin:0;font-size:1.25em;color:#1f2937;}
-        .order-dialog-close {background:none;border:none;font-size:1.2em;cursor:pointer;color:#6b7280;}
-        .order-dialog-close:hover {color:#f59e0b;}
-        .order-dialog-body {padding:1em;}
+        .order-dialog, .review-dialog {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:center;}
+        .order-dialog-content, .review-dialog-content {background:#fff;border-radius:0.5em;width:50%;max-width:50vw;min-width:20em;max-height:80vh;box-shadow:0 0.25em 0.5em rgba(0,0,0,0.2);overflow-y:auto;}
+        .order-dialog-header, .review-dialog-header {padding:0.75em 1em;border-bottom:1px solid #d9d9d9;background:#f5f5f5;display:flex;justify-content:space-between;align-items:center;}
+        .order-dialog-header h3, .review-dialog-header h3 {margin:0;font-size:1.25em;color:#1f2937;}
+        .order-dialog-close, .review-dialog-close {background:none;border:none;font-size:1.2em;cursor:pointer;color:#6b7280;}
+        .order-dialog-close:hover, .review-dialog-close:hover {color:#f59e0b;}
+        .order-dialog-body, .review-dialog-body {padding:1em;}
         .order-info, .refund-records, .exchange-records {margin-bottom:1em;}
         .order-info p, .refund-records p, .exchange-records p {margin:0.5em 0;}
         .order-actions {display:flex;gap:0.5em;}
@@ -110,11 +112,12 @@
                         <th>用户信息</th>
                         <th>商品信息</th>
                         <th onclick="sortTable('quantity.sample')">数量 <span class="sort-icon" id="sort-quantity.sample"><i class="fas fa-sort"></i></span></th>
-                        <th onclick="sortTable('amount.sample')">金额 <span class="sort-icon" id="sort-amount.sample"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable('amount.sample')">价格 <span class="sort-icon" id="sort-amount.sample"><i class="fas fa-sort"></i></span></th>
                         <th>状态</th>
                         <th>订单时间</th>
                         <th onclick="sortTable('refund_amount')">退款 <span class="sort-icon" id="sort-refund_amount"><i class="fas fa-sort"></i></span></th>
                         <th onclick="sortTable('exchange_quantity')">换货 <span class="sort-icon" id="sort-exchange_quantity"><i class="fas fa-sort"></i></span></th>
+                        <th>评分</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -140,10 +143,11 @@
                             <p id="detail-order-time"></p>
                             <p id="detail-refunded"></p>
                             <p id="detail-exchanged"></p>
+                            <p id="detail-rating"></p>
                         </div>
                         <div class="order-actions">
                             <button class="action-btn" onclick="downloadOrder()"><i class="fas fa-download"></i></button>
-                            <button class="action-btn" id="ticket-btn"><i class="fas fa-ticket-alt"></i></button>
+                            <button class="action-btn" id="ticket-btn" style="display: none;"><i class="fas fa-ticket-alt"></i></button>
                         </div>
                         <div class="refund-records">
                             <h4>退款记录</h4>
@@ -180,6 +184,19 @@
                     </div>
                 </div>
             </div>
+            <div class="review-dialog" id="review-dialog" style="display: none;">
+                <div class="review-dialog-content">
+                    <div class="review-dialog-header">
+                        <h3>订单评价</h3>
+                        <button class="review-dialog-close" onclick="closeReviewDialog()">×</button>
+                    </div>
+                    <div class="review-dialog-body">
+                        <p id="review-order-id"></p>
+                        <p id="review-rating"></p>
+                        <p id="review-content"></p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -196,8 +213,13 @@
         });
     });
 
+    // 随机整数函数
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     // 模拟订单数据
-    let allOrders = Array.from({ length: randomInt(100,500) }, () => {
+    let allOrders = Array.from({ length: randomInt(100, 500) }, () => {
         const type = faker.random.arrayElement(['demand', 'item', 'posts']);
         const refundRecords = Array.from({ length: faker.datatype.number({ min: 0, max: 2 }) }, () => ({
             id: faker.datatype.number({ min: 1000, max: 9999 }),
@@ -214,6 +236,7 @@
             apply_time: faker.date.recent(30).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
             complete_time: faker.date.recent(15).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
         }));
+        const hasRating = Math.random() < 0.2;
         return {
             id: { sample: faker.datatype.number({ min: 1000, max: 9999 }) },
             user_info: faker.name.findName(),
@@ -231,7 +254,10 @@
             refund_quantity: refundRecords.reduce((sum, r) => sum + (r.status === '已处理' ? r.quantity : 0), 0),
             refund_count: refundRecords.filter(r => r.status === '已处理').length,
             exchange_quantity: exchangeRecords.reduce((sum, r) => sum + (r.status === '已完成' ? r.quantity : 0), 0),
-            exchange_count: exchangeRecords.filter(r => r.status === '已完成').length
+            exchange_count: exchangeRecords.filter(r => r.status === '已完成').length,
+            has_ticket: Math.random() < 0.2,
+            rating: hasRating ? faker.datatype.number({ min: 1, max: 5 }) : null,
+            review_content: hasRating ? faker.lorem.sentence(10) : null
         };
     });
 
@@ -276,6 +302,7 @@
             const displayName = `${itemType}：${order.item_name}`;
             const refundDisplay = order.refund_count > 0 ? `$${order.refund_amount} (${order.refund_count}件, ${order.refund_quantity}件)` : '--';
             const exchangeDisplay = order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count}件)` : '--';
+            const ratingDisplay = order.rating ? `${order.rating}` : '--';
             return `
                 <tr>
                     <td>${order.id.sample}</td>
@@ -285,12 +312,13 @@
                     <td>${order.amount.sample}</td>
                     <td class="status-${order.status}">${order.status}</td>
                     <td>${order.paid_time}</td>
-                    <td class="aftersales">${refundDisplay}${order.refund_count > 0 ? `<button class="download-aftersales-btn" onclick="downloadRefund(${order.id.sample})"><i class="fas fa-download"></i></button>` : ''}</td>
-                    <td class="aftersales">${exchangeDisplay}${order.exchange_count > 0 ? `<button class="download-aftersales-btn" onclick="downloadExchange(${order.id.sample})"><i class="fas fa-download"></i></button>` : ''}</td>
+                    <td class="aftersales">${refundDisplay}${order.refund_count > 0 && !order.posts_id ? `<button class="download-aftersales-btn" onclick="downloadRefund(${order.id.sample})"><i class="fas fa-download"></i></button>` : ''}</td>
+                    <td class="aftersales">${exchangeDisplay}${order.exchange_count > 0 && !order.posts_id ? `<button class="download-aftersales-btn" onclick="downloadExchange(${order.id.sample})"><i class="fas fa-download"></i></button>` : ''}</td>
+                    <td>${ratingDisplay}${order.rating ? `<button class="review-btn" onclick="showReviewModal(${order.id.sample})"><i class="fas fa-star"></i></button>` : ''}</td>
                     <td class="actions">
                         <button class="action-btn" onclick="showOrderDetails(${order.id.sample})"><i class="fas fa-eye"></i></button>
                         <button class="action-btn" onclick="downloadOrder(${order.id.sample})"><i class="fas fa-download"></i></button>
-                        <button class="action-btn" onclick="openChatDialog(${order.id.sample})"><i class="fas fa-ticket-alt"></i></button>
+                        ${order.has_ticket ? `<button class="action-btn" onclick="openChatDialog(${order.id.sample})"><i class="fas fa-ticket-alt"></i></button>` : ''}
                     </td>
                 </tr>
             `;
@@ -423,11 +451,12 @@
         document.getElementById('detail-user-info').textContent = `用户信息: ${order.user_info}`;
         document.getElementById('detail-item-name').textContent = `商品信息: ${itemType}：${order.item_name}`;
         document.getElementById('detail-quantity').textContent = `数量: ${order.quantity.sample}`;
-        document.getElementById('detail-price').textContent = `金额: ${order.amount.sample}`;
+        document.getElementById('detail-price').textContent = `价格: ${order.amount.sample}`;
         document.getElementById('detail-status').textContent = `状态: ${order.status}`;
         document.getElementById('detail-order-time').textContent = `订单时间: ${order.paid_time}`;
         document.getElementById('detail-refunded').textContent = `退款: ${order.refund_count > 0 ? `$${order.refund_amount} (${order.refund_count}件, ${order.refund_quantity}件)` : '--'}`;
         document.getElementById('detail-exchanged').textContent = `换货: ${order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count}件)` : '--'}`;
+        document.getElementById('detail-rating').textContent = `评分: ${order.rating ? order.rating : '--'}`;
 
         const refundBody = document.getElementById('refund-records-body');
         refundBody.innerHTML = order.refund_records.map(record => `
@@ -453,8 +482,26 @@
             </tr>
         `).join('');
 
-        document.getElementById('ticket-btn').setAttribute('onclick', `openChatDialog(${orderId})`);
+        const ticketBtn = document.getElementById('ticket-btn');
+        ticketBtn.style.display = order.has_ticket ? 'inline-block' : 'none';
+        if (order.has_ticket) ticketBtn.setAttribute('onclick', `openChatDialog(${orderId})`);
         document.getElementById('order-details-dialog').style.display = 'flex';
+    }
+
+    // 显示评价弹窗
+    function showReviewModal(orderId) {
+        const order = allOrders.find(o => o.id.sample === orderId);
+        if (!order || !order.rating) return;
+
+        document.getElementById('review-order-id').textContent = `订单ID: ${order.id.sample}`;
+        document.getElementById('review-rating').textContent = `评分: ${order.rating} 星`;
+        document.getElementById('review-content').textContent = `评价内容: ${order.review_content}`;
+        document.getElementById('review-dialog').style.display = 'flex';
+    }
+
+    // 关闭评价弹窗
+    function closeReviewDialog() {
+        document.getElementById('review-dialog').style.display = 'none';
     }
 
     // 关闭订单详情弹窗
@@ -473,11 +520,12 @@
 用户信息: ${order.user_info}
 商品信息: ${itemType}：${order.item_name}
 数量: ${order.quantity.sample}
-金额: ${order.amount.sample}
+价格: ${order.amount.sample}
 状态: ${order.status}
 订单时间: ${order.paid_time}
 退款: ${order.refund_count > 0 ? `$${order.refund_amount} (${order.refund_count}件, ${order.refund_quantity}件)` : '--'}
 换货: ${order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count}件)` : '--'}
+评分: ${order.rating ? order.rating : '--'}
         `;
         const blob = new Blob([content], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
