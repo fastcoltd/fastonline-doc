@@ -42,6 +42,8 @@
         .wallet-table .action-btn:hover {background:#1C86EE;}
         .wallet-table .status-0 {color:#808080;}
         .wallet-table .status-1 {color:#32CD32;}
+        .wallet-table .default-0 {color:#808080;}
+        .wallet-table .default-1 {color:#32CD32;}
         .add-wallet-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;margin-bottom:1em;}
         .add-wallet-btn:hover {background:#45a049;}
         .wallet-dialog {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:center;}
@@ -96,6 +98,7 @@
                         <th>姓名</th>
                         <th>收款账户</th>
                         <th onclick="sortTable('status')">状态 <span class="sort-icon" id="sort-status"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable('is_default')">默认 <span class="sort-icon" id="sort-is_default"><i class="fas fa-sort"></i></span></th>
                         <th onclick="sortTable('create_time')">创建时间 <span class="sort-icon" id="sort-create_time"><i class="fas fa-sort"></i></span></th>
                         <th>操作</th>
                     </tr>
@@ -150,6 +153,13 @@
                             <select id="edit-status">
                                 <option value="0">禁用</option>
                                 <option value="1">启用</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>默认钱包</label>
+                            <select id="edit-is_default">
+                                <option value="0">否</option>
+                                <option value="1">是</option>
                             </select>
                         </div>
                         <button class="action-btn-save" onclick="saveWallet()">保存</button>
@@ -270,7 +280,7 @@
             sortedWallets.sort((a, b) => {
                 let valA = a[sortField] || 0;
                 let valB = b[sortField] || 0;
-                if (sortField === 'id' || sortField === 'status' || sortField === 'wallet_type' || sortField === 'create_time') {
+                if (sortField === 'id' || sortField === 'status' || sortField === 'wallet_type' || sortField === 'is_default' || sortField === 'create_time') {
                     valA = parseInt(valA) || 0;
                     valB = parseInt(valB) || 0;
                 }
@@ -294,6 +304,7 @@
                     <td>${fullName || '--'}</td>
                     <td>${wallet.receive_account}</td>
                     <td class="status-${wallet.status}">${wallet.status === 0 ? '禁用' : '启用'}</td>
+                    <td class="default-${wallet.is_default}">${wallet.is_default === 1 ? '是' : '否'}</td>
                     <td>${new Date(wallet.create_time * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
                     <td class="actions">
                         <button class="action-btn" title="编辑钱包" onclick="editWallet(${wallet.id})"><i class="fas fa-edit"></i></button>
@@ -357,7 +368,7 @@
 
     // 更新排序指示器
     function updateSortIndicators() {
-        ['id', 'status', 'wallet_type', 'create_time'].forEach(field => {
+        ['id', 'status', 'wallet_type', 'is_default', 'create_time'].forEach(field => {
             const sortIcon = document.getElementById(`sort-${field}`);
             if (sortIcon) {
                 const icon = sortIcon.querySelector('i');
@@ -407,6 +418,7 @@
         document.getElementById('edit-last_name').value = '';
         document.getElementById('edit-receive_account').value = '';
         document.getElementById('edit-status').value = '1';
+        document.getElementById('edit-is_default').value = '0';
         document.getElementById('wallet-edit-dialog').style.display = 'flex';
     }
 
@@ -424,6 +436,7 @@
         document.getElementById('edit-last_name').value = wallet.last_name || '';
         document.getElementById('edit-receive_account').value = wallet.receive_account;
         document.getElementById('edit-status').value = wallet.status;
+        document.getElementById('edit-is_default').value = wallet.is_default;
         document.getElementById('wallet-edit-dialog').style.display = 'flex';
     }
 
@@ -437,7 +450,8 @@
             middle_name: document.getElementById('edit-middle_name').value.trim() || null,
             last_name: document.getElementById('edit-last_name').value.trim() || null,
             receive_account: document.getElementById('edit-receive_account').value.trim(),
-            status: parseInt(document.getElementById('edit-status').value)
+            status: parseInt(document.getElementById('edit-status').value),
+            is_default: parseInt(document.getElementById('edit-is_default').value)
         };
 
         if (!walletData.wallet_name || !walletData.receive_account) {

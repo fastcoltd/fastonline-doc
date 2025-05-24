@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品管理</title>
+    <title>商品编辑</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.16/antd.min.css">
     <link rel="stylesheet" href="/site/_site.css">
     <link rel="stylesheet" href="/site/store/_store.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="/site/_fields.js"></script>
     <script src="/site/_data.js"></script>
     <script src="/site/_location.js"></script>
@@ -21,47 +19,19 @@
     <style>
         .tips {background:#fefcbf;border:1px solid #f6e05e;border-radius:0.25em;padding:1em;margin-bottom:1em;}
         .tips p {margin:0;color:#744210;}
-        .item-manage-container {padding:1em;}
-        .item-filter {display:flex;gap:0.5em;margin-bottom:1em;align-items:center;}
-        .item-filter input, .item-filter select {padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;width:100px;}
-        .item-filter .ant-input {padding:0.5em;margin-bottom:0.25em;}
-        .item-filter .filter-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
-        .item-filter .filter-btn:hover {background:#45a049;}
-        .item-filter .clear-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#FF4500;color:#fff;border:none;font-size:0.875em;}
-        .item-filter .clear-btn:hover {background:#D63B00;}
-        .item-table {width:100%;border-collapse:collapse;}
-        .item-table th, .item-table td {padding:0.75em;border:1px solid #d9d9d9;text-align:left;}
-        .item-table th {background:#f5f5f5;font-weight:bold;cursor:pointer;white-space:nowrap;}
-        .item-table th:hover {background:#e5e5e5;}
-        .item-table th .sort-icon {margin-left:0.3em;display:inline-flex;align-items:center;}
-        .item-table th .sort-icon i {font-size:0.75em;color:#6b7280;}
-        .item-table th .sort-icon i.sort-active {color:#4CAF50;}
-        .item-table td {font-size:0.875em;}
-        .item-table td.actions {white-space:nowrap;}
-        .item-table .action-btn {padding:0.3em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.875em;margin-right:0.3em;}
-        .item-table .action-btn:hover {background:#1C86EE;}
-        .item-table .sort-btn {padding:0.2em;border-radius:0.25em;cursor:pointer;background:#6b7280;color:#fff;border:none;font-size:0.75em;margin-right:0.2em;}
-        .item-table .sort-btn:hover {background:#4b5563;}
-        .item-table .status-0 {color:#808080;}
-        .item-table .status-1 {color:#32CD32;}
-        .item-table .stock-low {color:#FF4500;}
-        .item-table .stock-medium {color:#FFA500;}
-        .item-table .stock-high {color:#32CD32;}
-        .language-set {background:#e6ffed;}
-        .language-unset {background:#f5f5f5;}
-        .item-dialog {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:center;}
-        .item-dialog-content {background:#fff;border-radius:0.5em;width:50%;max-width:50vw;min-width:20em;max-height:80vh;box-shadow:0 0.25em 0.5em rgba(0,0,0,0.2);overflow-y:auto;}
-        .item-dialog-header {padding:0.75em 1em;border-bottom:1px solid #d9d9d9;background:#f5f5f5;display:flex;justify-content:space-between;align-items:center;}
-        .item-dialog-header h3 {margin:0;font-size:1.25em;color:#1f2937;}
-        .item-dialog-close {background:none;border:none;font-size:1.2em;cursor:pointer;color:#6b7280;}
-        .item-dialog-close:hover {color:#f59e0b;}
-        .item-dialog-body {padding:1em;}
+        .item-edit-container {padding:1em;}
         .form-group {flex:1;min-width:0;display:flex;align-items:center;margin-bottom:0.75em;}
         .form-group label {width:100px;font-size:0.875em;color:#1f2937;white-space:nowrap;text-align:right;margin-right:0.5em;}
         .form-group input, .form-group select, .form-group textarea {flex:1;padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;}
         .form-group textarea {height:6em;resize:vertical;}
-        .action-btn-save {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
+        .form-section {margin-bottom:1.5em;}
+        .form-section h3 {font-size:1.1em;color:#1f2937;margin-bottom:0.5em;}
+        .action-btn-save {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;margin-right:0.5em;}
         .action-btn-save:hover {background:#45a049;}
+        .action-btn-cancel {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#FF4500;color:#fff;border:none;font-size:0.875em;}
+        .action-btn-cancel:hover {background:#D63B00;}
+        .language-set {background:#e6ffed;}
+        .language-unset {background:#f5f5f5;}
     </style>
 </head>
 <body>
@@ -71,100 +41,85 @@
     <div class="sidebar-main-wrapper">
         <div w3-include-html="/site/store/_sidebar.html"></div>
         <div class="main-content">
-            <h2>商品管理</h2>
-            <div class="item-manage-container">
-                <div class="item-filter">
-                    <input type="text" id="filter-search" placeholder="商品名/ID">
-                    <select id="filter-brand">
-                        <option value="">全部品牌</option>
-                    </select>
-                    <select id="filter-status">
-                        <option value="">全部状态</option>
-                        <option value="0">禁用</option>
-                        <option value="1">启用</option>
-                    </select>
-                    <button class="filter-btn" onclick="applyFilters()">确定</button>
-                    <button class="clear-btn" onclick="clearFilters()">清空条件</button>
+            <h2 id="page-title">添加商品</h2>
+            <div class="item-edit-container">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label>选择语言</label>
+                        <select id="language-selector"></select>
+                    </div>
                 </div>
-                <table class="item-table">
-                    <thead>
-                    <tr>
-                        <th onclick="sortTable('id')">商品ID <span class="sort-icon" id="sort-id"><i class="fas fa-sort"></i></span></th>
-                        <th>品牌</th>
-                        <th>商品名</th>
-                        <th onclick="sortTable('price')">价格 <span class="sort-icon" id="sort-price"><i class="fas fa-sort"></i></span></th>
-                        <th>发货方式</th>
-                        <th onclick="sortTable('stock_quantity')">库存 <span class="sort-icon" id="sort-stock_quantity"><i class="fas fa-sort"></i></span></th>
-                        <th>评价</th>
-                        <th onclick="sortTable('after_sales_time')">售后时间 <span class="sort-icon" id="sort-after_sales_time"><i class="fas fa-sort"></i></span></th>
-                        <th onclick="sortTable('sort_index')">排序 <span class="sort-icon" id="sort-sort_index"><i class="fas fa-sort"></i></span></th>
-                        <th>状态</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tbody id="item-table-body"></tbody>
-                </table>
-                <div class="pagination" id="pagination"></div>
-            </div>
-            <div class="item-dialog" id="item-edit-dialog" style="display: none;">
-                <div class="item-dialog-content">
-                    <div class="item-dialog-header">
-                        <h3>编辑商品</h3>
-                        <button class="item-dialog-close" onclick="closeItemDialog('item-edit-dialog')">×</button>
+                <div class="form-section">
+                    <h3>商品信息</h3>
+                    <div class="form-group">
+                        <label>品牌</label>
+                        <select id="edit-brand_id"></select>
                     </div>
-                    <div class="item-dialog-body">
-                        <div class="form-group">
-                            <label>选择语言</label>
-                            <select id="language-selector"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>商品名称</label>
-                            <input type="text" id="edit-name">
-                        </div>
-                        <div class="form-group">
-                            <label>SEO关键词</label>
-                            <input type="text" id="edit-seo_keywords">
-                        </div>
-                        <div class="form-group">
-                            <label>SEO描述</label>
-                            <input type="text" id="edit-seo_description">
-                        </div>
-                        <div class="form-group">
-                            <label>售后规则</label>
-                            <textarea id="edit-after_sales_rules"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>价格</label>
-                            <input type="number" id="edit-price" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>发货方式</label>
-                            <select id="edit-delivery_type">
-                                <option value="0">标准运输</option>
-                                <option value="1">快速运输</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>库存数量</label>
-                            <input type="number" id="edit-stock_quantity" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>低库存提醒</label>
-                            <input type="number" id="edit-lower_notice_quantity" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>售后时间</label>
-                            <input type="number" id="edit-after_sales_time" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>状态</label>
-                            <select id="edit-status">
-                                <option value="0">禁用</option>
-                                <option value="1">启用</option>
-                            </select>
-                        </div>
-                        <button class="action-btn-save" onclick="saveItem()">保存</button>
+                    <div class="form-group">
+                        <label>服务</label>
+                        <select id="edit-services_id"></select>
                     </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="edit-status">
+                            <option value="0">禁用</option>
+                            <option value="1">启用</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>发货方式</label>
+                        <select id="edit-delivery_type">
+                            <option value="0">标准运输</option>
+                            <option value="1">快速运输</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>库存数量</label>
+                        <input type="number" id="edit-stock_quantity" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>低库存提醒</label>
+                        <input type="number" id="edit-lower_notice_quantity" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>售后时间(秒)</label>
+                        <input type="number" id="edit-after_sales_time" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>价格</label>
+                        <input type="number" id="edit-price" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>原价</label>
+                        <input type="number" id="edit-original_price" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>保质期(天)</label>
+                        <input type="number" id="edit-shelf_life" min="1">
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h3>多语言信息</h3>
+                    <div class="form-group">
+                        <label>商品名称</label>
+                        <input type="text" id="edit-name">
+                    </div>
+                    <div class="form-group">
+                        <label>SEO关键词</label>
+                        <input type="text" id="edit-seo_keywords">
+                    </div>
+                    <div class="form-group">
+                        <label>SEO描述</label>
+                        <input type="text" id="edit-seo_description">
+                    </div>
+                    <div class="form-group">
+                        <label>售后规则</label>
+                        <textarea id="edit-after_sales_rules"></textarea>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <button class="action-btn-save" onclick="saveItem()">保存</button>
+                    <button class="action-btn-cancel" onclick="cancelEdit()">取消</button>
                 </div>
             </div>
         </div>
@@ -177,386 +132,164 @@
             initSidebar();
             InitSidebarContent();
             initStoreMessages();
-            initializeItems();
-            initializeFilters();
-            renderItemList();
+            initializeForm();
         });
     });
 
-    // 模拟商品数据
-    let allItems = Array.from({ length: randomInt(10, 30) }, () => {
-        const brand = hotBrands[randomInt(0, hotBrands.length - 1)];
-        const service = services[randomInt(0, services.length - 1)];
-        const stockQuantity = randomInt(0, 1000);
-        const dealAvgCount = randomInt(0, 10);
-        const sellableDays = dealAvgCount === 0 ? Infinity : Math.floor(stockQuantity / dealAvgCount);
-        const afterSalesTime = randomInt(3600, 30 * 24 * 3600); // 1h to 30d
-        const itemLang = {};
-        window.languages.forEach(lang => {
-            const langCode = `${lang.code}_US`;
-            itemLang[langCode] = {
-                id: faker.datatype.number({ min: 10000, max: 99999 }),
-                item_id: 0, // Set later
-                status: 1,
-                version: 1,
-                language: langCode,
-                seo_keywords: faker.lorem.words(5),
-                seo_description: faker.lorem.sentence(10),
-                name: faker.commerce.productName(),
-                after_sales_rules: faker.lorem.paragraph(2),
-                sample_pics: '[]',
-                content: faker.lorem.paragraph(3),
-                create_time: Math.floor(Date.now() / 1000) - randomInt(0, 30 * 24 * 3600),
-                update_time: Math.floor(Date.now() / 1000),
-                site_reply: Math.random() > 0.7 ? faker.lorem.sentence(10) : ''
-            };
-        });
-        const item = {
-            id: faker.datatype.number({ min: 1000, max: 9999 }),
-            user_id: faker.datatype.number({ min: 1, max: 10000 }),
-            store_id: faker.datatype.number({ min: 1000, max: 9999 }),
-            brand_id: brand.id,
-            services_id: service.id,
-            status: faker.random.arrayElement([0, 1]),
-            delivery_type: randomInt(0, 1),
-            sort_index: 0, // Set later
-            stock_quantity: stockQuantity,
-            lower_notice_quantity: randomInt(10, 100),
-            shelf_life: randomInt(1, 5),
-            after_sales_time: afterSalesTime,
-            price: parseFloat(faker.finance.amount(10, 1000, 2)),
-            original_price: parseFloat(faker.finance.amount(10, 1000, 2)),
-            custom_url: faker.internet.url().replace(/^https?:\/\//, ''),
-            cover_pic: faker.image.imageUrl(100, 100, 'product'),
-            field_list: '[]',
-            choose_field_index: 0,
-            last_restock_time: Math.floor(Date.now() / 1000) - randomInt(0, 30 * 24 * 3600),
-            create_time: Math.floor(Date.now() / 1000) - randomInt(0, 30 * 24 * 3600),
-            update_time: Math.floor(Date.now() / 1000),
-            item_lang: itemLang,
-            item_stat: {
-                rating: parseFloat(faker.finance.amount(1, 5, 2)),
-                comment_count: randomInt(0, 100),
-                deal_avg_count: dealAvgCount,
-                sellable_days: sellableDays
-            }
-        };
-        return item;
-    });
-
-    // Set sort_index sequentially
-    allItems.forEach((item, index) => {
-        item.sort_index = index;
-    });
-
-    let currentPage = 1;
-    const pageSize = 20;
-    let sortField = null;
-    let sortDirection = 'asc';
-    let currentFilteredItems = null;
-    let currentItemId = null;
+    let currentItem = null;
+    let currentLangCode = 'en_US';
+    const itemId = new URLSearchParams(window.location.search).get('id');
 
     // 随机整数函数
     function randomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // 初始化筛选器
-    function initializeFilters() {
-        const brandSelect = document.getElementById('filter-brand');
-        brandSelect.innerHTML = `<option value="">全部品牌</option>` +
+    // 初始化表单
+    function initializeForm() {
+        // 加载品牌和服务
+        const brandSelect = document.getElementById('edit-brand_id');
+        brandSelect.innerHTML = `<option value="">选择品牌</option>` +
             hotBrands.map(brand => `<option value="${brand.id}">${brand.name}</option>`).join('');
-        flatpickr('#filter-order-time-start', { dateFormat: 'Y-m-d' });
-        flatpickr('#filter-order-time-end', { dateFormat: 'Y-m-d' });
-    }
 
-    // 渲染商品列表
-    function renderItemList() {
-        const tbody = document.getElementById('item-table-body');
-        const pagination = document.getElementById('pagination');
+        const serviceSelect = document.getElementById('edit-services_id');
+        serviceSelect.innerHTML = `<option value="">选择服务</option>` +
+            services.map(service => `<option value="${service.id}">${service.name}</option>`).join('');
 
-        const items = currentFilteredItems || allItems;
-        let sortedItems = [...items];
-        if (sortField) {
-            sortedItems.sort((a, b) => {
-                let valA = a[sortField] || a[sortField.split('.')[0]][sortField.split('.')[1]] || 0;
-                let valB = b[sortField] || b[sortField.split('.')[0]][sortField.split('.')[1]] || 0;
-                if (sortField === 'price') {
-                    valA = parseFloat(valA);
-                    valB = parseFloat(valB);
-                }
-                return sortDirection === 'asc' ? valA - valB : valB - valA;
-            });
-        }
-
-        const totalPages = Math.ceil(sortedItems.length / pageSize);
-        const startIndex = (currentPage - 1) * pageSize;
-        const paginatedItems = sortedItems.slice(startIndex, startIndex + pageSize);
-
-        tbody.innerHTML = paginatedItems.map((item, index) => {
-            const langCode = document.getElementById('language-selector')?.value || 'en_US';
-            const langData = item.item_lang[langCode] || {};
-            const brand = hotBrands.find(b => b.id === item.brand_id) || { name: 'Unknown', theme_color: '#000' };
-            const service = services.find(s => s.id === item.services_id) || { name: 'Unknown' };
-            const sellableDays = item.item_stat.sellable_days === Infinity ? '>30' : item.item_stat.sellable_days;
-            const stockClass = sellableDays === '>30' || sellableDays > 10 ? 'stock-high' : sellableDays > 5 ? 'stock-medium' : 'stock-low';
-            const afterSalesDisplay = item.after_sales_time < 24 * 3600 ? `${Math.floor(item.after_sales_time / 3600)}h` : `${Math.floor(item.after_sales_time / (24 * 3600))}d`;
-            return `
-                <tr>
-                    <td>${item.id}</td>
-                    <td style="color:${brand.theme_color}">${brand.name} (${service.name})</td>
-                    <td>${langData.name || '未设置'}</td>
-                    <td>$${item.price.toFixed(2)}</td>
-                    <td>${item.delivery_type === 0 ? '标准运输' : '快速运输'}</td>
-                    <td class="${stockClass}">${item.stock_quantity} (${sellableDays}天)</td>
-                    <td>${item.item_stat.rating.toFixed(1)} (${item.item_stat.comment_count})</td>
-                    <td>${afterSalesDisplay}</td>
-                    <td>
-                        <button class="sort-btn" onclick="moveItemUp(${item.id})" ${index === 0 ? 'disabled' : ''}><i class="fas fa-arrow-up"></i></button>
-                        <button class="sort-btn" onclick="moveItemDown(${item.id})" ${index === paginatedItems.length - 1 ? 'disabled' : ''}><i class="fas fa-arrow-down"></i></button>
-                        <button class="sort-btn" onclick="moveItemTop(${item.id})"><i class="fas fa-angle-double-up"></i></button>
-                        <button class="sort-btn" onclick="moveItemBottom(${item.id})"><i class="fas fa-angle-double-down"></i></button>
-                    </td>
-                    <td class="status-${item.status}">${item.status === 0 ? '禁用' : '启用'}</td>
-                    <td class="actions">
-                        <button class="action-btn" onclick="restockItem(${item.id})"><i class="fas fa-plus-circle"></i></button>
-                        <button class="action-btn" onclick="editItem(${item.id})"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn" onclick="viewItem('${encodeURIComponent(langData.name || '未设置')}')"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn" onclick="addStock(${item.id})"><i class="fas fa-cart-plus"></i></button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-
-        pagination.innerHTML = renderPagination(totalPages);
-        updateSortIndicators();
-    }
-
-    // 渲染分页
-    function renderPagination(totalPages) {
-        if (totalPages <= 1) return '';
-        const pages = [];
-        if (totalPages <= 7) {
-            for (let i = 1; i <= totalPages; i++) {
-                pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
-            }
-        } else {
-            pages.push(`<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`);
-            for (let i = 1; i <= 3; i++) {
-                pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
-            }
-            if (currentPage > 5) pages.push('<span class="ellipsis">...</span>');
-            for (let i = Math.max(4, currentPage - 1); i <= Math.min(totalPages - 3, currentPage + 1); i++) {
-                if (i > 3 && i < totalPages - 2) {
-                    pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
-                }
-            }
-            if (currentPage < totalPages - 4) pages.push('<span class="ellipsis">...</span>');
-            for (let i = totalPages - 2; i <= totalPages; i++) {
-                pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
-            }
-            pages.push(`<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`);
-        }
-        return pages.join('');
-    }
-
-    // 切换页面
-    function changePage(page) {
-        const totalPages = Math.ceil((currentFilteredItems || allItems).length / pageSize);
-        if (page >= 1 && page <= totalPages) {
-            currentPage = page;
-            renderItemList();
-        }
-    }
-
-    // 排序表格
-    function sortTable(field) {
-        if (sortField === field) {
-            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            sortField = field;
-            sortDirection = 'asc';
-        }
-        renderItemList();
-    }
-
-    // 更新排序指示器
-    function updateSortIndicators() {
-        ['id', 'price', 'stock_quantity', 'after_sales_time', 'sort_index'].forEach(field => {
-            const sortIcon = document.getElementById(`sort-${field}`);
-            if (sortIcon) {
-                const icon = sortIcon.querySelector('i');
-                icon.className = 'fas ' + (sortField === field ? (sortDirection === 'asc' ? 'fa-sort-up sort-active' : 'fa-sort-down sort-active') : 'fa-sort');
-            }
-        });
-    }
-
-    // 应用筛选条件
-    function applyFilters() {
-        const searchFilter = document.getElementById('filter-search').value.trim().toLowerCase();
-        const brandFilter = document.getElementById('filter-brand').value;
-        const statusFilter = document.getElementById('filter-status').value;
-
-        currentFilteredItems = allItems.filter(item => {
-            const langCode = document.getElementById('language-selector')?.value || 'en_US';
-            const langData = item.item_lang[langCode] || {};
-            const matchesSearch = searchFilter ? (
-                item.id.toString().includes(searchFilter) ||
-                langData.name?.toLowerCase().includes(searchFilter)
-            ) : true;
-            const matchesBrand = brandFilter ? item.brand_id.toString() === brandFilter : true;
-            const matchesStatus = statusFilter ? item.status.toString() === statusFilter : true;
-            return matchesSearch && matchesBrand && matchesStatus;
-        });
-
-        currentPage = 1;
-        renderItemList();
-    }
-
-    // 清空筛选条件
-    function clearFilters() {
-        document.getElementById('filter-search').value = '';
-        document.getElementById('filter-brand').value = '';
-        document.getElementById('filter-status').value = '';
-        currentFilteredItems = null;
-        currentPage = 1;
-        renderItemList();
-    }
-
-    // 移动商品向上
-    function moveItemUp(itemId) {
-        const index = allItems.findIndex(item => item.id === itemId);
-        if (index > 0) {
-            const temp = allItems[index].sort_index;
-            allItems[index].sort_index = allItems[index - 1].sort_index;
-            allItems[index - 1].sort_index = temp;
-            [allItems[index], allItems[index - 1]] = [allItems[index - 1], allItems[index]];
-            renderItemList();
-        }
-    }
-
-    // 移动商品向下
-    function moveItemDown(itemId) {
-        const index = allItems.findIndex(item => item.id === itemId);
-        if (index < allItems.length - 1) {
-            const temp = allItems[index].sort_index;
-            allItems[index].sort_index = allItems[index + 1].sort_index;
-            allItems[index + 1].sort_index = temp;
-            [allItems[index], allItems[index + 1]] = [allItems[index + 1], allItems[index]];
-            renderItemList();
-        }
-    }
-
-    // 置顶商品
-    function moveItemTop(itemId) {
-        const index = allItems.findIndex(item => item.id === itemId);
-        if (index > 0) {
-            allItems.splice(0, 0, allItems.splice(index, 1)[0]);
-            allItems.forEach((item, i) => item.sort_index = i);
-            renderItemList();
-        }
-    }
-
-    // 置底商品
-    function moveItemBottom(itemId) {
-        const index = allItems.findIndex(item => item.id === itemId);
-        if (index < allItems.length - 1) {
-            allItems.push(allItems.splice(index, 1)[0]);
-            allItems.forEach((item, i) => item.sort_index = i);
-            renderItemList();
-        }
-    }
-
-    // 入库商品
-    function restockItem(itemId) {
-        const item = allItems.find(item => item.id === itemId);
-        if (item) {
-            item.stock_quantity += randomInt(10, 100);
-            item.last_restock_time = Math.floor(Date.now() / 1000);
-            alert(`商品 ${item.id} 已入库，新增库存 ${randomInt(10, 100)}`);
-            renderItemList();
-        }
-    }
-
-    // 编辑商品
-    function editItem(itemId) {
-        currentItemId = itemId;
-        const item = allItems.find(item => item.id === itemId);
-        if (!item) return;
-
+        // 加载语言选择器
         const langSelect = document.getElementById('language-selector');
         langSelect.innerHTML = window.languages.map(lang => {
             const langCode = `${lang.code}_US`;
-            const isSet = item.item_lang[langCode]?.name ? '已设置' : '未设置';
+            const isSet = itemId && allItems.find(item => item.id == itemId)?.item_lang[langCode]?.name ? '已设置' : '未设置';
             const className = isSet === '已设置' ? 'language-set' : 'language-unset';
             return `<option value="${langCode}" class="${className}">${lang.name} (${langCode}) - ${isSet}</option>`;
         }).join('');
+        langSelect.addEventListener('change', updateLangFields);
 
-        const langCode = langSelect.value || 'en_US';
-        const langData = item.item_lang[langCode] || {};
+        // 判断添加或编辑
+        if (itemId) {
+            document.getElementById('page-title').textContent = '编辑商品';
+            currentItem = allItems.find(item => item.id == itemId);
+            if (currentItem) {
+                loadItemData();
+            } else {
+                alert('商品不存在！');
+                window.location.href = '/site/store/item-manage.html';
+            }
+        } else {
+            currentItem = {
+                item_lang: {}
+            };
+            window.languages.forEach(lang => {
+                const langCode = `${lang.code}_US`;
+                currentItem.item_lang[langCode] = {
+                    name: '',
+                    seo_keywords: '',
+                    seo_description: '',
+                    after_sales_rules: ''
+                };
+            });
+            updateLangFields();
+        }
+    }
+
+    // 加载商品数据
+    function loadItemData() {
+        document.getElementById('edit-brand_id').value = currentItem.brand_id || '';
+        document.getElementById('edit-services_id').value = currentItem.services_id || '';
+        document.getElementById('edit-status').value = currentItem.status || '0';
+        document.getElementById('edit-delivery_type').value = currentItem.delivery_type || '0';
+        document.getElementById('edit-stock_quantity').value = currentItem.stock_quantity || '0';
+        document.getElementById('edit-lower_notice_quantity').value = currentItem.lower_notice_quantity || '0';
+        document.getElementById('edit-after_sales_time').value = currentItem.after_sales_time || '0';
+        document.getElementById('edit-price').value = currentItem.price || '0';
+        document.getElementById('edit-original_price').value = currentItem.original_price || '0';
+        document.getElementById('edit-shelf_life').value = currentItem.shelf_life || '1';
+        updateLangFields();
+    }
+
+    // 更新多语言字段
+    function updateLangFields() {
+        currentLangCode = document.getElementById('language-selector').value;
+        const langData = currentItem.item_lang[currentLangCode] || {};
         document.getElementById('edit-name').value = langData.name || '';
         document.getElementById('edit-seo_keywords').value = langData.seo_keywords || '';
         document.getElementById('edit-seo_description').value = langData.seo_description || '';
         document.getElementById('edit-after_sales_rules').value = langData.after_sales_rules || '';
-        document.getElementById('edit-price').value = item.price;
-        document.getElementById('edit-delivery_type').value = item.delivery_type;
-        document.getElementById('edit-stock_quantity').value = item.stock_quantity;
-        document.getElementById('edit-lower_notice_quantity').value = item.lower_notice_quantity;
-        document.getElementById('edit-after_sales_time').value = item.after_sales_time;
-        document.getElementById('edit-status').value = item.status;
-
-        document.getElementById('item-edit-dialog').style.display = 'flex';
     }
 
     // 保存商品
     function saveItem() {
-        const item = allItems.find(item => item.id === currentItemId);
-        if (!item) return;
+        const itemData = {
+            brand_id: parseInt(document.getElementById('edit-brand_id').value) || 0,
+            services_id: parseInt(document.getElementById('edit-services_id').value) || 0,
+            status: parseInt(document.getElementById('edit-status').value),
+            delivery_type: parseInt(document.getElementById('edit-delivery_type').value),
+            stock_quantity: parseInt(document.getElementById('edit-stock_quantity').value) || 0,
+            lower_notice_quantity: parseInt(document.getElementById('edit-lower_notice_quantity').value) || 0,
+            after_sales_time: parseInt(document.getElementById('edit-after_sales_time').value) || 0,
+            price: parseFloat(document.getElementById('edit-price').value) || 0,
+            original_price: parseFloat(document.getElementById('edit-original_price').value) || 0,
+            shelf_life: parseInt(document.getElementById('edit-shelf_life').value) || 1
+        };
 
-        const langCode = document.getElementById('language-selector').value;
-        item.item_lang[langCode] = item.item_lang[langCode] || {};
-        item.item_lang[langCode].name = document.getElementById('edit-name').value.trim();
-        item.item_lang[langCode].seo_keywords = document.getElementById('edit-seo_keywords').value.trim();
-        item.item_lang[langCode].seo_description = document.getElementById('edit-seo_description').value.trim();
-        item.item_lang[langCode].after_sales_rules = document.getElementById('edit-after_sales_rules').value.trim();
-        item.price = parseFloat(document.getElementById('edit-price').value) || 0;
-        item.delivery_type = parseInt(document.getElementById('edit-delivery_type').value);
-        item.stock_quantity = parseInt(document.getElementById('edit-stock_quantity').value) || 0;
-        item.lower_notice_quantity = parseInt(document.getElementById('edit-lower_notice_quantity').value) || 0;
-        item.after_sales_time = parseInt(document.getElementById('edit-after_sales_time').value) || 0;
-        item.status = parseInt(document.getElementById('edit-status').value);
-        item.update_time = Math.floor(Date.now() / 1000);
+        // 保存当前语言的多语言数据
+        currentItem.item_lang[currentLangCode] = {
+            name: document.getElementById('edit-name').value.trim(),
+            seo_keywords: document.getElementById('edit-seo_keywords').value.trim(),
+            seo_description: document.getElementById('edit-seo_description').value.trim(),
+            after_sales_rules: document.getElementById('edit-after_sales_rules').value.trim()
+        };
 
-        alert('商品信息已保存！');
-        closeItemDialog('item-edit-dialog');
-        renderItemList();
-    }
-
-    // 关闭编辑弹窗
-    function closeItemDialog(dialogId) {
-        document.getElementById(dialogId).style.display = 'none';
-    }
-
-    // 查看商品
-    function viewItem(itemName) {
-        window.location.href = `/site/item.html?name=${itemName}`;
-    }
-
-    // 添加库存
-    function addStock(itemId) {
-        const amount = prompt('请输入添加的库存数量：', '10');
-        const num = parseInt(amount);
-        if (isNaN(num) || num <= 0) {
-            alert('请输入有效的库存数量！');
+        if (!itemData.brand_id || !itemData.services_id || !currentItem.item_lang[currentLangCode].name) {
+            alert('品牌、服务和商品名称不能为空！');
             return;
         }
-        const item = allItems.find(item => item.id === itemId);
-        if (item) {
-            item.stock_quantity += num;
-            item.last_restock_time = Math.floor(Date.now() / 1000);
-            alert(`商品 ${item.id} 已添加 ${num} 库存`);
-            renderItemList();
+
+        if (itemId) {
+            // 编辑现有商品
+            const index = allItems.findIndex(item => item.id == itemId);
+            if (index !== -1) {
+                allItems[index] = {
+                    ...allItems[index],
+                    ...itemData,
+                    item_lang: currentItem.item_lang,
+                    update_time: Math.floor(Date.now() / 1000)
+                };
+            }
+        } else {
+            // 添加新商品
+            const newItem = {
+                id: faker.datatype.number({ min: 1000, max: 9999 }),
+                user_id: faker.datatype.number({ min: 1, max: 10000 }),
+                store_id: faker.datatype.number({ min: 1000, max: 9999 }),
+                ...itemData,
+                sort_index: allItems.length,
+                custom_url: faker.internet.url().replace(/^https?:\/\//, ''),
+                cover_pic: faker.image.imageUrl(100, 100, 'product'),
+                field_list: '[]',
+                choose_field_index: 0,
+                last_restock_time: Math.floor(Date.now() / 1000),
+                create_time: Math.floor(Date.now() / 1000),
+                update_time: Math.floor(Date.now() / 1000),
+                item_lang: currentItem.item_lang,
+                item_stat: {
+                    rating: parseFloat(faker.finance.amount(1, 5, 2)),
+                    comment_count: randomInt(0, 100),
+                    deal_avg_count: randomInt(0, 10),
+                    sellable_days: itemData.stock_quantity / randomInt(1, 10) || Infinity
+                }
+            };
+            allItems.push(newItem);
         }
+
+        alert('商品信息已保存！');
+        window.location.href = '/site/store/item-manage.html';
+    }
+
+    // 取消编辑
+    function cancelEdit() {
+        window.location.href = '/site/store/item-manage.html';
     }
 </script>
 </body>
