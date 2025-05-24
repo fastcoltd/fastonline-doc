@@ -128,6 +128,7 @@ let memberMenuConfig = [
             { text: "店铺KYC", icon: "fas fa-id-card", href: "/site/store/kyc.html" },
             { text: "店铺日志", icon: "fas fa-list-alt", href: "/site/store/logs.html" },
             { text: "店铺信息", icon: "fas fa-cogs", href: "/site/store/info.html" },
+            { text: "钱包管理", icon: "fas fa-money-check-alt", href: "/site/store/wallet.html"},
             { text: "博客设置", icon: "fas fa-blog", href: "/site/store/blog.html" },
             { text: "文章分类", icon: "fas fa-newspaper", href: "/site/store/posts-type.html" },
             { text: "文章管理", icon: "fas fa-newspaper", href: "/site/store/posts-manage.html" },

@@ -47,8 +47,21 @@
         .item-table .stock-low {color:#FF4500;}
         .item-table .stock-medium {color:#FFA500;}
         .item-table .stock-high {color:#32CD32;}
-        .add-item-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;margin-bottom:1em;}
-        .add-item-btn:hover {background:#45a049;}
+        .language-set {background:#e6ffed;}
+        .language-unset {background:#f5f5f5;}
+        .item-dialog {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:center;}
+        .item-dialog-content {background:#fff;border-radius:0.5em;width:50%;max-width:50vw;min-width:20em;max-height:80vh;box-shadow:0 0.25em 0.5em rgba(0,0,0,0.2);overflow-y:auto;}
+        .item-dialog-header {padding:0.75em 1em;border-bottom:1px solid #d9d9d9;background:#f5f5f5;display:flex;justify-content:space-between;align-items:center;}
+        .item-dialog-header h3 {margin:0;font-size:1.25em;color:#1f2937;}
+        .item-dialog-close {background:none;border:none;font-size:1.2em;cursor:pointer;color:#6b7280;}
+        .item-dialog-close:hover {color:#f59e0b;}
+        .item-dialog-body {padding:1em;}
+        .form-group {flex:1;min-width:0;display:flex;align-items:center;margin-bottom:0.75em;}
+        .form-group label {width:100px;font-size:0.875em;color:#1f2937;white-space:nowrap;text-align:right;margin-right:0.5em;}
+        .form-group input, .form-group select, .form-group textarea {flex:1;padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;}
+        .form-group textarea {height:6em;resize:vertical;}
+        .action-btn-save {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
+        .action-btn-save:hover {background:#45a049;}
     </style>
 </head>
 <body>
@@ -59,7 +72,6 @@
         <div w3-include-html="/site/store/_sidebar.html"></div>
         <div class="main-content">
             <h2>商品管理</h2>
-            <button class="add-item-btn" onclick="addItem()">添加商品</button>
             <div class="item-manage-container">
                 <div class="item-filter">
                     <input type="text" id="filter-search" placeholder="商品名/ID">
@@ -94,6 +106,67 @@
                 </table>
                 <div class="pagination" id="pagination"></div>
             </div>
+            <div class="item-dialog" id="item-edit-dialog" style="display: none;">
+                <div class="item-dialog-content">
+                    <div class="item-dialog-header">
+                        <h3>编辑商品</h3>
+                        <button class="item-dialog-close" onclick="closeItemDialog('item-edit-dialog')">×</button>
+                    </div>
+                    <div class="item-dialog-body">
+                        <div class="form-group">
+                            <label>选择语言</label>
+                            <select id="language-selector"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>商品名称</label>
+                            <input type="text" id="edit-name">
+                        </div>
+                        <div class="form-group">
+                            <label>SEO关键词</label>
+                            <input type="text" id="edit-seo_keywords">
+                        </div>
+                        <div class="form-group">
+                            <label>SEO描述</label>
+                            <input type="text" id="edit-seo_description">
+                        </div>
+                        <div class="form-group">
+                            <label>售后规则</label>
+                            <textarea id="edit-after_sales_rules"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>价格</label>
+                            <input type="number" id="edit-price" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>发货方式</label>
+                            <select id="edit-delivery_type">
+                                <option value="0">标准运输</option>
+                                <option value="1">快速运输</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>库存数量</label>
+                            <input type="number" id="edit-stock_quantity" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>低库存提醒</label>
+                            <input type="number" id="edit-lower_notice_quantity" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>售后时间</label>
+                            <input type="number" id="edit-after_sales_time" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>状态</label>
+                            <select id="edit-status">
+                                <option value="0">禁用</option>
+                                <option value="1">启用</option>
+                            </select>
+                        </div>
+                        <button class="action-btn-save" onclick="saveItem()">保存</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -110,12 +183,6 @@
         });
     });
 
-    // 初始化商品数据
-    function initializeItems() {
-        // Placeholder for additional initialization (e.g., fetching data, setting up configs)
-        // Currently, data is generated in allItems
-    }
-
     // 模拟商品数据
     let allItems = Array.from({ length: randomInt(10, 30) }, () => {
         const brand = hotBrands[randomInt(0, hotBrands.length - 1)];
@@ -124,13 +191,15 @@
         const dealAvgCount = randomInt(0, 10);
         const sellableDays = dealAvgCount === 0 ? Infinity : Math.floor(stockQuantity / dealAvgCount);
         const afterSalesTime = randomInt(3600, 30 * 24 * 3600); // 1h to 30d
-        const itemLang = {
-            en_US: {
+        const itemLang = {};
+        window.languages.forEach(lang => {
+            const langCode = `${lang.code}_US`;
+            itemLang[langCode] = {
                 id: faker.datatype.number({ min: 10000, max: 99999 }),
                 item_id: 0, // Set later
                 status: 1,
                 version: 1,
-                language: 'en_US',
+                language: langCode,
                 seo_keywords: faker.lorem.words(5),
                 seo_description: faker.lorem.sentence(10),
                 name: faker.commerce.productName(),
@@ -140,8 +209,8 @@
                 create_time: Math.floor(Date.now() / 1000) - randomInt(0, 30 * 24 * 3600),
                 update_time: Math.floor(Date.now() / 1000),
                 site_reply: Math.random() > 0.7 ? faker.lorem.sentence(10) : ''
-            }
-        };
+            };
+        });
         const item = {
             id: faker.datatype.number({ min: 1000, max: 9999 }),
             user_id: faker.datatype.number({ min: 1, max: 10000 }),
@@ -185,6 +254,7 @@
     let sortField = null;
     let sortDirection = 'asc';
     let currentFilteredItems = null;
+    let currentItemId = null;
 
     // 随机整数函数
     function randomInt(min, max) {
@@ -196,6 +266,8 @@
         const brandSelect = document.getElementById('filter-brand');
         brandSelect.innerHTML = `<option value="">全部品牌</option>` +
             hotBrands.map(brand => `<option value="${brand.id}">${brand.name}</option>`).join('');
+        flatpickr('#filter-order-time-start', { dateFormat: 'Y-m-d' });
+        flatpickr('#filter-order-time-end', { dateFormat: 'Y-m-d' });
     }
 
     // 渲染商品列表
@@ -207,22 +279,11 @@
         let sortedItems = [...items];
         if (sortField) {
             sortedItems.sort((a, b) => {
-                let valA, valB;
+                let valA = a[sortField] || a[sortField.split('.')[0]][sortField.split('.')[1]] || 0;
+                let valB = b[sortField] || b[sortField.split('.')[0]][sortField.split('.')[1]] || 0;
                 if (sortField === 'price') {
-                    valA = parseFloat(a.price) || 0;
-                    valB = parseFloat(b.price) || 0;
-                } else if (sortField === 'stock_quantity') {
-                    valA = parseInt(a.stock_quantity) || 0;
-                    valB = parseInt(b.stock_quantity) || 0;
-                } else if (sortField === 'after_sales_time') {
-                    valA = parseInt(a.after_sales_time) || 0;
-                    valB = parseInt(b.after_sales_time) || 0;
-                } else if (sortField === 'sort_index') {
-                    valA = parseInt(a.sort_index) || 0;
-                    valB = parseInt(b.sort_index) || 0;
-                } else if (sortField === 'id') {
-                    valA = parseInt(a.id) || 0;
-                    valB = parseInt(b.id) || 0;
+                    valA = parseFloat(valA);
+                    valB = parseFloat(valB);
                 }
                 return sortDirection === 'asc' ? valA - valB : valB - valA;
             });
@@ -233,7 +294,8 @@
         const paginatedItems = sortedItems.slice(startIndex, startIndex + pageSize);
 
         tbody.innerHTML = paginatedItems.map((item, index) => {
-            const langData = item.item_lang['en_US'] || {};
+            const langCode = document.getElementById('language-selector')?.value || 'en_US';
+            const langData = item.item_lang[langCode] || {};
             const brand = hotBrands.find(b => b.id === item.brand_id) || { name: 'Unknown', theme_color: '#000' };
             const service = services.find(s => s.id === item.services_id) || { name: 'Unknown' };
             const sellableDays = item.item_stat.sellable_days === Infinity ? '>30' : item.item_stat.sellable_days;
@@ -257,10 +319,10 @@
                     </td>
                     <td class="status-${item.status}">${item.status === 0 ? '禁用' : '启用'}</td>
                     <td class="actions">
-                        <button class="action-btn" title="编辑商品" onclick="editItem(${item.id})"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn" title="查看商品" onclick="viewItem('${encodeURIComponent(langData.name || '未设置')}')"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn" title="入库/添加库存" onclick="restockItem(${item.id}, '${encodeURIComponent(langData.name || '未设置')}')"><i class="fas fa-cart-plus"></i></button>
-                        <button class="action-btn" title="查看库存" onclick="viewStock(${item.id})"><i class="fas fa-warehouse"></i></button>
+                        <button class="action-btn" onclick="restockItem(${item.id})"><i class="fas fa-plus-circle"></i></button>
+                        <button class="action-btn" onclick="editItem(${item.id})"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn" onclick="viewItem('${encodeURIComponent(langData.name || '未设置')}')"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn" onclick="addStock(${item.id})"><i class="fas fa-cart-plus"></i></button>
                     </td>
                 </tr>
             `;
@@ -336,7 +398,8 @@
         const statusFilter = document.getElementById('filter-status').value;
 
         currentFilteredItems = allItems.filter(item => {
-            const langData = item.item_lang['en_US'] || {};
+            const langCode = document.getElementById('language-selector')?.value || 'en_US';
+            const langData = item.item_lang[langCode] || {};
             const matchesSearch = searchFilter ? (
                 item.id.toString().includes(searchFilter) ||
                 langData.name?.toLowerCase().includes(searchFilter)
@@ -404,19 +467,74 @@
         }
     }
 
-    // 入库/添加库存（跳转）
-    function restockItem(itemId, itemName) {
-        window.location.href = `/site/store/stock-restock.html?itemId=${itemId}&name=${itemName}`;
+    // 入库商品
+    function restockItem(itemId) {
+        const item = allItems.find(item => item.id === itemId);
+        if (item) {
+            item.stock_quantity += randomInt(10, 100);
+            item.last_restock_time = Math.floor(Date.now() / 1000);
+            alert(`商品 ${item.id} 已入库，新增库存 ${randomInt(10, 100)}`);
+            renderItemList();
+        }
     }
 
-    // 编辑商品（跳转）
+    // 编辑商品
     function editItem(itemId) {
-        window.location.href = `/site/store/item.html?id=${itemId}`;
+        currentItemId = itemId;
+        const item = allItems.find(item => item.id === itemId);
+        if (!item) return;
+
+        const langSelect = document.getElementById('language-selector');
+        langSelect.innerHTML = window.languages.map(lang => {
+            const langCode = `${lang.code}_US`;
+            const isSet = item.item_lang[langCode]?.name ? '已设置' : '未设置';
+            const className = isSet === '已设置' ? 'language-set' : 'language-unset';
+            return `<option value="${langCode}" class="${className}">${lang.name} (${langCode}) - ${isSet}</option>`;
+        }).join('');
+
+        const langCode = langSelect.value || 'en_US';
+        const langData = item.item_lang[langCode] || {};
+        document.getElementById('edit-name').value = langData.name || '';
+        document.getElementById('edit-seo_keywords').value = langData.seo_keywords || '';
+        document.getElementById('edit-seo_description').value = langData.seo_description || '';
+        document.getElementById('edit-after_sales_rules').value = langData.after_sales_rules || '';
+        document.getElementById('edit-price').value = item.price;
+        document.getElementById('edit-delivery_type').value = item.delivery_type;
+        document.getElementById('edit-stock_quantity').value = item.stock_quantity;
+        document.getElementById('edit-lower_notice_quantity').value = item.lower_notice_quantity;
+        document.getElementById('edit-after_sales_time').value = item.after_sales_time;
+        document.getElementById('edit-status').value = item.status;
+
+        document.getElementById('item-edit-dialog').style.display = 'flex';
     }
 
-    // 添加商品（跳转）
-    function addItem() {
-        window.location.href = '/site/store/item.html';
+    // 保存商品
+    function saveItem() {
+        const item = allItems.find(item => item.id === currentItemId);
+        if (!item) return;
+
+        const langCode = document.getElementById('language-selector').value;
+        item.item_lang[langCode] = item.item_lang[langCode] || {};
+        item.item_lang[langCode].name = document.getElementById('edit-name').value.trim();
+        item.item_lang[langCode].seo_keywords = document.getElementById('edit-seo_keywords').value.trim();
+        item.item_lang[langCode].seo_description = document.getElementById('edit-seo_description').value.trim();
+        item.item_lang[langCode].after_sales_rules = document.getElementById('edit-after_sales_rules').value.trim();
+        item.price = parseFloat(document.getElementById('edit-price').value) || 0;
+        item.delivery_type = parseInt(document.getElementById('edit-delivery_type').value);
+        item.stock_quantity = parseInt(document.getElementById('edit-stock_quantity').value) || 0;
+        item.lower_notice_quantity = parseInt(document.getElementById('edit-lower_notice_quantity').value) || 0;
+        item.after_sales_time = parseInt(document.getElementById('edit-after_sales_time').value) || 0;
+        item.status = parseInt(document.getElementById('edit-status').value);
+        item.update_time = Math.floor(Date.now() / 1000);
+
+        alert('商品信息已保存！');
+        closeItemDialog('item-edit-dialog');
+        renderItemList();
+    }
+
+    // 关闭编辑弹窗
+    function closeItemDialog(dialogId) {
+        document.getElementById(dialogId).style.display = 'none';
     }
 
     // 查看商品
@@ -424,9 +542,21 @@
         window.location.href = `/site/item.html?name=${itemName}`;
     }
 
-    // 查看库存（跳转）
-    function viewStock(itemId) {
-        window.location.href = `/site/store/stock-manage.html?itemId=${itemId}`;
+    // 添加库存
+    function addStock(itemId) {
+        const amount = prompt('请输入添加的库存数量：', '10');
+        const num = parseInt(amount);
+        if (isNaN(num) || num <= 0) {
+            alert('请输入有效的库存数量！');
+            return;
+        }
+        const item = allItems.find(item => item.id === itemId);
+        if (item) {
+            item.stock_quantity += num;
+            item.last_restock_time = Math.floor(Date.now() / 1000);
+            alert(`商品 ${item.id} 已添加 ${num} 库存`);
+            renderItemList();
+        }
     }
 </script>
 </body>

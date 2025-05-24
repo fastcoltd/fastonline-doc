@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>钱包管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.16/antd.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .tips {background:#fefcbf;border:1px solid #f6e05e;border-radius:0.25em;padding:1em;margin-bottom:1em;}
+        .tips p {margin:0;color:#744210;}
+        .wallet-manage-container {padding:1em;}
+        .wallet-filter {display:flex;gap:0.5em;margin-bottom:1em;align-items:center;}
+        .wallet-filter input, .wallet-filter select {padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;width:100px;}
+        .wallet-filter .ant-input {padding:0.5em;margin-bottom:0.25em;}
+        .wallet-filter .filter-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
+        .wallet-filter .filter-btn:hover {background:#45a049;}
+        .wallet-filter .clear-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#FF4500;color:#fff;border:none;font-size:0.875em;}
+        .wallet-filter .clear-btn:hover {background:#D63B00;}
+        .wallet-table {width:100%;border-collapse:collapse;}
+        .wallet-table th, .wallet-table td {padding:0.75em;border:1px solid #d9d9d9;text-align:left;}
+        .wallet-table th {background:#f5f5f5;font-weight:bold;cursor:pointer;white-space:nowrap;}
+        .wallet-table th:hover {background:#e5e5e5;}
+        .wallet-table th .sort-icon {margin-left:0.3em;display:inline-flex;align-items:center;}
+        .wallet-table th .sort-icon i {font-size:0.75em;color:#6b7280;}
+        .wallet-table th .sort-icon i.sort-active {color:#4CAF50;}
+        .wallet-table td {font-size:0.875em;}
+        .wallet-table td.actions {white-space:nowrap;}
+        .wallet-table .action-btn {padding:0.3em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.875em;margin-right:0.3em;}
+        .wallet-table .action-btn:hover {background:#1C86EE;}
+        .wallet-table .status-0 {color:#808080;}
+        .wallet-table .status-1 {color:#32CD32;}
+        .add-wallet-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;margin-bottom:1em;}
+        .add-wallet-btn:hover {background:#45a049;}
+        .wallet-dialog {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:center;}
+        .wallet-dialog-content {background:#fff;border-radius:0.5em;width:50%;max-width:50vw;min-width:20em;max-height:80vh;box-shadow:0 0.25em 0.5em rgba(0,0,0,0.2);overflow-y:auto;}
+        .wallet-dialog-header {padding:0.75em 1em;border-bottom:1px solid #d9d9d9;background:#f5f5f5;display:flex;justify-content:space-between;align-items:center;}
+        .wallet-dialog-header h3 {margin:0;font-size:1.25em;color:#1f2937;}
+        .wallet-dialog-close {background:none;border:none;font-size:1.2em;cursor:pointer;color:#6b7280;}
+        .wallet-dialog-close:hover {color:#f59e0b;}
+        .wallet-dialog-body {padding:1em;}
+        .form-group {flex:1;min-width:0;display:flex;align-items:center;margin-bottom:0.75em;}
+        .form-group label {width:100px;font-size:0.875em;color:#1f2937;white-space:nowrap;text-align:right;margin-right:0.5em;}
+        .form-group input, .form-group select {flex:1;padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;}
+        .action-btn-save {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
+        .action-btn-save:hover {background:#45a049;}
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="store-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div w3-include-html="/site/store/_sidebar.html"></div>
+        <div class="main-content">
+            <h2>钱包管理</h2>
+            <button class="add-wallet-btn" onclick="addWallet()">添加钱包</button>
+            <div class="wallet-manage-container">
+                <div class="wallet-filter">
+                    <input type="text" id="filter-search" placeholder="钱包名称/ID">
+                    <select id="filter-type">
+                        <option value="">全部类型</option>
+                        <option value="0">PayPal</option>
+                        <option value="1">Cash App</option>
+                        <option value="2">Bitcoin</option>
+                        <option value="3">Ethereum</option>
+                        <option value="4">Bank Transfer</option>
+                    </select>
+                    <select id="filter-status">
+                        <option value="">全部状态</option>
+                        <option value="0">禁用</option>
+                        <option value="1">启用</option>
+                    </select>
+                    <button class="filter-btn" onclick="applyFilters()">确定</button>
+                    <button class="clear-btn" onclick="clearFilters()">清空条件</button>
+                </div>
+                <table class="wallet-table">
+                    <thead>
+                    <tr>
+                        <th onclick="sortTable('id')">ID <span class="sort-icon" id="sort-id"><i class="fas fa-sort"></i></span></th>
+                        <th>钱包名称</th>
+                        <th>类型</th>
+                        <th>国家</th>
+                        <th>姓名</th>
+                        <th>收款账户</th>
+                        <th onclick="sortTable('status')">状态 <span class="sort-icon" id="sort-status"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable('create_time')">创建时间 <span class="sort-icon" id="sort-create_time"><i class="fas fa-sort"></i></span></th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="wallet-table-body"></tbody>
+                </table>
+                <div class="pagination" id="pagination"></div>
+            </div>
+            <div class="wallet-dialog" id="wallet-edit-dialog" style="display: none;">
+                <div class="wallet-dialog-content">
+                    <div class="wallet-dialog-header">
+                        <h3>编辑钱包</h3>
+                        <button class="wallet-dialog-close" onclick="closeWalletDialog()">×</button>
+                    </div>
+                    <div class="wallet-dialog-body">
+                        <div class="form-group">
+                            <label>钱包名称</label>
+                            <input type="text" id="edit-wallet_name">
+                        </div>
+                        <div class="form-group">
+                            <label>类型</label>
+                            <select id="edit-wallet_type">
+                                <option value="0">PayPal</option>
+                                <option value="1">Cash App</option>
+                                <option value="2">Bitcoin</option>
+                                <option value="3">Ethereum</option>
+                                <option value="4">Bank Transfer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>国家</label>
+                            <select id="edit-country"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>名字</label>
+                            <input type="text" id="edit-first_name">
+                        </div>
+                        <div class="form-group">
+                            <label>中间名</label>
+                            <input type="text" id="edit-middle_name">
+                        </div>
+                        <div class="form-group">
+                            <label>姓氏</label>
+                            <input type="text" id="edit-last_name">
+                        </div>
+                        <div class="form-group">
+                            <label>收款账户</label>
+                            <input type="text" id="edit-receive_account">
+                        </div>
+                        <div class="form-group">
+                            <label>状态</label>
+                            <select id="edit-status">
+                                <option value="0">禁用</option>
+                                <option value="1">启用</option>
+                            </select>
+                        </div>
+                        <button class="action-btn-save" onclick="saveWallet()">保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+            initializeWallets();
+            initializeFilters();
+            renderWalletList();
+        });
+    });
+
+    // 初始化钱包数据
+    function initializeWallets() {
+        // Placeholder for additional initialization
+    }
+
+    // 备用国家列表
+    const fallbackCountries = [
+        { country: 'United States' },
+        { country: 'China' },
+        { country: 'United Kingdom' },
+        { country: 'Japan' },
+        { country: 'Germany' },
+        { country: 'Canada' },
+        { country: 'Australia' }
+    ];
+
+    // 真实钱包类型
+    const walletTypes = [
+        { id: 0, name: 'PayPal' },
+        { id: 1, name: 'Cash App' },
+        { id: 2, name: 'Bitcoin' },
+        { id: 3, name: 'Ethereum' },
+        { id: 4, name: 'Bank Transfer' }
+    ];
+
+    // 模拟钱包数据
+    let allWallets = Array.from({ length: randomInt(1, 5) }, () => {
+        const walletType = randomInt(0, 4);
+        const firstName = faker.name.firstName();
+        const lastName = faker.name.lastName();
+        const middleName = Math.random() > 0.5 ? faker.name.firstName() : null;
+        let receiveAccount;
+        switch (walletType) {
+            case 0: // PayPal
+                receiveAccount = faker.internet.email();
+                break;
+            case 1: // Cash App
+                receiveAccount = '$' + faker.internet.userName();
+                break;
+            case 2: // Bitcoin
+            case 3: // Ethereum
+                receiveAccount = faker.random.alphaNumeric(40);
+                break;
+            case 4: // Bank Transfer
+                receiveAccount = faker.finance.iban();
+                break;
+        }
+        const countries = window.currencies && Array.isArray(window.currencies) ? window.currencies : fallbackCountries;
+        const country = countries[randomInt(0, countries.length - 1)].country;
+        return {
+            id: faker.datatype.number({ min: 1000, max: 9999 }),
+            status: faker.random.arrayElement([0, 1]),
+            wallet_name: faker.finance.accountName(),
+            user_id: faker.datatype.number({ min: 1, max: 10000 }),
+            wallet_type: walletType,
+            country: country,
+            first_name: firstName,
+            middle_name: middleName,
+            last_name: lastName,
+            receive_account: receiveAccount,
+            extra_data: JSON.stringify({ note: faker.lorem.sentence(5) }),
+            create_time: Math.floor(Date.now() / 1000) - randomInt(0, 30 * 24 * 3600)
+        };
+    });
+
+    let currentPage = 1;
+    const pageSize = 20;
+    let sortField = null;
+    let sortDirection = 'asc';
+    let currentFilteredWallets = null;
+    let currentWalletId = null;
+
+    // 随机整数函数
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 初始化筛选器
+    function initializeFilters() {
+        const countrySelect = document.getElementById('edit-country');
+        if (countrySelect) {
+            const countries = window.currencies && Array.isArray(window.currencies) ? window.currencies : fallbackCountries;
+            countrySelect.innerHTML = `<option value="">选择国家</option>` +
+                countries.map(c => `<option value="${c.country}">${c.country}</option>`).join('');
+        }
+    }
+
+    // 渲染钱包列表
+    function renderWalletList() {
+        const tbody = document.getElementById('wallet-table-body');
+        const pagination = document.getElementById('pagination');
+
+        const wallets = currentFilteredWallets || allWallets;
+        let sortedWallets = [...wallets];
+        if (sortField) {
+            sortedWallets.sort((a, b) => {
+                let valA = a[sortField] || 0;
+                let valB = b[sortField] || 0;
+                if (sortField === 'id' || sortField === 'status' || sortField === 'wallet_type' || sortField === 'create_time') {
+                    valA = parseInt(valA) || 0;
+                    valB = parseInt(valB) || 0;
+                }
+                return sortDirection === 'asc' ? valA - valB : valB - valA;
+            });
+        }
+
+        const totalPages = Math.ceil(sortedWallets.length / pageSize);
+        const startIndex = (currentPage - 1) * pageSize;
+        const paginatedWallets = sortedWallets.slice(startIndex, startIndex + pageSize);
+
+        tbody.innerHTML = paginatedWallets.map(wallet => {
+            const fullName = [wallet.first_name, wallet.middle_name, wallet.last_name].filter(Boolean).join(' ');
+            const walletTypeName = walletTypes.find(type => type.id === wallet.wallet_type)?.name || 'Unknown';
+            return `
+                <tr>
+                    <td>${wallet.id}</td>
+                    <td>${wallet.wallet_name}</td>
+                    <td>${walletTypeName}</td>
+                    <td>${wallet.country}</td>
+                    <td>${fullName || '--'}</td>
+                    <td>${wallet.receive_account}</td>
+                    <td class="status-${wallet.status}">${wallet.status === 0 ? '禁用' : '启用'}</td>
+                    <td>${new Date(wallet.create_time * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+                    <td class="actions">
+                        <button class="action-btn" title="编辑钱包" onclick="editWallet(${wallet.id})"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn" title="删除钱包" onclick="deleteWallet(${wallet.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        pagination.innerHTML = renderPagination(totalPages);
+        updateSortIndicators();
+    }
+
+    // 渲染分页
+    function renderPagination(totalPages) {
+        if (totalPages <= 1) return '';
+        const pages = [];
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
+            }
+        } else {
+            pages.push(`<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`);
+            for (let i = 1; i <= 3; i++) {
+                pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
+            }
+            if (currentPage > 5) pages.push('<span class="ellipsis">...</span>');
+            for (let i = Math.max(4, currentPage - 1); i <= Math.min(totalPages - 3, currentPage + 1); i++) {
+                if (i > 3 && i < totalPages - 2) {
+                    pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
+                }
+            }
+            if (currentPage < totalPages - 4) pages.push('<span class="ellipsis">...</span>');
+            for (let i = totalPages - 2; i <= totalPages; i++) {
+                pages.push(`<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`);
+            }
+            pages.push(`<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`);
+        }
+        return pages.join('');
+    }
+
+    // 切换页面
+    function changePage(page) {
+        const totalPages = Math.ceil((currentFilteredWallets || allWallets).length / pageSize);
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderWalletList();
+        }
+    }
+
+    // 排序表格
+    function sortTable(field) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        renderWalletList();
+    }
+
+    // 更新排序指示器
+    function updateSortIndicators() {
+        ['id', 'status', 'wallet_type', 'create_time'].forEach(field => {
+            const sortIcon = document.getElementById(`sort-${field}`);
+            if (sortIcon) {
+                const icon = sortIcon.querySelector('i');
+                icon.className = 'fas ' + (sortField === field ? (sortDirection === 'asc' ? 'fa-sort-up sort-active' : 'fa-sort-down sort-active') : 'fa-sort');
+            }
+        });
+    }
+
+    // 应用筛选条件
+    function applyFilters() {
+        const searchFilter = document.getElementById('filter-search').value.trim().toLowerCase();
+        const typeFilter = document.getElementById('filter-type').value;
+        const statusFilter = document.getElementById('filter-status').value;
+
+        currentFilteredWallets = allWallets.filter(wallet => {
+            const matchesSearch = searchFilter ? (
+                wallet.id.toString().includes(searchFilter) ||
+                wallet.wallet_name.toLowerCase().includes(searchFilter)
+            ) : true;
+            const matchesType = typeFilter ? wallet.wallet_type.toString() === typeFilter : true;
+            const matchesStatus = statusFilter ? wallet.status.toString() === statusFilter : true;
+            return matchesSearch && matchesType && matchesStatus;
+        });
+
+        currentPage = 1;
+        renderWalletList();
+    }
+
+    // 清空筛选条件
+    function clearFilters() {
+        document.getElementById('filter-search').value = '';
+        document.getElementById('filter-type').value = '';
+        document.getElementById('filter-status').value = '';
+        currentFilteredWallets = null;
+        currentPage = 1;
+        renderWalletList();
+    }
+
+    // 添加钱包
+    function addWallet() {
+        currentWalletId = null;
+        document.getElementById('edit-wallet_name').value = '';
+        document.getElementById('edit-wallet_type').value = '0';
+        document.getElementById('edit-country').value = '';
+        document.getElementById('edit-first_name').value = '';
+        document.getElementById('edit-middle_name').value = '';
+        document.getElementById('edit-last_name').value = '';
+        document.getElementById('edit-receive_account').value = '';
+        document.getElementById('edit-status').value = '1';
+        document.getElementById('wallet-edit-dialog').style.display = 'flex';
+    }
+
+    // 编辑钱包
+    function editWallet(walletId) {
+        currentWalletId = walletId;
+        const wallet = allWallets.find(w => w.id === walletId);
+        if (!wallet) return;
+
+        document.getElementById('edit-wallet_name').value = wallet.wallet_name;
+        document.getElementById('edit-wallet_type').value = wallet.wallet_type;
+        document.getElementById('edit-country').value = wallet.country;
+        document.getElementById('edit-first_name').value = wallet.first_name || '';
+        document.getElementById('edit-middle_name').value = wallet.middle_name || '';
+        document.getElementById('edit-last_name').value = wallet.last_name || '';
+        document.getElementById('edit-receive_account').value = wallet.receive_account;
+        document.getElementById('edit-status').value = wallet.status;
+        document.getElementById('wallet-edit-dialog').style.display = 'flex';
+    }
+
+    // 保存钱包
+    function saveWallet() {
+        const walletData = {
+            wallet_name: document.getElementById('edit-wallet_name').value.trim(),
+            wallet_type: parseInt(document.getElementById('edit-wallet_type').value),
+            country: document.getElementById('edit-country').value,
+            first_name: document.getElementById('edit-first_name').value.trim() || null,
+            middle_name: document.getElementById('edit-middle_name').value.trim() || null,
+            last_name: document.getElementById('edit-last_name').value.trim() || null,
+            receive_account: document.getElementById('edit-receive_account').value.trim(),
+            status: parseInt(document.getElementById('edit-status').value)
+        };
+
+        if (!walletData.wallet_name || !walletData.receive_account) {
+            alert('钱包名称和收款账户不能为空！');
+            return;
+        }
+
+        if (currentWalletId) {
+            const wallet = allWallets.find(w => w.id === currentWalletId);
+            if (wallet) {
+                Object.assign(wallet, {
+                    ...walletData,
+                    update_time: Math.floor(Date.now() / 1000)
+                });
+            }
+        } else {
+            allWallets.push({
+                id: faker.datatype.number({ min: 1000, max: 9999 }),
+                ...walletData,
+                user_id: faker.datatype.number({ min: 1, max: 10000 }),
+                extra_data: JSON.stringify({ note: 'New wallet' }),
+                create_time: Math.floor(Date.now() / 1000)
+            });
+        }
+
+        alert('钱包信息已保存！');
+        closeWalletDialog();
+        renderWalletList();
+    }
+
+    // 删除钱包
+    function deleteWallet(walletId) {
+        if (confirm('确定要删除此钱包吗？')) {
+            allWallets = allWallets.filter(w => w.id !== walletId);
+            alert('钱包已删除！');
+            renderWalletList();
+        }
+    }
+
+    // 关闭钱包编辑弹窗
+    function closeWalletDialog() {
+        document.getElementById('wallet-edit-dialog').style.display = 'none';
+    }
+</script>
+</body>
+</html>
