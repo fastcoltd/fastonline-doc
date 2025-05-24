@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.16/antd.min.css">
     <link rel="stylesheet" href="/site/_site.css">
     <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="/site/_fields.js"></script>
     <script src="/site/_data.js"></script>
     <script src="/site/_location.js"></script>
@@ -19,19 +21,66 @@
     <style>
         .tips {background:#fefcbf;border:1px solid #f6e05e;border-radius:0.25em;padding:1em;margin-bottom:1em;}
         .tips p {margin:0;color:#744210;}
-        .item-edit-container {padding:1em;}
-        .form-group {flex:1;min-width:0;display:flex;align-items:center;margin-bottom:0.75em;}
-        .form-group label {width:100px;font-size:0.875em;color:#1f2937;white-space:nowrap;text-align:right;margin-right:0.5em;}
-        .form-group input, .form-group select, .form-group textarea {flex:1;padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;}
-        .form-group textarea {height:6em;resize:vertical;}
-        .form-section {margin-bottom:1.5em;}
-        .form-section h3 {font-size:1.1em;color:#1f2937;margin-bottom:0.5em;}
+        .item-edit-container {padding:1em;background:#fff;border-radius:0.5em;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+        .form-section {margin-bottom:1em;padding:1em;border:1px solid #e8e8e8;border-radius:0.25em;}
+        .form-section h3 {font-size:1.1em;color:#1f2937;margin:0 0 0.5em;padding:0.5em;background:#f5f5f5;border-radius:0.25em;}
+        .form-group {display:flex;align-items:center;margin-bottom:0.5em;gap:0.5em;}
+        .form-group label {width:100px;font-size:0.875em;color:#1f2937;text-align:right;}
+        .form-group input, .form-group select, .form-group textarea {flex:1;padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;transition:border-color 0.2s;}
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {border-color:#4CAF50;outline:none;}
+        .form-group textarea {height:4em;resize:vertical;}
+        .form-group textarea.content {height:8em;}
+        .form-group-inline {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.5em;}
+        .image-preview {margin-top:0.5em;}
+        .cover-pic-preview {width:300px;height:200px;border:1px solid #d9d9d9;border-radius:0.25em;background:#f5f5f5;display:flex;justify-content:center;align-items:center;position:relative;cursor:pointer;}
+        .cover-pic-preview img {width:100%;height:100%;object-fit:cover;border-radius:0.25em;}
+        .cover-pic-preview .overlay {position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;color:#fff;font-size:0.875em;border-radius:0.25em;}
+        .cover-pic-preview:hover .overlay {display:flex;}
+        .cover-pic-preview.empty::before {content:"点击上传封面图";color:#6b7280;font-size:0.875em;}
+        .sample-pics-preview {display:flex;gap:0.5em;flex-wrap:wrap;}
+        .sample-pic-item {position:relative;width:100px;height:100px;border:1px solid #d9d9d9;border-radius:0.25em;}
+        .sample-pic-item img {width:100%;height:100%;object-fit:cover;border-radius:0.25em;}
+        .sample-pic-item .remove-btn {position:absolute;top:2px;right:2px;background:#FF4500;color:#fff;border:none;border-radius:50%;width:20px;height:20px;display:flex;justify-content:center;align-items:center;cursor:pointer;font-size:0.75em;}
+        .sample-pic-item .remove-btn:hover {background:#D63B00;}
+        .add-pic-btn {width:100px;height:100px;border:1px dashed #d9d9d9;border-radius:0.25em;display:flex;justify-content:center;align-items:center;color:#6b7280;cursor:pointer;}
+        .add-pic-btn:hover {border-color:#4CAF50;}
+        .attribute-list, .tag-list {margin-bottom:0.5em;}
+        .attribute-tags, .tag-tags {display:flex;flex-wrap:wrap;gap:0.5em;margin-bottom:0.5em;}
+        .attribute-tags .ant-tag, .tag-tags .ant-tag {display:flex;align-items:center;padding:0.2em 0.5em;border-radius:0.25em;font-size:0.75em;}
+        .attribute-tags .ant-tag-close, .tag-tags .ant-tag-close {margin-left:0.5em;cursor:pointer;}
+        .show-list {display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.5em;}
+        .show-item {border:1px solid #d9d9d9;border-radius:0.25em;padding:0.5em;background:#fff;}
+        .show-item img {width:100%;height:120px;object-fit:cover;border-radius:0.25em;}
+        .show-item span {display:block;margin:0.5em 0;font-size:0.875em;}
+        .action-btn-add {padding:0.3em 0.6em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.75em;}
+        .action-btn-add:hover {background:#45a049;}
+        .action-btn-remove {padding:0.3em 0.6em;border-radius:0.25em;cursor:pointer;background:#FF4500;color:#fff;border:none;font-size:0.75em;}
+        .action-btn-remove:hover {background:#D63B00;}
         .action-btn-save {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;margin-right:0.5em;}
         .action-btn-save:hover {background:#45a049;}
         .action-btn-cancel {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#FF4500;color:#fff;border:none;font-size:0.875em;}
         .action-btn-cancel:hover {background:#D63B00;}
+        .action-btn-wholesale {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.875em;}
+        .action-btn-wholesale:hover {background:#1C86EE;}
         .language-set {background:#e6ffed;}
         .language-unset {background:#f5f5f5;}
+        .wholesale-list {margin-bottom:1em;}
+        .wholesale-item {display:flex;gap:0.5em;margin-bottom:0.5em;align-items:center;}
+        .wholesale-item input {width:100px;}
+        .wholesale-display {margin-top:0.5em;font-size:0.875em;}
+        .wholesale-display ul {list-style:none;padding:0;}
+        .wholesale-display li {margin-bottom:0.25em;}
+        .limit-purchase summary {cursor:pointer;padding:0.5em;border-radius:0.25em;background:#f5f5f5;}
+        .limit-purchase summary:hover {background:#e5e5e5;}
+        .limit-purchase details[open] summary {background:#d9d9d9;}
+        .limit-purchase .form-group {margin-top:0.5em;}
+        .wholesale-dialog, .show-dialog {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:center;}
+        .wholesale-dialog-content, .show-dialog-content {background:#fff;border-radius:0.5em;width:50%;max-width:50vw;min-width:20em;max-height:80vh;box-shadow:0 0.25em 0.5em rgba(0,0,0,0.2);overflow-y:auto;}
+        .wholesale-dialog-header, .show-dialog-header {padding:0.75em 1em;border-bottom:1px solid #d9d9d9;background:#f5f5f5;display:flex;justify-content:space-between;align-items:center;}
+        .wholesale-dialog-header h3, .show-dialog-header h3 {margin:0;font-size:1.25em;color:#1f2937;}
+        .wholesale-dialog-close, .show-dialog-close {background:none;border:none;font-size:1.2em;cursor:pointer;color:#6b7280;}
+        .wholesale-dialog-close:hover, .show-dialog-close:hover {color:#f59e0b;}
+        .wholesale-dialog-body, .show-dialog-body {padding:1em;}
     </style>
 </head>
 <body>
@@ -42,64 +91,107 @@
         <div w3-include-html="/site/store/_sidebar.html"></div>
         <div class="main-content">
             <h2 id="page-title">添加商品</h2>
+            <div id="site-reply-tips" class="tips" style="display:none;">
+                <p><strong>审核回复:</strong> <span id="site-reply-content"></span></p>
+            </div>
             <div class="item-edit-container">
                 <div class="form-section">
-                    <div class="form-group">
-                        <label>选择语言</label>
-                        <select id="language-selector"></select>
-                    </div>
-                </div>
-                <div class="form-section">
                     <h3>商品信息</h3>
-                    <div class="form-group">
-                        <label>品牌</label>
-                        <select id="edit-brand_id"></select>
+                    <div class="form-group-inline">
+                        <div class="form-group">
+                            <label>品牌</label>
+                            <select id="edit-brand_id">
+                                <option value="">选择品牌</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>服务</label>
+                            <select id="edit-services_id">
+                                <option value="">选择服务</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>状态</label>
+                            <select id="edit-sattus">
+                                <option value="0">禁用</option>
+                                <option value="1">启用</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>服务</label>
-                        <select id="edit-services_id"></select>
+                    <div class="form-group-inline">
+                        <div class="form-group">
+                            <label>发货方式</label>
+                            <select id="edit-delivery_type">
+                                <option value="0">标准运输</option>
+                                <option value="1">快速运输</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>URL</label>
+                            <input type="text" id="edit-custom_url">
+                        </div>
+                        <div class="form-group">
+                            <label>低库存提醒</label>
+                            <input type="number" id="edit-lower_notice_quantity" min="0">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>状态</label>
-                        <select id="edit-status">
-                            <option value="0">禁用</option>
-                            <option value="1">启用</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>发货方式</label>
-                        <select id="edit-delivery_type">
-                            <option value="0">标准运输</option>
-                            <option value="1">快速运输</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>库存数量</label>
-                        <input type="number" id="edit-stock_quantity" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>低库存提醒</label>
-                        <input type="number" id="edit-lower_notice_quantity" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>售后时间(秒)</label>
-                        <input type="number" id="edit-after_sales_time" min="0">
+                    <div class="form-group-inline">
+                        <div class="form-group">
+                            <label>保质期(天)</label>
+                            <input type="number" id="edit-shelf_life" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>售后时间(秒)</label>
+                            <input type="number" id="edit-after_sales_time" min="0">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>价格</label>
                         <input type="number" id="edit-price" step="0.01" min="0">
+                        <button class="action-btn-wholesale" onclick="openWholesaleModal()">批发价</button>
                     </div>
+                    <div class="wholesale-display" id="wholesale-display"></div>
                     <div class="form-group">
                         <label>原价</label>
                         <input type="number" id="edit-original_price" step="0.01" min="0">
                     </div>
                     <div class="form-group">
-                        <label>保质期(天)</label>
-                        <input type="number" id="edit-shelf_life" min="1">
+                        <label>封面图片</label>
+                        <input type="file" id="edit-cover_pic" accept="image/*" style="display:none;">
+                        <div class="cover-pic-preview empty" id="cover-pic-preview" onclick="document.getElementById('edit-cover_pic').click()">
+                            <div class="overlay">编辑图片</div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-section">
+                    <h3>属性</h3>
+                    <div class="form-group">
+                        <label>添加属性</label>
+                        <select id="attribute-selector">
+                            <option value="">选择属性</option>
+                        </select>
+                        <select id="attribute-value-selector" style="display:none;">
+                            <option value="">选择属性值</option>
+                        </select>
+                    </div>
+                    <div class="attribute-tags" id="attribute-tags"></div>
+                </div>
+                <div class="form-section">
+                    <h3>标签</h3>
+                    <div class="form-group">
+                        <label>添加标签</label>
+                        <select id="tag-selector">
+                            <option value="">选择标签</option>
+                        </select>
+                    </div>
+                    <div class="tag-tags" id="tag-tags"></div>
+                </div>
+                <div class="form-section">
                     <h3>多语言信息</h3>
+                    <div class="form-group">
+                        <label>选择语言</label>
+                        <select id="language-selector"></select>
+                    </div>
                     <div class="form-group">
                         <label>商品名称</label>
                         <input type="text" id="edit-name">
@@ -116,10 +208,108 @@
                         <label>售后规则</label>
                         <textarea id="edit-after_sales_rules"></textarea>
                     </div>
+                    <div class="form-group">
+                        <label>样本图片</label>
+                        <input type="file" id="edit-sample_pics" accept="image/*" multiple style="display:none;">
+                        <div class="sample-pics-preview" id="sample-pics-preview"></div>
+                        <div class="add-pic-btn" onclick="document.getElementById('edit-sample_pics').click()">+ 添加图片</div>
+                    </div>
+                    <div class="form-group">
+                        <label>内容</label>
+                        <textarea id="edit-content" class="content"></textarea>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h3>宣传图册</h3>
+                    <div class="show-list" id="show-list"></div>
+                    <button class="action-btn-add" onclick="openShowModal()">添加图册</button>
+                </div>
+                <div class="form-section limit-purchase">
+                    <h3>限购策略</h3>
+                    <details>
+                        <summary id="limit-purchase-summary">无限购</summary>
+                        <div class="form-group-inline">
+                            <div class="form-group">
+                                <label>状态</label>
+                                <select id="edit-limit_status">
+                                    <option value="0">禁用</option>
+                                    <option value="1">启用</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>单次限购</label>
+                                <input type="number" id="edit-limit_single" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>总限购</label>
+                                <input type="number" id="edit-limit_user" min="0">
+                            </div>
+                        </div>
+                        <div class="form-group-inline">
+                            <div class="form-group">
+                                <label>每日限购</label>
+                                <input type="number" id="edit-limit_day" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>每周限购</label>
+                                <input type="number" id="edit-limit_week" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>每月限购</label>
+                                <input type="number" id="edit-limit_month" min="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>开始时间</label>
+                            <input type="text" id="edit-limit_start_time">
+                        </div>
+                        <div class="form-group">
+                            <label>结束时间</label>
+                            <input type="text" id="edit-limit_end_time">
+                        </div>
+                    </details>
                 </div>
                 <div class="form-section">
                     <button class="action-btn-save" onclick="saveItem()">保存</button>
                     <button class="action-btn-cancel" onclick="cancelEdit()">取消</button>
+                </div>
+            </div>
+            <div class="wholesale-dialog" id="wholesale-dialog" style="display: none;">
+                <div class="wholesale-dialog-content">
+                    <div class="wholesale-dialog-header">
+                        <h3>批发价管理</h3>
+                        <button class="wholesale-dialog-close" onclick="closeWholesaleModal()">×</button>
+                    </div>
+                    <div class="wholesale-dialog-body">
+                        <div class="wholesale-list" id="wholesale-list"></div>
+                        <button class="action-btn-add" onclick="addWholesale()">添加批发价</button>
+                        <button class="action-btn-save" onclick="saveWholesale()">保存</button>
+                    </div>
+                </div>
+            </div>
+            <div class="show-dialog" id="show-dialog" style="display: none;">
+                <div class="show-dialog-content">
+                    <div class="show-dialog-header">
+                        <h3>编辑宣传图册</h3>
+                        <button class="show-dialog-close" onclick="closeShowModal()">×</button>
+                    </div>
+                    <div class="show-dialog-body">
+                        <div class="form-group">
+                            <label>标题</label>
+                            <input type="text" id="show-title">
+                        </div>
+                        <div class="form-group">
+                            <label>摘要</label>
+                            <textarea id="show-summary"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>展示图片</label>
+                            <input type="file" id="show-show_data" accept="image/*" multiple style="display:none;">
+                            <div class="sample-pics-preview" id="show-data-preview"></div>
+                            <div class="add-pic-btn" onclick="document.getElementById('show-show_data').click()">+ 添加图片</div>
+                        </div>
+                        <button class="action-btn-save" onclick="saveShow()">保存</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -138,11 +328,116 @@
 
     let currentItem = null;
     let currentLangCode = 'en_US';
+    let currentWholesale = [];
+    let currentShow = [];
+    let currentAttributes = [];
+    let currentTags = [];
+    let editingShowIndex = null;
+    let samplePics = [];
     const itemId = new URLSearchParams(window.location.search).get('id');
+
+    // 修正 ecommerceAttributes 格式
+    const formattedAttributes = Object.keys(ecommerceAttributes).map((name, index) => ({
+        id: index + 1,
+        name,
+        values: ecommerceAttributes[name].map((value, idx) => ({ id: idx + 1, name: value }))
+    }));
+
+    // 修正 ecommerceTags 格式
+    const formattedTags = ecommerceTags.map((name, index) => ({
+        id: index + 1,
+        name
+    }));
 
     // 随机整数函数
     function randomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 生成随机图片 URL
+    function generateRandomImage() {
+        return `https://picsum.photos/id/${randomInt(0, 1000)}/300/200`;
+    }
+
+    // 生成随机商品数据
+    function generateRandomItem() {
+        const brand = hotBrands[randomInt(0, hotBrands.length - 1)];
+        const service = services[randomInt(0, services.length - 1)];
+        const afterSalesTime = randomInt(3600, 30 * 24 * 3600);
+        const itemLang = {};
+        window.languages.forEach(lang => {
+            const langCode = `${lang.code}_US`;
+            itemLang[langCode] = {
+                id: faker.datatype.number({ min: 10000, max: 99999 }),
+                item_id: 0,
+                status: 1,
+                version: 1,
+                language: langCode,
+                seo_keywords: faker.lorem.words(5),
+                seo_description: faker.lorem.sentence(10),
+                name: faker.commerce.productName(),
+                after_sales_rules: faker.lorem.paragraph(2),
+                sample_pics: Array(randomInt(1, 5)).fill().map(() => generateRandomImage()).join(','),
+                content: faker.lorem.paragraph(3),
+                create_time: Math.floor(Date.now() / 1000) - randomInt(0, 30 * 24 * 3600),
+                update_time: Math.floor(Date.now() / 1000),
+                site_reply: '商品描述不够详细，请补充规格信息'
+            };
+        });
+        return {
+            id: faker.datatype.number({ min: 1000, max: 9999 }),
+            user_id: faker.datatype.number({ min: 1, max: 10000 }),
+            store_id: faker.datatype.number({ min: 1000, max: 9999 }),
+            brand_id: brand.id,
+            services_id: randomInt(1, services.length),
+            sattus: faker.random.arrayElement([0, 1]),
+            delivery_type: randomInt(0, 1),
+            sort_index: randomInt(0, 100),
+            stock_quantity: 0,
+            lower_notice_quantity: randomInt(10, 100),
+            shelf_life: randomInt(1, 5),
+            after_sales_time: afterSalesTime,
+            price: parseFloat(faker.finance.amount(10, 1000, 2)),
+            original_price: parseFloat(faker.finance.amount(10, 1000, 2)),
+            custom_url: faker.internet.url().replace(/^https?:\/\//, ''),
+            cover_pic: generateRandomImage(),
+            field_list: '[]',
+            choose_field_index: 0,
+            last_restock_time: Math.floor(Date.now() / 1000) - randomInt(0, 30 * 24 * 3600),
+            create_time: Math.floor(Date.now() / 1000) - randomInt(0, 30 * 24 * 3600),
+            update_time: Math.floor(Date.now() / 1000),
+            item_lang: itemLang,
+            wholesale: Array(randomInt(0, 3)).fill().map(() => ({
+                quantity: randomInt(10, 100),
+                discount: parseFloat(faker.finance.amount(0.5, 0.9, 4)),
+                unit_price: parseFloat(faker.finance.amount(5, 500, 2))
+            })),
+            show: Array(randomInt(0, 3)).fill().map(() => ({
+                title: faker.lorem.words(3),
+                summary: faker.lorem.sentence(10),
+                show_data: Array(randomInt(1, 5)).fill().map(() => generateRandomImage()).join(',')
+            })),
+            attributes: Array(randomInt(0, 5)).fill().map(() => {
+                const attr = formattedAttributes[randomInt(0, formattedAttributes.length - 1)];
+                return {
+                    attr_id: attr.id,
+                    attr_value_id: attr.values[randomInt(0, attr.values.length - 1)].id
+                };
+            }),
+            tags: Array(randomInt(0, 3)).fill().map(() => ({
+                tag_id: formattedTags[randomInt(0, formattedTags.length - 1)].id
+            })),
+            limit_purchase: {
+                status: faker.random.arrayElement([0, 1]),
+                limit_single: randomInt(0, 100),
+                limit_user: randomInt(0, 500),
+                limit_day: randomInt(0, 50),
+                limit_week: randomInt(0, 200),
+                limit_month: randomInt(0, 1000),
+                start_time: Math.floor(Date.now() / 1000) - randomInt(0, 30 * 24 * 3600),
+                end_time: Math.floor(Date.now() / 1000) + randomInt(0, 30 * 24 * 3600)
+            }
+        };
     }
 
     // 初始化表单
@@ -154,31 +449,87 @@
 
         const serviceSelect = document.getElementById('edit-services_id');
         serviceSelect.innerHTML = `<option value="">选择服务</option>` +
-            services.map(service => `<option value="${service.id}">${service.name}</option>`).join('');
+            services.map((service, idx) => `<option value="${idx + 1}">${service.name}</option>`).join('');
 
-        // 加载语言选择器
+        // 初始化语言选择器
         const langSelect = document.getElementById('language-selector');
         langSelect.innerHTML = window.languages.map(lang => {
             const langCode = `${lang.code}_US`;
-            const isSet = itemId && allItems.find(item => item.id == itemId)?.item_lang[langCode]?.name ? '已设置' : '未设置';
+            const isSet = currentItem?.item_lang[langCode]?.name ? '已设置' : '未设置';
             const className = isSet === '已设置' ? 'language-set' : 'language-unset';
             return `<option value="${langCode}" class="${className}">${lang.name} (${langCode}) - ${isSet}</option>`;
         }).join('');
         langSelect.addEventListener('change', updateLangFields);
 
+        // 初始化属性和标签下拉
+        const attrSelect = document.getElementById('attribute-selector');
+        attrSelect.addEventListener('change', selectAttribute);
+
+        const tagSelect = document.getElementById('tag-selector');
+        tagSelect.innerHTML = `<option value="">选择标签</option>` +
+            formattedTags.map(tag => `<option value="${tag.id}">${tag.name}</option>`).join('');
+        tagSelect.addEventListener('change', addTag);
+
+        const attrValueSelect = document.getElementById('attribute-value-selector');
+        attrValueSelect.addEventListener('change', addAttribute);
+
+        // 初始化日期选择器
+        flatpickr('#edit-limit_start_time', { dateFormat: 'Y-m-d H:i', enableTime: true });
+        flatpickr('#edit-limit_end_time', { dateFormat: 'Y-m-d H:i', enableTime: true });
+
+        // 封面图上传
+        document.getElementById('edit-cover_pic').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                const preview = document.getElementById('cover-pic-preview');
+                preview.innerHTML = `<img src="${url}" alt="Cover Preview"><div class="overlay">编辑图片</div>`;
+                preview.classList.remove('empty');
+            }
+        });
+
+        // 样本图片上传
+        document.getElementById('edit-sample_pics').addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            samplePics = samplePics.concat(files.map(file => ({ url: URL.createObjectURL(file), file })));
+            renderSamplePics();
+        });
+
+        // 宣传图册图片上传
+        document.getElementById('show-show_data').addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            const preview = document.getElementById('show-data-preview');
+            preview.innerHTML = files.map(file => `
+                <div class="sample-pic-item">
+                    <img src="${URL.createObjectURL(file)}" alt="Show Preview">
+                    <button class="remove-btn" onclick="removeShowPic(this)">×</button>
+                </div>
+            `).join('');
+        });
+
         // 判断添加或编辑
         if (itemId) {
             document.getElementById('page-title').textContent = '编辑商品';
-            currentItem = allItems.find(item => item.id == itemId);
-            if (currentItem) {
-                loadItemData();
-            } else {
-                alert('商品不存在！');
-                window.location.href = '/site/store/item-manage.html';
-            }
+            currentItem = generateRandomItem();
+            samplePics = currentItem.item_lang[currentLangCode].sample_pics.split(',').map(url => ({ url, file: null }));
+            loadItemData();
         } else {
             currentItem = {
-                item_lang: {}
+                item_lang: {},
+                wholesale: [],
+                show: [],
+                attributes: [],
+                tags: [],
+                limit_purchase: {
+                    status: 0,
+                    limit_single: 0,
+                    limit_user: 0,
+                    limit_day: 0,
+                    limit_week: 0,
+                    limit_month: 0,
+                    start_time: 0,
+                    end_time: 0
+                }
             };
             window.languages.forEach(lang => {
                 const langCode = `${lang.code}_US`;
@@ -186,10 +537,18 @@
                     name: '',
                     seo_keywords: '',
                     seo_description: '',
-                    after_sales_rules: ''
+                    after_sales_rules: '',
+                    sample_pics: '',
+                    content: '',
+                    site_reply: ''
                 };
             });
             updateLangFields();
+            renderAttributeList();
+            renderTagList();
+            renderShowList();
+            renderWholesaleDisplay();
+            updateLimitPurchaseSummary();
         }
     }
 
@@ -197,15 +556,50 @@
     function loadItemData() {
         document.getElementById('edit-brand_id').value = currentItem.brand_id || '';
         document.getElementById('edit-services_id').value = currentItem.services_id || '';
-        document.getElementById('edit-status').value = currentItem.status || '0';
+        document.getElementById('edit-sattus').value = currentItem.sattus || '0';
         document.getElementById('edit-delivery_type').value = currentItem.delivery_type || '0';
-        document.getElementById('edit-stock_quantity').value = currentItem.stock_quantity || '0';
+        document.getElementById('edit-sort_index').value = currentItem.sort_index || '0';
         document.getElementById('edit-lower_notice_quantity').value = currentItem.lower_notice_quantity || '0';
+        document.getElementById('edit-shelf_life').value = currentItem.shelf_life || '1';
         document.getElementById('edit-after_sales_time').value = currentItem.after_sales_time || '0';
         document.getElementById('edit-price').value = currentItem.price || '0';
         document.getElementById('edit-original_price').value = currentItem.original_price || '0';
-        document.getElementById('edit-shelf_life').value = currentItem.shelf_life || '1';
+        document.getElementById('edit-custom_url').value = currentItem.custom_url || '';
+        const coverPreview = document.getElementById('cover-pic-preview');
+        if (currentItem.cover_pic) {
+            coverPreview.innerHTML = `<img src="${currentItem.cover_pic}" alt="Cover Preview"><div class="overlay">编辑图片</div>`;
+            coverPreview.classList.remove('empty');
+        }
+
+        // 限购策略
+        const limit = currentItem.limit_purchase || {};
+        document.getElementById('edit-limit_status').value = limit.status || '0';
+        document.getElementById('edit-limit_single').value = limit.limit_single || '0';
+        document.getElementById('edit-limit_user').value = limit.limit_user || '0';
+        document.getElementById('edit-limit_day').value = limit.limit_day || '0';
+        document.getElementById('edit-limit_week').value = limit.limit_week || '0';
+        document.getElementById('edit-limit_month').value = limit.limit_month || '0';
+        document.getElementById('edit-limit_start_time').value = limit.start_time ? new Date(limit.start_time * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+        document.getElementById('edit-limit_end_time').value = limit.end_time ? new Date(limit.end_time * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+
+        // 站点回复
+        const siteReply = currentItem.item_lang[currentLangCode]?.site_reply;
+        const tips = document.getElementById('site-reply-tips');
+        const content = document.getElementById('site-reply-content');
+        if (siteReply) {
+            content.textContent = siteReply;
+            tips.style.display = 'block';
+        } else {
+            tips.style.display = 'none';
+        }
+
         updateLangFields();
+        renderAttributeList();
+        renderTagList();
+        renderShowList();
+        renderWholesaleDisplay();
+        renderSamplePics();
+        updateLimitPurchaseSummary();
     }
 
     // 更新多语言字段
@@ -216,6 +610,279 @@
         document.getElementById('edit-seo_keywords').value = langData.seo_keywords || '';
         document.getElementById('edit-seo_description').value = langData.seo_description || '';
         document.getElementById('edit-after_sales_rules').value = langData.after_sales_rules || '';
+        samplePics = langData.sample_pics ? langData.sample_pics.split(',').map(url => ({ url, file: null })) : [];
+        renderSamplePics();
+        document.getElementById('edit-content').value = langData.content || '';
+    }
+
+    // 渲染样本图片
+    function renderSamplePics() {
+        const preview = document.getElementById('sample-pics-preview');
+        preview.innerHTML = samplePics.map((pic, index) => `
+            <div class="sample-pic-item">
+                <img src="${pic.url}" alt="Sample Preview">
+                <button class="remove-btn" onclick="removeSamplePic(${index})">×</button>
+            </div>
+        `).join('');
+    }
+
+    // 删除样本图片
+    function removeSamplePic(index) {
+        samplePics.splice(index, 1);
+        renderSamplePics();
+    }
+
+    // 选择属性
+    function selectAttribute(event) {
+        const attrId = parseInt(event.target.value);
+        if (!attrId) {
+            document.getElementById('attribute-value-selector').style.display = 'none';
+            return;
+        }
+        const attr = formattedAttributes.find(a => a.id === attrId);
+        if (attr) {
+            const valueSelect = document.getElementById('attribute-value-selector');
+            valueSelect.innerHTML = `<option value="">选择属性值</option>` +
+                attr.values.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
+            valueSelect.style.display = 'inline-block';
+            valueSelect.focus();
+            // 临时存储当前选择的属性 ID
+            valueSelect.dataset.attrId = attrId;
+        }
+        event.target.value = '';
+    }
+
+    // 添加属性
+    function addAttribute(event) {
+        const valueId = parseInt(event.target.value);
+        const attrId = parseInt(event.target.dataset.attrId);
+        if (attrId && valueId && !currentAttributes.some(a => a.attr_id === attrId)) {
+            currentAttributes.push({ attr_id: attrId, attr_value_id: valueId });
+            renderAttributeList();
+        }
+        event.target.style.display = 'none';
+        event.target.value = '';
+        event.target.dataset.attrId = '';
+    }
+
+    // 渲染属性列表
+    function renderAttributeList() {
+        const attrTags = document.getElementById('attribute-tags');
+        attrTags.innerHTML = currentAttributes.map((attr, index) => {
+            const attrData = formattedAttributes.find(a => a.id === attr.attr_id);
+            const valueData = attrData?.values.find(v => v.id === attr.attr_value_id);
+            return attrData && valueData ? `
+                <span class="ant-tag ant-tag-blue">${attrData.name}:${valueData.name}<span class="ant-tag-close" onclick="removeAttribute(${index})">×</span></span>
+            ` : '';
+        }).join('');
+
+        // 更新属性下拉列表，排除已选属性
+        const attrSelect = document.getElementById('attribute-selector');
+        const selectedAttrIds = currentAttributes.map(attr => attr.attr_id);
+        attrSelect.innerHTML = `<option value="">选择属性</option>` +
+            formattedAttributes
+                .filter(attr => !selectedAttrIds.includes(attr.id))
+                .map(attr => `<option value="${attr.id}">${attr.name}</option>`).join('');
+    }
+
+    // 删除属性
+    function removeAttribute(index) {
+        currentAttributes.splice(index, 1);
+        renderAttributeList();
+    }
+
+    // 添加标签
+    function addTag(event) {
+        const tagId = parseInt(event.target.value);
+        if (tagId && currentTags.length < 3 && !currentTags.some(t => t.tag_id === tagId)) {
+            currentTags.push({ tag_id: tagId });
+            renderTagList();
+        } else if (currentTags.length >= 3) {
+            alert('最多可添加 3 个标签！');
+        }
+        event.target.value = '';
+    }
+
+    // 渲染标签列表
+    function renderTagList() {
+        const tagTags = document.getElementById('tag-tags');
+        tagTags.innerHTML = currentTags.map((tag, index) => {
+            const tagData = formattedTags.find(t => t.id === tag.tag_id);
+            return tagData ? `
+                <span class="ant-tag ant-tag-green">${tagData.name}<span class="ant-tag-close" onclick="removeTag(${index})">×</span></span>
+            ` : '';
+        }).join('');
+    }
+
+    // 删除标签
+    function removeTag(index) {
+        currentTags.splice(index, 1);
+        renderTagList();
+    }
+
+    // 渲染宣传图册列表
+    function renderShowList() {
+        const showList = document.getElementById('show-list');
+        showList.innerHTML = currentShow.map((show, index) => {
+            const firstImage = show.show_data.split(',')[0] || '';
+            return `
+                <div class="show-item">
+                    <img src="${firstImage}" alt="${show.title}">
+                    <span>${show.title}</span>
+                    <button class="action-btn-remove" onclick="removeShow(${index})">删除</button>
+                    <button class="action-btn" onclick="editShow(${index})">编辑</button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 渲染批发价显示
+    function renderWholesaleDisplay() {
+        const wholesaleDisplay = document.getElementById('wholesale-display');
+        if (currentWholesale.length > 0) {
+            wholesaleDisplay.innerHTML = `
+                <ul>
+                    ${currentWholesale.map(item => `
+                        <li>数量: ${item.quantity}, 折扣: ${(item.discount * 100).toFixed(2)}%, 单价: ${item.unit_price.toFixed(2)}</li>
+                    `).join('')}
+                </ul>
+            `;
+        } else {
+            wholesaleDisplay.innerHTML = '';
+        }
+    }
+
+    // 更新限购策略摘要
+    function updateLimitPurchaseSummary() {
+        const limit = currentItem.limit_purchase || {};
+        const summary = document.getElementById('limit-purchase-summary');
+        if (limit.status === 0 || (!limit.limit_single && !limit.limit_user && !limit.limit_day && !limit.limit_week && !limit.limit_month)) {
+            summary.textContent = '无限购';
+        } else {
+            const limits = [];
+            if (limit.limit_single) limits.push(`单次限购: ${limit.limit_single}`);
+            if (limit.limit_user) limits.push(`总限购: ${limit.limit_user}`);
+            if (limit.limit_day) limits.push(`每日限购: ${limit.limit_day}`);
+            if (limit.limit_week) limits.push(`每周限购: ${limit.limit_week}`);
+            if (limit.limit_month) limits.push(`每月限购: ${limit.limit_month}`);
+            summary.textContent = limits.join(', ');
+        }
+    }
+
+    // 打开宣传图册模态
+    function openShowModal(index = null) {
+        editingShowIndex = index;
+        if (index !== null) {
+            const show = currentShow[index];
+            document.getElementById('show-title').value = show.title || '';
+            document.getElementById('show-summary').value = show.summary || '';
+            const preview = document.getElementById('show-data-preview');
+            preview.innerHTML = show.show_data ? show.show_data.split(',').map((url, idx) => `
+                <div class="sample-pic-item">
+                    <img src="${url}" alt="Show Preview">
+                    <button class="remove-btn" onclick="removeShowPic(${idx})">×</button>
+                </div>
+            `).join('') : '';
+        } else {
+            document.getElementById('show-title').value = '';
+            document.getElementById('show-summary').value = '';
+            document.getElementById('show-data-preview').innerHTML = '';
+        }
+        document.getElementById('show-dialog').style.display = 'flex';
+    }
+
+    // 删除宣传图册图片
+    function removeShowPic(index) {
+        const preview = document.getElementById('show-data-preview');
+        const items = Array.from(preview.children);
+        items.splice(index, 1);
+        preview.innerHTML = items.map(item => item.outerHTML).join('');
+    }
+
+    // 保存宣传图册
+    function saveShow() {
+        const title = document.getElementById('show-title').value.trim();
+        const summary = document.getElementById('show-summary').value.trim();
+        const files = Array.from(document.getElementById('show-show_data').files);
+        const existingUrls = editingShowIndex !== null ? (currentShow[editingShowIndex]?.show_data || '').split(',') : [];
+        const showData = files.length > 0 ? files.map(() => generateRandomImage()).concat(existingUrls).join(',') : existingUrls.join(',');
+        if (!title) {
+            alert('图册标题不能为空！');
+            return;
+        }
+        const show = { title, summary, show_data: showData };
+        if (editingShowIndex !== null) {
+            currentShow[editingShowIndex] = show;
+        } else {
+            currentShow.push(show);
+        }
+        closeShowModal();
+        renderShowList();
+    }
+
+    // 删除宣传图册
+    function removeShow(index) {
+        currentShow.splice(index, 1);
+        renderShowList();
+    }
+
+    // 关闭宣传图册模态
+    function closeShowModal() {
+        document.getElementById('show-dialog').style.display = 'none';
+    }
+
+    // 打开批发价模态
+    function openWholesaleModal() {
+        renderWholesaleList();
+        document.getElementById('wholesale-dialog').style.display = 'flex';
+    }
+
+    // 渲染批发价列表
+    function renderWholesaleList() {
+        const wholesaleList = document.getElementById('wholesale-list');
+        wholesaleList.innerHTML = currentWholesale.map((item, index) => `
+            <div class="wholesale-item">
+                <input type="number" value="${item.quantity || ''}" placeholder="数量" min="1" oninput="updateWholesale(${index}, 'quantity', this.value)">
+                <input type="number" value="${item.discount || ''}" step="0.0001" min="0" max="1" placeholder="折扣" oninput="updateWholesale(${index}, 'discount', this.value)">
+                <input type="number" value="${item.unit_price || ''}" step="0.01" min="0" placeholder="单价" oninput="updateWholesale(${index}, 'unit_price', this.value)">
+                <button class="action-btn-remove" onclick="removeWholesale(${index})">删除</button>
+            </div>
+        `).join('');
+    }
+
+    // 添加批发价
+    function addWholesale() {
+        currentWholesale.push({ quantity: '', discount: '', unit_price: '' });
+        renderWholesaleList();
+    }
+
+    // 更新批发价
+    function updateWholesale(index, field, value) {
+        currentWholesale[index][field] = parseFloat(value) || '';
+        renderWholesaleDisplay();
+        renderWholesaleList();
+    }
+
+    // 删除批发价
+    function removeWholesale(index) {
+        currentWholesale.splice(index, 1);
+        renderWholesaleList();
+        renderWholesaleDisplay();
+    }
+
+    // 保存批发价
+    function saveWholesale() {
+        if (currentWholesale.some(item => !item.quantity || !item.discount || !item.unit_price)) {
+            alert('请填写完整的批发价信息！');
+            return;
+        }
+        closeWholesaleModal();
+        renderWholesaleDisplay();
+    }
+
+    // 关闭批发价模态
+    function closeWholesaleModal() {
+        document.getElementById('wholesale-dialog').style.display = 'none';
     }
 
     // 保存商品
@@ -223,14 +890,30 @@
         const itemData = {
             brand_id: parseInt(document.getElementById('edit-brand_id').value) || 0,
             services_id: parseInt(document.getElementById('edit-services_id').value) || 0,
-            status: parseInt(document.getElementById('edit-status').value),
+            sattus: parseInt(document.getElementById('edit-sattus').value),
             delivery_type: parseInt(document.getElementById('edit-delivery_type').value),
-            stock_quantity: parseInt(document.getElementById('edit-stock_quantity').value) || 0,
+            sort_index: parseInt(document.getElementById('edit-sort_index').value) || 0,
             lower_notice_quantity: parseInt(document.getElementById('edit-lower_notice_quantity').value) || 0,
+            shelf_life: parseInt(document.getElementById('edit-shelf_life').value) || 1,
             after_sales_time: parseInt(document.getElementById('edit-after_sales_time').value) || 0,
             price: parseFloat(document.getElementById('edit-price').value) || 0,
             original_price: parseFloat(document.getElementById('edit-original_price').value) || 0,
-            shelf_life: parseInt(document.getElementById('edit-shelf_life').value) || 1
+            custom_url: document.getElementById('edit-custom_url').value.trim(),
+            cover_pic: document.getElementById('edit-cover_pic').files[0] ? generateRandomImage() : currentItem.cover_pic || '',
+            wholesale: currentWholesale,
+            show: currentShow,
+            attributes: currentAttributes.filter(attr => attr.attr_id && attr.attr_value_id),
+            tags: currentTags.filter(tag => tag.tag_id),
+            limit_purchase: {
+                status: parseInt(document.getElementById('edit-limit_status').value),
+                limit_single: parseInt(document.getElementById('edit-limit_single').value) || 0,
+                limit_user: parseInt(document.getElementById('edit-limit_user').value) || 0,
+                limit_day: parseInt(document.getElementById('edit-limit_day').value) || 0,
+                limit_week: parseInt(document.getElementById('edit-limit_week').value) || 0,
+                limit_month: parseInt(document.getElementById('edit-limit_month').value) || 0,
+                start_time: document.getElementById('edit-limit_start_time').value ? Math.floor(new Date(document.getElementById('edit-limit_start_time').value).getTime() / 1000) : 0,
+                end_time: document.getElementById('edit-limit_end_time').value ? Math.floor(new Date(document.getElementById('edit-limit_end_time').value).getTime() / 1000) : 0
+            }
         };
 
         // 保存当前语言的多语言数据
@@ -238,7 +921,10 @@
             name: document.getElementById('edit-name').value.trim(),
             seo_keywords: document.getElementById('edit-seo_keywords').value.trim(),
             seo_description: document.getElementById('edit-seo_description').value.trim(),
-            after_sales_rules: document.getElementById('edit-after_sales_rules').value.trim()
+            after_sales_rules: document.getElementById('edit-after_sales_rules').value.trim(),
+            sample_pics: samplePics.map(pic => pic.url).join(','),
+            content: document.getElementById('edit-content').value.trim(),
+            site_reply: currentItem.item_lang[currentLangCode]?.site_reply || ''
         };
 
         if (!itemData.brand_id || !itemData.services_id || !currentItem.item_lang[currentLangCode].name) {
@@ -246,41 +932,9 @@
             return;
         }
 
-        if (itemId) {
-            // 编辑现有商品
-            const index = allItems.findIndex(item => item.id == itemId);
-            if (index !== -1) {
-                allItems[index] = {
-                    ...allItems[index],
-                    ...itemData,
-                    item_lang: currentItem.item_lang,
-                    update_time: Math.floor(Date.now() / 1000)
-                };
-            }
-        } else {
-            // 添加新商品
-            const newItem = {
-                id: faker.datatype.number({ min: 1000, max: 9999 }),
-                user_id: faker.datatype.number({ min: 1, max: 10000 }),
-                store_id: faker.datatype.number({ min: 1000, max: 9999 }),
-                ...itemData,
-                sort_index: allItems.length,
-                custom_url: faker.internet.url().replace(/^https?:\/\//, ''),
-                cover_pic: faker.image.imageUrl(100, 100, 'product'),
-                field_list: '[]',
-                choose_field_index: 0,
-                last_restock_time: Math.floor(Date.now() / 1000),
-                create_time: Math.floor(Date.now() / 1000),
-                update_time: Math.floor(Date.now() / 1000),
-                item_lang: currentItem.item_lang,
-                item_stat: {
-                    rating: parseFloat(faker.finance.amount(1, 5, 2)),
-                    comment_count: randomInt(0, 100),
-                    deal_avg_count: randomInt(0, 10),
-                    sellable_days: itemData.stock_quantity / randomInt(1, 10) || Infinity
-                }
-            };
-            allItems.push(newItem);
+        if (!/^[a-zA-Z0-9\-\/]+$/.test(itemData.custom_url) && itemData.custom_url) {
+            alert('自定义URL格式不正确！');
+            return;
         }
 
         alert('商品信息已保存！');
