@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存详情</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.16/antd.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .stock-container {padding:1em;max-width:var(--max-content-width);margin:0 auto;}
+        .filter-section {margin-bottom:1em;padding:1em;border:1px solid #e8e8e8;border-radius:0.25em;background:#fff;}
+        .filter-group {display:flex;flex-wrap:wrap;gap:1em;margin-bottom:0.5em;}
+        .filter-group label {font-size:0.875em;color:#1f2937;text-align:right;width:80px;display:inline-block;}
+        .filter-group input, .filter-group select {padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;}
+        .filter-group input:focus, .filter-group select:focus {border-color:#4CAF50;outline:none;}
+        .action-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;color:#fff;border:none;font-size:0.875em;margin-right:0.5em;}
+        .action-btn.add {background:#4CAF50;}
+        .action-btn.add:hover {background:#45a049;}
+        .action-btn.filter {background:#1E90FF;}
+        .action-btn.filter:hover {background:#1C86EE;}
+        .action-btn.batch {background:#FFA500;}
+        .action-btn.batch:hover {background:#FF8C00;}
+        .action-btn.delete {background:#FF4500;}
+        .action-btn.delete:hover {background:#D63B00;}
+        .table-container {background:#fff;border-radius:0.5em;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+        table {width:100%;max-width:100%;border-collapse:collapse;}
+        th {background:#f5f5f5;color:#1f2937;cursor:pointer;white-space:nowrap;}
+        th:hover {background:#e5e5e5;}
+        th, td {padding:0.75em;border:1px solid #e8e8e8;text-align:left;font-size:0.875em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .sort-icon {margin-left:0.1em;}
+        .sort-icon.active {color:#4CAF50;}
+        .primary-key-link {cursor:pointer;color:#1E90FF;}
+        .primary-key-link:hover {color:#1C86EE;}
+        .pagination {display:flex;justify-content:center;align-items:center;gap:0.5em;margin-top:1em;}
+        .pagination button {padding:0.5em 1em;border:1px solid #d9d9d9;border-radius:0.25em;background:#fff;cursor:pointer;font-size:0.875em;}
+        .pagination button:hover {background:#f5f5f5;}
+        .pagination button.active {background:#4CAF50;color:#fff;border-color:#4CAF50;}
+        .pagination button:disabled {color:#d9d9d9;cursor:not-allowed;}
+        .pagination select, .pagination input {padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;}
+        .modal {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:none;justify-content:center;align-items:center;}
+        .modal-content {background:#fff;border-radius:0.5em;width:80%;max-width:800px;padding:1em;box-shadow:0 0.25em 0.5em rgba(0,0,0,0.2);overflow-y:auto;}
+        .modal-header {display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #d9d9d9;padding-bottom:0.5em;}
+        .modal-header h3 {margin:0;font-size:1.25em;color:#1f2937;}
+        .modal-close {background:none;border:none;font-size:1.2em;cursor:pointer;color:#6b7280;}
+        .modal-close:hover {color:#f59e0b;}
+        .modal-body {padding:1em 0;}
+        .modal-footer {border-top:1px solid #d9d9d9;padding-top:0.5em;text-align:right;}
+        .modal-table {width:100%;border-collapse:collapse;}
+        .modal-table th, .modal-table td {border:1px solid #d9d9d9;padding:0.5em;text-align:left;}
+        .modal-table input {width:100%;border:none;padding:0.2em;}
+        .modal-table input:focus {outline:none;border:1px solid #4CAF50;}
+        .modal-action-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;color:#fff;border:none;font-size:0.875em;margin-right:0.5em;}
+        .modal-action-btn.add {background:#4CAF50;}
+        .modal-action-btn.add:hover {background:#45a049;}
+        .modal-action-btn.delete {background:#FF4500;}
+        .modal-action-btn.delete:hover {background:#D63B00;}
+        .modal-action-btn.replace {background:#1E90FF;}
+        .modal-action-btn.replace:hover {background:#1C86EE;}
+        .toast {position:fixed;bottom:20px;right:20px;background:#333;color:#fff;padding:0.5em 1em;border-radius:0.25em;display:none;}
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="stock-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div w3-include-html="/site/store/_sidebar.html"></div>
+        <div class="main-content">
+            <h2>库存详情</h2>
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label>商品</label>
+                    <select id="filter-item">
+                        <option value="">全部商品</option>
+                    </select>
+                    <label>批次</label>
+                    <select id="filter-batch">
+                        <option value="">全部批次</option>
+                    </select>
+                    <label>状态</label>
+                    <select id="filter-sold-status">
+                        <option value="">销售状态</option>
+                        <option value="0">未售</option>
+                        <option value="1">已售</option>
+                    </select>
+                    <select id="filter-replacement-status">
+                        <option value="">换货状态</option>
+                        <option value="0">未换货</option>
+                        <option value="1">已换货</option>
+                    </select>
+                    <label>时间范围</label>
+                    <input type="text" id="filter-start-time" placeholder="开始时间">
+                    <input type="text" id="filter-end-time" placeholder="结束时间">
+                    <label>主键</label>
+                    <input type="text" id="filter-account" placeholder="主账户">
+                    <button class="action-btn filter" onclick="applyFilter()">筛选</button>
+                    <button class="action-btn batch" onclick="openStatusModal()">批量修改状态</button>
+                    <button class="action-btn batch" onclick="openValueListModal()">批量修改库存</button>
+                    <button class="action-btn delete" onclick="batchDelete()">批量删除</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all" onchange="toggleSelectAll()"></th>
+                        <th onclick="sortTable('id')">ID <span class="sort-icon" id="sort-id">↕</span></th>
+                        <th>商品</th>
+                        <th>主键</th>
+                        <th onclick="sortTable('batch_id')">批次 <span class="sort-icon" id="sort-batch_id">↕</span></th>
+                        <th onclick="sortTable('orders_id')">订单 <span class="sort-icon" id="sort-orders_id">↕</span></th>
+                        <th onclick="sortTable('sold_status')">销售状态 <span class="sort-icon" id="sort-sold_status">↕</span></th>
+                        <th onclick="sortTable('replacement_status')">换货状态 <span class="sort-icon" id="sort-replacement_status">↕</span></th>
+                        <th onclick="sortTable('create_time')">创建时间 <span class="sort-icon" id="sort-create_time">↕</span></th>
+                        <th onclick="sortTable('sold_time')">售出时间 <span class="sort-icon" id="sort-sold_time">↕</span></th>
+                    </tr>
+                    </thead>
+                    <tbody id="stock-table-body"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<div class="modal" id="status-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>批量修改状态</h3>
+            <button class="modal-close" onclick="closeModal('status-modal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="filter-group">
+                <label>字段</label>
+                <select id="status-field">
+                    <option value="sold_status">销售状态</option>
+                    <option value="replacement_status">换货状态</option>
+                </select>
+                <label>值</label>
+                <select id="status-value">
+                    <option value="0">未处理</option>
+                    <option value="1">已处理</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-action-btn add" onclick="saveStatusChanges()">确认修改</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="value-list-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>批量修改库存</h3>
+            <button class="modal-close" onclick="closeModal('value-list-modal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="filter-group">
+                <button class="modal-action-btn add" onclick="openAddColumnModal()">添加列</button>
+                <button class="modal-action-btn delete" onclick="openDeleteColumnModal()">删除列</button>
+                <button class="modal-action-btn add" onclick="openPrefixSuffixModal('prefix')">添加前缀</button>
+                <button class="modal-action-btn add" onclick="openPrefixSuffixModal('suffix')">添加后缀</button>
+                <button class="modal-action-btn replace" onclick="openReplaceModal()">替换</button>
+            </div>
+            <table class="modal-table" id="value-list-table">
+                <thead id="value-list-table-header"></thead>
+                <tbody id="value-list-table-body"></tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-action-btn add" onclick="saveValueListChanges()">保存</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="add-column-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>添加列</h3>
+            <button class="modal-close" onclick="closeModal('add-column-modal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="filter-group">
+                <label>位置</label>
+                <select id="add-column-position"></select>
+                <label>值</label>
+                <input type="text" id="add-column-value" placeholder="输入值">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-action-btn add" onclick="addValueListColumn()">确认</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="delete-column-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>删除列</h3>
+            <button class="modal-close" onclick="closeModal('delete-column-modal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="filter-group">
+                <label>列</label>
+                <select id="delete-column-index"></select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-action-btn delete" onclick="deleteValueListColumn()">确认</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="prefix-suffix-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="prefix-suffix-title">添加前缀/后缀</h3>
+            <button class="modal-close" onclick="closeModal('prefix-suffix-modal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="filter-group">
+                <label>列</label>
+                <select id="prefix-suffix-column"></select>
+                <label>值</label>
+                <input type="text" id="prefix-suffix-value" placeholder="输入前缀/后缀">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-action-btn add" onclick="applyPrefixSuffix()">确认</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="replace-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>替换字符</h3>
+            <button class="modal-close" onclick="closeModal('replace-modal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="filter-group">
+                <label>列</label>
+                <select id="replace-column"></select>
+                <label>旧字符</label>
+                <input type="text" id="replace-old" placeholder="输入旧字符">
+                <label>新字符</label>
+                <input type="text" id="replace-new" placeholder="输入新字符">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-action-btn add" onclick="applyReplace()">确认</button>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast">Copied to clipboard!</div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+            initializePage();
+        });
+    });
+
+    let stockData = [];
+    let filteredData = [];
+    let sortField = null;
+    let sortDirection = 'asc';
+    let currentPage = 1;
+    let pageSize = 100; // 默认 100 条/页
+    let selectedIds = new Set();
+
+    // 状态映射和颜色
+    const statusMap = {
+        sold_status: { 0: { text: '未售', color: '#1E90FF' }, 1: { text: '已售', color: '#4CAF50' } },
+        replacement_status: { 0: { text: '未换货', color: '#1E90FF' }, 1: { text: '已换货', color: '#4CAF50' } }
+    };
+
+    // 模拟商品和批次数据
+    const items = Array(10).fill().map(() => ({
+        id: faker.datatype.number({ min: 1000, max: 9999 }),
+        name: faker.commerce.productName()
+    }));
+    const batches = Array(50).fill().map(() => ({
+        id: faker.datatype.number({ min: 10000, max: 99999 })
+    }));
+
+    // 初始化页面
+    function initializePage() {
+        // 生成模拟数据 (500-5000 条)
+        stockData = Array(randomInt(500, 5000)).fill().map(() => {
+            const batchCount = randomInt(50, 500);
+            const salesCount = randomInt(0, batchCount);
+            const replacementCount = randomInt(0, Math.min(20, batchCount - salesCount));
+            const refundCount = randomInt(0, Math.min(20, batchCount - salesCount - replacementCount));
+            return {
+                id: faker.datatype.number({ min: 100000, max: 999999 }),
+                item_id: items[randomInt(0, items.length - 1)].id,
+                batch_id: batches[randomInt(0, batches.length - 1)].id,
+                orders_id: faker.datatype.number({ min: 10000, max: 99999 }),
+                sold_status: faker.random.arrayElement([0, 1]),
+                replacement_status: faker.random.arrayElement([0, 1]),
+                delete_status: faker.random.arrayElement([0, 1]),
+                create_time: Math.floor(Date.now() / 1000) - randomInt(0, 90 * 24 * 3600),
+                sold_time: Math.random() > 0.5 ? Math.floor(Date.now() / 1000) - randomInt(0, 90 * 24 * 3600) : 0,
+                account: faker.internet.email(),
+                value_list: JSON.stringify(Array(randomInt(2, 6)).fill().map(() => faker.lorem.word()))
+            };
+        });
+        filteredData = [...stockData].filter(item => item.delete_status === 0);
+
+        // 初始化筛选
+        const itemSelect = document.getElementById('filter-item');
+        itemSelect.innerHTML = `<option value="">全部商品</option>` +
+            items.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
+
+        const batchSelect = document.getElementById('filter-batch');
+        batchSelect.innerHTML = `<option value="">全部批次</option>` +
+            batches.map(batch => `<option value="${batch.id}">${batch.id}</option>`).join('');
+
+        // 处理 URL 参数
+        const params = new URLSearchParams(window.location.search);
+        const batchId = params.get('batchId');
+        if (batchId) {
+            document.getElementById('filter-batch').value = batchId;
+            applyFilter();
+        }
+
+        // 初始化时间选择器
+        flatpickr('#filter-start-time', { dateFormat: 'Y-m-d H:i', enableTime: true });
+        flatpickr('#filter-end-time', { dateFormat: 'Y-m-d H:i', enableTime: true });
+
+        renderTable();
+        renderPagination();
+    }
+
+    // 随机整数函数
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 格式化时间
+    function formatTime(timestamp) {
+        if (!timestamp) return '--';
+        const date = new Date(timestamp * 1000);
+        return `${date.getMonth() + 1}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+    }
+
+    // 复制到剪贴板
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2000);
+        }).catch(err => {
+            console.error('Clipboard error:', err);
+        });
+    }
+
+    // 应用筛选
+    function applyFilter() {
+        const itemId = document.getElementById('filter-item').value;
+        const batchId = document.getElementById('filter-batch').value;
+        const soldStatus = document.getElementById('filter-sold-status').value;
+        const replacementStatus = document.getElementById('filter-replacement-status').value;
+        const startTime = document.getElementById('filter-start-time').value ? Math.floor(new Date(document.getElementById('filter-start-time').value).getTime() / 1000) : null;
+        const endTime = document.getElementById('filter-end-time').value ? Math.floor(new Date(document.getElementById('filter-end-time').value).getTime() / 1000) : null;
+        const account = document.getElementById('filter-account').value.trim().toLowerCase();
+
+        filteredData = stockData.filter(item => {
+            let pass = item.delete_status === 0;
+            if (itemId && item.item_id != itemId) pass = false;
+            if (batchId && item.batch_id != batchId) pass = false;
+            if (soldStatus !== '' && item.sold_status != soldStatus) pass = false;
+            if (replacementStatus !== '' && item.replacement_status != replacementStatus) pass = false;
+            if (startTime && item.create_time < startTime) pass = false;
+            if (endTime && item.create_time > endTime) pass = false;
+            if (account && !item.account?.toLowerCase().includes(account)) pass = false;
+            return pass;
+        });
+
+        currentPage = 1;
+        renderTable();
+        renderPagination();
+    }
+
+    // 排序表格
+    function sortTable(field) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+
+        filteredData.sort((a, b) => {
+            const valA = a[field] || 0;
+            const valB = b[field] || 0;
+            return sortDirection === 'asc' ? valA - valB : valB - valA;
+        });
+
+        document.querySelectorAll('.sort-icon').forEach(icon => icon.classList.remove('active'));
+        document.getElementById(`sort-${field}`).classList.add('active');
+        document.getElementById(`sort-${field}`).textContent = sortDirection === 'asc' ? '↑' : '↓';
+
+        renderTable();
+    }
+
+    // 渲染表格
+    function renderTable() {
+        const tbody = document.getElementById('stock-table-body');
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const paginatedData = filteredData.slice(start, end);
+
+        tbody.innerHTML = paginatedData.map(item => {
+            const itemName = items.find(i => i.id === item.item_id)?.name || '未知商品';
+            return `
+                <tr>
+                    <td><input type="checkbox" class="select-item" data-id="${item.id}" ${selectedIds.has(item.id) ? 'checked' : ''} onchange="toggleSelectItem(${item.id})"></td>
+                    <td>${item.id}</td>
+                    <td>${itemName}</td>
+                    <td><span class="primary-key-link" onclick="copyToClipboard('${item.account}')">${item.account || '--'}</span></td>
+                    <td>${item.batch_id}</td>
+                    <td>${item.orders_id}</td>
+                    <td><span style="color:${statusMap.sold_status[item.sold_status].color}">${statusMap.sold_status[item.sold_status].text}</span></td>
+                    <td><span style="color:${statusMap.replacement_status[item.replacement_status].color}">${statusMap.replacement_status[item.replacement_status].text}</span></td>
+                    <td>${formatTime(item.create_time)}</td>
+                    <td>${formatTime(item.sold_time)}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // 全选/取消全选
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('select-all').checked;
+        document.querySelectorAll('.select-item').forEach(checkbox => {
+            const id = parseInt(checkbox.dataset.id);
+            checkbox.checked = selectAll;
+            if (selectAll) {
+                selectedIds.add(id);
+            } else {
+                selectedIds.delete(id);
+            }
+        });
+    }
+
+    // 单个选择
+    function toggleSelectItem(id) {
+        const checkbox = document.querySelector(`.select-item[data-id="${id}"]`);
+        if (checkbox.checked) {
+            selectedIds.add(id);
+        } else {
+            selectedIds.delete(id);
+        }
+        document.getElementById('select-all').checked = selectedIds.size === filteredData.length;
+    }
+
+    // 批量删除
+    function batchDelete() {
+        if (selectedIds.size === 0) {
+            alert('请至少选择一条记录！');
+            return;
+        }
+        if (confirm(`确认删除选中的 ${selectedIds.size} 条记录？`)) {
+            stockData.forEach(item => {
+                if (selectedIds.has(item.id)) {
+                    item.delete_status = 1;
+                }
+            });
+            filteredData = stockData.filter(item => item.delete_status === 0);
+            applyFilter();
+            selectedIds.clear();
+            document.getElementById('select-all').checked = false;
+            alert('记录已删除！');
+        }
+    }
+
+    // 打开状态修改模态框
+    function openStatusModal() {
+        if (selectedIds.size === 0) {
+            alert('请至少选择一条记录！');
+            return;
+        }
+        document.getElementById('status-modal').style.display = 'flex';
+    }
+
+    // 保存状态修改
+    function saveStatusChanges() {
+        const field = document.getElementById('status-field').value;
+        const value = parseInt(document.getElementById('status-value').value);
+        stockData.forEach(item => {
+            if (selectedIds.has(item.id)) {
+                item[field] = value;
+            }
+        });
+        filteredData = [...stockData].filter(item => item.delete_status === 0);
+        applyFilter();
+        closeModal('status-modal');
+        alert('状态已更新！');
+    }
+
+    // 打开值列表修改模态框
+    function openValueListModal() {
+        if (selectedIds.size === 0) {
+            alert('请至少选择一条记录！');
+            return;
+        }
+        const selectedItems = stockData.filter(item => selectedIds.has(item.id));
+        const maxFields = Math.max(...selectedItems.map(item => JSON.parse(item.value_list || '[]').length));
+        const header = document.getElementById('value-list-table-header');
+        if (!header) {
+            console.error('Value list table header not found');
+            return;
+        }
+        header.innerHTML = `<tr><th>ID</th>${Array(maxFields).fill().map((_, i) => `<th>字段${i + 1}</th>`).join('')}</tr>`;
+        const body = document.getElementById('value-list-table-body');
+        body.innerHTML = selectedItems.map(item => {
+            const valueList = JSON.parse(item.value_list || '[]');
+            return `
+                <tr data-id="${item.id}">
+                    <td>${item.id}</td>
+                    ${Array(maxFields).fill().map((_, i) => `<td><input value="${valueList[i] || ''}" data-index="${i}"></td>`).join('')}
+                </tr>
+            `;
+        }).join('');
+        document.getElementById('prefix-suffix-column').innerHTML = Array(maxFields).fill().map((_, i) => `<option value="${i}">字段${i + 1}</option>`).join('');
+        document.getElementById('replace-column').innerHTML = Array(maxFields).fill().map((_, i) => `<option value="${i}">字段${i + 1}</option>`).join('');
+        document.getElementById('add-column-position').innerHTML = Array(maxFields + 1).fill().map((_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
+        document.getElementById('delete-column-index').innerHTML = Array(maxFields).fill().map((_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
+        document.getElementById('value-list-modal').style.display = 'flex';
+    }
+
+    // 打开添加列模态框
+    function openAddColumnModal() {
+        const header = document.getElementById('value-list-table-header')?.querySelector('tr');
+        if (!header) {
+            console.error('Value list table header not found');
+            return;
+        }
+        const maxFields = header.children.length - 1;
+        document.getElementById('add-column-position').innerHTML = Array(maxFields + 1).fill().map((_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
+        document.getElementById('add-column-modal').style.display = 'flex';
+    }
+
+    // 添加值列表列
+    function addValueListColumn() {
+        const position = parseInt(document.getElementById('add-column-position').value);
+        const value = document.getElementById('add-column-value').value;
+        if (!value) {
+            alert('请输入值！');
+            return;
+        }
+        const header = document.getElementById('value-list-table-header')?.querySelector('tr');
+        if (!header) {
+            console.error('Value list table header not found');
+            return;
+        }
+        const newIndex = header.children.length - 1;
+        const headerCells = Array.from(header.children);
+        headerCells.splice(position, 0, document.createElement('th'));
+        headerCells[position].textContent = `字段${position}`;
+        header.innerHTML = headerCells.map(cell => cell.outerHTML).join('');
+        document.getElementById('value-list-table-body').querySelectorAll('tr').forEach(row => {
+            const cells = Array.from(row.children);
+            cells.splice(position, 0, document.createElement('td'));
+            cells[position].innerHTML = `<input value="${value}" data-index="${position - 1}">`;
+            row.innerHTML = cells.map(cell => cell.outerHTML).join('');
+        });
+        document.getElementById('prefix-suffix-column').innerHTML = Array(header.children.length - 1).fill().map((_, i) => `<option value="${i}">字段${i + 1}</option>`).join('');
+        document.getElementById('replace-column').innerHTML = Array(header.children.length - 1).fill().map((_, i) => `<option value="${i}">字段${i + 1}</option>`).join('');
+        closeModal('add-column-modal');
+    }
+
+    // 打开删除列模态框
+    function openDeleteColumnModal() {
+        const header = document.getElementById('value-list-table-header')?.querySelector('tr');
+        if (!header) {
+            console.error('Value list table header not found');
+            return;
+        }
+        const maxFields = header.children.length - 1;
+        if (maxFields === 0) {
+            alert('没有可删除的列！');
+            return;
+        }
+        document.getElementById('delete-column-index').innerHTML = Array(maxFields).fill().map((_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
+        document.getElementById('delete-column-modal').style.display = 'flex';
+    }
+
+    // 删除值列表列
+    function deleteValueListColumn() {
+        const index = parseInt(document.getElementById('delete-column-index').value);
+        const header = document.getElementById('value-list-table-header')?.querySelector('tr');
+        if (!header || index < 1 || index > header.children.length - 1) {
+            alert('无效的列索引！');
+            return;
+        }
+        header.removeChild(header.children[index]);
+        document.getElementById('value-list-table-body').querySelectorAll('tr').forEach(row => {
+            row.removeChild(row.children[index]);
+        });
+        document.getElementById('prefix-suffix-column').innerHTML = Array(header.children.length - 1).fill().map((_, i) => `<option value="${i}">字段${i + 1}</option>`).join('');
+        document.getElementById('replace-column').innerHTML = Array(header.children.length - 1).fill().map((_, i) => `<option value="${i}">字段${i + 1}</option>`).join('');
+        closeModal('delete-column-modal');
+    }
+
+    // 打开前缀/后缀模态框
+    function openPrefixSuffixModal(type) {
+        document.getElementById('prefix-suffix-title').textContent = `添加${type === 'prefix' ? '前缀' : '后缀'}`;
+        document.getElementById('prefix-suffix-modal').dataset.type = type;
+        document.getElementById('prefix-suffix-modal').style.display = 'flex';
+    }
+
+    // 应用前缀/后缀
+    function applyPrefixSuffix() {
+        const column = parseInt(document.getElementById('prefix-suffix-column').value);
+        const value = document.getElementById('prefix-suffix-value').value;
+        const type = document.getElementById('prefix-suffix-modal').dataset.type;
+        if (!value) {
+            alert('请输入值！');
+            return;
+        }
+        document.getElementById('value-list-table-body').querySelectorAll('tr').forEach(row => {
+            const input = row.querySelector(`td:nth-child(${column + 2}) input`);
+            input.value = type === 'prefix' ? value + input.value : input.value + value;
+        });
+        closeModal('prefix-suffix-modal');
+    }
+
+    // 打开替换模态框
+    function openReplaceModal() {
+        document.getElementById('replace-modal').style.display = 'flex';
+    }
+
+    // 应用替换
+    function applyReplace() {
+        const column = parseInt(document.getElementById('replace-column').value);
+        const oldStr = document.getElementById('replace-old').value;
+        const newStr = document.getElementById('replace-new').value;
+        if (!oldStr) {
+            alert('请输入旧字符！');
+            return;
+        }
+        document.getElementById('value-list-table-body').querySelectorAll('tr').forEach(row => {
+            const input = row.querySelector(`td:nth-child(${column + 2}) input`);
+            input.value = input.value.replaceAll(oldStr, newStr);
+        });
+        closeModal('replace-modal');
+    }
+
+    // 保存值列表修改
+    function saveValueListChanges() {
+        const rows = document.getElementById('value-list-table-body').querySelectorAll('tr');
+        const fieldCount = rows[0].children.length - 1;
+        let isValid = true;
+        rows.forEach(row => {
+            if (row.children.length - 1 !== fieldCount) {
+                isValid = false;
+            }
+        });
+        if (!isValid) {
+            alert('所有行的字段数量必须一致！');
+            return;
+        }
+        rows.forEach(row => {
+            const id = parseInt(row.dataset.id);
+            const valueList = Array.from(row.querySelectorAll('input')).map(input => input.value);
+            const item = stockData.find(item => item.id === id);
+            if (item) {
+                item.value_list = JSON.stringify(valueList);
+            }
+        });
+        filteredData = [...stockData].filter(item => item.delete_status === 0);
+        applyFilter();
+        closeModal('value-list-modal');
+        alert('库存已更新！');
+    }
+
+    // 关闭模态框
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    // 渲染分页
+    function renderPagination() {
+        const pagination = document.getElementById('pagination');
+        const totalPages = Math.ceil(filteredData.length / pageSize);
+        const maxPagesToShow = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+
+        const pages = [];
+        if (totalPages <= maxPagesToShow) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            if (currentPage <= 3) {
+                pages.push(1, 2, 3, '...', totalPages - 1, totalPages);
+            } else if (currentPage >= totalPages - 2) {
+                pages.push(1, 2, '...', totalPages - 2, totalPages - 1, totalPages);
+            } else {
+                pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+            }
+        }
+
+        pagination.innerHTML = `
+            <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>
+            ${pages.map(page => page === '...' ? `<span>...</span>` : `<button onclick="changePage(${page})" ${page === currentPage ? 'class="active"' : ''}>${page}</button>`).join('')}
+            <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>
+            <input type="number" id="jump-page" placeholder="页码" min="1" max="${totalPages}" style="width:60px;">
+            <button onclick="jumpToPage()">跳转</button>
+            <select onchange="changePageSize(this.value)">
+                <option value="20" ${pageSize === 20 ? 'selected' : ''}>20/页</option>
+                <option value="50" ${pageSize === 50 ? 'selected' : ''}>50/页</option>
+                <option value="100" ${pageSize === 100 ? 'selected' : ''}>100/页</option>
+                <option value="500" ${pageSize === 500 ? 'selected' : ''}>500/页</option>
+                <option value="1000" ${pageSize === 1000 ? 'selected' : ''}>1000/页</option>
+            </select>
+        `;
+    }
+
+    // 更改页面
+    function changePage(page) {
+        const totalPages = Math.ceil(filteredData.length / pageSize);
+        if (page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderTable();
+            renderPagination();
+        }
+    }
+
+    // 跳转到指定页面
+    function jumpToPage() {
+        const page = parseInt(document.getElementById('jump-page').value);
+        const totalPages = Math.ceil(filteredData.length / pageSize);
+        if (page >= 1 && page <= totalPages) {
+            changePage(page);
+        } else {
+            alert('无效的页码！');
+        }
+    }
+
+    // 更改每页条数
+    function changePageSize(size) {
+        pageSize = parseInt(size);
+        currentPage = 1;
+        renderTable();
+        renderPagination();
+    }
+
+    // 查看批次
+    function viewBatch(batchId) {
+        window.location.href = `/site/store/item-stock.html?batchId=${batchId}`;
+    }
+
+    // 添加库存
+    function addStock() {
+        window.location.href = '/site/store/stock-restock.html';
+    }
+</script>
+</body>
+</html>
