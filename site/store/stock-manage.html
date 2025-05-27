@@ -21,8 +21,8 @@
     <style>
         .stock-container {padding:1em;max-width:var(--max-content-width);margin:0 auto;}
         .filter-section {margin-bottom:1em;padding:1em;border:1px solid #e8e8e8;border-radius:0.25em;background:#fff;}
-        .filter-group {gap:1em;margin-bottom:0.5em;align-items:center;}
-        .filter-group label {font-size:0.875em;color:#1f2937;text-align:right;}
+        .filter-group {display:flex;gap:1em;margin-bottom:0.5em;align-items:center;}
+        .filter-group label {width:80px;font-size:0.875em;color:#1f2937;text-align:right;}
         .filter-group input, .filter-group select {padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;}
         .filter-group input:focus, .filter-group select:focus {border-color:#4CAF50;outline:none;}
         .action-btn-add {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
@@ -31,9 +31,9 @@
         .action-btn-filter:hover {background:#1C86EE;}
         .table-container {background:#fff;border-radius:0.5em;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
         table {width:100%;max-width:100%;border-collapse:collapse;}
+        th, td {padding:0.75em;border:1px solid #e8e8e8;text-align:left;font-size:0.875em;}
         th {background:#f5f5f5;color:#1f2937;cursor:pointer;white-space:nowrap;}
         th:hover {background:#e5e5e5;}
-        th, td {padding:0.75em;border:1px solid #e8e8e8;text-align:left;font-size:0.875em;}
         .sort-icon {margin-left:0.1em;}
         .sort-icon.active {color:#4CAF50;}
         .progress-bar {height:8px;border-radius:4px;background:#e0e0e0;margin-bottom:0.25em;}
@@ -46,6 +46,8 @@
         .action-icon.off-sell:hover {color:#D63B00;}
         .action-icon.on-sell {color:#4CAF50;}
         .action-icon.on-sell:hover {color:#45a049;}
+        .action-icon.restock {color:#8B008B;}
+        .action-icon.restock:hover {color:#6A006A;}
         .pagination {display:flex;justify-content:center;align-items:center;gap:0.5em;margin-top:1em;}
         .pagination button {padding:0.5em 1em;border:1px solid #d9d9d9;border-radius:0.25em;background:#fff;cursor:pointer;font-size:0.875em;}
         .pagination button:hover {background:#f5f5f5;}
@@ -68,20 +70,28 @@
                     <select id="filter-item">
                         <option value="">全部商品</option>
                     </select>
+                </div>
+                <div class="filter-group">
                     <label>状态</label>
                     <select id="filter-status">
                         <option value="">全部状态</option>
-                        <option value="0">在售</option>
-                        <option value="1">下架</option>
-                        <option value="2">售罄</option>
-                        <option value="3">删除</option>
+                        <option value="1">在售</option>
+                        <option value="2">下架</option>
+                        <option value="3">售罄</option>
+                        <option value="0">删除</option>
                     </select>
+                </div>
+                <div class="filter-group">
                     <label>时间范围</label>
                     <input type="text" id="filter-start-time" placeholder="开始时间">
                     <input type="text" id="filter-end-time" placeholder="结束时间">
+                </div>
+                <div class="filter-group">
                     <label>数量范围</label>
                     <input type="number" id="filter-count-min" placeholder="最小数量" min="0">
                     <input type="number" id="filter-count-max" placeholder="最大数量" min="0">
+                </div>
+                <div class="filter-group">
                     <button class="action-btn-filter" onclick="applyFilter()">筛选</button>
                     <button class="action-btn-add" onclick="addStock()">添加库存</button>
                 </div>
@@ -99,6 +109,7 @@
                         <th onclick="sortTable('rest_count')">剩余数量 <span class="sort-icon" id="sort-rest_count">↕</span></th>
                         <th onclick="sortTable('status')">状态 <span class="sort-icon" id="sort-status">↕</span></th>
                         <th>字段列表</th>
+                        <th>批次标记</th>
                         <th onclick="sortTable('create_time')">创建时间 <span class="sort-icon" id="sort-create_time">↕</span></th>
                         <th>操作</th>
                     </tr>
@@ -128,12 +139,12 @@
     let currentPage = 1;
     let pageSize = 20; // 默认 20 条/页
 
-    // 状态映射和颜色
+    // 状态映射
     const statusMap = {
-        0: { text: '在售', color: '#4CAF50' },
-        1: { text: '下架', color: '#FF4500' },
-        2: { text: '售罄', color: '#6B7280' },
-        3: { text: '删除', color: '#374151' }
+        0: { text: '删除', color: '#374151' },
+        1: { text: '在售', color: '#4CAF50' },
+        2: { text: '下架', color: '#FF4500' },
+        3: { text: '售罄', color: '#6B7280' }
     };
 
     // 模拟商品数据
@@ -152,7 +163,7 @@
             const refundCount = randomInt(0, Math.min(20, batchCount - salesCount - replacementCount));
             return {
                 id: faker.datatype.number({ min: 10000, max: 99999 }),
-                status: faker.random.arrayElement([0, 1]), // 随机在售或下架
+                status: faker.random.arrayElement([0, 1, 2, 3]),
                 store_id: faker.datatype.number({ min: 1000, max: 9999 }),
                 item_id: items[randomInt(0, items.length - 1)].id,
                 batch_count: batchCount,
@@ -165,6 +176,7 @@
                         `${faker.random.arrayElement(['Size', 'Color', 'Material', 'Style', 'Brand'])}: ${faker.lorem.word()}`
                     )
                 ),
+                batch_mark: `BATCH-${faker.random.alphaNumeric(6).toUpperCase()}`,
                 create_time: Math.floor(Date.now() / 1000) - randomInt(0, 90 * 24 * 3600)
             };
         });
@@ -245,7 +257,7 @@
         tbody.innerHTML = paginatedData.map(item => {
             const itemName = items.find(i => i.id === item.item_id)?.name || '未知商品';
             const salesPercent = (item.sales_count / item.batch_count * 100).toFixed(2);
-            const greenShade = Math.floor((salesPercent / 100) * (128 - 144) + 144); // 从 144 到 128
+            const greenShade = Math.floor((salesPercent / 100) * (128 - 144) + 144);
             const fieldList = JSON.parse(item.field_list || '[]');
             const statusInfo = statusMap[item.status] || { text: '未知', color: '#000000' };
             return `
@@ -268,24 +280,31 @@
                             ${fieldList.map(field => `<span class="ant-tag ant-tag-blue">${field}</span>`).join('')}
                         </div>
                     </td>
+                    <td>${item.batch_mark || '--'}</td>
                     <td>${new Date(item.create_time * 1000).toLocaleString('zh-CN')}</td>
                     <td>
                         <i class="fas fa-eye action-icon" onclick="viewBatch(${item.id})"></i>
-                        ${item.status === 0 ? `<i class="fas fa-ban action-icon off-sell" onclick="offSellBatch(${item.id})"></i>` :
-                item.status === 1 ? `<i class="fas fa-arrow-up action-icon on-sell" onclick="onSellBatch(${item.id})"></i>` : ''}
+                        ${item.status === 1 ? `<i class="fas fa-ban action-icon off-sell" onclick="offSellBatch(${item.id})"></i>` :
+                item.status === 2 ? `<i class="fas fa-arrow-up action-icon on-sell" onclick="onSellBatch(${item.id})"></i>` : ''}
+                        <i class="fas fa-warehouse action-icon restock" onclick="restockBatch(${item.id}, ${item.item_id}, '${encodeURIComponent(item.field_list)}')"></i>
                     </td>
                 </tr>
             `;
         }).join('');
     }
 
+    // 查看批次
+    function viewBatch(batchId) {
+        window.location.href = `/site/store/item-stock.html?batchId=${batchId}`;
+    }
+
     // 下架批次
     function offSellBatch(batchId) {
         const item = stockData.find(item => item.id === batchId);
         if (item) {
-            item.status = 1; // 设置为下架
-            filteredData = [...stockData]; // 刷新过滤数据
-            applyFilter(); // 重新应用筛选
+            item.status = 2; // 设置为下架
+            filteredData = [...stockData];
+            applyFilter();
             alert('批次已下架！');
         }
     }
@@ -294,11 +313,21 @@
     function onSellBatch(batchId) {
         const item = stockData.find(item => item.id === batchId);
         if (item) {
-            item.status = 0; // 设置为在售
-            filteredData = [...stockData]; // 刷新过滤数据
-            applyFilter(); // 重新应用筛选
+            item.status = 1; // 设置为在售
+            filteredData = [...stockData];
+            applyFilter();
             alert('批次已上架！');
         }
+    }
+
+    // 入库批次
+    function restockBatch(batchId, itemId, fieldList) {
+        window.location.href = `/site/store/stock-restock.html?itemId=${itemId}&fieldList=${fieldList}`;
+    }
+
+    // 添加库存
+    function addStock() {
+        window.location.href = '/site/store/stock-restock.html';
     }
 
     // 渲染分页
@@ -341,16 +370,6 @@
         currentPage = 1;
         renderTable();
         renderPagination();
-    }
-
-    // 查看批次
-    function viewBatch(batchId) {
-        window.location.href = `/site/store/item-stock.html?batchId=${batchId}`;
-    }
-
-    // 添加库存
-    function addStock() {
-        window.location.href = '/site/store/stock-restock.html';
     }
 </script>
 </body>
