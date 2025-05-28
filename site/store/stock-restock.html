@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存入库</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.16/antd.min.css">
+    <link rel="stylesheet" href="/site/_site.css">
+    <link rel="stylesheet" href="/site/store/_store.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <script src="/site/_fields.js"></script>
+    <script src="/site/_data.js"></script>
+    <script src="/site/_location.js"></script>
+    <script src="/site/_member.js"></script>
+    <script src="/site/_common.js"></script>
+    <script src="/site/store/_store.js"></script>
+    <style>
+        .restock-container {padding:1em;max-width:1200px;margin:0 auto;}
+        .form-section {margin-bottom:1em;padding:1em;border:1px solid #e8e8e8;border-radius:0.25em;background:#fff;}
+        .form-group {display:flex;gap:1em;margin-bottom:0.5em;align-items:center;}
+        .form-group label {width:80px;font-size:0.875em;color:#1f2937;text-align:right;}
+        .form-group input, .form-group select, .form-group textarea {padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;}
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {border-color:#4CAF50;outline:none;}
+        .form-group input[readonly] {background:#f5f5f5;cursor:not-allowed;}
+        .field-tags {display:flex;gap:0.5em;align-items:center;}
+        .field-tags .ant-tag {position:relative;padding:0.2em 1.5em 0.2em 0.5em;border-radius:0.25em;font-size:0.75em;cursor:move;}
+        .field-tags .tag-close {position:absolute;top:0.2em;right:0.2em;cursor:pointer;color:#6b7280;font-size:0.6em;}
+        .field-tags .tag-close:hover {color:#FF4500;}
+        .add-field-btn {cursor:pointer;color:#1E90FF;}
+        .add-field-btn:hover {color:#1C86EE;}
+        .action-btn {padding:0.6em;border-radius:0.25em;cursor:pointer;color:#fff;border:none;font-size:0.875em;margin-right:0.5em;}
+        .action-btn.submit {background:#4CAF50;}
+        .action-btn.submit:hover {background:#45a049;}
+        .action-btn.secondary {background:#1E90FF;padding:0.5em 0.8em;}
+        .action-btn.secondary:hover {background:#1C86EE;}
+        .action-btn.dedupe {background:#FF4500;}
+        .action-btn.dedupe:hover {background:#D63B00;}
+        .action-btn i {font-size:1em;}
+        .action-btn:hover {position:relative;}
+        .action-btn[title]:hover::after {
+            content:attr(title);
+            position:absolute;top:-2em;left:50%;transform:translateX(-50%);
+            background:#333;color:#fff;padding:0.3em 0.6em;border-radius:0.2em;
+            font-size:0.75em;white-space:nowrap;z-index:1000;
+            box-shadow:0 2px 4px rgba(0,0,0,0.2);
+        }
+        .product-list-container {margin-top:1em;}
+        .product-list {width:100%;height:400px;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;}
+        .product-table-container {width:100%;height:400px;overflow-y:auto;display:block;}
+        .product-table {width:100%;border-collapse:collapse;}
+        .product-table th, .product-table td {border:1px solid #d9d9d9;padding:0.5em;text-align:left;min-width:100px;}
+        .product-table thead {position:sticky;top:0;background:#f5f5f5;z-index:1;}
+        .product-table th {background:#f5f5f5;}
+        .product-table tr.error {color:#FF4500;}
+        .product-table td:not(:first-child) {cursor:pointer;}
+        .product-table td.edit-cell {padding:0;display:flex;align-items:center;border:1px solid #d9d9d9;}
+        .product-table td.edit-cell input {width:100%;padding:0.5em;border:none;font-size:0.875em;box-sizing:border-box;}
+        .product-table td.edit-cell .delete-cell {margin-left:0.5em;color:#FF4500;opacity:0;visibility:hidden;}
+        .product-table td.edit-cell:hover .delete-cell {opacity:1;visibility:visible;}
+        .error-message {display:block;color:#FF4500;margin-top:0.5em;font-size:0.875em;}
+        .error-message a {cursor:pointer;text-decoration:underline;color:#FF4500;}
+        .error-message a:hover {color:#D63B00;}
+        .modal {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:none;justify-content:center;align-items:center;}
+        .modal-content {background:#fff;border-radius:0.5em;width:80%;max-width:600px;padding:1em;box-shadow:0 0.25em 0.5em rgba(0,0,0,0.2);}
+        .modal-header {display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #d9d9d9;padding-bottom:0.5em;}
+        .modal-header h3 {margin:0;font-size:1.25em;color:#1f2937;}
+        .modal-close {background:none;border:none;font-size:1.2em;cursor:pointer;color:#6b7280;}
+        .modal-close:hover {color:#f59e0b;}
+        .modal-body {padding:1em 0;}
+        .modal-footer {border-top:1px solid #d9d9d9;padding-top:0.5em;text-align:right;}
+        .function-toast {position:absolute;top:100%;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:0.5em 1em;border-radius:0.25em;margin-top:0.5em;font-size:0.875em;white-space:nowrap;z-index:1000;box-shadow:0 2px 4px rgba(0,0,0,0.2);display:none;}
+        .flash {animation: flash 1s;}
+        @keyframes flash {
+            0% {background-color:#FFFF99;}
+            100% {background-color:transparent;}
+        }
+        .flash-line {background-color:#FFFF99;}
+    </style>
+</head>
+<body>
+<div w3-include-html="/site/_header.html"></div>
+<div class="restock-container">
+    <div class="store-messages" id="store-messages"></div>
+    <div class="sidebar-main-wrapper">
+        <div w3-include-html="/site/store/_sidebar.html"></div>
+        <div class="main-content">
+            <h2>库存入库</h2>
+            <form id="restock-form" onsubmit="handleSubmit(event)">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label>品牌</label>
+                        <select id="brand" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>商品</label>
+                        <select id="item-id" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>字段列表</label>
+                        <div class="field-tags" id="field-list"></div>
+                        <i class="fas fa-plus add-field-btn" onclick="addField()"></i>
+                    </div>
+                    <div class="form-group">
+                        <label>批次备注</label>
+                        <input type="text" id="batch-mark" placeholder="请输入批次备注">
+                    </div>
+                    <div class="form-group">
+                        <label>商品件数</label>
+                        <input type="number" id="batch-count" readonly value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>商品列表</label>
+                        <div style="flex:1;position:relative;">
+                            <div class="form-group" id="function-area">
+                                <button type="button" class="action-btn secondary" id="format-btn" title="格式化" onclick="toggleFormat()"><i class="fas fa-table"></i></button>
+                                <input type="file" id="import-file" accept=".xlsx,.csv" style="display:none;" onchange="handleImport(event)">
+                                <button type="button" class="action-btn secondary" title="导入" onclick="document.getElementById('import-file').click()"><i class="fas fa-file-import"></i></button>
+                                <button type="button" class="action-btn secondary" title="替换列" onclick="openReplaceModal()"><i class="fas fa-exchange-alt"></i></button>
+                                <button type="button" class="action-btn secondary" title="插入列" onclick="openInsertModal()"><i class="fas fa-plus-square"></i></button>
+                                <button type="button" class="action-btn secondary" title="前/后缀" onclick="openPrefixSuffixModal()"><i class="fas fa-text-width"></i></button>
+                                <button type="button" class="action-btn secondary" title="去重" onclick="deduplicate()"><i class="fas fa-filter"></i></button>
+                                <div class="function-toast" id="function-toast"></div>
+                            </div>
+                            <textarea class="product-list" id="product-list" placeholder="仅允许粘贴 Excel/CSV 格式，或导入 Excel/CSV 内容" onpaste="handlePaste(event)" style="display:block;"></textarea>
+                            <div class="product-table-container" id="product-table-container" style="display:none;">
+                                <table class="product-table" id="product-table"></table>
+                            </div>
+                            <div class="error-message" id="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label></label>
+                        <button type="submit" class="action-btn submit" id="submit-btn">入库</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div w3-include-html="/site/_footer.html"></div>
+<div class="modal" id="replace-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>替换列</h3>
+            <button class="modal-close" onclick="closeModal('replace-modal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>列</label>
+                <select id="replace-column"></select>
+            </div>
+            <div class="form-group">
+                <label>旧内容</label>
+                <input type="text" id="replace-old" placeholder="输入旧内容">
+            </div>
+            <div class="form-group">
+                <label>新内容</label>
+                <input type="text" id="replace-new" placeholder="输入新内容">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="action-btn add" onclick="applyReplace()">确认</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="insert-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>插入列</h3>
+            <button class="modal-close" onclick="closeModal('insert-modal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>列</label>
+                <select id="insert-column"></select>
+            </div>
+            <div class="form-group">
+                <label>位置</label>
+                <select id="insert-position">
+                    <option value="before">前</option>
+                    <option value="after">后</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>内容</label>
+                <input type="text" id="insert-value" placeholder="输入内容">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="action-btn add" onclick="applyInsert()">确认</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="prefix-suffix-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="prefix-suffix-title">添加前缀/后缀</h3>
+            <button class="modal-close" onclick="closeModal('prefix-suffix-modal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>列</label>
+                <select id="prefix-suffix-column"></select>
+            </div>
+            <div class="form-group">
+                <label>类型</label>
+                <select id="prefix-suffix-type">
+                    <option value="prefix">前缀</option>
+                    <option value="suffix">后缀</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>内容</label>
+                <input type="text" id="prefix-suffix-value" placeholder="输入内容">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="action-btn add" onclick="applyPrefixSuffix()">确认</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="add-field-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>添加字段</h3>
+            <button class="modal-close" onclick="closeModal('add-field-modal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>字段</label>
+                <input type="text" id="new-field" placeholder="输入字段 (如 Color: Red)">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="action-btn add" onclick="confirmAddField()">确认</button>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+    window.addEventListener('load', () => {
+        w3.includeHTML(() => {
+            initSidebar();
+            InitSidebarContent();
+            initStoreMessages();
+            initializePage();
+        });
+    });
+
+    let fieldList = [];
+    let productList = [];
+    let isExcelMode = false;
+    let errors = [];
+    const items = Array(randomInt(10, 30)).fill().map(() => ({
+        id: faker.datatype.number({ min: 1000, max: 9999 }),
+        name: faker.commerce.productName(),
+        defaultFields: Array(randomInt(2, 5)).fill().map(() =>
+            `${faker.random.arrayElement(['Size', 'Color', 'Material', 'Style', 'Brand'])}: ${faker.lorem.word()}`
+        )
+    }));
+
+    function initializePage() {
+        try {
+            const currentStoreId = typeof storeId !== 'undefined' ? storeId : 1001;
+            if (!currentStoreId) {
+                console.error('storeId is not defined');
+                return;
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const itemId = params.get('itemId');
+            const fieldListParam = params.get('fieldList');
+
+            if (!window.hotBrands || !Array.isArray(window.hotBrands)) {
+                console.error('hotBrands not defined or invalid in _data.js');
+                return;
+            }
+            const brandSelect = document.getElementById('brand');
+            brandSelect.innerHTML = hotBrands.map(brand =>
+                `<option value="${brand.id}" style="color:${brand.themeColor}">${brand.name}</option>`
+            ).join('');
+
+            const itemSelect = document.getElementById('item-id');
+            itemSelect.innerHTML = `<option value="">选择商品</option>` +
+                items.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
+            if (itemId) {
+                itemSelect.value = itemId;
+            }
+
+            if (fieldListParam) {
+                try {
+                    fieldList = JSON.parse(decodeURIComponent(fieldListParam));
+                } catch (e) {
+                    console.error('Invalid fieldList parameter:', e);
+                }
+            } else if (itemId) {
+                const item = items.find(i => i.id == itemId);
+                fieldList = item ? item.defaultFields : [];
+            }
+            renderFieldList();
+
+            Sortable.create(document.getElementById('field-list'), {
+                animation: 150,
+                onEnd: () => {
+                    fieldList = Array.from(document.getElementById('field-list').children)
+                        .filter(el => el.classList.contains('ant-tag'))
+                        .map(el => el.textContent.split(' ×')[0]);
+                    validateProductList();
+                }
+            });
+
+            validateProductList();
+
+            itemSelect.addEventListener('change', () => {
+                if (!fieldList.length) {
+                    const item = items.find(i => i.id == itemSelect.value);
+                    fieldList = item ? item.defaultFields : [];
+                    renderFieldList();
+                }
+                validateProductList();
+            });
+        } catch (e) {
+            console.error('Error in initializePage:', e);
+        }
+    }
+
+    function renderFieldList() {
+        try {
+            const fieldListEl = document.getElementById('field-list');
+            fieldListEl.innerHTML = fieldList.map((field, index) =>
+                `<span class="ant-tag ant-tag-blue" data-index="${index}">${field}<span class="tag-close" onclick="deleteField(${index})"><i class="fas fa-times"></i></span></span>`
+            ).join('');
+        } catch (e) {
+            console.error('Error in renderFieldList:', e);
+        }
+    }
+
+    function deleteField(index) {
+        try {
+            fieldList.splice(index, 1);
+            renderFieldList();
+            validateProductList();
+        } catch (e) {
+            console.error('Error in deleteField:', e);
+        }
+    }
+
+    function addField() {
+        try {
+            document.getElementById('add-field-modal').style.display = 'flex';
+        } catch (e) {
+            console.error('Error in addField:', e);
+        }
+    }
+
+    function confirmAddField() {
+        try {
+            const newField = document.getElementById('new-field').value.trim();
+            if (newField) {
+                fieldList.push(newField);
+                renderFieldList();
+                validateProductList();
+                closeModal('add-field-modal');
+            } else {
+                alert('请输入字段！');
+            }
+        } catch (e) {
+            console.error('Error in confirmAddField:', e);
+        }
+    }
+
+    function toggleFormat() {
+        try {
+            isExcelMode = !isExcelMode;
+            document.getElementById('format-btn').innerHTML = `<i class="fas fa-table"></i>`;
+            document.getElementById('format-btn').title = isExcelMode ? '展示为文本' : '展示为Excel';
+            document.getElementById('product-list').style.display = isExcelMode ? 'none' : 'block';
+            document.getElementById('product-table-container').style.display = isExcelMode ? 'block' : 'none';
+            validateProductList();
+        } catch (e) {
+            console.error('Error in toggleFormat:', e);
+        }
+    }
+
+    function handlePaste(event) {
+        try {
+            setTimeout(() => validateProductList(), 0); // Async to ensure paste is processed
+        } catch (e) {
+            console.error('Error in handlePaste:', e);
+        }
+    }
+
+    function handleImport(event) {
+        try {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.csv')) {
+                alert('仅支持 .xlsx 或 .csv 格式文件！');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                productList = content.trim().split('\n').map(line => line.split(/,|\t/).map(v => v.trim()));
+                document.getElementById('product-list').value = content;
+                isExcelMode = true;
+                toggleFormat();
+                validateProductList();
+                showFunctionToast('导入成功！');
+            };
+            reader.readAsText(file);
+        } catch (e) {
+            console.error('Error in handleImport:', e);
+        }
+    }
+
+    function openReplaceModal() {
+        try {
+            const select = document.getElementById('replace-column');
+            select.innerHTML = fieldList.map((field, i) => `<option value="${i}">${field}</option>`).join('');
+            document.getElementById('replace-modal').style.display = 'flex';
+        } catch (e) {
+            console.error('Error in openReplaceModal:', e);
+        }
+    }
+
+    function applyReplace() {
+        try {
+            const column = parseInt(document.getElementById('replace-column').value);
+            const oldStr = document.getElementById('replace-old').value;
+            const newStr = document.getElementById('replace-new').value;
+            if (!oldStr) {
+                alert('请输入旧内容！');
+                return;
+            }
+            if (isNaN(column) || column < 0 || column >= fieldList.length) {
+                alert('无效的列索引！');
+                return;
+            }
+            let count = 0;
+            productList.forEach(row => {
+                if (row[column]) {
+                    row[column] = row[column].replaceAll(oldStr, newStr);
+                    count++;
+                }
+            });
+            validateProductList();
+            showFunctionToast(`成功替换第${column + 1}列中的 ${oldStr} 为 ${newStr}，${count}条`);
+            closeModal('replace-modal');
+        } catch (e) {
+            console.error('Error in applyReplace:', e);
+        }
+    }
+
+    function openInsertModal() {
+        try {
+            const select = document.getElementById('insert-column');
+            select.innerHTML = Array(fieldList.length + 1).fill().map((_, i) =>
+                `<option value="${i}">${i === fieldList.length ? '末尾' : fieldList[i]}</option>`
+            ).join('');
+            document.getElementById('insert-modal').style.display = 'flex';
+        } catch (e) {
+            console.error('Error in openInsertModal:', e);
+        }
+    }
+
+    function applyInsert() {
+        try {
+            const column = parseInt(document.getElementById('insert-column').value);
+            const position = document.getElementById('insert-position').value;
+            const value = document.getElementById('insert-value').value;
+            if (!value) {
+                alert('请输入内容！');
+                return;
+            }
+            if (isNaN(column) || column < 0 || column > fieldList.length) {
+                alert('无效的列索引！');
+                return;
+            }
+            const insertIndex = position === 'before' ? column : column + 1;
+            productList.forEach(row => {
+                row.splice(insertIndex, 0, value);
+            });
+            validateProductList();
+            showFunctionToast(`成功在${fieldList[column] || '末尾'}${position === 'before' ? '前' : '后'}插入列`);
+            closeModal('insert-modal');
+        } catch (e) {
+            console.error('Error in applyInsert:', e);
+        }
+    }
+
+    function openPrefixSuffixModal() {
+        try {
+            const select = document.getElementById('prefix-suffix-column');
+            select.innerHTML = fieldList.map((field, i) => `<option value="${i}">${field}</option>`).join('');
+            document.getElementById('prefix-suffix-modal').style.display = 'flex';
+        } catch (e) {
+            console.error('Error in openPrefixSuffixModal:', e);
+        }
+    }
+
+    function applyPrefixSuffix() {
+        try {
+            const column = parseInt(document.getElementById('prefix-suffix-column').value);
+            const value = document.getElementById('prefix-suffix-value').value;
+            const type = document.getElementById('prefix-suffix-type').value;
+            if (!value) {
+                alert('请输入内容！');
+                return;
+            }
+            if (isNaN(column) || column < 0 || column >= fieldList.length) {
+                alert('无效的列索引！');
+                return;
+            }
+            let count = 0;
+            productList.forEach(row => {
+                row[column] = row[column] || '';
+                row[column] = type === 'prefix' ? value + row[column] : row[column] + value;
+                count++;
+            });
+            validateProductList();
+            showFunctionToast(`成功为第${column + 1}列添加${type === 'prefix' ? '前缀' : '后缀'}，${count}条`);
+            closeModal('prefix-suffix-modal');
+        } catch (e) {
+            console.error('Error in applyPrefixSuffix:', e);
+        }
+    }
+
+    function deduplicate() {
+        try {
+            const uniqueRows = [];
+            const seen = new Set();
+            productList.forEach(row => {
+                const key = row.join('|');
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    uniqueRows.push(row);
+                }
+            });
+            const removed = productList.length - uniqueRows.length;
+            productList = uniqueRows;
+            validateProductList();
+            showFunctionToast(`成功剔除重复商品 ${removed} 条`);
+        } catch (e) {
+            console.error('Error in deduplicate:', e);
+        }
+    }
+
+    function validateProductList() {
+        try {
+            const textarea = document.getElementById('product-list');
+            const table = document.getElementById('product-table');
+            const batchCountInput = document.getElementById('batch-count');
+            const errorMessage = document.getElementById('error-message');
+            errors = [];
+
+            productList = textarea.value.trim().split('\n').map(line => line.split(/,|\t/).map(v => v.trim()));
+            if (!textarea.value.trim()) productList = [];
+
+            batchCountInput.value = productList.length;
+
+            productList.forEach((row, i) => {
+                if (row.length !== fieldList.length) {
+                    const extra = row.length > fieldList.length ? `，多出列：${row.slice(fieldList.length).join(', ')}` : '';
+                    errors.push({
+                        row: i + 1,
+                        type: 'mismatch',
+                        message: `第${i + 1}行：列数不匹配 (预期 ${fieldList.length} 列，实际 ${row.length} 列${extra})`
+                    });
+                } else {
+                    row.forEach((val, j) => {
+                        if (!val) errors.push({
+                            row: i + 1,
+                            type: 'empty',
+                            message: `第${i + 1}行：第${j + 1}列为空`
+                        });
+                    });
+                }
+            });
+
+            const errorGroups = {};
+            errors.forEach(e => {
+                const type = e.type === 'mismatch' ? '列数不匹配' : '列为空';
+                if (!errorGroups[type]) errorGroups[type] = [];
+                errorGroups[type].push(e.row);
+            });
+
+            errorMessage.innerHTML = Object.entries(errorGroups).map(([type, rows]) =>
+                `错误信息：第 ${rows.map(row => `<a onclick="scrollToRow(${row})">${row}</a>`).join('，')} 行，${type}`
+            ).join('; ') || '';
+
+            if (isExcelMode) {
+                table.innerHTML = `
+                    <thead><tr><th>#</th>${fieldList.map(field => `<th>${field}</th>`).join('')}</tr></thead>
+                    <tbody>${productList.map((row, i) => {
+                    const isError = errors.some(e => e.row === i + 1);
+                    return `<tr class="${isError ? 'error' : ''}" data-row="${i}"><td>${i + 1}</td>${row.map((cell, j) => `<td onclick="editCell(${i}, ${j})">${cell || ''}</td>`).join('')}</tr>`;
+                }).join('')}</tbody>
+                `;
+                textarea.style.display = 'none';
+                document.getElementById('product-table-container').style.display = 'block';
+            } else {
+                textarea.value = productList.map(row => row.join(',')).join('\n');
+                document.getElementById('product-table-container').style.display = 'none';
+                textarea.style.display = 'block';
+            }
+        } catch (e) {
+            console.error('Error in validateProductList:', e);
+        }
+    }
+
+    function editCell(rowIndex, colIndex) {
+        try {
+            // Save and close any existing edit mode
+            document.querySelectorAll('.edit-cell').forEach(cell => {
+                const row = parseInt(cell.closest('tr').dataset.row);
+                const col = Array.from(cell.parentNode.children).indexOf(cell) - 1;
+                const input = cell.querySelector('input');
+                if (input && (row !== rowIndex || col !== colIndex)) {
+                    if (row >= 0 && row < productList.length && col >= 0 && col < productList[row].length) {
+                        productList[row][col] = input.value.trim();
+                    }
+                    cell.textContent = productList[row][col] || '';
+                    cell.classList.remove('edit-cell');
+                }
+            });
+
+            const table = document.getElementById('product-table');
+            const cell = table.querySelector(`tr[data-row="${rowIndex}"] td:nth-child(${colIndex + 2})`);
+            if (!cell || cell.classList.contains('edit-cell')) return;
+            const value = productList[rowIndex][colIndex] || '';
+            cell.innerHTML = `<input type="text" value="${value}" /><i class="fas fa-times delete-cell" onclick="deleteCell(${rowIndex}, ${colIndex}, this)"></i>`;
+            cell.classList.add('edit-cell');
+            const input = cell.querySelector('input');
+            input.focus();
+            input.addEventListener('input', () => {
+                if (rowIndex >= 0 && rowIndex < productList.length && colIndex >= 0 && colIndex < productList[rowIndex].length) {
+                    productList[rowIndex][colIndex] = input.value.trim();
+                    validateProductList();
+                }
+            });
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    productList[rowIndex][colIndex] = input.value.trim();
+                    validateProductList();
+                }
+            });
+        } catch (e) {
+            console.error('Error in editCell:', e);
+        }
+    }
+
+    function deleteCell(rowIndex, colIndex, element) {
+        try {
+            if (rowIndex >= 0 && rowIndex < productList.length && colIndex >= 0 && colIndex < productList[rowIndex].length) {
+                productList[rowIndex].splice(colIndex, 1);
+                validateProductList();
+            }
+        } catch (e) {
+            console.error('Error in deleteCell:', e);
+        }
+    }
+
+    function scrollToRow(row) {
+        try {
+            if (isExcelMode) {
+                const table = document.getElementById('product-table');
+                const rowEl = table.querySelector(`tr[data-row="${row - 1}"]`);
+                if (rowEl) {
+                    rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    rowEl.classList.add('flash');
+                    setTimeout(() => rowEl.classList.remove('flash'), 1000);
+                }
+            } else {
+                const textarea = document.getElementById('product-list');
+                const lines = textarea.value.split('\n');
+                const charIndex = lines.slice(0, row - 1).join('\n').length + (row > 1 ? 1 : 0);
+                textarea.focus();
+                textarea.setSelectionRange(charIndex, charIndex);
+                textarea.scrollTop = (charIndex / textarea.value.length) * textarea.scrollHeight;
+                textarea.value = textarea.value.substring(0, charIndex) +
+                    '<span class="flash-line">' + lines[row - 1] + '</span>' +
+                    textarea.value.substring(charIndex + lines[row - 1].length);
+                setTimeout(() => {
+                    textarea.value = lines.join('\n');
+                }, 1000);
+            }
+        } catch (e) {
+            console.error('Error in scrollToRow:', e);
+        }
+    }
+
+    function handleSubmit(event) {
+        try {
+            event.preventDefault();
+            if (errors.length) {
+                alert('请先处理以下错误：' + errors.map(e => e.message).join(', '));
+                return;
+            }
+            if (!productList.length) {
+                alert('请至少输入一条商品记录！');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submit-btn');
+            if (submitBtn.textContent === '剔除重复商品 & 入库') {
+                deduplicate();
+                handleSubmit(event);
+                return;
+            }
+
+            const currentStoreId = typeof storeId !== 'undefined' ? storeId : 1001;
+
+            const batchId = faker.datatype.number({ min: 10000, max: 99999 });
+            const batch = {
+                id: batchId,
+                status: 1,
+                store_id: currentStoreId,
+                item_id: parseInt(document.getElementById('item-id').value),
+                batch_count: productList.length,
+                sales_count: 0,
+                replacement_count: 0,
+                refund_count: 0,
+                rest_count: productList.length,
+                field_list: JSON.stringify(fieldList),
+                batch_mark: document.getElementById('batch-mark').value || null,
+                create_time: Math.floor(Date.now() / 1000)
+            };
+
+            const stocks = productList.map(row => ({
+                id: faker.datatype.number({ min: 100000, max: 999999 }),
+                item_id: batch.item_id,
+                batch_id: batchId,
+                orders_id: 0,
+                check_status: 0,
+                sold_status: 0,
+                delete_status: 0,
+                replacement_status: 0,
+                create_time: batch.create_time,
+                check_time: 0,
+                sold_time: 0,
+                delete_time: 0,
+                replacement_time: 0,
+                value_key: row.join('|'),
+                value_list: JSON.stringify(row)
+            }));
+
+            if (Math.random() < 0.1) {
+                const duplicateRows = Array(randomInt(1, Math.min(5, productList.length))).fill().map(() => randomInt(1, productList.length));
+                const duplicateText = productList.filter((_, i) => duplicateRows.includes(i + 1)).map(row => row.join(',')).join('\n');
+                document.getElementById('error-message').innerHTML = `错误信息：第 ${duplicateRows.map(row => `<a onclick="scrollToRow(${row})">${row}</a>`).join('，')} 行，重复销售商品 <button class="action-btn secondary" onclick="navigator.clipboard.writeText('${duplicateText}').then(() => showFunctionToast('已复制到剪贴板'))">复制</button>`;
+                submitBtn.textContent = '剔除重复商品 & 入库';
+                return;
+            }
+
+            if (Math.random() < 0.3) {
+                showFunctionToast(`成功入库 商品 ${batch.item_id} ${productList.length}条`);
+                submitBtn.textContent = '入库';
+                document.getElementById('restock-form').reset();
+                fieldList = [];
+                productList = [];
+                renderFieldList();
+                validateProductList();
+            } else {
+                showFunctionToast(`成功入库，跳转至审核页面`);
+                submitBtn.textContent = '入库';
+                window.location.href = `/site/store/stock-review.html?batchId=${batchId}`; // Redirect to review page
+            }
+        } catch (e) {
+            console.error('Error in handleSubmit:', e);
+        }
+    }
+
+    function showFunctionToast(message) {
+        try {
+            const toast = document.getElementById('function-toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2000);
+        } catch (e) {
+            console.error('Error in showFunctionToast:', e);
+        }
+    }
+
+    function closeModal(id) {
+        try {
+            document.getElementById(id).style.display = 'none';
+        } catch (e) {
+            console.error('Error in closeModal:', e);
+        }
+    }
+
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+</script>
+</body>
+</html>
