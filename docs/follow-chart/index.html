@@ -672,6 +672,49 @@
         P->>S: 通知审核失败
         end
     </div>
+    <h2 id="recharge-dispute-flow">充值争议 - 流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[用户选择支付订单] --> B{创建争议方式}
+        B -->|基于支付订单| C[提交争议]
+        B -->|找平台客服| D[客服添加争议]
+        C --> E[提交支付截图/时间/金额]
+        D --> E
+        E --> F[平台财务审核]
+        F --> G[查阅第三方支付平台]
+        G -->|审核通过| H[对支付订单发货处理]
+        G -->|审核不通过| I[回复并结束争议]
+        H --> J[结束]
+        I --> J
+    </div>
+
+    <h2 id="recharge-dispute-seq">充值争议 - 时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        participant C as 客服
+        participant F as 财务
+        participant T as 第三方支付平台
+        alt 基于支付订单
+        U->>P: 选择支付订单并提交争议
+        else 找平台客服
+        U->>C: 请求添加充值争议
+        C->>P: 添加争议
+        end
+        U->>P: 提交支付截图/时间/金额
+        P->>F: 通知财务审核
+        F->>T: 查阅第三方支付记录
+        T->>F: 返回支付信息
+        alt 审核通过
+        F->>P: 确认支付订单
+        P->>U: 进行发货处理
+        P->>U: 通知争议解决
+        else 审核不通过
+        F->>P: 提供审核回复
+        P->>U: 发送回复并结束争议
+        end
+    </div>
 
 </div>
 
@@ -712,6 +755,8 @@
         <li><a href="#store-withdrawal-seq">店铺 - 提现时序图</a></li>
         <li><a href="#store-funds-flow">店铺 - 资金流程图</a></li>
         <li><a href="#store-funds-seq">店铺 - 资金时序图</a></li>
+        <li><a href="#recharge-dispute-flow">充值争议 - 流程图</a></li>
+        <li><a href="#recharge-dispute-seq">充值争议 - 时序图</a></li>
     </ul>
 </div>
 
