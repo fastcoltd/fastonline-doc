@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>需求流程图与时序图</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+        .content {
+            flex: 1;
+            max-width: 70%;
+        }
+        .index {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            width: 200px;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .index h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+        }
+        .index ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .index li {
+            margin: 5px 0;
+        }
+        .index a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 14px;
+        }
+        .index a:hover {
+            text-decoration: underline;
+        }
+        h2 {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        .mermaid {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <h2 id="flowchart">需求流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[发布需求] --> B[平台审核]
+        B -->|审核通过| C[付定金]
+        B -->|审核不通过| D[再次修改]
+        B -->|超时| E[结束]
+        D --> A
+        C -->|超时| E
+        C --> F[投标（店铺）]
+        F -->|超时| E
+        F --> G[选择中标者]
+        G --> H[付尾款]
+        H -->|超时| E
+        H --> I[发货]
+        I --> J[完成需求]
+        J --> K[评价]
+        K --> E[结束]
+    </div>
+
+    <h2 id="sequence">需求时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        participant S as 店铺
+        U->>P: 发布需求
+        P->>P: 平台审核
+        alt 审核通过
+        P->>U: 通知通过
+        alt 付定金
+        U->>P: 付定金
+        P->>S: 开启投标
+        alt 投标成功
+        S->>P: 提交投标
+        P->>U: 选择中标者
+        alt 付尾款
+        U->>P: 付尾款
+        S->>U: 发货
+        U->>P: 完成需求
+        U->>S: 评价
+        else 超时
+        P->>U: 通知超时
+        end
+        else 超时
+        P->>U: 通知超时
+        end
+        else 超时
+        P->>U: 通知超时
+        end
+        else 审核不通过
+        P->>U: 通知不通过
+        U->>P: 再次修改需求
+        P->>P: 重新审核
+        else 超时
+        P->>U: 通知超时
+        end
+    </div>
+</div>
+
+<div class="index">
+    <h3>快速导航</h3>
+    <ul>
+        <li><a href="#flowchart">需求流程图</a></li>
+        <li><a href="#sequence">需求时序图</a></li>
+    </ul>
+</div>
+
+<script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+
+    // 平滑滚动
+    document.querySelectorAll('.index a').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+</script>
+</body>
+</html>
