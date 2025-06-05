@@ -523,11 +523,14 @@
     <h2 id="penalty-flow">处罚流程图</h2>
     <div class="mermaid">
         flowchart TD
-        A[违规行为] --> B[自动触发]
-        B --> C[平台人工处罚]
+        A[违规行为] --> B{来源}
+        B -->|人工添加| C[平台处理]
+        B -->|自动触发| C
         C --> D[发送违规通知]
-        D --> E[执行处罚]
-        E -->|禁评/封号/罚款等| F[结束]
+        D --> E[执行处罚<br>禁评/禁止聊天/禁止发布文章/禁止投标/封号/封店/罚款]
+        D --> F[记录事件]
+        E --> G[结束]
+        F --> G
     </div>
 
     <h2 id="penalty-seq">处罚时序图</h2>
@@ -535,12 +538,18 @@
         sequenceDiagram
         participant E as 实体
         participant P as 平台
+        alt 人工添加
+        P->>P: 记录违规行为
+        else 自动触发
         E->>P: 触发违规行为
-        P->>P: 自动检测
-        P->>P: 人工审核
+        end
+        P->>P: 处理违规
         P->>E: 发送违规通知
-        P->>E: 执行处罚
-        note right of E: 禁评、封号、罚款等
+        par 并行操作
+        P->>E: 执行处罚<br>禁评/禁止聊天/禁止发布文章/禁止投标/封号/封店/罚款
+        and
+        P->>P: 记录事件
+        end
     </div>
 </div>
 
