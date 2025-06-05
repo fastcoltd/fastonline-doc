@@ -31,6 +31,48 @@
             top: 100%;
             box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2);
         }
+        .dispute-btn {
+            position: relative;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            font-size: 1em;
+        }
+        .red-dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 8px;
+            height: 8px;
+            background-color: red;
+            border-radius: 50%;
+        }
+        .modal-body .form-group {
+            margin-bottom: 15px;
+        }
+        .modal-body .readonly-section {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .file-preview img, .submitted-attachments img {
+            max-width: 100px;
+            margin: 5px;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+        }
+        .modal-close-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            color: #595959;
+        }
+        .modal-close-icon:hover {
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -51,6 +93,56 @@
 </div>
 
 <div w3-include-html="../_footer.html"></div>
+
+<!-- Dispute Modal -->
+<div class="modal fade" id="disputeModal" tabindex="-1" aria-labelledby="disputeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="position: relative; border-bottom: none;">
+                <h5 class="modal-title" id="disputeModalLabel">争议处理</h5>
+                <i class="fas fa-times modal-close-icon" data-bs-dismiss="modal" aria-label="Close"></i>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>流水号:</label>
+                    <span id="modalTransactionId"></span>
+                </div>
+                <div class="form-group">
+                    <label>金额:</label>
+                    <span id="modalAmount"></span>
+                </div>
+                <div class="form-group">
+                    <label>时间:</label>
+                    <span id="modalTime"></span>
+                </div>
+                <div class="form-group" id="problemDescriptionGroup">
+                    <label>问题描述:</label>
+                    <textarea class="form-control ant-input" id="problemDescription" rows="4"></textarea>
+                </div>
+                <div class="form-group" id="attachmentGroup">
+                    <label>附件:</label>
+                    <input type="file" class="form-control ant-input" id="attachments" multiple accept="image/*,.pdf">
+                    <div id="filePreview" class="file-preview"></div>
+                </div>
+                <div class="form-group readonly-section" id="submittedInfo" style="display: none;">
+                    <h6>已提交资料:</h6>
+                    <p><strong>问题描述:</strong> <span id="submittedDescription"></span></p>
+                    <p><strong>附件:</strong> <span id="submittedAttachments" class="submitted-attachments"></span></p>
+                </div>
+                <div class="form-group readonly-section" id="systemReply" style="display: none;">
+                    <h6>系统回复:</h6>
+                    <p><strong>状态:</strong> <span id="disputeStatus"></span></p>
+                    <p><strong>回复内容:</strong> <span id="systemMessage"></span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary ant-btn ant-btn-default" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary ant-btn ant-btn-primary" id="submitDisputeBtn">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://www.w3schools.com/lib/w3.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
 <script src="../_location.js"></script>
@@ -60,6 +152,8 @@
 <script src="_ticket.js"></script>
 <script src="../_fields.js"></script>
 <script src="../_data.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const transactionTypes = [
         { value: 0, label: '充值', isIncome: true },
@@ -68,12 +162,12 @@
         { value: 3, label: '需求定金', isIncome: false },
         { value: 4, label: '需求尾款', isIncome: false },
         { value: 5, label: '退款', isIncome: true },
-        { value: 6, label: '商品销售', isIncome: true },  // 新增
-        { value: 7, label: '投标款', isIncome: true },    // 新增
-        { value: 8, label: '文章收入', isIncome: true }   // 新增
+        { value: 6, label: '商品销售', isIncome: true },
+        { value: 7, label: '投标款', isIncome: true },
+        { value: 8, label: '文章收入', isIncome: true }
     ];
 
-    // 生成真实的 change_info（仅新增三项的生成逻辑）
+    // 生成真实的 change_info
     function generateChangeInfo(type, amount) {
         switch (type) {
             case 0: // 充值
@@ -109,7 +203,7 @@
                 const type = transactionTypes.find(t => t.value === v);
                 return type ? type.label : '未知类型';
             },
-            sample: () => faker.datatype.number({ min: 0, max: 8 }) // 扩展到 8
+            sample: () => faker.datatype.number({ min: 0, max: 8 })
         },
         change_money: {
             ...userTransactionFieldConfig.change_money,
@@ -134,7 +228,22 @@
             }
         },
         status: { ...userTransactionFieldConfig.status, label: '状态', format: (d, v) => `<span style="color: ${v === 0 ? '#A9A9A9' : '#32CD32'}">${v === 0 ? '待处理' : '已完成'}</span>` },
-        create_time: { ...userTransactionFieldConfig.create_time, label: '时间', format: v => v }
+        create_time: { ...userTransactionFieldConfig.create_time, label: '时间', format: v => v },
+        action: { label: '操作', format: (d, v, transaction) => {
+                const changeType = transaction.change_type.sample;
+                if (changeType === 0) { // 仅充值类型显示争议按钮
+                    const isDisputed = Math.random() > 0.5;
+                    const hasRedDot = isDisputed && Math.random() > 0.5;
+                    const icon = isDisputed ? 'fa-eye' : 'fa-upload';
+                    const text = isDisputed ? '查看争议' : '提交争议';
+                    return `<button class="dispute-btn" data-transaction='${JSON.stringify({
+                        id: transaction.id.sample,
+                        amount: transaction.change_money.sample,
+                        time: transaction.create_time.sample
+                    })}' data-disputed="${isDisputed}"><i class="fas ${icon}"></i> ${text}${hasRedDot ? '<span class="red-dot"></span>' : ''}</button>`;
+                }
+                return ''; // 其他类型操作栏为空
+            }}
     };
 
     // 分页和数据管理
@@ -222,19 +331,14 @@
                 ${Object.entries(userTransactionDisplayConfig).map(([key, config]) => {
             const value = typeof transaction[key].sample == 'function' ? transaction[key].sample() : transaction[key].sample;
             const formatFn = config.format || (v => v);
-            // 根据 format 函数签名调整参数
             let formattedValue = ``;
-
-            if (formatFn.length == 1){
-                formattedValue = formatFn(value)
+            if (formatFn.length == 1) {
+                formattedValue = formatFn(value);
+            } else if (formatFn.length == 2) {
+                formattedValue = formatFn(config, value);
+            } else if (formatFn.length == 3) {
+                formattedValue = formatFn(config, value, transaction);
             }
-            else if (formatFn.length == 2){
-                formattedValue = formatFn(config, value)
-            }
-            else if (formatFn.length == 3){
-                formattedValue = formatFn(config, value, transaction)
-            }
-
             return `<td>${formattedValue}</td>`;
         }).join('')}
             </tr>
@@ -288,10 +392,99 @@
         }
     }
 
-    // 初始化页面
+    // Dispute functionality
+    const statuses = ["审核中", "补充资料", "审核通过", "未通过审核"];
+    const systemReplies = [
+        "我们正在处理您的争议，请耐心等待。",
+        "请补充更多证明材料以便审核。",
+        "您的争议已通过审核，资金将在3-5个工作日内处理。",
+        "很抱歉，您的争议未通过审核，原因：资料不完整。"
+    ];
+
+    function initDisputeButtons() {
+        document.querySelectorAll(".dispute-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const transaction = JSON.parse(this.dataset.transaction);
+                const isDisputed = this.dataset.disputed === "true";
+                const modal = new bootstrap.Modal(document.getElementById("disputeModal"));
+                const submitBtn = document.getElementById("submitDisputeBtn");
+
+                // Populate modal fields
+                document.getElementById("modalTransactionId").textContent = transaction.id;
+                document.getElementById("modalAmount").textContent = transaction.amount;
+                document.getElementById("modalTime").textContent = transaction.time;
+                document.getElementById("problemDescription").value = "";
+                document.getElementById("filePreview").innerHTML = "";
+                document.getElementById("submittedInfo").style.display = "none";
+                document.getElementById("systemReply").style.display = "none";
+                document.getElementById("problemDescriptionGroup").style.display = "block";
+                document.getElementById("attachmentGroup").style.display = "block";
+
+                if (isDisputed) {
+                    const status = statuses[Math.floor(Math.random() * statuses.length)];
+                    const reply = systemReplies[statuses.indexOf(status)];
+                    document.getElementById("disputeStatus").textContent = status;
+                    document.getElementById("systemMessage").textContent = reply;
+                    document.getElementById("systemReply").style.display = "block";
+
+                    document.getElementById("submittedDescription").textContent = "示例问题描述";
+                    const submittedAttachments = document.getElementById("submittedAttachments");
+                    submittedAttachments.innerHTML = `
+                        <img src="https://via.placeholder.com/100?text=Example+Image" alt="example.jpg" />
+                        <p>example.pdf</p>
+                    `;
+                    document.getElementById("submittedInfo").style.display = "block";
+
+                    if (status === "补充资料") {
+                        document.getElementById("problemDescription").value = "补充说明";
+                        submitBtn.textContent = "提交补充资料";
+                    } else {
+                        document.getElementById("problemDescriptionGroup").style.display = "none";
+                        document.getElementById("attachmentGroup").style.display = "none";
+                        submitBtn.style.display = "none";
+                    }
+                } else {
+                    submitBtn.textContent = "提交";
+                    submitBtn.style.display = "block";
+                }
+
+                // Handle file preview for new uploads
+                const attachmentInput = document.getElementById("attachments");
+                attachmentInput.onchange = function() {
+                    const preview = document.getElementById("filePreview");
+                    preview.innerHTML = "";
+                    Array.from(this.files).forEach(file => {
+                        if (file.type.startsWith("image/")) {
+                            const img = document.createElement("img");
+                            img.src = URL.createObjectURL(file);
+                            img.alt = file.name;
+                            preview.appendChild(img);
+                        } else {
+                            const p = document.createElement("p");
+                            p.textContent = file.name;
+                            preview.appendChild(p);
+                        }
+                    });
+                };
+
+                // Handle submit
+                submitBtn.onclick = function() {
+                    if (!isDisputed || document.getElementById("disputeStatus").textContent === "补充资料") {
+                        alert("系统正在加紧为您处理，请耐心等待。");
+                        modal.hide();
+                    }
+                };
+
+                modal.show();
+            });
+        });
+    }
+
+    // Initialize page and dispute buttons
     window.onload = () => {
         w3.includeHTML(() => {
             initTransactionsPage();
+            initDisputeButtons();
         });
     };
 </script>
