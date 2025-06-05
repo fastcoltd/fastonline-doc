@@ -113,6 +113,435 @@
         P->>U: 通知超时
         end
     </div>
+
+    <h2 id="store-creation-flow">店铺创建流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[申请创建店铺] --> B[平台审核]
+        B -->|审核通过| C[店铺创建成功]
+        B -->|审核不通过| D[打回修改]
+        C --> E[通知用户]
+        D --> A
+        E -->|邮箱/用户中心| F[结束]
+    </div>
+
+    <h2 id="store-creation-seq">店铺创建时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        U->>P: 提交店铺创建申请
+        P->>P: 审核申请
+        alt 审核通过
+        P->>U: 通知创建成功
+        else 审核不通过
+        P->>U: 通知打回修改
+        U->>P: 重新提交申请
+        end
+        P->>U: 邮箱/用户中心通知
+    </div>
+
+    <h2 id="store-kyc-flow">店铺 KYC 流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[填写资料] --> B[提交证件]
+        B --> C[人脸/活体检测]
+        C -->|检测通过| D[提交审核]
+        C -->|检测失败| E[重新检测]
+        E --> C
+        D -->|审核通过| F[KYC 完成]
+        D -->|审核失败| G[返回修改]
+        G --> A
+    </div>
+
+    <h2 id="store-kyc-seq">店铺 KYC 时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        participant M as 移动端
+        U->>P: 填写资料
+        U->>P: 提交证件
+        U->>M: 进行人脸/活体检测
+        M->>P: 检测结果
+        alt 检测通过
+        P->>P: 提交审核
+        alt 审核通过
+        P->>U: 通知 KYC 完成
+        else 审核失败
+        P->>U: 通知返回修改
+        U->>P: 重新提交资料
+        end
+        else 检测失败
+        M->>U: 通知重新检测
+        U->>M: 重新进行检测
+        end
+    </div>
+
+    <h2 id="user-login-flow">用户登录流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[选择登录方式] --> B{登录方式}
+        B -->|Google| C[Google 登录]
+        B -->|Apple| D[Apple 登录]
+        B -->|账号密码| E[输入账号密码]
+        C --> F[验证]
+        D --> F
+        E --> F
+        F -->|已启用 2FA| G[输入 2FA 验证码]
+        F -->|无 2FA| H[登录成功]
+        G -->|验证码正确| H
+        G -->|验证码错误| I[登录失败]
+        I --> E
+    </div>
+
+    <h2 id="user-login-seq">用户登录时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        participant T as 第三方
+        U->>P: 选择登录方式
+        alt Google/Apple 登录
+        U->>T: 发起第三方登录
+        T->>P: 返回验证结果
+        else 账号密码登录
+        U->>P: 提交账号密码
+        end
+        P->>P: 验证凭据
+        alt 已启用 2FA
+        P->>U: 要求 2FA 验证码
+        U->>P: 提交验证码
+        alt 验证码正确
+        P->>U: 登录成功
+        else 验证码错误
+        P->>U: 登录失败
+        U->>P: 重新提交凭据
+        end
+        else 无 2FA
+        P->>U: 登录成功
+        end
+    </div>
+
+    <h2 id="user-password-reset-flow">用户找回密码流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[输入邮箱] --> B[接收验证码]
+        B --> C[提交验证码]
+        C -->|验证通过| D[输入新密码]
+        C -->|验证失败| E[重新输入验证码]
+        E --> B
+        D --> F[提交成功]
+        F --> G[结束]
+    </div>
+
+    <h2 id="user-password-reset-seq">用户找回密码时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        U->>P: 提交邮箱
+        P->>U: 发送邮箱验证码
+        U->>P: 提交验证码
+        alt 验证通过
+        P->>U: 允许输入新密码
+        U->>P: 提交新密码
+        P->>U: 通知重置成功
+        else 验证失败
+        P->>U: 通知验证码错误
+        U->>P: 重新提交验证码
+        end
+    </div>
+
+    <h2 id="user-2fa-reset-flow">用户重置 2FA 流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[请求重置 2FA] --> B[接收邮箱验证码]
+        B --> C[提交验证码]
+        C -->|验证通过| D[生成新 2FA 代码]
+        C -->|验证失败| E[重新输入验证码]
+        E --> B
+        D --> F[校验新 2FA 验证码]
+        F -->|校验成功| G[重置成功]
+        F -->|校验失败| D
+    </div>
+
+    <h2 id="user-2fa-reset-seq">用户重置 2FA 时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        U->>P: 请求重置 2FA
+        P->>U: 发送邮箱验证码
+        U->>P: 提交验证码
+        alt 验证通过
+        P->>U: 生成新 2FA 代码
+        U->>P: 提交新 2FA 验证码
+        alt 校验成功
+        P->>U: 通知重置成功
+        else 校验失败
+        P->>U: 通知验证码错误
+        U->>P: 重新提交 2FA 验证码
+        end
+        else 验证失败
+        P->>U: 通知验证码错误
+        U->>P: 重新提交验证码
+        end
+    </div>
+
+    <h2 id="user-recharge-flow">用户充值流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[选择充值渠道] --> B[输入金额]
+        B --> C[提交付款]
+        C --> D[支付渠道创建订单]
+        D --> E[返回二维码/URL]
+        E --> F[用户支付]
+        F --> G[第三方回调]
+        G --> H[添加用户余额]
+        H --> I[通知用户]
+        I --> J[结束]
+    </div>
+
+    <h2 id="user-recharge-seq">用户充值时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        participant T as 第三方支付
+        U->>P: 选择充值渠道
+        U->>P: 输入金额并提交
+        P->>T: 创建支付订单
+        T->>P: 返回二维码/URL
+        P->>U: 显示二维码/URL
+        U->>T: 完成支付
+        T->>P: 回调支付结果
+        P->>P: 添加用户余额
+        P->>T: 确认回调
+        P->>U: 通知充值成功
+    </div>
+
+    <h2 id="user-order-flow">用户订单流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[选择商品/服务] --> B{类型}
+        B -->|常规商品| C[确认付款]
+        B -->|文章付费| C
+        B -->|需求付费| D[支付定金]
+        C -->|余额不足| E[充值]
+        D -->|余额不足| E
+        E --> C
+        C --> F[订单发货]
+        D --> F
+        F --> G[订单评价]
+        G --> H[结束]
+    </div>
+
+    <h2 id="user-order-seq">用户订单时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        participant S as 店铺
+        U->>P: 选择商品/服务
+        alt 常规商品/文章
+        U->>P: 确认付款
+        else 需求付费
+        U->>P: 支付定金
+        end
+        alt 余额不足
+        P->>U: 通知充值
+        U->>P: 完成充值
+        U->>P: 重新付款
+        end
+        P->>S: 通知订单
+        S->>P: 发货
+        P->>U: 通知发货
+        U->>P: 提交评价
+        P->>S: 转发评价
+    </div>
+
+    <h2 id="user-subscription-flow">用户订阅流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[订阅商品] --> B[设置条件]
+        B --> C[监控库存/价格]
+        C -->|条件达成| D[发送通知]
+        D -->|Telegram/系统| E[结束]
+    </div>
+
+    <h2 id="user-subscription-seq">用户订阅时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        U->>P: 订阅商品
+        U->>P: 设置条件
+        P->>P: 监控库存/价格
+        alt 条件达成
+        P->>U: 发送 Telegram 通知
+        P->>U: 发送系统通知
+        end
+    </div>
+
+    <h2 id="user-complaint-flow">用户投诉流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[提交投诉] --> B[平台处理]
+        B --> C[反馈结果]
+        C -->|系统消息| D[结束]
+    </div>
+
+    <h2 id="user-complaint-seq">用户投诉时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant P as 平台
+        U->>P: 提交投诉
+        P->>P: 处理投诉
+        P->>U: 发送系统消息反馈
+    </div>
+
+    <h2 id="ticket-flow">用户/店铺工单流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[创建工单] --> B[选择理由和要求]
+        B --> C[店铺响应]
+        C -->|同意退款/换货| D[执行退款/换货]
+        C -->|拒绝| E[客户与店铺沟通]
+        E -->|邀请平台介入| F[平台客服处理]
+        E -->|继续沟通| D
+        F -->|退款/关闭工单| D
+        D --> G{订单金额/件数相等?}
+        G -->|是| H[自动关闭工单]
+        G -->|否| I[继续提交退款/换货]
+        I --> A
+        C -->|店铺超时未回复| J[自动退款]
+        E -->|客户超时未回复| K[自动关闭工单]
+        J --> H
+        K --> H
+    </div>
+
+    <h2 id="ticket-seq">用户/店铺工单时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant S as 店铺
+        participant P as 平台
+        U->>P: 创建工单
+        U->>P: 选择理由和要求
+        P->>S: 通知工单
+        alt 店铺同意
+        S->>P: 同意退款/换货
+        P->>U: 执行退款/换货
+        else 店铺拒绝
+        S->>P: 拒绝请求
+        U->>S: 沟通
+        alt 邀请平台介入
+        U->>P: 请求客服介入
+        P->>P: 处理工单
+        P->>U: 执行退款/关闭工单
+        end
+        end
+        alt 订单金额/件数相等
+        P->>U: 自动关闭工单
+        P->>S: 通知关闭
+        else 客户超时未回复
+        P->>S: 自动关闭工单
+        else 店铺超时未回复
+        P->>U: 自动退款
+        end
+    </div>
+
+    <h2 id="store-product-flow">店铺发布商品流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[添加/修改商品] --> B[平台审核]
+        B -->|审核通过| C[发布上架]
+        B -->|审核失败| D[继续修改]
+        B -->|违规| E[回复通知]
+        D --> A
+        C --> F[结束]
+        E --> F
+    </div>
+
+    <h2 id="store-product-seq">店铺发布商品时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant S as 店铺
+        participant P as 平台
+        S->>P: 提交商品
+        P->>P: 审核商品
+        alt 审核通过
+        P->>S: 通知上架
+        else 审核失败
+        P->>S: 通知修改
+        S->>P: 重新提交
+        else 违规
+        P->>S: 发送违规通知
+        end
+    </div>
+
+    <h2 id="store-inventory-flow">店铺提交库存流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[添加批次库存] --> B{触发抽检}
+        B -->|是| C[Pending 状态]
+        B -->|否| D[库存通过]
+        C --> E[系统返回抽检商品]
+        E --> F[提交证明]
+        F --> G[平台审核]
+        G -->|审核通过| D
+        G -->|审核失败| H[返回修改]
+        H --> F
+        D --> I[结束]
+    </div>
+
+    <h2 id="store-inventory-seq">店铺提交库存时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant S as 店铺
+        participant P as 平台
+        S->>P: 提交批次库存
+        P->>P: 检查抽检
+        alt 触发抽检
+        P->>S: 通知 Pending 状态
+        P->>S: 返回抽检商品
+        S->>P: 提交证明
+        P->>P: 审核证明
+        alt 审核通过
+        P->>S: 通知库存通过
+        else 审核失败
+        P->>S: 通知返回修改
+        S->>P: 重新提交证明
+        end
+        else 无抽检
+        P->>S: 通知库存通过
+        end
+    </div>
+
+    <h2 id="penalty-flow">处罚流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[违规行为] --> B[自动触发]
+        B --> C[平台人工处罚]
+        C --> D[发送违规通知]
+        D --> E[执行处罚]
+        E -->|禁评/封号/罚款等| F[结束]
+    </div>
+
+    <h2 id="penalty-seq">处罚时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant E as 实体
+        participant P as 平台
+        E->>P: 触发违规行为
+        P->>P: 自动检测
+        P->>P: 人工审核
+        P->>E: 发送违规通知
+        P->>E: 执行处罚
+        note right of E: 禁评、封号、罚款等
+    </div>
 </div>
 
 <div class="index">
@@ -120,6 +549,32 @@
     <ul>
         <li><a href="#flowchart">需求流程图</a></li>
         <li><a href="#sequence">需求时序图</a></li>
+        <li><a href="#store-creation-flow">店铺创建流程图</a></li>
+        <li><a href="#store-creation-seq">店铺创建时序图</a></li>
+        <li><a href="#store-kyc-flow">店铺 KYC 流程图</a></li>
+        <li><a href="#store-kyc-seq">店铺 KYC 时序图</a></li>
+        <li><a href="#user-login-flow">用户登录流程图</a></li>
+        <li><a href="#user-login-seq">用户登录时序图</a></li>
+        <li><a href="#user-password-reset-flow">用户找回密码流程图</a></li>
+        <li><a href="#user-password-reset-seq">用户找回密码时序图</a></li>
+        <li><a href="#user-2fa-reset-flow">用户重置 2FA 流程图</a></li>
+        <li><a href="#user-2fa-reset-seq">用户重置 2FA 时序图</a></li>
+        <li><a href="#user-recharge-flow">用户充值流程图</a></li>
+        <li><a href="#user-recharge-seq">用户充值时序图</a></li>
+        <li><a href="#user-order-flow">用户订单流程图</a></li>
+        <li><a href="#user-order-seq">用户订单时序图</a></li>
+        <li><a href="#user-subscription-flow">用户订阅流程图</a></li>
+        <li><a href="#user-subscription-seq">用户订阅时序图</a></li>
+        <li><a href="#user-complaint-flow">用户投诉流程图</a></li>
+        <li><a href="#user-complaint-seq">用户投诉时序图</a></li>
+        <li><a href="#ticket-flow">用户/店铺工单流程图</a></li>
+        <li><a href="#ticket-seq">用户/店铺工单时序图</a></li>
+        <li><a href="#store-product-flow">店铺发布商品流程图</a></li>
+        <li><a href="#store-product-seq">店铺发布商品时序图</a></li>
+        <li><a href="#store-inventory-flow">店铺提交库存流程图</a></li>
+        <li><a href="#store-inventory-seq">店铺提交库存时序图</a></li>
+        <li><a href="#penalty-flow">处罚流程图</a></li>
+        <li><a href="#penalty-seq">处罚时序图</a></li>
     </ul>
 </div>
 
