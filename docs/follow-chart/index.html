@@ -551,6 +551,128 @@
         P->>P: 记录事件
         end
     </div>
+
+    <h2 id="support-handover-flow">平台客服 - 交接流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[客服下班前提交待交接事项] --> B[提交交接内容]
+        B --> C[下一班次客服跟进]
+        C --> D[提交跟进记录]
+        D --> E{工单可关闭?}
+        E -->|是| F[关闭工单]
+        E -->|否| G[继续交接]
+        G --> B
+        C -->|长时间未处理| H[触发右下角通知]
+        C -->|客户长时间未联系| I[超时关闭事项]
+        F --> J[结束]
+        I --> J
+    </div>
+
+    <h2 id="support-handover-seq">平台客服 - 交接时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant C1 as 当前客服
+        participant P as 平台
+        participant C2 as 下一班次客服
+        participant U as 客户
+        C1->>P: 提交待交接事项
+        C1->>P: 提交交接内容
+        P->>C2: 通知跟进事项
+        C2->>P: 提交跟进记录
+        alt 工单可关闭
+        C2->>P: 关闭工单
+        P->>U: 通知工单关闭
+        else 继续交接
+        C2->>P: 提交新的交接内容
+        P->>C1: 通知下一轮交接
+        end
+        alt 长时间未处理
+        P->>C2: 触发右下角通知
+        else 客户长时间未联系
+        P->>P: 超时关闭事项
+        P->>U: 通知事项关闭
+        end
+    </div>
+
+    <h2 id="store-withdrawal-flow">店铺 - 提现流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[店铺提交提现] --> B[资金进入提现中状态]
+        B --> C[平台财务审核]
+        C -->|审核通过| D[财务打款到指定钱包]
+        C -->|审核不通过| E[解冻资金到可提现余额]
+        D --> F[删除提现中资金]
+        F --> G[完成提现]
+        E --> H[发送审核回复]
+        G --> I[结束]
+        H --> I
+    </div>
+
+    <h2 id="store-withdrawal-seq">店铺 - 提现时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant S as 店铺
+        participant P as 平台
+        participant F as 财务
+        S->>P: 提交提现申请
+        P->>P: 资金进入提现中状态
+        P->>F: 通知财务审核
+        F->>P: 提交审核结果
+        alt 审核通过
+        F->>S: 打款到指定钱包
+        P->>P: 删除提现中资金
+        P->>S: 通知提现完成
+        else 审核不通过
+        P->>P: 解冻资金到可提现余额
+        P->>S: 发送审核回复
+        end
+    </div>
+
+    <h2 id="store-funds-flow">店铺 - 资金流程图</h2>
+    <div class="mermaid">
+        flowchart TD
+        A[用户购买商品/文章/需求] --> B[资金进入待结算金额]
+        B --> C{订单状态}
+        C -->|超过售后时间| D[资金进入可提现金额]
+        C -->|关联工单关闭| D
+        D --> E[店铺提交提现]
+        E --> F[提现金额进入提现中]
+        F --> G[平台审核]
+        G -->|审核通过| H[清零可提现金额]
+        G -->|审核不通过| I[提现金额回到待结算金额]
+        H --> J[财务打款到指定钱包]
+        J --> K[结束]
+        I --> D
+    </div>
+
+    <h2 id="store-funds-seq">店铺 - 资金时序图</h2>
+    <div class="mermaid">
+        sequenceDiagram
+        participant U as 用户
+        participant S as 店铺
+        participant P as 平台
+        participant F as 财务
+        U->>P: 购买商品/文章/需求
+        P->>S: 资金进入待结算金额
+        alt 订单超过售后时间
+        P->>S: 资金转入可提现金额
+        else 关联工单关闭
+        P->>S: 资金转入可提现金额
+        end
+        S->>P: 提交提现申请
+        P->>P: 提现金额进入提现中
+        P->>F: 通知财务审核
+        F->>P: 提交审核结果
+        alt 审核通过
+        P->>S: 清零可提现金额
+        F->>S: 打款到指定钱包
+        P->>S: 通知提现完成
+        else 审核不通过
+        P->>S: 提现金额回到待结算金额
+        P->>S: 通知审核失败
+        end
+    </div>
+
 </div>
 
 <div class="index">
@@ -584,6 +706,12 @@
         <li><a href="#store-inventory-seq">店铺提交库存时序图</a></li>
         <li><a href="#penalty-flow">处罚流程图</a></li>
         <li><a href="#penalty-seq">处罚时序图</a></li>
+        <li><a href="#support-handover-flow">平台客服 - 交接流程图</a></li>
+        <li><a href="#support-handover-seq">平台客服 - 交接时序图</a></li>
+        <li><a href="#store-withdrawal-flow">店铺 - 提现流程图</a></li>
+        <li><a href="#store-withdrawal-seq">店铺 - 提现时序图</a></li>
+        <li><a href="#store-funds-flow">店铺 - 资金流程图</a></li>
+        <li><a href="#store-funds-seq">店铺 - 资金时序图</a></li>
     </ul>
 </div>
 
