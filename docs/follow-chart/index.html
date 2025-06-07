@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>需求流程图与时序图</title>
+    <title>流程图与时序图</title>
     <style>
         body {
             margin: 0;
@@ -55,10 +55,10 @@
 </head>
 <body>
 <div class="content">
-    <h2 id="flowchart">需求流程图</h2>
+    <h2 id="flowchart">需求发布-流程图</h2>
     <div class="mermaid">
         flowchart TD
-        A[发布需求] --> B[平台审核]
+        A[发布需求发布-] --> B[平台审核]
         B -->|审核通过| C[付定金]
         B -->|审核不通过| D[再次修改]
         B -->|超时| E[结束]
@@ -70,18 +70,18 @@
         G --> H[付尾款]
         H -->|超时| E
         H --> I[发货]
-        I --> J[完成需求]
+        I --> J[完成需求发布-]
         J --> K[评价]
         K --> E[结束]
     </div>
 
-    <h2 id="sequence">需求时序图</h2>
+    <h2 id="sequence">需求发布-时序图</h2>
     <div class="mermaid">
         sequenceDiagram
         participant U as 用户
         participant P as 平台
         participant S as 店铺
-        U->>P: 发布需求
+        U->>P: 发布需求发布-
         P->>P: 平台审核
         alt 审核通过
         P->>U: 通知通过
@@ -94,7 +94,7 @@
         alt 付尾款
         U->>P: 付尾款
         S->>U: 发货
-        U->>P: 完成需求
+        U->>P: 完成需求发布
         U->>S: 评价
         else 超时
         P->>U: 通知超时
@@ -107,7 +107,7 @@
         end
         else 审核不通过
         P->>U: 通知不通过
-        U->>P: 再次修改需求
+        U->>P: 再次修改需求发布-
         P->>P: 重新审核
         else 超时
         P->>U: 通知超时
@@ -327,7 +327,7 @@
         A[选择商品/服务] --> B{类型}
         B -->|常规商品| C[确认付款]
         B -->|文章付费| C
-        B -->|需求付费| D[支付定金]
+        B -->|需求发布-付费| D[支付定金]
         C -->|余额不足| E[充值]
         D -->|余额不足| E
         E --> C
@@ -346,7 +346,7 @@
         U->>P: 选择商品/服务
         alt 常规商品/文章
         U->>P: 确认付款
-        else 需求付费
+        else 需求发布-付费
         U->>P: 支付定金
         end
         alt 余额不足
@@ -631,7 +631,7 @@
     <h2 id="store-funds-flow">店铺 - 资金流程图</h2>
     <div class="mermaid">
         flowchart TD
-        A[用户购买商品/文章/需求] --> B[资金进入待结算金额]
+        A[用户购买商品/文章/需求发布] --> B[资金进入待结算金额]
         B --> C{订单状态}
         C -->|超过售后时间| D[资金进入可提现金额]
         C -->|关联工单关闭| D
@@ -652,7 +652,7 @@
         participant S as 店铺
         participant P as 平台
         participant F as 财务
-        U->>P: 购买商品/文章/需求
+        U->>P: 购买商品/文章/需求发布
         P->>S: 资金进入待结算金额
         alt 订单超过售后时间
         P->>S: 资金转入可提现金额
@@ -721,8 +721,8 @@
 <div class="index">
     <h3>快速导航</h3>
     <ul>
-        <li><a href="#flowchart">需求流程图</a></li>
-        <li><a href="#sequence">需求时序图</a></li>
+        <li><a href="#flowchart">需求发布-流程图</a></li>
+        <li><a href="#sequence">需求发布-时序图</a></li>
         <li><a href="#store-creation-flow">店铺创建流程图</a></li>
         <li><a href="#store-creation-seq">店铺创建时序图</a></li>
         <li><a href="#store-kyc-flow">店铺 KYC 流程图</a></li>
