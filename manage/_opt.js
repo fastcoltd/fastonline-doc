@@ -215,7 +215,158 @@ function renderModal(isEditingMode) {
                 input.className = 'tree-container';
                 const tree = renderTree(tabField.treeData, isEditingMode ? tableLangData.filter(p => p.role_id === editId).map(p => p.resource_id.toString()) : [], field.name, isEditingMode ? tabField.editableInEdit : tabField.editableInAdd);
                 input.appendChild(tree);
-            } else {
+            }
+            else if (tabField.type === 'list') {
+                input = document.createElement('div'); input.id = `modal${field.name}`; input.className = 'list-container';
+                const list = document.createElement('div'); list.className = 'list-items';
+                const maxItems = tabField.maxItems || Infinity;
+                const updateAddButton = () => {
+                    let addBtn = input.querySelector('.ant-btn-primary');
+                    if (list.children.length === 0 && list.children.length < maxItems) {
+                        if (!addBtn) {
+                            addBtn = document.createElement('button'); addBtn.className = 'ant-btn ant-btn-primary'; addBtn.textContent = '添加';
+                            addBtn.onclick = () => { if (list.children.length < maxItems) { createListItem(); updateAddButton(); } };
+                            input.insertBefore(addBtn, list);
+                        }
+                    } else if (addBtn) {
+                        addBtn.remove();
+                    }
+                };
+                const createListItem = (item = null, idx = list.children.length) => {
+                    const itemDiv = document.createElement('div'); itemDiv.className = 'list-item';
+                    const removeBtn = document.createElement('button'); removeBtn.className = 'ant-btn-danger'; removeBtn.textContent = '删除';
+                    removeBtn.onclick = () => { itemDiv.remove(); updateAddButton(); };
+                    itemDiv.appendChild(removeBtn);
+                    tabField.subFields.forEach(field => {
+                        const subFormItem = document.createElement('div'); subFormItem.className = 'ant-form-item' + (field.type === 'textarea' ? ' textarea-item' : field.type === 'file' ? ' image-item' : '');
+                        const label = document.createElement('label'); label.textContent = field.label; subFormItem.appendChild(label);
+                        let subInput;
+                        if (field.type === 'select') {
+                            subInput = document.createElement('select'); subInput.className = 'ant-select';
+                            subInput.innerHTML = field.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+                            if (item) subInput.value = item[field.name] || '';
+                        } else if (field.type === 'textarea') {
+                            subInput = document.createElement('textarea'); subInput.rows = 3;
+                            if (item) subInput.value = item[field.name] || '';
+                        } else if (field.type === 'file') {
+                            subInput = document.createElement('input'); subInput.type = 'file'; subInput.accept = 'image/*'; subInput.multiple = true;
+                            const previewDiv = document.createElement('div'); previewDiv.className = 'image-preview';
+                            if (item && item[field.name]) {
+                                JSON.parse(item[field.name] || '[]').forEach(img => {
+                                    const wrapper = document.createElement('div'); wrapper.className = 'image-wrapper';
+                                    const imgTag = document.createElement('img'); imgTag.src = img; imgTag.className = 'preview-img';
+                                    const delBtn = document.createElement('button'); delBtn.className = 'delete-btn'; delBtn.textContent = '×';
+                                    delBtn.onclick = () => wrapper.remove();
+                                    wrapper.appendChild(imgTag); wrapper.appendChild(delBtn); previewDiv.appendChild(wrapper);
+                                });
+                            }
+                            subInput.onchange = (e) => {
+                                Array.from(e.target.files).forEach(file => {
+                                    const reader = new FileReader();
+                                    reader.onload = (ev) => {
+                                        const wrapper = document.createElement('div'); wrapper.className = 'image-wrapper';
+                                        const img = document.createElement('img'); img.src = ev.target.result; img.className = 'preview-img';
+                                        const delBtn = document.createElement('button'); delBtn.className = 'delete-btn'; delBtn.textContent = '×';
+                                        delBtn.onclick = () => wrapper.remove();
+                                        wrapper.appendChild(img); wrapper.appendChild(delBtn); previewDiv.appendChild(wrapper);
+                                    };
+                                    reader.readAsDataURL(file);
+                                });
+                            };
+                            subFormItem.appendChild(previewDiv);
+                        } else {
+                            subInput = document.createElement('input'); subInput.type = field.type || 'text';
+                            if (item) subInput.value = item[field.name] || '';
+                        }
+                        subInput.id = `modal${field.name}_${field.name}_${idx}`;
+                        subFormItem.appendChild(subInput);
+                        itemDiv.appendChild(subFormItem);
+                    });
+                    list.appendChild(itemDiv);
+                };
+                input.appendChild(list);
+                if (isEditingMode) {
+                    const record = tableData.find(item => item.id === editId);
+                    const items = JSON.parse(record[field.name] || '[]');
+                    if (items.length > 0) {
+                        items.forEach((item, idx) => createListItem(item, idx));
+                    }
+                }
+                updateAddButton();
+            }
+            else if (tabField.type === 'attr') {
+                input = document.createElement('div');
+                input.id = `modal${field.name}`;
+                input.className = 'attr-container';
+                const attrSelect = document.createElement('select');
+                attrSelect.className = 'ant-select attr-select';
+                attrSelect.innerHTML = '<option value="">选择属性</option>' + tabField.attrOptions.map(opt => `<option value="${opt.id}">${opt.name}</option>`).join('');
+                const valueSelect = document.createElement('select');
+                valueSelect.className = 'ant-select value-select';
+                valueSelect.disabled = true;
+                valueSelect.innerHTML = '<option value="">选择属性值</option>';
+                const addBtn = document.createElement('button');
+                addBtn.className = 'ant-btn ant-btn-primary';
+                addBtn.textContent = '添加';
+                addBtn.disabled = true;
+                addBtn.onclick = () => {
+                    const attrId = attrSelect.value;
+                    const valueId = valueSelect.value;
+                    if (attrId && valueId) {
+                        const attrName = tabField.attrOptions.find(opt => opt.id == attrId)?.name;
+                        const valueName = tabField.valueOptions[attrId]?.find(v => v.id == valueId)?.name;
+                        if (attrName && valueName) {
+                            const tags = JSON.parse(input.dataset.tags || '[]');
+                            if (!tags.some(t => t.attrId == attrId)) {
+                                const tag = `<span class="ant-tag ant-tag-${tabField.color || 'blue'}" data-attr-id="${attrId}" data-value-id="${valueId}">${attrName}: ${valueName} <span class="tag-close" onclick="removeTag(this, '${field.name}')">×</span></span>`;
+                                input.insertBefore(document.createRange().createContextualFragment(tag), attrSelect);
+                                tags.push({ attrId, valueId });
+                                input.dataset.tags = JSON.stringify(tags);
+                                attrSelect.value = '';
+                                valueSelect.value = '';
+                                valueSelect.disabled = true;
+                                addBtn.disabled = true;
+                                valueSelect.innerHTML = '<option value="">选择属性值</option>';
+                                const options = Array.from(attrSelect.options).map(opt => opt.value);
+                                const usedAttrs = tags.map(t => t.attrId.toString());
+                                attrSelect.innerHTML = '<option value="">选择属性</option>' + tabField.attrOptions
+                                    .filter(opt => !usedAttrs.includes(opt.id.toString()))
+                                    .map(opt => `<option value="${opt.id}">${opt.name}</option>`).join('');
+                            }
+                        }
+                    }
+                };
+                attrSelect.onchange = () => {
+                    valueSelect.disabled = !attrSelect.value;
+                    addBtn.disabled = !attrSelect.value;
+                    valueSelect.innerHTML = '<option value="">选择属性值</option>';
+                    if (attrSelect.value) {
+                        const values = tabField.valueOptions[attrSelect.value] || [];
+                        valueSelect.innerHTML += values.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
+                    }
+                };
+                valueSelect.onchange = () => addBtn.disabled = !valueSelect.value;
+                input.appendChild(attrSelect);
+                input.appendChild(valueSelect);
+                input.appendChild(addBtn);
+                if (isEditingMode) {
+                    const record = tableData.find(item => item.id === editId);
+                    const tags = JSON.parse(record[field.name] || '[]');
+                    tags.forEach(tag => {
+                        const attrName = tabField.attrOptions.find(opt => opt.id == tag.attrId)?.name;
+                        const valueName = tabField.valueOptions[tag.attrId]?.find(v => v.id == tag.valueId)?.name;
+                        if (attrName && valueName) {
+                            input.innerHTML += `<span class="ant-tag ant-tag-${tabField.color || 'blue'}" data-attr-id="${tag.attrId}" data-value-id="${tag.valueId}">${attrName}: ${valueName} <span class="tag-close" onclick="removeTag(this, '${field.name}')">×</span></span>`;
+                        }
+                    });
+                    input.dataset.tags = JSON.stringify(tags);
+                    const usedAttrs = tags.map(t => t.attrId.toString());
+                    attrSelect.innerHTML = '<option value="">选择属性</option>' + tabField.attrOptions
+                        .filter(opt => !usedAttrs.includes(opt.id.toString()))
+                        .map(opt => `<option value="${opt.id}">${opt.name}</option>`).join('');
+                }
+            }
+            else {
                 input = document.createElement('input');
                 input.type = tabField.type || 'text';
                 input.id = `modal${field.name}`;
@@ -650,6 +801,27 @@ function saveRecord() {
                 } else {
                     record[field.name] = value === '' ? '' : (tabField.type === 'number' ? parseInt(value) : value);
                 }
+            } else if (tabField.type === 'attr') {
+                const tags = JSON.parse(element.dataset.tags || '[]');
+                record[field.name] = JSON.stringify(tags);
+            } else if (tabField.type === 'list') {
+                const items = [];
+                const listItems = element.querySelectorAll('.list-item');
+                listItems.forEach((itemDiv, idx) => {
+                    const item = {};
+                    tabField.subFields.forEach(subField => {
+                        const subInput = document.getElementById(`modal${field.name}_${subField.name}_${idx}`);
+                        if (subField.type === 'file') {
+                            const previewDiv = subInput.nextElementSibling;
+                            const images = Array.from(previewDiv.querySelectorAll('img')).map(img => img.src);
+                            item[subField.name] = JSON.stringify(images);
+                        } else {
+                            item[subField.name] = subInput ? (subField.type === 'number' ? parseInt(subInput.value) || 0 : subInput.value) : '';
+                        }
+                    });
+                    items.push(item);
+                });
+                record[field.name] = JSON.stringify(items);
             }
         });
     });

@@ -28,6 +28,10 @@
         .col-version { width: 8%; min-width: 60px; }
         .col-create-time { width: 15%; min-width: 120px; }
         .col-actions { width: 15%; min-width: 120px; }
+        .col-attrs, .col-tags { min-width: 12em; max-width: 20em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .attr-container { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .attr-container .ant-select { width: 120px; }
+        .attr-container .ant-btn { padding: 4px 8px; }
         .cover-pic-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
         .cover-pic-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
     </style>
@@ -89,6 +93,14 @@
     const stores = ["Downtown Store", "Mall Outlet", "Online Shop", "City Branch", "Suburban Plaza"];
     const services = ["Express Delivery", "Standard Shipping", "In-Store Pickup", "Gift Wrapping", "Extended Warranty"];
     const users = ["Alice Smith", "Bob Johnson", "Charlie Brown", "Diana Lee", "Eve White"];
+    const attrsData = [{id: 1, name: "颜色"}, {id: 2, name: "尺寸"}, {id: 3, name: "材质"}];
+    const attrValuesData = {
+        1: [{id: 1, name: "红色"}, {id: 2, name: "蓝色"}],
+        2: [{id: 1, name: "S"}, {id: 2, name: "M"}],
+        3: [{id: 1, name: "棉"}, {id: 2, name: "丝"}]
+    };
+    const tagsData = [{id:1,name:"新品"},{id:2,name:"热销"},{id:3,name:"促销"}];
+
     function getRandomItem(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
@@ -400,6 +412,34 @@
             { name: 'content', isLangField: true, generator: (id) => id % 2 === 0 ? `Features of product ${id}, suitable for daily use.` : `Enhanced features of product ${id}, perfect for daily use with new upgrades.` },
             { name: 'create_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'update_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
+            {
+                name: 'attrs',
+                isSystemField: false,
+                generator: id => {
+                    const attrIds = [...new Set(Array.from({length: randomInt(0, 2)}, () => randomInt(1, attrsData.length)))];
+                    const tags = attrIds.map(attrId => ({
+                        attrId,
+                        valueId: randomInt(1, attrValuesData[attrId]?.length || 1)
+                    }));
+                    return JSON.stringify(tags);
+                }
+            },
+            {
+                name: 'tags',
+                isSystemField: false,
+                generator: id => JSON.stringify([...new Set(Array.from({length: randomInt(1, 3)}, () => randomInt(1, tagsData.length)))])
+            },
+            {
+                name: 'item_show',
+                isSystemField: false,
+                generator: id => JSON.stringify(Array.from({length: randomInt(0, 1)}, (_, i) => ({
+                    title: `示例${id}-${i+1}`,
+                    summary: `商品${id}的示例描述${i+1}`,
+                    show_data: JSON.stringify(Array.from({length: randomInt(1, 3)}, () => getRandomImage('sexy'))),
+                    status: randomInt(0, 1),
+                    sort_index: i
+                })))
+            },
             { name: 'site_reply', isLangField: true, generator: (id) => `Thank you for your interest in product ${id}!` }
         ],
         actionButtons: [
@@ -417,6 +457,22 @@
             { name: 'store_id', label: '店铺', className: 'col-store-id', formatter: v => stores[v - 1] || `店铺${v}` },
             { name: 'brand_id', label: '品牌', className: 'col-brand-id', formatter: v => brands[v - 1] || `品牌${v}` },
             { name: 'services_id', label: '服务', className: 'col-services-id', formatter: v => services[v - 1] || `服务${v}` },
+            {
+                name: 'tags',
+                label: '标签',
+                className: 'col-tags',
+                formatter: (value, item) => JSON.parse(item.tags || '[]').map(id => `<span class="ant-tag ant-tag-green">${tagsData.find(t => t.id === id)?.name || ''}</span>`).join('')
+            },
+            {
+                name: 'attrs',
+                label: '属性',
+                className: 'col-attrs',
+                formatter: (value, item) => JSON.parse(item.attrs || '[]').map(tag => {
+                    const attrName = attrsData.find(a => a.id === tag.attrId)?.name;
+                    const valueName = attrValuesData[tag.attrId]?.find(v => v.id === tag.valueId)?.name;
+                    return attrName && valueName ? `<span class="ant-tag ant-tag-blue">${attrName}：${valueName}</span>` : '';
+                }).join('')
+            },
             {
                 name: 'status',
                 label: '状态',
@@ -501,7 +557,27 @@
                 { name: 'sort_index', label: '排序索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                 { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                 { name: 'cover_pic', label: '封面图', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                {
+                    name: 'attrs',
+                    label: '属性',
+                    type: 'attr',
+                    color: 'blue',
+                    attrOptions: attrsData,
+                    valueOptions: attrValuesData,
+                    editableInAdd: true,
+                    editableInEdit: true
+                },
+                {
+                    name: 'tags',
+                    label: '标签',
+                    type: 'tag',
+                    color: 'green',
+                    options: tagsData.map(t => t.name),
+                    editableInAdd: true,
+                    editableInEdit: true,
+                    allowCustom: true
+                }
             ]
         },
         {
@@ -543,6 +619,27 @@
                 { name: 'site_reply', label: '站点回复', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                 { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), isLangField: true, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
                 { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), isLangField: true, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+            ]
+        },
+        {
+            id: 'item_show',
+            title: '商品展示',
+            fields: [
+                {
+                    name: 'item_show',
+                    label: '商品展示',
+                    type: 'list',
+                    maxItems: 1, // 限制最多一个示例
+                    editableInAdd: true,
+                    editableInEdit: true,
+                    subFields: [
+                        { name: 'title', label: '标题', type: 'text', isLangField: true, editableInAdd: true, editableInEdit: true },
+                        { name: 'summary', label: '摘要', type: 'textarea', isLangField: true, editableInAdd: true, editableInEdit: true },
+                        { name: 'show_data', label: '展示图片', type: 'file', isLangField: false, multiple: true, editableInAdd: true, editableInEdit: true },
+                        { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], editableInAdd: true, editableInEdit: true },
+                        { name: 'sort_index', label: '排序', type: 'number', editableInAdd: true, editableInEdit: true }
+                    ]
+                }
             ]
         }
     ]
