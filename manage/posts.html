@@ -26,6 +26,7 @@
         .col-cover-pic { width: 10%; min-width: 80px; }
         .col-create-time { width: 15%; min-width: 120px; }
         .col-actions { width: 10%; min-width: 100px; }
+        .col-brands,.col-tags{min-width:12em;max-width:20em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
         .cover-pic-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
         .cover-pic-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
     </style>
@@ -84,6 +85,16 @@
     const users = ["Alice Smith", "Bob Johnson", "Charlie Brown", "Diana Lee", "Eve White"];
     const stores = ["Downtown Store", "Mall Outlet", "Online Shop", "City Branch", "Suburban Plaza"];
     const blogs = ["Tech Blog", "Lifestyle Blog", "Travel Blog", "Food Blog", "Fashion Blog"];
+    const brandsData = [
+        { id: 1, name: "品牌A" },
+        { id: 2, name: "品牌B" },
+        { id: 3, name: "品牌C" }
+    ];
+    const tagsData = [
+        { id: 1, name: "技术" },
+        { id: 2, name: "生活" },
+        { id: 3, name: "编程" }
+    ];
     function getRandomItem(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
@@ -115,6 +126,30 @@
             { name: 'save_count', generator: () => randomInt(0, 2000) },
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
+            {
+                name: 'brands',
+                isSystemField: false,
+                generator: id => {
+                    const brandIds = [];
+                    const count = randomInt(0, 2);
+                    for (let i = 0; i < count; i++) {
+                        brandIds.push(randomInt(1, brandsData.length));
+                    }
+                    return JSON.stringify([...new Set(brandIds)]);
+                }
+            },
+            {
+                name: 'tags',
+                isSystemField: false,
+                generator: id => {
+                    const tagIds = [];
+                    const count = randomInt(1, 3);
+                    for (let i = 0; i < count; i++) {
+                        tagIds.push(randomInt(1, tagsData.length));
+                    }
+                    return JSON.stringify([...new Set(tagIds)]);
+                }
+            },
             // 多语言字段
             { name: 'id', isLangField: true, isSystemField: true, generator: id => id * 6 + randomInt(1, 6) },
             { name: 'posts_id', isLangField: true, generator: id => id },
@@ -157,6 +192,27 @@
                         case 3: return '<span class="ant-tag ant-tag-gray">已废弃</span>';
                         default: return '<span class="ant-tag">未知</span>';
                     }
+                }
+            },{
+                name: 'brands',
+                label: '品牌',
+                className: 'col-brands',
+                formatter: (value) => {
+                    const brandIds = value ? JSON.parse(value) : [];
+                    return brandIds
+                        .map(id => `<span class="ant-tag ant-tag-blue">${brandsData.find(b => b.id === id)?.name || ''}</span>`)
+                        .join('');
+                }
+            },
+            {
+                name: 'tags',
+                label: '标签',
+                className: 'col-tags',
+                formatter: (value) => {
+                    const tagIds = value ? JSON.parse(value) : [];
+                    return tagIds
+                        .map(id => `<span class="ant-tag ant-tag-green">${tagsData.find(t => t.id === id)?.name || ''}</span>`)
+                        .join('');
                 }
             },
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
@@ -204,6 +260,8 @@
                 id: 'basic',
                 title: '基本信息',
                 fields: [
+                    {name:'brands',label:'品牌',type:'tag',color:'blue',options:brandsData.map(b=>(b.name)),editableInAdd:!0,editableInEdit:!0,allowCustom:!1},
+                    {name:'tags',label:'标签',type:'tag',color:'green',options:tagsData.map(t=>(t.name)),editableInAdd:!0,editableInEdit:!0,allowCustom:!0},
                     { name: 'posts_type', label: '文章类型', type: 'select', options: postTypes.map((t, i) => ({ value: i + 1, label: t })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'blog_id', label: '博客', type: 'select', options: blogs.map((b, i) => ({ value: i + 1, label: b })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'user_id', label: '用户', type: 'select', options: users.map((u, i) => ({ value: i + 1, label: u })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
