@@ -32,6 +32,7 @@
         .col-bid-images { width: 25%; min-width: 200px; }
         .col-field-info { width: 20%; min-width: 150px; }
         .col-bid-description { width: 20%; min-width: 150px; }
+        .col-attrs { min-width: 12em; max-width: 20em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -253,7 +254,12 @@
             { name: 'after_sales_rules', isLangField: true, generator: (id, lang) => `售后规则 #${id}: 退货需在30天内。` },
             { name: 'demand_name', isLangField: true, generator: (id, lang) => `${demandData[lang].names[id % 5]} #${id}` },
             { name: 'demand_information', isLangField: true, generator: (id, lang) => `${demandData[lang].info[id % 5]} (ID: ${id})` },
-            { name: 'site_reply', isLangField: true, generator: id => randomInt(0, 1) ? `回复 #${id}: 已处理` : '' }
+            { name: 'site_reply', isLangField: true, generator: id => randomInt(0, 1) ? `回复 #${id}: 已处理` : '' },
+            {
+                name: 'attrs',
+                isSystemField: false,
+                generator: id => JSON.stringify([...new Set(Array.from({length: randomInt(0, 2)}, () => randomInt(1, attrsData.length)))].map(attrId => ({ attrId, valueId: randomInt(1, attrValuesData[attrId]?.length || 1) })))
+            },
         ],
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
@@ -269,6 +275,16 @@
             { name: 'user_id', label: '用户', className: 'col-user-id', formatter: v => `${userNames[v % userNames.length]} (${v})` },
             { name: 'brand_id', label: '品牌', className: 'col-brand-id', formatter: v => `${brandNames[v % brandNames.length]} (${v})` },
             { name: 'services_id', label: '服务', className: 'col-services-id', formatter: v => `${serviceNames[v % serviceNames.length]} (${v})` },
+            {
+                name: 'attrs',
+                label: '属性',
+                className: 'col-attrs',
+                formatter: (value, item) => JSON.parse(item.attrs || '[]').map(tag => {
+                    const attrName = attrsData.find(a => a.id === tag.attrId)?.name;
+                    const valueName = attrValuesData[tag.attrId]?.find(v => v.id === tag.valueId)?.name;
+                    return attrName && valueName ? `<span class="ant-tag ant-tag-blue">${attrName}：${valueName}</span>` : '';
+                }).join('')
+            },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => {
                     const statusMap = getStatusMap();
                     const colorMap = { 0: 'orange', 1: 'green', 2: 'red', 3: 'blue', 4: 'purple', 5: 'green', 6: 'gray', 7: 'gray', 8: 'red' };
@@ -322,6 +338,16 @@
                     { name: 'samples_need', label: '需要样品', type: 'select', options: [{ value: 0, label: '否' }, { value: 1, label: '是' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'after_sales_time', label: '售后时间(天)', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                    {
+                        name: 'attrs',
+                        label: '属性',
+                        type: 'attr',
+                        color: 'blue',
+                        attrOptions: attrsData,
+                        valueOptions: attrValuesData,
+                        editableInAdd: true,
+                        editableInEdit: true
+                    },
                     { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
                 ]
             },

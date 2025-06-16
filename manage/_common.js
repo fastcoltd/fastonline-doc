@@ -601,7 +601,46 @@ setInterval(() => {
     openCheckinModal();
 }, 300000); // 5分钟 = 300,000毫秒
 
-// _common.js (替换或更新事件弹窗相关代码)
+const attrsData = [
+    { id: 1, name: "交付周期" }, { id: 2, name: "适用平台" }, { id: 3, name: "语言支持" }, { id: 4, name: "用户规模" }, { id: 5, name: "响应速度" },
+    { id: 6, name: "服务等级" }, { id: 7, name: "付费模式" }, { id: 8, name: "续费周期" }, { id: 9, name: "附加功能" }, { id: 10, name: "隐私保护" },
+    { id: 11, name: "内容类型" }, { id: 12, name: "互动水平" }, { id: 13, name: "数据备份" }, { id: 14, name: "定制程度" }, { id: 15, name: "支持设备" },
+    { id: 16, name: "社区互动" }, { id: 17, name: "奖励类型" }, { id: 18, name: "使用引导" }, { id: 19, name: "客户支持" }, { id: 20, name: "更新频率" },
+    { id: 21, name: "兼容性" }, { id: 22, name: "服务范围" }, { id: 23, name: "粉丝增长速度" }, { id: 24, name: "AI模型类型" }, { id: 25, name: "SEO目标" }
+];
+const attrValuesData = {
+    1: [{ id: 1, name: "即时" }, { id: 2, name: "24小时" }, { id: 3, name: "3天" }, { id: 4, name: "7天" }],
+    2: [{ id: 1, name: "PC" }, { id: 2, name: "移动端" }, { id: 3, name: "游戏主机" }, { id: 4, name: "多平台" }],
+    3: [{ id: 1, name: "中文" }, { id: 2, name: "英文" }, { id: 3, name: "多语言" }],
+    4: [{ id: 1, name: "个人" }, { id: 2, name: "小型团队" }, { id: 3, name: "大型企业" }],
+    5: [{ id: 1, name: "实时" }, { id: 2, name: "<1小时" }, { id: 3, name: "<12小时" }],
+    6: [{ id: 1, name: "基础" }, { id: 2, name: "高级" }, { id: 3, name: "尊享" }],
+    7: [{ id: 1, name: "一次性" }, { id: 2, name: "订阅" }, { id: 3, name: "按需付费" }],
+    8: [{ id: 1, name: "月度" }, { id: 2, name: "季度" }, { id: 3, name: "年度" }],
+    9: [{ id: 1, name: "无" }, { id: 2, name: "基础" }, { id: 3, name: "高级" }],
+    10: [{ id: 1, name: "标准" }, { id: 2, name: "增强" }, { id: 3, name: "高等级" }],
+    11: [{ id: 1, name: "文本" }, { id: 2, name: "图片" }, { id: 3, name: "视频" }, { id: 4, name: "多媒体" }],
+    12: [{ id: 1, name: "低" }, { id: 2, name: "中" }, { id: 3, name: "高" }],
+    13: [{ id: 1, name: "无" }, { id: 2, name: "每日" }, { id: 3, name: "每周" }],
+    14: [{ id: 1, name: "无" }, { id: 2, name: "部分" }, { id: 3, name: "完全" }],
+    15: [{ id: 1, name: "手机" }, { id: 2, name: "平板" }, { id: 3, name: "PC" }, { id: 4, name: "多设备" }],
+    16: [{ id: 1, name: "无" }, { id: 2, name: "基础" }, { id: 3, name: "高级" }],
+    17: [{ id: 1, name: "无" }, { id: 2, name: "积分" }, { id: 3, name: "虚拟道具" }],
+    18: [{ id: 1, name: "无" }, { id: 2, name: "基础教程" }, { id: 3, name: "详细指南" }],
+    19: [{ id: 1, name: "邮件" }, { id: 2, name: "在线聊天" }, { id: 3, name: "24/7" }],
+    20: [{ id: 1, name: "不定期" }, { id: 2, name: "月度" }, { id: 3, name: "每周" }],
+    21: [{ id: 1, name: "主流设备" }, { id: 2, name: "全设备" }, { id: 3, name: "特定设备" }],
+    22: [{ id: 1, name: "本地" }, { id: 2, name: "区域" }, { id: 3, name: "全球" }],
+    23: [{ id: 1, name: "慢速" }, { id: 2, name: "中速" }, { id: 3, name: "快速" }],
+    24: [{ id: 1, name: "文本生成" }, { id: 2, name: "图像生成" }, { id: 3, name: "多模态" }],
+    25: [{ id: 1, name: "排名提升" }, { id: 2, name: "流量增长" }, { id: 3, name: "品牌曝光" }]
+};
+const tagsData = [
+    { id: 1, name: "新上线" }, { id: 2, name: "热门" }, { id: 3, name: "促销" }, { id: 4, name: "限时优惠" }, { id: 5, name: "独家" },
+    { id: 6, name: "游戏代练" }, { id: 7, name: "粉丝增长" }, { id: 8, name: "AI服务" }, { id: 9, name: "SEO优化" }, { id: 10, name: "虚拟道具" },
+    { id: 11, name: "快速交付" }, { id: 12, name: "高评分" }, { id: 13, name: "会员专享" }, { id: 14, name: "多语言" }, { id: 15, name: "高性价比" },
+    { id: 16, name: "新手友好" }, { id: 17, name: "优质服务" }, { id: 18, name: "社区活跃" }, { id: 19, name: "可续费" }, { id: 20, name: "跨平台" }
+];
 
 const eventPopupTypes = {
     articleReview: { name: "文章审核", color: "#ec4899", actionLink: "posts.html", button: "action" },
