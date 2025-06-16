@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="../site/_data.js"></script>
     <script src="_common.js"></script>
     <script src="_chat.js"></script>
     <script src="_img.js"></script>
@@ -27,6 +28,7 @@
         .col-actions { width: 10%; min-width: 100px; }
         .logo-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
         .logo-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
+        .col-tags, .col-brands, .col-services { min-width: 12em; max-width: 20em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -101,6 +103,7 @@
         { value: 'ES', label: 'Spain' },
         { value: 'MX', label: 'Mexico' }
     ];
+    const servicesData = _servicesData
     const userData = Array.from({ length: 15 }, (_, i) => ({ id: i + 1, username: `user${i + 1}` }));
     function getRandomItem(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
@@ -287,6 +290,25 @@
             { name: 'custom_url', generator: id => `/stores/${getRandomItem(storeNames).toLowerCase().replace(' ', '-')}-${id}` }, // 自定义URL
             { name: 'store_password', generator: () => `pass${randomInt(1000, 9999)}` }, // 随机密码
             { name: 'two_factors', generator: () => `2FA_${randomInt(1000, 9999)}` }, // 随机双重认证码
+            {
+                name: 'tags',
+                isSystemField: false,
+                generator: id => JSON.stringify([...new Set(Array.from({length: randomInt(1, 3)}, () => randomInt(1, tagsData.length)))])
+            },
+            {
+                name: 'brands',
+                isSystemField: false,
+                generator: id => JSON.stringify([...new Set(Array.from({length: randomInt(0, 2)}, () => randomInt(1, brandsData.length)))])
+            },
+            {
+                name: 'services',
+                isSystemField: false,
+                generator: id => JSON.stringify(Array.from({length: randomInt(1, 3)}, () => ({
+                    services_id: randomInt(1, servicesData.length),
+                    sort_index: randomInt(0, 10),
+                    create_time: moment().subtract(randomInt(1, 30), 'days').unix()
+                })))
+            },
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'update_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 90), 'days').unix() },
             // 多语言字段
@@ -336,6 +358,24 @@
             },
             { name: 'language', label: '语言', className: 'col-language', isLangField: true },
             { name: 'name', label: '店铺名称', className: 'col-name', isLangField: true },
+            {
+                name: 'brands',
+                label: '品牌',
+                className: 'col-brands',
+                formatter: (value, item) => JSON.parse(item.brands || '[]').map(id => `<span class="ant-tag ant-tag-blue">${brandsData.find(b => b.id === id)?.name || ''}</span>`).join('')
+            },
+            {
+                name: 'services',
+                label: '服务',
+                className: 'col-services',
+                formatter: (value, item) => JSON.parse(item.services || '[]').map(s => `<span class="ant-tag ant-tag-orange">${servicesData.find(sv => sv.id === s.services_id)?.name || ''}</span>`).join('')
+            },
+            {
+                name: 'tags',
+                label: '标签',
+                className: 'col-tags',
+                formatter: (value, item) => JSON.parse(item.tags || '[]').map(id => `<span class="ant-tag ant-tag-green">${tagsData.find(t => t.id === id)?.name || ''}</span>`).join('')
+            },
             { name: 'logo', label: '店铺标志', className: 'col-logo', formatter: v => v ? `<div class="logo-preview"><img src="${v}" alt="标志" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="logo-preview"><span class="placeholder" onclick="alert(\'标志不存在\')">无</span></div>' },
             { name: 'country', label: '国家', className: 'col-country' },
             { name: 'custom_url', label: '自定义URL', className: 'col-custom-url' },
@@ -394,6 +434,42 @@
                     { name: 'name', label: '店铺名称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true },
                     { name: 'language', label: '语言', type: 'select', options: languageOptions.map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false, isLangField: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, isLangField: true }
+                ]
+            },
+            {
+                id: 'store_business',
+                title: '店铺业务',
+                fields: [
+                    {
+                        name: 'brands',
+                        label: '品牌',
+                        type: 'tag',
+                        color: 'blue',
+                        options: brandsData.map(b => b.name),
+                        editableInAdd: true,
+                        editableInEdit: true,
+                        allowCustom: false
+                    },
+                    {
+                        name: 'services',
+                        label: '服务',
+                        type: 'tag',
+                        color: 'orange',
+                        options: servicesData.map(b => b.name),
+                        editableInAdd: true,
+                        editableInEdit: true,
+                        allowCustom: false
+                    },
+                    {
+                        name: 'tags',
+                        label: '标签',
+                        type: 'tag',
+                        color: 'green',
+                        options: tagsData.map(t => t.name),
+                        editableInAdd: true,
+                        editableInEdit: true,
+                        allowCustom: true
+                    },
                 ]
             },
             {

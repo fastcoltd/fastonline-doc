@@ -663,12 +663,22 @@ let brandsData = [
     { id: 2, name: "品牌B" },
     { id: 3, name: "品牌C" }
 ];
-if (hotBrands){
+let _servicesData = [
+    { id: 1, name: "快速配送" }, { id: 2, name: "售后保障" }, { id: 3, name: "定制服务" }, { id: 4, name: "免费安装" }, { id: 5, name: "会员专享" }
+];
+if (typeof hotBrands != 'undefined'){
     let allBrands = [];i = 0
     hotBrands.forEach(b => {
         allBrands.push({id: i++, name: b.name, brand_name: b.name});
     })
     brandsData = allBrands;
+}
+if (typeof services != 'undefined'){
+    let allServices = [];i = 0
+    services.forEach(s => {
+        allServices.push({id: i++, name: s.name});
+    })
+    _servicesData = allServices;
 }
 
 function generateEventContent(eventType) {
