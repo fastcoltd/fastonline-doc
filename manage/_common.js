@@ -658,6 +658,18 @@ const eventPopupTypes = {
     paymentDispute: { name: "支付争议", color: "#14b8a6", actionLink: "payment_dispute.html", button: "action" },
     riskControlEvent: { name: "风控事件", color: "#ef4444", actionLink: "risk_control_finance.html", button: "action" }
 };
+let brandsData = [
+    { id: 1, name: "品牌A" },
+    { id: 2, name: "品牌B" },
+    { id: 3, name: "品牌C" }
+];
+if (hotBrands){
+    let allBrands = [];i = 0
+    hotBrands.forEach(b => {
+        allBrands.push({id: i++, name: b.name, brand_name: b.name});
+    })
+    brandsData = allBrands;
+}
 
 function generateEventContent(eventType) {
     const users = ["张三", "李四", "王五", "赵六", "刘七"];
