@@ -25,6 +25,13 @@
         .col-actions { width: 15%; min-width: 100px; }
         .pic-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
         .pic-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
+        .col-tags { min-width: 15em; max-width: 20em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #campaignItemsModal .modal-content { width: 90%; max-width: 500px; padding: 16px; }
+        #campaignItemsModal .table-header { display: grid; grid-template-columns: 100px 1fr 100px; font-weight: bold; background: #f5f5f5; padding: 8px; border-bottom: 1px solid #ddd; }
+        #campaignItemsModal .task-item { display: grid; grid-template-columns: 100px 1fr 100px; padding: 8px; border-bottom: 1px solid #eee; }
+        #campaignItemsModal .col-id, #campaignItemsModal .col-name, #campaignItemsModal .col-store { text-align: center; font-size: 13px; }
+        #campaignItemsModal .modal-buttons { margin-top: 12px; text-align: right; }
+        #campaignItemsModal .ant-btn { padding: 4px 12px; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -86,6 +93,48 @@
     function randomUrl() {
         return `campaign-${randomInt(1000, 9999)}`;
     }
+    function showCampaignItemsModal(campaignId) {
+        let modal = document.getElementById('campaignItemsModal');
+        if (!modal) {
+            modal = document.createElement('div'); modal.id = 'campaignItemsModal'; modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
+        const items = JSON.parse(tableData.find(item => item.id === campaignId)?.items || '[]');
+        modal.innerHTML = `
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('campaignItemsModal')">×</button>
+            <h3>关联商品列表</h3>
+            <div class="table-header">
+                <div class="col-id">商品ID</div>
+                <div class="col-name">商品名称</div>
+                <div class="col-store">店铺名称</div>
+            </div>
+            <div id="campaignItemsList" class="task-list"></div>
+            <div class="modal-buttons">
+                <button class="ant-btn" onclick="closeModal('campaignItemsModal')">关闭</button>
+            </div>
+        </div>
+    `;
+        modal.style.display = 'block';
+        renderCampaignItemsList(campaignId, items);
+    }
+    function renderCampaignItemsList(campaignId, items) {
+        const list = document.getElementById('campaignItemsList');
+        list.innerHTML = '';
+        items.forEach(item => {
+            const row = document.createElement('div'); row.className = 'task-item';
+            row.innerHTML = `
+            <div class="col-id">${item.item_id}</div>
+            <div class="col-name">${item.item_name}</div>
+            <div class="col-store">${item.store_name}</div>
+        `;
+            list.appendChild(row);
+        });
+    }
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.style.display = 'none';
+    }
 
     window.tableConfig = {
         tableName: 'campaign',
@@ -109,6 +158,22 @@
             { name: 'seo_description', isLangField: true, generator: id => `Description for campaign ${id}` },
             { name: 'create_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'update_time', isLangField: true, isSystemField: true, generator: () => moment().subtract(randomInt(0, 30), 'days').unix() },
+            {
+                name: 'tags',
+                isSystemField: false,
+                generator: id => JSON.stringify([...new Set(Array.from({length: randomInt(1, 3)}, () => randomInt(1, tagsData.length)))])
+            },
+            {
+                name: 'items',
+                isSystemField: false,
+                generator: id => JSON.stringify(Array.from({length: randomInt(1, 5)}, () => ({
+                    item_id: randomInt(1, 50),
+                    item_name: `商品${randomInt(1000, 9999)}`, // 随机生成商品名称
+                    store_id: randomInt(1, 10),
+                    store_name: `店铺${randomInt(100, 999)}`, // 随机生成店铺名称
+                    create_time: moment().subtract(randomInt(1, 30), 'days').unix()
+                })))
+            },
             { name: 'content', isLangField: true, generator: id => `Detailed content for campaign ${id}` }
         ],
         langFields: {
@@ -129,12 +194,24 @@
                     const langData = tableLangData.find(l => l.campaign_id === item.id && l.language === languages[0]);
                     return langData ? langData.title : '';
                 }},
+            {
+                name: 'tags',
+                label: '标签',
+                className: 'col-tags',
+                formatter: (value, item) => JSON.parse(item.tags || '[]').map(id => `<span class="ant-tag ant-tag-green">${tagsData.find(t => t.id === id)?.name || ''}</span>`).join('')
+            },
             { name: 'cover_pic', label: '封面图', className: 'col-cover-pic', formatter: v => v ? `<div class="pic-preview"><img src="${v}" alt="封面图" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="pic-preview"><span class="placeholder" onclick="alert(\'图片不存在\')">无</span></div>' },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
-            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
-                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
-                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
-            ` }
+            {
+                name: 'actions',
+                label: '操作',
+                className: 'col-actions',
+                formatter: (value, item) => `
+        <button class="ant-btn ant-btn-primary" onclick="editRecord(${item.id})">编辑</button>
+        <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+        <button class="ant-btn ant-btn-primary" onclick="showCampaignItemsModal(${item.id})">商品</button>
+    `
+            },
         ],
         filterFields: [
             { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '未激活' }, { value: '1', label: '激活' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
@@ -150,6 +227,16 @@
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '未激活' }, { value: 1, label: '激活' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'custom_url', label: '自定义URL', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'cover_pic', label: '封面图', type: 'file', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    {
+                        name: 'tags',
+                        label: '标签',
+                        type: 'tag',
+                        color: 'green',
+                        options: tagsData.map(t => t.name),
+                        editableInAdd: true,
+                        editableInEdit: true,
+                        allowCustom: true
+                    },
                     { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
                     { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
                 ]
