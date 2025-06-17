@@ -1,25 +1,26 @@
 name: Sync fastresp-server-web
-      on:
-        repository_dispatch:
-          types: [sync]
-      jobs:
-        sync:
-          runs-on: ubuntu-latest
-          steps:
-            - uses: actions/checkout@v3
-              with:
-                repository: fastcoltd/fastonline-doc
-                token: ${{ secrets.PAT }}
-            - name: Sync fastresp-server-web
-              run: |
-                git clone https://x-access-token:${{ secrets.PAT }}@github.com/fastcoltd/fastresp-server-web.git temp
-                rm -rf target-folder/*
-                cp -r temp/* target-folder/
-                find target-folder -type f -name "*.html" -exec sed -i 's|href="css/|href="target-folder/css/|g' {} \;
-                find target-folder -type f -name "*.html" -exec sed -i 's|src="js/|src="target-folder/js/|g' {} \;
-                find target-folder -type f -name "*.css" -exec sed -i 's|url("images/|url("target-folder/images/|g' {} \;
-                git config user.name "Fastco Dev"
-                git config user.email "dev@fastco.com"
-                git add target-folder
-                git commit -m "Sync fastresp-server-web updates" || true
-                git push
+on:
+  repository_dispatch:
+    types: [sync]
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fastonline-doc
+        uses: actions/checkout@v3
+        with:
+          repository: fastcoltd/fastonline-doc
+          token: ${{ secrets.PAT }}
+      - name: Sync fastresp-server-web
+        run: |
+          git clone https://x-access-token:${{ secrets.PAT }}@github.com/fastcoltd/fastresp-server-web.git temp
+          rm -rf target-folder/*
+          cp -r temp/* target-folder/
+          find target-folder -type f -name "*.html" -exec sed -i 's|href="css/|href="target-folder/css/|g' {} \;
+          find target-folder -type f -name "*.html" -exec sed -i 's|src="js/|src="target-folder/js/|g' {} \;
+          find target-folder -type f -name "*.css" -exec sed -i 's|url("images/|url("target-folder/images/|g' {} \;
+          git config user.name "Fastco Dev"
+          git config user.email "dev@fastco.com"
+          git add target-folder
+          git commit -m "Sync fastresp-server-web updates" || true
+          git push
