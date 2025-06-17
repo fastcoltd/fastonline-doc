@@ -18,7 +18,7 @@ jobs:
           cp -r temp/* target-folder/
           find target-folder -type f -name "*.html" -exec sed -i 's|href="css/|href="target-folder/css/|g' {} \;
           find target-folder -type f -name "*.html" -exec sed -i 's|src="js/|src="target-folder/js/|g' {} \;
-          find target-folder -type f -name "*.css" -exec sed -i 's|url("images/|url("target-folder/images/|g' {} \;
+          find target-folder -type f -name "*.css" -exec sed -i 's|url("images/|url="target-folder/images/|g' {} \;
           git config user.name "Fastco Dev"
           git config user.email "dev@fastco.com"
           git add target-folder
