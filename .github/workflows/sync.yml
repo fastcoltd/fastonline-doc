@@ -17,14 +17,14 @@ jobs:
           git clone https://x-access-token:${{ secrets.PAT }}@github.com/fastcoltd/fastresp-server-web.git temp || { echo "Clone failed"; exit 1; }
           echo "Clone completed, listing temp contents"
           ls -la temp
-          mkdir -p target-folder
-          rm -rf target-folder/*
-          cp -r temp/* target-folder/
-          find target-folder -type f -name "*.html" -exec sed -i 's|href="css/|href="target-folder/css/|g' {} \;
-          find target-folder -type f -name "*.html" -exec sed -i 's|src="js/|src="target-folder/js/|g' {} \;
-          find target-folder -type f -name "*.css" -exec sed -i 's|url("images/|url="target-folder/images/|g' {} \;
+          mkdir -p web
+          rm -rf web/*
+          cp -r temp/* web/
+          find web -type f -name "*.html" -exec sed -i 's|href="css/|href="web/css/|g' {} \;
+          find web -type f -name "*.html" -exec sed -i 's|src="js/|src="web/js/|g' {} \;
+          find web -type f -name "*.css" -exec sed -i 's|url("images/|url="web/images/|g' {} \;
           git config user.name "Fastco Dev"
           git config user.email "dev@fastco.com"
-          git add target-folder
+          git add web
           git commit -m "Sync fastresp-server-web updates" || true
           git push
