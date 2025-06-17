@@ -13,7 +13,11 @@ jobs:
           token: ${{ secrets.PAT }}
       - name: Sync fastresp-server-web
         run: |
-          git clone https://x-access-token:${{ secrets.PAT }}@github.com/fastcoltd/fastresp-server-web.git temp
+          echo "Starting clone of fastresp-server-web"
+          git clone https://x-access-token:${{ secrets.PAT }}@github.com/fastcoltd/fastresp-server-web.git temp || { echo "Clone failed"; exit 1; }
+          echo "Clone completed, listing temp contents"
+          ls -la temp
+          mkdir -p target-folder
           rm -rf target-folder/*
           cp -r temp/* target-folder/
           find target-folder -type f -name "*.html" -exec sed -i 's|href="css/|href="target-folder/css/|g' {} \;
