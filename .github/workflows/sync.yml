@@ -1,0 +1,30 @@
+name: Sync fastresp-server-web
+on:
+  repository_dispatch:
+    types: [sync]
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fastonline-doc
+        uses: actions/checkout@v3
+        with:
+          repository: fastcoltd/fastonline-doc
+          token: ${{ secrets.PAT }}
+      - name: Sync fastresp-server-web
+        run: |
+          echo "Starting clone of fastresp-server-web"
+          git clone https://x-access-token:${{ secrets.PAT }}@github.com/fastcoltd/fastresp-server-web.git temp || { echo "Clone failed"; exit 1; }
+          echo "Clone completed, listing temp contents"
+          ls -la temp
+          mkdir -p web
+          rm -rf web/*
+          cp -r temp/* web/
+          find web -type f -name "*.html" -exec sed -i 's|href="css/|href="web/css/|g' {} \;
+          find web -type f -name "*.html" -exec sed -i 's|src="js/|src="web/js/|g' {} \;
+          find web -type f -name "*.css" -exec sed -i 's|url("images/|url="web/images/|g' {} \;
+          git config user.name "Fastco Dev"
+          git config user.email "dev@fastco.com"
+          git add web
+          git commit -m "Sync fastresp-server-web updates" || true
+          git push
