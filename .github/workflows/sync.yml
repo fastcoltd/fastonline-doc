@@ -20,9 +20,9 @@ jobs:
           mkdir -p web
           rm -rf web/*
           cp -r temp/* web/
-          find web -type f -name "*.html" -exec sed -i 's|href="css/|href="web/css/|g' {} \;
-          find web -type f -name "*.html" -exec sed -i 's|src="js/|src="web/js/|g' {} \;
-          find web -type f -name "*.css" -exec sed -i 's|url("images/|url="web/images/|g' {} \;
+          find web -type f -name "*.html" -exec sed -i 's|href="css/|href="/web/css/|g' {} \;
+          find web -type f -name "*.html" -exec sed -i 's|src="js/|src="/web/js/|g' {} \;
+          find web -type f -name "*.css" -exec sed -i 's|url("images/|url="/web/images/|g' {} \;
           git config user.name "Fastco Dev"
           git config user.email "dev@fastco.com"
           git add web
