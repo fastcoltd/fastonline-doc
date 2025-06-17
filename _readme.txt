@@ -9,6 +9,7 @@ attr_value_lang:属性值多语言
 black_list:黑名单
 brand:品牌
 brand_lang:品牌多语`言
+
 brand_services_list:品牌服务列表
 brand_shield_area:品牌禁售区域列表
 campaign:集合专页
