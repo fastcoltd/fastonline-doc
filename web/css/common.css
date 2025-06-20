@@ -421,13 +421,14 @@ footer {
     width: 100%;
     background-color: #000;
     border: #fff solid 1px;
-    display: flex;
-    justify-content: center;
-    padding: 40px 26px 40px 26px;
 }
 
-.footer-item {
-    flex: 1;
+.footer-content {
+    margin: 40px auto;
+    max-width: var(--container-width);
+    display: flex;
+    justify-content: space-between;
+
 }
 
 .footer-item-content {
@@ -437,6 +438,13 @@ footer {
     align-items: flex-start;
 }
 
+.footer-item-title-box {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .footer-item-title {
     color: #f4f4f4;
     font-size: 14px;
@@ -444,6 +452,24 @@ footer {
     font-weight: 600;
     font-family: var(--primary-popfont);
     text-decoration: underline;
+}
+
+.footer-item-title-icon {
+    width: 24px;
+    height: 24px;
+    display: none;
+}
+
+.footer-item-desc-box {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media (max-width: 750px) {
+    .footer-item-desc-box {
+        display: none;
+    }
 }
 
 .footer-item-text {
@@ -462,7 +488,6 @@ footer {
         background: #fff;
         border: #f4f4f4 solid 1px;
         border-radius: 5px;
-        overflow: hidden;
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -475,6 +500,7 @@ footer {
         display: flex;
         flex-direction: row;
         align-items: center;
+        position: relative;
         cursor: pointer;
     }
 
@@ -567,13 +593,12 @@ footer {
     footer {
         background-color: transparent;
         border: #fff solid 1px;
-        flex-direction: column;
-        padding: 16px 26px 16px 26px;
-        gap: 30px;
+        padding: 0 26px;
     }
 
-    .footer-item {
-        flex: auto;
+    .footer-content {
+        flex-direction: column;
+        gap: 30px;
     }
 
     .footer-item-content {
@@ -583,6 +608,10 @@ footer {
 
     .footer-item-title {
         color: #000000;
+    }
+
+    .footer-item-title-icon {
+        display: inline-block;
     }
 
     .footer-item-text {

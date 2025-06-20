@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     this.headerSearchMenu = new HeaderMenu('.header-search-box-label', '.header-search-box-label-icon', '.header-search-box-label-text', 'items');
     this.headerResourceMenu = new HeaderMenu('.header-items-label-resource', '.header-items-label-icon', '', '');
     this.headerPostMenu = new HeaderMenu('.header-items-label-post', '.header-items-label-icon', '', '');
+    this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', '.header-search-mobile-box-label-icon', '.header-search-mobile-box-label-text', 'items')
     refreshHeaderUserUI();
     function refreshHeaderUserUI() {
         const signinButtonEle = document.getElementById('header-signin');
@@ -101,6 +102,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         })
     }
+
+    const footerContent = document.querySelector('.footer-content');
+    const footerItems = footerContent.querySelectorAll('.footer-item-content');
+    footerItems.forEach(item => {
+        const itemTitleBox = item.querySelector('.footer-item-title-box');
+        const itemTitleIcon = itemTitleBox.querySelector('.footer-item-title-icon');
+        const itemTitleIconStyle = window.getComputedStyle(itemTitleIcon);
+        if (itemTitleIconStyle.display === 'none') {
+            return;
+        }
+        const itemDescBox = item.querySelector('.footer-item-desc-box');
+        itemTitleBox.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const itemDescStyle = window.getComputedStyle(itemDescBox);
+            console.log('111', itemDescStyle)
+            if (itemDescStyle.display === 'none') {
+                itemDescBox.style.display = 'flex';
+                itemTitleIcon.style.transform = 'rotate(0deg)';
+            } else {
+                itemDescBox.style.display = 'none';
+                itemTitleIcon.style.transform = 'rotate(180deg)';
+            }
+        });
+    });
 })
 
 class HeaderMenu {
