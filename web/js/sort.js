@@ -1,7 +1,5 @@
 class SortSelector {
     constructor() {
-        this.selectedValue = '';
-        this.selectedText = 'all';
         this.sortContainer = document.querySelector('.sort-container');
         this.sortButton = document.querySelector('.page-sort-box');
         this.sortItems = document.querySelectorAll('.sort-item');

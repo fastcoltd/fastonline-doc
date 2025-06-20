@@ -10,6 +10,7 @@ class PageList {
 
     init() {
         this.bindEvents();
+        this.resetNoMore();
     }
 
     // 绑定事件
@@ -24,6 +25,7 @@ class PageList {
         this.currentPage = 1;
         this.isLoading = false;
         this.hasMore = true;
+        this.resetNoMore();
         this.loadItems(true);
     }
 
@@ -56,5 +58,11 @@ class PageList {
         this.hasMore = false;
         const moreBox = document.querySelector('.load-more');
         moreBox.style.display = 'none';
+    }
+
+    resetNoMore() {
+        this.hasMore = true;
+        const moreBox = document.querySelector('.load-more');
+        moreBox.style.display = 'iload-more';
     }
 }
