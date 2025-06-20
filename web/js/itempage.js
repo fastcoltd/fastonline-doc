@@ -103,15 +103,15 @@ function createItemElement(item) {
               <p class="best-items-item-star-recommend">{{(200)}}</p>
             </div>
             <div class="best-items-item-middle-box">
-              <div class="best-items-item-brand-service-box">
-                <div class="best-items-item-brand-box">
-                  <p class="best-items-item-brand-text">品牌: </p>
-                  <p class="best-items-item-brand" style="color: #06C70C;">{{Google}}</p>
-                </div>
-                <div class="best-items-item-service-box">
-                  <p class="best-items-item-service-text">服务: </p>
-                  <p class="best-items-item-service">{{SEO & SA}}</p>
-                </div>
+              <div class="best-items-item-brand-box">
+                <p class="best-items-item-brand-text">品牌: </p>
+                <img class="best-items-item-brand-icon" src="image/brand.png" />
+                <p class="best-items-item-brand" style="color: #06C70C;">{{Google}}</p>
+              </div>
+              <div class="best-items-item-service-box">
+                <p class="best-items-item-service-text">服务: </p>
+                <img class="best-items-item-service-icon" src="image/service.png" />
+                <p class="best-items-item-service">{{SEO & SA}}</p>
               </div>
               <div class="best-items-item-price-stock-box">
                 <div class="best-items-item-price-box">
