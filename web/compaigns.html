@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/common.css" />
   <link rel="stylesheet" href="css/star.css" />
   <link rel="stylesheet" href="css/filter.css" />
+  <link rel="stylesheet" href="css/pagination.css" />
   <link rel="stylesheet" href="css/compaign.css" />
   <link rel="stylesheet" href="css/page.css" />
 </head>
@@ -133,6 +134,58 @@
       <div class="load-more" id="load-more">
         <div class="loading" style="display: none;"></div>
         <span class="load-more-text">Show More</span>
+      </div>
+      <div class="pagination-container">
+        <div class="pagination" id="pagination">
+          <div class="pagination-content">
+            <div class="total-text">Total <span id="totalItems">85</span> items</div>
+
+            <button class="pagination-item pagination-prev" id="prevBtn">
+              <svg viewBox="0 0 12 12">
+                <path d="M7.5 1.5L3 6l4.5 4.5" stroke="currentColor" stroke-width="1.5" fill="none"
+                  stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <div class="pagination-numbers" id="paginationNumbers">
+              <!-- 页码将由JavaScript动态生成 -->
+            </div>
+            <div class="pagination-measure" id="paginationMeasure"></div>
+
+            <button class="pagination-item pagination-next" id="nextBtn">
+              <svg viewBox="0 0 12 12">
+                <path d="M4.5 1.5L9 6l-4.5 4.5" stroke="currentColor" stroke-width="1.5" fill="none"
+                  stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="pagination-options">
+            <div class="size-changer" id="sizeChanger">
+              <div class="selection-item">
+                <span class="selection-text" id="sizeText">10 / page</span>
+                <div class="icon">
+                  <svg viewBox="0 0 12 12">
+                    <path d="M6 8.5L2.5 5h7L6 8.5z" fill="currentColor" />
+                  </svg>
+                </div>
+              </div>
+              <div class="size-changer-dropdown" id="sizeDropdown">
+                <div class="size-changer-option" data-size="10">10 / page</div>
+                <div class="size-changer-option" data-size="20">20 / page</div>
+                <div class="size-changer-option" data-size="50">50 / page</div>
+                <div class="size-changer-option" data-size="100">100 / page</div>
+              </div>
+            </div>
+
+            <div class="quick-jumper">
+              <span class="go-to-text">Go to</span>
+              <div class="input-wrapper" id="jumpInputWrapper">
+                <input type="text" id="jumpInput" placeholder="">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="filter-container">
@@ -374,6 +427,7 @@
   <script src="js/layoutswitch.js"></script>
   <script src="js/pagelist.js"></script>
   <script src="js/sort.js"></script>
+  <script src="js/pagination.js"></script>
   <script src="js/compaignpage.js"></script>
   <script>
     // 页面加载完成后初始化
