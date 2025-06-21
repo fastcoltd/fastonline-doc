@@ -87,56 +87,56 @@ function createItemElement(item) {
 
   div.innerHTML = `
            <img class="best-items-item-icon" src="{{item.image}}" />
-           <img class="best-items-item-like" src="image/like.png" alt="Like" />
+           <img class="item-like" src="image/like.png" alt="Like" />
            <div class="best-items-item-content">
-            <div class="best-items-item-title-box">
-              <div class="best-items-item-mark best-items-item-mark1">{{item.mark}}</div>
-              <p class="best-items-item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>
+            <div class="item-title-box">
+              <div class="item-mark item-mark1">{{item.mark}}</div>
+              <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>
             </div>
-            <div class="best-items-item-star-box">
+            <div class="item-star-box">
               <div class="star-bg">
                 <div class="stars-outer">
                   <div class="stars-inner" style="width: 83%;"></div>
                 </div>
               </div>
-              <p class="best-items-item-star-score">{{4.3}}</p>
-              <p class="best-items-item-star-recommend">{{(200)}}</p>
+              <p class="item-star-score">{{4.3}}</p>
+              <p class="item-star-recommend">{{(200)}}</p>
             </div>
             <div class="best-items-item-middle-box">
-              <div class="best-items-item-brand-box">
-                <p class="best-items-item-brand-text">品牌: </p>
-                <img class="best-items-item-brand-icon" src="image/brand.png" />
-                <p class="best-items-item-brand" style="color: #06C70C;">{{Google}}</p>
+              <div class="item-brand-box">
+                <p class="item-brand-text">品牌: </p>
+                <img class="item-brand-icon" src="image/brand.png" />
+                <p class="item-brand" style="color: #06C70C;">{{Google}}</p>
               </div>
-              <div class="best-items-item-service-box">
-                <p class="best-items-item-service-text">服务: </p>
-                <img class="best-items-item-service-icon" src="image/service.png" />
-                <p class="best-items-item-service">{{SEO & SA}}</p>
+              <div class="item-service-box">
+                <p class="item-service-text">服务: </p>
+                <img class="item-service-icon" src="image/service.png" />
+                <p class="item-service">{{SEO & SA}}</p>
               </div>
               <div class="best-items-item-price-stock-box">
-                <div class="best-items-item-price-box">
-                  <p class="best-items-item-price-text">{{价格}}</p>
-                  <p class="best-items-item-price">{{$10.0}}</p>
+                <div class="item-price-box">
+                  <p class="item-price-text">{{价格}}</p>
+                  <p class="item-price">{{$10.0}}</p>
                 </div>
-                <div class="best-items-item-stock-box">
-                  <p class="best-items-item-stock-text">{{库存}}</p>
-                  <img class="best-items-item-stock-icon" src="image/stock.png" />
-                  <p class="best-items-item-stock">{{80}}</p>
+                <div class="item-stock-box">
+                  <p class="item-stock-text">{{库存}}</p>
+                  <img class="item-stock-icon" src="image/stock.png" />
+                  <p class="item-stock">{{80}}</p>
                 </div>
               </div>
             </div>
-            <div class="best-items-item-tag-box">
-              <div class="best-items-item-tag">
-                <p class="best-items-item-tag-text">{{新品发布}}</p>
+            <div class="item-tag-box">
+              <div class="item-tag">
+                <p class="item-tag-text">{{新品发布}}</p>
               </div>
-              <div class="best-items-item-tag">
-                <p class="best-items-item-tag-text">{{运动户外}}</p>
+              <div class="item-tag">
+                <p class="item-tag-text">{{运动户外}}</p>
               </div>
-              <div class="best-items-item-tag">
-                <p class="best-items-item-tag-text">{{配送时间: 24H+}}</p>
+              <div class="item-tag">
+                <p class="item-tag-text">{{配送时间: 24H+}}</p>
               </div>
             </div>
-            <div class="best-items-item-button-box ${Math.random() > 0.5 ? 'best-items-item-button-box-highlight' : ''}">立即购买</div>
+            <div class="item-button-box ${Math.random() > 0.5 ? 'active' : ''}">立即购买</div>
         </div>
          `;
 
