@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/common.css" />
   <link rel="stylesheet" href="css/star.css" />
   <link rel="stylesheet" href="css/filter.css" />
-  <link rel="stylesheet" href="css/items.css" />
+  <link rel="stylesheet" href="css/store.css" />
   <link rel="stylesheet" href="css/page.css" />
 </head>
 
@@ -24,7 +24,7 @@
     <div class="page-nav-box">
       <img class="page-nav-home-icon" src="image/home.png" />
       <p class="page-nav-seperator">/</p>
-      <p class="page-nav-current">{{Items}}</p>
+      <p class="page-nav-current">Stores</p>
     </div>
     <div class="page-filter-layoutcontrol-box">
       <div class="page-filter-box">
@@ -42,7 +42,7 @@
         <div class="page-filterresult-box">
           <p class="page-filterresult-num">100</p>
           <p class="page-filterresult-text">{{result for}}</p>
-          <p class="page-filterresult-content">{{items}}</p>
+          <p class="page-filterresult-content">{{stores}}</p>
         </div>
         <!-- 排序按钮-->
         <div class="page-sort-box">
@@ -74,14 +74,23 @@
       <!-- 商品容器 -->
       <div id="items-container" class="layout-vertical">
         <div class="items-pager" id="items-grid">
-          <div class="best-items-item">
-            <img class="best-items-item-icon" src="{{item.image}}" />
+          <div class="store-item">
             <img class="item-like" src="image/like.png" alt="Like" />
-            <div class="best-items-item-content">
-              <div class="item-title-box">
-                <div class="item-mark item-mark1">{{item.mark}}</div>
-                <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>
+            <div class="store-item-user-box">
+              <img class="store-item-icon" src="{{item.image}}" />
+              <div class="store-item-name-box">
+                <div class="item-title-box">
+                  <p class="item-title">Store name,Store name,Store name,Store name,Store name,Store name,Store name,
+                    Store name,Store name,Store name,Store name,Store name</p>
+                </div>
+                <div class="item-desc-box">
+                  <p class="item-desc">Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
+                    desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
+                    desc,Store desc,Store desc,Store desc,Store desc</p>
+                </div>
               </div>
+            </div>
+            <div class="store-item-content">
               <div class="item-star-box">
                 <div class="star-bg">
                   <div class="stars-outer">
@@ -91,7 +100,15 @@
                 <p class="item-star-score">{{4.3}}</p>
                 <p class="item-star-recommend">{{(200)}}</p>
               </div>
-              <div class="best-items-item-middle-box">
+              <div class="store-item-detail-box">
+                <p class="store-item-detail">Store detail,Store detail,Store detail,Store detail,Store detail,Store
+                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
+                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
+                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
+                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
+                  detail,Store detail,Store detail</p>
+              </div>
+              <div class="store-item-brand-service-box">
                 <div class="item-brand-box">
                   <p class="item-brand-text">品牌: </p>
                   <img class="item-brand-icon" src="image/brand.png" />
@@ -102,34 +119,21 @@
                   <img class="item-service-icon" src="image/service.png" />
                   <p class="item-service">{{SEO & SA}}</p>
                 </div>
-                <div class="best-items-item-price-stock-box">
-                  <div class="item-price-box">
-                    <p class="item-price-text">{{价格}}</p>
-                    <p class="item-price">{{$10.0}}</p>
-                  </div>
-                  <div class="item-stock-box">
-                    <p class="item-stock-text">{{库存}}</p>
-                    <img class="item-stock-icon" src="image/stock.png" />
-                    <p class="item-stock">{{80}}</p>
-                  </div>
-                </div>
               </div>
-              <div class="item-tag-box">
-                <a class="item-tag" href="items.html" target="_self">
-                  <p class="item-tag-text">{{新品发布}}</p>
-                </a>
-                <a class="item-tag" href="items.html" target="_self">
-                  <p class="item-tag-text">{{运动户外}}</p>
-                </a>
-                <a class="item-tag" href="items.html" target="_self">
-                  <p class="item-tag-text">{{配送时间: 24H+}}</p>
-                </a>
-                <div class="item-tag-more-box">
-                  <p class="item-tag-more">+3</p>
-                </div>
+            </div>
+            <div class="item-tag-box">
+              <a class="item-tag" href="items.html" target="_self">
+                <p class="item-tag-text">{{新品发布}}</p>
+              </a>
+              <a class="item-tag" href="items.html" target="_self">
+                <p class="item-tag-text">{{运动户外}}</p>
+              </a>
+              <a class="item-tag" href="items.html" target="_self">
+                <p class="item-tag-text">{{配送时间: 24H+}}</p>
+              </a>
+              <div class="item-tag-more-box" style="display: inline-block;">
+                <p class="item-tag-more">+3</p>
               </div>
-              <div class="item-button-box ${Math.random() > 0.5 ? 'active' : ''}">
-                立即购买</div>
             </div>
           </div>
         </div>
@@ -380,7 +384,7 @@
   <script src="js/layoutswitch.js"></script>
   <script src="js/pagelist.js"></script>
   <script src="js/sort.js"></script>
-  <script src="js/itempage.js"></script>
+  <script src="js/storepage.js"></script>
   <script>
     // 页面加载完成后初始化
     document.addEventListener('DOMContentLoaded', () => {
