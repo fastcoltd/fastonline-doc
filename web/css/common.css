@@ -23,6 +23,11 @@ body {
     color: #000;
     overflow: auto;
     position: relative;
+    /* 支持刘海屏安全区域 - 使用!important确保优先级 */
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    padding-left: env(safe-area-inset-left, 0px) !important;
+    padding-right: env(safe-area-inset-right, 0px) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
 }
 
 header {
@@ -32,6 +37,10 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
+    /* 刘海屏适配：避免内容被刘海遮挡 */
+    padding-top: calc(20px + env(safe-area-inset-top));
+    padding-left: calc(16px + env(safe-area-inset-left));
+    padding-right: calc(16px + env(safe-area-inset-right));
 }
 
 a {
