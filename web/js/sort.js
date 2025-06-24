@@ -39,7 +39,7 @@ class SortSelector {
 
         this.sortContainer.style.display = 'none';
         /// 排序变化，触发排序
-        window.sortItems();
+        window.sortItems(value);
         console.log(`选中: ${text}, 值: ${value}`);
     }
 

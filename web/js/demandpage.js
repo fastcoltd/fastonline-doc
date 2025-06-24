@@ -29,8 +29,8 @@ function reloadItems() {
   loadItems();
 }
 
-function sortItems() {
-  console.log('sort items');
+function sortItems(value) {
+  console.log('sort items', value);
 }
 
 // 生成模拟商品数据

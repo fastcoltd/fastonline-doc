@@ -1,4 +1,3 @@
-
 // 加载商品数据
 async function loadItems() {
   console.log('load items');
@@ -23,7 +22,7 @@ async function loadItems() {
 }
 
 function reloadItems() {
-  console.log('reload items');
+  console.log('reload items', this.dropdownMenu.selectedValue);
   const container = document.getElementById('items-grid');
   container.innerHTML = '';
   loadItems();
@@ -31,6 +30,10 @@ function reloadItems() {
 
 function sortItems(value) {
   console.log('sort items', value);
+}
+
+function searchItems(inputValue) {
+  console.log('search items', inputValue)
 }
 
 // 生成模拟商品数据
@@ -81,63 +84,48 @@ function renderItems(items) {
 // 创建商品元素 - 完全按照Figma设计
 function createItemElement(item) {
   const div = document.createElement('div');
-  div.className = 'best-items-item';
+  div.className = 'resource-item';
 
   const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
   div.innerHTML = `
-           <img class="best-items-item-icon" src="{{item.image}}" />
-           <img class="item-like" src="image/like.png" alt="Like" />
-           <div class="best-items-item-content">
-            <div class="item-title-box">
-              <div class="item-mark item-mark1">{{item.mark}}</div>
-              <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>
-            </div>
-            <div class="item-star-box">
-              <div class="star-bg">
-                <div class="stars-outer">
-                  <div class="stars-inner" style="width: 83%;"></div>
+           <div class="resource-header">
+                    <span class="resource-title">Resource Title,Resource Title,Resource Title,Resource Title,Resource
+                        Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource
+                        Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource
+                        Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource
+                        Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource Title</span>
+                    <span class="resource-date">Update: 2023/05/16 12:13:14</span>
                 </div>
-              </div>
-              <p class="item-star-score">{{4.3}}</p>
-              <p class="item-star-recommend">{{(200)}}</p>
-            </div>
-            <div class="best-items-item-middle-box">
-              <div class="item-brand-box">
-                <p class="item-brand-text">品牌: </p>
-                <img class="item-brand-icon" src="image/brand.png" />
-                <p class="item-brand" style="color: #06C70C;">{{Google}}</p>
-              </div>
-              <div class="item-service-box">
-                <p class="item-service-text">服务: </p>
-                <img class="item-service-icon" src="image/service.png" />
-                <p class="item-service">{{SEO & SA}}</p>
-              </div>
-              <div class="best-items-item-price-stock-box">
-                <div class="item-price-box">
-                  <p class="item-price-text">{{价格}}</p>
-                  <p class="item-price">{{$10.0}}</p>
+                <div class="resource-body">
+                    <span class="resource-content">Resource content,Resource content,Resource content,Resource
+                        content,Resource content,Resource content,Resource content,Resource content,Resource
+                        content,Resource content,Resource content,Resource content,Resource content,Resource
+                        content,Resource content,Resource content,Resource content,Resource content,Resource
+                        content,Resource content,Resource content,Resource content,Resource content,Resource
+                        content,Resource content,Resource content,Resource content,Resource content,Resource
+                        content,Resource content,Resource content,Resource content,Resource content,Resource
+                        content,Resource content,Resource content,Resource content,Resource content,Resource
+                        content,Resource content,Resource content,Resource content,</span>
+                    <div class="resource-actions">
+                        <div class="resource-action-group">
+                            <img src="image/view-count.png" class="resource-action-icon" />
+                            <span class="resource-action-count">304</span>
+                        </div>
+                        <div class="resource-action-group">
+                            <img src="image/like-count.png" class="resource-action-icon" />
+                            <span class="resource-action-count">203</span>
+                        </div>
+                        <div class="resource-action-group">
+                            <img src="image/unlike-count.png" class="resource-action-icon" />
+                            <span class="resource-action-count">102</span>
+                        </div>
+                        <div class="resource-action-group">
+                            <img src="image/follow-count.png" class="resource-action-icon" />
+                            <span class="resource-action-count">502</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="item-stock-box">
-                  <p class="item-stock-text">{{库存}}</p>
-                  <img class="item-stock-icon" src="image/stock.png" />
-                  <p class="item-stock">{{80}}</p>
-                </div>
-              </div>
-            </div>
-            <div class="item-tag-box">
-              <div class="item-tag">
-                <p class="item-tag-text">{{新品发布}}</p>
-              </div>
-              <div class="item-tag">
-                <p class="item-tag-text">{{运动户外}}</p>
-              </div>
-              <div class="item-tag">
-                <p class="item-tag-text">{{配送时间: 24H+}}</p>
-              </div>
-            </div>
-            <div class="item-button-box ${Math.random() > 0.5 ? 'active' : ''}">立即购买</div>
-        </div>
          `;
 
   return div;
