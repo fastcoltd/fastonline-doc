@@ -15,12 +15,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const brandListRect = brandListContainer.getBoundingClientRect();
         let brand = null;
         let minDistance = Infinity;
-        
+
         // 找到当前最接近顶部的分组
         brandList.forEach(brandItem => {
             const brandRect = brandItem.getBoundingClientRect();
             const relativeTop = brandRect.top - brandListRect.top;
-            
+
             // 如果分组在可视区域内或刚好超出顶部一点
             if (relativeTop <= 100 && relativeTop > -brandItem.offsetHeight) {
                 const distance = Math.abs(relativeTop);
@@ -30,13 +30,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         });
-        
+
         // 如果没有找到，使用第一个完全可见的分组
         if (!brand) {
             brandList.forEach(brandItem => {
                 const brandRect = brandItem.getBoundingClientRect();
                 const relativeTop = brandRect.top - brandListRect.top;
-                
+
                 if (relativeTop >= 0 && relativeTop <= brandListRect.height) {
                     if (!brand) {
                         brand = brandItem;
@@ -44,19 +44,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         }
-        
+
         if (brand) {
             console.log('当前滚动位置:', scrollTop); // 调试信息
             console.log(brand);
             const letter = brand.id;
             console.log('高亮索引:', letter); // 调试信息
-            
+
             // 更新索引高亮
-            setlectIndex(letter);
+            selectIndex(letter);
         }
     });
 
-    function setlectIndex(letter) {
+    function selectIndex(letter) {
         brandPageIndexs.forEach(function (item) {
             const text = item.textContent;
             if (text === letter) {
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function scrollToGroup(letter) {
-        setlectIndex(letter);
+        selectIndex(letter);
         const target = document.getElementById(letter);
         isScrolling = true;
         brandListContainer.scrollTo({

@@ -664,7 +664,7 @@ document.addEventListener('DOMContentLoaded', function () {
             color: white;
             padding: 12px 24px;
             border-radius: 6px;
-            z-index: 1001;
+            z-index: 60;
             font-size: 14px;
             opacity: 0;
             transition: opacity 0.3s ease;

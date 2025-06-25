@@ -31,10 +31,10 @@ body {
     padding-left: var(--safe-area-inset-left) !important;
     padding-right: var(--safe-area-inset-right) !important;
     padding-bottom: var(--safe-area-inset-bottom) !important;
-    
+
     /* 确保最小高度包含安全区域 */
     min-height: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
-    
+
     /* 兼容性回退 - 为不支持env()的浏览器 */
     padding-top: env(safe-area-inset-top, 0px) !important;
     padding-left: env(safe-area-inset-left, 0px) !important;
@@ -80,7 +80,7 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 99;
     /* 确保内容不被刘海遮挡 */
     padding-top: var(--safe-area-inset-top);
     padding-left: var(--safe-area-inset-left);
@@ -92,7 +92,7 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 99;
     /* 确保内容不被底部home indicator遮挡 */
     padding-bottom: var(--safe-area-inset-bottom);
     padding-left: var(--safe-area-inset-left);
@@ -142,22 +142,22 @@ header,
 
 /* iPhone X/11/12/13/14 系列特定适配 */
 @media screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3),
-       screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
-       screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3),
-       screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3),
-       screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) {
-    
+screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
+screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3),
+screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3),
+screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) {
+
     /* 针对有刘海的iPhone优化 */
     :root {
         --status-bar-height: 44px;
     }
-    
+
     /* 强制为有刘海的iPhone设置顶部安全距离 */
     body {
         padding-top: 44px !important;
         padding-top: max(env(safe-area-inset-top), 44px) !important;
     }
-    
+
     /* 确保状态栏区域有足够的安全距离 */
     .status-bar-spacer {
         height: var(--status-bar-height);
