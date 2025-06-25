@@ -1,31 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const pageHeaderDescToggle = document.querySelector('.page-header-desc-right-detail-toggle-btn');
-    pageHeaderDescToggle.addEventListener('click', function () {
-        const pageHeaderDesc = document.querySelector('.page-header-desc-right-detail-text');
-        pageHeaderDesc.classList.toggle('is-toggle');
-        if (pageHeaderDesc.classList.contains('is-toggle')) {
-            pageHeaderDescToggle.innerHTML = 'Hide Detail';
-        } else {
-            pageHeaderDescToggle.innerHTML = 'Show Detail';
-        }
-    });
-
-    const faqHeaders = document.querySelectorAll('.faq-header');
-    faqHeaders.forEach(function (item) {
-        item.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const faqContent = e.currentTarget.nextElementSibling;
-            const arrow = e.currentTarget.getElementsByClassName('faq-header-arrow-icon')[0];
-            if (faqContent.style.display === 'none') {
-                faqContent.style.display = 'block';
-                arrow.style.transform = 'rotate(180deg)';
-            } else {
-                faqContent.style.display = 'none';
-                arrow.style.transform = 'rotate(0deg)';
-            }
-        })
-    });
-
     const brandPageIndexs = document.querySelectorAll(".page-link");
     const brandSections = document.querySelectorAll('.brand-section');
     const stickyHeader = document.getElementById('stickyHeader');

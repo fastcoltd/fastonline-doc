@@ -23,7 +23,7 @@ class PageLayout {
         if (this.currentLayout === layout) return;
 
         this.currentLayout = layout;
-        const container = document.getElementById('items-container');
+        const container = document.querySelectorAll('.items-container');
         const buttons = document.querySelectorAll('.layout-switch');
 
         // 更新按钮状态
@@ -32,6 +32,9 @@ class PageLayout {
         });
 
         // 更新容器类名
-        container.className = `layout-${layout}`;
+        container.forEach(item => {
+            item.classList.toggle('layout-vertical', layout === 'vertical');
+            item.classList.toggle('layout-horizontal', layout === 'horizontal');
+        });
     }
 }

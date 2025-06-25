@@ -63,6 +63,6 @@ class PageList {
     resetNoMore() {
         this.hasMore = true;
         const moreBox = document.querySelector('.load-more');
-        moreBox.style.display = 'iload-more';
+        moreBox.style.display = 'flex';
     }
 }
