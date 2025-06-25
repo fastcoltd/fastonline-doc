@@ -22,6 +22,8 @@ body {
     background-color: #f4f4f4;
     color: #000;
     overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #C5C5C5 transparent;
     position: relative;
     /* 支持刘海屏安全区域 - 使用!important确保优先级 */
     padding-top: env(safe-area-inset-top, 0px) !important;
@@ -676,10 +678,21 @@ footer {
 
 
 .page-filterresult-sort-box {
-    width: 100%;
+    position: absolute;
+    top: 58px;
+    left: 343px;
+    right: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+@media (max-width: 768px) {
+    .page-filterresult-sort-box {
+        position: unset;
+        margin-top: 16px;
+        width: 100%;
+    }
 }
 
 .page-filterresult-box {
@@ -716,17 +729,20 @@ footer {
 
 .list-container {
     position: absolute;
-    top: 20px;
+    top: 120px;
     left: 367.5px;
+    bottom: 0px;
     width: calc(100% - 367.5px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #C5C5C5 transparent;
 }
 
 @media (max-width: 768px) {
     .list-container {
-        position: relative;
-        top: 6px;
-        left: 0;
-        width: 100%;
+        left: 16px;
+        top: 170px;
+        width: calc(100% - 32px);
     }
 }
 
@@ -816,7 +832,6 @@ footer {
 .layout-horizontal,
 .layout-vertical {
     margin: 0 auto;
-    margin-top: 20px;
     width: 100%;
 }
 
