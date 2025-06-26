@@ -8,7 +8,7 @@ Carousel.prototype.setup = function (domId, duration) {
   // 鼠标拖动（桌面）
   this.mouseStartX = 0;
   this.isMousing = false;
-  this.timeInteval = duration*1000;
+  this.timeInteval = duration * 1000;
   this.carousel = document.getElementById(domId);
   this.track = this.carousel.getElementsByClassName('carousel-track')[0];
   const slideList = this.track.querySelectorAll('.carousel-slide');
@@ -46,9 +46,9 @@ Carousel.prototype.startCarouselTime = function () {
   if (this.slideCount <= 1) return;
   this.stopCarouselTime();
   const that = this;
-  this.carouselTimer = setInterval(() => {
-    that.goToSlide(that.index + 1);
-  }, this.timeInteval);
+  // this.carouselTimer = setInterval(() => {
+  //   that.goToSlide(that.index + 1);
+  // }, this.timeInteval);
 }
 
 Carousel.prototype.stopCarouselTime = function () {
