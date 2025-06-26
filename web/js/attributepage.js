@@ -198,7 +198,7 @@ function createBestItemElement(item) {
 
   div.innerHTML = `
            <img class="best-items-item-icon" src="{{item.image}}" />
-           <img class="item-like" src="image/like.png" alt="Like" />
+           <img class="item-like" src="image/like.png" />
            <div class="best-items-item-content">
             <div class="item-title-box">
               <div class="item-mark item-mark1">{{item.mark}}</div>
@@ -261,7 +261,7 @@ function createDemandItemElement(item) {
   const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
   div.innerHTML = `
-           <img class="item-like" src="image/like.png" alt="Like" />
+           <img class="item-like" src="image/like.png" />
                         <a href="demand-detail.html?name=demand-name" target="_self" class="item-title-box">
                             <p class="item-title">Experienced Art Director Needed for Website</p>
                         </a>
@@ -345,7 +345,7 @@ function createCompaignItemElement(item) {
 
   div.innerHTML = `
            <img class="compaign-item-icon" src="{{item.image}}" />
-            <img class="item-like" src="image/like.png" alt="Like" />
+            <img class="item-like" src="image/like.png" />
             <div class="compaign-item-content">
               <a href="compaign-detail.html?name=compaign-name" target="_self" class="item-title-box">
                 <div class="item-mark item-mark1">compaign.mark</div>
@@ -407,7 +407,7 @@ function createPostItemElement(item) {
 
   div.innerHTML = `
            <img class="post-item-icon" src="{{item.image}}" />
-            <img class="item-like" src="image/like.png" alt="Like" />
+            <img class="item-like" src="image/like.png" />
             <div class="post-item-content">
               <a href="post-detail.html?name=post-name" class="item-title-box">
                 <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>

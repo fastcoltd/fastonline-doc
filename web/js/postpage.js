@@ -87,7 +87,7 @@ function createItemElement(item) {
 
   div.innerHTML = `
            <img class="post-item-icon" src="{{item.image}}" />
-            <img class="item-like" src="image/like.png" alt="Like" />
+            <img class="item-like" src="image/like.png" />
             <div class="post-item-content">
               <a href="post-detail.html?name=post-name" class="item-title-box">
                 <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>

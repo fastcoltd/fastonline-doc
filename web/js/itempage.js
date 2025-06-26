@@ -87,7 +87,7 @@ function createItemElement(item) {
 
   div.innerHTML = `
            <img class="best-items-item-icon" src="{{item.image}}" />
-           <img class="item-like" src="image/like.png" alt="Like" />
+           <img class="item-like" src="image/like.png" />
            <div class="best-items-item-content">
             <div class="item-title-box">
               <div class="item-mark item-mark1">{{item.mark}}</div>

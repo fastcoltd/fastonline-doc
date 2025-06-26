@@ -86,7 +86,7 @@ function createItemElement(item) {
   const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
   div.innerHTML = `
-           <img class="item-like" src="image/like.png" alt="Like" />
+           <img class="item-like" src="image/like.png" />
                         <a href="demand-detail.html?name=demand-name" target="_self" class="item-title-box">
                             <p class="item-title">Experienced Art Director Needed for Website</p>
                         </a>
