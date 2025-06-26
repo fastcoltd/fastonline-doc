@@ -1,7 +1,6 @@
 
 
 window.addEventListener('DOMContentLoaded', function () {
-    this.window.alert(this.window.screen.width)
     const banner = new Carousel('banner', 5);
     const bestItems = new Carousel('best-items', 11);
     const bestStore = new Carousel('best-store', 23);
