@@ -16,7 +16,7 @@ if (brandPageIndexs.length > 0) {
 
 if (attributes.length > 0) {
   attributes[0].classList.add('active');
-  attributeValue = brandPageIndexs[0].textContent;
+  attributeValue = attributes[0].textContent;
 }
 
 // 点击导航链接事件
@@ -35,7 +35,7 @@ attributes.forEach(function (item) {
     e.stopPropagation();
     attributes.forEach(item => item.classList.remove('active'));
     e.currentTarget.classList.add('active');
-    attributeValue = e.currentTarget;
+    attributeValue = e.currentTarget.textContent;
     reloadItems();
   });
 });
