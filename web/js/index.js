@@ -11,8 +11,8 @@ window.addEventListener('DOMContentLoaded', function () {
     const brandContent = brand.querySelector('.brand-content');
     const brandRightMore = brand.querySelector('.brand-right-box');
     const brandLeftMore = brand.querySelector('.brand-left-box');
-    brandContent.addEventListener('wheel', { passive: window.innerWidth <= 750 });
-    brandContent.addEventListener('touchmove', { passive: window.innerWidth <= 750 });
+    // brandContent.addEventListener('wheel', { passive: window.innerWidth <= 750 });
+    // brandContent.addEventListener('touchmove', { passive: window.innerWidth <= 750 });
     let brandScrollOffsetX = 0
     const brandContentScroll = brandContent.scrollWidth > brandContent.clientWidth;
     brandRightMore.style.display = brandContentScroll ? 'block' : 'none';
