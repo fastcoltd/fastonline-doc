@@ -19,7 +19,7 @@ loginForm.addEventListener('submit', function (e) {
     }
     user = new UserInfo('Test', 'https://avatars.githubusercontent.com/u/10436682?v=4', 'fastresp@163.com', '10436682', 1, new Date('1998-01-01'), 'China');
     signin.style.display = 'none';
-    body.style.overflow = 'auto';
+    body.classList.toggle('modal-open', false);
     dismissHomeMenuPage();
     refreshHeaderUserUI();
 })
@@ -31,7 +31,7 @@ let registRemember2 = false
 
 signinCloseButton.addEventListener('click', function () {
     signin.style.display = 'none';
-    body.style.overflow = 'auto';
+    body.classList.toggle('modal-open', true);
 });
 
 function showSigninLoginPage() {
@@ -58,11 +58,11 @@ headerSignInButton.addEventListener('click', function () {
     showSigninRegistPage();
 })
 
-function displayBackButton () {
+function displayBackButton() {
     signinBackButton.style.display = signinNavArray.length > 1 ? 'block' : 'none';
 }
 
-function displaySigninPage () {
+function displaySigninPage() {
     const login = document.getElementById('signin-login');
     const regist = document.getElementById('signin-regist');
     const resetpwd = document.getElementById('signin-resetpwd');
@@ -96,24 +96,24 @@ function setup() {
     registRemember2 = false;
 
 
-    body.style.overflow = 'hidden';
+    body.classList.toggle('modal-open', true);
     signin.style.display = 'flex';
 
     displayBackButton();
     displaySigninPage();
 }
 
-function updateSigninNavArray (name) {
+function updateSigninNavArray(name) {
     const index = signinNavArray.indexOf(name);
     if (index >= 0) {
-        signinNavArray.splice(index+1);
+        signinNavArray.splice(index + 1);
     } else {
         signinNavArray.push(name);
     }
 }
 
-function showLogin () {
-    
+function showLogin() {
+
     const registButton = document.getElementById('signin-login-regist');
     registButton.addEventListener('click', function () {
         updateSigninNavArray('regist');
@@ -136,7 +136,7 @@ function showLogin () {
     });
 }
 
-function showRegist () {
+function showRegist() {
     const loginButton = document.getElementById('signin-regist-login');
     loginButton.addEventListener('click', function () {
         updateSigninNavArray('login');
@@ -158,11 +158,11 @@ function showRegist () {
     });
 }
 
-function showResetpwd () {
+function showResetpwd() {
 }
 
-function show2fa () {
-    
+function show2fa() {
+
     const registButton = document.getElementById('signin-2fa-regist');
     registButton.addEventListener('click', function () {
         updateSigninNavArray('regist');
@@ -178,7 +178,7 @@ function show2fa () {
     });
 }
 
-function showReset2fa () {
+function showReset2fa() {
 
     const registButton = document.getElementById('signin-reset2fa-regist');
     registButton.addEventListener('click', function () {

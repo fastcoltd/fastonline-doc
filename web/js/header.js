@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
     headerMenu.addEventListener('click', function () {
         homeMenuPage.style.display = 'flex';
         homeMenuPage.style.width = '100vw';
-        body.style.overflow = 'hidden';
+        body.classList.toggle('modal-open', true);
         const homeMenuUserEle = homeMenuPage.querySelector('.home-menu-user-box');
         const homeMenuRegistEle = homeMenuPage.querySelector('.home-menu-login-box');
         const homeMenuLgoinEle = homeMenuPage.querySelector('.home-menu-signin-text');
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function dismissHomeMenuPage() {
         homeMenuPage.style.width = '0';
         homeMenuPage.style.display = 'none';
-        body.style.overflow = 'auto';
+        body.classList.toggle('modal-open', false);
     }
 
     for (let i = 0; i < homeMenuTitles.length; i++) {
