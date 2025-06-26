@@ -7,191 +7,191 @@ const stickyHeader = document.getElementById('stickyHeader');
 
 // 初始化 - 设置第一个链接为激活状态
 if (brandPageIndexs.length > 0) {
-    brandPageIndexs[0].classList.add('active');
-    pageType = brandPageIndexs[0].id;
-    changePageType(pageType);
+  brandPageIndexs[0].classList.add('active');
+  pageType = brandPageIndexs[0].id;
+  changePageType(pageType);
 }
 
 // 点击导航链接事件
 brandPageIndexs.forEach(function (item) {
-    item.addEventListener("click", function (e) {
-        e.stopPropagation();
-        brandPageIndexs.forEach(item => item.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        pageType = e.currentTarget.id;
-        changePageType(pageType);
-    });
+  item.addEventListener("click", function (e) {
+    e.stopPropagation();
+    brandPageIndexs.forEach(item => item.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    pageType = e.currentTarget.id;
+    changePageType(pageType);
+  });
 });
 
 function changePageType(type) {
-    const allPageList = document.querySelectorAll('.page-list');
-    allPageList.forEach(item => {
-        const id = item.id
-        item.style.display = id === type ? 'block' : 'none';
-        if (id === type) {
-            pageList = item;
-        }
-    });
+  const allPageList = document.querySelectorAll('.page-list');
+  allPageList.forEach(item => {
+    const id = item.id
+    item.style.display = id === type ? 'block' : 'none';
+    if (id === type) {
+      pageList = item;
+    }
+  });
 }
 
 // 防抖函数
 function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
     };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
 
 // 滚动监听事件
 const handleScroll = debounce(function () {
-    updateStickyHeader();
+  updateStickyHeader();
 }, 10);
 
 window.addEventListener('scroll', handleScroll, { passive: true });
 
 // 更新sticky header状态
 function updateStickyHeader() {
-    if (!stickyHeader) return;
+  if (!stickyHeader) return;
 
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-    if (scrollTop > 50) {
-        stickyHeader.classList.add('is-sticky');
-    } else {
-        stickyHeader.classList.remove('is-sticky');
-    }
+  if (scrollTop > 50) {
+    stickyHeader.classList.add('is-sticky');
+  } else {
+    stickyHeader.classList.remove('is-sticky');
+  }
 }
 updateStickyHeader();
 
 // 初始化分页组件
 const pagination = new Pagination({
-    current: 1,
-    pageSize: 20,
-    total: 285,
-    showSizeChanger: true,
-    showQuickJumper: true
+  current: 1,
+  pageSize: 20,
+  total: 285,
+  showSizeChanger: true,
+  showQuickJumper: true
 });
 
 // 页面变化回调
 pagination.onPageChange = (page, pageSize) => {
-    console.log(`页面变化: 第${page}页, 每页${pageSize}条`);
-    loadItems();
+  console.log(`页面变化: 第${page}页, 每页${pageSize}条`);
+  loadItems();
 };
 
 // 页面大小变化回调
 pagination.onPageSizeChange = (page, pageSize) => {
-    console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
-    reloadItems();
+  console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
+  reloadItems();
 };
 
 
 // 加载商品数据
 async function loadItems() {
-    console.log('load items');
-    try {
-        // 模拟API调用
-        await new Promise(resolve => setTimeout(resolve, 1000));
+  console.log('load items');
+  try {
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-        const items = generateMockItems();
-        renderItems(items);
+    const items = generateMockItems();
+    renderItems(items);
 
-        // 模拟没有更多数据的情况
-        if (Math.random() > 0.8) {
-            this.list.showNoMore();
-        }
-
-    } catch (error) {
-        console.error('加载商品失败:', error);
-    } finally {
-        /// 加载结束
-        this.list.showLoading(false);
+    // 模拟没有更多数据的情况
+    if (Math.random() > 0.8) {
+      this.list.showNoMore();
     }
+
+  } catch (error) {
+    console.error('加载商品失败:', error);
+  } finally {
+    /// 加载结束
+    this.list.showLoading(false);
+  }
 }
 
 function reloadItems() {
-    console.log('reload items');
-    const container = pageList.querySelector('.items-pager');
-    container.innerHTML = '';
-    loadItems();
+  console.log('reload items');
+  const container = pageList.querySelector('.items-pager');
+  container.innerHTML = '';
+  loadItems();
 }
 
 function sortItems(value) {
-    console.log('sort items', value);
+  console.log('sort items', value);
 }
 
 // 生成模拟商品数据
 function generateMockItems() {
-    const brands = ['Google', 'Apple', 'Microsoft', 'Amazon', 'Meta', 'Netflix'];
-    const services = ['云服务', 'SEO服务', '社交媒体', '内容创作', '交易平台', '游戏服务'];
-    const categories = ['科技产品', '服装鞋履', '家居用品', '数码配件', '美妆护肤', '运动户外'];
-    const marks = ['Hot', 'New', '推荐', '热销', '限时', '特价'];
-    const markClasses = ['best-items-item-mark1', 'best-items-item-mark2', 'best-items-item-mark3', 'best-items-item-mark4', 'best-items-item-mark5', 'best-items-item-mark6'];
+  const brands = ['Google', 'Apple', 'Microsoft', 'Amazon', 'Meta', 'Netflix'];
+  const services = ['云服务', 'SEO服务', '社交媒体', '内容创作', '交易平台', '游戏服务'];
+  const categories = ['科技产品', '服装鞋履', '家居用品', '数码配件', '美妆护肤', '运动户外'];
+  const marks = ['Hot', 'New', '推荐', '热销', '限时', '特价'];
+  const markClasses = ['best-items-item-mark1', 'best-items-item-mark2', 'best-items-item-mark3', 'best-items-item-mark4', 'best-items-item-mark5', 'best-items-item-mark6'];
 
-    const items = [];
-    for (let i = 0; i < this.list.itemsPerPage; i++) {
-        const price = (Math.random() * 1000 + 50).toFixed(2);
-        const stock = Math.floor(Math.random() * 100) + 1;
-        const rating = (Math.random() * 2 + 3).toFixed(1);
-        const reviews = Math.floor(Math.random() * 500) + 10;
-        const isLiked = Math.random() > 0.5;
+  const items = [];
+  for (let i = 0; i < this.list.itemsPerPage; i++) {
+    const price = (Math.random() * 1000 + 50).toFixed(2);
+    const stock = Math.floor(Math.random() * 100) + 1;
+    const rating = (Math.random() * 2 + 3).toFixed(1);
+    const reviews = Math.floor(Math.random() * 500) + 10;
+    const isLiked = Math.random() > 0.5;
 
-        items.push({
-            id: (this.list.currentPage - 1) * this.list.itemsPerPage + i + 1,
-            title: `商品名称 ${(this.list.currentPage - 1) * this.list.itemsPerPage + i + 1}`,
-            price: `$${price}`,
-            stock: stock,
-            rating: rating,
-            reviews: reviews,
-            brand: brands[Math.floor(Math.random() * brands.length)],
-            service: services[Math.floor(Math.random() * services.length)],
-            category: categories[Math.floor(Math.random() * categories.length)],
-            mark: marks[Math.floor(Math.random() * marks.length)],
-            markClass: markClasses[Math.floor(Math.random() * markClasses.length)],
-            isLiked: isLiked,
-            image: 'https://via.placeholder.com/300x200'
-        });
-    }
-    return items;
+    items.push({
+      id: (this.list.currentPage - 1) * this.list.itemsPerPage + i + 1,
+      title: `商品名称 ${(this.list.currentPage - 1) * this.list.itemsPerPage + i + 1}`,
+      price: `$${price}`,
+      stock: stock,
+      rating: rating,
+      reviews: reviews,
+      brand: brands[Math.floor(Math.random() * brands.length)],
+      service: services[Math.floor(Math.random() * services.length)],
+      category: categories[Math.floor(Math.random() * categories.length)],
+      mark: marks[Math.floor(Math.random() * marks.length)],
+      markClass: markClasses[Math.floor(Math.random() * markClasses.length)],
+      isLiked: isLiked,
+      image: 'https://via.placeholder.com/300x200'
+    });
+  }
+  return items;
 }
 
 // 渲染商品
 function renderItems(items) {
-    const container = pageList.querySelector('.items-pager');
-    items.forEach(item => {
-        if (pageType == 'best-items-item') {
-            const itemElement = createBestItemElement(item);
-            container.appendChild(itemElement);
-        } else if (pageType == 'store-item') {
-            const itemElement = createStoreItemElement(item);
-            container.appendChild(itemElement);
-        } else if (pageType == 'compaign-item') {
-            const itemElement = createCompaignItemElement(item);
-            container.appendChild(itemElement);
-        } else if (pageType == 'post-item') {
-            const itemElement = createPostItemElement(item);
-            container.appendChild(itemElement);
-        }
-    });
+  const container = pageList.querySelector('.items-pager');
+  items.forEach(item => {
+    if (pageType == 'best-items-item') {
+      const itemElement = createBestItemElement(item);
+      container.appendChild(itemElement);
+    } else if (pageType == 'store-item') {
+      const itemElement = createStoreItemElement(item);
+      container.appendChild(itemElement);
+    } else if (pageType == 'compaign-item') {
+      const itemElement = createCompaignItemElement(item);
+      container.appendChild(itemElement);
+    } else if (pageType == 'post-item') {
+      const itemElement = createPostItemElement(item);
+      container.appendChild(itemElement);
+    }
+  });
 }
 
 function createBestItemElement(item) {
-    const div = document.createElement('div');
-    div.className = 'best-items-item';
+  const div = document.createElement('div');
+  div.className = 'best-items-item';
 
-    const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
+  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
-    div.innerHTML = `
+  div.innerHTML = `
            <img class="best-items-item-icon" src="{{item.image}}" />
            <img class="item-like" src="image/like.png" alt="Like" />
            <div class="best-items-item-content">
             <div class="item-title-box">
               <div class="item-mark item-mark1">{{item.mark}}</div>
-              <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>
+              <a href="item-detail.html?item_id=123" target="_self" class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</a>
             </div>
             <div class="item-star-box">
               <div class="star-bg">
@@ -226,38 +226,38 @@ function createBestItemElement(item) {
               </div>
             </div>
             <div class="item-tag-box">
-              <div class="item-tag">
+              <a href="tag-all.html?type=items&name=item-name" target="_self" class="item-tag">
                 <p class="item-tag-text">{{新品发布}}</p>
-              </div>
-              <div class="item-tag">
+              </a>
+              <a href="tag-all.html?type=items&name=item-name" target="_self" class="item-tag">
                 <p class="item-tag-text">{{运动户外}}</p>
-              </div>
-              <div class="item-tag">
+              </a>
+              <a href="tag-all.html?type=items&name=item-name" target="_self" class="item-tag">
                 <p class="item-tag-text">{{配送时间: 24H+}}</p>
-              </div>
+              </a>
             </div>
             <div class="item-button-box ${Math.random() > 0.5 ? 'active' : ''}">立即购买</div>
         </div>
          `;
 
-    return div;
+  return div;
 }
 
 function createStoreItemElement(item) {
-    const div = document.createElement('div');
-    div.className = 'store-item';
+  const div = document.createElement('div');
+  div.className = 'store-item';
 
-    const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
+  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
-    div.innerHTML = `
+  div.innerHTML = `
            <img class="item-like" src="image/like.png" alt="Like" />
             <div class="store-item-user-box">
               <img class="store-item-icon" src="{{item.image}}" />
               <div class="store-item-name-box">
-                <div class="item-title-box">
+                <a href="store-detail.html?name=store-name" target="_self" class="item-title-box">
                   <p class="item-title">Store name,Store name,Store name,Store name,Store name,Store name,Store name,
                     Store name,Store name,Store name,Store name,Store name</p>
-                </div>
+                </a>
                 <div class="item-desc-box">
                   <p class="item-desc">Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
                     desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
@@ -297,13 +297,13 @@ function createStoreItemElement(item) {
               </div>
             </div>
             <div class="item-tag-box">
-              <a class="item-tag" href="items.html" target="_self">
+              <a class="item-tag" href="tag-all.html?type=store&name=store-name" target="_self">
                 <p class="item-tag-text">{{新品发布}}</p>
               </a>
-              <a class="item-tag" href="items.html" target="_self">
+              <a class="item-tag" href="tag-all.html?type=store&name=store-name" target="_self">
                 <p class="item-tag-text">{{运动户外}}</p>
               </a>
-              <a class="item-tag" href="items.html" target="_self">
+              <a class="item-tag" href="tag-all.html?type=store&name=store-name" target="_self">
                 <p class="item-tag-text">{{配送时间: 24H+}}</p>
               </a>
               <div class="item-tag-more-box" style="display: inline-block;">
@@ -312,24 +312,24 @@ function createStoreItemElement(item) {
             </div>
          `;
 
-    return div;
+  return div;
 }
 
 function createCompaignItemElement(item) {
-    const div = document.createElement('div');
-    div.className = 'compaign-item';
+  const div = document.createElement('div');
+  div.className = 'compaign-item';
 
-    const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
+  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
-    div.innerHTML = `
+  div.innerHTML = `
            <img class="compaign-item-icon" src="{{item.image}}" />
             <img class="item-like" src="image/like.png" alt="Like" />
             <div class="compaign-item-content">
-              <div class="item-title-box">
+              <a href="compaign-detail.html?name=compaign-name" target="_self" class="item-title-box">
                 <div class="item-mark item-mark1">compaign.mark</div>
                 <p class="item-title">item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题
                   item 标题 item 标题 item 标题</p>
-              </div>
+              </a>
               <div class="compaign-item-middle-box">
                 <div class="compaign-item-box">
                   <div class="compaign-item-brand-box">
@@ -358,13 +358,13 @@ function createCompaignItemElement(item) {
                   Product G, Product H, Product I, Product J, Product K, Product L, Product M, Product N</p>
               </div>
               <div class="item-tag-box">
-                <a class="item-tag" href="items.html" target="_self">
+                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
                   <p class="item-tag-text">{{新品发布}}</p>
                 </a>
-                <a class="item-tag" href="items.html" target="_self">
+                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
                   <p class="item-tag-text">{{运动户外}}</p>
                 </a>
-                <a class="item-tag" href="items.html" target="_self">
+                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
                   <p class="item-tag-text">{{配送时间: 24H+}}</p>
                 </a>
                 <div class="item-tag-more-box">
@@ -374,22 +374,22 @@ function createCompaignItemElement(item) {
             </div>
          `;
 
-    return div;
+  return div;
 }
 
 function createPostItemElement(item) {
-    const div = document.createElement('div');
-    div.className = 'post-item';
+  const div = document.createElement('div');
+  div.className = 'post-item';
 
-    const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
+  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
-    div.innerHTML = `
+  div.innerHTML = `
            <img class="post-item-icon" src="{{item.image}}" />
             <img class="item-like" src="image/like.png" alt="Like" />
             <div class="post-item-content">
-              <div class="item-title-box">
+              <a href="post-detail.html?name=post-name" class="item-title-box">
                 <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>
-              </div>
+              </a>
               <div class="post-item-user-box">
                 <img class="post-item-user-avatar" src="用户头像" />
                 <p class="post-item-user-name">xxxxxx</p>
@@ -421,5 +421,5 @@ function createPostItemElement(item) {
             </div>
          `;
 
-    return div;
+  return div;
 }

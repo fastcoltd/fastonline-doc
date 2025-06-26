@@ -89,11 +89,11 @@ function createItemElement(item) {
            <img class="compaign-item-icon" src="{{item.image}}" />
             <img class="item-like" src="image/like.png" alt="Like" />
             <div class="compaign-item-content">
-              <div class="item-title-box">
+              <a href="compaign-detail.html?name=compaign-name" target="_self" class="item-title-box">
                 <div class="item-mark item-mark1">compaign.mark</div>
                 <p class="item-title">item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题
                   item 标题 item 标题 item 标题</p>
-              </div>
+              </a>
               <div class="compaign-item-middle-box">
                 <div class="compaign-item-box">
                   <div class="compaign-item-brand-box">
@@ -122,13 +122,13 @@ function createItemElement(item) {
                   Product G, Product H, Product I, Product J, Product K, Product L, Product M, Product N</p>
               </div>
               <div class="item-tag-box">
-                <a class="item-tag" href="items.html" target="_self">
+                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
                   <p class="item-tag-text">{{新品发布}}</p>
                 </a>
-                <a class="item-tag" href="items.html" target="_self">
+                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
                   <p class="item-tag-text">{{运动户外}}</p>
                 </a>
-                <a class="item-tag" href="items.html" target="_self">
+                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
                   <p class="item-tag-text">{{配送时间: 24H+}}</p>
                 </a>
                 <div class="item-tag-more-box">

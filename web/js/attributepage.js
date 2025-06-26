@@ -202,7 +202,7 @@ function createBestItemElement(item) {
            <div class="best-items-item-content">
             <div class="item-title-box">
               <div class="item-mark item-mark1">{{item.mark}}</div>
-              <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>
+              <a href="item-detail.html?item_id=123" target="_self" class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</a>
             </div>
             <div class="item-star-box">
               <div class="star-bg">
@@ -237,15 +237,15 @@ function createBestItemElement(item) {
               </div>
             </div>
             <div class="item-tag-box">
-              <div class="item-tag">
+              <a href="tag-all.html?type=items&name=item-name" target="_self" class="item-tag">
                 <p class="item-tag-text">{{新品发布}}</p>
-              </div>
-              <div class="item-tag">
+              </a>
+              <a href="tag-all.html?type=items&name=item-name" target="_self" class="item-tag">
                 <p class="item-tag-text">{{运动户外}}</p>
-              </div>
-              <div class="item-tag">
+              </a>
+              <a href="tag-all.html?type=items&name=item-name" target="_self" class="item-tag">
                 <p class="item-tag-text">{{配送时间: 24H+}}</p>
-              </div>
+              </a>
             </div>
             <div class="item-button-box ${Math.random() > 0.5 ? 'active' : ''}">立即购买</div>
         </div>
@@ -262,9 +262,9 @@ function createDemandItemElement(item) {
 
   div.innerHTML = `
            <img class="item-like" src="image/like.png" alt="Like" />
-                        <div class="item-title-box">
+                        <a href="demand-detail.html?name=demand-name" target="_self" class="item-title-box">
                             <p class="item-title">Experienced Art Director Needed for Website</p>
-                        </div>
+                        </a>
                         <div class="demand-item-content">
                             <div class="demand-item-middle-box">
                                 <div class="demand-item-row-box">
@@ -303,13 +303,13 @@ function createDemandItemElement(item) {
                             </div>
 
                             <div class="item-tag-box">
-                                <a class="item-tag" href="items.html" target="_self">
+                                <a class="item-tag" href="attribute-all.html?type=demand&name=demand-name&value=demand-value" target="_self">
                                     <p class="item-tag-text">{{新品发布}}</p>
                                 </a>
-                                <a class="item-tag" href="items.html" target="_self">
+                                <a class="item-tag" href="attribute-all.html?type=demand&name=demand-name&value=demand-value" target="_self">
                                     <p class="item-tag-text">{{运动户外}}</p>
                                 </a>
-                                <a class="item-tag" href="items.html" target="_self">
+                                <a class="item-tag" href="attribute-all.html?type=demand&name=demand-name&value=demand-value" target="_self">
                                     <p class="item-tag-text">{{配送时间: 24H+}}</p>
                                 </a>
                                 <div class="item-tag-more-box">
@@ -347,11 +347,11 @@ function createCompaignItemElement(item) {
            <img class="compaign-item-icon" src="{{item.image}}" />
             <img class="item-like" src="image/like.png" alt="Like" />
             <div class="compaign-item-content">
-              <div class="item-title-box">
+              <a href="compaign-detail.html?name=compaign-name" target="_self" class="item-title-box">
                 <div class="item-mark item-mark1">compaign.mark</div>
                 <p class="item-title">item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题
                   item 标题 item 标题 item 标题</p>
-              </div>
+              </a>
               <div class="compaign-item-middle-box">
                 <div class="compaign-item-box">
                   <div class="compaign-item-brand-box">
@@ -380,13 +380,13 @@ function createCompaignItemElement(item) {
                   Product G, Product H, Product I, Product J, Product K, Product L, Product M, Product N</p>
               </div>
               <div class="item-tag-box">
-                <a class="item-tag" href="items.html" target="_self">
+                <a class="item-tag" href="href="tag-all.html?type=compaign&name=compaign-name" target="_self"" target="_self">
                   <p class="item-tag-text">{{新品发布}}</p>
                 </a>
-                <a class="item-tag" href="items.html" target="_self">
+                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
                   <p class="item-tag-text">{{运动户外}}</p>
                 </a>
-                <a class="item-tag" href="items.html" target="_self">
+                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
                   <p class="item-tag-text">{{配送时间: 24H+}}</p>
                 </a>
                 <div class="item-tag-more-box">
@@ -409,9 +409,9 @@ function createPostItemElement(item) {
            <img class="post-item-icon" src="{{item.image}}" />
             <img class="item-like" src="image/like.png" alt="Like" />
             <div class="post-item-content">
-              <div class="item-title-box">
+              <a href="post-detail.html?name=post-name" class="item-title-box">
                 <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>
-              </div>
+              </a>
               <div class="post-item-user-box">
                 <img class="post-item-user-avatar" src="用户头像" />
                 <p class="post-item-user-name">xxxxxx</p>

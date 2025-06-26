@@ -87,9 +87,9 @@ function createItemElement(item) {
 
   div.innerHTML = `
            <img class="item-like" src="image/like.png" alt="Like" />
-                        <div class="item-title-box">
+                        <a href="demand-detail.html?name=demand-name" target="_self" class="item-title-box">
                             <p class="item-title">Experienced Art Director Needed for Website</p>
-                        </div>
+                        </a>
                         <div class="demand-item-content">
                             <div class="demand-item-middle-box">
                                 <div class="demand-item-row-box">
@@ -128,13 +128,13 @@ function createItemElement(item) {
                             </div>
 
                             <div class="item-tag-box">
-                                <a class="item-tag" href="items.html" target="_self">
+                                <a class="item-tag" href="attribute-all.html?type=demand&name=demand-name&value=demand-value" target="_self">
                                     <p class="item-tag-text">{{新品发布}}</p>
                                 </a>
-                                <a class="item-tag" href="items.html" target="_self">
+                                <a class="item-tag" href="attribute-all.html?type=demand&name=demand-name&value=demand-value" target="_self">
                                     <p class="item-tag-text">{{运动户外}}</p>
                                 </a>
-                                <a class="item-tag" href="items.html" target="_self">
+                                <a class="item-tag" href="attribute-all.html?type=demand&name=demand-name&value=demand-value" target="_self">
                                     <p class="item-tag-text">{{配送时间: 24H+}}</p>
                                 </a>
                                 <div class="item-tag-more-box">
