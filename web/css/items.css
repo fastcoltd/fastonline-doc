@@ -25,31 +25,31 @@
     border-radius: 40px;
 }
 
-@media (min-width: 1441px) {
+@media screen and (min-width: 1441px) {
     .layout-vertical .best-items-item {
         width: 337.5px;
     }
 }
 
-@media (max-width: 1440px) {
+@media screen and (max-width: 1440px) {
     .layout-vertical .best-items-item {
         width: calc((100% - 60px) / 3);
     }
 }
 
-@media (max-width: 1160px) {
+@media screen and (max-width: 1160px) {
     .layout-vertical .best-items-item {
         width: calc((100% - 30px) / 2);
     }
 }
 
-@media (max-width: 980px) {
+@media screen and (max-width: 980px) {
     .layout-vertical .best-items-item {
         width: 337.5px;
     }
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
 
     .layout-horizontal .best-items-item,
     .layout-vertical .best-items-item {
@@ -89,7 +89,7 @@
     top: 39px;
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
 
     .layout-horizontal .best-items-item-icon {
         min-width: 113px;
@@ -154,7 +154,7 @@
     padding-bottom: 0;
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
 
     .layout-horizontal .best-items-item-content {
         width: calc(100% - 133px);
@@ -195,7 +195,7 @@
     height: 40px;
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
 
     .layout-horizontal .best-items-item .item-title-box {
         padding-right: 22px;
@@ -237,7 +237,7 @@
     gap: 6px;
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
     .layout-horizontal .best-items-item-middle-box {
         column-gap: 20px;
         row-gap: 3px;
@@ -265,7 +265,7 @@
     gap: 6px;
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
     .layout-horizontal .best-items-item-price-stock-box {
         display: flex;
         flex-direction: row;
@@ -289,4 +289,108 @@
     height: 30px;
     border-radius: 4px;
     padding: 3px 39px;
+}
+
+/* ===== 额外的移动端优化 ===== */
+
+/* 超小屏幕优化 (< 576px) */
+@media (max-width: 575.98px) {
+    .layout-vertical .best-items-item {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .layout-horizontal .best-items-item {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .layout-horizontal .best-items-item-icon {
+        min-width: 100%;
+        width: 100%;
+        height: 140px;
+        border-radius: 10px 10px 0 0;
+    }
+    
+    .layout-horizontal .best-items-item-content {
+        width: 100%;
+        padding: 10px;
+    }
+    
+    .layout-horizontal .best-items-item .item-title-box {
+        padding-right: 0;
+    }
+    
+    .best-items-item-content {
+        gap: 6px;
+    }
+    
+    .layout-vertical .best-items-item-icon {
+        height: 120px;
+    }
+}
+
+/* 小屏幕优化 (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .layout-vertical .best-items-item {
+        width: calc((100% - 15px) / 2);
+    }
+    
+    .layout-horizontal .best-items-item-icon {
+        min-width: 140px;
+        width: 140px;
+        height: 120px;
+    }
+    
+    .layout-horizontal .best-items-item-content {
+        width: calc(100% - 160px);
+        padding-right: 15px;
+    }
+}
+
+/* 平板优化 (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .layout-vertical .best-items-item {
+        width: calc((100% - 20px) / 2);
+    }
+    
+    .layout-horizontal .best-items-item {
+        padding: 15px;
+    }
+    
+    .layout-horizontal .best-items-item-icon {
+        min-width: 200px;
+        width: 200px;
+        height: 140px;
+    }
+    
+    .layout-horizontal .best-items-item-content {
+        width: calc(100% - 240px);
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .best-items-item {
+        cursor: default;
+    }
+    
+    .item-button-box {
+        min-height: 44px;
+        padding: 12px 16px;
+    }
+    
+    .item-like {
+        width: 32px;
+        height: 32px;
+        padding: 4px;
+    }
+}
+
+/* 高DPI屏幕图片优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .best-items-item-icon {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
 }
