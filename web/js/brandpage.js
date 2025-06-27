@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const pageHeader = document.querySelector('.page-header');
+    const pageHeaderHeight = pageHeader.offsetHeight;
+    document.documentElement.style.setProperty('--page-header-height', `${pageHeaderHeight}px`);
     const brandPageIndexs = document.querySelectorAll(".brand-page-index-box-item");
     const brandList = document.querySelectorAll('.brand-page-list');
     const brandListContainer = document.querySelector('.brand-page-list-container');
@@ -70,11 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
     function scrollToGroup(letter) {
         selectIndex(letter);
         const target = document.getElementById(letter);
-        isScrolling = true;
         brandListContainer.scrollTo({
             top: target.offsetTop,
             behavior: 'smooth'
         });
+        isScrolling = true;
         setTimeout(() => {
             isScrolling = false;
         }, 1000);
