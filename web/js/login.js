@@ -31,7 +31,7 @@ let registRemember2 = false
 
 signinCloseButton.addEventListener('click', function () {
     signin.style.display = 'none';
-    body.classList.toggle('modal-open', true);
+    body.classList.toggle('modal-open', false);
 });
 
 function showSigninLoginPage() {
