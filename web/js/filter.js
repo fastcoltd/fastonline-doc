@@ -254,8 +254,6 @@ document.addEventListener('DOMContentLoaded', function () {
         dropdownPanel.style.width = rect.width + 'px';
 
         // 计算垂直位置
-        const spaceBelow = viewportHeight - rect.bottom;
-        const spaceAbove = rect.top;
         const dropdownHeight = Math.min(200, options.length * 45); // 估算高度
 
         let top, left;
@@ -263,23 +261,12 @@ document.addEventListener('DOMContentLoaded', function () {
         // 检查body是否处于固定定位状态
         const isScrollDisabled = document.body.classList.contains('scroll-disabled');
 
-        // 决定显示在上方还是下方
-        if (spaceBelow >= dropdownHeight || spaceBelow >= spaceAbove) {
-            // 显示在下方
-            if (isScrollDisabled) {
-                // body固定定位时，直接使用getBoundingClientRect的值
-                top = rect.bottom + 4;
-            } else {
-                top = rect.bottom + 4;
-            }
+        // 显示在下方
+        if (isScrollDisabled) {
+            // body固定定位时，直接使用getBoundingClientRect的值
+            top = rect.bottom + 4;
         } else {
-            // 显示在上方
-            if (isScrollDisabled) {
-                // body固定定位时，直接使用getBoundingClientRect的值
-                top = rect.top - dropdownHeight - 4;
-            } else {
-                top = rect.top - dropdownHeight - 4;
-            }
+            top = rect.bottom + 4;
         }
 
         // 计算水平位置

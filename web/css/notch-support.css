@@ -28,115 +28,28 @@ html {
 body {
     /* 基础安全区域内边距 - 确保在所有设备上生效 */
     padding-top: var(--safe-area-inset-top) !important;
-    padding-left: var(--safe-area-inset-left) !important;
-    padding-right: var(--safe-area-inset-right) !important;
-    padding-bottom: var(--safe-area-inset-bottom) !important;
-
     /* 确保最小高度包含安全区域 */
     min-height: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
-
     /* 兼容性回退 - 为不支持env()的浏览器 */
-    padding-top: env(safe-area-inset-top, 0px) !important;
-    padding-left: env(safe-area-inset-left, 0px) !important;
-    padding-right: env(safe-area-inset-right, 0px) !important;
-    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    padding-top: env(safe-area-inset-top, 20px) !important;
 }
 
-/* 顶部安全区域适配 */
-.safe-area-top {
-    padding-top: var(--safe-area-inset-top);
+footer {
+    padding-bottom: var(--safe-area-inset-bottom) !important;
+    /* 兼容性回退 - 为不支持env()的浏览器 */
+    padding-bottom: env(safe-area-inset-bottom, 20px) !important;
 }
 
-.safe-area-top-margin {
-    margin-top: var(--safe-area-inset-top);
-}
-
-/* 底部安全区域适配（适用于有底部导航的页面） */
-.safe-area-bottom {
-    padding-bottom: var(--safe-area-inset-bottom);
-}
-
-.safe-area-bottom-margin {
-    margin-bottom: var(--safe-area-inset-bottom);
-}
-
-/* 左右安全区域适配 */
-.safe-area-horizontal {
-    padding-left: var(--safe-area-inset-left);
-    padding-right: var(--safe-area-inset-right);
-}
-
-/* 全安全区域适配 */
-.safe-area-all {
-    padding-top: var(--safe-area-inset-top);
-    padding-left: var(--safe-area-inset-left);
-    padding-right: var(--safe-area-inset-right);
-    padding-bottom: var(--safe-area-inset-bottom);
-}
-
-/* 固定定位元素的安全区域适配 */
-.fixed-top {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 99;
-    /* 确保内容不被刘海遮挡 */
-    padding-top: var(--safe-area-inset-top);
-    padding-left: var(--safe-area-inset-left);
-    padding-right: var(--safe-area-inset-right);
-}
-
-.fixed-bottom {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 99;
-    /* 确保内容不被底部home indicator遮挡 */
-    padding-bottom: var(--safe-area-inset-bottom);
-    padding-left: var(--safe-area-inset-left);
-    padding-right: var(--safe-area-inset-right);
-}
-
-/* 头部导航栏适配 */
-header,
-.header,
-.navbar {
-    /* 为header添加顶部安全区域内边距 */
-    padding-top: calc(var(--safe-area-inset-top) + 20px);
-    padding-left: calc(var(--safe-area-inset-left) + 16px);
-    padding-right: calc(var(--safe-area-inset-right) + 16px);
-}
-
-/* 移动端特定适配 */
 @media screen and (max-width: 768px) {
 
-    /* 在移动设备上确保全屏显示 */
-    html {
-        width: 100%;
-        height: 100%;
-    }
-
-    body {
-        width: 100%;
-        /* 移动端减少默认内边距，依赖安全区域 */
-        margin: 0;
-        /* 强制应用安全区域 */
+    .home-menu-container,
+    .signin-container {
+        /* 基础安全区域内边距 - 确保在所有设备上生效 */
+        padding-top: var(--safe-area-inset-top) !important;
+        padding-bottom: var(--safe-area-inset-bottom) !important;
+        /* 兼容性回退 - 为不支持env()的浏览器 */
         padding-top: env(safe-area-inset-top, 20px) !important;
-        padding-left: env(safe-area-inset-left, 0px) !important;
-        padding-right: env(safe-area-inset-right, 0px) !important;
-        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-    }
-
-    /* 移动端导航栏适配 */
-    header,
-    .header,
-    .navbar {
-        /* 移动端使用较小的基础内边距 */
-        padding-top: calc(var(--safe-area-inset-top) + 15px);
-        padding-left: calc(var(--safe-area-inset-left) + 12px);
-        padding-right: calc(var(--safe-area-inset-right) + 12px);
+        padding-bottom: env(safe-area-inset-bottom, 20px) !important;
     }
 }
 
@@ -146,22 +59,15 @@ screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-
 screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3),
 screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3),
 screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) {
-
-    /* 针对有刘海的iPhone优化 */
-    :root {
-        --status-bar-height: 44px;
+    footer {
+        padding-bottom: 20px !important;
+        padding-bottom: max(env(safe-area-inset-bottom), 20px) !important;
     }
 
     /* 强制为有刘海的iPhone设置顶部安全距离 */
     body {
         padding-top: 44px !important;
         padding-top: max(env(safe-area-inset-top), 44px) !important;
-    }
-
-    /* 确保状态栏区域有足够的安全距离 */
-    .status-bar-spacer {
-        height: var(--status-bar-height);
-        background: inherit;
     }
 }
 
@@ -170,26 +76,11 @@ screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-
     body {
         /* 在iOS Safari中强制启用安全区域 */
         padding-top: env(safe-area-inset-top, 44px) !important;
-        padding-left: env(safe-area-inset-left, 0px) !important;
-        padding-right: env(safe-area-inset-right, 0px) !important;
+    }
+
+    footer {
+        /* 在iOS Safari中强制启用安全区域 */
         padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-    }
-}
-
-/* 横屏模式适配 */
-@media screen and (orientation: landscape) {
-
-    /* 横屏时顶部安全区域通常较小 */
-    header,
-    .header,
-    .navbar {
-        padding-top: calc(var(--safe-area-inset-top) + 10px);
-    }
-
-    /* 横屏时左右安全区域更重要 */
-    .content-container {
-        padding-left: calc(var(--safe-area-inset-left) + 20px);
-        padding-right: calc(var(--safe-area-inset-right) + 20px);
     }
 }
 
@@ -198,8 +89,10 @@ screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-
     body {
         /* 全屏模式下确保所有安全区域都被考虑 */
         padding-top: var(--safe-area-inset-top);
-        padding-left: var(--safe-area-inset-left);
-        padding-right: var(--safe-area-inset-right);
+    }
+
+    footer {
+        /* 全屏模式下确保所有安全区域都被考虑 */
         padding-bottom: var(--safe-area-inset-bottom);
     }
 }
@@ -211,26 +104,5 @@ screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-
     .pwa-header {
         /* 为PWA头部添加额外的状态栏空间 */
         padding-top: calc(var(--safe-area-inset-top) + var(--status-bar-height));
-    }
-}
-
-/* 特殊情况处理 */
-/* 当设备不支持env()时的回退方案 */
-@supports not (padding: env(safe-area-inset-top)) {
-
-    /* 为不支持安全区域的设备提供基础适配 */
-    body {
-        padding-top: 0;
-        padding-left: 0;
-        padding-right: 0;
-        padding-bottom: 0;
-    }
-
-    header,
-    .header,
-    .navbar {
-        padding-top: 20px;
-        padding-left: 16px;
-        padding-right: 16px;
     }
 }
