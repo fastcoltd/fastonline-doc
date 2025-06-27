@@ -12,8 +12,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     let isScrolling = false;
+    let scrollTimer = null;
     brandListContainer.addEventListener('scroll', function () {
         if (isScrolling) return;
+        scrollTimer && clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(scrollWithBrand, 100);
+    });
+
+    function scrollWithBrand() {
         const scrollTop = brandListContainer.scrollTop;
         const brandListRect = brandListContainer.getBoundingClientRect();
         let brand = null;
@@ -57,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // 更新索引高亮
             selectIndex(letter);
         }
-    });
+    }
 
     function selectIndex(letter) {
         brandPageIndexs.forEach(function (item) {
@@ -73,6 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function scrollToGroup(letter) {
         selectIndex(letter);
         const target = document.getElementById(letter);
+        if (!target) return;
         brandListContainer.scrollTo({
             top: target.offsetTop,
             behavior: 'smooth'
