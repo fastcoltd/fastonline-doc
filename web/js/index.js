@@ -11,11 +11,13 @@ window.addEventListener('DOMContentLoaded', function () {
     const brandContent = brand.querySelector('.brand-content');
     const brandRightMore = brand.querySelector('.brand-right-box');
     const brandLeftMore = brand.querySelector('.brand-left-box');
+    const body = this.document.getElementsByTagName('body')[0];
+    const isMobile = body.offsetWidth <= 768;
     // brandContent.addEventListener('wheel', { passive: window.innerWidth <= 750 });
     // brandContent.addEventListener('touchmove', { passive: window.innerWidth <= 750 });
     let brandScrollOffsetX = 0
     const brandContentScroll = brandContent.scrollWidth > brandContent.clientWidth;
-    brandRightMore.style.display = brandContentScroll ? 'block' : 'none';
+    brandRightMore.style.display = (brandContentScroll && !isMobile) ? 'block' : 'none';
     brandRightMore.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -32,6 +34,7 @@ window.addEventListener('DOMContentLoaded', function () {
     })
 
     function brandScroll() {
+        if (isMobile) { return }
         const width = brandContent.clientWidth;
         const offsetX = brandContent.scrollLeft;
         const scrollWidth = brandContent.scrollWidth;
