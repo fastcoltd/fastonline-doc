@@ -379,6 +379,7 @@
 
                 // Add other buttons based on status
                 if (item.status === 0) buttons += `<button class="btn-small btn-solid-medium" onclick="submitDemandForReview(${item.id})">提交审核</button>`;
+                if (item.status === 3) buttons += `<button class="btn-small btn-green-solid-small" onclick="payDeposit(${item.id})">支付定金</button>`;
                 if (item.status === 6) buttons += `<button class="btn-small btn-orange-solid-small" onclick="payRestMoney(${item.id})">支付尾款</button>`;
                 if (item.status === 8) buttons += `<button class="btn-small" onclick="reviewDemand(${item.id})"><i class="fa fa-star"></i> 评价</button>`;
 
@@ -816,6 +817,28 @@
             });
             renderTableBody();
             console.log(`需求 ID: ${id} 已提交审核`);
+        }
+    }
+
+    function payDeposit(id) {
+        const demand = allDemands.find(d => d.id === id);
+        if (demand && demand.status === 3 && confirm('确认要支付定金吗？')) {
+            demand.paid_rest_money = demand.amount - demand.deposit;
+            demand.paid_time = Math.floor(Date.now() / 1000);
+            demand.status = 4;
+            filteredDemands = filteredDemands.map(d => d.id === id ? demand : d);
+            allLogs.push({
+                id: Math.max(...allLogs.map(l => l.id)) + 1,
+                demand_id: id,
+                user_id: demand.user_id,
+                store_id: demand.choose_store_id,
+                username: faker.internet.userName(),
+                store_name: faker.company.companyName(),
+                log: `${faker.internet.userName()} 支付了定金`,
+                create_time: Math.floor(Date.now() / 1000)
+            });
+            renderTableBody();
+            console.log(`需求 ID: ${id} 已支付定金`);
         }
     }
 
