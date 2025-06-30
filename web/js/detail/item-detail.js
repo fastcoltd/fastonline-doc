@@ -1,3 +1,7 @@
+const sort = new SortSelector();
+function sortItems(value) {
+    console.log('sort items', value);
+}
 document.addEventListener("DOMContentLoaded", function () {
     const similar = new Carousel('best-items', 20);
     const body = document.getElementsByTagName('body')[0];
@@ -75,5 +79,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 arrow.style.transform = 'rotate(0deg)';
             }
         })
+    });
+
+    const reviews = document.querySelectorAll('.item-detail-review-item');
+    reviews.forEach(element => {
+        const reviewer = element.querySelector('.item-detail-reiviewer-box');
+        const user = reviewer.querySelector('.item-detail-reviewer-user-box')
+        const arrow = user.querySelector('.item-detail-reviewer-arrow');
+        const content = reviewer.querySelector('.item-detail-reviewer-content');
+        user.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (content.style.display === 'none') {
+                content.style.display = 'inline-block';
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        });
     });
 });
