@@ -48,9 +48,9 @@ Carousel.prototype.startCarouselTime = function () {
   if (this.slideCount <= 1) return;
   this.stopCarouselTime();
   const that = this;
-  // this.carouselTimer = setInterval(() => {
-  //   that.goToSlide(that.index + 1);
-  // }, this.timeInteval);
+  this.carouselTimer = setInterval(() => {
+    that.goToSlide(that.index + 1);
+  }, this.timeInteval);
 }
 
 Carousel.prototype.stopCarouselTime = function () {
