@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const similar = new Carousel('best-items', 20);
     const body = document.getElementsByTagName('body')[0];
     const screenshot = document.querySelector('.item-detail-screenshot');
     const screenshotContent = screenshot.querySelector('.item-detail-screenshot-content');

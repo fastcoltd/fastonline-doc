@@ -48,9 +48,9 @@ Carousel.prototype.startCarouselTime = function () {
   if (this.slideCount <= 1) return;
   this.stopCarouselTime();
   const that = this;
-  this.carouselTimer = setInterval(() => {
-    that.goToSlide(that.index + 1);
-  }, this.timeInteval);
+  // this.carouselTimer = setInterval(() => {
+  //   that.goToSlide(that.index + 1);
+  // }, this.timeInteval);
 }
 
 Carousel.prototype.stopCarouselTime = function () {
@@ -62,7 +62,7 @@ Carousel.prototype.stopCarouselTime = function () {
 
 Carousel.prototype.addCarouselEvent = function () {
   const that = this;
-  
+
   // 触摸开始
   this.carousel.addEventListener('touchstart', e => {
     that.startX = e.touches[0].clientX;
@@ -71,16 +71,16 @@ Carousel.prototype.addCarouselEvent = function () {
     that.isHorizontalSwipe = false;
     // 不要在这里preventDefault，让页面可以正常响应
   }, { passive: true });
-  
+
   // 触摸移动 - 判断滑动方向
   this.carousel.addEventListener('touchmove', e => {
     if (!that.isTouching) return;
-    
+
     const currentX = e.touches[0].clientX;
     const currentY = e.touches[0].clientY;
     const deltaX = Math.abs(currentX - that.startX);
     const deltaY = Math.abs(currentY - that.startY);
-    
+
     // 如果还没确定滑动方向且移动距离足够
     if (!that.isHorizontalSwipe && (deltaX > 10 || deltaY > 10)) {
       // 判断是横向滑动还是竖向滑动
@@ -99,7 +99,7 @@ Carousel.prototype.addCarouselEvent = function () {
       e.preventDefault();
     }
   }, { passive: false });
-  
+
   // 触摸结束
   this.carousel.addEventListener('touchend', e => {
     if (!that.isTouching || !that.isHorizontalSwipe) {
@@ -107,10 +107,10 @@ Carousel.prototype.addCarouselEvent = function () {
       that.isHorizontalSwipe = false;
       return;
     }
-    
+
     const endX = e.changedTouches[0].clientX;
     const deltaX = endX - that.startX;
-    
+
     // 只有在明确的横向滑动且距离足够时才切换
     if (Math.abs(deltaX) > 50) {
       if (deltaX < 0) {
@@ -119,12 +119,12 @@ Carousel.prototype.addCarouselEvent = function () {
         that.goToSlide(that.index - 1); // 向右滑
       }
     }
-    
+
     that.isTouching = false;
     that.isHorizontalSwipe = false;
     that.startCarouselTime();
   }, { passive: true });
-  
+
   // 鼠标事件保持原样（桌面端）
   this.carousel.addEventListener('mousedown', e => {
     that.mouseStartX = e.clientX;
@@ -132,7 +132,7 @@ Carousel.prototype.addCarouselEvent = function () {
     e.preventDefault();
     that.stopCarouselTime();
   });
-  
+
   this.carousel.addEventListener('mouseup', e => {
     e.preventDefault();
     if (!that.isMousing) return;
@@ -147,7 +147,7 @@ Carousel.prototype.addCarouselEvent = function () {
     that.isMousing = false;
     that.startCarouselTime();
   });
-  
+
   // 窗口大小改变事件
   window.addEventListener('resize', () => {
     that.startCarouselTime();
