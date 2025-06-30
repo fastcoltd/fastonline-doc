@@ -84,6 +84,7 @@
 
 /* Main Chart - Horizontal Layout */
 .main-chart {
+    width: 100%;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -227,8 +228,8 @@
 .x-axis-top {
     display: flex;
     justify-content: space-between;
-    margin-left: 0.5px;
-    margin-right: -33.5px;
+    margin-left: 30px;
+    width: calc((100% - 34px) * 1.2);
 }
 
 .x-scale-item {
@@ -237,7 +238,7 @@
     font-size: 12px;
     line-height: 15px;
     color: rgba(0, 0, 0, 0.7);
-    text-align: center;
+    text-align: left;
     flex: 1;
 }
 
@@ -315,21 +316,19 @@
 /* Line Chart Container */
 .line-chart-container {
     width: 100%;
-    height: 200px;
     background: #FFFFFF;
     display: flex;
     flex-direction: column;
 }
 
 .chart-axis {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: -2px;
+    gap: 0;
 }
 
 .main-chart-area {
-    flex: 1;
+    height: 155px;
     display: flex;
     align-items: center;
 }
@@ -341,7 +340,7 @@
     align-items: flex-end;
     padding: 0 4px;
     min-width: 29px;
-    height: 155px;
+    height: 100%;
 }
 
 .y-label {
@@ -354,7 +353,7 @@
 
 .chart-grid {
     flex: 1;
-    height: 155px;
+    height: 100%;
     position: relative;
 }
 
@@ -603,18 +602,19 @@
 @media (max-width: 768px) {
     .frame-container {
         width: 100%;
-        max-width: 410px;
-        padding: 0 10px;
+        padding: 20px 20px;
+        flex: 1;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #C5C5C5 transparent;
     }
 
     .overview-header,
     .line-chart-container {
         width: 100%;
-        max-width: 370px;
     }
 
     .legend-row {
-        flex-direction: column;
         gap: 4px;
     }
 }
@@ -629,7 +629,7 @@
     }
 
     .statistics-frame {
-        padding: 15px;
+        padding: 0px;
     }
 
     .rating-row {

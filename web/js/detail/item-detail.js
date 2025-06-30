@@ -269,4 +269,24 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+
+    const menu = document.querySelector('.detail-page-menu');
+    const statistics = document.querySelector('.item-detail-right-box');
+    menu.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const statisticsStyle = window.getComputedStyle(statistics);
+        const close = statistics.querySelector('.item-detail-right-close');
+        close.addEventListener('click', function (event) {
+            statistics.style.display = 'none';
+            body.classList.toggle('modal-open', false);
+        });
+        if (statisticsStyle.display === 'none') {
+            statistics.style.display = 'flex';
+            body.classList.toggle('modal-open', true);
+        } else {
+            statistics.style.display = 'none';
+            body.classList.toggle('modal-open', false);
+        }
+    });
 });
