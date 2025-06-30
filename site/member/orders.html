@@ -111,12 +111,14 @@
 <script>
     const redDotState = {
         ticket: {},
-        comment: {}
+        comment: {},
+        confirm: {}
     };
     const userOrdersFieldConfig = {
         id: { ...ordersFieldConfig.id, label: '订单ID', format: v => v, sample: () => faker.datatype.number({ min: 100000, max: 999999 }) },
-        brandName: { label: '品牌', format: v => `<span style="color: ${hotBrands.find(b => b.name === v)?.themeColor || '#000'}">${hotBrands.find(b => b.name === v)?.name || v || '无'}</span> - ${services[Math.floor(Math.random() * services.length)].name}`, sample: () => hotBrands[Math.floor(Math.random() * hotBrands.length)].name },
-        itemName: { label: '名称', format: (v, item) => {
+        orders_type: { ...ordersFieldConfig.orders_type},
+        brandName: { label: '品牌服务', format: v => `<span style="color: ${hotBrands.find(b => b.name === v)?.themeColor || '#000'}">${hotBrands.find(b => b.name === v)?.name || v || '无'}</span> - ${services[Math.floor(Math.random() * services.length)].name}`, sample: () => hotBrands[Math.floor(Math.random() * hotBrands.length)].name },
+        itemName: { label: '商品名称', format: (v, item) => {
                 let randomItem = [
                     (item) => { item.item_id = faker.datatype.number({ min: 100000, max: 999999 }) },
                     (item) => { item.demand_id = faker.datatype.number({ min: 100000, max: 999999 }) },
@@ -131,11 +133,16 @@
         quantity: { ...ordersFieldConfig.quantity, format: v => v, sample: () => faker.datatype.number({ min: 1, max: 1000 }) },
         coupon: { ...ordersFieldConfig.coupon, format: v => `${v}` },
         amount: { ...ordersFieldConfig.amount, label: '金额', format: v => `<span style="color:var(--font-orange)">${v}</span>`, sample: () => faker.commerce.price(50, 2000, 2, "$") },
-        paid_time: { ...ordersFieldConfig.paid_time, label: '时间', sample: () => faker.date.recent().toLocaleString() },
-        feedback: { label: '反馈', format: (v, item) => {
+        status: { ...ordersFieldConfig.status},
+        paid_time: { ...ordersFieldConfig.paid_time, label: '时间', sample: () => {
+                let ts = faker.date.recent().toLocaleString()
+                return ts.substring(5, ts.length-3)
+            } },
+        feedback: { label: '操作', format: (v, item) => {
                 let actions = '';
                 const hasTicketRedDot = Math.random() > 0.6 && !redDotState.ticket[item.id.sample];
                 const hasCommentRedDot = Math.random() > 0.8 && !redDotState.comment[item.id.sample];
+                const hasConfirmRedDot = Math.random() > 0.8 && !redDotState.confirm[item.id.sample];
                 actions += Math.random() > 0.5 ? `` : `
                     <button class="btn-small" style="color: ${randomInt(0, 1) > 0 ? '' : 'red'}" onclick="raiseTicket(${item.id.sample}); removeRedDot(this,${item.id.sample}, 'ticket')" title="Ticket">
                         <i class="${randomInt(0, 1) > 0 ? 'far' : 'fa'} fa-paper-plane"></i>
@@ -145,6 +152,11 @@
                     <button class="btn-small" style="color: ${randomInt(0, 1) > 0 ? 'var(--font-orange)' : ''}" onclick="raiseComment(${item.id.sample}); removeRedDot(this,${item.id.sample}, 'comment')" title="Reviews">
                         <i class="${randomInt(0, 1) > 0 ? 'fas' : 'far'} fa-star"></i>
                         ${hasCommentRedDot ? '<span class="red-dot"></span>' : ''}
+                    </button>`;
+                actions += item.status.sample != 2 ? `` : `
+                    <button class="btn-small" style="color: ${randomInt(0, 1) > 0 ? 'var(--font-green)' : ''}" onclick="confirmItem(${item.id.sample}); removeRedDot(this,${item.id.sample}, 'confirm')" title="Confirm Item">
+                        <i class="${randomInt(0, 1) > 0 ? 'fas' : 'fa'} fa-check"></i>
+                        ${hasConfirmRedDot ? '<span class="red-dot"></span>' : ''}
                     </button>`;
                 actions = actions.length <= 0 ? '--' : actions;
                 return `<div class="operation-area">${actions}</div>`;
@@ -414,6 +426,17 @@
         }
 
         dialog.style.display = 'flex';
+    }
+
+    function confirmItem(orderId){
+        const order = allOrders.find(o => o.id.sample === orderId);
+        if (!order) return;
+
+        if (order && confirm('确认 服务商品验收完成？')) {
+            order.status = 5;
+            alert(`订单 ${orderId} 确认完成.`)
+            renderTableBody();
+        }
     }
 
     function submitReview(orderId) {

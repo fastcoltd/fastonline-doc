@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>品牌字段管理 - FASTRESP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
+    <link rel="stylesheet" href="_style.css">
+    <style>
+        .col-checkbox { width: 5%; min-width: 50px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-brand { width: 10%; min-width: 80px; }
+        .col-field-name { width: 12%; min-width: 100px; }
+        .col-field-type { width: 10%; min-width: 80px; }
+        .col-required { width: 8%; min-width: 60px; }
+        .col-label值 { width: 12%; min-width: 100px; }
+        .col-default-value { width: 12%; min-width: 100px; }
+        .col-placeholder { width: 12%; min-width: 100px; }
+        .col-value-list { width: 15%; min-width: 120px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 12%; min-width: 100px; }
+        .default-value-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
+        .default-value-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
+        .col-value-list .ant-tag { margin: 2px; padding: 0 7px; line-height: 20px; font-size: 12px; border-radius: 2px; background: #e6f7ff; border: 1px solid #91d5ff; color: #1890ff; display: inline-flex; align-items: center; white-space: nowrap; }
+        .col-value-list .ant-tag .tag-close { margin-left: 5px; cursor: pointer; color: #1890ff; font-size: 12px; }
+        .col-value-list .ant-tag .tag-close:hover { color: #ff4d4f; }
+        .ant-form-item .ant-tag { margin: 2px; padding: 0 7px; line-height: 20px; font-size: 12px; border-radius: 2px; background: #e6f7ff; border: 1px solid #91d5ff; color: #1890ff; display: inline-flex; align-items: center; }
+        .ant-form-item .ant-tag .tag-close { margin-left: 5px; cursor: pointer; color: #1890ff; }
+        .ant-form-item .ant-tag .tag-close:hover { color: #ff4d4f; }
+        .ant-form-item .tag-input-container select,
+        .ant-form-item .tag-input-container input[type="text"] { margin-top: 8px; width: 150px; padding: 4px; border: 1px solid #d9d9d9; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 头部 -->
+    <div w3-include-html="_header.html"></div>
+
+    <!-- 内容区域 -->
+    <div class="content-wrapper">
+        <!-- 侧边栏 -->
+        <div w3-include-html="_sidebar.html"></div>
+
+        <!-- 主内容 -->
+        <div class="main-content">
+            <div class="tabs-container">
+                <div class="ant-tabs ant-tabs-top">
+                    <div class="ant-tabs-nav">
+                        <div class="ant-tabs-nav-wrap">
+                            <div class="ant-tabs-nav-list">
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="brand-field">
+                                    <span class="ant-tabs-tab-btn">品牌字段</span>
+                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-container"></div>
+            <div class="action-container"></div>
+            <div class="task-list">
+                <div class="table-header"></div>
+                <div id="brand_field-list"></div>
+            </div>
+            <div class="pagination"></div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <div w3-include-html="_footer.html"></div>
+
+    <!-- 图片预览弹窗 -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeImageModal()">×</button>
+            <div class="carousel">
+                <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
+                <img id="enlargedImage" src="">
+                <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="_common.js"></script>
+<script src="_chat.js"></script>
+<script src="_img.js"></script>
+<script src="_opt.js"></script>
+<script>
+    // 字段类型映射
+    const fieldTypeMap = {
+        0: '文本',
+        1: '数字',
+        2: '日期',
+        3: '下拉',
+        4: '复选框',
+        5: '多行文本',
+        6: '单选',
+        7: '图片',
+        8: '链接'
+    };
+
+    // 字段数据选项
+    const fieldDataOptions = [
+        '选项1', '选项2', '选项3', '选项4', '选项5',
+        '选项6', '选项7', '选项8', '选项9', '选项10'
+    ];
+
+    // 品牌字段配置
+    window.tableConfig = {
+        tableName: 'brand_field',
+        tableTitle: '品牌字段',
+        defaultPerPage: 20,
+        sampleCount: 200,
+        langFields: {
+            foreignKey: 'brand_field_id',
+            languages: ['zh_CN', 'en_US', 'fr_FR']
+        },
+        filterFields: [
+            {
+                id: 'brand_id',
+                type: 'select',
+                options: () => brandsData.map(b => ({ value: b.id, label: b.name })),
+                filter: (data, value) => data.filter(item => item.brand_id == value)
+            },
+            {
+                id: 'language',
+                type: 'select',
+                options: () => ['zh_CN', 'en_US', 'fr_FR'].map(lang => ({ value: lang, label: lang })),
+                filter: (data, value) => data // 语言筛选在渲染时处理
+            },
+            {
+                id: 'label_field_name',
+                type: 'text',
+                placeholder: '字段名/label值',
+                filter: (data, value) => {
+                    const lang = document.querySelector('#languageFilter')?.value || 'zh_CN';
+                    return data.filter(item => {
+                        const langData = tableLangData.find(l => l.brand_field_id === item.id && l.language === lang);
+                        return (langData?.label值 || '').toLowerCase().includes(value.toLowerCase()) ||
+                            item.field_name.toLowerCase().includes(value.toLowerCase());
+                    });
+                }
+            },
+            {
+                id: 'create_time',
+                type: 'date',
+                placeholder: '创建时间',
+                filter: (data, value) => {
+                    const [start, end] = value.split(',').map(d => moment(d).unix());
+                    return data.filter(item => item.create_time >= start && item.create_time <= end);
+                }
+            },
+            {
+                id: 'required',
+                type: 'select',
+                options: [
+                    { value: '', label: '全部' },
+                    { value: '1', label: '必填' },
+                    { value: '0', label: '非必填' }
+                ],
+                filter: (data, value) => {
+                    if (value === '') return data;
+                    return data.filter(item => item.required == value);
+                }
+            }
+        ],
+        listFields: [
+            { name: 'id', label: 'ID', className: 'col-id' },
+            { name: 'brand_id', label: '品牌', className: 'col-brand', formatter: (value) => brandsData.find(b => b.id == value)?.name || value },
+            { name: 'field_name', label: '字段名', className: 'col-field-name' },
+            { name: 'field_type', label: '字段类型', className: 'col-field-type', formatter: (value) => fieldTypeMap[value] || '未知' },
+            { name: 'required', label: '是否必填', className: 'col-required', formatter: (value) => value ? '必填' : '非必填' },
+            { name: 'label值', label: 'label值', className: 'col-label值', isLangField: true },
+            {
+                name: 'default_value',
+                label: '默认值',
+                className: 'col-default-value',
+                isLangField: true,
+                formatter: (value, item) => {
+                    const lang = document.querySelector('#languageFilter')?.value || 'zh_CN';
+                    const langData = tableLangData.find(l => l.brand_field_id === item.id && l.language === lang);
+                    if (langData?.field_type == 7 && value) {
+                        return `<div class="default-value-preview"><img src="${value}" onclick="enlargeImage(${item.id}, 0, ['${value}'])"></div>`;
+                    }
+                    return value || '';
+                }
+            },
+            {
+                name: 'placeholder',
+                label: '占位符',
+                className: 'col-placeholder',
+                isLangField: true
+            },
+            {
+                name: 'value_list',
+                label: '字段数据',
+                className: 'col-value-list',
+                isLangField: true,
+                formatter: (value, item) => {
+                    try {
+                        const values = JSON.parse(value || '[]');
+                        return values.map(v => `<span class="ant-tag ant-tag-blue">${v}</span>`).join('');
+                    } catch (e) {
+                        return '';
+                    }
+                }
+            },
+            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: (value) => moment.unix(value).format('YYYY-MM-DD HH:mm:ss') },
+            {
+                name: 'actions',
+                label: '操作',
+                className: 'col-actions',
+                formatter: (value, item) => `
+                        <button class="ant-btn" onclick="editRecord(${item.id})">编辑</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
+                    `
+            }
+        ],
+        fields: [
+            { name: 'id', isSystemField: true, generator: (id) => id },
+            { name: 'brand_id', generator: () => randomInt(1, brandsData.length) },
+            { name: 'field_name', generator: (id) => `field_${id}` },
+            { name: 'field_type', generator: () => randomInt(0, 8) },
+            { name: 'required', generator: () => randomInt(0, 1) },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(0, 365), 'days').unix() },
+            { name: 'update_time', isSystemField: true, generator: () => moment().unix() },
+            { name: 'label值', isLangField: true, generator: (id, lang) => `${lang}_label_${id}` },
+            {
+                name: 'default_value',
+                isLangField: true,
+                generator: (id, lang) => {
+                    const field_type = tableConfig.values[id]['field_type']
+                    switch (field_type) {
+                        case 7: // IMAGE
+                            return `https://via.placeholder.com/150?text=Image${id}`;
+                        case 8: // LINK
+                            return `https://example.com/field_${id}`;
+                        case 3: // SELECT
+                        case 4: // CHECKBOX
+                        case 6: // RADIO
+                            return fieldDataOptions[randomInt(0, fieldDataOptions.length - 1)];
+                        default:
+                            return `${lang}_default_${id}`;
+                    }
+                }
+            },
+            { name: 'placeholder', isLangField: true, generator: (id, lang) => `${lang}_placeholder_${id}` },
+            {
+                name: 'value_list',
+                isLangField: true,
+                generator: (id, lang) => {
+                    const field_type = tableConfig.values[id]['field_type']
+                    if ([3, 4, 6].includes(field_type)) {
+                        const randomOptions = fieldDataOptions.slice(0, randomInt(1, 5));
+                        return JSON.stringify(randomOptions);
+                    }
+                    return '[]';
+                }
+            }
+        ],
+        modalTabs: [
+            {
+                id: 'basic',
+                title: '基本信息',
+                fields: [
+                    {
+                        name: 'brand_id',
+                        label: '品牌',
+                        type: 'select',
+                        options: () => brandsData.map(b => ({ value: b.id, label: b.name })),
+                        editableInAdd: true,
+                        editableInEdit: false
+                    },
+                    { name: 'field_name', label: '字段名', type: 'text', editableInAdd: true, editableInEdit: true },
+                    {
+                        name: 'field_type',
+                        label: '字段类型',
+                        type: 'select',
+                        options: Object.entries(fieldTypeMap).map(([value, label]) => ({ value, label })),
+                        editableInAdd: true,
+                        editableInEdit: true
+                    },
+                    {
+                        name: 'required',
+                        label: '是否必填',
+                        type: 'select',
+                        options: [
+                            { value: '0', label: '必填' },
+                            { value: '1', label: '非必填' }
+                        ],
+                        editableInAdd: true,
+                        editableInEdit: true
+                    }
+                ]
+            },
+            {
+                id: 'lang',
+                title: '多语言',
+                fields: [
+                    {
+                        name: 'language',
+                        label: '语言',
+                        type: 'select',
+                        options: () => ['zh_CN', 'en_US', 'fr_FR'].map(lang => ({ value: lang, label: lang })),
+                        editableInAdd: true,
+                        editableInEdit: true
+                    },
+                    { name: 'label值', label: 'label值', type: 'text', editableInAdd: true, editableInEdit: true },
+                    {
+                        name: 'default_value',
+                        label: '默认值',
+                        type: 'dynamic',
+                        getType: (formData) => {
+                            const fieldType = formData.field_type || '0';
+                            switch (parseInt(fieldType)) {
+                                case 5: return 'textarea';
+                                case 7: return 'file';
+                                case 3:
+                                case 4:
+                                case 6: return 'textarea';
+                                default: return 'text';
+                            }
+                        },
+                        editableInAdd: true,
+                        editableInEdit: true
+                    },
+                    { name: 'placeholder', label: '占位符', type: 'text', editableInAdd: true, editableInEdit: true },
+                    {
+                        name: 'value_list',
+                        label: '字段数据',
+                        type: 'tag',
+                        options: fieldDataOptions,
+                        allowCustom: true,
+                        color: 'blue',
+                        editableInAdd: true,
+                        editableInEdit: true,
+                        showInAdd: (formData) => [3, 4, 6].includes(parseInt(formData.field_type || '0')),
+                        showInEdit: (formData) => [3, 4, 6].includes(parseInt(formData.field_type || '0'))
+                    }
+                ]
+            }
+        ],
+        actionButtons: [
+            { label: '添加字段', className: 'ant-btn ant-btn-primary', action: 'addRecord', color: '#f97316' },
+            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete', color: '#f5222d' },
+            {
+                label: '批量修改必填',
+                className: 'ant-btn ant-btn-primary',
+                color: '#3b82f6',
+                field: {
+                    name: 'required',
+                    label: '是否必填',
+                    type: 'select',
+                    options: [
+                        { value: '0', label: '必填' },
+                        { value: '1', label: '非必填' }
+                    ]
+                }
+            }
+        ]
+    };
+
+    // 动态调整表单字段类型
+    function updateModalFieldType() {
+        const modal = document.getElementById('brand_fieldModal');
+        if (!modal) return;
+
+        const fieldTypeSelect = document.getElementById('modalfield_type');
+        const defaultValueField = document.getElementById('modaldefault_value');
+        const defaultValueFormItem = defaultValueField?.closest('.ant-form-item');
+        const valueListField = document.getElementById('modalvalue_list');
+        const valueListFormItem = valueListField?.closest('.ant-form-item');
+
+        if (!fieldTypeSelect || !defaultValueFormItem) return;
+
+        const fieldType = fieldTypeSelect.value;
+        const currentValue = defaultValueField?.value || '';
+
+        // 更新 default_value 输入控件
+        if (defaultValueField) {
+            defaultValueFormItem.removeChild(defaultValueField);
+            let newInput;
+            switch (parseInt(fieldType)) {
+                case 5: // TEXTAREA
+                    newInput = document.createElement('textarea');
+                    newInput.rows = 5;
+                    defaultValueFormItem.classList.add('textarea-item');
+                    break;
+                case 7: // IMAGE
+                    newInput = document.createElement('input');
+                    newInput.type = 'file';
+                    newInput.accept = 'image/*';
+                    newInput.onchange = (e) => previewImage('default_value', e.target);
+                    defaultValueFormItem.classList.add('image-item');
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'image-preview';
+                    previewDiv.id = 'modaldefault_valuePreview';
+                    defaultValueFormItem.appendChild(previewDiv);
+                    break;
+                case 3: // SELECT
+                case 4: // CHECKBOX
+                case 6: // RADIO
+                    newInput = document.createElement('textarea');
+                    newInput.rows = 3;
+                    newInput.placeholder = '请输入选项，用逗号分隔（如：option1,option2,option3）';
+                    defaultValueFormItem.classList.add('textarea-item');
+                    break;
+                default: // TEXT, NUMBER, DATE, LINK
+                    newInput = document.createElement('input');
+                    newInput.type = fieldType == 1 ? 'number' : fieldType == 2 ? 'date' : 'text';
+                    defaultValueFormItem.classList.remove('textarea-item', 'image-item');
+                    break;
+            }
+            newInput.id = 'modaldefault_value';
+            newInput.value = currentValue;
+            defaultValueFormItem.appendChild(newInput);
+        }
+
+        // 更新 value_list 显示/隐藏
+        if (valueListFormItem) {
+            valueListFormItem.style.display = [3, 4, 6].includes(parseInt(fieldType)) ? 'block' : 'none';
+        }
+    }
+
+    // 在 field_type 变化时更新 default_value 和 value_list
+    document.addEventListener('change', (e) => {
+        if (e.target.id === 'modalfield_type') {
+            updateModalFieldType();
+        }
+    });
+
+    // 重写 renderModal 以支持动态显示 value_list
+    const originalRenderModal = renderModal;
+    renderModal = function(isEditingMode) {
+        originalRenderModal(isEditingMode);
+        const modal = document.getElementById('brand_fieldModal');
+        if (!modal) return;
+
+        const fieldTypeSelect = document.getElementById('modalfield_type');
+        const valueListFormItem = document.getElementById('modalvalue_list')?.closest('.ant-form-item');
+        if (fieldTypeSelect && valueListFormItem) {
+            const fieldType = fieldTypeSelect.value;
+            valueListFormItem.style.display = [3, 4, 6].includes(parseInt(fieldType)) ? 'block' : 'none';
+        }
+
+        // 在编辑模式下，预填 value_list
+        if (isEditingMode) {
+            const record = tableData.find(item => item.id === editId);
+            const lang = config.langFields.languages[0];
+            const langData = tableLangData.find(l => l[config.langFields.foreignKey] === editId && l.language === lang);
+            if (langData && valueListFormItem) {
+                const valueListContainer = document.getElementById('modalvalue_list');
+                if (valueListContainer) {
+                    valueListContainer.innerHTML = '';
+                    try {
+                        const tags = JSON.parse(langData.value_list || '[]');
+                        tags.forEach(tag => {
+                            valueListContainer.innerHTML += `<span class="ant-tag ant-tag-blue" data-value="${tag}">${tag} <span class="tag-close" onclick="removeTag(this, 'value_list')">×</span></span>`;
+                        });
+                        const select = document.createElement('select');
+                        select.onchange = () => addTag(select, 'value_list');
+                        select.innerHTML = `<option value="">添加</option>` + fieldDataOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                        valueListContainer.appendChild(select);
+                        const customInput = document.createElement('input');
+                        customInput.type = 'text';
+                        customInput.placeholder = '自定义';
+                        customInput.onkeydown = (e) => {
+                            if (e.key === 'Enter') addCustomTag(customInput, 'value_list');
+                        };
+                        valueListContainer.appendChild(customInput);
+                    } catch (e) {
+                        console.error('Failed to parse value_list:', e);
+                    }
+                }
+            }
+        }
+    };
+
+    // 重写 saveRecord 以处理 value_list
+    const originalSaveRecord = saveRecord;
+    saveRecord = function() {
+        const record = { id: isEditing ? editId : tableData.length + 1 };
+        const langRecord = config.langFields ? {
+            id: tableLangData.length + 1,
+            [config.langFields.foreignKey]: record.id,
+            language: document.getElementById('modallanguage')?.value || config.langFields.languages[0]
+        } : null;
+
+        config.modalTabs.forEach(tab => {
+            tab.fields.forEach(tabField => {
+                const field = config.fields.find(f => f.name === tabField.name) || tabField;
+                const element = document.getElementById(`modal${field.name}`);
+                if (!element) return;
+
+                if (field.isLangField && langRecord) {
+                    if (tabField.type === 'file') {
+                        langRecord[field.name] = currentImageContext || (isEditing ? tableLangData.find(l => l[config.langFields.foreignKey] === editId && l.language === langRecord.language)?.[field.name] : '');
+                    } else if (tabField.type === 'tag') {
+                        const tags = Array.from(element.querySelectorAll('.ant-tag')).map(tag => tag.dataset.value);
+                        langRecord[field.name] = JSON.stringify(tags);
+                    } else {
+                        langRecord[field.name] = element.value === '' ? '' : (tabField.type === 'number' ? parseInt(element.value) : element.value);
+                    }
+                } else if (!field.isSystemField) {
+                    record[field.name] = element.value === '' ? '' : (tabField.type === 'number' ? parseInt(element.value) : element.value);
+                }
+            });
+        });
+
+        if (isEditing) {
+            const index = tableData.findIndex(item => item.id === editId);
+            tableData[index] = { ...tableData[index], ...record, update_time: moment().unix() };
+            if (langRecord) {
+                const langIndex = tableLangData.findIndex(l => l[config.langFields.foreignKey] === editId && l.language === langRecord.language);
+                if (langIndex !== -1) tableLangData[langIndex] = { ...tableLangData[langIndex], ...langRecord };
+                else tableLangData.push(langRecord);
+            }
+        } else {
+            record.create_time = moment().unix();
+            record.update_time = moment().unix();
+            tableData.push(record);
+            if (langRecord) tableLangData.push(langRecord);
+        }
+        closeModal();
+        renderTableList();
+    };
+</script>
+</body>
+</html>

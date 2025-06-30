@@ -14,6 +14,9 @@ let config = {};
 // 初始化函数，接收配置
 function initTable(tableConfig) {
     config = tableConfig;
+    if(undefined == config.values){
+        config.values = {}
+    }
     perPage = config.defaultPerPage || 20;
     renderFilterArea();
     renderTableHeader();
@@ -366,6 +369,117 @@ function renderModal(isEditingMode) {
                         .map(opt => `<option value="${opt.id}">${opt.name}</option>`).join('');
                 }
             }
+            else if (tabField.type === 'table-list') {
+                input = document.createElement('div');
+                input.id = `modal${field.name}`;
+                input.className = 'table-list';
+                const list = document.createElement('div');
+                list.className = 'list-items';
+                input.appendChild(list);
+
+                const maxItems = tabField.maxItems || Infinity;
+                const createListItem = (item = null, idx = list.children.length) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'field-list-item';
+                    itemDiv.draggable = true;
+                    itemDiv.dataset.index = idx;
+
+                    tabField.subFields.forEach(subField => {
+                        const subFormItem = document.createElement('div');
+                        subFormItem.className = 'ant-form-item';
+                        const label = document.createElement('label');
+                        label.textContent = subField.label;
+                        subFormItem.appendChild(label);
+
+                        const subInput = document.createElement('select');
+                        subInput.id = `modalfield_ids_${subField.name}_${idx}`;
+                        if (typeof subField.options === 'function') {
+                            subField.options = subField.options();
+                        }
+                        subInput.innerHTML = subField.options.map(opt => `<option value="${opt.value}" ${item && item[subField.name] == opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
+                        subFormItem.appendChild(subInput);
+                        itemDiv.appendChild(subFormItem);
+                    });
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'ant-btn ant-btn-danger';
+                    removeBtn.textContent = '刪除';
+                    removeBtn.onclick = (e) => {
+                        e.preventDefault();
+                        itemDiv.remove();
+                        updateAddButton();
+                    };
+                    itemDiv.appendChild(removeBtn);
+
+                    itemDiv.addEventListener('dragstart', (e) => {
+                        e.target.dataset.index = idx;
+                        draggedFieldIndex = idx;
+                        e.target.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                    });
+                    itemDiv.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                    });
+                    itemDiv.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        const targetIndex = parseInt(e.target.closest('.field-list-item').dataset.index);
+                        if (draggedFieldIndex !== null && draggedFieldIndex !== targetIndex) {
+                            const items = Array.from(list.children);
+                            const [draggedItem] = items.splice(draggedFieldIndex, 1);
+                            items.splice(targetIndex, 0, draggedItem);
+                            list.innerHTML = '';
+                            items.forEach((item, newIdx) => {
+                                item.dataset.index = newIdx;
+                                const selects = item.querySelectorAll('select');
+                                if (selects[0]) selects[0].id = `modalfield_ids_${tabField.subFields[0].name}_${newIdx}`;
+                                if (selects[1]) selects[1].id = `modalfield_ids_${tabField.subFields[1].name}_${newIdx}`;
+                                list.appendChild(item);
+                            });
+                            draggedFieldIndex = null;
+                        }
+                    });
+                    itemDiv.addEventListener('dragend', (e) => {
+                        e.target.classList.remove('dragging');
+                        draggedFieldIndex = null;
+                    });
+
+                    list.appendChild(itemDiv);
+                };
+
+                const updateAddButton = () => {
+                    let addBtn = input.querySelector('.add-field-btn');
+                    if (list.children.length < maxItems) {
+                        if (!addBtn) {
+                            addBtn = document.createElement('button');
+                            addBtn.className = 'ant-btn ant-btn-primary add-field-btn';
+                            addBtn.textContent = '添加字段';
+                            addBtn.onclick = (e) => {
+                                e.preventDefault();
+                                if (list.children.length < maxItems) {
+                                    createListItem();
+                                    updateAddButton();
+                                } else {
+                                    alert(`最多添加${maxItems}個字段`);
+                                }
+                            };
+                            input.appendChild(addBtn);
+                        }
+                    } else if (addBtn) {
+                        addBtn.remove();
+                    }
+                };
+
+                if (isEditingMode) {
+                    const record = tableData.find(item => item.id === editId);
+                    const items = record[field.name] || [];
+                    if (items.length > 0) {
+                        items.forEach((item, idx) => createListItem(item, idx));
+                    }
+                }
+
+                updateAddButton();
+            }
             else {
                 input = document.createElement('input');
                 input.type = tabField.type || 'text';
@@ -570,6 +684,7 @@ function generateRecord(id) {
             record[field.name] = field.generator ? field.generator(id) : `Value_${id}`; // 默认值确保非空
         }
     });
+    config.values[id] = record
     return record;
 }
 
@@ -580,6 +695,7 @@ function generateLangRecord(id, lang, index) {
         [config.langFields.foreignKey]: id,
         language: lang
     };
+
     config.fields.filter(f => f.isLangField).forEach(field => {
         if (/(pic|logo|avatar|show_data|extra_data)/i.test(field.name)) {
             langRecord[field.name] = field.generator ? field.generator(id, lang) : getRandomImage('sexy');
@@ -587,6 +703,8 @@ function generateLangRecord(id, lang, index) {
             langRecord[field.name] = field.generator ? field.generator(id, lang) : `${lang}_${field.name}_${id}`;
         }
     });
+
+    config.values[id] = Object.assign({}, config.values[id] , langRecord);
     return langRecord;
 }
 

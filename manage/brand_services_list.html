@@ -1,182 +1,366 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 品牌服务列表</title>
+    <title>品牌服務列表 - FASTRESP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
     <link rel="stylesheet" href="_style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
-    <script src="https://www.w3schools.com/lib/w3.js"></script>
-    <script src="_common.js"></script>
-    <script src="_chat.js"></script>
-    <script src="_img.js"></script>
-    <script src="_opt.js"></script>
     <style>
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 10%; min-width: 80px; }
-        .col-brand-id { width: 15%; min-width: 120px; }
-        .col-services-id { width: 15%; min-width: 120px; }
-        .col-create-time { width: 20%; min-width: 150px; }
-        .col-actions { width: 15%; min-width: 120px; }
+        .col-id { width: 8%; min-width: 60px; }
+        .col-brand { width: 10%; min-width: 80px; }
+        .col-service { width: 12%; min-width: 100px; }
+        .col-fields { width: 20%; min-width: 150px; }
+        .col-required { width: 8%; min-width: 60px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 12%; min-width: 100px; }
+        .col-fields .ant-tag { margin: 2px; padding: 0 7px; line-height: 20px; font-size: 12px; border-radius: 2px; background: #e6f7ff; border: 1px solid #91d5ff; color: #1890ff; display: inline-flex; align-items: center; white-space: nowrap; }
+        .col-fields .ant-tag .tag-close { margin-left: 5px; cursor: pointer; color: #1890ff; font-size: 12px; }
+        .col-fields .ant-tag .tag-close:hover { color: #ff4d4f; }
+        .ant-form-item.table-list { margin-bottom: 8px; }
+        .table-list .field-list-item { display: flex; align-items: center; gap: 8px; margin: 0.5em; padding: 0.2em; background: #fafafa; border: 1px solid #ddd; border-radius: 4px; cursor: move; }
+        .table-list .field-list-item.dragging { opacity: 0.5; }
+        .table-list .field-list-item .ant-form-item { margin: 0!important; }
+        .table-list .field-list-item select { width: 200px; padding: 4px; border: 1px solid #d9d9d9; border-radius: 4px; }
+        .table-list .field-list-item button { padding: 4px 8px; }
+        .table-list .add-field-btn { margin-top: 8px; }
     </style>
 </head>
 <body>
 <div class="container">
-    <div id="header" w3-include-html="_header.html"></div>
+    <!-- 头部 -->
+    <div w3-include-html="_header.html"></div>
+
+    <!-- 内容区域 -->
     <div class="content-wrapper">
-        <div id="sidebar" w3-include-html="_sidebar.html"></div>
+        <!-- 侧边栏 -->
+        <div w3-include-html="_sidebar.html"></div>
+
+        <!-- 主内容 -->
         <div class="main-content">
             <div class="tabs-container">
                 <div class="ant-tabs ant-tabs-top">
-                    <div class="ant-tabs-nav" role="tablist">
+                    <div class="ant-tabs-nav">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('brand_services_list.html')">
-                                    <span class="ant-tabs-tab-btn">品牌服务列表</span>
-                                    <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" data-tab="brand-services">
+                                    <span class="ant-tabs-tab-btn">品牌服務列表</span>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ant-tabs-content-holder">
-                        <div class="ant-tabs-content ant-tabs-content-top">
-                            <div class="ant-tabs-tabpane ant-tabs-tabpane-active">
-                                <div class="filter-container"></div>
-                                <div class="action-container"></div>
-                                <div class="task-list">
-                                    <div class="table-header"></div>
-                                    <div id="brand_services_list-list">加载中...</div>
-                                    <div class="pagination"></div>
-                                </div>
+                                <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="filter-container"></div>
+            <div class="action-container"></div>
+            <div class="task-list">
+                <div class="table-header"></div>
+                <div id="brand_services_list-list"></div>
+            </div>
+            <div class="pagination"></div>
         </div>
     </div>
-    <div id="footer" w3-include-html="_footer.html"></div>
+
+    <!-- 底部 -->
+    <div w3-include-html="_footer.html"></div>
+
+    <!-- 图片预览弹窗 -->
     <div id="imageModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeImageModal()">×</button>
             <div class="carousel">
                 <button class="carousel-btn left" onclick="shiftImage(-1)">◄</button>
-                <img id="enlargedImage" src="" alt="放大图片">
+                <img id="enlargedImage" src="">
                 <button class="carousel-btn right" onclick="shiftImage(1)">►</button>
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script src="_common.js"></script>
+<script src="_chat.js"></script>
+<script src="_img.js"></script>
+<script src="_opt.js"></script>
 <script>
-    function getRandomItem(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
-    }
+    // 模擬 brand_field 表數據
+    const fieldNameOptions = [
+        'profile_link', 'followers', 'reviews', 'comments', 'star',
+        'bio', 'rating', 'posts', 'likes', 'shares'
+    ];
+    const brandFieldsData = fieldNameOptions.map((name, index) => ({
+        id: index + 1,
+        field_name: name
+    }));
+
+    // 隨機整數函數
     function randomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // 模拟 brand 表数据
-    const brandData = [
-        { id: 1, brand_name: 'TechTrend' },
-        { id: 2, brand_name: 'FashionPeak' },
-        { id: 3, brand_name: 'GadgetPro' },
-        { id: 4, brand_name: 'StyleVibe' },
-        { id: 5, brand_name: 'InnoGear' },
-        { id: 6, brand_name: 'EcoLife' },
-        { id: 7, brand_name: 'SmartTech' },
-        { id: 8, brand_name: 'LuxuryWear' },
-        { id: 9, brand_name: 'HealthPlus' },
-        { id: 10, brand_name: 'TrendyHome' },
-        { id: 11, brand_name: 'FastMove' },
-        { id: 12, brand_name: 'PureNature' },
-        { id: 13, brand_name: 'BrightFuture' },
-        { id: 14, brand_name: 'EliteGear' },
-        { id: 15, brand_name: 'VitalEnergy' }
-    ];
-
-    // 模拟 services 表数据
-    const servicesData = [
-        { id: 1, services_name: 'Technical Support' },
-        { id: 2, services_name: 'Logistics Service' },
-        { id: 3, services_name: 'Customer Inquiry' },
-        { id: 4, services_name: 'After-Sales Repair' },
-        { id: 5, services_name: 'Payment Support' },
-        { id: 6, services_name: 'Online Consulting' },
-        { id: 7, services_name: 'Home Delivery' },
-        { id: 8, services_name: 'Custom Solutions' },
-        { id: 9, services_name: 'Fast Response' },
-        { id: 10, services_name: 'Security Assurance' },
-        { id: 11, services_name: 'Product Training' },
-        { id: 12, services_name: 'Warranty Service' },
-        { id: 13, services_name: 'Installation Help' },
-        { id: 14, services_name: 'Feedback Collection' },
-        { id: 15, services_name: 'VIP Support' }
-    ];
-
-    function getBrandOptions() {
-        return brandData.map(item => ({ value: item.id, label: item.brand_name }));
-    }
-
-    function getServicesOptions() {
-        return servicesData.map(item => ({ value: item.id, label: item.services_name }));
-    }
-
+    // 品牌服務字段配置
     window.tableConfig = {
         tableName: 'brand_services_list',
-        tableTitle: '品牌服务列表',
-        sampleCount: 200,
+        tableTitle: '品牌服務列表',
         defaultPerPage: 20,
-        fields: [
-            { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'brand_id', generator: () => randomInt(1, 15) }, // 关联 brand 表
-            { name: 'services_id', generator: () => randomInt(1, 15) }, // 关联 services 表
-            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
-        ],
-        actionButtons: [
-            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
-            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
-            { label: '批量修改品牌', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'brand_id', label: '品牌', type: 'select', options: getBrandOptions } },
-            { label: '批量修改服务', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'services_id', label: '服务', type: 'select', options: getServicesOptions } }
+        sampleCount: 200,
+        filterFields: [
+            {
+                id: 'brand_id',
+                type: 'select',
+                options: () => brandsData.map(b => ({ value: b.id, label: b.name })),
+                filter: (data, value) => data.filter(item => item.brand_id == value)
+            },
+            {
+                id: 'services_id',
+                type: 'select',
+                options: () => _servicesData.map(s => ({ value: s.id, label: s.name })),
+                filter: (data, value) => data.filter(item => item.services_id == value)
+            },
+            {
+                id: 'required',
+                type: 'select',
+                options: [
+                    { value: '', label: '全部' },
+                    { value: '1', label: '是' },
+                    { value: '0', label: '否' }
+                ],
+                filter: (data, value) => {
+                    if (value === '') return data;
+                    return data.filter(item => item.field_ids.some(f => f.required == value));
+                }
+            },
+            {
+                id: 'create_time',
+                type: 'date',
+                placeholder: '創建時間',
+                filter: (data, value) => {
+                    const [start, end] = value.split(',').map(d => moment(d).unix());
+                    return data.filter(item => item.create_time >= start && item.create_time <= end);
+                }
+            }
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
-            { name: 'brand_id', label: '品牌', className: 'col-brand-id', formatter: v => brandData.find(b => b.id === v)?.brand_name || '未知' },
-            { name: 'services_id', label: '服务', className: 'col-services-id', formatter: v => servicesData.find(s => s.id === v)?.services_name || '未知' },
-            { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
-            { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
-                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
-                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">删除</button>
-            ` }
+            { name: 'brand_id', label: '品牌', className: 'col-brand', formatter: (value) => brandsData.find(b => b.id == value)?.name || value },
+            { name: 'services_id', label: '服務', className: 'col-service', formatter: (value) => _servicesData.find(s => s.id == value)?.name || value },
+            {
+                name: 'fields',
+                label: '字段列表',
+                className: 'col-fields',
+                formatter: (value, item) => {
+                    try {
+                        return item.field_ids.map(field => {
+                            const fieldData = brandFieldsData.find(f => f.id === field.brand_field_id);
+                            return fieldData ? `<span class="ant-tag ant-tag-blue">${fieldData.field_name}</span>` : '';
+                        }).join('');
+                    } catch (e) {
+                        console.error('Error rendering fields:', e);
+                        return '';
+                    }
+                }
+            },
+            { name: 'create_time', label: '創建時間', className: 'col-create-time', formatter: (value) => moment.unix(value).format('YYYY-MM-DD HH:mm:ss') },
+            {
+                name: 'actions',
+                label: '操作',
+                className: 'col-actions',
+                formatter: (value, item) => `
+                        <button class="ant-btn" onclick="editRecord(${item.id})">編輯</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})">刪除</button>
+                    `
+            }
         ],
-        filterFields: [
-            { id: 'brand_id', type: 'select', options: getBrandOptions, filter: (data, value) => value === '' ? data : data.filter(d => d.brand_id === parseInt(value)) },
-            { id: 'services_id', type: 'select', options: getServicesOptions, filter: (data, value) => value === '' ? data : data.filter(d => d.services_id === parseInt(value)) },
-            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
-            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
+        fields: [
+            { name: 'id', isSystemField: true, generator: (id) => id },
+            { name: 'brand_id', generator: () => randomInt(1, brandsData.length) },
+            { name: 'services_id', generator: () => randomInt(1, _servicesData.length) },
+            {
+                name: 'field_ids',
+                generator: () => {
+                    const count = randomInt(0, 5);
+                    const shuffled = [...brandFieldsData].sort(() => 0.5 - Math.random()).slice(0, count);
+                    return shuffled.map((f, index) => ({
+                        brand_field_id: f.id,
+                        required: randomInt(0, 1),
+                        sort_index: index
+                    }));
+                }
+            },
+            { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(0, 365), 'days').unix() }
         ],
         modalTabs: [
             {
                 id: 'basic',
                 title: '基本信息',
                 fields: [
-                    { name: 'brand_id', label: '品牌', type: 'select', options: getBrandOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'services_id', label: '服务', type: 'select', options: getServicesOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                    { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
+                    {
+                        name: 'brand_id',
+                        label: '品牌',
+                        type: 'select',
+                        options: () => brandsData.map(b => ({ value: b.id, label: b.name })),
+                        editableInAdd: true,
+                        editableInEdit: false
+                    },
+                    {
+                        name: 'services_id',
+                        label: '服務',
+                        type: 'select',
+                        options: () => _servicesData.map(s => ({ value: s.id, label: s.name })),
+                        editableInAdd: true,
+                        editableInEdit: false
+                    }
+                ]
+            },
+            {
+                id: 'fields',
+                title: '字段配置',
+                fields: [
+                    {
+                        name: 'field_ids',
+                        label: '字段列表',
+                        type: 'table-list',
+                        subFields: [
+                            {
+                                name: 'brand_field_id',
+                                label: '字段名',
+                                type: 'select',
+                                options: () => brandFieldsData.map(f => ({ value: f.id, label: f.field_name }))
+                            },
+                            {
+                                name: 'required',
+                                label: '是否必填',
+                                type: 'select',
+                                options: [
+                                    { value: '0', label: '否' },
+                                    { value: '1', label: '是' }
+                                ]
+                            }
+                        ],
+                        maxItems: 10,
+                        editableInAdd: true,
+                        editableInEdit: true
+                    }
                 ]
             }
+        ],
+        actionButtons: [
+            { label: '添加服務', className: 'ant-btn ant-btn-primary', action: 'addRecord', color: '#f97316' },
+            { label: '批量刪除', className: 'ant-btn ant-btn-danger', action: 'batchDelete', color: '#f5222d' },
+            {
+                label: '批量修改品牌',
+                className: 'ant-btn ant-btn-primary',
+                color: '#3b82f6',
+                field: {
+                    name: 'brand_id',
+                    label: '品牌',
+                    type: 'select',
+                    options: () => brandsData.map(b => ({ value: b.id, label: b.name }))
+                }
+            },
+            {
+                label: '批量修改服務',
+                className: 'ant-btn ant-btn-primary',
+                color: '#3b82f6',
+                field: {
+                    name: 'services_id',
+                    label: '服務',
+                    type: 'select',
+                    options: () => _servicesData.map(s => ({ value: s.id, label: s.name }))
+                }
+            },
         ]
     };
 
-    // 支持 Enter 键触发查询
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
-            applyFilters();
+    // 拖動排序邏輯
+    let draggedFieldIndex = null;
+
+    function handleFieldDragStart(e, index) {
+        draggedFieldIndex = index;
+        e.target.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleFieldDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleFieldDrop(e, targetIndex) {
+        e.preventDefault();
+        const list = document.querySelector('.table-list .list-items');
+        if (!list) return;
+        const items = Array.from(list.children).filter(item => item.classList.contains('field-list-item'));
+        if (draggedFieldIndex !== null && draggedFieldIndex !== targetIndex) {
+            const [draggedItem] = items.splice(draggedFieldIndex, 1);
+            items.splice(targetIndex, 0, draggedItem);
+            list.innerHTML = '';
+            items.forEach((item, idx) => {
+                item.dataset.index = idx;
+                const selects = item.querySelectorAll('select');
+                if (selects[0]) selects[0].id = `modalfield_ids_brand_field_id_${idx}`;
+                if (selects[1]) selects[1].id = `modalfield_ids_required_${idx}`;
+                list.appendChild(item);
+            });
+            draggedFieldIndex = null;
         }
-    });
+    }
+
+    function handleFieldDragEnd(e) {
+        e.target.classList.remove('dragging');
+        draggedFieldIndex = null;
+    }
+
+    // 重寫 saveRecord 以處理 field_ids
+    const originalSaveRecord = saveRecord;
+    saveRecord = function(e) {
+        if (e) e.preventDefault();
+        const record = { id: isEditing ? editId : tableData.length + 1 };
+        const fieldListContainer = document.getElementById('modalfield_ids');
+        const fieldItems = fieldListContainer ? Array.from(fieldListContainer.querySelectorAll('.field-list-item')) : [];
+
+        record.field_ids = fieldItems.map((item, index) => {
+            const fieldSelect = item.querySelector(`#modalfield_ids_brand_field_id_${index}`);
+            const requiredSelect = item.querySelector(`#modalfield_ids_required_${index}`);
+            return {
+                brand_field_id: fieldSelect ? parseInt(fieldSelect.value) || 0 : 0,
+                required: requiredSelect ? parseInt(requiredSelect.value) || 0 : 0,
+                sort_index: index
+            };
+        }).filter(f => f.brand_field_id > 0);
+
+        config.modalTabs.forEach(tab => {
+            tab.fields.forEach(tabField => {
+                if (tabField.name === 'field_ids') return;
+                const field = config.fields.find(f => f.name === tabField.name) || tabField;
+                const element = document.getElementById(`modal${field.name}`);
+                if (!element) return;
+                record[field.name] = element.value === '' ? '' : (tabField.type === 'number' ? parseInt(element.value) : element.value);
+            });
+        });
+
+        if (isEditing) {
+            const index = tableData.findIndex(item => item.id === editId);
+            tableData[index] = { ...tableData[index], ...record, create_time: tableData[index].create_time, update_time: moment().unix() };
+        } else {
+            record.create_time = moment().unix();
+            record.update_time = moment().unix();
+            tableData.push(record);
+        }
+        closeModal();
+        renderTableList();
+    };
+
+    // 重寫 addRecord 以防止頁面刷新
+    const originalAddRecord = addRecord;
+    addRecord = function(e) {
+        if (e) e.preventDefault();
+        originalAddRecord();
+    };
 </script>
 </body>
 </html>

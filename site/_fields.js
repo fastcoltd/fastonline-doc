@@ -295,17 +295,37 @@ let ordersFieldConfig = {
         card: true, cardSq: true, cardHoriz: true,
         type: 'text',
         label: '订单类型',
-        format: (d, v) => `<span style="color: ${v === 1 ? '#32CD32' : v === 2 ? '#FFD700' : '#4682B4'}">${v === 1 ? '自动' : v === 2 ? '预付' : '市场'}</span>`,
+        format: (d, v) =>{
+            const type = [
+                "",'商品(自动)', '商品(手动)','文章','需求'
+            ]
+            return `<span style="color: ${d === 1 ? '#32CD32' : d === 2 ? '#FFD700' : '#4682B4'}">${type[d]}</span>`
+        },
         style: {},
-        sample: () => faker.random.arrayElement([1, 2, 3])
+        sample: () => faker.random.arrayElement([1, 2, 3, 4])
     },
     status: {
         card: true, cardSq: true, cardHoriz: true,
         type: 'text',
         label: '状态',
-        format: (d, v) => `<span style="color: ${v === 0 ? '#A9A9A9' : '#32CD32'}">${v === 0 ? '未完成' : '已完成'}</span>`,
+        format: (d, v) =>{
+            const type = [
+                "确认中",'已付款', '已发货','已收货','已退款','完成','已取消','超时'
+            ]
+            const colors = {
+                0: "#A9A9A9", // 确认中 - 灰色（待处理）
+                1: "#32CD32", // 已付款 - 绿色（进行中）
+                2: "#FFA500", // 已发货 - 橙色（运输中）
+                3: "#1E90FF", // 已收货 - 蓝色（接近完成）
+                4: "#FF4500", // 已退款 - 红色（异常/终止）
+                5: "#008000", // 完成 - 深绿色（成功结束）
+                6: "#DC143C", // 已取消 - 深红色（终止）
+                7: "#708090"  // 超时 - 蓝灰色（异常）
+            };
+            return `<span style="color: ${colors[d]}">${type[d]}</span>`
+        },
         style: {},
-        sample: () => faker.datatype.number({ min: 0, max: 5 })
+        sample: () => faker.datatype.number({ min: 0, max: 7 })
     },
     price: { card: true, cardSq: true, cardHoriz: true, type: 'price', label: '单价', style: {}, sample: () => faker.commerce.price(10, 500, 2, "$") },
     original_price: { card: false, cardSq: false, cardHoriz: true, type: 'text', label: '原价', format: (d, v) => `<span style="color: #A9A9A9; text-decoration: line-through">${v}</span>`, style: {}, sample: () => faker.commerce.price(15, 600, 2, "$") },

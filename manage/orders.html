@@ -15,20 +15,20 @@
     <script src="_opt.js"></script>
     <style>
         .col-checkbox { width: 5%; min-width: 50px; }
-        .col-id { width: 8%; min-width: 60px; }
+        .col-id { width: 5%; min-width: 60px; }
         .col-user-id { width: 8%; min-width: 60px; }
         .col-item-id { width: 8%; min-width: 60px; }
         .col-store-id { width: 8%; min-width: 60px; }
         .col-orders-type { width: 10%; min-width: 80px; }
-        .col-status { width: 8%; min-width: 60px; }
+        .col-status { width: 5%; min-width: 60px; }
         .col-price { width: 10%; min-width: 80px; }
         .col-quantity { width: 8%; min-width: 60px; }
-        .col-amount { width: 10%; min-width: 80px; }
-        .col-coupon { width: 10%; min-width: 80px; }
-        .col-create-time { width: 12%; min-width: 100px; }
-        .col-paid-time { width: 12%; min-width: 100px; }
-        .col-download { width: 10%; min-width: 80px; }
-        .col-actions { width: 20%; min-width: 180px; }
+        .col-amount { width: 5%; min-width: 80px; }
+        .col-coupon { width: 8%; min-width: 80px; }
+        .col-create-time { width: 10%; min-width: 100px; }
+        .col-paid-time { width: 10%; min-width: 100px; }
+        .col-download { width: 5%; min-width: 80px; }
+        .col-actions { width: 30%; min-width: 200px; }
     </style>
 </head>
 <body>
@@ -90,7 +90,112 @@
         { value: 3, label: '已完成', color: 'green' },
         { value: 4, label: '已取消', color: 'gray' }
     ];
+    // 模擬 brand_field 表數據
+    const fieldNameOptions = [
+        { name: 'profile_link', type: 8 }, // LINK
+        { name: 'followers', type: 1 },    // NUMBER
+        { name: 'reviews', type: 5 },      // TEXTAREA
+        { name: 'comments', type: 0 },     // TEXT
+        { name: 'star', type: 1 },         // NUMBER
+        { name: 'bio', type: 5 },          // TEXTAREA
+        { name: 'rating', type: 1 },       // NUMBER
+        { name: 'posts', type: 1 },        // NUMBER
+        { name: 'likes', type: 1 },        // NUMBER
+        { name: 'shares', type: 1 }        // NUMBER
+    ];
+    const brandFieldsData = fieldNameOptions.map((field, index) => ({
+        id: index + 1,
+        field_name: field.name,
+        field_type: field.type
+    }));
+
+    // 字段類型映射
+    const fieldTypeMap = {
+        0: '文本',
+        1: '數字',
+        2: '日期',
+        3: '下拉',
+        4: '復選框',
+        5: '多行文本',
+        6: '單選',
+        7: '圖片',
+        8: '鏈接'
+    };
     const coupons = ['SAVE10', 'DISCOUNT20', 'FREESHIP', '', 'WELCOME5'];
+
+
+    // 隨機生成字段內容
+    function generateFieldContent(fieldType, id) {
+        switch (fieldType) {
+            case 0: // TEXT
+                return `Text_${id}_${Math.random().toString(36).substring(2, 8)}`;
+            case 1: // NUMBER
+                return randomInt(1, 1000);
+            case 2: // DATE
+                return moment().subtract(randomInt(0, 365), 'days').format('YYYY-MM-DD');
+            case 3: // SELECT
+            case 4: // CHECKBOX
+            case 6: // RADIO
+                return ['選項1', '選項2', '選項3'][randomInt(0, 2)];
+            case 5: // TEXTAREA
+                return `Description_${id}_${Math.random().toString(36).substring(2, 10)}`;
+            case 7: // IMAGE
+                return `https://via.placeholder.com/150?text=Image${id}`;
+            case 8: // LINK
+                return `https://example.com/link_${id}`;
+            default:
+                return '';
+        }
+    }
+
+    function viewElements(id) {
+        const count = randomInt(1, 10);
+        const selectedFields = [...brandFieldsData].sort(() => 0.5 - Math.random()).slice(0, count);
+        const modal = document.createElement('div');
+        modal.id = 'orderElementsModal';
+        modal.className = 'modal';
+        modal.style.zIndex = '1001';
+
+        let contentHtml = `
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeElementsModal()">×</button>
+            <h3>訂單要素</h3>
+            <div class="elements-list" style="max-height: 400px; overflow-y: auto;">
+    `;
+        selectedFields.forEach(field => {
+            const content = generateFieldContent(field.field_type, id);
+            contentHtml += `
+            <div class="ant-form-item" style="margin-bottom: 16px;">
+                <label style="display: inline-block; width: 120px; font-weight: bold;">${field.field_name}</label>
+                <span>${
+                field.field_type === 7 ?
+                    `<img src="${content}" style="width: 50px; height: 50px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;" onclick="enlargeImage(${id}, 0, ['${content}'])">` :
+                    field.field_type === 8 ?
+                        `<a href="${content}" target="_blank">${content}</a>` :
+                        content
+            }</span>
+            </div>
+        `;
+        });
+        contentHtml += `
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="ant-btn" onclick="closeElementsModal()">關閉</button>
+            </div>
+        </div>
+    `;
+        modal.innerHTML = contentHtml;
+        document.body.appendChild(modal);
+        modal.style.display = 'block';
+    }
+
+    // 關閉要素彈窗
+    function closeElementsModal() {
+        const modal = document.getElementById('orderElementsModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
 
     window.tableConfig = {
         tableName: 'orders',
@@ -161,6 +266,7 @@
                 className: 'col-actions',
                 formatter: (_, item) => `
                     ${randomInt(0, 1) ? `<button class="ant-btn ant-btn-primary" onclick="alert('跳转到工单查看页面')" style="margin-right: 8px;">工单</button>` : ''}
+                    <button class="ant-btn" style="background-color: rgb(82, 196, 26); color: rgb(255, 255, 255); margin-right: 0px;" onclick="viewElements(${item.id})">要素</button>
                     <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
                     <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})" style="margin-right: 8px;">删除</button>
                 `
