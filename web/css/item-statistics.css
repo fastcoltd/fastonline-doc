@@ -404,7 +404,8 @@
 .chart-svg {
     width: 100%;
     height: 100%;
-    margin: 0 calc(100% / -14) 0 calc(100% / 14);
+    transform: translateX(calc(100% / 14));
+    overflow: visible;
 }
 
 /* Line Chart Effects */
@@ -617,6 +618,22 @@
     .legend-row {
         gap: 4px;
     }
+
+    /* 修复手机端SVG显示 */
+    .chart-svg {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .line-area {
+        position: absolute;
+        top: 6px;
+        bottom: 6px;
+        left: 0;
+        right: 0;
+        overflow: hidden;
+    }
 }
 
 @media (max-width: 480px) {
@@ -654,5 +671,23 @@
 
     .tab-text {
         font-size: 12px;
+    }
+
+    /* 小屏幕设备SVG优化 */
+    .chart-svg {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        transform: translateX(calc(100% / 14)) scale(1);
+    }
+
+    /* 简化小屏幕上的滤镜效果以提升性能 */
+    .line-goods,
+    .line-response,
+    .line-sufficient,
+    .line-sales,
+    .line-after,
+    .line-new {
+        filter: none;
     }
 }
