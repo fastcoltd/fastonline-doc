@@ -1,18 +1,18 @@
-/* Main Container - Exact Figma Specs: 410px width with 20px gaps */
+/* Main Container */
 .frame-container {
-    width: 410px;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    border: 1px solid #F0F0F3;
+    border-radius: 20px;
+    padding: 20px;
 }
 
 /* ===== STATISTICS FRAME ===== */
 .statistics-frame {
     background: #FFFFFF;
-    border: 1px solid #F0F0F3;
-    border-radius: 20px;
-    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -28,58 +28,6 @@
     margin: 0;
 }
 
-/* Rating Row - Stars + Score */
-.rating-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.star-component {
-    width: 29px;
-    height: 29px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.star-component svg {
-    width: 24px;
-    height: 22.79px;
-}
-
-.rating-group {
-    width: 70px;
-    height: 22px;
-    display: flex;
-    align-items: flex-start;
-    margin-left: 4px;
-}
-
-.rating-score {
-    font-family: Roboto;
-    font-weight: 600;
-    font-size: 20px;
-    line-height: 1.1;
-    color: rgba(0, 0, 0, 0.85);
-}
-
-.rating-count {
-    font-family: Roboto;
-    font-weight: 400;
-    font-size: 20px;
-    line-height: 1.1;
-    color: #6D6D6D;
-    margin-left: 4px;
-}
-
-/* Rating Details Row */
-.details-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
 .detail-text {
     font-family: Inter;
     font-weight: 400;
@@ -88,18 +36,48 @@
     color: #000000;
 }
 
+.statistics-num-box {
+    width: 100%;
+    flex-wrap: wrap;
+    column-gap: 10px;
+    row-gap: 6px;
+}
+
+.statistics-num-text {
+    font-family: var(--primary-popfont);
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 500;
+    color: #000000;
+}
+
+.statistics-num {
+    font-family: var(--primary-popfont);
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 500;
+    color: #FD8E2D;
+}
+
+.statistics-num-count {
+    font-family: var(--primary-popfont);
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 500;
+    color: var(--gray-color);
+}
+
 /* Bar Chart Frame */
 .bar-chart-frame {
     width: 100%;
-    height: 255px;
-    padding: 10px 0px;
+    height: 235px;
     display: flex;
     flex-direction: column;
 }
 
 .chart-content {
     width: 100%;
-    height: 235px;
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -109,7 +87,6 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
     position: relative;
 }
 
@@ -118,13 +95,12 @@
     display: flex;
     flex-direction: column;
     position: absolute;
-    left: 0;
-    top: 0;
-    height: 200px;
-    width: 30px;
-    justify-content: space-between;
-    align-items: flex-end;
-    padding: 20px 4px 20px 0;
+    left: 10px;
+    top: 15px;
+    bottom: 0;
+    width: 24px;
+    align-items: center;
+    justify-content: space-around;
 }
 
 .y-label-item {
@@ -133,7 +109,6 @@
     font-size: 12px;
     line-height: 1.21;
     color: rgba(0, 0, 0, 0.7);
-    height: 20px;
     display: flex;
     align-items: center;
 }
@@ -158,53 +133,50 @@
 
 .vertical-lines {
     position: absolute;
-    top: 20px;
+    top: 0px;
     left: 0;
     right: 0;
-    bottom: 20px;
+    bottom: 0px;
     display: flex;
     justify-content: space-between;
 }
 
 .horizontal-lines {
     position: absolute;
-    top: 20px;
+    top: 0px;
     left: 0;
     right: 0;
-    bottom: 20px;
+    bottom: 0px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
 .vertical-lines .grid-line {
-    width: 1px;
-    background: rgba(0, 0, 26, 0.15);
+    border: rgba(0, 0, 26, 0.15) 0.5px dashed;
     height: 100%;
 }
 
 .vertical-lines .right-line {
-    width: 1px;
-    background: rgba(0, 0, 26, 0.3);
+    border: rgba(0, 0, 26, 0.3) 0.5px dashed;
     height: 100%;
 }
 
 .horizontal-lines .grid-line {
-    height: 1px;
-    background: rgba(0, 0, 26, 0.15);
+    border: rgba(0, 0, 26, 0.15) 0.5px dashed;
     width: 100%;
 }
 
 /* Bars Container */
 .bars-container {
     position: absolute;
-    top: 20px;
+    top: 0px;
     left: 0;
     right: 0;
-    bottom: 20px;
+    bottom: 0px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
 }
 
 .bar-row {
@@ -242,10 +214,7 @@
 }
 
 .bar-value {
-    position: absolute;
-    right: -20px;
-    top: 50%;
-    transform: translateY(-50%);
+    margin-left: 5px;
     font-family: Inter;
     font-weight: 400;
     font-size: 10px;
@@ -258,15 +227,15 @@
 .x-axis-top {
     display: flex;
     justify-content: space-between;
-    margin-left: 34px;
-    margin-top: 8px;
+    margin-left: 0.5px;
+    margin-right: -33.5px;
 }
 
 .x-scale-item {
     font-family: Inter;
     font-weight: 400;
     font-size: 12px;
-    line-height: 1.21;
+    line-height: 15px;
     color: rgba(0, 0, 0, 0.7);
     text-align: center;
     flex: 1;
@@ -292,13 +261,10 @@
     position: relative;
     display: flex;
     align-items: center;
+    gap: 6px;
 }
 
 .red-indicator {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
     width: 4px;
     height: 16.16px;
     background: #FF1B20;
@@ -310,8 +276,6 @@
     font-size: 14px;
     line-height: 1.5714em;
     color: #000000;
-    margin-left: 10px;
-    margin: 0;
 }
 
 .tabs-container {
@@ -350,10 +314,9 @@
 
 /* Line Chart Container */
 .line-chart-container {
-    width: 370px;
-    height: 220px;
+    width: 100%;
+    height: 200px;
     background: #FFFFFF;
-    padding: 10px 0px;
     display: flex;
     flex-direction: column;
 }
@@ -408,13 +371,11 @@
 
 .h-line {
     width: 100%;
-    height: 1px;
-    background: rgba(0, 0, 26, 0.15);
+    border: rgba(0, 0, 26, 0.15) dashed 0.5px;
 }
 
 .border-line {
-    height: 1px;
-    background: rgba(0, 0, 26, 0.3);
+    border: rgba(0, 0, 26, 0.15) dashed 0.5px;
     width: 100%;
 }
 
@@ -429,22 +390,22 @@
 }
 
 .v-line {
-    width: 1px;
     height: 100%;
-    background: rgba(0, 0, 26, 0.15);
+    border: rgba(0, 0, 26, 0.15) dashed 0.5px;
 }
 
 .line-area {
     position: absolute;
-    top: 7px;
+    top: 6px;
+    bottom: 6px;
     left: 0;
     right: 0;
-    height: 141px;
 }
 
 .chart-svg {
     width: 100%;
     height: 100%;
+    margin: 0 calc(100% / -14) 0 calc(100% / 14);
 }
 
 /* Line Chart Effects */
@@ -487,7 +448,7 @@
 .x-axis-bottom {
     display: flex;
     justify-content: space-between;
-    padding: 0 29px 8px 29px;
+    padding: 0 0px 8px 29px;
 }
 
 .x-axis-bottom .x-label-box {
@@ -632,8 +593,7 @@
 }
 
 .sales-header {
-    width: 73px;
-    height: 22px;
+    width: 100%;
     display: flex;
     align-items: center;
     position: relative;
@@ -651,11 +611,6 @@
     .line-chart-container {
         width: 100%;
         max-width: 370px;
-    }
-
-    .details-row {
-        flex-direction: column;
-        gap: 5px;
     }
 
     .legend-row {
