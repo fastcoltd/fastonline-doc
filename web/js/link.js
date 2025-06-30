@@ -21,26 +21,26 @@ LinkRef.prototype.setup = function () {
         this.pageIndexs[0].classList.add('active');
     }
     // 点击导航链接事件
-    this.pageIndexs.forEach(function (item) {
-        item.addEventListener("click", function (e) {
+    this.pageIndexs.forEach((item) => {
+        item.addEventListener("click", (e) => {
             e.stopPropagation();
             const value = e.currentTarget.id;
             this.scrollToSection(value);
         });
     });
-    this.handleScroll.bind(this);
-    window.addEventListener('scroll', this.handleScroll, { passive: true });
+    // 修正滚动事件监听器的绑定问题
+    window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
 
     // 初始化时更新一次状态
     this.updateActiveLink();
     this.updateStickyHeader();
 
     // 监听窗口大小变化，重新计算位置
-    window.addEventListener('resize', function () {
+    window.addEventListener('resize', () => {
         if (!this.isScrolling) {
             this.updateActiveLink();
         }
-    }.bind(this));
+    });
 }
 
 // 更新激活的导航链接
@@ -58,7 +58,7 @@ LinkRef.prototype.updateActiveLink = function () {
         const distance = Math.abs(scrollTop + offset - sectionTop);
 
         // 检查当前section是否在可视区域内
-        if (scrollTop + offset >= sectionTop - 100 && scrollTop + offset < sectionBottom) {
+        if (scrollTop + offset >= sectionTop - 20 && scrollTop + offset < sectionBottom) {
             if (distance < closestDistance) {
                 closestDistance = distance;
                 activeSection = section;
@@ -133,7 +133,7 @@ LinkRef.prototype.updateStickyHeader = function () {
 
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-    if (scrollTop > 50) {
+    if (scrollTop > 20) {
         this.stickyHeader.classList.add('is-sticky');
     } else {
         this.stickyHeader.classList.remove('is-sticky');
