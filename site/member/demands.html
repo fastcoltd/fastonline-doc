@@ -185,6 +185,18 @@
             <div class="order-info-section">
                 <label>需求名称:</label>
                 <input type="text" id="create-demand-name" placeholder="请输入需求名称">
+
+                <label>品牌-服务:</label>
+                <div class="attr-row">
+                    <select id="create-brand-name" onchange="updateAttrValues()">
+                        <option value="">选择品牌</option>
+                        ${Object.keys(ecommerceAttributes).map(name => `<option value="${name}">${name}</option>`).join('')}
+                    </select>
+                    <select id="create-service-value">
+                        <option value="">选择服务</option>
+                    </select>
+                </div>
+
                 <label>价格范围 ($):</label>
                 <div style="display: flex; gap: 1em;">
                     <input type="number" id="create-price-from" min="0" step="0.01" placeholder="最低价格">
@@ -375,6 +387,7 @@
 
                 // Add other buttons based on status
                 if (item.status === 0) buttons += `<button class="btn-small btn-solid-medium" onclick="submitDemandForReview(${item.id})">提交审核</button>`;
+                if (item.status === 2) buttons += `<button class="btn-small btn-solid-medium" onclick="editDemands(${item.id})">编辑</button>`;
                 if (item.status === 3) buttons += `<button class="btn-orange-solid-small" onclick="payDeposit(${item.id})">支付定金</button>`;
                 if (item.status === 6) buttons += `<button class="btn-small btn-orange-solid-small" onclick="payRestMoney(${item.id})">支付尾款</button>`;
                 if (item.status === 8) buttons += `<button class="btn-small btn-red-solid-small" onclick="refusedDemands(${item.id})">验收失败</button><button class="btn-solid-small" onclick="confirmDemands(${item.id})">验收通过</button>`;
@@ -687,6 +700,11 @@
         document.getElementById('create-attr-value').disabled = true;
         document.getElementById('create-attrs').innerHTML = '';
         document.getElementById('create-demand-dialog').style.display = 'flex';
+
+        let brandOptions = `${hotBrands.map(b => `<option value="${b.name}" style="color: ${b.themeColor};">${b.name}</option>`).join('')}`
+        let serversOptions = `${services.map(s => `<option value="${s.name}">${s.name}</option>`).join('')}`
+        document.getElementById('create-brand-name').innerHTML = brandOptions;
+        document.getElementById('create-service-value').innerHTML = serversOptions;
     }
 
     function updateAttrValues() {
@@ -820,6 +838,24 @@
             });
             renderTableBody();
             console.log(`需求 ID: ${id} 已提交审核`);
+        }
+    }
+    function editDemands(id) {
+        const demand = allDemands.find(d => d.id === id);
+        if (demand && demand.status === 2) {
+            demand.status = 1;
+            filteredDemands = filteredDemands.map(d => d.id === id ? demand : d);
+            allLogs.push({
+                id: Math.max(...allLogs.map(l => l.id)) + 1,
+                demand_id: id,
+                user_id: demand.user_id,
+                store_id: 0,
+                username: faker.internet.userName(),
+                store_name: '',
+                log: '编辑',
+                create_time: Math.floor(Date.now() / 1000)
+            });
+            openCreateDemandModal()
         }
     }
 

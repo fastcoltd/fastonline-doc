@@ -74,6 +74,7 @@
                 <h4>订单信息</h4>
                 <div id="order-basic-info" class="order-info-content"></div>
                 <div id="order-item-info" class="order-item-content"></div>
+                <div id="order-requirement-info" class="order-item-content" style="margin-top: 1em;"></div>
             </div>
             <div class="order-actions">
                 <button class="btn-small" onclick="downloadInvoiceModal()"><i class="fa fa-download"></i> 下载订单</button>
@@ -114,6 +115,24 @@
         comment: {},
         confirm: {}
     };
+    const fieldNameOptions = [
+        { name: 'profile_link', type: 8 }, // LINK
+        { name: 'followers', type: 1 },    // NUMBER
+        { name: 'reviews', type: 5 },      // TEXTAREA
+        { name: 'comments', type: 0 },     // TEXT
+        { name: 'star', type: 1 },         // NUMBER
+        { name: 'bio', type: 5 },          // TEXTAREA
+        { name: 'rating', type: 1 },       // NUMBER
+        { name: 'posts', type: 1 },        // NUMBER
+        { name: 'likes', type: 1 },        // NUMBER
+        { name: 'shares', type: 1 }        // NUMBER
+    ];
+    const brandFieldsData = fieldNameOptions.map((field, index) => ({
+        id: index + 1,
+        field_name: field.name,
+        field_type: field.type
+    }));
+
     const userOrdersFieldConfig = {
         id: { ...ordersFieldConfig.id, label: '订单ID', format: v => v, sample: () => faker.datatype.number({ min: 100000, max: 999999 }) },
         orders_type: { ...ordersFieldConfig.orders_type},
@@ -211,7 +230,7 @@
             <input type="text" id="filter-search" placeholder="订单ID/商品名">
             <select id="filter-brand">
                 <option value="">品牌</option>
-                ${hotBrands.map(b => `<option value="${b.name}">${b.name}</option>`).join('')}
+                ${hotBrands.map(b => `<option value="${b.name}" style="color: ${b.themeColor};">${b.name}</option>`).join('')}
             </select>
             <select id="filter-service">
                 <option value="">服务</option>
@@ -472,6 +491,29 @@
         }
     }
 
+    function generateFieldContent(fieldType) {
+        switch (fieldType) {
+            case 0: // TEXT
+                return `Text_${Math.random().toString(36).substring(2, 8)}`;
+            case 1: // NUMBER
+                return randomInt(1, 1000);
+            case 2: // DATE
+                return moment().subtract(randomInt(0, 365), 'days').format('YYYY-MM-DD');
+            case 3: // SELECT
+            case 4: // CHECKBOX
+            case 6: // RADIO
+                return ['選項1', '選項2', '選項3'][randomInt(0, 2)];
+            case 5: // TEXTAREA
+                return `Description_${Math.random().toString(36).substring(2, 10)}`;
+            case 7: // IMAGE
+                return `https://via.placeholder.com/150?text=Image`;
+            case 8: // LINK
+                return `https://example.com/link_`;
+            default:
+                return '';
+        }
+    }
+
     function viewDetails(orderId) {
         const order = allOrders.find(o => o.id.sample === orderId);
         if (!order) return;
@@ -479,6 +521,7 @@
         const dialog = document.getElementById('order-details-dialog');
         const basicInfo = document.getElementById('order-basic-info');
         const itemInfo = document.getElementById('order-item-info');
+        const requirementInfo = document.getElementById('order-requirement-info');
 
         // 订单基本信息
         const orderFields = Object.entries(ordersFieldConfig)
@@ -493,6 +536,7 @@
 
         // 根据订单类型显示详细信息
         let typeInfo = '';
+        let requirementHtml = '';
         if (order.item_id) {
             let item = generateData(itemFieldConfig, 1)[0]
             let itemFields = ``
@@ -544,19 +588,41 @@
             const postFields = [
                 postsFieldConfig.title.format = () => (null, { title: faker.lorem.sentence() }),
                 postsFieldConfig.author.format = () => (null, { author: faker.name.findName() }),
-                postsFieldConfig.brandName.format = () => (null, { brandName: order.brandName }),
+                postsFieldConfig.brandName.format = () => (null, { brandName: order.brandName.sample }),
                 postsFieldConfig.paid.format(null, { paid: faker.datatype.boolean() }),
-                ...generateRandomTags(postsFieldConfig.tags, 0, 5),
-                ...generateRandomFields(fieldsList, 3, 8)
             ].map(field => {
                 let v = field;
                 v = typeof v == 'function' ? v() : v;
                 v = typeof v == 'object' ? Object.values(v)[0] : v;
-                return `<span class="tag">${v}</span>`
+                return `<span class="tag" style="padding-left: 0.5em;">${v}</span>`
             }).join('');
             typeInfo = `<p>文章信息: ${postFields}</p>`;
         }
         itemInfo.innerHTML = typeInfo;
+
+
+        requirementInfo.style.display = "none"
+        if (order.orders_type.sample == 2){
+            requirementHtml = `<p>订单要素：<span style="float: right;"><button class="btn-small" onclick="alert('复制成功')"><i class="fa fa-copy"></i> 复制</button></span></p>`
+            const selectedFields = [...brandFieldsData].sort(() => 0.5 - Math.random()).slice(0, randomInt(1,10));
+            selectedFields.forEach(field => {
+                const content = generateFieldContent(field.field_type);
+                requirementHtml += `
+                    <p>${field.field_name}：
+                        <span>${
+                    field.field_type === 7 ?
+                        `<img src="${content}" style="width: 50px; height: 50px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;" onclick="enlargeImage(${id}, 0, ['${content}'])">` :
+                        field.field_type === 8 ?
+                            `<a href="${content}" target="_blank">${content}</a>` :
+                            content
+                }</span>
+                    </p>
+                `;
+            });
+
+            requirementInfo.style.display = "block"
+            requirementInfo.innerHTML = requirementHtml;
+        }
 
         dialog.style.display = 'flex';
     }
@@ -598,6 +664,8 @@
                 `;
                     refundTable.appendChild(row);
                 }
+            }else {
+                refundSection.style.display = 'none';
             }
 
             // 换货记录
@@ -619,6 +687,8 @@
                 `;
                     replacementTable.appendChild(row);
                 }
+            }else {
+                refundSection.style.display = 'none';
             }
         }
     }
