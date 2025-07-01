@@ -98,7 +98,7 @@ function updateHeaderUI() {
             : (userData.messages.chat + userData.messages.tickets + userData.messages.system);
         const messageClass = totalMessages > 0 ? 'messages has-messages' : 'messages';
 
-        const messageUrl = haveStore ? '/site/store/message.html' : `/site/member/message.html`
+        const messageUrl = haveStore ? '/site/member/message.html' : `/site/member/message.html`
         headerActions.innerHTML += `
             <div class="user-actions">
                 <a href="#" class="balance" onclick="showModal('topup-modal', generateTopUpModal(), { className: 'topup-modal', style: signInRegisterStyle })">$${userData.balance}</a>
