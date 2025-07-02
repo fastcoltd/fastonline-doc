@@ -644,15 +644,15 @@ document.addEventListener('DOMContentLoaded', function () {
         toast.textContent = message;
         toast.style.cssText = `
             position: fixed;
-            top: 20px;
+            top: 2.5rem;
             left: 50%;
             transform: translateX(-50%);
             background-color: #333;
             color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
+            padding: 1.5rem 3rem;
+            border-radius: 0.75rem;
             z-index: 60;
-            font-size: 14px;
+            font-size: 1.75rem;
             opacity: 0;
             transition: opacity 0.3s ease;
         `;
