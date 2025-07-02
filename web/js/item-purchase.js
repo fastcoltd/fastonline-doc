@@ -1,5 +1,5 @@
 // 购买组件交互功能
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // 获取DOM元素
     const decreaseBtn = document.getElementById('decrease-qty');
     const increaseBtn = document.getElementById('increase-qty');
@@ -32,11 +32,11 @@ document.addEventListener('DOMContentLoaded', function() {
         quantityDisplay.textContent = productData.quantity;
         const totalPrice = (productData.basePrice * productData.quantity).toFixed(2);
         totalPriceElement.textContent = `$${totalPrice}`;
-        
+
         // 更新按钮状态
         decreaseBtn.disabled = productData.quantity <= productData.minQuantity;
         increaseBtn.disabled = productData.quantity >= productData.maxQuantity;
-        
+
         // 更新按钮样式
         if (decreaseBtn.disabled) {
             decreaseBtn.style.opacity = '0.5';
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
             decreaseBtn.style.opacity = '1';
             decreaseBtn.style.cursor = 'pointer';
         }
-        
+
         if (increaseBtn.disabled) {
             increaseBtn.style.opacity = '0.5';
             increaseBtn.style.cursor = 'not-allowed';
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 绑定事件
     function bindEvents() {
         // 减少数量
-        decreaseBtn.addEventListener('click', function() {
+        decreaseBtn.addEventListener('click', function () {
             if (productData.quantity > productData.minQuantity) {
                 productData.quantity--;
                 updateDisplay();
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // 增加数量
-        increaseBtn.addEventListener('click', function() {
+        increaseBtn.addEventListener('click', function () {
             if (productData.quantity < productData.maxQuantity) {
                 productData.quantity++;
                 updateDisplay();
@@ -74,29 +74,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // 购买按钮
-        buyNowBtn.addEventListener('click', function() {
+        buyNowBtn.addEventListener('click', function () {
             handleBuyNow();
         });
 
         // 点赞按钮
-        likeBtn.addEventListener('click', function() {
+        likeBtn.addEventListener('click', function () {
             handleLike();
         });
 
         // 分享按钮
-        shareBtn.addEventListener('click', function() {
+        shareBtn.addEventListener('click', function () {
             handleShare();
         });
 
         // 更多操作按钮
-        ellipsisBtn.addEventListener('click', function() {
+        ellipsisBtn.addEventListener('click', function () {
             handleEllipsis();
         });
 
         // 批发价格标签点击
         const wholesaleBadges = document.querySelectorAll('.item-purchase-wholesale-badge');
         wholesaleBadges.forEach(badge => {
-            badge.addEventListener('click', function() {
+            badge.addEventListener('click', function () {
                 handleWholesaleSelect(this);
             });
         });
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 处理购买
     function handleBuyNow() {
         const totalPrice = (productData.basePrice * productData.quantity).toFixed(2);
-        
+
         // 模拟购买流程
         console.log('购买信息：', {
             quantity: productData.quantity,
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (confirm(`确认购买 ${productData.quantity} 件商品，总价 $${totalPrice}？`)) {
             // 这里可以添加实际的购买逻辑，比如跳转到支付页面
             alert('购买成功！正在跳转到支付页面...');
-            
+
             // 模拟跳转
             // window.location.href = '/checkout';
         }
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 处理点赞
     function handleLike() {
         productData.isLiked = !productData.isLiked;
-        
+
         if (productData.isLiked) {
             likeBtn.style.background = '#FF1B20';
             likeBtn.setAttribute('aria-pressed', 'true');
@@ -186,9 +186,9 @@ document.addEventListener('DOMContentLoaded', function() {
             '举报商品',
             '查看详细规格'
         ];
-        
+
         const action = prompt('选择操作：\n' + actions.map((item, index) => `${index + 1}. ${item}`).join('\n'));
-        
+
         if (action) {
             const actionIndex = parseInt(action) - 1;
             if (actionIndex >= 0 && actionIndex < actions.length) {
@@ -207,12 +207,12 @@ document.addEventListener('DOMContentLoaded', function() {
             badge.style.background = 'transparent';
             badge.style.borderColor = '#C5C5C5';
         });
-        
+
         // 设置当前标签为选中状态
         selectedBadge.classList.add('selected');
         selectedBadge.style.background = '#f0f0f0';
         selectedBadge.style.borderColor = '#FF1B20';
-        
+
         // 解析价格信息
         const text = selectedBadge.textContent;
         const priceMatch = text.match(/\$(\d+\.?\d*)/);
@@ -225,9 +225,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 键盘事件支持
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.target.closest('.item-purchase-container')) {
-            switch(e.key) {
+            switch (e.key) {
                 case 'ArrowUp':
                 case '+':
                     e.preventDefault();
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 数量输入框直接编辑（可选功能）
-    quantityDisplay.addEventListener('click', function() {
+    quantityDisplay.addEventListener('click', function () {
         const input = document.createElement('input');
         input.type = 'number';
         input.min = productData.minQuantity;
@@ -264,14 +264,14 @@ document.addEventListener('DOMContentLoaded', function() {
         input.style.height = '100%';
         input.style.border = 'none';
         input.style.textAlign = 'center';
-        input.style.fontSize = '12px';
+        input.style.fontSize = '1.5rem';
         input.style.fontFamily = 'Lexend, sans-serif';
-        
+
         quantityDisplay.innerHTML = '';
         quantityDisplay.appendChild(input);
         input.focus();
         input.select();
-        
+
         function finishEdit() {
             const newValue = parseInt(input.value);
             if (newValue >= productData.minQuantity && newValue <= productData.maxQuantity) {
@@ -280,9 +280,9 @@ document.addEventListener('DOMContentLoaded', function() {
             quantityDisplay.innerHTML = productData.quantity;
             updateDisplay();
         }
-        
+
         input.addEventListener('blur', finishEdit);
-        input.addEventListener('keydown', function(e) {
+        input.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 finishEdit();
             } else if (e.key === 'Escape') {

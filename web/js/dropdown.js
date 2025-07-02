@@ -51,7 +51,7 @@ class DropdownMenu {
     showMenuContainer() {
         const rect = this.menuButton.getBoundingClientRect()
         this.menuContainer.style.display = 'block';
-        this.menuContainer.style.left = 0 + 'px';
+        this.menuContainer.style.left = 0;
         this.menuContainer.style.top = rect.height + 'px';
         this.menuArrow.style.transform = 'rotate(180deg)';
     }

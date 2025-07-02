@@ -184,12 +184,12 @@ class HeaderMenu {
     showMenuContainer() {
         const rect = this.menuButton.getBoundingClientRect()
         this.menuContainer.style.display = 'block';
-        this.menuContainer.style.left = 0 + 'px';
+        this.menuContainer.style.left = 0;
         this.menuContainer.style.top = rect.height + 'px';
         this.menuArrow.style.transform = 'rotate(180deg)';
         if (this.menuButton.classList.contains('header-items-label')) {
             this.menuButton.style.backgroundColor = '#f4f4f4';
-            this.menuButton.style.borderRadius = '4px';
+            this.menuButton.style.borderRadius = '0.5rem';
         }
     }
 
@@ -198,7 +198,7 @@ class HeaderMenu {
         this.menuArrow.style.transform = 'rotate(0deg)';
         if (this.menuButton.classList.contains('header-items-label')) {
             this.menuButton.style.backgroundColor = '#fff';
-            this.menuButton.style.borderRadius = '0px';
+            this.menuButton.style.borderRadius = '0';
         }
     }
 

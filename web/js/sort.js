@@ -16,7 +16,7 @@ class SortSelector {
             }
             const rect = this.sortButton.getBoundingClientRect()
             this.sortContainer.style.display = 'block';
-            this.sortContainer.style.right = 0 + 'px';
+            this.sortContainer.style.right = 0;
             this.sortContainer.style.top = rect.height + 8 + 'px';
         });
 
