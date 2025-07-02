@@ -1,6 +1,5 @@
 // 博客文章详情页面交互功能
 document.addEventListener('DOMContentLoaded', function () {
-    const relateItems = new Carousel('best-items', 20);
     const link = new LinkRef('toc-item', 'post-detail-section', true, 'post-detail-container');
     updateHeaderHeight();
     const menu = document.querySelector('.detail-page-menu');
