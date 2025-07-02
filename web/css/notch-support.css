@@ -31,13 +31,12 @@ body {
     /* 确保最小高度包含安全区域 */
     min-height: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
     /* 兼容性回退 - 为不支持env()的浏览器 */
-    padding-top: env(safe-area-inset-top, 20px) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
 }
 
 footer {
-    padding-bottom: var(--safe-area-inset-bottom) !important;
-    /* 兼容性回退 - 为不支持env()的浏览器 */
-    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    padding-top: 20px;
+    padding-bottom: 20px !important;
 }
 
 /* iPhone X/11/12/13/14 系列特定适配 */
@@ -47,8 +46,8 @@ screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-
 screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3),
 screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) {
     footer {
-        padding-bottom: 0px !important;
-        padding-bottom: max(env(safe-area-inset-bottom), 0px) !important;
+        padding-bottom: 20px !important;
+        padding-bottom: max(env(safe-area-inset-bottom), 20px) !important;
     }
 
     /* 强制为有刘海的iPhone设置顶部安全距离 */
@@ -66,8 +65,9 @@ screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-
     }
 
     footer {
+        padding-bottom: 20px !important;
         /* 在iOS Safari中强制启用安全区域 */
-        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+        padding-bottom: env(safe-area-inset-bottom, 20px) !important;
     }
 }
 
@@ -79,6 +79,7 @@ screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-
     }
 
     footer {
+        padding-bottom: 20px !important;
         /* 全屏模式下确保所有安全区域都被考虑 */
         padding-bottom: var(--safe-area-inset-bottom);
     }

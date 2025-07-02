@@ -120,8 +120,8 @@ function createItemElement(item) {
                                             <div class="stars-inner" style="width: 83%;"></div>
                                         </div>
                                     </div>
-                                    <p class="item-star-score">{{4.3}}</p>
-                                    <p class="item-star-recommend">{{(200)}}</p>
+                                    <p class="item-star-score">4.3</p>
+                                    <p class="item-star-recommend">(200)</p>
                                 </div>
                                 <div class="flex-row item-detail-review-info-box">
                                     <div class="flex-column item-detail-review-info-item">
