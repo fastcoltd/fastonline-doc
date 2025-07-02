@@ -1,4 +1,6 @@
-function LinkRef(linkId, sectionId) {
+function LinkRef(linkId, sectionId, fixed = false, containerId = null) {
+    this.container = containerId ? document.querySelector('.' + containerId) : null
+    this.fixed = fixed;
     this.pageIndexs = document.querySelectorAll('.' + linkId);
     this.sections = document.querySelectorAll('.' + sectionId);
     this.stickyHeader = document.getElementById('stickyHeader');
@@ -29,7 +31,11 @@ LinkRef.prototype.setup = function () {
         });
     });
     // 修正滚动事件监听器的绑定问题
-    window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
+    if (this.container) {
+        this.container.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
+    } else {
+        window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
+    }
 
     // 初始化时更新一次状态
     this.updateActiveLink();
@@ -45,18 +51,22 @@ LinkRef.prototype.setup = function () {
 
 // 更新激活的导航链接
 LinkRef.prototype.updateActiveLink = function () {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const headerHeight = this.stickyHeader ? this.stickyHeader.offsetHeight : 0;
+    let scrollTop = 0
+    if (this.container) {
+        scrollTop = this.container.scrollTop;
+    } else {
+        scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    }
+    const headerHeight = (!this.fixed && this.stickyHeader) ? this.stickyHeader.offsetHeight : 0;
     const offset = headerHeight; // 额外偏移量
-
     let activeSection = null;
     let closestDistance = Infinity;
 
     this.sections.forEach(section => {
+        if (activeSection) { return }
         const sectionTop = section.offsetTop;
         const sectionBottom = sectionTop + section.offsetHeight;
         const distance = Math.abs(scrollTop + offset - sectionTop);
-
         // 检查当前section是否在可视区域内
         if (scrollTop + offset >= sectionTop - 20 && scrollTop + offset < sectionBottom) {
             if (distance < closestDistance) {
@@ -65,7 +75,6 @@ LinkRef.prototype.updateActiveLink = function () {
             }
         }
     });
-
     // 如果没有找到活跃的section，使用最接近顶部的section
     if (!activeSection) {
         this.sections.forEach(section => {
@@ -107,18 +116,21 @@ LinkRef.prototype.scrollToSection = function (sectionId) {
         }
     });
     if (!targetSection) return;
-    const headerHeight = this.stickyHeader ? this.stickyHeader.offsetHeight : 0;
+    const headerHeight = (!this.fixed && this.stickyHeader) ? this.stickyHeader.offsetHeight : 0;
     const targetTop = targetSection.offsetTop - headerHeight;
 
     this.isScrolling = true;
 
     // 先更新导航状态
     this.updateNavigation(sectionId);
-
-    window.scrollTo({
-        top: targetTop,
-        behavior: 'smooth'
-    });
+    if (this.container) {
+        this.container.scrollTo({ top: targetTop, behavior: 'smooth' });
+    } else {
+        window.scrollTo({
+            top: targetTop,
+            behavior: 'smooth'
+        });
+    }
 
     // 平滑滚动完成后重置标志
     this.scrollTimeout && clearTimeout(this.scrollTimeout);
@@ -129,7 +141,7 @@ LinkRef.prototype.scrollToSection = function (sectionId) {
 
 // 更新sticky header状态
 LinkRef.prototype.updateStickyHeader = function () {
-    if (!this.stickyHeader) return;
+    if (!this.stickyHeader || this.container) return;
 
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
