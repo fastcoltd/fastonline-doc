@@ -85,6 +85,10 @@
 .product-title-box {
     flex: 1;
     flex-shrink: 1;
+    min-width: 0;
+    /* 确保flex项目可以收缩 */
+    overflow: hidden;
+    /* 隐藏溢出内容 */
 }
 
 .product-action-box {
@@ -112,12 +116,19 @@
         gap: 6px;
     }
 
+    .product-title-box {
+        width: 100%;
+        /* 确保在移动端占满可用宽度 */
+        max-width: 100%;
+        /* 防止溢出 */
+    }
+
     .product-info .product-title {
         font-size: 14px;
         line-height: 18px;
-        white-space: normal;
-        word-break: break-word;
-        word-wrap: break-word;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .product-info .item-mark-box {
@@ -322,10 +333,10 @@
 
 /* 目录导航 */
 .table-of-container {
-    position: absolute;
+    position: fixed;
     top: calc(var(--page-header-height) + 20px);
     left: calc((100vw - var(--container-width)) / 2);
-    height: calc(100vh - var(--page-header-height) - 40px);
+    max-height: calc(100vh - var(--page-header-height) - 40px);
     background-color: rgba(0, 0, 0, 0.5);
     width: 410px;
     border-radius: 20px;
@@ -339,12 +350,9 @@
 }
 
 .table-of-contents {
-    position: absolute;
-    right: 0;
-    top: 0;
+    position: relative;
     width: 410px;
     max-height: calc(100vh - var(--page-header-height) - 40px);
-    bottom: 0;
     background-color: #FFFFFF;
     border: 1px solid #F0F0F3;
     border-radius: 20px;
@@ -356,12 +364,12 @@
 
 .table-of-container-close {
     display: none;
-    position: absolute;
+    position: relative;
     left: 50%;
     transform: translateX(-50%);
     width: 40px;
     height: 40px;
-    bottom: 20px;
+    margin-bottom: 20px;
     cursor: pointer;
 }
 
@@ -369,28 +377,30 @@
 @media screen and (max-width: 768px) {
     .table-of-container {
         display: none;
+        position: fixed;
         top: 0;
         right: 0;
         width: 100vw;
         height: 100vh;
+        max-height: 100vh;
         border-radius: 0;
         transition: all 0.2s ease-in-out;
+        padding: env(safe-area-inset-top, 20px) 0px env(safe-area-inset-bottom, 20px) 0px;
     }
 
     .table-of-contents {
         border-radius: 0;
-        /* 基础安全区域内边距 - 确保在所有设备上生效 */
-        top: var(--safe-area-inset-top) !important;
-        bottom: var(--safe-area-inset-bottom) !important;
-        /* 兼容性回退 - 为不支持env()的浏览器 */
-        top: env(safe-area-inset-top, 20px) !important;
-        bottom: env(safe-area-inset-bottom, 20px) !important;
         width: calc(100vw - 40px);
-        max-height: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) 100vh;
+        max-height: 100vh;
+        margin-left: 40px;
+        height: 100%;
+        padding: 20px;
     }
 
     .table-of-container-close {
         display: block;
+        position: absolute;
+        bottom: env(safe-area-inset-bottom, 20px);
     }
 }
 
