@@ -35,7 +35,7 @@
 
 .product-info .item-title-box {
     gap: 10px;
-    width: calc(100% - 24px);
+    width: 100%;
 }
 
 .product-info .product-title {
@@ -47,14 +47,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.product-info .item-like {
-    position: absolute;
-    right: 0;
-    top: 8px;
-    width: 24px;
-    height: 24px;
 }
 
 /* 分类路径 */
@@ -86,6 +78,29 @@
     font-family: var(--primary-popfont);
 }
 
+.product-info .item-like {
+    position: relative;
+}
+
+.product-title-box {
+    flex: 1;
+    flex-shrink: 1;
+}
+
+.product-action-box {
+    flex-shrink: 0;
+    gap: 60px;
+}
+
+.production-actions {
+    gap: 60px;
+}
+
+.production-action-icon {
+    width: 36px;
+    height: 36px;
+}
+
 @media screen and (max-width: 768px) {
     .product-info {
         padding-bottom: 16px;
@@ -103,14 +118,6 @@
         white-space: normal;
         word-break: break-word;
         word-wrap: break-word;
-    }
-
-    .product-info .item-like {
-        position: absolute;
-        right: 0;
-        top: 7px;
-        width: 22px;
-        height: 22px;
     }
 
     .product-info .item-mark-box {
@@ -237,6 +244,7 @@
 }
 
 .article-content {
+    margin-left: 440px;
     width: calc(100% - 440px);
     padding: 20px 0;
     gap: 30px;
@@ -282,6 +290,7 @@
 
 @media screen and (max-width: 768px) {
     .article-content {
+        margin-left: 0;
         width: 100%;
         padding: 16px 16px;
         gap: 10px;
@@ -315,7 +324,7 @@
 .table-of-container {
     position: absolute;
     top: calc(var(--page-header-height) + 20px);
-    right: calc((100vw - var(--container-width)) / 2);
+    left: calc((100vw - var(--container-width)) / 2);
     height: calc(100vh - var(--page-header-height) - 40px);
     background-color: rgba(0, 0, 0, 0.5);
     width: 410px;
@@ -325,7 +334,7 @@
 
 @media screen and (max-width: 1440px) {
     .table-of-container {
-        right: 0;
+        left: 0;
     }
 }
 
