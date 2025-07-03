@@ -116,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
         itemTitleBox.addEventListener('click', function (e) {
             e.stopPropagation();
             const itemDescStyle = window.getComputedStyle(itemDescBox);
-            console.log('111', itemDescStyle)
             if (itemDescStyle.display === 'none') {
                 itemDescBox.style.display = 'flex';
                 itemTitleIcon.style.transform = 'rotate(0deg)';
