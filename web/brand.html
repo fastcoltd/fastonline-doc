@@ -1966,7 +1966,14 @@
       const text = headDetailBox.querySelector('.page-header-desc-right-detail-text');
       const button = headDetailBox.querySelector('.page-header-desc-right-detail-toggle-btn');
       button.addEventListener('click', function () {
-        text.classList.toggle('is-toggle');
+        const isToggle = text.classList.contains('is-toggle');
+        if (isToggle) {
+          text.classList.remove('is-toggle');
+          button.innerHTML = 'Show Detail';
+        } else {
+          text.classList.add('is-toggle');
+          button.innerHTML = 'Show Less';
+        }
       })
     })
   </script>
