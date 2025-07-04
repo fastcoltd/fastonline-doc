@@ -21,57 +21,88 @@
     <script src="/site/store/_store.js"></script>
     <script src="/site/member/_ticket.js"></script>
     <style>
-        .tips {background:#fefcbf;border:1px solid #f6e05e;border-radius:0.25em;padding:1em;margin-bottom:1em;}
-        .tips p {margin:0;color:#744210;}
-        .order-list-container {padding:1em;}
-        .order-filter {display:flex;gap:0.5em;margin-bottom:1em;align-items:center;}
-        .order-filter input, .order-filter select {padding:0.5em;border:1px solid #d9d9d9;border-radius:0.25em;font-size:0.875em;width:100px;}
-        .order-filter .ant-input {padding:0.5em;margin-bottom:0.25em;}
-        .order-filter .filter-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
-        .order-filter .filter-btn:hover {background:#45a049;}
-        .order-filter .clear-btn {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#FF4500;color:#fff;border:none;font-size:0.875em;}
-        .order-filter .clear-btn:hover {background:#D63B00;}
-        .order-table {width:100%;border-collapse:collapse;}
-        .order-table th, .order-table td {padding:0.75em;border:1px solid #d9d9d9;text-align:left;}
-        .order-table th {background:#f5f5f5;font-weight:bold;cursor:pointer;white-space:nowrap;}
-        .order-table th:hover {background:#e5e5e5;}
-        .order-table th .sort-icon {margin-left:0.3em;display:inline-flex;align-items:center;}
-        .order-table th .sort-icon i {font-size:0.75em;color:#6b7280;}
-        .order-table th .sort-icon i.sort-active {color:#4CAF50;}
-        .order-table td {font-size:0.875em;}
-        .order-table td.actions {white-space:nowrap;}
-        .order-table td.aftersales {white-space:nowrap;}
-        .order-table .action-btn {padding:0.3em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.875em;margin-right:0.3em;}
-        .order-table .action-btn:hover {background:#1C86EE;}
-        .order-table .download-aftersales-btn {padding:0.2em;border-radius:0.25em;cursor:pointer;background:#f59e0b;color:#fff;border:none;font-size:0.75em;margin-left:0.3em;}
-        .order-table .download-aftersales-btn:hover {background:#d97706;}
-        .order-table .review-btn {padding:0.2em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.75em;margin-left:0.3em;}
-        .order-table .review-btn:hover {background:#1C86EE;}
-        .order-table .status-待支付 {color:#FFA500;}
-        .order-table .status-已支付 {color:#1E90FF;}
-        .order-table .status-已发货 {color:#800080;}
-        .order-table .status-已完成 {color:#32CD32;}
-        .order-table .status-已取消 {color:#808080;}
-        .pagination {display:flex;gap:0.5em;margin-top:1em;justify-content:center;}
-        .pagination button {padding:0.3em 0.6em;border-radius:0.25em;cursor:pointer;background:#1E90FF;color:#fff;border:none;font-size:0.875em;}
-        .pagination button:disabled {background:#d9d9d9;cursor:not-allowed;}
-        .pagination button.active {background:#4CAF50;}
-        .pagination .ellipsis {padding:0.3em 0.6em;font-size:0.875em;color:#6b7280;}
-        .order-dialog, .review-dialog {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:center;}
-        .order-dialog-content, .review-dialog-content {background:#fff;border-radius:0.5em;width:50%;max-width:50vw;min-width:20em;max-height:80vh;box-shadow:0 0.25em 0.5em rgba(0,0,0,0.2);overflow-y:auto;}
-        .order-dialog-header, .review-dialog-header {padding:0.75em 1em;border-bottom:1px solid #d9d9d9;background:#f5f5f5;display:flex;justify-content:space-between;align-items:center;}
-        .order-dialog-header h3, .review-dialog-header h3 {margin:0;font-size:1.25em;color:#1f2937;}
-        .order-dialog-close, .review-dialog-close {background:none;border:none;font-size:1.2em;cursor:pointer;color:#6b7280;}
-        .order-dialog-close:hover, .review-dialog-close:hover {color:#f59e0b;}
-        .order-dialog-body, .review-dialog-body {padding:1em;}
-        .order-info, .refund-records, .exchange-records {margin-bottom:1em;}
-        .order-info p, .refund-records p, .exchange-records p {margin:0.5em 0;}
-        .order-actions {display:flex;gap:0.5em;}
-        .order-actions button {padding:0.5em 1em;border-radius:0.25em;cursor:pointer;background:#4CAF50;color:#fff;border:none;font-size:0.875em;}
-        .order-actions button:hover {background:#45a049;}
-        .refund-records table, .exchange-records table {width:100%;border-collapse:collapse;margin-top:0.5em;}
-        .refund-records th, .refund-records td, .exchange-records th, .exchange-records td {padding:0.5em;border:1px solid #d9d9d9;text-align:left;font-size:0.875em;}
-        .refund-records th, .exchange-records th {background:#f5f5f5;font-weight:bold;}
+        .tips { background: #fefcbf; border: 1px solid #f6e05e; border-radius: 0.25em; padding: 1em; margin-bottom: 1em; }
+        .tips p { margin: 0; color: #744210; }
+        .order-list-container { padding: 1em; }
+        .order-filter { display: flex; gap: 0.5em; margin-bottom: 1em; align-items: center; }
+        .order-filter input { padding: 0.5em; border: 1px solid #d9d9d9; border-radius: 0.25em; font-size: 0.875em; width: 100px; }
+        .order-filter select { padding: 0.5em; border: 1px solid #d9d9d9; border-radius: 0.25em; font-size: 0.875em; width: 100px; }
+        .order-filter .ant-input { padding: 0.5em; margin-bottom: 0.25em; }
+        .order-filter .filter-btn { padding: 0.5em 1em; border-radius: 0.25em; cursor: pointer; background: #4CAF50; color: #fff; border: none; font-size: 0.875em; }
+        .order-filter .filter-btn:hover { background: #45a049; }
+        .order-filter .clear-btn { padding: 0.5em 1em; border-radius: 0.25em; cursor: pointer; background: #FF4500; color: #fff; border: none; font-size: 0.875em; }
+        .order-filter .clear-btn:hover { background: #D63B00; }
+        .order-table { width: 100%; border-collapse: collapse; }
+        .order-table th { padding: 0.75em; border: 1px solid #d9d9d9; text-align: left; background: #f5f5f5; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .order-table th:hover { background: #e5e5e5; }
+        .order-table th .sort-icon { margin-left: 0.3em; display: inline-flex; align-items: center; }
+        .order-table th .sort-icon i { font-size: 0.75em; color: #6b7280; }
+        .order-table th .sort-icon i.sort-active { color: #4CAF50; }
+        .order-table td { padding: 0.75em; border: 1px solid #d9d9d9; text-align: left; font-size: 0.875em; }
+        .order-table td.actions { white-space: nowrap; }
+        .order-table td.aftersales { white-space: nowrap; }
+        .order-table .action-btn { padding: 0.3em; border-radius: 0.25em; cursor: pointer; background: #1E90FF; color: #fff; border: none; font-size: 0.875em; margin-right: 0.3em; }
+        .order-table .action-btn:hover { background: #1C86EE; }
+        .order-table .download-aftersales-btn { padding: 0.2em; border-radius: 0.25em; cursor: pointer; background: #f59e0b; color: #fff; border: none; font-size: 0.75em; margin-left: 0.3em; }
+        .order-table .download-aftersales-btn:hover { background: #d97706; }
+        .order-table .review-btn { padding: 0.2em; border-radius: 0.25em; cursor: pointer; background: #1E90FF; color: #fff; border: none; font-size: 0.75em; margin-left: 0.3em; }
+        .order-table .review-btn:hover { background: #1C86EE; }
+        .order-table .status-待支付 { color: #FFA500; }
+        .order-table .status-已支付 { color: #1E90FF; }
+        .order-table .status-已发货 { color: #800080; }
+        .order-table .status-已完成 { color: #32CD32; }
+        .order-table .status-已取消 { color: #808080; }
+        .pagination { display: flex; gap: 0.5em; margin-top: 1em; justify-content: center; }
+        .pagination button { padding: 0.3em 0.6em; border-radius: 0.25em; cursor: pointer; background: #1E90FF; color: #fff; border: none; font-size: 0.875em; }
+        .pagination button:disabled { background: #d9d9d9; cursor: not-allowed; }
+        .pagination button.active { background: #4CAF50; }
+        .pagination .ellipsis { padding: 0.3em 0.6em; font-size: 0.875em; color: #6b7280; }
+        .order-dialog { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .review-dialog { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .order-dialog-content { background: #fff; border-radius: 0.5em; width: 50%; max-width: 50vw; min-width: 20em; max-height: 80vh; box-shadow: 0 0.25em 0.5em rgba(0,0,0,0.2); overflow-y: auto; }
+        .review-dialog-content { background: #fff; border-radius: 0.5em; width: 50%; max-width: 50vw; min-width: 20em; max-height: 80vh; box-shadow: 0 0.25em 0.5em rgba(0,0,0,0.2); overflow-y: auto; }
+        .order-dialog-header { padding: 0.75em 1em; border-bottom: 1px solid #d9d9d9; background: #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
+        .review-dialog-header { padding: 0.75em 1em; border-bottom: 1px solid #d9d9d9; background: #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
+        .order-dialog-header h3 { margin: 0; font-size: 1.25em; color: #1f2937; }
+        .review-dialog-header h3 { margin: 0; font-size: 1.25em; color: #1f2937; }
+        .order-dialog-close { background: none; border: none; font-size: 1.2em; cursor: pointer; color: #6b7280; }
+        .review-dialog-close { background: none; border: none; font-size: 1.2em; cursor: pointer; color: #6b7280; }
+        .order-dialog-close:hover { color: #f59e0b; }
+        .review-dialog-close:hover { color: #f59e0b; }
+        .order-dialog-body { padding: 1em; }
+        .review-dialog-body { padding: 1em; }
+        .order-info { margin-bottom: 1em; }
+        .refund-records { margin-bottom: 1em; }
+        .exchange-records { margin-bottom: 1em; }
+        .order-info p { margin: 0.5em 0; }
+        .refund-records p { margin: 0.5em 0; }
+        .exchange-records p { margin: 0.5em 0; }
+        .order-actions { display: flex; gap: 0.5em; }
+        .order-actions button { padding: 0.5em 1em; border-radius: 0.25em; cursor: pointer; background: #4CAF50; color: #fff; border: none; font-size: 0.875em; }
+        .order-actions button:hover { background: #45a049; }
+        .refund-records table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
+        .exchange-records table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
+        .refund-records th { padding: 0.5em; border: 1px solid #d9d9d9; text-align: left; font-size: 0.875em; background: #f5f5f5; font-weight: bold; }
+        .refund-records td { padding: 0.5em; border: 1px solid #d9d9d9; text-align: left; font-size: 0.875em; }
+        .exchange-records th { padding: 0.5em; border: 1px solid #d9d9d9; text-align: left; font-size: 0.875em; background: #f5f5f5; font-weight: bold; }
+        .exchange-records td { padding: 0.5em; border: 1px solid #d9d9d9; text-align: left; font-size: 0.875em; }
+        /* 交付弹窗样式 */
+        .delivery-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1001; }
+        .delivery-modal-content { background: #fff; margin: 5% auto; padding: 20px; width: 90%;height: 50%; max-width: 800px; border-radius: 8px; position: relative; }
+        .delivery-modal-content .close { position: absolute; right: 20px; top: 10px; font-size: 24px; cursor: pointer; }
+        .delivery-form { display: flex; flex-direction: column; gap: 20px; }
+        .upload-section { display: flex; flex-direction: column; gap: 10px; }
+        .content-section { display: flex; flex-direction: column; gap: 10px; }
+        .preview-container { display: flex; flex-wrap: wrap; gap: 10px; max-height: 200px; overflow-y: auto; }
+        .preview-item { position: relative; width: 100px; height: 100px; border: 1px solid #d9d9d9; border-radius: 4px; overflow: hidden; }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-item .file-info { padding: 5px; font-size: 12px; word-break: break-all; text-align: center; }
+        .preview-item .delete-btn { position: absolute; top: 5px; right: 5px; background: #FF4500; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .delivery-form textarea { width: 100%; resize: vertical; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .modal-actions button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875em; }
+        .submit-delivery-btn { background: #4CAF50; color: #fff; }
+        .cancel-delivery-btn { background: #d9d9d9; color: #000; }
     </style>
 </head>
 <body>
@@ -109,6 +140,7 @@
                     <thead>
                     <tr>
                         <th onclick="sortTable('id.sample')">订单ID <span class="sort-icon" id="sort-id.sample"><i class="fas fa-sort"></i></span></th>
+                        <th>订单类型</th>
                         <th>用户信息</th>
                         <th>商品信息</th>
                         <th onclick="sortTable('quantity.sample')">数量 <span class="sort-icon" id="sort-quantity.sample"><i class="fas fa-sort"></i></span></th>
@@ -144,6 +176,12 @@
                             <p id="detail-refunded"></p>
                             <p id="detail-exchanged"></p>
                             <p id="detail-rating"></p>
+                        </div>
+                        <div class="order-dialog-body" id="order-requirements">
+                            <h4>买家要素 <button class="btn-small" style="float: right;" onclick="alert('复制成功')"><i class="fa fa-copy"></i> 复制</button></h4>
+                            <p>profile: https://instagram.com/abbbaba</p>
+                            <p>followers: 100</p>
+                            <p>posts: 100</p>
                         </div>
                         <div class="order-actions">
                             <button class="action-btn" onclick="downloadOrder()"><i class="fas fa-download"></i></button>
@@ -197,6 +235,28 @@
                     </div>
                 </div>
             </div>
+            <!-- 交付弹窗 -->
+            <div class="delivery-modal" id="delivery-modal" style="display: none;">
+                <div class="delivery-modal-content">
+                    <span class="close" onclick="closeDeliveryModal()">×</span>
+                    <h3>订单交付</h3>
+                    <div class="delivery-form">
+                        <div class="upload-section">
+                            <label>上传文件/图片 (可多选)</label>
+                            <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.txt">
+                            <div id="previewContainer" class="preview-container"></div>
+                        </div>
+                        <div class="content-section">
+                            <label>交付内容/说明</label>
+                            <textarea id="deliveryContent" rows="6" placeholder="请输入交付内容或说明"></textarea>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="submit-delivery-btn" id="submitDelivery">发货</button>
+                            <button class="cancel-delivery-btn" onclick="closeDeliveryModal()">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -210,6 +270,7 @@
             initializeOrders();
             initializeFilters();
             renderOrderList();
+            initializeOrderActions();
         });
     });
 
@@ -240,10 +301,11 @@
         return {
             id: { sample: faker.datatype.number({ min: 1000, max: 9999 }) },
             user_info: faker.name.findName(),
+            orders_type: { ...ordersFieldConfig.orders_type, sample: () => faker.random.arrayElement([1, 2, 3, 4]) },
             item_name: faker.commerce.productName(),
             quantity: { sample: faker.datatype.number({ min: 1, max: 10 }) },
             amount: { sample: `$${faker.finance.amount(10, 1000, 2)}` },
-            status: faker.random.arrayElement(['待支付', '已支付', '已发货', '已完成', '已取消']),
+            status: faker.random.arrayElement(["确认中",'已付款', '已发货','已收货','已退款','完成','已取消','超时']),
             paid_time: faker.date.recent(30).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
             posts_id: type === 'posts' ? faker.datatype.number({ min: 100, max: 999 }) : null,
             demand_id: type === 'demand' ? faker.datatype.number({ min: 100, max: 999 }) : null,
@@ -255,9 +317,10 @@
             refund_count: refundRecords.filter(r => r.status === '已处理').length,
             exchange_quantity: exchangeRecords.reduce((sum, r) => sum + (r.status === '已完成' ? r.quantity : 0), 0),
             exchange_count: exchangeRecords.filter(r => r.status === '已完成').length,
-            has_ticket: Math.random() < 0.2,
+            has_ticket: Math.random() < 0.3,
             rating: hasRating ? faker.datatype.number({ min: 1, max: 5 }) : null,
-            review_content: hasRating ? faker.lorem.sentence(10) : null
+            review_content: hasRating ? faker.lorem.sentence(10) : null,
+            deliveryData: null
         };
     });
 
@@ -266,6 +329,8 @@
     let sortField = null;
     let sortDirection = 'asc';
     let currentFilteredOrders = null;
+    let currentOrder = null;
+    let uploadedFiles = [];
 
     // 初始化订单数据
     function initializeOrders() {
@@ -298,14 +363,20 @@
         const paginatedOrders = sortedOrders.slice(startIndex, startIndex + pageSize);
 
         tbody.innerHTML = paginatedOrders.map(order => {
+            console.log(order.status.sample)
             const itemType = order.posts_id ? '文章' : order.demand_id || order.item_id ? '需求' : '商品';
             const displayName = `${itemType}：${order.item_name}`;
+            const orderTypeInt = order.orders_type.sample();
+            const orderType = order.orders_type.format(orderTypeInt, orderTypeInt);
             const refundDisplay = order.refund_count > 0 ? `$${order.refund_amount} (${order.refund_count}/ ${order.refund_quantity})` : '--';
             const exchangeDisplay = order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count})` : '--';
             const ratingDisplay = order.rating ? `${order.rating}` : '--';
+            const isManual = orderTypeInt === 2 || orderTypeInt === 4;
+            const isShipped = order.status !== '已发货' && order.status !== '已完成' && order.status !== '已取消'
             return `
-                <tr>
+                <tr data-order-id="${order.id.sample}">
                     <td>${order.id.sample}</td>
+                    <td>${orderType}</td>
                     <td>${order.user_info}</td>
                     <td>${displayName}</td>
                     <td>${order.quantity.sample}</td>
@@ -316,9 +387,11 @@
                     <td class="aftersales">${exchangeDisplay}${order.exchange_count > 0 && !order.posts_id ? `<button class="download-aftersales-btn" onclick="downloadExchange(${order.id.sample})"><i class="fas fa-download"></i></button>` : ''}</td>
                     <td>${ratingDisplay}${order.rating ? `<button class="review-btn" onclick="showReviewModal(${order.id.sample})"><i class="fas fa-star"></i></button>` : ''}</td>
                     <td class="actions">
-                        <button class="action-btn" onclick="showOrderDetails(${order.id.sample})"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn" onclick="downloadOrder(${order.id.sample})"><i class="fas fa-download"></i></button>
-                        ${order.has_ticket ? `<button class="action-btn" onclick="openChatDialog(${order.id.sample})"><i class="fas fa-ticket-alt"></i></button>` : ''}
+                        ${isManual && isShipped ? `<button class="btn-blue-small" onclick="deliveryOrder(${order.id.sample})" title="Shipping Order">${Math.random() < 0.9 ? '<span class="red-dot"></span>' : ''}<i class="fas fa-check-double"></i></button>` : ''}
+                        ${isManual && !isShipped ? `<button class="btn-blue-small view-delivery-btn" onclick="viewDelivery(${order.id.sample})" title="View Delivery"><i class="fas fa-box-open"></i></button>` : ''}
+                        <button class="btn-blue-small" onclick="showOrderDetails(${order.id.sample})" title="View Order"><i class="fas fa-eye"></i></button>
+                        ${order.has_ticket ? `<button class="btn-blue-small" onclick="openChatDialog(${order.id.sample})"><i class="fas fa-paper-plane"></i>${Math.random() < 0.9 ? '<span class="red-dot"></span>' : ''}</button>` : ''}
+                        <button class="btn-blue-small" onclick="downloadOrder(${order.id.sample})" title="Download Order All Data"><i class="fas fa-download"></i></button>
                     </td>
                 </tr>
             `;
@@ -326,6 +399,96 @@
 
         pagination.innerHTML = renderPagination(totalPages);
         updateSortIndicators();
+    }
+
+    // 模拟 brand_field 表数据
+    const fieldNameOptions = [
+        { name: 'profile_link', type: 8 }, // LINK
+        { name: 'followers', type: 1 },    // NUMBER
+        { name: 'reviews', type: 5 },      // TEXTAREA
+        { name: 'comments', type: 0 },     // TEXT
+        { name: 'star', type: 1 },         // NUMBER
+        { name: 'bio', type: 5 },          // TEXTAREA
+        { name: 'rating', type: 1 },       // NUMBER
+        { name: 'posts', type: 1 },        // NUMBER
+        { name: 'likes', type: 1 },        // NUMBER
+        { name: 'shares', type: 1 }        // NUMBER
+    ];
+    const brandFieldsData = fieldNameOptions.map((field, index) => ({
+        id: index + 1,
+        field_name: field.name,
+        field_type: field.type
+    }));
+
+    function generateFieldContent(fieldType, id) {
+        switch (fieldType) {
+            case 0: // TEXT
+                return `Text_${id}_${Math.random().toString(36).substring(2, 8)}`;
+            case 1: // NUMBER
+                return randomInt(1, 1000);
+            case 2: // DATE
+                return moment().subtract(randomInt(0, 365), 'days').format('YYYY-MM-DD');
+            case 3: // SELECT
+            case 4: // CHECKBOX
+            case 6: // RADIO
+                return ['选项1', '选项2', '选项3'][randomInt(0, 2)];
+            case 5: // TEXTAREA
+                return `Description_${id}_${Math.random().toString(36).substring(2, 10)}`;
+            case 7: // IMAGE
+                return `https://via.placeholder.com/150?text=Image${id}`;
+            case 8: // LINK
+                return `https://example.com/link_${id}`;
+            default:
+                return '';
+        }
+    }
+
+    function showRequirements(id) {
+        const count = randomInt(1, 10);
+        const selectedFields = [...brandFieldsData].sort(() => 0.5 - Math.random()).slice(0, count);
+        const modal = document.createElement('div');
+        modal.id = 'orderElementsModal';
+        modal.className = 'modal';
+        modal.style.zIndex = '1001';
+
+        let contentHtml = `
+        <div class="modal-content">
+            <button class="close-btn" style="float: right;" onclick="closeElementsModal()">×</button>
+            <h3>订单要素</h3>
+            <div class="elements-list" style="max-height: 400px; overflow-y: auto;">
+        `;
+        selectedFields.forEach(field => {
+            const content = generateFieldContent(field.field_type, id);
+            contentHtml += `
+            <div class="ant-form-item" style="margin-bottom: 16px;">
+                <label style="display: inline-block; width: 120px; font-weight: bold;">${field.field_name}</label>
+                <span>${
+                field.field_type === 7 ?
+                    `<img src="${content}" style="width: 50px; height: 50px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;" onclick="enlargeImage(${id}, 0, ['${content}'])">` :
+                    field.field_type === 8 ?
+                        `<a href="${content}" target="_blank">${content}</a>` :
+                        content
+            }</span>
+            </div>
+        `;
+        });
+        contentHtml += `
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-small" style="float: right;" onclick="alert('复制成功')"><i class="fa fa-copy"></i> 复制</button>
+            </div>
+        </div>
+        `;
+        modal.innerHTML = contentHtml;
+        document.body.appendChild(modal);
+        modal.style.display = 'block';
+    }
+
+    function closeElementsModal() {
+        const modal = document.getElementById('orderElementsModal');
+        if (modal) {
+            modal.remove();
+        }
     }
 
     // 渲染分页
@@ -488,6 +651,182 @@
         document.getElementById('order-details-dialog').style.display = 'flex';
     }
 
+    // 交付订单
+    function deliveryOrder(orderId) {
+        const order = allOrders.find(o => o.id.sample === orderId);
+        if (!order) return;
+
+        currentOrder = order;
+        uploadedFiles = [];
+
+        if (order.status === '已发货') {
+            viewDelivery(orderId);
+            return;
+        }
+
+        resetDeliveryModal();
+        console.log(order)
+        document.getElementById('delivery-modal').style.display = 'flex';
+        setupDeliveryModalEventListeners(false);
+    }
+
+    // 查看/编辑交付
+    function viewDelivery(orderId) {
+        const order = allOrders.find(o => o.id.sample === orderId);
+        if (!order) return;
+
+        currentOrder = order;
+        uploadedFiles = [];
+        resetDeliveryModal();
+
+        if (order.deliveryData) {
+            try {
+                const deliveryData = JSON.parse(order.deliveryData);
+                document.getElementById('deliveryContent').value = deliveryData.content || '';
+                if (deliveryData.files) {
+                    uploadedFiles = deliveryData.files.map(file => ({
+                        name: file.name,
+                        type: file.type,
+                        data: file.data,
+                        isExisting: true
+                    }));
+                    updatePreview();
+                }
+            } catch (e) {
+                console.error('解析 deliveryData 失败:', e);
+            }
+        }
+
+        document.getElementById('delivery-modal').style.display = 'flex';
+        setupDeliveryModalEventListeners(true);
+    }
+
+    // 重置交付弹窗
+    function resetDeliveryModal() {
+        document.getElementById('deliveryContent').value = '';
+        document.getElementById('fileInput').value = '';
+        document.getElementById('previewContainer').innerHTML = '';
+        uploadedFiles = [];
+    }
+
+    // 设置交付弹窗事件监听器
+    function setupDeliveryModalEventListeners(isEditing) {
+        const modal = document.getElementById('delivery-modal');
+        const closeBtn = modal.querySelector('.close');
+        const cancelBtn = modal.querySelector('.cancel-delivery-btn');
+        const submitBtn = modal.querySelector('.submit-delivery-btn');
+        const fileInput = document.getElementById('fileInput');
+
+        // 移除现有监听器以防止重复绑定
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+        const newSubmitBtn = submitBtn.cloneNode(true);
+        submitBtn.parentNode.replaceChild(newSubmitBtn, submitBtn);
+
+        const newFileInput = fileInput.cloneNode(true);
+        fileInput.parentNode.replaceChild(newFileInput, fileInput);
+
+        // 添加新监听器
+        newCloseBtn.addEventListener('click', closeDeliveryModal);
+        newCancelBtn.addEventListener('click', closeDeliveryModal);
+        newSubmitBtn.addEventListener('click', () => submitDelivery(isEditing));
+        newFileInput.addEventListener('change', handleFileUpload);
+
+        // 更新提交按钮文本
+        newSubmitBtn.textContent = isEditing ? '更新' : '发货';
+    }
+
+    // 关闭交付弹窗
+    function closeDeliveryModal() {
+        document.getElementById('delivery-modal').style.display = 'none';
+        uploadedFiles = [];
+        currentOrder = null;
+    }
+
+    // 处理文件上传
+    function handleFileUpload(event) {
+        const files = Array.from(event.target.files);
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedFiles.push({
+                    name: file.name,
+                    type: file.type,
+                    data: e.target.result,
+                    isExisting: false
+                });
+                updatePreview();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // 更新文件预览
+    function updatePreview() {
+        const previewContainer = document.getElementById('previewContainer');
+        previewContainer.innerHTML = '';
+
+        uploadedFiles.forEach((file, index) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = file.data;
+                previewItem.appendChild(img);
+            } else {
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'file-info';
+                fileInfo.textContent = file.name;
+                previewItem.appendChild(fileInfo);
+            }
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '×';
+            deleteBtn.onclick = () => {
+                uploadedFiles.splice(index, 1);
+                updatePreview();
+            };
+            previewItem.appendChild(deleteBtn);
+
+            previewContainer.appendChild(previewItem);
+        });
+    }
+
+    // 提交交付
+    function submitDelivery(isEditing) {
+        if (!currentOrder) return;
+
+        const content = document.getElementById('deliveryContent').value;
+        const deliveryData = {
+            content,
+            files: uploadedFiles.map(file => ({
+                name: file.name,
+                type: file.type,
+                data: file.data
+            }))
+        };
+
+        currentOrder.deliveryData = JSON.stringify(deliveryData);
+        if (!isEditing) {
+            currentOrder.status = '已发货';
+            currentOrder.delivery_time = new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        }
+
+        renderOrderList();
+        closeDeliveryModal();
+    }
+
+    // 初始化订单操作按钮
+    function initializeOrderActions() {
+        renderOrderList(); // 确保按钮正确渲染
+    }
+
     // 显示评价弹窗
     function showReviewModal(orderId) {
         const order = allOrders.find(o => o.id.sample === orderId);
@@ -526,6 +865,7 @@
 退款: ${order.refund_count > 0 ? `$${order.refund_amount} (${order.refund_count}件, ${order.refund_quantity}件)` : '--'}
 换货: ${order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count}件)` : '--'}
 评分: ${order.rating ? order.rating : '--'}
+交付数据: ${order.deliveryData ? JSON.stringify(JSON.parse(order.deliveryData), null, 2) : '--'}
         `;
         const blob = new Blob([content], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
@@ -587,6 +927,24 @@ ${order.exchange_records.filter(r => r.status === '已完成').map(record => `
     function viewExchangeDetails(exchangeId) {
         alert(`查看换货详情: 换货ID ${exchangeId}`);
     }
+
+    // 添加 deliveryData 到 ordersFieldConfig
+    ordersFieldConfig.deliveryData = {
+        card: false,
+        cardSq: false,
+        cardHoriz: true,
+        type: 'text',
+        label: '交付数据',
+        style: {},
+        format: (d, v) => v ? `<span style="color: #4682B4">已交付</span>` : `<span style="color: #A9A9A9">未交付</span>`,
+        sample: () => JSON.stringify({
+            content: faker.lorem.paragraph(),
+            files: [
+                { name: 'example.jpg', type: 'image/jpeg', data: getPicsumImage(300, 200, 'delivery-1') },
+                { name: 'document.pdf', type: 'application/pdf', data: 'data:application/pdf;base64,...' }
+            ]
+        })
+    };
 </script>
 </body>
 </html>

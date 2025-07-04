@@ -9,6 +9,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/file-saver/2.0.5/FileSaver.min.js"></script>
     <script src="_common.js"></script>
     <script src="_chat.js"></script>
     <script src="_img.js"></script>
@@ -29,6 +31,32 @@
         .col-paid-time { width: 10%; min-width: 100px; }
         .col-download { width: 5%; min-width: 80px; }
         .col-actions { width: 30%; min-width: 200px; }
+        .task-list .col-actions {
+            max-width: 20em !important;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        .file-link {
+            display: inline-block;
+            margin: 5px;
+            text-decoration: none;
+            color: #1890ff;
+        }
     </style>
 </head>
 <body>
@@ -77,31 +105,127 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // 模拟数据生成
+    // 模拟数据
     const orderTypes = [
-        { value: 1, label: '自动订单' },
-        { value: 2, label: '预付订单' },
-        { value: 3, label: '市场订单' }
+        { value: 1, label: '自动' },
+        { value: 2, label: '手动' },
+        { value: 3, label: '文章' },
+        { value: 4, label: '需求' }
     ];
     const statuses = [
-        { value: 0, label: '待支付', color: 'red' },
+        { value: 0, label: '确认中', color: 'gray' },
         { value: 1, label: '已支付', color: 'blue' },
         { value: 2, label: '已发货', color: 'orange' },
-        { value: 3, label: '已完成', color: 'green' },
-        { value: 4, label: '已取消', color: 'gray' }
+        { value: 3, label: '已收货', color: 'orange' },
+        { value: 4, label: '已退款', color: 'green' },
+        { value: 5, label: '已取消', color: 'gray' },
+        { value: 6, label: '超时', color: 'red' },
+        { value: 7, label: '完成', color: 'green' },
     ];
-    // 模擬 brand_field 表數據
+    const mediaItems = [
+        { type: 'image', src: 'https://via.placeholder.com/150?text=Image1', name: 'image1.jpg' },
+        { type: 'image', src: 'https://via.placeholder.com/150?text=Image2', name: 'image2.jpg' },
+        { type: 'file', src: 'https://example.com/files/document1.pdf', name: 'document1.pdf' },
+        { type: 'file', src: 'https://example.com/files/report1.docx', name: 'report1.docx' }
+    ];
+    const deliveryDescriptions = [
+        '订单已按时交付，包含所有要求的项目。',
+        '产品经过严格的质量检查，确保符合标准。',
+        '交付时间严格按照合同规定执行。',
+        '客户对交付结果表示满意，无需额外修改。',
+        '如有问题，请联系我们的支持团队。'
+    ];
+
+    // 随机选择媒体项
+    function getRandomMedia() {
+        const count = randomInt(1, 5);
+        return [...mediaItems].sort(() => 0.5 - Math.random()).slice(0, count);
+    }
+
+    // 随机生成交付说明
+    function getRandomDescriptions() {
+        const count = randomInt(2, 5);
+        return [...deliveryDescriptions].sort(() => 0.5 - Math.random()).slice(0, count);
+    }
+
+    // 下载 ZIP 文件
+    async function downloadAsZip(media, orderId) {
+        const zip = new JSZip();
+        for (let i = 0; i < media.length; i++) {
+            const item = media[i];
+            try {
+                const response = await fetch(item.src);
+                const blob = await response.blob();
+                zip.file(item.name, blob);
+            } catch (error) {
+                console.error(`Failed to fetch ${item.name}:`, error);
+            }
+        }
+        zip.generateAsync({ type: 'blob' }).then(content => {
+            saveAs(content, `order_${orderId}_content.zip`);
+        });
+    }
+
+    // 显示查看弹窗
+    function viewDetails(id) {
+        const modal = document.createElement('div');
+        modal.id = 'viewDetailsModal';
+        modal.className = 'modal';
+        modal.style.zIndex = '1001';
+
+        const media = getRandomMedia();
+        const descriptions = getRandomDescriptions();
+
+        let contentHtml = `
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeDetailsModal()">×</button>
+            <h3>订单详情</h3>
+            <div class="media-list" style="margin-bottom: 16px;">
+        `;
+        media.forEach(item => {
+            if (item.type === 'image') {
+                contentHtml += `<img src="${item.src}" alt="${item.name}" class="thumbnail" onclick="enlargeImage(${id}, 0, ['${item.src}'])">`;
+            } else {
+                contentHtml += `<a href="${item.src}" class="file-link" target="_blank">${item.name}</a>`;
+            }
+        });
+        contentHtml += `</div><div class="description-list">`;
+        descriptions.forEach(desc => {
+            contentHtml += `<p style="margin-bottom: 8px;">${desc}</p>`;
+        });
+        contentHtml += `
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="ant-btn ant-btn-primary" onclick="downloadAsZip(${JSON.stringify(media)}, ${id})" style="margin-right: 8px;">下载 ZIP</button>
+                <button type="button" class="ant-btn" onclick="closeDetailsModal()">关闭</button>
+            </div>
+        </div>
+        `;
+        modal.innerHTML = contentHtml;
+        document.body.appendChild(modal);
+        modal.style.display = 'flex';
+    }
+
+    // 关闭查看弹窗
+    function closeDetailsModal() {
+        const modal = document.getElementById('viewDetailsModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    // 模拟 brand_field 表数据
     const fieldNameOptions = [
-        { name: 'profile_link', type: 8 }, // LINK
-        { name: 'followers', type: 1 },    // NUMBER
-        { name: 'reviews', type: 5 },      // TEXTAREA
-        { name: 'comments', type: 0 },     // TEXT
-        { name: 'star', type: 1 },         // NUMBER
-        { name: 'bio', type: 5 },          // TEXTAREA
-        { name: 'rating', type: 1 },       // NUMBER
-        { name: 'posts', type: 1 },        // NUMBER
-        { name: 'likes', type: 1 },        // NUMBER
-        { name: 'shares', type: 1 }        // NUMBER
+        { name: 'profile_link', type: 8 },
+        { name: 'followers', type: 1 },
+        { name: 'reviews', type: 5 },
+        { name: 'comments', type: 0 },
+        { name: 'star', type: 1 },
+        { name: 'bio', type: 5 },
+        { name: 'rating', type: 1 },
+        { name: 'posts', type: 1 },
+        { name: 'likes', type: 1 },
+        { name: 'shares', type: 1 }
     ];
     const brandFieldsData = fieldNameOptions.map((field, index) => ({
         id: index + 1,
@@ -109,42 +233,29 @@
         field_type: field.type
     }));
 
-    // 字段類型映射
     const fieldTypeMap = {
         0: '文本',
-        1: '數字',
+        1: '数字',
         2: '日期',
         3: '下拉',
-        4: '復選框',
+        4: '复选框',
         5: '多行文本',
-        6: '單選',
-        7: '圖片',
-        8: '鏈接'
+        6: '单选',
+        7: '图片',
+        8: '链接'
     };
     const coupons = ['SAVE10', 'DISCOUNT20', 'FREESHIP', '', 'WELCOME5'];
 
-
-    // 隨機生成字段內容
     function generateFieldContent(fieldType, id) {
         switch (fieldType) {
-            case 0: // TEXT
-                return `Text_${id}_${Math.random().toString(36).substring(2, 8)}`;
-            case 1: // NUMBER
-                return randomInt(1, 1000);
-            case 2: // DATE
-                return moment().subtract(randomInt(0, 365), 'days').format('YYYY-MM-DD');
-            case 3: // SELECT
-            case 4: // CHECKBOX
-            case 6: // RADIO
-                return ['選項1', '選項2', '選項3'][randomInt(0, 2)];
-            case 5: // TEXTAREA
-                return `Description_${id}_${Math.random().toString(36).substring(2, 10)}`;
-            case 7: // IMAGE
-                return `https://via.placeholder.com/150?text=Image${id}`;
-            case 8: // LINK
-                return `https://example.com/link_${id}`;
-            default:
-                return '';
+            case 0: return `Text_${id}_${Math.random().toString(36).substring(2, 8)}`;
+            case 1: return randomInt(1, 1000);
+            case 2: return moment().subtract(randomInt(0, 365), 'days').format('YYYY-MM-DD');
+            case 3: case 4: case 6: return ['选项1', '选项2', '选项3'][randomInt(0, 2)];
+            case 5: return `Description_${id}_${Math.random().toString(36).substring(2, 10)}`;
+            case 7: return `https://via.placeholder.com/150?text=Image${id}`;
+            case 8: return `https://example.com/link_${id}`;
+            default: return '';
         }
     }
 
@@ -159,9 +270,9 @@
         let contentHtml = `
         <div class="modal-content">
             <button class="close-btn" onclick="closeElementsModal()">×</button>
-            <h3>訂單要素</h3>
+            <h3>订单要素</h3>
             <div class="elements-list" style="max-height: 400px; overflow-y: auto;">
-    `;
+        `;
         selectedFields.forEach(field => {
             const content = generateFieldContent(field.field_type, id);
             contentHtml += `
@@ -175,21 +286,20 @@
                         content
             }</span>
             </div>
-        `;
+            `;
         });
         contentHtml += `
             </div>
             <div class="modal-buttons">
-                <button type="button" class="ant-btn" onclick="closeElementsModal()">關閉</button>
+                <button type="button" class="ant-btn" onclick="closeElementsModal()">关闭</button>
             </div>
         </div>
-    `;
+        `;
         modal.innerHTML = contentHtml;
         document.body.appendChild(modal);
-        modal.style.display = 'block';
+        modal.style.display = 'flex';
     }
 
-    // 關閉要素彈窗
     function closeElementsModal() {
         const modal = document.getElementById('orderElementsModal');
         if (modal) {
@@ -218,9 +328,7 @@
             { name: 'coupon_discount', generator: () => randomInt(0, 20) / 100 },
             {
                 name: 'amount',
-                generator: (id, fields) => {
-                    return randomInt(100, 1000).toFixed(2);
-                }
+                generator: (id, fields) => randomInt(100, 1000).toFixed(2)
             },
             { name: 'original_amount', generator: (id, _, original_price, quantity) => (parseFloat(original_price) * quantity).toFixed(2) },
             { name: 'commission_amount', generator: (id, _, amount) => (parseFloat(amount) * randomInt(5, 15) / 100).toFixed(2) },
@@ -234,7 +342,6 @@
             { name: 'replacement_quantity', generator: () => randomInt(0, 2) }
         ],
         actionButtons: [
-            // { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改类型', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'orders_type', label: '订单类型', type: 'select', options: orderTypes } },
             { label: '批量修改状态', className: 'ant-btn ant-btn-default', color: '#52c41a', field: { name: 'status', label: '状态', type: 'select', options: statuses.map(s => ({ value: s.value, label: s.label })) } }
@@ -248,9 +355,7 @@
             { name: 'status', label: '状态', className: 'col-status', formatter: v => `<span class="ant-tag ant-tag-${statuses.find(s => s.value === v)?.color || 'gray'}">${statuses.find(s => s.value === v)?.label || '未知'}</span>` },
             { name: 'price', label: '单价', className: 'col-price', formatter: v => `$${v}` },
             { name: 'quantity', label: '数量', className: 'col-quantity' },
-            { name: 'amount', label: '总金额', className: 'col-amount', formatter: (v) =>{
-                return isNaN(v) ? '-' : `$${v}`
-            } },
+            { name: 'amount', label: '总金额', className: 'col-amount', formatter: v => isNaN(v) ? '-' : `$${v}` },
             { name: 'coupon', label: '优惠券', className: 'col-coupon', formatter: v => v || '无' },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'paid_time', label: '支付时间', className: 'col-paid-time', formatter: v => v ? moment.unix(v).format('YYYY-MM-DD HH:mm:ss') : '-' },
@@ -258,7 +363,14 @@
                 name: 'download',
                 label: '下载',
                 className: 'col-download',
-                formatter: (_, item) => item.status === 3 ? `<a href="/download/order_${item.id}.pdf" target="_blank">下载</a>` : '-'
+                formatter: (_, item) => {
+                    if ([2, 3, 7].includes(item.status)) {
+                        return randomInt(0, 1) ?
+                            `<a href="/download/order_${item.id}.pdf" target="_blank">下载</a>` :
+                            `<button class="ant-btn ant-btn-default" onclick="viewDetails(${item.id})">查看</button>`;
+                    }
+                    return '-';
+                }
             },
             {
                 name: 'actions',
@@ -266,7 +378,7 @@
                 className: 'col-actions',
                 formatter: (_, item) => `
                     ${randomInt(0, 1) ? `<button class="ant-btn ant-btn-primary" onclick="alert('跳转到工单查看页面')" style="margin-right: 8px;">工单</button>` : ''}
-                    <button class="ant-btn" style="background-color: rgb(82, 196, 26); color: rgb(255, 255, 255); margin-right: 0px;" onclick="viewElements(${item.id})">要素</button>
+                    <button class="ant-btn" style="background-color: rgb(82, 196, 26); color: rgb(255, 255, 255); margin-right: 8px;" onclick="viewElements(${item.id})">要素</button>
                     <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
                     <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})" style="margin-right: 8px;">删除</button>
                 `
@@ -328,7 +440,6 @@
         ]
     };
 
-    // 支持 Enter 键触发查询
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
             applyFilters();
