@@ -1,7 +1,7 @@
 const stickyHeader = document.getElementById('stickyHeader');
 const stickyHeaderHeight = stickyHeader.offsetHeight;
 const pageContent = document.querySelector('.page-content');
-const filterContainer = document.querySelector('.filter-container');
+const pageFix = document.querySelector('.page-fix-box');
 const pageHead = document.querySelector('.page-head');
 const pageHeadHeight = pageHead.offsetHeight;
 const footer = document.getElementsByTagName('footer')[0];
@@ -35,10 +35,10 @@ function updateStickyHeader() {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     if (scrollTop > pageHeadHeight) {
         stickyHeader.classList.add('is-sticky');
-        filterContainer.classList.toggle('is-sticky', true);
+        pageFix.classList.toggle('is-sticky', true);
     } else {
         stickyHeader.classList.remove('is-sticky');
-        filterContainer.classList.toggle('is-sticky', false);
+        pageFix.classList.toggle('is-sticky', false);
     }
     adjustFilterPosition();
 }
@@ -46,8 +46,9 @@ updateStickyHeader();
 
 // 动态调整过滤器位置
 function adjustFilterPosition() {
-
-    if (!filterContainer) return;
+    const body = document.getElementsByTagName('body')[0];
+    if (body.offsetWidth < 768) return;
+    if (!pageFix) return;
     const headIsSticky = stickyHeader.classList.contains('is-sticky');
     // 计算页面头部所有固定元素的总高度
     let totalHeight = stickyHeaderHeight;
@@ -57,13 +58,13 @@ function adjustFilterPosition() {
     // 设置过滤器的位置和高度
     if (!headIsSticky) {
         // 非sticky状态：相对于page-content定位
-        Object.assign(filterContainer.style, {
+        Object.assign(pageFix.style, {
             top: '0px',
             maxHeight: `calc(100vh - ${totalHeight}px)` // 添加max-height
         });
     } else {
         // sticky状态：固定定位
-        Object.assign(filterContainer.style, {
+        Object.assign(pageFix.style, {
             top: totalHeight + 'px',
             maxHeight: `calc(100vh - ${totalHeight + footerHeight}px)` // 添加max-height
         });

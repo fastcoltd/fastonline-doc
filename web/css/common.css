@@ -26,18 +26,14 @@ body {
     background-color: #fff;
     color: #000;
     overflow: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: #C5C5C5 transparent;
     position: relative;
     /* 支持刘海屏安全区域 - 使用!important确保优先级 */
     padding-top: env(safe-area-inset-top, 0) !important;
     padding-left: 0;
     padding-right: 0;
     display: block;
-}
-
-body::-webkit-scrollbar {
-    display: none;
 }
 
 /* 当弹窗显示时，阻止body滚动 */
@@ -1126,6 +1122,23 @@ footer {
     100% {
         transform: rotate(360deg);
     }
+}
+
+.page-fix-box {
+    position: absolute;
+    top: 0;
+    /* 调整top值，考虑所有固定元素 */
+    left: 0;
+    /* height: auto; 移除这行，让JavaScript控制高度 */
+    /* 调整高度，为header、top-menu、page-header留出空间 */
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #C5C5C5 transparent;
+}
+
+.page-fix-box.is-sticky {
+    position: fixed;
+    left: calc((100vw - var(--container-width)) / 2);
 }
 
 .page-filterresult-sort-box {
