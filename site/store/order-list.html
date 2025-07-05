@@ -372,7 +372,10 @@
             const exchangeDisplay = order.exchange_count > 0 ? `${order.exchange_quantity} (${order.exchange_count})` : '--';
             const ratingDisplay = order.rating ? `${order.rating}` : '--';
             const isManual = orderTypeInt === 2 || orderTypeInt === 4;
-            const isShipped = order.status !== '已发货' && order.status !== '已完成' && order.status !== '已取消'
+            const isItemDemands = [1,2,4].includes(orderTypeInt)
+            const isShipped = order.status == '已发货' || order.status == '已收货' || order.status == '已完成'
+            const canCancel = order.status == '已付款' && isItemDemands
+            order.has_ticket = order.status == '已发货' || order.status == '已收货' || order.status == '已完成' || order.status == '超时'
             return `
                 <tr data-order-id="${order.id.sample}">
                     <td>${order.id.sample}</td>
@@ -387,11 +390,12 @@
                     <td class="aftersales">${exchangeDisplay}${order.exchange_count > 0 && !order.posts_id ? `<button class="download-aftersales-btn" onclick="downloadExchange(${order.id.sample})"><i class="fas fa-download"></i></button>` : ''}</td>
                     <td>${ratingDisplay}${order.rating ? `<button class="review-btn" onclick="showReviewModal(${order.id.sample})"><i class="fas fa-star"></i></button>` : ''}</td>
                     <td class="actions">
-                        ${isManual && isShipped ? `<button class="btn-blue-small" onclick="deliveryOrder(${order.id.sample})" title="Shipping Order">${Math.random() < 0.9 ? '<span class="red-dot"></span>' : ''}<i class="fas fa-check-double"></i></button>` : ''}
-                        ${isManual && !isShipped ? `<button class="btn-blue-small view-delivery-btn" onclick="viewDelivery(${order.id.sample})" title="View Delivery"><i class="fas fa-box-open"></i></button>` : ''}
-                        <button class="btn-blue-small" onclick="showOrderDetails(${order.id.sample})" title="View Order"><i class="fas fa-eye"></i></button>
+                        ${isItemDemands && isManual && !isShipped ? `<button class="btn-blue-small" onclick="deliveryOrder(${order.id.sample})" title="Shipping Order">${Math.random() < 0.9 ? '<span class="red-dot"></span>' : ''}<i class="fas fa-check-double"></i></button>` : ''}
+                        ${isItemDemands && isManual && isShipped ? `<button class="btn-blue-small view-delivery-btn" onclick="viewDelivery(${order.id.sample})" title="View Delivery"><i class="fas fa-box-open"></i></button>` : ''}
                         ${order.has_ticket ? `<button class="btn-blue-small" onclick="openChatDialog(${order.id.sample})"><i class="fas fa-paper-plane"></i>${Math.random() < 0.9 ? '<span class="red-dot"></span>' : ''}</button>` : ''}
-                        <button class="btn-blue-small" onclick="downloadOrder(${order.id.sample})" title="Download Order All Data"><i class="fas fa-download"></i></button>
+                        ${isShipped ? `<button class="btn-blue-small" onclick="downloadOrder(${order.id.sample})" title="Download Order All Data"><i class="fas fa-download"></i></button>` : ``}
+                        ${isItemDemands && canCancel ? `<button class="btn-blue-small" onclick="cancelOrder(${order.id.sample})" title="Clsoe Download Order"><i class="fas fa-times"></i></button>` : ``}
+                        <button class="btn-blue-small" onclick="showOrderDetails(${order.id.sample})" title="View Order"><i class="fas fa-eye"></i></button>
                     </td>
                 </tr>
             `;
@@ -820,6 +824,18 @@
 
         renderOrderList();
         closeDeliveryModal();
+    }
+
+
+    function cancelOrder(orderId){
+        const order = allOrders.find(o => o.id.sample === orderId);
+        if (!order) return;
+
+        if (order && confirm('确认 取消该订单吗，取消后资金将 原路退回到买家账户？')) {
+            order.status = '已取消';
+            alert(`订单 ${orderId} 取消完成.`)
+            renderOrderList();
+        }
     }
 
     // 初始化订单操作按钮

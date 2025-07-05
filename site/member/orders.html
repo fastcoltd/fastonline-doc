@@ -151,7 +151,7 @@
                 let actions = '';
                 const hasTicketRedDot = Math.random() > 0.6 && !redDotState.ticket[item.id.sample];
                 const hasCommentRedDot = Math.random() > 0.8 && !redDotState.comment[item.id.sample];
-                const hasConfirmRedDot = Math.random() > 0.8 && !redDotState.confirm[item.id.sample];
+                const hasConfirmRedDot = Math.random() > 0.5 && !redDotState.confirm[item.id.sample];
                 actions += Math.random() > 0.5 ? `` : `
                     <button class="btn-small" style="color: ${randomInt(0, 1) > 0 ? '' : 'red'}" onclick="raiseTicket(${item.id.sample}); removeRedDot(this,${item.id.sample}, 'ticket')" title="Ticket">
                         <i class="${randomInt(0, 1) > 0 ? 'far' : 'fa'} fa-paper-plane"></i>
@@ -593,7 +593,7 @@
 
         requirementInfo.style.display = "none"
         if (order.orders_type.sample == 2){
-            requirementHtml = `<p>订单要素：<span style="float: right;"><button class="btn-small" onclick="alert('复制成功')"><i class="fa fa-copy"></i> 复制</button></span></p>`
+            requirementHtml = `<p>订单要素：（订单提交后5分钟内可编辑）<span style="float: right;"><button class="btn-small" onclick="alert('复制成功')"><i class="fa fa-copy"></i> 复制</button></span></p>`
             const selectedFields = [...brandFieldsData].sort(() => 0.5 - Math.random()).slice(0, randomInt(1,10));
             selectedFields.forEach(field => {
                 const content = generateFieldContent(field.field_type);
@@ -609,6 +609,7 @@
                     </p>
                 `;
             });
+            requirementHtml += Math.random() < 0.2 ? `` : `<p>&nbsp;&nbsp;<span style="float: right"><b style="color: red;">（订单提交后5分钟内可编辑）</b><button class="btn-small" onclick="alert('弹出弹窗进行编辑')"><i class="fa fa-edit"></i> 编辑</button></span></p>`
 
             requirementInfo.style.display = "block"
             requirementInfo.innerHTML = requirementHtml;
