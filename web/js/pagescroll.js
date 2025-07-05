@@ -4,7 +4,7 @@ const pageContent = document.querySelector('.page-content');
 const filterContainer = document.querySelector('.filter-container');
 const pageHead = document.querySelector('.page-head');
 const pageHeadHeight = pageHead.offsetHeight;
-const footer = document.getElementsByTagName('footer');
+const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
 // 滚动监听事件
 const handleScroll = debounce(function () {
@@ -49,23 +49,23 @@ function adjustFilterPosition() {
 
     if (!filterContainer) return;
     const headIsSticky = stickyHeader.classList.contains('is-sticky');
-    const pageContent = document.querySelector('.page-content');
-    const pageContentHeight = pageContent.offsetTop;
     // 计算页面头部所有固定元素的总高度
     let totalHeight = stickyHeaderHeight;
     if (pageHead && !headIsSticky) {
         totalHeight += pageHeadHeight;
     }
-    // 设置过滤器的top位置
+    // 设置过滤器的位置和高度
     if (!headIsSticky) {
+        // 非sticky状态：相对于page-content定位
         Object.assign(filterContainer.style, {
-            top: 0,
-            height: `calc(100vh - ${totalHeight + footerHeight}px)`
+            top: '0px',
+            maxHeight: `calc(100vh - ${totalHeight}px)` // 添加max-height
         });
-        return;
+    } else {
+        // sticky状态：固定定位
+        Object.assign(filterContainer.style, {
+            top: totalHeight + 'px',
+            maxHeight: `calc(100vh - ${totalHeight + footerHeight}px)` // 添加max-height
+        });
     }
-    Object.assign(filterContainer.style, {
-        top: totalHeight + 'px',
-        height: `calc(100vh - ${totalHeight + footerHeight}px)`
-    });
 }
