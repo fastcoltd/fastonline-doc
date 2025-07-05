@@ -702,10 +702,12 @@ function generateOrderFields() {
         if (!selectedTypes.includes(typeIndex)) {
             selectedTypes.push(typeIndex);
             const fieldName = faker.lorem.word();
+            const isRequired = Math.random() < 0.5; // 50% chance to be required
             fields.push({
                 name: fieldName,
                 type: typeIndex,
-                label: `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} (${fieldTypeMap[typeIndex]})`
+                label: `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} (${fieldTypeMap[typeIndex]})`,
+                required: isRequired
             });
         }
     }
@@ -716,28 +718,29 @@ function generateOrderFields() {
 // Generate HTML for order fields form
 function generateOrderFieldsForm(fields, itemName, quantity, subtotal, saveAmount, orderId) {
     let formHtml = `
-        <h3 class="popup-title">Add Requirements for ${itemName}</h3>
+        <h3 class="popup-title">Add Order Requirements for ${itemName}</h3>
         <div class="order-fields-content" style="margin-bottom: 1.5em;">
     `;
 
     fields.forEach((field, index) => {
         formHtml += `<div class="popup-row" style="margin-bottom: 1em;">`;
-        formHtml += `<label class="popup-label">${field.label}:</label>`;
+        formHtml += `<label class="popup-label">${field.label}${field.required ? '<span style="color: red;"> *</span>' : ''}:</label>`;
         formHtml += `<div class="popup-value">`;
 
         switch (field.type) {
             case 0: // Text
-                formHtml += `<input type="text" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;">`;
+                formHtml += `<input type="text" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;" ${field.required ? 'required' : ''}>`;
                 break;
             case 1: // Number
-                formHtml += `<input type="number" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;" min="0">`;
+                formHtml += `<input type="number" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;" min="0" ${field.required ? 'required' : ''}>`;
                 break;
             case 2: // Date
-                formHtml += `<input type="date" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;">`;
+                formHtml += `<input type="date" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;" ${field.required ? 'required' : ''}>`;
                 break;
             case 3: // Dropdown
                 formHtml += `
-                    <select id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;">
+                    <select id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;" ${field.required ? 'required' : ''}>
+                        <option value="">Select an option</option>
                         ${Array.from({length: 3}, () => `<option value="${faker.lorem.word()}">${faker.lorem.word()}</option>`).join('')}
                     </select>
                 `;
@@ -745,20 +748,20 @@ function generateOrderFieldsForm(fields, itemName, quantity, subtotal, saveAmoun
             case 4: // Checkbox
                 formHtml += `
                     <label style="display: flex; align-items: center;">
-                        <input type="checkbox" id="order-field-${index}" style="margin-right: 0.5em;">
+                        <input type="checkbox" id="order-field-${index}" style="margin-right: 0.5em;" ${field.required ? 'required' : ''}>
                         ${faker.lorem.word()}
                     </label>
                 `;
                 break;
             case 5: // Textarea
-                formHtml += `<textarea id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em; min-height: 5em;"></textarea>`;
+                formHtml += `<textarea id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em; min-height: 4em;" ${field.required ? 'required' : ''}></textarea>`;
                 break;
             case 6: // Radio
                 formHtml += `
                     <div style="display: flex; flex-direction: column; gap: 0.5em;">
                         ${Array.from({length: 3}, () => `
                             <label style="display: flex; align-items: center;">
-                                <input type="radio" name="order-field-${index}" value="${faker.lorem.word()}" style="margin-right: 0.5em;">
+                                <input type="radio" name="order-field-${index}" value="${faker.lorem.word()}" style="margin-right: 0.5em;" ${field.required ? 'required' : ''}>
                                 ${faker.lorem.word()}
                             </label>
                         `).join('')}
@@ -766,10 +769,10 @@ function generateOrderFieldsForm(fields, itemName, quantity, subtotal, saveAmoun
                 `;
                 break;
             case 7: // Image
-                formHtml += `<input type="file" id="order-field-${index}" accept="image/*" class="ant-input" style="width: 100%; padding: 0.5em;">`;
+                formHtml += `<input type="file" id="order-field-${index}" accept="image/*" class="ant-input" style="width: 100%; padding: 0.5em;" ${field.required ? 'required' : ''}>`;
                 break;
             case 8: // Link
-                formHtml += `<input type="url" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;" placeholder="https://">`;
+                formHtml += `<input type="url" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;" placeholder="https://" ${field.required ? 'required' : ''}>`;
                 break;
         }
         formHtml += `</div></div>`;
@@ -777,7 +780,7 @@ function generateOrderFieldsForm(fields, itemName, quantity, subtotal, saveAmoun
 
     formHtml += `
         </div>
-        <button id="submit-order-fields" class="btn-orange-solid-large" style="width: 100%;">Submit Order Details</button>
+        <button id="submit-order-fields" class="btn-orange-solid-large" style="width: 100%;">Submit Order</button>
     `;
 
     return { html: formHtml, fields, itemName, quantity, subtotal, saveAmount, orderId };
@@ -786,13 +789,13 @@ function generateOrderFieldsForm(fields, itemName, quantity, subtotal, saveAmoun
 // Generate confirmation popup for order fields
 function generateOrderFieldsConfirmation(fields, itemName, quantity, subtotal, saveAmount, orderId) {
     let confirmationHtml = `
-        <h2 class="popup-title">Confirm Order Details</h2>
+        <h3 class="popup-title">Confirm Order Requirements</h3>
         <div class="order-confirmation-content" style="margin-bottom: 1.5em;">
             <p><strong>Product:</strong> ${itemName}</p>
             <p><strong>Quantity:</strong> ${quantity}</p>
             <p><strong>Subtotal:</strong> $${subtotal}</p>
             ${saveAmount !== '0.00' ? `<p><strong>Save:</strong> $${saveAmount}</p>` : ''}
-            <h3 style="margin: 1em 0 0.5em;">Order Details:</h3>
+            <h3 style="margin: 1em 0 0.5em;">Order Requirements:</h3>
     `;
 
     fields.forEach((field, index) => {
@@ -814,7 +817,7 @@ function generateOrderFieldsConfirmation(fields, itemName, quantity, subtotal, s
 
         confirmationHtml += `
             <div class="popup-row" style="margin-bottom: 0.5em;">
-                <label class="popup-label">${field.label}:</label>
+                <label class="popup-label">${field.label}${field.required ? '<span style="color: red;"> *</span>' : ''}:</label>
                 <span class="popup-value">${value}</span>
             </div>
         `;
@@ -1043,7 +1046,7 @@ function generateShoppingPopup(item, cardElement) {
 
         setTimeout(() => {
             buyButton.classList.remove('loading');
-            buyButton.disabled = false; // 恢复按钮状态
+            buyButton.disabled = false;
             hideModal('shopping-popup');
 
             // 50% 概率显示订单要素弹窗
@@ -1054,35 +1057,67 @@ function generateShoppingPopup(item, cardElement) {
 
                 // Submit order fields
                 document.getElementById('submit-order-fields').addEventListener('click', () => {
-                    const confirmationData = generateOrderFieldsConfirmation(fields, itemName, quantity, subtotal, saveAmount, orderId);
-                    showModal('order-confirmation-popup', confirmationData.html, { className: 'order-confirmation-popup', style: { maxWidth: '30em', padding: '1.5em' } });
-
-                    // Confirm order
-                    document.getElementById('confirm-order').addEventListener('click', () => {
-                        hideModal('order-confirmation-popup');
-                        hideModal('order-fields-popup');
-                        const orderPopupContent = `
-                            <h2 class="popup-title">Order NO #${orderId}</h2>
-                            <div class="order-content">
-                                <p>Order placed successfully!</p>
-                                <p>Product: ${itemName}</p>
-                                <p>Quantity: ${quantity}</p>
-                                <p>Amount: <span class="price">$${subtotal}</span></p>
-                                ${saveAmount !== '0.00' ? `<p>Save: <span class="save">$${saveAmount}</span></p>` : ''}
-                            </div>
-                            <div class="order-buttons">
-                                <a href="/site/member/orders.html?id=${orderId}" class="btn-medium"><i class="fas fa-eye"></i> View Order</a>
-                                <a href="/download/order_${itemName.replace(/\s+/g, '_')}_${quantity}_items.txt" download="${itemName}_${quantity}_items.txt" class="btn-medium"><i class="fas fa-download"></i> Download</a>
-                            </div>
-                        `;
-                        showModal('order-popup', orderPopupContent, { className: 'order-popup', style: { maxWidth: '30em', padding: '1.5em' } });
+                    // Validate required fields
+                    let isValid = true;
+                    fields.forEach((field, index) => {
+                        const inputElement = document.getElementById(`order-field-${index}`);
+                        if (field.required) {
+                            if (field.type === 4) { // Checkbox
+                                if (!inputElement.checked) {
+                                    isValid = false;
+                                    alert(`Please check the required field: ${field.label}`);
+                                }
+                            } else if (field.type === 6) { // Radio
+                                const selectedRadio = document.querySelector(`input[name="order-field-${index}"]:checked`);
+                                if (!selectedRadio) {
+                                    isValid = false;
+                                    alert(`Please select an option for the required field: ${field.label}`);
+                                }
+                            } else if (field.type === 7) { // Image
+                                if (inputElement.files.length === 0) {
+                                    isValid = false;
+                                    alert(`Please upload an image for the required field: ${field.label}`);
+                                }
+                            } else {
+                                if (!inputElement.value) {
+                                    isValid = false;
+                                    alert(`Please fill in the required field: ${field.label}`);
+                                }
+                            }
+                        }
                     });
 
-                    // Cancel and return to form
-                    document.getElementById('cancel-order').addEventListener('click', () => {
-                        hideModal('order-confirmation-popup');
-                        showModal('order-fields-popup', formData.html, { className: 'order-fields-popup', style: { maxWidth: '30em', padding: '1.5em' } });
-                    });
+                    if (isValid) {
+                        const confirmationData = generateOrderFieldsConfirmation(fields, itemName, quantity, subtotal, saveAmount, orderId);
+                        showModal('order-confirmation-popup', confirmationData.html, { className: 'order-confirmation-popup', style: { maxWidth: '30em', padding: '1.5em' } });
+
+                        // Confirm order
+                        document.getElementById('confirm-order').addEventListener('click', () => {
+                            hideModal('order-fields-popup');
+                            hideModal('order-confirmation-popup');
+                            const orderPopupContent = `
+                                <h2 class="popup-title">Order NO #${orderId}</h2>
+                                <div class="order-content">
+                                    <p>Order placed successfully!</p>
+                                    <p>Product: ${itemName}</p>
+                                    <p>Quantity: ${quantity}</p>
+                                    <p>Amount: <span class="price">$${subtotal}</span></p>
+                                    ${saveAmount !== '0.00' ? `<p>Save: <span class="save">$${saveAmount}</span></p>` : ''}
+                                </div>
+                                <div class="order-buttons">
+                                    <a href="/site/member/orders.html?id=${orderId}" class="btn-medium"><i class="fas fa-eye"></i> View Order</a>
+                                    <a href="/download/order_${itemName.replace(/\s+/g, '_')}_${quantity}_items.txt" download="${itemName}_${quantity}_items.txt" class="btn-medium"><i class="fas fa-download"></i> Download</a>
+                                </div>
+                            `;
+                            showModal('order-popup', orderPopupContent, { className: 'order-popup', style: { maxWidth: '30em', padding: '1.5em' } });
+                        });
+
+                        // Cancel and return to form
+                        document.getElementById('cancel-order').addEventListener('click', () => {
+                            hideModal('order-confirmation-popup');
+                            showModal('order-fields-popup', formData.html, { className: 'order-fields-popup', style: { maxWidth: '30em', padding: '1.5em' } });
+                        });
+                    }
                 });
             } else {
                 // 原流程
