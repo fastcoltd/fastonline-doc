@@ -48,28 +48,27 @@ function adjustFilterPosition() {
     const headIsSticky = stickyHeader.classList.contains('is-sticky');
     if (!pageFix) return;
     if (body.offsetWidth < 768) {
-        const pageFixStyle = window.getComputedStyle(pageFix);
-        if (pageFixStyle.display === 'none') {
+        const pageFixVisble = pageFix.dataset.visible;
+        if (!pageFixVisble) {
             return;
         }
         if (headIsSticky) {
             Object.assign(pageFix.style, {
                 position: 'fixed',
                 left: 16 + 'px',
-                top: stickyHeaderHeight + 'px',
-                maxHeight: `calc(100vh - ${stickyHeaderHeight}px)`
+                top: stickyHeaderHeight + 20 + 'px',
+                maxHeight: `calc(100vh - ${stickyHeaderHeight + 40}px)`
             });
             return;
         }
         Object.assign(pageFix.style, {
             position: 'relative',
             left: 0,
-            top: 0,
-            maxHeight: `calc(100vh - ${stickyHeaderHeight + pageHeadHeight}px)`
+            top: 20 + 'px',
+            maxHeight: `calc(100vh - ${stickyHeaderHeight + pageHeadHeight + 40}px)`
         });
         return;
     };
-
     pageFix.classList.toggle('is-sticky', headIsSticky);
     // 计算页面头部所有固定元素的总高度
     let totalHeight = stickyHeaderHeight;
@@ -80,14 +79,14 @@ function adjustFilterPosition() {
     if (!headIsSticky) {
         // 非sticky状态：相对于page-content定位
         Object.assign(pageFix.style, {
-            top: '0px',
-            maxHeight: `calc(100vh - ${totalHeight}px)` // 添加max-height
+            top: '20px',
+            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
         });
     } else {
         // sticky状态：固定定位
         Object.assign(pageFix.style, {
-            top: totalHeight + 'px',
-            maxHeight: `calc(100vh - ${totalHeight + footerHeight}px)` // 添加max-height
+            top: totalHeight + 20 + 'px',
+            maxHeight: `calc(100vh - ${totalHeight + footerHeight + 40}px)` // 添加max-height
         });
     }
 }

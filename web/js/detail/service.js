@@ -1,7 +1,6 @@
 // 博客文章详情页面交互功能
 document.addEventListener('DOMContentLoaded', function () {
-    const link = new LinkRef('toc-item', 'post-detail-section', true, 'post-detail-container');
-    updateHeaderHeight();
+    const link = new LinkRef('toc-item', 'post-detail-section');
     const menu = document.querySelector('.detail-page-menu');
     const menuContainer = document.querySelector('.table-of-container');
     menu.addEventListener('click', function (event) {
@@ -21,14 +20,4 @@ document.addEventListener('DOMContentLoaded', function () {
             body.classList.toggle('modal-open', false);
         }
     });
-
-    window.addEventListener('resize', function () {
-        updateHeaderHeight();
-    })
 });
-
-function updateHeaderHeight() {
-    const stickyHeader = document.getElementById('stickyHeader');
-    const pageHeaderHeight = stickyHeader ? stickyHeader.offsetHeight : 0;
-    document.documentElement.style.setProperty('--page-header-height', `${pageHeaderHeight}px`);
-}

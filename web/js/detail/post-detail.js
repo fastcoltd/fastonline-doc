@@ -175,8 +175,7 @@ function createItemElement(item) {
 // 博客文章详情页面交互功能
 document.addEventListener('DOMContentLoaded', function () {
     const relateItems = new Carousel('best-items', 20);
-    const link = new LinkRef('toc-item', 'post-detail-section', true, 'post-detail-container');
-    updateHeaderHeight();
+    const link = new LinkRef('toc-item', 'post-detail-section');
     const reviews = document.querySelectorAll('.post-detail-review-item');
     reviews.forEach(element => {
         const reviewer = element.querySelector('.post-detail-reiviewer-box');
@@ -214,14 +213,4 @@ document.addEventListener('DOMContentLoaded', function () {
             body.classList.toggle('modal-open', false);
         }
     });
-
-    window.addEventListener('resize', function () {
-        updateHeaderHeight();
-    })
 });
-
-function updateHeaderHeight() {
-    const stickyHeader = document.getElementById('stickyHeader');
-    const pageHeaderHeight = stickyHeader ? stickyHeader.offsetHeight : 0;
-    document.documentElement.style.setProperty('--page-header-height', `${pageHeaderHeight}px`);
-}
