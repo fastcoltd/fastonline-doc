@@ -92,12 +92,22 @@
 .filter-container {
     background-color: #fff;
     width: 40.5rem;
+    height: auto;
+    /* 调整高度，为header、top-menu、page-header留出空间 */
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #C5C5C5 transparent;
     display: flex;
     flex-direction: column;
-    position: sticky;
+    position: absolute;
+    top: 0;
+    /* 调整top值，考虑所有固定元素 */
+    left: 0;
+}
+
+.filter-container.is-sticky {
+    position: fixed;
+    left: calc((100vw - var(--container-width)) / 2);
 }
 
 @media screen and (max-width: 768px) {
