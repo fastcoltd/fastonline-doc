@@ -679,12 +679,170 @@ function resetPassword() {
     }
 }
 
+// Generate random order fields for the form
+function generateOrderFields() {
+    const fieldTypeMap = {
+        0: '文本',
+        1: '数字',
+        2: '日期',
+        3: '下拉',
+        4: '复选框',
+        5: '多行文本',
+        6: '单选',
+        7: '图片',
+        8: '链接'
+    };
+    const numFields = randomInt(3, 5);
+    const selectedTypes = [];
+    const fields = [];
+
+    // Ensure unique field types
+    while (selectedTypes.length < numFields) {
+        const typeIndex = randomInt(0, 8);
+        if (!selectedTypes.includes(typeIndex)) {
+            selectedTypes.push(typeIndex);
+            const fieldName = faker.lorem.word();
+            fields.push({
+                name: fieldName,
+                type: typeIndex,
+                label: `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} (${fieldTypeMap[typeIndex]})`
+            });
+        }
+    }
+
+    return fields;
+}
+
+// Generate HTML for order fields form
+function generateOrderFieldsForm(fields, itemName, quantity, subtotal, saveAmount, orderId) {
+    let formHtml = `
+        <h3 class="popup-title">Add Requirements for ${itemName}</h3>
+        <div class="order-fields-content" style="margin-bottom: 1.5em;">
+    `;
+
+    fields.forEach((field, index) => {
+        formHtml += `<div class="popup-row" style="margin-bottom: 1em;">`;
+        formHtml += `<label class="popup-label">${field.label}:</label>`;
+        formHtml += `<div class="popup-value">`;
+
+        switch (field.type) {
+            case 0: // Text
+                formHtml += `<input type="text" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;">`;
+                break;
+            case 1: // Number
+                formHtml += `<input type="number" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;" min="0">`;
+                break;
+            case 2: // Date
+                formHtml += `<input type="date" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;">`;
+                break;
+            case 3: // Dropdown
+                formHtml += `
+                    <select id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;">
+                        ${Array.from({length: 3}, () => `<option value="${faker.lorem.word()}">${faker.lorem.word()}</option>`).join('')}
+                    </select>
+                `;
+                break;
+            case 4: // Checkbox
+                formHtml += `
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" id="order-field-${index}" style="margin-right: 0.5em;">
+                        ${faker.lorem.word()}
+                    </label>
+                `;
+                break;
+            case 5: // Textarea
+                formHtml += `<textarea id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em; min-height: 5em;"></textarea>`;
+                break;
+            case 6: // Radio
+                formHtml += `
+                    <div style="display: flex; flex-direction: column; gap: 0.5em;">
+                        ${Array.from({length: 3}, () => `
+                            <label style="display: flex; align-items: center;">
+                                <input type="radio" name="order-field-${index}" value="${faker.lorem.word()}" style="margin-right: 0.5em;">
+                                ${faker.lorem.word()}
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                break;
+            case 7: // Image
+                formHtml += `<input type="file" id="order-field-${index}" accept="image/*" class="ant-input" style="width: 100%; padding: 0.5em;">`;
+                break;
+            case 8: // Link
+                formHtml += `<input type="url" id="order-field-${index}" class="ant-input" style="width: 100%; padding: 0.5em;" placeholder="https://">`;
+                break;
+        }
+        formHtml += `</div></div>`;
+    });
+
+    formHtml += `
+        </div>
+        <button id="submit-order-fields" class="btn-orange-solid-large" style="width: 100%;">Submit Order Details</button>
+    `;
+
+    return { html: formHtml, fields, itemName, quantity, subtotal, saveAmount, orderId };
+}
+
+// Generate confirmation popup for order fields
+function generateOrderFieldsConfirmation(fields, itemName, quantity, subtotal, saveAmount, orderId) {
+    let confirmationHtml = `
+        <h2 class="popup-title">Confirm Order Details</h2>
+        <div class="order-confirmation-content" style="margin-bottom: 1.5em;">
+            <p><strong>Product:</strong> ${itemName}</p>
+            <p><strong>Quantity:</strong> ${quantity}</p>
+            <p><strong>Subtotal:</strong> $${subtotal}</p>
+            ${saveAmount !== '0.00' ? `<p><strong>Save:</strong> $${saveAmount}</p>` : ''}
+            <h3 style="margin: 1em 0 0.5em;">Order Details:</h3>
+    `;
+
+    fields.forEach((field, index) => {
+        const inputElement = document.getElementById(`order-field-${index}`);
+        let value = 'Not provided';
+
+        if (inputElement) {
+            if (field.type === 4) { // Checkbox
+                value = inputElement.checked ? 'Checked' : 'Unchecked';
+            } else if (field.type === 6) { // Radio
+                const selectedRadio = document.querySelector(`input[name="order-field-${index}"]:checked`);
+                value = selectedRadio ? selectedRadio.value : 'None selected';
+            } else if (field.type === 7) { // Image
+                value = inputElement.files.length > 0 ? inputElement.files[0].name : 'No file selected';
+            } else {
+                value = inputElement.value || 'Not provided';
+            }
+        }
+
+        confirmationHtml += `
+            <div class="popup-row" style="margin-bottom: 0.5em;">
+                <label class="popup-label">${field.label}:</label>
+                <span class="popup-value">${value}</span>
+            </div>
+        `;
+    });
+
+    confirmationHtml += `
+        </div>
+        <div class="order-buttons" style="display: flex; gap: 1em;">
+            <button id="confirm-order" class="btn-orange-solid-large" style="flex: 1;">Confirm</button>
+            <button id="cancel-order" class="btn-large" style="flex: 1;">Cancel</button>
+        </div>
+    `;
+
+    return { html: confirmationHtml, fields, itemName, quantity, subtotal, saveAmount, orderId };
+}
+
+// Modified generateShoppingPopup function
 function generateShoppingPopup(item, cardElement) {
     let userInfo = getUserLoginInfo();
-    if (!userInfo){
-        return showMessageToast({ messageType: 'warning', message: 'please login first , after then buy it.', timeout: 3000, callback: () => {
+    if (!userInfo) {
+        return showMessageToast({
+            messageType: 'warning',
+            message: 'please login first, after then buy it.',
+            timeout: 3000,
+            callback: () => {
                 showModal('login-modal', generateLoginModal(), { className: 'login-modal', style: signInRegisterStyle })
-            }})
+            }
+        });
     }
     const linkElement = cardElement.querySelector('a[href*="item.html"]');
     const itemName = linkElement ? linkElement.textContent.trim() : 'Unnamed Product';
@@ -764,8 +922,7 @@ function generateShoppingPopup(item, cardElement) {
                         `).join('')}
                     </div>
                 </div>
-                `
-            }
+                `}
             <div class="popup-row">
                 <label class="popup-label">Amount:</label>
                 <div class="popup-value popup-quantity">
@@ -798,10 +955,10 @@ function generateShoppingPopup(item, cardElement) {
 
     // 更新小计和折扣
     window.updateSubtotal = function updateSubtotal() {
-        let quantityEle = document.getElementById('popup-quantity')
+        let quantityEle = document.getElementById('popup-quantity');
         let quantity = parseInt(quantityEle.value) || 1;
-        if (quantity > quantityEle.getAttribute('max')){
-            quantity = quantityEle.value = quantityEle.getAttribute('max')
+        if (quantity > quantityEle.getAttribute('max')) {
+            quantity = quantityEle.value = quantityEle.getAttribute('max');
         }
         let currentPrice = basePrice;
         let saveAmount = 0;
@@ -831,7 +988,7 @@ function generateShoppingPopup(item, cardElement) {
         } else {
             plusButton.classList.remove('disabled');
         }
-    }
+    };
 
     // 更新数量
     window.updateQuantity = function(delta) {
@@ -877,7 +1034,7 @@ function generateShoppingPopup(item, cardElement) {
     document.getElementById('popup-buy-btn').addEventListener('click', () => {
         const buyButton = document.getElementById('popup-buy-btn');
         buyButton.classList.add('loading');
-        buyButton.disabled = true; // 点击后保持禁用状态
+        buyButton.disabled = true;
 
         const quantity = parseInt(document.getElementById('popup-quantity').value) || 1;
         const subtotal = document.getElementById('popup-subtotal-value').textContent.replace('$', '');
@@ -886,24 +1043,65 @@ function generateShoppingPopup(item, cardElement) {
 
         setTimeout(() => {
             buyButton.classList.remove('loading');
+            buyButton.disabled = false; // 恢复按钮状态
             hideModal('shopping-popup');
 
-            // 新弹窗内容
-            const orderPopupContent = `
-                <h2 class="popup-title">Order NO #${orderId}</h2>
-                <div class="order-content">
-                    <p>Order placed successfully!</p>
-                    <p>Product: ${itemName}</p>
-                    <p>Quantity: ${quantity}</p>
-                    <p>Amount: <span class="price">$${subtotal}</span></p>
-                    ${saveAmount !== '0.00' ? `<p>Save: <span class="save">$${saveAmount}</span></p>` : ''}
-                </div>
-                <div class="order-buttons">
-                    <a href="/site/member/orders.html?id=${orderId}" class="btn-medium"><i class="fas fa-eye"></i> View Order</a>
-                    <a href="/download/order_${itemName.replace(/\s+/g, '_')}_${quantity}_items.txt" download="${itemName}_${quantity}_items.txt" class="btn-medium"><i class="fas fa-download"></i> Download</a>
-                </div>
-            `;
-            showModal('order-popup', orderPopupContent, { className: 'order-popup', style: { maxWidth: '30em', padding: '1.5em' } });
+            // 50% 概率显示订单要素弹窗
+            if (Math.random() < 0.5) {
+                const fields = generateOrderFields();
+                const formData = generateOrderFieldsForm(fields, itemName, quantity, subtotal, saveAmount, orderId);
+                showModal('order-fields-popup', formData.html, { className: 'order-fields-popup', style: { maxWidth: '30em', padding: '1.5em' } });
+
+                // Submit order fields
+                document.getElementById('submit-order-fields').addEventListener('click', () => {
+                    const confirmationData = generateOrderFieldsConfirmation(fields, itemName, quantity, subtotal, saveAmount, orderId);
+                    showModal('order-confirmation-popup', confirmationData.html, { className: 'order-confirmation-popup', style: { maxWidth: '30em', padding: '1.5em' } });
+
+                    // Confirm order
+                    document.getElementById('confirm-order').addEventListener('click', () => {
+                        hideModal('order-confirmation-popup');
+                        hideModal('order-fields-popup');
+                        const orderPopupContent = `
+                            <h2 class="popup-title">Order NO #${orderId}</h2>
+                            <div class="order-content">
+                                <p>Order placed successfully!</p>
+                                <p>Product: ${itemName}</p>
+                                <p>Quantity: ${quantity}</p>
+                                <p>Amount: <span class="price">$${subtotal}</span></p>
+                                ${saveAmount !== '0.00' ? `<p>Save: <span class="save">$${saveAmount}</span></p>` : ''}
+                            </div>
+                            <div class="order-buttons">
+                                <a href="/site/member/orders.html?id=${orderId}" class="btn-medium"><i class="fas fa-eye"></i> View Order</a>
+                                <a href="/download/order_${itemName.replace(/\s+/g, '_')}_${quantity}_items.txt" download="${itemName}_${quantity}_items.txt" class="btn-medium"><i class="fas fa-download"></i> Download</a>
+                            </div>
+                        `;
+                        showModal('order-popup', orderPopupContent, { className: 'order-popup', style: { maxWidth: '30em', padding: '1.5em' } });
+                    });
+
+                    // Cancel and return to form
+                    document.getElementById('cancel-order').addEventListener('click', () => {
+                        hideModal('order-confirmation-popup');
+                        showModal('order-fields-popup', formData.html, { className: 'order-fields-popup', style: { maxWidth: '30em', padding: '1.5em' } });
+                    });
+                });
+            } else {
+                // 原流程
+                const orderPopupContent = `
+                    <h2 class="popup-title">Order NO #${orderId}</h2>
+                    <div class="order-content">
+                        <p>Order placed successfully!</p>
+                        <p>Product: ${itemName}</p>
+                        <p>Quantity: ${quantity}</p>
+                        <p>Amount: <span class="price">$${subtotal}</span></p>
+                        ${saveAmount !== '0.00' ? `<p>Save: <span class="save">$${saveAmount}</span></p>` : ''}
+                    </div>
+                    <div class="order-buttons">
+                        <a href="/site/member/orders.html?id=${orderId}" class="btn-medium"><i class="fas fa-eye"></i> View Order</a>
+                        <a href="/download/order_${itemName.replace(/\s+/g, '_')}_${quantity}_items.txt" download="${itemName}_${quantity}_items.txt" class="btn-medium"><i class="fas fa-download"></i> Download</a>
+                    </div>
+                `;
+                showModal('order-popup', orderPopupContent, { className: 'order-popup', style: { maxWidth: '30em', padding: '1.5em' } });
+            }
         }, 500);
     });
 
