@@ -49,6 +49,7 @@ function openTicketSubmissionDialog(orderId) {
     const isPost = order.posts_id;
     const isDemandOrItem = order.demand_id || order.item_id;
     let detailsField = '';
+    console.log(isPost)
     if (isPost) {
         detailsField = `
             <label>问题描述（可选）:</label>
@@ -56,10 +57,20 @@ function openTicketSubmissionDialog(orderId) {
         `;
     } else if (isDemandOrItem) {
         const unitPrice = parseFloat(order.amount.sample.replace('$', '')) / order.quantity.sample;
-        detailsField = `
-            <label>问题账号（必填）:</label>
-            <textarea id="submission-details" placeholder="请输入问题账号，每行一个..." rows="5" oninput="updateAccountStats(${unitPrice})" required></textarea>
-            <div id="account-stats">数量: 0 金额: $0.00</div>
+        let chooseRefund = Math.random() < 0.5
+        detailsField = chooseRefund ?
+            `
+                <label>退款金额:</label>
+                <input type="number" id="request-amount" min="0" max="" step="0.01" value="0" placeholder="请输入退款金额">
+            `
+            :
+            `
+                <label>换货件数:</label>
+                <input type="number" id="request-amount" min="0" max="" step="1" placeholder="请输入换货件数">
+            `
+        detailsField += `
+            <label>理由:</label>
+            <textarea id="submission-details" placeholder="请输入理由..." rows="5" oninput="updateAccountStats(${unitPrice})" required></textarea>
         `;
     }
 
@@ -433,6 +444,8 @@ function openRequestDialog(orderId, type) {
             </select>
             <label>退款金额:</label>
             <input type="number" id="request-amount" min="0" max="${maxAmount}" step="0.01" value="0" placeholder="请输入退款金额">
+            <label>理由描述:</label>
+            <textarea id="request-details" placeholder="请输入问题账号，每行一个..." rows="5" oninput="updateRequestStats(${unitPrice})"></textarea>
         `;
     } else if ((order.demand_id || order.item_id) && (type === 'refund' || type === 'exchange')) {
         bodyContent = `
@@ -443,10 +456,17 @@ function openRequestDialog(orderId, type) {
             <label>问题原因:</label>
             <select id="request-reason">
                 ${aftersalesConfig[0].reasons.map(reason => `<option value="${reason}">${reason}</option>`).join('')}
-            </select>
-            <label>问题账号:</label>
+            </select>`
+        bodyContent += type === 'exchange' ? `
+            <label>换货件数:</label>
+            <input type="number" id="request-amount" min="0" max="${maxAmount}" step="1" placeholder="请输入换货件数">
+            ` : `
+            <label>退款金额:</label>
+            <input type="number" id="request-amount" min="0" max="${maxAmount}" step="0.01" value="0" placeholder="请输入退款金额">
+            `
+        bodyContent += `
+            <label>理由描述:</label>
             <textarea id="request-details" placeholder="请输入问题账号，每行一个..." rows="5" oninput="updateRequestStats(${unitPrice})"></textarea>
-            <div id="request-stats">数量: 0 金额: $0.00</div>
         `;
     }
 
