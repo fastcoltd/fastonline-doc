@@ -39,16 +39,18 @@ body {
 /* 当弹窗显示时，阻止body滚动 */
 body.modal-open {
     overflow: hidden !important;
-    position: fixed !important;
-    width: 100% !important;
-    height: 100% !important;
+    /* 移除 position: fixed 和 width/height 设置，避免触发 resize 事件 */
+    /* 使用 touch-action 来防止移动端滚动 */
+    touch-action: none !important;
     -webkit-overflow-scrolling: touch !important;
+    /* 防止页面内容跳动，计算滚动条宽度并补偿 */
+    padding-right: var(--scrollbar-width, 0) !important;
 }
 
 /* 确保html也不能滚动 */
 html.modal-open {
     overflow: hidden !important;
-    height: 100% !important;
+    /* 移除 height: 100% 设置，避免触发 resize 事件 */
 }
 
 @media screen and (max-width: 1440px) {
