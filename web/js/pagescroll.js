@@ -35,10 +35,8 @@ function updateStickyHeader() {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     if (scrollTop > pageHeadHeight) {
         stickyHeader.classList.add('is-sticky');
-        pageFix.classList.toggle('is-sticky', true);
     } else {
         stickyHeader.classList.remove('is-sticky');
-        pageFix.classList.toggle('is-sticky', false);
     }
     adjustFilterPosition();
 }
@@ -47,9 +45,32 @@ updateStickyHeader();
 // 动态调整过滤器位置
 function adjustFilterPosition() {
     const body = document.getElementsByTagName('body')[0];
-    if (body.offsetWidth < 768) return;
-    if (!pageFix) return;
     const headIsSticky = stickyHeader.classList.contains('is-sticky');
+    if (!pageFix) return;
+    if (body.offsetWidth < 768) {
+        const pageFixStyle = window.getComputedStyle(pageFix);
+        if (pageFixStyle.display === 'none') {
+            return;
+        }
+        if (headIsSticky) {
+            Object.assign(pageFix.style, {
+                position: 'fixed',
+                left: 16 + 'px',
+                top: stickyHeaderHeight + 'px',
+                maxHeight: `calc(100vh - ${stickyHeaderHeight}px)`
+            });
+            return;
+        }
+        Object.assign(pageFix.style, {
+            position: 'relative',
+            left: 0,
+            top: 0,
+            maxHeight: `calc(100vh - ${stickyHeaderHeight + pageHeadHeight}px)`
+        });
+        return;
+    };
+
+    pageFix.classList.toggle('is-sticky', headIsSticky);
     // 计算页面头部所有固定元素的总高度
     let totalHeight = stickyHeaderHeight;
     if (pageHead && !headIsSticky) {
