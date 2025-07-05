@@ -5,7 +5,6 @@ let pageList = null;
 let attributeValue = null;
 const attributes = document.querySelectorAll(".tag-page-header-desc-tag-item");
 const brandPageIndexs = document.querySelectorAll(".page-link");
-const stickyHeader = document.getElementById('stickyHeader');
 
 // 初始化 - 设置第一个链接为激活状态
 if (brandPageIndexs.length > 0) {
@@ -50,40 +49,6 @@ function changePageType(type) {
     }
   });
 }
-
-// 防抖函数
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
-
-// 滚动监听事件
-const handleScroll = debounce(function () {
-  updateStickyHeader();
-}, 10);
-
-window.addEventListener('scroll', handleScroll, { passive: true });
-
-// 更新sticky header状态
-function updateStickyHeader() {
-  if (!stickyHeader) return;
-
-  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-  if (scrollTop > 50) {
-    stickyHeader.classList.add('is-sticky');
-  } else {
-    stickyHeader.classList.remove('is-sticky');
-  }
-}
-updateStickyHeader();
 
 // 初始化分页组件
 const pagination = new Pagination({

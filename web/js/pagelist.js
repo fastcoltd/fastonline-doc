@@ -5,6 +5,7 @@ class PageList {
         this.isLoading = false;
         this.hasMore = true;
         this.itemsPerPage = 20;
+        if (document.body.clientWidth > 768) { return }
         this.init();
     }
 
@@ -21,6 +22,7 @@ class PageList {
     }
 
     async reloadItems() {
+        if (document.body.clientWidth > 768) { return }
         console.log('reload list');
         this.currentPage = 1;
         this.isLoading = false;
@@ -31,6 +33,7 @@ class PageList {
 
     // 加载商品数据
     loadItems(reload) {
+        if (document.body.clientWidth > 768) { return }
         if (this.isLoading || !this.hasMore) return;
         this.showLoading(true);
         if (reload) {
@@ -42,6 +45,7 @@ class PageList {
 
     // 显示加载状态
     showLoading(show) {
+        if (document.body.clientWidth > 768) { return }
         this.isLoading = show;
         const loading = document.querySelector('.loading');
         const loadText = document.querySelector('.load-more-text');
@@ -55,12 +59,14 @@ class PageList {
     }
 
     showNoMore() {
+        if (document.body.clientWidth > 768) { return }
         this.hasMore = false;
         const moreBox = document.querySelector('.load-more');
         moreBox.style.display = 'none';
     }
 
     resetNoMore() {
+        if (document.body.clientWidth > 768) { return }
         this.hasMore = true;
         const moreBox = document.querySelector('.load-more');
         moreBox.style.display = 'flex';
