@@ -4,6 +4,13 @@
     margin-left: 53.75rem;
 }
 
+@media screen and (max-width: 768px) {
+    .page-right-box {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
 .page-right-box .item-tag-box {
     display: flex;
     flex-wrap: wrap;
@@ -15,7 +22,7 @@
     top: 0;
     left: 0;
     background-color: #fff;
-    border-bottom: #C5C5C5 solid 1px;
+    border-bottom: #C5C5C5 solid 0.125rem;
 }
 
 .page-link-box.is-sticky {
@@ -23,6 +30,15 @@
     top: 0;
     left: 53.75rem;
     z-index: 51;
+}
+
+@media screen and (max-width: 768px) {
+    .page-link-box.is-sticky {
+        position: sticky;
+        top: 0;
+        left: 0;
+        z-index: 51;
+    }
 }
 
 .item-detail-right-header {
@@ -43,39 +59,13 @@
 }
 
 @media screen and (max-width: 768px) {
-    .page-right-box {
-        width: 100%;
+    .page-content {
+        flex-direction: column;
     }
 
     .item-detail-left-title {
         width: 100%;
         gap: 2rem;
-    }
-
-    .item-detail-right-box {
-        z-index: 100;
-        background-color: #fff;
-        position: fixed;
-        top: 0;
-        height: 100vh;
-        left: 0;
-        width: 100vw;
-        padding: 0 2rem;
-        display: none;
-        margin-left: 0;
-        display: none;
-        flex-direction: column;
-
-        /* 基础安全区域内边距 - 确保在所有设备上生效 */
-        padding-top: var(--safe-area-inset-top) !important;
-        padding-bottom: var(--safe-area-inset-bottom) !important;
-        /* 兼容性回退 - 为不支持env()的浏览器 */
-        padding-top: env(safe-area-inset-top, 2.5rem) !important;
-        padding-bottom: env(safe-area-inset-bottom, 2.5rem) !important;
-    }
-
-    .item-detail-right-header {
-        display: flex;
     }
 }
 
@@ -378,7 +368,7 @@
 }
 
 .item-detail-review-info-line {
-    border: #f0f3f3 0.5px solid;
+    border: #f0f3f3 0.125rem solid;
     height: 100%;
 }
 
@@ -389,7 +379,7 @@
 }
 
 .item-detail-review-line {
-    border: #c5c5c5 0.5px solid;
+    border: #c5c5c5 0.125rem solid;
     width: 100%;
     margin: 3.75rem 0;
 }
@@ -592,5 +582,362 @@
     .item-detail-review-tool-icon {
         width: 2rem;
         height: 2rem;
+    }
+}
+
+/* 商店详情右侧容器 */
+.store-detail-left-box {
+    width: 51.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding: 0;
+    margin-right: 2.5rem;
+}
+
+@media screen and (max-width: 768px) {
+    .store-detail-left-box {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .page-fix-box {
+        top: unset;
+        position: relative;
+        z-index: unset;
+    }
+}
+
+/* 商店信息卡片 */
+.store-info-card {
+    background: #FFFFFF;
+    border: 0.125rem solid #F0F0F3;
+    border-radius: 2.5rem;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.75rem;
+}
+
+/* 商店头像部分 */
+.store-avatar-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.store-avatar-container {
+    position: relative;
+    width: 15rem;
+    height: 15rem;
+}
+
+.store-avatar {
+    width: 15rem;
+    height: 15rem;
+    border-radius: 50%;
+    border: 0.25rem solid #FFFFFF;
+    overflow: hidden;
+    position: relative;
+}
+
+.store-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.online-indicator {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    width: 2rem;
+    height: 2rem;
+    background: #06C70C;
+    border: 0.25rem solid #FFFFFF;
+    border-radius: 50%;
+}
+
+/* 商店信息内容 */
+.store-info-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    width: 100%;
+}
+
+.store-name {
+    font-family: var(--primary-popfont);
+    font-weight: 600;
+    font-size: 3.5rem;
+    line-height: 3.75rem;
+    color: #000000;
+    margin: 0;
+    text-align: center;
+}
+
+/* 详细信息 */
+.store-details {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 100%;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.detail-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail-text {
+    font-family: var(--primary-popfont);
+    font-weight: 400;
+    font-size: 1.75rem;
+    line-height: 3rem;
+    color: #000000;
+}
+
+.item-tag-box {
+    display: flex;
+    justify-content: center;
+}
+
+/* 商店部分 */
+.store-section {
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* 部分标题 */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.title-indicator {
+    width: 0.5rem;
+    height: 2rem;
+    background: #FF1B20;
+    border-radius: 0.25rem;
+}
+
+.section-title h3 {
+    font-family: var(--primary-popfont);
+    font-weight: 400;
+    font-size: 1.75rem;
+    line-height: 2.75rem;
+    color: #000000;
+    margin: 0;
+}
+
+/* 部分内容 */
+.section-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.section-content p {
+    font-family: var(--primary-popfont);
+    font-weight: 400;
+    font-size: 1.75rem;
+    line-height: 2.75rem;
+    color: #000000;
+    margin: 0;
+}
+
+/* 查看更多按钮 */
+.see-more-btn {
+    padding: 0.5rem 1rem;
+    background: #FFFFFF;
+    border: 0.125rem solid #D9D9D9;
+    border-radius: 0.75rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 1.75rem;
+    line-height: 2.75rem;
+    color: #6D6D6D;
+    cursor: pointer;
+    align-self: flex-start;
+    box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.02);
+}
+
+.see-more-btn:hover {
+    background: #F5F5F5;
+}
+
+/* 团队成员 */
+.team-members {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 2.5rem;
+}
+
+.team-member {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.25rem 0;
+    border: 0.125rem solid #F0F0F3;
+    border-radius: 2.5rem;
+    width: calc((100% - 5rem) / 3);
+}
+
+.member-avatar {
+    position: relative;
+    width: 7.5rem;
+    height: 7.5rem;
+}
+
+.member-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.member-status {
+    position: absolute;
+    bottom: 0.25rem;
+    right: 0.25rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 0.25rem solid #FFFFFF;
+    border-radius: 50%;
+}
+
+.member-status.online {
+    background: #06C70C;
+}
+
+.member-status.offline {
+    background: #C5C5C5;
+}
+
+.member-name {
+    font-family: var(--primary-popfont);
+    font-weight: 400;
+    font-size: 1.75rem;
+    line-height: 2.5rem;
+    color: #000000;
+    text-align: center;
+    width: 100%;
+    white-space: normal;
+    word-break: break-word;
+    word-wrap: break-word;
+}
+
+/* 服务列表 */
+.services-list {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.service-item {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 1.75rem;
+    line-height: 2.75rem;
+    color: #FF1B20;
+}
+
+@media screen and (max-width: 768px) {
+
+    /* 商店信息卡片 */
+    .store-info-card {
+        gap: 2.5rem;
+    }
+
+    .store-avatar-container {
+        width: 8.75rem;
+        height: 8.75rem;
+    }
+
+    .store-avatar {
+        width: 8.75rem;
+        height: 8.75rem;
+    }
+
+    .store-avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .online-indicator {
+        bottom: 0.5rem;
+        right: 0.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    /* 商店信息内容 */
+    .store-info-content {
+        gap: 0.5rem;
+    }
+
+    .store-name {
+        font-size: 2.5rem;
+        line-height: 2.75rem;
+    }
+
+    .item-mark-box {
+        margin: 1.5rem 0;
+    }
+
+    .layout-vertical .item-mark {
+        position: relative;
+
+    }
+
+    .detail-item {
+        gap: 0.5rem;
+    }
+
+    .detail-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    .detail-text {
+        font-size: 1.5rem;
+        line-height: 3rem;
+    }
+
+    /* 商店部分 */
+    .store-section {
+        gap: 0.75rem;
+    }
+
+    /* 部分标题 */
+    .section-title {
+        gap: 0.75rem;
+    }
+
+    .section-content p {
+        font-size: 1.5rem;
+        line-height: 2.25rem;
     }
 }

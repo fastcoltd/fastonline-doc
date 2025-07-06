@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const body = document.getElementsByTagName('body')[0];
         const headIsSticky = stickyHeader.classList.contains('is-sticky');
         if (!pageLink) return;
-        if (body.offsetWidth < 768) return;
         pageLink.classList.toggle('is-sticky', headIsSticky);
         // 设置过滤器的位置和高度
         if (headIsSticky) {
