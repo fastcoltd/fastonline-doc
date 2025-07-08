@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="css/second-page.css" />
   <link rel="stylesheet" href="css/page.css" />
   <link rel="stylesheet" href="css/detail/demand-detail.css" />
+  <link rel="stylesheet" href="css/detail/demand-detail-item.css" />
 </head>
 
 <body style="background: white;">
@@ -1017,7 +1018,7 @@
       <p class="page-nav-current">Detail</p>
     </div>
   </div>
-  <div class="page-content">
+  <div class="page-content" style="flex-direction: column;">
     <div class="demand-card">
         <div class="card-content">
             <!-- 第一行：用户信息 -->
@@ -1065,10 +1066,10 @@
                     <span class="item-service">Promotion & Ads</span>
                 </div>
                 <div class="brand-tag-box">
-                    <div class="item-tag">Screen Size: 17-20in</div>
-                    <div class="item-tag">Waterproof: IPX7</div>
-                    <div class="item-tag">Cleaning: Pro Clean</div>
-                    <div class="item-tag">Lighting:Incandescent</div>
+                    <div class="item-tag"><p class="item-tag-text">Screen Size: 17-20in</p></div>
+                    <div class="item-tag"><p class="item-tag-text">Waterproof: IPX7</p></div>
+                    <div class="item-tag"><p class="item-tag-text">Cleaning: Pro Clean</p></div>
+                    <div class="item-tag"><p class="item-tag-text">Lighting:Incandescent</p></div>
                 </div>
                 <div class="item-service-box">
                     <img class="item-service-icon" src="image" />
@@ -1114,6 +1115,131 @@
         <div class="status-badge status-badge1">
             <p>Delivered</p>
         </div>
+    </div>
+    <div class="list-container">
+      <div class="demand-card">
+        <div class="card-content">
+          <!-- 第一行：用户信息 -->
+          <div class="user-section">
+            <img class="demand-detail-item-user-avatar" src="image" />
+            <div class="demand-detail-item-user-info">
+              <div class="user-header">
+                <h2 class="demand-detail-item-user-name">Sergio Tremblay</h2>
+                <div class="user-icon-box">
+                  <div class="item-mark item-mark1">Hot</div>
+                  <div class="item-mark item-mark2">LV1</div>
+                  <div class="level-badge level-badge1"></div>
+                  <div class="item-star-box">
+                    <div class="star-bg">
+                        <div class="stars-outer">
+                            <div class="stars-inner" style="width: 83%;"></div>
+                        </div>
+                    </div>
+                    <p class="item-star-score">4.3</p>
+                    <p class="item-star-recommend">(200)</p>
+                  </div>
+                </div>
+              </div>
+              <div class="demand-detail-item-user-stats">
+                <div class="item-service-box">
+                  <img class="item-service-icon" src="image" />
+                  <span class="item-service-text">Order volumn:</span>
+                  <span class="item-service">40</span>
+                </div>
+                <div class="item-service-box">
+                  <img class="item-service-icon" src="image" />
+                  <span class="item-service-text">Bidding/Winning:</span>
+                  <span class="item-service">33</span>
+                </div>
+                <div class="item-service-box">
+                  <img class="item-service-icon" src="image" />
+                  <span class="item-service-text">Winning rate:</span>
+                  <span class="item-service">70.2%</span>
+                </div>
+                <div class="item-service-box">
+                  <img class="item-service-icon" src="image" />
+                  <span class="item-service-text">Bidding time:</span>
+                  <span class="item-service">2025/07/31 ~ 2025/09/30</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="brand-tag-box">
+            <div class="item-tag"><p class="item-tag-text">Screen Size: 17-20in</p></div>
+            <div class="item-tag"><p class="item-tag-text">Waterproof: IPX7</p></div>
+            <div class="item-tag"><p class="item-tag-text">Cleaning: Pro Clean</p></div>
+            <div class="item-tag"><p class="item-tag-text">Lighting:Incandescent</p></div>
+          </div>
+          <div class="other-info">
+            <p class="other-label">Provide samples: <span class="other-text">
+                Nesciunt quibusdam quae nihil debitis eveniet quidem perspiciatis numquam. Voluptatem necessitatibus occaecati voluptatem qui blanditiis eligendi. Quod rerum itaque tempora dolorem tenetur molestias aut deleniti incidunt. Sit alias sed ea dolorem unde culpa incidunt neque.
+            </span></p>
+          </div>
+          <span class="item-service">Fuga nisi id dicta fugi Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.t.</span>
+        </div>
+        <div class="demand-edit-box demand-edit-box1">Edit</div>
+        <!-- 状态标签 -->
+        <div class="status-badge status-badge1">
+          <p>Delivered</p>
+        </div>
+      </div>
+    </div>
+    <!-- 加载更多提示 -->
+    <div class="load-more" id="load-more">
+      <div class="loading" style="display: none;"></div>
+      <span class="load-more-text">Show More</span>
+    </div>
+    <div class="pagination-container">
+      <div class="pagination" id="pagination">
+          <div class="pagination-content">
+            <div class="total-text">Total <span id="totalItems">85</span> items</div>
+
+            <button class="pagination-item pagination-prev" id="prevBtn">
+              <svg viewBox="0 0 12 12">
+                <path d="M7.5 1.5L3 6l4.5 4.5" stroke="currentColor" stroke-width="1.5" fill="none"
+                      stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <div class="pagination-numbers" id="paginationNumbers">
+              <!-- 页码将由JavaScript动态生成 -->
+            </div>
+            <div class="pagination-measure" id="paginationMeasure"></div>
+
+            <button class="pagination-item pagination-next" id="nextBtn">
+              <svg viewBox="0 0 12 12">
+                <path d="M4.5 1.5L9 6l-4.5 4.5" stroke="currentColor" stroke-width="1.5" fill="none"
+                      stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="pagination-options">
+            <div class="size-changer" id="sizeChanger">
+              <div class="selection-item">
+                <span class="selection-text" id="sizeText">10 / page</span>
+                <div class="icon">
+                <svg viewBox="0 0 12 12">
+                  <path d="M6 8.5L2.5 5h7L6 8.5z" fill="currentColor" />
+                </svg>
+              </div>
+            </div>
+            <div class="size-changer-dropdown" id="sizeDropdown">
+              <div class="size-changer-option" data-size="10">10 / page</div>
+              <div class="size-changer-option" data-size="20">20 / page</div>
+              <div class="size-changer-option" data-size="50">50 / page</div>
+              <div class="size-changer-option" data-size="100">100 / page</div>
+            </div>
+          </div>
+
+          <div class="quick-jumper">
+            <span class="go-to-text">Go to</span>
+            <div class="input-wrapper" id="jumpInputWrapper">
+              <input type="text" id="jumpInput" placeholder="">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <footer>
@@ -1659,12 +1785,7 @@
   <script src="js/pagelist.js"></script>
   <script src="js/pagination.js"></script>
   <script src="js/detail/demand-detail.js"></script>
-  <script>
-    // 页面加载完成后初始化
-    document.addEventListener('DOMContentLoaded', () => {
-      this.list = new PageList();
-    });
-  </script>
+  <script></script>
 </body>
 
 </html>

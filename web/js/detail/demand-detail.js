@@ -1,8 +1,3 @@
-const sort = new SortSelector();
-function sortItems(value) {
-    console.log('sort items', value);
-}
-
 const list = new PageList();
 
 // 加载商品数据
@@ -76,7 +71,7 @@ function generateMockItems() {
 
 // 渲染商品
 function renderItems(items) {
-    const container = document.querySelector('.item-detail-review-list');
+    const container = document.querySelector('.list-container');
 
     items.forEach(item => {
         const itemElement = createItemElement(item);
@@ -87,206 +82,100 @@ function renderItems(items) {
 // 创建商品元素 - 完全按照Figma设计
 function createItemElement(item) {
     const div = document.createElement('div');
-    div.className = 'item-detail-review-item';
+    div.className = 'demand-card';
 
     const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
     div.innerHTML = `
-           <div class="page-section">
-                            <div class="flex-column item-detail-review-box">
-                                <div class="flex-row item-detail-review-user-box">
-                                    <img class="item-detail-review-user-avatar" src="用户头像" />
-                                    <div class="flex-column item-detail-review-user-name-box">
-                                        <span class="item-detail-review-user-name">用户名</span>
-                                        <span class="item-detail-review-user-time">1 day ago</span>
-                                    </div>
-                                    <div class="flex-row item-detail-review-user-status-box">
-                                        <img class="item-detail-review-user-status-icon"
-                                            src="image/detailpage/repeat-client.png" />
-                                        <span class="item-detail-review-user-status-text">Repeat client</span>
-                                    </div>
-                                </div>
-                                <span class="item-detail-review-content">We supply a series of design principles,
-                                    practical
-                                    patterns and high quality design resources (Sketch and Axure), to help people create
-                                    their
-                                    produc and see more，We supply a series of design principles, practical patterns and
-                                    high
-                                    quality design resources (Sketch and Axure), to help people create their produc
-                                </span>
-                                <div class="item-star-box">
-                                    <div class="star-bg">
-                                        <div class="stars-outer">
-                                            <div class="stars-inner" style="width: 83%;"></div>
-                                        </div>
-                                    </div>
-                                    <p class="item-star-score">4.3</p>
-                                    <p class="item-star-recommend">(200)</p>
-                                </div>
-                                <div class="flex-row item-detail-review-info-box">
-                                    <div class="flex-column item-detail-review-info-item">
-                                        <span class="item-detail-review-info-title">$666.6</span>
-                                        <span class="item-detail-review-info-desc">Price</span>
-                                    </div>
-                                    <div class="item-detail-review-info-line"></div>
-                                    <div class="flex-column item-detail-review-info-item">
-                                        <span class="item-detail-review-info-title">333</span>
-                                        <span class="item-detail-review-info-desc">Quantity</span>
-                                    </div>
-                                    <div class="item-detail-review-info-line"></div>
-                                    <div class="flex-column item-detail-review-info-item icon">
-                                        <img class="item-detail-review-info-icon" src="review图片" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item-detail-review-line"></div>
-                            <div class="flex-column item-detail-reiviewer-box">
-                                <div class="flex-row item-detail-reviewer-user-box">
-                                    <img class="item-detail-reviewer-user-icon" src="用户头像" />
-                                    <span class="item-detail-reviewer-user-name">用户名</span>
-                                    <div class="item-detail-reviewer-user-empty"></div>
-                                    <img class="item-detail-reviewer-arrow" src="image/detailpage/arrow-down.png" />
-                                </div>
-                                <span class="item-detail-reviewer-content" style="display: none;">Incidunt velit eveniet
-                                    sint.
-                                    Tempore est et quaerat
-                                    quia. Nam consequatur tenetur quia ut sed esse molestias. Nulla enim vel et porro
-                                    quisquam.
-                                    Et sapiente velit quam adipisci voluptates sed nisi veritatis facilis. Omnis sed
-                                    dignissimos.</span>
-                            </div>
+    <div class="card-content">
+          <!-- 第一行：用户信息 -->
+          <div class="user-section">
+            <img class="demand-detail-item-user-avatar" src="image" />
+            <div class="demand-detail-item-user-info">
+              <div class="user-header">
+                <h2 class="demand-detail-item-user-name">Sergio Tremblay</h2>
+                <div class="user-icon-box">
+                  <div class="item-mark item-mark1">Hot</div>
+                  <div class="item-mark item-mark2">LV1</div>
+                  <div class="level-badge level-badge1"></div>
+                  <div class="item-star-box">
+                    <div class="star-bg">
+                        <div class="stars-outer">
+                            <div class="stars-inner" style="width: 83%;"></div>
                         </div>
-                        <div class="flex-row item-detail-review-tool-box">
-                            <span class="item-detail-review-tool-text">Helpful?</span>
-                            <div class="flex-row item-detail-review-tool-item" id="review-like">
-                                <img class="item-detail-review-tool-icon" src="image/like-count.png" />
-                                <span class="item-detail-review-tool-text">YES</span>
-                            </div>
-                            <div class="flex-row item-detail-review-tool-item" id="review-unlike">
-                                <img class="item-detail-review-tool-icon" src="image/unlike-count.png" />
-                                <span class="item-detail-review-tool-text">NO</span>
-                            </div>
-                        </div>
+                    </div>
+                    <p class="item-star-score">4.3</p>
+                    <p class="item-star-recommend">(200)</p>
+                  </div>
+                </div>
+              </div>
+              <div class="demand-detail-item-user-stats">
+                <div class="item-service-box">
+                  <img class="item-service-icon" src="image" />
+                  <span class="item-service-text">Order volumn:</span>
+                  <span class="item-service">40</span>
+                </div>
+                <div class="item-service-box">
+                  <img class="item-service-icon" src="image" />
+                  <span class="item-service-text">Bidding/Winning:</span>
+                  <span class="item-service">33</span>
+                </div>
+                <div class="item-service-box">
+                  <img class="item-service-icon" src="image" />
+                  <span class="item-service-text">Winning rate:</span>
+                  <span class="item-service">70.2%</span>
+                </div>
+                <div class="item-service-box">
+                  <img class="item-service-icon" src="image" />
+                  <span class="item-service-text">Bidding time:</span>
+                  <span class="item-service">2025/07/31 ~ 2025/09/30</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="brand-tag-box">
+            <div class="item-tag"><p class="item-tag-text">Screen Size: 17-20in</p></div>
+            <div class="item-tag"><p class="item-tag-text">Waterproof: IPX7</p></div>
+            <div class="item-tag"><p class="item-tag-text">Cleaning: Pro Clean</p></div>
+            <div class="item-tag"><p class="item-tag-text">Lighting:Incandescent</p></div>
+          </div>
+          <div class="other-info">
+            <p class="other-label">Provide samples: <span class="other-text">
+                Nesciunt quibusdam quae nihil debitis eveniet quidem perspiciatis numquam. Voluptatem necessitatibus occaecati voluptatem qui blanditiis eligendi. Quod rerum itaque tempora dolorem tenetur molestias aut deleniti incidunt. Sit alias sed ea dolorem unde culpa incidunt neque.
+            </span></p>
+          </div>
+          <span class="item-service">Fuga nisi id dicta fugi Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.t.</span>
+        </div>
+        <div class="demand-edit-box demand-edit-box1">Edit</div>
+        <!-- 状态标签 -->
+        <div class="status-badge status-badge1">
+          <p>Delivered</p>
+        </div>
          `;
 
     return div;
 }
 document.addEventListener("DOMContentLoaded", function () {
-    const similar = new Carousel('best-items', 20);
-    const link = new LinkRef('page-link', 'item-detail-left-group');
-    const body = document.getElementsByTagName('body')[0];
-    const screenshot = document.querySelector('.item-detail-screenshot');
-    const screenshotContent = screenshot.querySelector('.item-detail-screenshot-content');
-    const screenshotRightMore = screenshot.querySelector('.item-detail-screenshot-right-box');
-    const screenshotLeftMore = screenshot.querySelector('.item-detail-screenshot-left-box');
-    const isMobile = body.offsetWidth <= 768;
-    // screenshotContent.addEventListener('wheel', { passive: window.innerWidth <= 750 });
-    // screenshotContent.addEventListener('touchmove', { passive: window.innerWidth <= 750 });
-    let screenshotScrollOffsetX = 0
-    const screenshotContentScroll = screenshotContent.scrollWidth > screenshotContent.clientWidth;
-    screenshotLeftMore.style.display = (screenshotContentScroll && !isMobile) ? 'flex' : 'none';
-    screenshotRightMore.style.display = (screenshotContentScroll && !isMobile) ? 'flex' : 'none';
-    screenshotScroll();
-    screenshotRightMore.addEventListener('click', function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        screenshotScrollOffsetX += 260;
-        screenshotContent.scrollLeft = screenshotScrollOffsetX;
-        screenshotScroll();
-    })
-    screenshotLeftMore.addEventListener('click', function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        screenshotScrollOffsetX -= 260;
-        screenshotContent.scrollLeft = screenshotScrollOffsetX;
-        screenshotScroll();
-    })
-
-    function screenshotScroll() {
-        if (isMobile) { return }
-        const width = screenshotContent.clientWidth;
-        const offsetX = screenshotContent.scrollLeft;
-        const scrollWidth = screenshotContent.scrollWidth;
-        if (offsetX + width >= scrollWidth) {
-            screenshotRightMore.classList.toggle('active', false);
-        } else {
-            screenshotRightMore.classList.toggle('active', true);
-        }
-        if (offsetX > 0) {
-            screenshotLeftMore.classList.toggle('active', true);
-        } else {
-            screenshotLeftMore.classList.toggle('active', false);
-        }
-    }
-
-    const rules = document.querySelectorAll('.item-detail-rules-box');
-    rules.forEach(element => {
-        const content = element.querySelector('.item-detail-rules-content');
-        const moreButton = element.querySelector('.item-detail-rules-more-button');
-        moreButton.addEventListener('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            content.classList.toggle('toggle', true);
-            moreButton.style.display = 'none';
-        })
-    });
-
-    const faqs = document.querySelectorAll('.item-detail-faq-box');
-    faqs.forEach(element => {
-        const content = element.querySelector('.item-detail-faq-content');
-        const title = element.querySelector('.item-detail-faq-title-box');
-        const arrow = title.querySelector('.item-detail-faq-title-arrow');
-        title.addEventListener('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            if (content.style.display === 'none') {
-                title.classList.toggle('toggle', true);
-                content.style.display = 'inline-block';
-                arrow.style.transform = 'rotate(180deg)';
-            } else {
-                title.classList.toggle('toggle', false);
-                content.style.display = 'none';
-                arrow.style.transform = 'rotate(0deg)';
-            }
-        })
-    });
-
-    const reviews = document.querySelectorAll('.item-detail-review-item');
-    reviews.forEach(element => {
-        const reviewer = element.querySelector('.item-detail-reiviewer-box');
-        const user = reviewer.querySelector('.item-detail-reviewer-user-box')
-        const arrow = user.querySelector('.item-detail-reviewer-arrow');
-        const content = reviewer.querySelector('.item-detail-reviewer-content');
-        user.addEventListener('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            if (content.style.display === 'none') {
-                content.style.display = 'inline-block';
-                arrow.style.transform = 'rotate(180deg)';
-            } else {
-                content.style.display = 'none';
-                arrow.style.transform = 'rotate(0deg)';
-            }
-        });
-    });
-
-    const menu = document.querySelector('.detail-page-menu');
-    const statistics = document.querySelector('.item-detail-right-box');
-    menu.addEventListener('click', function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        const statisticsStyle = window.getComputedStyle(statistics);
-        const close = statistics.querySelector('.item-detail-right-close');
-        close.addEventListener('click', function (event) {
-            statistics.style.display = 'none';
-            body.classList.toggle('modal-open', false);
-        });
-        if (statisticsStyle.display === 'none') {
-            statistics.style.display = 'flex';
-            body.classList.toggle('modal-open', true);
-        } else {
-            statistics.style.display = 'none';
-            body.classList.toggle('modal-open', false);
-        }
-    });
+    
 });
+
+// 初始化分页组件
+const pagination = new Pagination({
+    current: 1,
+    pageSize: 20,
+    total: 285,
+    showSizeChanger: true,
+    showQuickJumper: true
+  });
+  
+  // 页面变化回调
+  pagination.onPageChange = (page, pageSize) => {
+    console.log(`页面变化: 第${page}页, 每页${pageSize}条`);
+    loadItems();
+  };
+  
+  // 页面大小变化回调
+  pagination.onPageSizeChange = (page, pageSize) => {
+    console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
+    reloadItems();
+  };
