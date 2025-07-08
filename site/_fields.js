@@ -37,6 +37,7 @@ let itemFieldConfig = {
 
     // 新增字段（面向客户展示）
     original_price: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '原价', format: (d, v) => `<span style="color: #A9A9A9; text-decoration: line-through">${v}</span>`, style: {}, sample: () => faker.commerce.price(60, 250, 2, "$")},
+    stock_quantity: {card: false, cardSq: false, cardHoriz: false, type: 'text', label: '总库存', format: (d, v) => `<span style="color: #4682B4">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 50, max: 500 })},
     visit_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '访问量', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 100, max: 1000 })},
     orders_count: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '订单数', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.datatype.number({ min: 50, max: 200 })},
     sales_amount: {card: false, cardSq: false, cardHoriz: true, type: 'text', label: '总销售额', format: (d, v) => `<span style="color: #32CD32">${v}</span>`, style: {}, sample: () => faker.commerce.price(1000, 5000, 2, "$")},
