@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>需求页面 - PC端</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .demand-card {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #F0F0F3;
+            border-radius: 30px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* 第一行：用户信息 */
+        .user-section {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFC2B8 0%, #FF8A75 100%);
+            border: 4px solid #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            padding-top: 9px;
+        }
+
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 19px;
+            margin-bottom: 8px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 28px;
+            line-height: 1.07;
+            color: #000000;
+        }
+
+        .user-badges {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 0 0 8px 0;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1;
+            color: #ffffff;
+        }
+
+        .badge-hot {
+            background: linear-gradient(135deg, #9216AA 0%, #E75CEE 100%);
+        }
+
+        .badge-sale {
+            background: linear-gradient(135deg, #0567C4 0%, #0BB4E0 100%);
+        }
+
+        .level-badge {
+            width: 64px;
+            height: 16px;
+            background: linear-gradient(135deg, #FF6B35 0%, #FFB347 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 14px;
+        }
+
+        /* 第二行：品牌和服务信息 */
+        .brand-service-section {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* 第三行：产品标签 */
+        .product-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-width: 886px;
+        }
+
+        .product-tag {
+            background: #ffffff;
+            border: 1px solid #D9D9D9;
+            border-radius: 20px;
+            padding: 4px 8px;
+            font-size: 14px;
+            line-height: 1.57;
+            color: #6D6D6D;
+            box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
+        }
+
+        /* 第四行：价格信息 */
+        .price-section {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* 第五行：其他信息 */
+        .other-info {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .other-text {
+            flex: 1;
+            max-width: 1400px;
+            font-size: 14px;
+            line-height: 1.43;
+            color: #000000;
+        }
+
+        /* 通用属性样式 */
+        .attribute {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .attribute-label {
+            font-size: 14px;
+            line-height: 1.71;
+            color: #6D6D6D;
+            font-weight: 400;
+        }
+
+        .attribute-value {
+            font-size: 14px;
+            line-height: 1.43;
+            color: #000000;
+            font-weight: 400;
+        }
+
+        /* 状态标签 */
+        .status-badge {
+            position: absolute;
+            top: 3px;
+            right: 21px;
+            width: 119px;
+            height: 91px;
+            background: linear-gradient(135deg, #31AA16 0%, #77EE5C 100%);
+            border-radius: 0 30px 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 1.375;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .user-stats,
+            .brand-service-section,
+            .price-section {
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .demand-card {
+                padding: 16px;
+                border-radius: 20px;
+            }
+
+            .user-section {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .user-avatar {
+                width: 60px;
+                height: 60px;
+            }
+
+            .user-name {
+                font-size: 24px;
+            }
+
+            .user-stats,
+            .brand-service-section,
+            .price-section {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .product-tags {
+                gap: 4px;
+            }
+
+            .status-badge {
+                width: 80px;
+                height: 60px;
+                font-size: 14px;
+                right: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .user-header {
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-start;
+            }
+
+            .user-badges {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+
+            .attribute {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demand-card">
+        <div class="card-content">
+            <!-- 第一行：用户信息 -->
+            <div class="user-section">
+                <div class="user-avatar">
+                    <!-- 头像占位符 -->
+                </div>
+                <div class="user-info">
+                    <div class="user-header">
+                        <h2 class="user-name">Sergio Tremblay</h2>
+                        <div class="user-badges">
+                            <div class="badge badge-hot">HOT</div>
+                            <div class="badge badge-sale">Limited time sale</div>
+                        </div>
+                        <div class="level-badge">LV1</div>
+                    </div>
+                    <div class="user-stats">
+                        <div class="attribute">
+                            <span class="attribute-label">Release requirements:</span>
+                            <span class="attribute-value">40</span>
+                        </div>
+                        <div class="attribute">
+                            <span class="attribute-label">Number of transactions:</span>
+                            <span class="attribute-value">33</span>
+                        </div>
+                        <div class="attribute">
+                            <span class="attribute-label">Transaction rate:</span>
+                            <span class="attribute-value">70.2%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第二行：品牌和服务信息 -->
+            <div class="brand-service-section">
+                <div class="attribute">
+                    <span class="attribute-label">Brand:</span>
+                    <span class="attribute-value">Discord</span>
+                </div>
+                <div class="attribute">
+                    <span class="attribute-label">Service:</span>
+                    <span class="attribute-value">Promotion & Ads</span>
+                </div>
+                <div class="product-tags">
+                    <div class="product-tag">Screen Size: 17-20in</div>
+                    <div class="product-tag">Waterproof: IPX7</div>
+                    <div class="product-tag">Cleaning: Pro Clean</div>
+                    <div class="product-tag">Lighting:Incandescent</div>
+                </div>
+            </div>
+
+            <!-- 第三行：价格信息 -->
+            <div class="price-section">
+                <div class="attribute">
+                    <span class="attribute-label">Bid:</span>
+                    <span class="attribute-value">$262.00</span>
+                </div>
+                <div class="attribute">
+                    <span class="attribute-label">Deposit:</span>
+                    <span class="attribute-value">$39</span>
+                </div>
+                <div class="attribute">
+                    <span class="attribute-label">Required quantity:</span>
+                    <span class="attribute-value">51</span>
+                </div>
+                <div class="attribute">
+                    <span class="attribute-label">Total amount:</span>
+                    <span class="attribute-value">$13362.00</span>
+                </div>
+                <div class="attribute">
+                    <span class="attribute-label">Need samples:</span>
+                    <span class="attribute-value">Yes</span>
+                </div>
+                <div class="attribute">
+                    <span class="attribute-label">Bidding time:</span>
+                    <span class="attribute-value">2025/6/27 ~ 2025/6/27</span>
+                </div>
+            </div>
+
+            <!-- 第四行：其他信息 -->
+            <div class="other-info">
+                <div class="other-text">
+                    Others: Nesciunt quibusdam quae nihil debitis eveniet quidem perspiciatis numquam. Voluptatem necessitatibus occaecati voluptatem qui blanditiis eligendi. Quod rerum itaque tempora dolorem tenetur molestias aut deleniti incidunt. Sit alias sed ea dolorem unde culpa incidunt neque.
+                </div>
+            </div>
+        </div>
+
+        <!-- 状态标签 -->
+        <div class="status-badge">
+            Delivered
+        </div>
+    </div>
+</body>
+</html>
