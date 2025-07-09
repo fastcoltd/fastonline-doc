@@ -192,3 +192,256 @@ const pagination = new Pagination({
     console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
     reloadItems();
   };
+
+  // 字符计数功能
+  function initializeCharacterCount() {
+    const textareas = [
+        { element: document.getElementById('fieldInfo'), counter: document.getElementById('fieldInfoCount') },
+        { element: document.getElementById('samplesInfo'), counter: document.getElementById('samplesInfoCount') },
+        { element: document.getElementById('biddingInstructions'), counter: document.getElementById('biddingInstructionsCount') }
+    ];
+
+    document.getElementById('captchaInput').addEventListener('input', function () {
+      document.getElementById('captchaInput').classList.toggle('error', false)
+    })
+
+    textareas.forEach(textarea => {
+        textarea.element.addEventListener('input', function() {
+          textarea.element.classList.toggle('error', false)
+            const length = this.value.length;
+            const maxLength = this.getAttribute('maxlength');
+            textarea.counter.textContent = `${length} / ${maxLength}`;
+            
+            // 接近限制时改变颜色
+            if (length > maxLength * 0.8) {
+                textarea.counter.style.color = '#FF4D4F';
+            } else {
+                textarea.counter.style.color = 'rgba(0, 0, 0, 0.25)';
+            }
+        });
+    });
+}
+
+// 文件上传功能
+function initializeFileUpload() {
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    let uploadedFiles = [];
+
+    fileInput.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        document.getElementById('file-upload').classList.toggle('error', false)
+        files.forEach(file => {
+            if (!uploadedFiles.find(f => f.name === file.name)) {
+                uploadedFiles.push(file);
+                addFileToPreview(file);
+            }
+        });
+
+        if (uploadedFiles.length > 0) {
+            filePreview.style.display = 'flex';
+        }
+    });
+
+    function addFileToPreview(file) {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        
+        const fileName = document.createElement('span');
+        fileName.className = 'file-name';
+        fileName.textContent = file.name;
+        
+        const removeBtn = document.createElement('span');
+        removeBtn.className = 'file-remove';
+        removeBtn.innerHTML = '×';
+        removeBtn.onclick = function() {
+            uploadedFiles = uploadedFiles.filter(f => f.name !== file.name);
+            fileItem.remove();
+            
+            if (uploadedFiles.length === 0) {
+                filePreview.style.display = 'none';
+            }
+        };
+        
+        fileItem.appendChild(fileName);
+        fileItem.appendChild(removeBtn);
+        filePreview.appendChild(fileItem);
+    }
+}
+
+// 验证码功能
+function generateCaptcha() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 4; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
+function refreshCaptcha() {
+    const captchaCode = document.getElementById('captchaCode');
+    captchaCode.textContent = generateCaptcha();
+    
+    // 添加刷新动画
+    captchaCode.style.opacity = '0.5';
+    setTimeout(() => {
+        captchaCode.style.opacity = '1';
+    }, 200);
+}
+
+// 表单验证
+function validateForm() {
+    const fieldInfo = document.getElementById('fieldInfo').value.trim();
+    const samplesInfo = document.getElementById('samplesInfo').value.trim();
+    const biddingInstructions = document.getElementById('biddingInstructions').value.trim();
+    const captchaInput = document.getElementById('captchaInput').value.trim();
+    const captchaCode = document.getElementById('captchaCode').textContent;
+    const fileInput = document.getElementById('fileInput');
+
+    // 验证必填字段
+    if (!fieldInfo) {
+        document.getElementById('fieldInfo').classList.toggle('error', true)
+        return false;
+    }
+    document.getElementById('fieldInfo').classList.toggle('error', false)
+    if (!samplesInfo) {
+      document.getElementById('samplesInfo').classList.toggle('error', true)
+      return false;
+  }
+  document.getElementById('samplesInfo').classList.toggle('error', false)
+    if (!biddingInstructions) {
+      document.getElementById('biddingInstructions').classList.toggle('error', true)
+        return false;
+    }
+    document.getElementById('biddingInstructions').classList.toggle('error', false)
+    if (fileInput.files.length === 0) {
+      document.getElementById('file-upload').classList.toggle('error', true)
+        return false;
+    }
+    document.getElementById('file-upload').classList.toggle('error', false)
+    if (!captchaInput) {
+      document.getElementById('captchaInput').classList.toggle('error', true)
+        return false;
+    }
+    document.getElementById('captchaInput').classList.toggle('error', false)
+    if (captchaInput.toUpperCase() !== captchaCode.toUpperCase()) {
+      document.getElementById('captchaInput').classList.toggle('error', true)
+        refreshCaptcha();
+        return false;
+    }
+    document.getElementById('captchaInput').classList.toggle('error', false)
+    return true;
+}
+
+// 提交表单
+function submitForm() {
+    if (!validateForm()) {
+        return;
+    }
+
+    const formData = {
+        storeName: 'Krajcik - Quitzon',
+        fieldInfo: document.getElementById('fieldInfo').value,
+        samplesInfo: document.getElementById('samplesInfo').value,
+        biddingInstructions: document.getElementById('biddingInstructions').value,
+        files: Array.from(document.getElementById('fileInput').files).map(file => file.name),
+        captcha: document.getElementById('captchaInput').value
+    };
+
+    console.log('提交的表单数据:', formData);
+    
+    // 模拟提交
+    const submitButton = document.querySelector('.submit-button');
+    const originalText = submitButton.querySelector('.submit-text').textContent;
+    
+    submitButton.querySelector('.submit-text').textContent = '提交中...';
+    submitButton.style.pointerEvents = 'none';
+    submitButton.style.opacity = '0.7';
+
+    setTimeout(() => {
+        
+        // 重置表单
+        document.getElementById('fieldInfo').value = '';
+        document.getElementById('samplesInfo').value = '';
+        document.getElementById('biddingInstructions').value = '';
+        document.getElementById('captchaInput').value = '';
+        document.getElementById('fileInput').value = '';
+        document.getElementById('filePreview').innerHTML = '';
+        document.getElementById('filePreview').style.display = 'none';
+        
+        // 重置字符计数
+        document.querySelectorAll('.word-count').forEach(counter => {
+            counter.textContent = '0 / 100';
+            counter.style.color = 'rgba(0, 0, 0, 0.25)';
+        });
+        
+        // 刷新验证码
+        refreshCaptcha();
+        
+        // 恢复按钮
+        submitButton.querySelector('.submit-text').textContent = originalText;
+        submitButton.style.pointerEvents = 'auto';
+        submitButton.style.opacity = '1';
+    }, 2000);
+}
+
+// 快捷键支持
+document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + Enter 提交表单
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        submitForm();
+    }
+    
+    // F5 刷新验证码
+    if (e.key === 'F5') {
+        e.preventDefault();
+        refreshCaptcha();
+    }
+});
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharacterCount();
+    initializeFileUpload();
+    refreshCaptcha();
+});
+
+// 自动保存草稿（可选功能）
+function autoSaveDraft() {
+    const draftData = {
+        fieldInfo: document.getElementById('fieldInfo').value,
+        samplesInfo: document.getElementById('samplesInfo').value,
+        biddingInstructions: document.getElementById('biddingInstructions').value,
+        timestamp: new Date().toISOString()
+    };
+    
+    localStorage.setItem('bidFormDraft', JSON.stringify(draftData));
+}
+
+// 恢复草稿
+function restoreDraft() {
+    // const draft = localStorage.getItem('bidFormDraft');
+    // if (draft) {
+    //     const draftData = JSON.parse(draft);
+        
+    //     if (confirm('发现未完成的草稿，是否恢复？')) {
+    //         document.getElementById('fieldInfo').value = draftData.fieldInfo || '';
+    //         document.getElementById('samplesInfo').value = draftData.samplesInfo || '';
+    //         document.getElementById('biddingInstructions').value = draftData.biddingInstructions || '';
+            
+    //         // 更新字符计数
+    //         document.querySelectorAll('textarea').forEach(textarea => {
+    //             const event = new Event('input');
+    //             textarea.dispatchEvent(event);
+    //         });
+    //     }
+    // }
+}
+
+// 页面加载时恢复草稿
+window.addEventListener('load', restoreDraft);
+
+// 定期自动保存
+setInterval(autoSaveDraft, 30000); // 每30秒保存一次
