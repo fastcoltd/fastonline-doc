@@ -144,7 +144,20 @@ function createItemElement(item) {
                 Nesciunt quibusdam quae nihil debitis eveniet quidem perspiciatis numquam. Voluptatem necessitatibus occaecati voluptatem qui blanditiis eligendi. Quod rerum itaque tempora dolorem tenetur molestias aut deleniti incidunt. Sit alias sed ea dolorem unde culpa incidunt neque.
             </span></p>
           </div>
-          <span class="item-service">Fuga nisi id dicta fugi Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.t.</span>
+          <span class="bidding-text">Bidding pictures</span>
+          <div class="bidding-box">
+            <img src="image" class="bidding-item" />
+            <img src="image" class="bidding-item" />
+            <img src="image" class="bidding-item" />
+            <img src="image" class="bidding-item" />
+            <img src="image" class="bidding-item" />
+            <img src="image" class="bidding-item" />
+            <img src="image" class="bidding-item" />
+            <img src="image" class="bidding-item" />
+            <img src="image" class="bidding-item" />
+            <img src="image" class="bidding-item" />
+          </div>
+          <span class="item-service demand-desc">Fuga nisi id dicta fugi Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.t.</span>
         </div>
         <div class="demand-edit-box demand-edit-box1">Edit</div>
         <!-- 状态标签 -->
