@@ -165,7 +165,7 @@
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'store_id', label: '店铺', className: 'col-store-id', formatter: v => storeData.find(s => s.id === v)?.store_name || '未知' },
             { name: 'status', label: '状态', className: 'col-status', formatter: v => v === 0 ? '<span class="ant-tag ant-tag-red">禁用</span>' : '<span class="ant-tag ant-tag-green">启用</span>' },
-            { name: 'username', label: '用户名', className: 'col-username' },
+            { name: 'username', label: '用户名/邮箱', className: 'col-username' },
             { name: 'nick_name', label: '昵称', className: 'col-nick-name' },
             { name: 'avatar', label: '头像', className: 'col-avatar', formatter: v => v ? `<div class="avatar-preview"><img src="${v}" alt="头像" onclick="enlargeImage(null, 0, ['${v}'])"></div>` : '<div class="avatar-preview"><span class="placeholder" onclick="alert(\'头像不存在\')">无</span></div>' },
             { name: 'phone', label: '电话', className: 'col-phone' },
@@ -179,7 +179,7 @@
         filterFields: [
             { id: 'store_id', type: 'select', options: [{ value: '', label: '全部店铺' }, ...getStoreOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.store_id === parseInt(value)) },
             { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '禁用' }, { value: '1', label: '启用' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
-            { id: 'username', type: 'text', placeholder: '搜索用户名', filter: (data, value) => value ? data.filter(d => d.username.toLowerCase().includes(value.toLowerCase())) : data },
+            { id: 'username', type: 'text', placeholder: '搜索用户名/邮箱', filter: (data, value) => value ? data.filter(d => d.username.toLowerCase().includes(value.toLowerCase())) : data },
             { id: 'nick_name', type: 'text', placeholder: '搜索昵称', filter: (data, value) => value ? data.filter(d => d.nick_name.toLowerCase().includes(value.toLowerCase())) : data },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
             { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
@@ -192,8 +192,8 @@
                     { name: 'store_id', label: '店铺', type: 'select', options: getStoreOptions, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'title', label: '职位', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'username', label: '用户名', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'password', label: '密码', type: 'password', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    { name: 'username', label: '用户邮箱', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                    // { name: 'password', label: '密码', type: 'password', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'nick_name', label: '昵称', type: 'text', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
                 ]
             },
@@ -221,6 +221,5 @@
         }
     });
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91c506a2adc65293',t:'MTc0MTI5NzM3Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
