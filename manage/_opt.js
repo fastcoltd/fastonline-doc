@@ -390,13 +390,20 @@ function renderModal(isEditingMode) {
                         const label = document.createElement('label');
                         label.textContent = subField.label;
                         subFormItem.appendChild(label);
-
-                        const subInput = document.createElement('select');
-                        subInput.id = `modalfield_ids_${subField.name}_${idx}`;
-                        if (typeof subField.options === 'function') {
-                            subField.options = subField.options();
+                        let subInput;
+                        if (subField.type == 'select'){
+                            subInput = document.createElement('select');
+                            subInput.id = `${tabField.name}_${subField.name}_${idx}`;
+                            if (typeof subField.options === 'function') {
+                                subField.options = subField.options();
+                            }
+                            subInput.innerHTML = subField.options.map(opt => `<option value="${opt.value}" ${item && item[subField.name] == opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
+                        } else {
+                            subInput = document.createElement('input');
+                            subInput.type = subField.type || 'text';
+                            subInput.placeholder = subField.placeholder || '';
+                            subInput.id = `${tabField.name}_${subField.name}_${idx}`;
                         }
-                        subInput.innerHTML = subField.options.map(opt => `<option value="${opt.value}" ${item && item[subField.name] == opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
                         subFormItem.appendChild(subInput);
                         itemDiv.appendChild(subFormItem);
                     });
@@ -432,8 +439,8 @@ function renderModal(isEditingMode) {
                             items.forEach((item, newIdx) => {
                                 item.dataset.index = newIdx;
                                 const selects = item.querySelectorAll('select');
-                                if (selects[0]) selects[0].id = `modalfield_ids_${tabField.subFields[0].name}_${newIdx}`;
-                                if (selects[1]) selects[1].id = `modalfield_ids_${tabField.subFields[1].name}_${newIdx}`;
+                                if (selects[0]) selects[0].id = `modal_${tabField.id}_${tabField.subFields[0].name}_${newIdx}`;
+                                if (selects[1]) selects[1].id = `modal_${tabField.id}_${tabField.subFields[1].name}_${newIdx}`;
                                 list.appendChild(item);
                             });
                             draggedFieldIndex = null;
@@ -453,7 +460,7 @@ function renderModal(isEditingMode) {
                         if (!addBtn) {
                             addBtn = document.createElement('button');
                             addBtn.className = 'ant-btn ant-btn-primary add-field-btn';
-                            addBtn.textContent = '添加字段';
+                            addBtn.textContent = '添加';
                             addBtn.onclick = (e) => {
                                 e.preventDefault();
                                 if (list.children.length < maxItems) {
@@ -484,6 +491,7 @@ function renderModal(isEditingMode) {
                 input = document.createElement('input');
                 input.type = tabField.type || 'text';
                 input.placeholder = tabField.placeholder || '';
+                input.value = undefined === tabField.defaultValue ? '' : tabField.defaultValue;
                 input.id = `modal${field.name}`;
             }
             input.disabled = isEditingMode ? !tabField.editableInEdit : !tabField.editableInAdd;

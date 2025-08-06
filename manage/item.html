@@ -34,6 +34,13 @@
         .attr-container .ant-btn { padding: 4px 8px; }
         .cover-pic-preview img { width: 30px; height: 30px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
         .cover-pic-preview .placeholder { width: 30px; height: 30px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #888; cursor: pointer; }
+
+        .table-list .field-list-item { display: flex; align-items: center; gap: 8px; margin: 0.5em; padding: 0.2em; background: #fafafa; border: 1px solid #ddd; border-radius: 4px; cursor: move; }
+        .table-list .field-list-item.dragging { opacity: 0.5; }
+        .table-list .field-list-item .ant-form-item { margin: 0!important; }
+        .table-list .field-list-item input { width: 200px; padding: 4px; border: 1px solid #d9d9d9; border-radius: 4px; }
+        .table-list .field-list-item button { padding: 4px 8px; }
+        .table-list .add-field-btn { margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -635,11 +642,42 @@
             ]
         },
         {
+            id: 'item_wholesale',
+            title: '批发优惠',
+            fields: [
+                {
+                    name: 'item_wholesale',
+                    label: '批发价',
+                    type: 'table-list',
+                    subFields: [
+                        {
+                            name: 'quantity',
+                            label: '数量',
+                            type: 'number',
+                        },
+                        {
+                            name: 'discount',
+                            label: '折扣',
+                            type: 'number',
+                        },
+                        {
+                            name: 'unit_price',
+                            label: '价格',
+                            type: 'number',
+                        }
+                    ],
+                    maxItems: 10,
+                    editableInAdd: true,
+                    editableInEdit: true
+                }
+            ]
+        },
+        {
             id: 'limitPurchase',
             title: '限购(单人)',
             fields: [
                 {name: 'status', label: '状态', type: 'select', options: [{value: 0, label: '禁用'}, {value: 1, label: '启用'}], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, multiple: true },
-                {name: 'limit_single', label: '单次购买数量', placeholder: '(0表示无限制)', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, multiple: true },
+                {name: 'limit_single', label: '单次购买数量', placeholder: '(0表示无限制)', defaultValue: 0, type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, multiple: true },
                 {name: 'limit_user', label: '总购买数量', placeholder: '(0表示无限制)', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, multiple: true },
                 {name: 'limit_day', label: '每日购买数量',  placeholder: '(0表示无限制)',type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, multiple: true },
                 {name: 'limit_week', label: '每周购买数量',  placeholder: '(0表示无限制)',type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, multiple: true },
