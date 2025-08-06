@@ -483,6 +483,7 @@ function renderModal(isEditingMode) {
             else {
                 input = document.createElement('input');
                 input.type = tabField.type || 'text';
+                input.placeholder = tabField.placeholder || '';
                 input.id = `modal${field.name}`;
             }
             input.disabled = isEditingMode ? !tabField.editableInEdit : !tabField.editableInAdd;
