@@ -225,10 +225,15 @@ function renderModal(isEditingMode) {
                 const maxItems = tabField.maxItems || Infinity;
                 const updateAddButton = () => {
                     let addBtn = input.querySelector('.ant-btn-primary');
-                    if (list.children.length === 0 && list.children.length < maxItems) {
+                    if (list.children.length < maxItems) {
                         if (!addBtn) {
-                            addBtn = document.createElement('button'); addBtn.className = 'ant-btn ant-btn-primary'; addBtn.textContent = '添加';
-                            addBtn.onclick = () => { if (list.children.length < maxItems) { createListItem(); updateAddButton(); } };
+                            addBtn = document.createElement('a'); addBtn.className = 'ant-btn ant-btn-primary'; addBtn.textContent = '添加';
+                            addBtn.onclick = () => {
+                                if (list.children.length < maxItems) {
+                                    createListItem();
+                                    updateAddButton();
+                                }
+                            };
                             input.insertBefore(addBtn, list);
                         }
                     } else if (addBtn) {

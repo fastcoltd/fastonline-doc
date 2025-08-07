@@ -580,6 +580,40 @@
             ]
         },
         {
+            id: 'lang',
+            title: '多语言信息',
+            fields: [
+                { name: 'language', label: '语言', type: 'select', options: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
+                { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '已上线' }, { value: 2, label: '已驳回' }], isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'version', label: '版本', type: 'number', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'name', label: '商品名称', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'after_sales_rules', label: '售后规则', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'sample_pics', label: '示例图片', type: 'file', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, multiple: true },
+                { name: 'content', label: '内容', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'site_reply', label: '站点回复', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
+                { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), isLangField: true, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+                { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), isLangField: true, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
+
+                {
+                    name: 'item_show',
+                    label: '商品展示',
+                    type: 'list',
+                    maxItems: 3, // 限制最多一个示例
+                    editableInAdd: true,
+                    editableInEdit: true,
+                    subFields: [
+                        { name: 'title', label: '标题', type: 'text', isLangField: true, editableInAdd: true, editableInEdit: true },
+                        { name: 'summary', label: '摘要', type: 'textarea', isLangField: true, editableInAdd: true, editableInEdit: true },
+                        { name: 'show_data', label: '展示图片', type: 'file', isLangField: false, multiple: true, editableInAdd: true, editableInEdit: true },
+                        // { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], editableInAdd: true, editableInEdit: true },
+                        // { name: 'sort_index', label: '排序', type: 'number', editableInAdd: true, editableInEdit: true }
+                    ]
+                }
+            ]
+        },
+        {
             id: 'stock',
             title: '库存信息',
             fields: [
@@ -600,45 +634,6 @@
                 { name: 'choose_field_index', label: '选择字段索引', type: 'number', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                 { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
                 { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
-            ]
-        },
-        {
-            id: 'lang',
-            title: '多语言信息',
-            fields: [
-                { name: 'language', label: '语言', type: 'select', options: ['en_US', 'zh_CN', 'fr_FR', 'es_ES', 'vi_VN', 'ru_RU'].map(l => ({ value: l, label: l })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: false },
-                { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '待审核' }, { value: 1, label: '已上线' }, { value: 2, label: '已驳回' }], isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                { name: 'version', label: '版本', type: 'number', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                { name: 'seo_keywords', label: 'SEO关键词', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                { name: 'seo_description', label: 'SEO描述', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                { name: 'name', label: '商品名称', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                { name: 'after_sales_rules', label: '售后规则', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                { name: 'sample_pics', label: '示例图片', type: 'file', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true, multiple: true },
-                { name: 'content', label: '内容', type: 'textarea', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                { name: 'site_reply', label: '站点回复', type: 'text', isLangField: true, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), isLangField: true, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
-                { name: 'update_time', label: '更新时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), isLangField: true, showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
-            ]
-        },
-        {
-            id: 'item_show',
-            title: '商品展示',
-            fields: [
-                {
-                    name: 'item_show',
-                    label: '商品展示',
-                    type: 'list',
-                    maxItems: 1, // 限制最多一个示例
-                    editableInAdd: true,
-                    editableInEdit: true,
-                    subFields: [
-                        { name: 'title', label: '标题', type: 'text', isLangField: true, editableInAdd: true, editableInEdit: true },
-                        { name: 'summary', label: '摘要', type: 'textarea', isLangField: true, editableInAdd: true, editableInEdit: true },
-                        { name: 'show_data', label: '展示图片', type: 'file', isLangField: false, multiple: true, editableInAdd: true, editableInEdit: true },
-                        // { name: 'status', label: '状态', type: 'select', options: [{ value: 0, label: '禁用' }, { value: 1, label: '启用' }], editableInAdd: true, editableInEdit: true },
-                        // { name: 'sort_index', label: '排序', type: 'number', editableInAdd: true, editableInEdit: true }
-                    ]
-                }
             ]
         },
         {
