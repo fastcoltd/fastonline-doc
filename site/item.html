@@ -299,8 +299,9 @@
 
     function renderItemInfo() {
         const wholesaleData = generateData(itemWholesaleFieldConfig, randomInt(0, 4));
-        const shippingType = faker.random.arrayElement(['Automatic', 'Manual']);
+        const shippingType = faker.random.arrayElement(['系统自动', '人工交付']);
 
+        const delivery_parallel = randomInt(0, 1) > 0 ? `同时进行` : `逐件进行`
         const badgesHtml = generateBadge('Item',0,3);
         document.getElementById('item-info-left').innerHTML = `<img src="${itemData.image}" alt="${itemName}">`;
         document.getElementById('item-info-right').innerHTML = `
@@ -308,7 +309,9 @@
         <p>Price: <span style="color: red; font-weight: bold">${itemData.price}</span>
             ${itemData.original_price ? `<span style="color: #A9A9A9; text-decoration: line-through">${itemData.original_price.sample}</span>` : ''}
             库存: ${itemData.stock_quantity.sample} (${itemData.last_restock_time.sample})
-            发货: <span style="color: ${shippingType === 'Automatic' ? '#32CD32' : '#4682B4'}">${shippingType}</span></p>
+            发货: <span style="color: ${shippingType === 'Automatic' ? '#32CD32' : '#4682B4'}">${shippingType}</span>
+            Parallel: <span style="color: ${randomInt(0, 1) > 0 ? '#32CD32' : '#4682B4'}">${delivery_parallel}</span>
+            Delivery Cycle: <span>${randomInt(1, 100)}分钟</span></p>
         ${wholesaleData.length ? `
             <div class="item-wholesale">
                 批发价: ${wholesaleData.map(w => `<div class="wholesale-block"><span>${w.quantity.sample}~${w.quantity.sample + 100}</span>: <b>${w.unit_price}</b></div>`).join('')}
