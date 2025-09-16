@@ -1,4 +1,3 @@
-<!-- 前半部分已在上一回答中提供，以下是完整代码 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -126,6 +125,9 @@
                                     <button class="ant-btn ant-btn-primary" onclick="addItem()">添加</button>
                                     <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
                                     <button class="ant-btn" onclick="batchEditCheckStatus()">批量修改审核状态</button>
+                                    <button class="ant-btn" onclick="batchEditSoldStatus()">批量修改销售状态</button>
+                                    <button class="ant-btn" onclick="batchEditDeleteStatus()">批量修改删除状态</button>
+                                    <button class="ant-btn" onclick="batchEditReplacementStatus()">批量修改售后状态</button>
                                 </div>
                                 <!-- 数据区域 -->
                                 <div class="task-list">
@@ -350,6 +352,111 @@
             </form>
         </div>
     </div>
+    <!-- 批量修改销售状态 -->
+    <div class="ant-modal" id="batchEditSoldStatusModal" style="display: none;">
+        <div class="ant-modal-content">
+            <div class="ant-modal-header">
+                <div class="ant-modal-title">批量修改销售状态</div>
+                <button class="ant-modal-close" onclick="closeModal('batchEditSoldStatusModal')">
+                    <span class="ant-modal-close-x">×</span>
+                </button>
+            </div>
+            <div class="ant-modal-body">
+                <div class="ant-form ant-form-horizontal">
+                    <div class="ant-form-item">
+                        <label class="ant-form-item-label">选中的ID:</label>
+                        <div class="ant-form-item-control">
+                            <span id="selectedIdsForSoldStatus"></span>
+                        </div>
+                    </div>
+                    <div class="ant-form-item">
+                        <label class="ant-form-item-label">新销售状态:</label>
+                        <div class="ant-form-item-control">
+                            <select class="ant-select" id="newSoldStatus">
+                                <option value="未销售">未销售</option>
+                                <option value="已销售">已销售</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ant-modal-footer">
+                <button class="ant-btn" onclick="closeModal('batchEditSoldStatusModal')">取消</button>
+                <button class="ant-btn ant-btn-primary" onclick="saveBatchEditSoldStatus()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量修改删除状态 -->
+    <div class="ant-modal" id="batchEditDeleteStatusModal" style="display: none;">
+        <div class="ant-modal-content">
+            <div class="ant-modal-header">
+                <div class="ant-modal-title">批量修改删除状态</div>
+                <button class="ant-modal-close" onclick="closeModal('batchEditDeleteStatusModal')">
+                    <span class="ant-modal-close-x">×</span>
+                </button>
+            </div>
+            <div class="ant-modal-body">
+                <div class="ant-form ant-form-horizontal">
+                    <div class="ant-form-item">
+                        <label class="ant-form-item-label">选中的ID:</label>
+                        <div class="ant-form-item-control">
+                            <span id="selectedIdsForDeleteStatus"></span>
+                        </div>
+                    </div>
+                    <div class="ant-form-item">
+                        <label class="ant-form-item-label">新删除状态:</label>
+                        <div class="ant-form-item-control">
+                            <select class="ant-select" id="newDeleteStatus">
+                                <option value="未删除">未删除</option>
+                                <option value="已删除">已删除</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ant-modal-footer">
+                <button class="ant-btn" onclick="closeModal('batchEditDeleteStatusModal')">取消</button>
+                <button class="ant-btn ant-btn-primary" onclick="saveBatchEditDeleteStatus()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量修改售后状态 -->
+    <div class="ant-modal" id="batchEditReplacementStatusModal" style="display: none;">
+        <div class="ant-modal-content">
+            <div class="ant-modal-header">
+                <div class="ant-modal-title">批量修改售后状态</div>
+                <button class="ant-modal-close" onclick="closeModal('batchEditReplacementStatusModal')">
+                    <span class="ant-modal-close-x">×</span>
+                </button>
+            </div>
+            <div class="ant-modal-body">
+                <div class="ant-form ant-form-horizontal">
+                    <div class="ant-form-item">
+                        <label class="ant-form-item-label">选中的ID:</label>
+                        <div class="ant-form-item-control">
+                            <span id="selectedIdsForReplacementStatus"></span>
+                        </div>
+                    </div>
+                    <div class="ant-form-item">
+                        <label class="ant-form-item-label">新售后状态:</label>
+                        <div class="ant-form-item-control">
+                            <select class="ant-select" id="newReplacementStatus">
+                                <option value="未替换">未替换</option>
+                                <option value="已替换">已替换</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ant-modal-footer">
+                <button class="ant-btn" onclick="closeModal('batchEditReplacementStatusModal')">取消</button>
+                <button class="ant-btn ant-btn-primary" onclick="saveBatchEditReplacementStatus()">保存</button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
