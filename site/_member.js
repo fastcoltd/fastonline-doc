@@ -909,6 +909,10 @@ function generateShoppingPopup(item, cardElement) {
                 </div>
             </div>
             <div class="popup-row">
+                <label class="popup-label">Delivery-Type:</label>
+                <span class="popup-value popup-price" id="popup-base-delivery-type">Manual/Automatic</span>
+            </div>
+            <div class="popup-row">
                 <label class="popup-label">Price:</label>
                 <span class="popup-value popup-price" id="popup-base-price">${priceDisplay}</span>
             </div>
