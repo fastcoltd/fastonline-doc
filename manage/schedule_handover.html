@@ -154,6 +154,7 @@
             ` }
         ],
         filterFields: [
+            { id: 'handover_type', type: 'select', options: [{ value: '', label: '全部类型' }, { value: '0', label: 'KYC审核' }, { value: '1', label: '文章审核' }, { value: '2', label: '店铺审核' }, { value: '3', label: '商品审核' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
             { id: 'status', type: 'select', options: [{ value: '', label: '全部状态' }, { value: '0', label: '交接中' }, { value: '1', label: '已完结' }, { value: '2', label: '超时' }], filter: (data, value) => value === '' ? data : data.filter(d => d.status === parseInt(value)) },
             { id: 'work_sort', type: 'select', options: priorityOptions, filter: (data, value) => value === '' ? data : data.filter(d => d.work_sort === parseInt(value)) },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
