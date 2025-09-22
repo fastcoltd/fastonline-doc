@@ -102,6 +102,7 @@
             { name: 'month', generator: () => getRandomItem(months) },
             { name: 'manage_id', generator: () => randomInt(1, 15) },
             { name: 'schedule_count', generator: () => randomInt(20, 25) },
+            { name: 'schedule_true_count', generator: () => randomInt(18, 25) },
             { name: 'expected_hours', generator: () => randomInt(160, 200) }, // 独立随机
             { name: 'actual_hours', generator: () => randomInt(140, 200) }, // 独立随机，不关联expected_hours
             { name: 'sign_normal', generator: () => randomInt(15, 20) },
@@ -117,6 +118,7 @@
             { name: 'month', label: '月份', className: 'col-month', formatter: v => moment(v, 'YYYY-MM').format('YYYY年MM月') },
             { name: 'manage_id', label: '员工', className: 'col-manage-id', formatter: v => manageIds.find(m => m.value === v)?.label || '未知' },
             { name: 'schedule_count', label: '排班次数', className: 'col-schedule-count' },
+            { name: 'schedule_true_count', label: '到班次数', className: 'col-schedule-count' },
             { name: 'expected_hours', label: '应上时数', className: 'col-expected-hours' },
             { name: 'actual_hours', label: '实际时数', className: 'col-actual-hours', formatter: (v, item) => {
                     const diff = item.expected_hours - v;
