@@ -251,10 +251,6 @@
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'role_name', label: '角色名称', className: 'col-role-name' },
             { name: 'mark', label: '角色备注', className: 'col-mark' },
-            { name: 'permissions', label: '权限', className: 'col-permissions', formatter: (_, item) => {
-                    const perms = tableLangData.filter(p => p.role_id === item.id);
-                    return perms.length ? perms.map(p => resources[p.resource_id - 1]).join('; ') : '无';
-                }},
             { name: 'resource_id', label: '资源权限', className: 'col-permissions', formatter: ()=>{return randomInt(10, 200)} },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
