@@ -123,6 +123,9 @@
     function getAttrOptions() {
         return attrData.map(item => ({ value: item.id, label: item.attr_name }));
     }
+    function getRequiredOptions() {
+        return [{ value: 0, label: "非必填" },{ value: 1, label: "必填" }];
+    }
 
     window.tableConfig = {
         tableName: 'services_attr_list',
@@ -133,6 +136,7 @@
             { name: 'id', isSystemField: true, generator: id => id },
             { name: 'services_id', generator: () => randomInt(1, 15) }, // 关联 services 表
             { name: 'attr_id', generator: () => randomInt(1, 15) }, // 关联 attr 表
+            { name: 'required', generator: () => randomInt(0, 1) ? true : false }, // 关联 attr 表
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() }
         ],
         actionButtons: [
@@ -140,12 +144,14 @@
             { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
             { label: '批量修改服务', className: 'ant-btn ant-btn-default', color: '#1890ff', field: { name: 'services_id', label: '服务', type: 'select', options: getServicesOptions } },
             { label: '批量修改属性', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'attr_id', label: '属性', type: 'select', options: getAttrOptions } },
+            { label: '批量修改必填', className: 'ant-btn ant-btn-default', color: 'red', field: { name: 'required', label: '是否必填', type: 'select', options:  getRequiredOptions} },
             { label: '批量添加', className: 'ant-btn ant-btn-primary', action: 'batchAddServicesAttr' } // 新增批量添加
         ],
         listFields: [
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'services_id', label: '服务', className: 'col-services-id', formatter: v => servicesData.find(s => s.id === v)?.services_name || '未知' },
             { name: 'attr_id', label: '属性', className: 'col-attr-id', formatter: v => attrData.find(a => a.id === v)?.attr_name || '未知' },
+            { name: 'required', label: '必填', className: 'col-attr-id', formatter: v => randomInt(0,1) ? "必填" : "非必填" },
             { name: 'create_time', label: '创建时间', className: 'col-create-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
             { name: 'actions', label: '操作', className: 'col-actions', formatter: (_, item) => `
                 <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
@@ -155,6 +161,7 @@
         filterFields: [
             { id: 'services_id', type: 'select', options: [{ value: '', label: '全部服务' }, ...getServicesOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.services_id === parseInt(value)) },
             { id: 'attr_id', type: 'select', options: [{ value: '', label: '全部属性' }, ...getAttrOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.attr_id === parseInt(value)) },
+            { id: 'required', type: 'select', options: [{ value: '', label: '全部' }, ...getRequiredOptions()], filter: (data, value) => value === '' ? data : data.filter(d => d.required === parseInt(value)) },
             { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrAfter(value)) : data },
             { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.create_time).isSameOrBefore(value)) : data }
         ],
