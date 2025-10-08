@@ -130,7 +130,6 @@ let memberMenuConfig = [
             { text: "店铺信息", icon: "fas fa-cogs", href: "/site/store/info.html" },
             { text: "钱包管理", icon: "fas fa-money-check-alt", href: "/site/store/wallet.html"},
             { text: "博客设置", icon: "fas fa-blog", href: "/site/store/blog.html" },
-            { text: "文章分类", icon: "fas fa-newspaper", href: "/site/store/posts-type.html" },
             { text: "文章管理", icon: "fas fa-newspaper", href: "/site/store/posts-manage.html" },
         ]},
     { text: "我的订单", icon: "fas fa-shopping-cart", show: true, memberSidebar: true, store: false, href: "/site/member/orders.html" },
