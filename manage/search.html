@@ -23,6 +23,7 @@
         .col-keywords { width: 12%; min-width: 100px; }
         .col-status { width: 8%; min-width: 60px; }
         .col-brand-id { width: 8%; min-width: 60px; }
+        .col-services-id { width: 8%; min-width: 60px; }
         .col-search-type { width: 8%; min-width: 60px; }
         .col-sort-index { width: 8%; min-width: 60px; }
         .col-search-count { width: 8%; min-width: 60px; }
@@ -72,6 +73,7 @@
                                         </select>
                                     </div>
                                     <input type="number" id="brandIdFilter" class="ant-input" placeholder="品牌ID">
+                                    <input type="number" id="servicesIdFilter" class="ant-input" placeholder="服务ID">
                                     <input type="text" id="keywordsFilter" class="ant-input" placeholder="搜索关键词">
                                     <input type="date" id="startDate" class="ant-input">
                                     <input type="date" id="endDate" class="ant-input">
@@ -93,6 +95,7 @@
                                         <div class="col-keywords">关键词</div>
                                         <div class="col-status">状态</div>
                                         <div class="col-brand-id">品牌ID</div>
+                                        <div class="col-services-id">服务ID</div>
                                         <div class="col-search-type">搜索类型</div>
                                         <div class="col-sort-index">排序</div>
                                         <div class="col-search-count">搜索次数</div>
@@ -164,6 +167,10 @@
                                 <div class="ant-form-item">
                                     <label>品牌ID:</label>
                                     <input type="number" id="modalBrandId">
+                                </div>
+                                <div class="ant-form-item">
+                                    <label>服务ID:</label>
+                                    <input type="number" id="modalServiceId">
                                 </div>
                                 <div class="ant-form-item">
                                     <label>状态:</label>
@@ -280,6 +287,7 @@
                 id: i,
                 search_type: Math.floor(Math.random() * 3),
                 brand_id: Math.floor(Math.random() * 100),
+                services_id: Math.floor(Math.random() * 100),
                 status,
                 sort_index: Math.floor(Math.random() * 1000),
                 search_count: Math.floor(Math.random() * 5000),
@@ -325,6 +333,7 @@
                     <div class="col-keywords">${langEntry.keywords}</div>
                     <div class="col-status">${statusTag}</div>
                     <div class="col-brand-id">${search.brand_id}</div>
+                    <div class="col-services-id">${search.services_id}</div>
                     <div class="col-search-type">${searchTypeText}</div>
                     <div class="col-sort-index">${search.sort_index}</div>
                     <div class="col-search-count">${search.search_count}</div>
@@ -346,6 +355,7 @@
 
     function applyFilters() {
         const brandId = document.getElementById('brandIdFilter').value;
+        const servicesId = document.getElementById('servicesIdFilter').value;
         const language = document.getElementById('languageFilter').value;
         const keywords = document.getElementById('keywordsFilter').value.toLowerCase();
         const startDate = document.getElementById('startDate').value;
@@ -355,6 +365,7 @@
         let filteredLangs = searchLangData;
 
         if (brandId) filteredSearches = filteredSearches.filter(item => item.brand_id === parseInt(brandId));
+        if (servicesId) filteredSearches = filteredSearches.filter(item => item.services_id === parseInt(servicesId));
         if (startDate) filteredSearches = filteredSearches.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
         if (endDate) filteredSearches = filteredSearches.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
         if (language) filteredLangs = filteredLangs.filter(item => item.language === language);
@@ -430,6 +441,7 @@
         document.getElementById('modalSearchId').value = search.id;
         document.getElementById('modalSearchType').value = search.search_type;
         document.getElementById('modalBrandId').value = search.brand_id;
+        document.getElementById('modalServiceId').value = search.services_id;
         document.getElementById('modalStatus').value = search.status;
         document.getElementById('modalSortIndex').value = search.sort_index;
         document.getElementById('modalSearchCount').value = search.search_count;
