@@ -97,7 +97,7 @@
             color: #6b7280;
             font-size: 0.875em;
         }
-        .staff-card .tags {
+        .staff-card .tags, .staff-card .notices {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5em;
@@ -105,6 +105,13 @@
         }
         .staff-card .tag {
             background: #f59e0b;
+            color: #fff;
+            padding: 0.25em 0.5em;
+            border-radius: 0.25em;
+            font-size: 0.75em;
+        }
+        .staff-card .notice-tag {
+            background: #1e90ff;
             color: #fff;
             padding: 0.25em 0.5em;
             border-radius: 0.25em;
@@ -268,6 +275,13 @@
         '权限分配', '日志查看', '退货处理', '换货处理', '投诉处理'
     ];
 
+    // 完善后的通知列表（店铺各种通知类型）
+    const allNotices = [
+        '新订单通知', '退款请求通知', '库存警报通知', '用户投诉通知', '促销结束通知',
+        '支付失败通知', '发货提醒通知', '评价更新通知', '店铺审核通知', '系统维护通知',
+        '会员升级通知', '优惠券到期通知', '数据报告通知', '安全警报通知', '合作邀请通知'
+    ];
+
     // 模拟员工数据
     let staffData = [];
     function generateStaffData() {
@@ -281,6 +295,15 @@
                 permIndices.add(Math.floor(Math.random() * allPermissions.length));
             }
             permIndices.forEach(idx => permissions.push(allPermissions[idx]));
+
+            const noticeCount = Math.floor(Math.random() * 6) + 5; // 5-10个通知
+            const notices = [];
+            const noticeIndices = new Set();
+            while (noticeIndices.size < noticeCount) {
+                noticeIndices.add(Math.floor(Math.random() * allNotices.length));
+            }
+            noticeIndices.forEach(idx => notices.push(allNotices[idx]));
+
             const job = jobTitles[Math.floor(Math.random() * jobTitles.length)];
             staffData.push({
                 id: faker.datatype.number({ min: 1000, max: 9999 }),
@@ -296,7 +319,8 @@
                 create_time: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
                 last_login_ip: faker.internet.ip(),
                 last_login_time: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
-                permissions: permissions
+                permissions: permissions,
+                notices: notices
             });
         }
     }
@@ -327,6 +351,9 @@
                 <p>最后登录: ${staff.last_login_time}</p>
                 <div class="tags">
                     ${staff.permissions.map(perm => `<span class="tag">${perm}</span>`).join('')}
+                </div>
+                <div class="notices">
+                    ${staff.notices.map(notice => `<span class="notice-tag">${notice}</span>`).join('')}
                 </div>
             `;
             container.appendChild(card);
@@ -393,6 +420,12 @@
                         ${allPermissions.map(perm => `<option value="${perm}">${perm}</option>`).join('')}
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>通知</label>
+                    <select id="add-notices" multiple class="permissions-select">
+                        ${allNotices.map(notice => `<option value="${notice}">${notice}</option>`).join('')}
+                    </select>
+                </div>
                 <button class="action-btn" onclick="addStaff()">保存</button>
             </div>
         `;
@@ -443,6 +476,8 @@
         const status = parseInt(document.getElementById('add-status').value);
         const permissionsSelect = document.getElementById('add-permissions');
         const permissions = Array.from(permissionsSelect.selectedOptions).map(opt => opt.value);
+        const noticesSelect = document.getElementById('add-notices');
+        const notices = Array.from(noticesSelect.selectedOptions).map(opt => opt.value);
 
         const newStaff = {
             id: faker.datatype.number({ min: 1000, max: 9999 }),
@@ -458,7 +493,8 @@
             create_time: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
             last_login_ip: faker.internet.ip(),
             last_login_time: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
-            permissions: permissions
+            permissions: permissions,
+            notices: notices
         };
 
         if (avatarInput.files[0]) {
@@ -530,6 +566,12 @@
                         ${allPermissions.map(perm => `<option value="${perm}" ${staff.permissions.includes(perm) ? 'selected' : ''}>${perm}</option>`).join('')}
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>通知</label>
+                    <select id="edit-notices" multiple class="permissions-select">
+                        ${allNotices.map(notice => `<option value="${notice}" ${staff.notices.includes(notice) ? 'selected' : ''}>${notice}</option>`).join('')}
+                    </select>
+                </div>
                 <button class="action-btn" onclick="saveStaff(${staff.id})">保存</button>
             </div>
         `;
@@ -588,6 +630,8 @@
         staff.status = parseInt(document.getElementById('edit-status').value);
         const permissionsSelect = document.getElementById('edit-permissions');
         staff.permissions = Array.from(permissionsSelect.selectedOptions).map(opt => opt.value);
+        const noticesSelect = document.getElementById('edit-notices');
+        staff.notices = Array.from(noticesSelect.selectedOptions).map(opt => opt.value);
 
         document.querySelector('.staff-popup').remove();
         if (!avatarInput.files[0]) {
