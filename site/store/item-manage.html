@@ -255,7 +255,7 @@
                         <button class="sort-btn" onclick="moveItemTop(${item.id})"><i class="fas fa-angle-double-up"></i></button>
                         <button class="sort-btn" onclick="moveItemBottom(${item.id})"><i class="fas fa-angle-double-down"></i></button>
                     </td>
-                    <td class="status-${item.status}">${item.status === 0 ? '禁用' : '启用'}</td>
+                    <td class="status-${item.status}">${item.status !== 0 ? `在架  <button class="sort-btn" onclick="alert('下架')"><i class="fas fa-arrow-down"></i></button>` : `下架  <button class="sort-btn" onclick="alert('上架')"><i class="fas fa-arrow-up"></i></button>`}</td>
                     <td class="actions">
                         <button class="action-btn" title="编辑商品" onclick="editItem(${item.id})"><i class="fas fa-edit"></i></button>
                         <button class="action-btn" title="查看商品" onclick="viewItem('${encodeURIComponent(langData.name || '未设置')}')"><i class="fas fa-eye"></i></button>
