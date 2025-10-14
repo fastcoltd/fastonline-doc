@@ -23,6 +23,21 @@
         .col-create-time { width: 15%; min-width: 100px; }
         .col-complaint-content { width: 27%; min-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .col-actions { width: 15%; min-width: 120px; }
+
+        .reply-delete-btn {
+            background: #ff4d4f;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            padding: 2px 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 8px;
+            float: right;
+        }
+        .reply-delete-btn:hover {
+            background: #d9363e;
+        }
     </style>
 </head>
 <body>
@@ -97,6 +112,12 @@
         { value: 4, label: '处理完成', color: 'green' }
     ];
 
+    // 生成唯一ID用于回复记录
+    let replyIdCounter = 0;
+    function generateReplyId() {
+        return 'reply_' + (++replyIdCounter) + '_' + Date.now();
+    }
+
     // 生成混合回复历史
     function generateMixedReplyHistory() {
         const history = [];
@@ -106,30 +127,36 @@
             const time = moment().subtract(randomInt(1, 60), 'minutes').unix();
             const rand = Math.random();
             const adminName = getRandomAdminName();
+            const replyId = generateReplyId();
 
             if (rand < 0.25) {
                 // 用户回复
                 history.push({
+                    id: replyId,
                     type: 'user',
                     name: getRandomUserName(),
                     role: '用户',
                     color: '#1890ff',
                     content: getRandomItem(['这个商品质量太差了，要求退款！', '为什么这么晚才到货？我等不及了！', '服务态度很差，希望能处理一下']),
-                    time: time
+                    time: time,
+                    deletable: false // 用户记录不可删除
                 });
             } else if (rand < 0.5) {
                 // 店铺回复
                 history.push({
+                    id: replyId,
                     type: 'store',
                     name: getRandomStoreName(),
                     role: '店铺',
                     color: '#fa8c16',
                     content: getRandomItem(['非常抱歉给您带来不便，我们会立即调查', '商品已发出，请耐心等待2-3天', '我们会与您联系处理退款事宜']),
-                    time: time
+                    time: time,
+                    deletable: false // 店铺记录不可删除
                 });
             } else if (rand < 0.75) {
                 // 管理员回复
                 history.push({
+                    id: replyId,
                     type: 'admin',
                     name: adminName,
                     role: '系统',
@@ -137,19 +164,22 @@
                     content: getRandomItem(['正在跟进处理中', '问题核实属实，将对店铺进行处罚', '已协调双方达成解决方案']),
                     time: time,
                     admin_name: adminName,
-                    site_reply: true
+                    site_reply: true,
+                    deletable: true // 管理员回复可删除
                 });
             } else {
-                // 状态更新
+                // 状态更新 - 不可删除
                 const statusValue = randomInt(0, 4);
                 const statusInfo = statuses.find(s => s.value === statusValue);
                 history.push({
+                    id: replyId,
                     type: 'status',
                     status: statusValue,
                     content: `状态更新为：${statusInfo.label}`,
                     time: time,
                     admin_name: adminName,
-                    role: '系统'
+                    role: '系统',
+                    deletable: false // 状态更新记录不可删除
                 });
             }
         }
@@ -240,6 +270,31 @@
         ]
     };
 
+    // 删除回复记录 - 只有管理员回复可删除
+    function deleteReplyRecord(complaintId, replyId) {
+        const record = tableData.find(item => item.id === complaintId);
+        if (!record || !record.reply_history) return;
+
+        const replyIndex = record.reply_history.findIndex(r => r.id === replyId);
+        if (replyIndex === -1) return;
+
+        const reply = record.reply_history[replyIndex];
+
+        // 只有管理员回复（非状态更新）可以删除
+        if (!reply.deletable || reply.type === 'status') {
+            alert('状态更新记录无法删除，只能删除管理员回复记录！');
+            return;
+        }
+
+        const message = `确认删除这条管理员回复记录吗？\n\n${reply.content}`;
+
+        if (confirm(message)) {
+            record.reply_history.splice(replyIndex, 1);
+            renderTableList();
+            showReplyModal(complaintId);
+        }
+    }
+
     // 状态更新确认对话框
     function confirmStatusUpdate(id, newStatus) {
         const record = tableData.find(item => item.id === id);
@@ -274,9 +329,11 @@
 
         const currentStatus = statuses.find(s => s.value === record.status);
 
-        // 生成回复历史 - 显示角色
+        // 生成回复历史 - 只有管理员回复显示删除按钮
         const replyHistoryHtml = record.reply_history.map(reply => {
             let prefix = '[未知]', statusColor = '#ccc', roleDisplay = '';
+            const deleteBtn = (reply.deletable && reply.type !== 'status') ?
+                `<button class="reply-delete-btn" onclick="deleteReplyRecord(${id}, '${reply.id}')">删除</button>` : '';
 
             if (reply.type === 'user') {
                 prefix = `[${reply.name}]`;
@@ -298,7 +355,8 @@
                 roleDisplay = `<span style="color: #666; margin-left: 4px;">(${reply.role})</span>`;
                 const timeStr = moment.unix(reply.time).format('YYYY-MM-DD HH:mm:ss');
                 return `
-                    <div style="margin-bottom: 6px; padding: 6px 8px; background: #f9f9f9; border-left: 3px solid ${statusColor};">
+                    <div style="margin-bottom: 6px; padding: 6px 8px; background: #f9f9f9; border-left: 3px solid ${statusColor}; position: relative;">
+                        ${deleteBtn}
                         <span style="color: ${statusColor}; font-weight: bold;">${prefix}</span>
                         ${roleDisplay}
                         <span style="color: #333; margin-left: 8px; display: inline; white-space: pre-wrap; word-wrap: break-word; word-break: break-word;">${reply.content}</span>
@@ -315,7 +373,8 @@
             }
 
             return `
-                <div style="margin-bottom: 6px; padding: 6px 8px; background: #f9f9f9; border-left: 3px solid ${statusColor};">
+                <div style="margin-bottom: 6px; padding: 6px 8px; background: #f9f9f9; border-left: 3px solid ${statusColor}; position: relative;">
+                    ${deleteBtn}
                     <span style="color: ${statusColor}; font-weight: bold;">${prefix}</span>
                     ${roleDisplay}
                     <span style="color: #333; margin-left: 8px; display: inline; white-space: pre-wrap; word-wrap: break-word; word-break: break-word;">${reply.content}</span>
@@ -369,34 +428,24 @@
 
         const statusInfo = statuses.find(s => s.value === newStatus);
         const adminName = getRandomAdminName();
+        const replyId = generateReplyId();
         const timeStr = moment().unix();
 
         record.reply_history.push({
+            id: replyId,
             type: 'status',
             status: newStatus,
             content: `状态更新为：${statusInfo.label}`,
             time: timeStr,
             admin_name: adminName,
-            role: '系统'
+            role: '系统',
+            deletable: false // 状态更新不可删除
         });
 
         record.status = newStatus;
         renderTableList();
         showReplyModal(id);
-        alert(`状态已成功更新为：${statusInfo.label}`);
-    }
-
-    function confirmStatusUpdate(id, newStatus) {
-        const record = tableData.find(item => item.id === id);
-        if (!record) return;
-
-        const currentStatusInfo = statuses.find(s => s.value === record.status);
-        const newStatusInfo = statuses.find(s => s.value === newStatus);
-
-        const message = `确认将投诉状态从 "${currentStatusInfo ? currentStatusInfo.label : '未知'}" 更新为 "${newStatusInfo ? newStatusInfo.label : '未知'}"？\n\n此操作不可逆转！`;
-        if (newStatus < 2 || confirm(message)) {
-            updateComplaintStatus(id, newStatus);
-        }
+        // 移除成功提示
     }
 
     function submitSiteReply(id) {
@@ -409,9 +458,11 @@
         const record = tableData.find(item => item.id === id);
         if (record) {
             const adminName = getRandomAdminName();
+            const replyId = generateReplyId();
             const timeStr = moment().unix();
 
             record.reply_history.push({
+                id: replyId,
                 type: 'admin',
                 name: adminName,
                 role: '系统',
@@ -419,7 +470,8 @@
                 content: replyInput,
                 time: timeStr,
                 site_reply: true,
-                admin_name: adminName
+                admin_name: adminName,
+                deletable: true // 管理员回复可删除
             });
 
             record.system_reply_time = timeStr;
@@ -428,7 +480,21 @@
             document.getElementById('siteReplyInput').value = '';
             renderTableList();
             showReplyModal(id);
-            alert('回复提交成功！');
+            // 移除成功提示
+        }
+    }
+
+    function confirmStatusUpdate(id, newStatus) {
+        const record = tableData.find(item => item.id === id);
+        if (!record) return;
+
+        const currentStatusInfo = statuses.find(s => s.value === record.status);
+        const newStatusInfo = statuses.find(s => s.value === newStatus);
+
+        const message = `确认将投诉状态从 "${currentStatusInfo ? currentStatusInfo.label : '未知'}" 更新为 "${newStatusInfo ? newStatusInfo.label : '未知'}"？\n\n此操作不可逆转！`;
+
+        if (confirm(message)) {
+            updateComplaintStatus(id, newStatus);
         }
     }
 
