@@ -240,6 +240,21 @@
         ]
     };
 
+    // 状态更新确认对话框
+    function confirmStatusUpdate(id, newStatus) {
+        const record = tableData.find(item => item.id === id);
+        if (!record) return;
+
+        const currentStatusInfo = statuses.find(s => s.value === record.status);
+        const newStatusInfo = statuses.find(s => s.value === newStatus);
+
+        const message = `确认将投诉状态从 "${currentStatusInfo ? currentStatusInfo.label : '未知'}" 更新为 "${newStatusInfo ? newStatusInfo.label : '未知'}"？\n\n此操作不可逆转！`;
+
+        if (confirm(message)) {
+            updateComplaintStatus(id, newStatus);
+        }
+    }
+
     // 自定义回复弹窗
     function showReplyModal(id) {
         const record = tableData.find(item => item.id === id);
@@ -287,7 +302,7 @@
                         <span style="color: ${statusColor}; font-weight: bold;">${prefix}</span>
                         ${roleDisplay}
                         <span style="color: #333; margin-left: 8px; display: inline; white-space: pre-wrap; word-wrap: break-word; word-break: break-word;">${reply.content}</span>
-                        <span style="color: #52c41a; margin-left: 8px;">(${adminName} ${moment.unix(reply.time).format('YYYY-MM-DD HH:mm:ss')})</span>
+                        <span style="color: #52c41a; margin-left: 8px;">(${adminName} ${timeStr})</span>
                     </div>
                 `;
             }
@@ -330,10 +345,12 @@
                 </div>
                 <div class="site-reply">
                     <div class="status-buttons" style="margin-bottom: 16px;">
-                        ${statuses.map(status => status.value <= record.status ?
-            `<button class="ant-btn" style="background-color: ${status.color}; color: #fff; margin-right: 8px; opacity: 0.5;" disabled>${status.label}</button>` :
-            `<button class="ant-btn" style="background-color: ${status.color}; color: #fff; margin-right: 8px;" onclick="updateComplaintStatus(${id}, ${status.value})">${status.label}</button>`
-        ).join('')}
+                        ${statuses.map(status => {
+            if (status.value <= record.status) {
+                return `<button class="ant-btn" style="background-color: ${status.color}; color: #fff; margin-right: 8px; opacity: 0.5;" disabled>${status.label}</button>`;
+            }
+            return `<button class="ant-btn" style="background-color: ${status.color}; color: #fff; margin-right: 8px;" onclick="confirmStatusUpdate(${id}, ${status.value})">${status.label}</button>`;
+        }).join('')}
                     </div>
                     <div style="margin-bottom: 8px;"><strong>管理员回复:</strong></div>
                     <textarea id="siteReplyInput" rows="4" class="ant-input" placeholder="输入管理员回复" style="width: 100%; margin-bottom: 8px;"></textarea>
@@ -366,6 +383,20 @@
         record.status = newStatus;
         renderTableList();
         showReplyModal(id);
+        alert(`状态已成功更新为：${statusInfo.label}`);
+    }
+
+    function confirmStatusUpdate(id, newStatus) {
+        const record = tableData.find(item => item.id === id);
+        if (!record) return;
+
+        const currentStatusInfo = statuses.find(s => s.value === record.status);
+        const newStatusInfo = statuses.find(s => s.value === newStatus);
+
+        const message = `确认将投诉状态从 "${currentStatusInfo ? currentStatusInfo.label : '未知'}" 更新为 "${newStatusInfo ? newStatusInfo.label : '未知'}"？\n\n此操作不可逆转！`;
+        if (newStatus < 2 || confirm(message)) {
+            updateComplaintStatus(id, newStatus);
+        }
     }
 
     function submitSiteReply(id) {
@@ -397,6 +428,7 @@
             document.getElementById('siteReplyInput').value = '';
             renderTableList();
             showReplyModal(id);
+            alert('回复提交成功！');
         }
     }
 
