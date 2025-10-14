@@ -71,13 +71,90 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    // 随机管理员英文名
+    const adminNames = [
+        'John Smith', 'Alice Johnson', 'Michael Brown', 'Sarah Davis',
+        'David Wilson', 'Emma Taylor', 'James Anderson', 'Olivia Martinez'
+    ];
+
+    // 店铺名称
+    const storeNames = [
+        'TechStore Pro', 'FashionHub', 'GadgetWorld', 'HomeEssentials'
+    ];
+
+    // 用户名称
+    const userNames = ['张三', '李四', '王五', '赵六'];
+
+    function getRandomAdminName() { return getRandomItem(adminNames); }
+    function getRandomStoreName() { return getRandomItem(storeNames); }
+    function getRandomUserName() { return getRandomItem(userNames); }
+
     const statuses = [
         { value: 0, label: '待处理', color: 'red' },
-        { value: 1, label: '跟进处理', color: 'orange' },
+        { value: 1, label: '跟进中', color: 'orange' },
         { value: 2, label: '核实完成', color: 'blue' },
         { value: 3, label: '处罚完成', color: 'purple' },
-        { value: 4, label: '投诉完结', color: 'green' }
+        { value: 4, label: '处理完成', color: 'green' }
     ];
+
+    // 生成混合回复历史
+    function generateMixedReplyHistory() {
+        const history = [];
+        const numEntries = randomInt(3, 6);
+
+        for (let i = 0; i < numEntries; i++) {
+            const time = moment().subtract(randomInt(1, 60), 'minutes').unix();
+            const rand = Math.random();
+            const adminName = getRandomAdminName();
+
+            if (rand < 0.25) {
+                // 用户回复
+                history.push({
+                    type: 'user',
+                    name: getRandomUserName(),
+                    role: '用户',
+                    color: '#1890ff',
+                    content: getRandomItem(['这个商品质量太差了，要求退款！', '为什么这么晚才到货？我等不及了！', '服务态度很差，希望能处理一下']),
+                    time: time
+                });
+            } else if (rand < 0.5) {
+                // 店铺回复
+                history.push({
+                    type: 'store',
+                    name: getRandomStoreName(),
+                    role: '店铺',
+                    color: '#fa8c16',
+                    content: getRandomItem(['非常抱歉给您带来不便，我们会立即调查', '商品已发出，请耐心等待2-3天', '我们会与您联系处理退款事宜']),
+                    time: time
+                });
+            } else if (rand < 0.75) {
+                // 管理员回复
+                history.push({
+                    type: 'admin',
+                    name: adminName,
+                    role: '系统',
+                    color: '#52c41a',
+                    content: getRandomItem(['正在跟进处理中', '问题核实属实，将对店铺进行处罚', '已协调双方达成解决方案']),
+                    time: time,
+                    admin_name: adminName,
+                    site_reply: true
+                });
+            } else {
+                // 状态更新
+                const statusValue = randomInt(0, 4);
+                const statusInfo = statuses.find(s => s.value === statusValue);
+                history.push({
+                    type: 'status',
+                    status: statusValue,
+                    content: `状态更新为：${statusInfo.label}`,
+                    time: time,
+                    admin_name: adminName,
+                    role: '系统'
+                });
+            }
+        }
+        return history;
+    }
 
     window.tableConfig = {
         tableName: 'complaint',
@@ -97,9 +174,8 @@
             { name: 'create_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 365), 'days').unix() },
             { name: 'store_reply_time', isSystemField: true, generator: (id, _, status) => status >= 1 ? moment().subtract(randomInt(1, 60), 'days').unix() : 0 },
             { name: 'system_reply_time', isSystemField: true, generator: (id, _, status) => status >= 2 ? moment().subtract(randomInt(1, 30), 'days').unix() : 0 },
-            { name: 'complaint_content', generator: () => `投诉内容示例 ${randomInt(1, 1000)}: ${getRandomItem(['商品质量问题', '配送延迟', '服务态度差'])}` },
-            { name: 'store_reply', generator: (id, _, status) => status >= 1 ? `店铺回复: 已处理投诉 ${id}` : '' },
-            { name: 'site_reply', generator: (id, _, status) => status >= 2 ? `站点回复: 已核实 ${id}` : '' }
+            { name: 'reply_history', isSystemField: true, generator: () => generateMixedReplyHistory() },
+            { name: 'complaint_content', generator: () => `投诉内容示例 ${randomInt(1, 1000)}: ${getRandomItem(['商品质量问题', '配送延迟', '服务态度差', '虚假宣传', '退款问题'])}` }
         ],
         actionButtons: [
             { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
@@ -131,10 +207,10 @@
                         actionButton = `<button class="ant-btn" style="background-color: #fa8c16; color: #fff; margin-right: 8px;" onclick="showReplyModal(${item.id})">跟进</button>`;
                     }
                     return `
-                <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
-                <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})" style="margin-right: 8px;">删除</button>
-                ${actionButton}
-            `;
+                        <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
+                        <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})" style="margin-right: 8px;">删除</button>
+                        ${actionButton}
+                    `;
                 }
             }
         ],
@@ -156,23 +232,9 @@
                     { name: 'store_id', label: '店铺ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `店铺 ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'item_id', label: '商品ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `商品 ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'manage_id', label: '管理员ID', type: 'select', options: () => [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `管理员 ${i + 1}` }))], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'posts_id', label: '文章ID', type: 'select', options: () => [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `文章 ${i + 1}` }))], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'demand_id', label: '需求ID', type: 'select', options: () => [{ value: 0, label: '无' }, ...Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `需求 ${i + 1}` }))], showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'rules_id', label: '规则ID', type: 'select', options: () => Array.from({ length: 10 }, (_, i) => ({ value: i + 1, label: `规则 ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'status', label: '状态', type: 'select', options: statuses, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
                     { name: 'create_time', label: '创建时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false },
                     { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
-                ]
-            },
-            {
-                id: 'replies',
-                title: '回复信息',
-                fields: [
-                    { name: 'complaint_content', label: '投诉内容', type: 'textarea', rows: 5, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'store_reply', label: '店铺回复', type: 'textarea', rows: 5, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'store_reply_time', label: '店铺回复时间', type: 'datetime-local', formatter: v => v ? moment.unix(v).format('YYYY-MM-DDTHH:mm') : '', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'site_reply', label: '站点回复', type: 'textarea', rows: 5, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'system_reply_time', label: '系统回复时间', type: 'datetime-local', formatter: v => v ? moment.unix(v).format('YYYY-MM-DDTHH:mm') : '', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true }
                 ]
             }
         ]
@@ -183,6 +245,10 @@
         const record = tableData.find(item => item.id === id);
         if (!record) return;
 
+        if (!record.reply_history) {
+            record.reply_history = generateMixedReplyHistory();
+        }
+
         let modal = document.getElementById('replyModal');
         if (!modal) {
             modal = document.createElement('div');
@@ -191,57 +257,146 @@
             document.body.appendChild(modal);
         }
 
+        const currentStatus = statuses.find(s => s.value === record.status);
+
+        // 生成回复历史 - 显示角色
+        const replyHistoryHtml = record.reply_history.map(reply => {
+            let prefix = '[未知]', statusColor = '#ccc', roleDisplay = '';
+
+            if (reply.type === 'user') {
+                prefix = `[${reply.name}]`;
+                statusColor = reply.color;
+                roleDisplay = `<span style="color: #666; margin-left: 4px;">(${reply.role})</span>`;
+            } else if (reply.type === 'store') {
+                prefix = `[${reply.name}]`;
+                statusColor = reply.color;
+                roleDisplay = `<span style="color: #666; margin-left: 4px;">(${reply.role})</span>`;
+            } else if (reply.type === 'admin') {
+                prefix = `[${reply.name}]`;
+                statusColor = reply.color;
+                roleDisplay = `<span style="color: #666; margin-left: 4px;">(${reply.role})</span>`;
+            } else if (reply.type === 'status') {
+                const status = statuses.find(s => s.value === reply.status);
+                const adminName = reply.admin_name || getRandomAdminName();
+                prefix = `[${status ? status.label : '未知'}]`;
+                statusColor = status ? status.color : '#ccc';
+                roleDisplay = `<span style="color: #666; margin-left: 4px;">(${reply.role})</span>`;
+                const timeStr = moment.unix(reply.time).format('YYYY-MM-DD HH:mm:ss');
+                return `
+                    <div style="margin-bottom: 6px; padding: 6px 8px; background: #f9f9f9; border-left: 3px solid ${statusColor};">
+                        <span style="color: ${statusColor}; font-weight: bold;">${prefix}</span>
+                        ${roleDisplay}
+                        <span style="color: #333; margin-left: 8px; display: inline; white-space: pre-wrap; word-wrap: break-word; word-break: break-word;">${reply.content}</span>
+                        <span style="color: #52c41a; margin-left: 8px;">(${adminName} ${moment.unix(reply.time).format('YYYY-MM-DD HH:mm:ss')})</span>
+                    </div>
+                `;
+            }
+
+            const timeStr = moment.unix(reply.time).format('YYYY-MM-DD HH:mm:ss');
+            const adminName = reply.admin_name || getRandomAdminName();
+            let systemInfo = '';
+            if (reply.site_reply) {
+                systemInfo = `<span style="color: #1890ff; margin-left: 8px;">(${adminName} ${timeStr})</span>`;
+            }
+
+            return `
+                <div style="margin-bottom: 6px; padding: 6px 8px; background: #f9f9f9; border-left: 3px solid ${statusColor};">
+                    <span style="color: ${statusColor}; font-weight: bold;">${prefix}</span>
+                    ${roleDisplay}
+                    <span style="color: #333; margin-left: 8px; display: inline; white-space: pre-wrap; word-wrap: break-word; word-break: break-word;">${reply.content}</span>
+                    ${systemInfo}
+                </div>
+            `;
+        }).join('') || '<div style="color: #999;">暂无回复历史</div>';
+
         modal.innerHTML = `
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeReplyModal()">×</button>
-            <h3>回复投诉</h3>
-            <div class="basic-info" style="margin-bottom: 16px;">
-                <div style="font-size: 14px;">投诉信息: 投诉用户: ${record.report_user_id}, 店铺: ${record.store_id}, 商品: ${record.item_id}, 管理员: ${record.manage_id || '-'}, 文章: ${record.posts_id || '-'}, 需求: ${record.demand_id || '-'}, 规则: ${record.rules_id}</div>
-                <div style="font-size: 14px; margin-top: 8px;"><strong>投诉内容:</strong> ${record.complaint_content}</div>
-            </div>
-            <div class="store-reply" style="margin-bottom: 16px;">
-                <strong>店铺回复:</strong> ${record.store_reply || '暂无回复'}
-            </div>
-            <div class="site-reply">
-                <div class="status-buttons" style="margin-bottom: 16px;">
-                    ${statuses.map(status => `
-                        <button class="ant-btn" style="background-color: ${status.color}; color: #fff; margin-right: 8px;" onclick="updateComplaintStatus(${id}, ${status.value})" ${record.status === status.value ? 'disabled' : ''}>${status.label}</button>
-                    `).join('')}
+            <div class="modal-content" style="max-height: 70vh; overflow-y: auto;">
+                <button class="close-btn" onclick="closeReplyModal()">×</button>
+                <h3>回复投诉</h3>
+                <div style="margin-bottom: 16px; padding: 8px; background: #e6f7ff; border: 1px solid #91d5ff; border-radius: 4px;">
+                    <strong style="color: ${currentStatus ? currentStatus.color : '#666'}">当前状态: </strong>
+                    <span class="ant-tag ant-tag-${currentStatus ? currentStatus.color : 'gray'}">${currentStatus ? currentStatus.label : '未知'}</span>
+                    <span style="color: #666; margin-left: 10px;">(状态不可逆转，只能更新到更高状态)</span>
                 </div>
-                <div style="margin-bottom: 8px;"><strong>站点回复:</strong> ${record.site_reply || '暂无回复'}</div>
-                <textarea id="siteReplyInput" rows="5" class="ant-input" placeholder="输入站点回复" style="width: 100%; margin-bottom: 8px;"></textarea>
-                <div class="modal-buttons">
-                    <button class="ant-btn ant-btn-primary" onclick="submitSiteReply(${id})">提交回复</button>
+                <div class="basic-info" style="margin-bottom: 16px;">
+                    <div style="font-size: 14px;">投诉信息: 投诉用户: ${record.report_user_id}, 店铺: ${record.store_id}, 商品: ${record.item_id}</div>
+                    <div style="font-size: 14px; margin-top: 8px;"><strong>投诉内容:</strong> ${record.complaint_content}</div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <strong>回复历史:</strong>
+                    <div style="margin-top: 8px; max-height: 400px; overflow-y: auto; border: 1px solid #e8e8e8; padding: 8px;">
+                        ${replyHistoryHtml}
+                    </div>
+                </div>
+                <div class="site-reply">
+                    <div class="status-buttons" style="margin-bottom: 16px;">
+                        ${statuses.map(status => status.value <= record.status ?
+            `<button class="ant-btn" style="background-color: ${status.color}; color: #fff; margin-right: 8px; opacity: 0.5;" disabled>${status.label}</button>` :
+            `<button class="ant-btn" style="background-color: ${status.color}; color: #fff; margin-right: 8px;" onclick="updateComplaintStatus(${id}, ${status.value})">${status.label}</button>`
+        ).join('')}
+                    </div>
+                    <div style="margin-bottom: 8px;"><strong>管理员回复:</strong></div>
+                    <textarea id="siteReplyInput" rows="4" class="ant-input" placeholder="输入管理员回复" style="width: 100%; margin-bottom: 8px;"></textarea>
+                    <div class="modal-buttons">
+                        <button class="ant-btn ant-btn-primary" onclick="submitSiteReply(${id})">提交回复</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
         modal.style.display = 'block';
     }
 
     function updateComplaintStatus(id, newStatus) {
         const record = tableData.find(item => item.id === id);
-        if (record) {
-            record.status = newStatus;
-            if (newStatus >= 1 && !record.store_reply_time) record.store_reply_time = moment().unix();
-            if (newStatus >= 2 && !record.system_reply_time) record.system_reply_time = moment().unix();
-            renderTableList();
-            showReplyModal(id); // 刷新弹窗
-        }
+        if (!record || newStatus <= record.status) return;
+
+        const statusInfo = statuses.find(s => s.value === newStatus);
+        const adminName = getRandomAdminName();
+        const timeStr = moment().unix();
+
+        record.reply_history.push({
+            type: 'status',
+            status: newStatus,
+            content: `状态更新为：${statusInfo.label}`,
+            time: timeStr,
+            admin_name: adminName,
+            role: '系统'
+        });
+
+        record.status = newStatus;
+        renderTableList();
+        showReplyModal(id);
     }
 
     function submitSiteReply(id) {
         const replyInput = document.getElementById('siteReplyInput').value.trim();
         if (!replyInput) {
-            alert('请输入站点回复');
+            alert('请输入管理员回复');
             return;
         }
+
         const record = tableData.find(item => item.id === id);
         if (record) {
-            record.site_reply = replyInput;
-            record.system_reply_time = moment().unix();
+            const adminName = getRandomAdminName();
+            const timeStr = moment().unix();
+
+            record.reply_history.push({
+                type: 'admin',
+                name: adminName,
+                role: '系统',
+                color: '#52c41a',
+                content: replyInput,
+                time: timeStr,
+                site_reply: true,
+                admin_name: adminName
+            });
+
+            record.system_reply_time = timeStr;
+            if (record.status === 0) record.status = 1;
+
+            document.getElementById('siteReplyInput').value = '';
             renderTableList();
-            showReplyModal(id); // 刷新弹窗
+            showReplyModal(id);
         }
     }
 
