@@ -173,34 +173,39 @@
         modal.className = 'modal';
         modal.style.zIndex = '1001';
 
-        const media = getRandomMedia();
-        const descriptions = getRandomDescriptions();
 
-        let contentHtml = `
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeDetailsModal()">×</button>
-            <h3>订单详情</h3>
-            <div class="media-list" style="margin-bottom: 16px;">
+        let contentHtml = `<div class="modal-content">
+                <button class="close-btn" onclick="closeDetailsModal()">×</button>
+                <h3>订单详情</h3>
         `;
-        media.forEach(item => {
-            if (item.type === 'image') {
-                contentHtml += `<img src="${item.src}" alt="${item.name}" class="thumbnail" onclick="enlargeImage(${id}, 0, ['${item.src}'])">`;
-            } else {
-                contentHtml += `<a href="${item.src}" class="file-link" target="_blank">${item.name}</a>`;
-            }
-        });
-        contentHtml += `</div><div class="description-list">`;
-        descriptions.forEach(desc => {
-            contentHtml += `<p style="margin-bottom: 8px;">${desc}</p>`;
-        });
-        contentHtml += `
-            </div>
-            <div class="modal-buttons">
-                <button type="button" class="ant-btn ant-btn-primary" onclick="downloadAsZip(${JSON.stringify(media)}, ${id})" style="margin-right: 8px;">下载 ZIP</button>
-                <button type="button" class="ant-btn" onclick="closeDetailsModal()">关闭</button>
-            </div>
-        </div>
-        `;
+        for (let i = 0; i < randomInt(1,3); i++) {
+            const media = getRandomMedia();
+            const descriptions = getRandomDescriptions();
+            const deliveryTime = moment.unix(moment().unix()).format('YYYY-MM-DD HH:mm:ss')
+
+            contentHtml += `
+                <div class="media-list" style="margin-bottom: 16px;">
+            `;
+                media.forEach(item => {
+                    if (item.type === 'image') {
+                        contentHtml += `<img src="${item.src}" alt="${item.name}" class="thumbnail" onclick="enlargeImage(${id}, 0, ['${item.src}'])">`;
+                    } else {
+                        contentHtml += `<a href="${item.src}" class="file-link" target="_blank">${item.name}</a>`;
+                    }
+                });
+                contentHtml += `</div><div class="description-list">`;
+                descriptions.forEach(desc => {
+                    contentHtml += `<p style="margin-bottom: 8px;">${desc}</p>`;
+                });
+                contentHtml += `<p style="margin-bottom: 8px;">交付时间：${deliveryTime}</p>`;
+                contentHtml += `
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="downloadAsZip(${JSON.stringify(media)}, ${id})" style="margin-right: 8px;">下载 ZIP</button>
+                </div>
+            `;
+        }
+        contentHtml += `</div>`
         modal.innerHTML = contentHtml;
         document.body.appendChild(modal);
         modal.style.display = 'flex';
