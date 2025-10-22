@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FASTRESP - 汇率配置</title>
+    <title>FASTRESP - 角色任务映射</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.24.14/antd.min.css" />
     <link rel="stylesheet" href="_style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -19,16 +19,13 @@
         .table-header div, .task-item div { padding: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box; }
         .col-checkbox { width: 5%; min-width: 50px; }
         .col-id { width: 8%; min-width: 60px; }
-        .col-country { width: 10%; min-width: 80px; }
-        .col-currency { width: 8%; min-width: 60px; }
-        .col-currency-name { width: 12%; min-width: 100px; }
-        .col-symbol-float { width: 8%; min-width: 60px; }
-        .col-currency-symbol { width: 8%; min-width: 60px; }
-        .col-rate { width: 10%; min-width: 80px; }
-        .col-new-rate { width: 10%; min-width: 80px; }
-        .col-create-time { width: 12%; min-width: 100px; }
-        .col-update-time { width: 12%; min-width: 100px; }
-        .col-actions { width: 15%; min-width: 120px; }
+        .col-notice-key { width: 15%; min-width: 100px; }
+        .col-task-type { width: 20%; min-width: 120px; }
+        .col-system-type { width: 20%; min-width: 120px; }
+        .col-priority-sort { width: 15%; min-width: 100px; }
+        .col-create-time { width: 15%; min-width: 100px; }
+        .col-update-time { width: 15%; min-width: 100px; }
+        .col-actions { width: 12%; min-width: 100px; }
         .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
         .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 600px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto; position: relative; }
@@ -39,20 +36,7 @@
         .modal-content .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
         .modal-content .ant-form-item label { margin-right: 16px; width: 120px; text-align: right; color: #333; font-weight: 500; }
         .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px; box-sizing: border-box; }
-        .modal-content .ant-form-item.textarea-item { display: block; }
-        .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; }
-        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px; box-sizing: border-box; resize: vertical; }
-        /* 审核弹窗样式 */
-        .audit-modal-content { max-width: 500px; background: #f9f9f9; border: 2px solid #1a73e8; }
-        .audit-modal-content .ant-form-item.rate-item { background: #e6f7ff; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
-        .audit-modal-content .ant-form-item.new-rate-item { background: #fff1f0; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
-        .audit-modal-content .ant-form-item input[disabled] { background: transparent; border: none; font-size: 16px; font-weight: bold; color: #000; }
-        .audit-modal-content .ant-form-item label { color: #555; }
-        .audit-modal-content .modal-buttons button { padding: 8px 16px; font-size: 14px; }
-        .audit-modal-content .modal-buttons .ant-btn-primary { background: #1a73e8; border-color: #1a73e8; color: #fff; }
-        .audit-modal-content .modal-buttons .ant-btn-primary:hover { background: #40c4ff; border-color: #40c4ff; }
-        .audit-modal-content .modal-buttons .ant-btn { background: #d9d9d9; border-color: #d9d9d9; color: #333; }
-        .audit-modal-content .modal-buttons .ant-btn:hover { background: #bfbfbf; border-color: #bfbfbf; }
+        .modal-content .ant-form-item input[disabled] { background: #f5f5f5; }
     </style>
 </head>
 <body>
@@ -66,8 +50,8 @@
                     <div class="ant-tabs-nav" role="tablist">
                         <div class="ant-tabs-nav-wrap">
                             <div class="ant-tabs-nav-list">
-                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('rate_config.html')" role="tab" aria-selected="true">
-                                    <span class="ant-tabs-tab-btn">汇率配置</span>
+                                <div class="ant-tabs-tab ant-tabs-tab-active" onclick="switchTab('role_task.html')" role="tab" aria-selected="true">
+                                    <span class="ant-tabs-tab-btn">角色任务映射</span>
                                 </div>
                                 <div class="ant-tabs-ink-bar ant-tabs-ink-bar-animated" style="left: 0; width: 100%;"></div>
                             </div>
@@ -78,35 +62,97 @@
                             <div class="ant-tabs-tabpane ant-tabs-tabpane-active" role="tabpanel">
                                 <!-- 条件筛选区域 -->
                                 <div class="filter-container">
-                                    <input type="text" id="currencyFilter" class="ant-input" placeholder="货币代码" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                    <input type="text" id="currencyNameFilter" class="ant-input" placeholder="货币名称" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                    <input type="date" id="startDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
-                                    <input type="date" id="endDate" class="ant-input" onkeydown="if(event.key === 'Enter') applyFilters()">
+                                    <select id="noticeKeyFilter" class="ant-select">
+                                        <option value="">全部通知角色</option>
+                                        <option value="CUSTOMER_MANAGE">客户管理</option>
+                                        <option value="CUSTOMER_SERVICE">客户服务</option>
+                                        <option value="FINANCE">财务</option>
+                                        <option value="FINANCE_MANAGE">财务管理</option>
+                                        <option value="ADMINISTRATOR">管理员</option>
+                                        <option value="VIEWER">查看者</option>
+                                    </select>
+                                    <select id="taskTypeFilter" class="ant-select">
+                                        <option value="">全部任务类型</option>
+                                        <option value="STORE_AUDIT">店铺审核</option>
+                                        <option value="DEMAND_AUDIT">需求审核</option>
+                                        <option value="COMPLAINT_HANDLING">投诉处理</option>
+                                        <option value="ITEM_AUDIT">商品审核</option>
+                                        <option value="POSTS_AUDIT">文章审核</option>
+                                        <option value="VIOLATION_PENALTY">违规处罚</option>
+                                        <option value="CUSTOMER_LEAVE_APPROVAL">客户休假审批</option>
+                                        <option value="STORE_FAQ_AUDIT">店铺FAQ审核</option>
+                                        <option value="TICKET_HANDLING">工单处理</option>
+                                        <option value="HANDOVER_TASK">交接任务</option>
+                                        <option value="KYC_AUDIT">KYC审核</option>
+                                        <option value="WITHDRAWAL_AUDIT">提现审核</option>
+                                        <option value="PROMOTION_AUDIT">促销审核</option>
+                                        <option value="BLOG_AUDIT">博客审核</option>
+                                        <option value="FINANCIAL_RISK_CONTROL">财务风险控制</option>
+                                        <option value="PAYMENT_DISPUTE_AUDIT">支付争议审核</option>
+                                        <option value="EXCHANGE_RATE_UPDATE">汇率更新</option>
+                                        <option value="SCHEDULE_LEAVE_AUDIT">日程休假审核</option>
+                                        <option value="CUSTOMER_MANAGE_LEAVE_APPROVAL">客户管理休假审批</option>
+                                        <option value="FINANCE_LEAVE_APPROVAL">财务休假审批</option>
+                                        <option value="FINANCE_MANAGE_LEAVE_APPROVAL">财务管理休假审批</option>
+                                    </select>
+                                    <select id="systemTypeFilter" class="ant-select">
+                                        <option value="">全部系统类型</option>
+                                        <option value="STORE">店铺</option>
+                                        <option value="POSTS">文章</option>
+                                        <option value="ITEM">商品</option>
+                                        <option value="DEMAND">需求</option>
+                                        <option value="STORE_FAQ">店铺FAQ</option>
+                                        <option value="BLOG">用户博客</option>
+                                        <option value="USER">用户KYC</option>
+                                        <option value="USER_KYC">用户KYC</option>
+                                        <option value="TICKET">提现</option>
+                                        <option value="ITEM_COMMENT">商品评论</option>
+                                        <option value="POSTS_COMMENT">文章评论</option>
+                                        <option value="STORE_WITHDRAW">店铺提现</option>
+                                        <option value="ORDERS">订单</option>
+                                        <option value="CHAT">聊天</option>
+                                        <option value="RATE">汇率</option>
+                                        <option value="PAGES">页面</option>
+                                        <option value="FAQ">FAQ</option>
+                                        <option value="BRAND">品牌</option>
+                                        <option value="SERVICES">服务</option>
+                                        <option value="TAG">标签</option>
+                                        <option value="ATTR">属性</option>
+                                        <option value="CAMPAIGN">活动</option>
+                                        <option value="HANDOVER_TASK">交接任务</option>
+                                        <option value="PAYMENT_DISPUTE">支付争议</option>
+                                        <option value="SCHEDULE_LEAVE">日程休假</option>
+                                    </select>
+                                    <select id="prioritySortFilter" class="ant-select">
+                                        <option value="">全部优先级</option>
+                                        <option value="IMPORTANT_URGENT">重要紧急</option>
+                                        <option value="IMPORTANT_NON_URGENT">重要非紧急</option>
+                                        <option value="MEDIUM_URGENT">中等紧急</option>
+                                        <option value="MEDIUM_NON_URGENT">中等非紧急</option>
+                                        <option value="UNIMPORTANT_URGENT">不重要紧急</option>
+                                        <option value="UNIMPORTANT_NON_URGENT">不重要非紧急</option>
+                                    </select>
                                     <button class="ant-btn ant-btn-primary" onclick="applyFilters()">查询</button>
                                 </div>
                                 <!-- 操作区域 -->
                                 <div class="action-container">
-                                    <button class="ant-btn ant-btn-primary" onclick="addRateConfig()">添加</button>
+                                    <button class="ant-btn ant-btn-primary" onclick="addRoleTask()">添加</button>
                                     <button class="ant-btn ant-btn-danger" onclick="batchDelete()">批量删除</button>
-                                    <button class="ant-btn" onclick="batchEditCurrency()">批量修改货币</button>
                                 </div>
                                 <!-- 数据区域 -->
                                 <div class="task-list">
                                     <div class="table-header" style="padding: 0px; background: #f5f5f5; font-weight: bold; border-bottom: 1px solid #ddd;">
                                         <div class="col-checkbox"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></div>
                                         <div class="col-id">ID</div>
-                                        <div class="col-country">国家</div>
-                                        <div class="col-currency">货币代码</div>
-                                        <div class="col-currency-name">货币名称</div>
-                                        <div class="col-symbol-float">符号位置</div>
-                                        <div class="col-currency-symbol">货币符号</div>
-                                        <div class="col-rate">汇率</div>
-                                        <div class="col-new-rate">新汇率</div>
+                                        <div class="col-notice-key">通知角色</div>
+                                        <div class="col-task-type">任务类型</div>
+                                        <div class="col-system-type">系统类型</div>
+                                        <div class="col-priority-sort">优先级</div>
                                         <div class="col-create-time">创建时间</div>
                                         <div class="col-update-time">更新时间</div>
                                         <div class="col-actions">操作</div>
                                     </div>
-                                    <div id="rate-list">加载中...</div>
+                                    <div id="role-task-list">加载中...</div>
                                     <div class="pagination">
                                         <button class="ant-btn" onclick="changePage(-1)">上一页</button>
                                         <input type="number" id="pageJump" min="1" class="ant-input" style="width: 60px; padding: 4px;" placeholder="页码">
@@ -133,11 +179,11 @@
     <div id="footer" w3-include-html="_footer.html"></div>
 
     <!-- 添加/编辑弹窗 -->
-    <div id="rateModal" class="modal">
+    <div id="roleTaskModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()">×</button>
-            <h3 id="modalTitle">添加汇率配置</h3>
-            <form id="rateForm">
+            <h3 id="modalTitle">添加角色任务映射</h3>
+            <form id="roleTaskForm">
                 <div id="systemFields" style="display: none;">
                     <div class="ant-form-item">
                         <label>ID:</label>
@@ -154,201 +200,268 @@
                 </div>
                 <div id="editableFields">
                     <div class="ant-form-item">
-                        <label>国家:</label>
-                        <input type="text" id="modalCountry" maxlength="32">
-                    </div>
-                    <div class="ant-form-item">
-                        <label>货币代码:</label>
-                        <input type="text" id="modalCurrency" maxlength="3">
-                    </div>
-                    <div class="ant-form-item">
-                        <label>货币名称:</label>
-                        <input type="text" id="modalCurrencyName" maxlength="32">
-                    </div>
-                    <div class="ant-form-item">
-                        <label>符号位置:</label>
-                        <select id="modalSymbolFloat" class="ant-select">
-                            <option value="0">靠左</option>
-                            <option value="1">靠右</option>
+                        <label>通知角色:</label>
+                        <select id="modalNoticeKey" class="ant-select">
+                            <option value="CUSTOMER_MANAGE">客户管理</option>
+                            <option value="CUSTOMER_SERVICE">客户服务</option>
+                            <option value="FINANCE">财务</option>
+                            <option value="FINANCE_MANAGE">财务管理</option>
+                            <option value="ADMINISTRATOR">管理员</option>
+                            <option value="VIEWER">查看者</option>
                         </select>
                     </div>
                     <div class="ant-form-item">
-                        <label>货币符号:</label>
-                        <input type="text" id="modalCurrencySymbol" maxlength="4">
+                        <label>任务类型:</label>
+                        <select id="modalTaskType" class="ant-select">
+                            <option value="STORE_AUDIT">店铺审核</option>
+                            <option value="DEMAND_AUDIT">需求审核</option>
+                            <option value="COMPLAINT_HANDLING">投诉处理</option>
+                            <option value="ITEM_AUDIT">商品审核</option>
+                            <option value="POSTS_AUDIT">文章审核</option>
+                            <option value="VIOLATION_PENALTY">违规处罚</option>
+                            <option value="CUSTOMER_LEAVE_APPROVAL">客户休假审批</option>
+                            <option value="STORE_FAQ_AUDIT">店铺FAQ审核</option>
+                            <option value="TICKET_HANDLING">工单处理</option>
+                            <option value="HANDOVER_TASK">交接任务</option>
+                            <option value="KYC_AUDIT">KYC审核</option>
+                            <option value="WITHDRAWAL_AUDIT">提现审核</option>
+                            <option value="PROMOTION_AUDIT">促销审核</option>
+                            <option value="BLOG_AUDIT">博客审核</option>
+                            <option value="FINANCIAL_RISK_CONTROL">财务风险控制</option>
+                            <option value="PAYMENT_DISPUTE_AUDIT">支付争议审核</option>
+                            <option value="EXCHANGE_RATE_UPDATE">汇率更新</option>
+                            <option value="SCHEDULE_LEAVE_AUDIT">日程休假审核</option>
+                            <option value="CUSTOMER_MANAGE_LEAVE_APPROVAL">客户管理休假审批</option>
+                            <option value="FINANCE_LEAVE_APPROVAL">财务休假审批</option>
+                            <option value="FINANCE_MANAGE_LEAVE_APPROVAL">财务管理休假审批</option>
+                        </select>
                     </div>
                     <div class="ant-form-item">
-                        <label>汇率:</label>
-                        <input type="number" id="modalRate" step="0.0001" min="0">
+                        <label>系统类型:</label>
+                        <select id="modalSystemType" class="ant-select">
+                            <option value="STORE">店铺</option>
+                            <option value="POSTS">文章</option>
+                            <option value="ITEM">商品</option>
+                            <option value="DEMAND">需求</option>
+                            <option value="STORE_FAQ">店铺FAQ</option>
+                            <option value="BLOG">用户博客</option>
+                            <option value="USER">用户KYC</option>
+                            <option value="USER_KYC">用户KYC</option>
+                            <option value="TICKET">提现</option>
+                            <option value="ITEM_COMMENT">商品评论</option>
+                            <option value="POSTS_COMMENT">文章评论</option>
+                            <option value="STORE_WITHDRAW">店铺提现</option>
+                            <option value="ORDERS">订单</option>
+                            <option value="CHAT">聊天</option>
+                            <option value="RATE">汇率</option>
+                            <option value="PAGES">页面</option>
+                            <option value="FAQ">FAQ</option>
+                            <option value="BRAND">品牌</option>
+                            <option value="SERVICES">服务</option>
+                            <option value="TAG">标签</option>
+                            <option value="ATTR">属性</option>
+                            <option value="CAMPAIGN">活动</option>
+                            <option value="HANDOVER_TASK">交接任务</option>
+                            <option value="PAYMENT_DISPUTE">支付争议</option>
+                            <option value="SCHEDULE_LEAVE">日程休假</option>
+                        </select>
                     </div>
                     <div class="ant-form-item">
-                        <label>新汇率:</label>
-                        <input type="number" id="modalNewRate" step="0.0001" min="0">
-                    </div>
-                    <div class="ant-form-item textarea-item">
-                        <label>备注:</label>
-                        <textarea id="modalMark" rows="5" maxlength="256"></textarea>
+                        <label>优先级:</label>
+                        <select id="modalPrioritySort" class="ant-select">
+                            <option value="IMPORTANT_URGENT">重要紧急</option>
+                            <option value="IMPORTANT_NON_URGENT">重要非紧急</option>
+                            <option value="MEDIUM_URGENT">中等紧急</option>
+                            <option value="MEDIUM_NON_URGENT">中等非紧急</option>
+                            <option value="UNIMPORTANT_URGENT">不重要紧急</option>
+                            <option value="UNIMPORTANT_NON_URGENT">不重要非紧急</option>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-buttons">
                     <button type="button" class="ant-btn" onclick="closeModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveRateConfig()">保存</button>
+                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveRoleTask()">保存</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <!-- 批量修改货币弹窗 -->
-    <div id="currencyModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeCurrencyModal()">×</button>
-            <h3>批量修改货币</h3>
-            <form id="currencyForm">
-                <div class="ant-form-item">
-                    <label>选中的ID:</label>
-                    <input type="text" id="selectedIds" disabled>
-                </div>
-                <div class="ant-form-item">
-                    <label>新货币代码:</label>
-                    <input type="text" id="newCurrency" maxlength="3">
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="ant-btn" onclick="closeCurrencyModal()">取消</button>
-                    <button type="button" class="ant-btn ant-btn-primary" onclick="saveBatchCurrency()">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 审核弹窗 -->
-    <div id="auditModal" class="modal">
-        <div class="modal-content audit-modal-content">
-            <button class="close-btn" onclick="closeAuditModal()">×</button>
-            <h3>审核汇率</h3>
-            <div id="auditBasicInfo"></div>
-            <div class="ant-form-item rate-item">
-                <label>当前汇率:</label>
-                <input type="text" id="auditRate" disabled>
-            </div>
-            <div class="ant-form-item new-rate-item">
-                <label>新汇率:</label>
-                <input type="text" id="auditNewRate" disabled>
-            </div>
-            <div class="modal-buttons">
-                <button type="button" class="ant-btn" onclick="rejectNewRate()">拒绝</button>
-                <button type="button" class="ant-btn ant-btn-primary" onclick="acceptNewRate()">接受</button>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
-    let rateData = [];
-    let ratePage = 1, ratePerPage = 20;
-    let auditRateId = null;
+    let roleTaskData = [];
+    let rolePage = 1, rolePerPage = 20;
 
-    function fetchRateData() {
-        console.log('Fetching rate data...');
-        rateData = [];
-        const countries = ['USA', 'China', 'Japan', 'UK', 'Germany', 'France', 'Vietnam', 'Russia', 'Spain', 'Brazil'];
-        const currencies = ['USD', 'CNY', 'JPY', 'GBP', 'EUR', 'EUR', 'VND', 'RUB', 'EUR', 'BRL'];
-        const symbols = ['$', '¥', '¥', '£', '€', '€', '₫', '₽', '€', 'R$'];
-        for (let i = 1; i <= 200; i++) {
-            const idx = Math.floor(Math.random() * countries.length);
-            const rate = {
+    // 枚举值定义（从 Java 枚举映射）
+    const noticeKeys = [
+        { value: 'CUSTOMER_MANAGE', label: '客户管理', id: 1 },
+        { value: 'CUSTOMER_SERVICE', label: '客户服务', id: 2 },
+        { value: 'FINANCE', label: '财务', id: 3 },
+        { value: 'FINANCE_MANAGE', label: '财务管理', id: 4 },
+        { value: 'ADMINISTRATOR', label: '管理员', id: 10 },
+        { value: 'VIEWER', label: '查看者', id: 100 }
+    ];
+
+    const taskTypes = [
+        { value: 'STORE_AUDIT', label: '店铺审核', id: 1 },
+        { value: 'DEMAND_AUDIT', label: '需求审核', id: 2 },
+        { value: 'COMPLAINT_HANDLING', label: '投诉处理', id: 3 },
+        { value: 'ITEM_AUDIT', label: '商品审核', id: 4 },
+        { value: 'POSTS_AUDIT', label: '文章审核', id: 5 },
+        { value: 'VIOLATION_PENALTY', label: '违规处罚', id: 6 },
+        { value: 'CUSTOMER_LEAVE_APPROVAL', label: '客户休假审批', id: 7 },
+        { value: 'STORE_FAQ_AUDIT', label: '店铺FAQ审核', id: 8 },
+        { value: 'TICKET_HANDLING', label: '工单处理', id: 9 },
+        { value: 'HANDOVER_TASK', label: '交接任务', id: 10 },
+        { value: 'KYC_AUDIT', label: 'KYC审核', id: 11 },
+        { value: 'WITHDRAWAL_AUDIT', label: '提现审核', id: 12 },
+        { value: 'PROMOTION_AUDIT', label: '促销审核', id: 13 },
+        { value: 'BLOG_AUDIT', label: '博客审核', id: 14 },
+        { value: 'FINANCIAL_RISK_CONTROL', label: '财务风险控制', id: 15 },
+        { value: 'PAYMENT_DISPUTE_AUDIT', label: '支付争议审核', id: 16 },
+        { value: 'EXCHANGE_RATE_UPDATE', label: '汇率更新', id: 17 },
+        { value: 'SCHEDULE_LEAVE_AUDIT', label: '日程休假审核', id: 18 },
+        { value: 'CUSTOMER_MANAGE_LEAVE_APPROVAL', label: '客户管理休假审批', id: 19 },
+        { value: 'FINANCE_LEAVE_APPROVAL', label: '财务休假审批', id: 20 },
+        { value: 'FINANCE_MANAGE_LEAVE_APPROVAL', label: '财务管理休假审批', id: 21 }
+    ];
+
+    const systemTypes = [
+        { value: 'STORE', label: '店铺', id: 1 },
+        { value: 'POSTS', label: '文章', id: 2 },
+        { value: 'ITEM', label: '商品', id: 3 },
+        { value: 'DEMAND', label: '需求', id: 4 },
+        { value: 'STORE_FAQ', label: '店铺FAQ', id: 5 },
+        { value: 'BLOG', label: '用户博客', id: 6 },
+        { value: 'USER', label: '用户KYC', id: 7 },
+        { value: 'USER_KYC', label: '用户KYC', id: 8 },
+        { value: 'TICKET', label: '提现', id: 10 },
+        { value: 'ITEM_COMMENT', label: '商品评论', id: 11 },
+        { value: 'POSTS_COMMENT', label: '文章评论', id: 12 },
+        { value: 'STORE_WITHDRAW', label: '店铺提现', id: 13 },
+        { value: 'ORDERS', label: '订单', id: 14 },
+        { value: 'CHAT', label: '聊天', id: 15 },
+        { value: 'RATE', label: '汇率', id: 16 },
+        { value: 'PAGES', label: '页面', id: 50 },
+        { value: 'FAQ', label: 'FAQ', id: 51 },
+        { value: 'BRAND', label: '品牌', id: 51 },
+        { value: 'SERVICES', label: '服务', id: 51 },
+        { value: 'TAG', label: '标签', id: 51 },
+        { value: 'ATTR', label: '属性', id: 51 },
+        { value: 'CAMPAIGN', label: '活动', id: 51 },
+        { value: 'HANDOVER_TASK', label: '交接任务', id: 101 },
+        { value: 'PAYMENT_DISPUTE', label: '支付争议', id: 102 },
+        { value: 'SCHEDULE_LEAVE', label: '日程休假', id: 103 }
+    ];
+
+    const prioritySorts = [
+        { value: 'IMPORTANT_URGENT', label: '重要紧急', id: 1, sort: 6 },
+        { value: 'IMPORTANT_NON_URGENT', label: '重要非紧急', id: 2, sort: 5 },
+        { value: 'MEDIUM_URGENT', label: '中等紧急', id: 3, sort: 4 },
+        { value: 'MEDIUM_NON_URGENT', label: '中等非紧急', id: 4, sort: 3 },
+        { value: 'UNIMPORTANT_URGENT', label: '不重要紧急', id: 5, sort: 2 },
+        { value: 'UNIMPORTANT_NON_URGENT', label: '不重要非紧急', id: 6, sort: 1 }
+    ];
+
+    function fetchRoleTaskData() {
+        console.log('Fetching role task data...');
+        roleTaskData = [];
+        for (let i = 1; i <= 100; i++) {
+            const noticeKey = noticeKeys[Math.floor(Math.random() * noticeKeys.length)];
+            const taskType = taskTypes[Math.floor(Math.random() * taskTypes.length)];
+            const systemType = systemTypes[Math.floor(Math.random() * systemTypes.length)];
+            const prioritySort = prioritySorts[Math.floor(Math.random() * prioritySorts.length)];
+            const roleTask = {
                 id: i,
-                country: countries[idx],
-                currency: currencies[idx] + (i % 10),
-                currency_name: `${countries[idx]} Dollar`,
-                symbol_float: Math.random() > 0.5 ? 1 : 0,
-                currency_symbol: symbols[idx],
-                rate: parseFloat((Math.random() * 100).toFixed(4)),
-                newRate: Math.random() > 0.7 ? parseFloat((Math.random() * 100).toFixed(4)) : 0,
-                mark: `Rate config for ${countries[idx]} - ${i}`,
+                notice_key: noticeKey.value,
+                task_type: taskType.value,
+                system_type: systemType.value,
+                priority_sort: prioritySort.value,
                 create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix(),
                 update_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix()
             };
-            rateData.push(rate);
+            roleTaskData.push(roleTask);
         }
-        renderRateList();
+        renderRoleTaskList();
     }
 
-    function renderRateList() {
-        const start = (ratePage - 1) * ratePerPage;
-        const end = start + ratePerPage;
-        const paginatedRates = rateData.slice(start, end);
-        const listContainer = document.getElementById('rate-list');
+    function renderRoleTaskList() {
+        const start = (rolePage - 1) * rolePerPage;
+        const end = start + rolePerPage;
+        const paginatedRoleTasks = roleTaskData.slice(start, end);
+        const listContainer = document.getElementById('role-task-list');
         listContainer.innerHTML = '';
 
-        paginatedRates.forEach(rate => {
+        paginatedRoleTasks.forEach(task => {
+            const noticeKeyLabel = noticeKeys.find(n => n.value === task.notice_key)?.label || task.notice_key;
+            const taskTypeLabel = taskTypes.find(t => t.value === task.task_type)?.label || task.task_type;
+            const systemTypeLabel = systemTypes.find(s => s.value === task.system_type)?.label || task.system_type;
+            const prioritySortLabel = prioritySorts.find(p => p.value === task.priority_sort)?.label || task.priority_sort;
+
             const itemDiv = document.createElement('div');
             itemDiv.className = 'task-item';
             itemDiv.style = `border-bottom: 1px solid #ddd;`;
             itemDiv.innerHTML = `
-                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${rate.id}"></div>
-                <div class="col-id">${rate.id}</div>
-                <div class="col-country">${rate.country}</div>
-                <div class="col-currency">${rate.currency}</div>
-                <div class="col-currency-name">${rate.currency_name}</div>
-                <div class="col-symbol-float">${rate.symbol_float === 0 ? '靠左' : '靠右'}</div>
-                <div class="col-currency-symbol">${rate.currency_symbol}</div>
-                <div class="col-rate">${rate.rate.toFixed(4)}</div>
-                <div class="col-new-rate">${rate.newRate > 0 ? rate.newRate.toFixed(4) : '-'}</div>
-                <div class="col-create-time">${moment.unix(rate.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-                <div class="col-update-time">${moment.unix(rate.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div class="col-checkbox"><input type="checkbox" class="select-item" data-id="${task.id}"></div>
+                <div class="col-id">${task.id}</div>
+                <div class="col-notice-key">${noticeKeyLabel}</div>
+                <div class="col-task-type">${taskTypeLabel}</div>
+                <div class="col-system-type">${systemTypeLabel}</div>
+                <div class="col-priority-sort">${prioritySortLabel}</div>
+                <div class="col-create-time">${moment.unix(task.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
+                <div class="col-update-time">${moment.unix(task.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
                 <div class="col-actions">
-                    ${rate.newRate > 0 ? `<button class="ant-btn ant-btn-primary" onclick="openAuditModal(${rate.id})">审核</button>` : ''}
-                    <button class="ant-btn" onclick="editRateConfig(${rate.id})">编辑</button>
-                    <button class="ant-btn ant-btn-danger" onclick="deleteRateConfig(${rate.id})">删除</button>
+                    <button class="ant-btn" onclick="editRoleTask(${task.id})">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteRoleTask(${task.id})">删除</button>
                 </div>
             `;
             listContainer.appendChild(itemDiv);
         });
 
-        const totalPages = Math.ceil(rateData.length / ratePerPage);
-        document.getElementById('page-info').textContent = `第 ${ratePage} 页 / 共 ${totalPages} 页`;
+        const totalPages = Math.ceil(roleTaskData.length / rolePerPage);
+        document.getElementById('page-info').textContent = `第 ${rolePage} 页 / 共 ${totalPages} 页`;
         document.getElementById('pageJump').max = totalPages;
     }
 
     function applyFilters() {
-        const currency = document.getElementById('currencyFilter').value.toUpperCase();
-        const currencyName = document.getElementById('currencyNameFilter').value.toLowerCase();
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
+        const noticeKey = document.getElementById('noticeKeyFilter').value;
+        const taskType = document.getElementById('taskTypeFilter').value;
+        const systemType = document.getElementById('systemTypeFilter').value;
+        const prioritySort = document.getElementById('prioritySortFilter').value;
 
-        let filteredRates = rateData;
-        if (currency) filteredRates = filteredRates.filter(item => item.currency.includes(currency));
-        if (currencyName) filteredRates = filteredRates.filter(item => item.currency_name.toLowerCase().includes(currencyName));
-        if (startDate) filteredRates = filteredRates.filter(item => moment.unix(item.create_time).isSameOrAfter(startDate));
-        if (endDate) filteredRates = filteredRates.filter(item => moment.unix(item.create_time).isSameOrBefore(endDate));
+        let filteredRoleTasks = roleTaskData;
+        if (noticeKey) filteredRoleTasks = filteredRoleTasks.filter(item => item.notice_key === noticeKey);
+        if (taskType) filteredRoleTasks = filteredRoleTasks.filter(item => item.task_type === taskType);
+        if (systemType) filteredRoleTasks = filteredRoleTasks.filter(item => item.system_type === systemType);
+        if (prioritySort) filteredRoleTasks = filteredRoleTasks.filter(item => item.priority_sort === prioritySort);
 
-        ratePage = 1;
-        rateData = filteredRates;
-        renderRateList();
+        rolePage = 1;
+        roleTaskData = filteredRoleTasks;
+        renderRoleTaskList();
     }
 
     function changePage(delta) {
-        const totalPages = Math.ceil(rateData.length / ratePerPage);
-        ratePage += delta;
-        if (ratePage < 1) ratePage = 1;
-        if (ratePage > totalPages) ratePage = totalPages;
-        renderRateList();
+        const totalPages = Math.ceil(roleTaskData.length / rolePerPage);
+        rolePage += delta;
+        if (rolePage < 1) rolePage = 1;
+        if (rolePage > totalPages) rolePage = totalPages;
+        renderRoleTaskList();
     }
 
     function jumpToPage() {
         const page = parseInt(document.getElementById('pageJump').value);
-        const totalPages = Math.ceil(rateData.length / ratePerPage);
+        const totalPages = Math.ceil(roleTaskData.length / rolePerPage);
         if (page >= 1 && page <= totalPages) {
-            ratePage = page;
-            renderRateList();
+            rolePage = page;
+            renderRoleTaskList();
         } else {
             alert('请输入有效的页码');
         }
     }
 
     function changePerPage() {
-        ratePerPage = parseInt(document.getElementById('perPage').value);
-        ratePage = 1;
-        renderRateList();
+        rolePerPage = parseInt(document.getElementById('perPage').value);
+        rolePage = 1;
+        renderRoleTaskList();
     }
 
     function toggleSelectAll() {
@@ -359,176 +472,77 @@
     let isEditing = false;
     let editId = null;
 
-    function addRateConfig() {
+    function addRoleTask() {
         isEditing = false;
         editId = null;
-        document.getElementById('modalTitle').textContent = '添加汇率配置';
+        document.getElementById('modalTitle').textContent = '添加角色任务映射';
         document.getElementById('systemFields').style.display = 'none';
-        document.getElementById('editableFields').style.display = 'block';
-        document.getElementById('modalCountry').value = 'USA';
-        document.getElementById('modalCurrency').value = 'USD';
-        document.getElementById('modalCurrencyName').value = '';
-        document.getElementById('modalSymbolFloat').value = '0';
-        document.getElementById('modalCurrencySymbol').value = '$';
-        document.getElementById('modalRate').value = '1.0000';
-        document.getElementById('modalNewRate').value = '0';
-        document.getElementById('modalMark').value = '';
-        document.getElementById('rateModal').style.display = 'block';
+        document.getElementById('modalNoticeKey').value = 'CUSTOMER_MANAGE';
+        document.getElementById('modalTaskType').value = 'STORE_AUDIT';
+        document.getElementById('modalSystemType').value = 'STORE';
+        document.getElementById('modalPrioritySort').value = 'IMPORTANT_URGENT';
+        document.getElementById('roleTaskModal').style.display = 'block';
     }
 
-    function editRateConfig(id) {
+    function editRoleTask(id) {
         isEditing = true;
         editId = id;
-        const rate = rateData.find(item => item.id === id);
-        document.getElementById('modalTitle').textContent = '编辑汇率配置';
+        const task = roleTaskData.find(item => item.id === id);
+        document.getElementById('modalTitle').textContent = '编辑角色任务映射';
         document.getElementById('systemFields').style.display = 'block';
-        document.getElementById('editableFields').style.display = 'block';
-        document.getElementById('modalId').value = rate.id;
-        document.getElementById('modalCountry').value = rate.country;
-        document.getElementById('modalCurrency').value = rate.currency;
-        document.getElementById('modalCurrencyName').value = rate.currency_name;
-        document.getElementById('modalSymbolFloat').value = rate.symbol_float;
-        document.getElementById('modalCurrencySymbol').value = rate.currency_symbol;
-        document.getElementById('modalRate').value = rate.rate.toFixed(4);
-        document.getElementById('modalNewRate').value = rate.newRate > 0 ? rate.newRate.toFixed(4) : '0';
-        document.getElementById('modalMark').value = rate.mark;
-        document.getElementById('modalCreateTime').value = moment.unix(rate.create_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('modalUpdateTime').value = moment.unix(rate.update_time).format('YYYY-MM-DDTHH:mm');
-        document.getElementById('rateModal').style.display = 'block';
+        document.getElementById('modalId').value = task.id;
+        document.getElementById('modalNoticeKey').value = task.notice_key;
+        document.getElementById('modalTaskType').value = task.task_type;
+        document.getElementById('modalSystemType').value = task.system_type;
+        document.getElementById('modalPrioritySort').value = task.priority_sort;
+        document.getElementById('modalCreateTime').value = moment.unix(task.create_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('modalUpdateTime').value = moment.unix(task.update_time).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('roleTaskModal').style.display = 'block';
     }
 
-    function saveRateConfig() {
-        const newRate = {
-            id: isEditing ? editId : rateData.length + 1,
-            country: document.getElementById('modalCountry').value,
-            currency: document.getElementById('modalCurrency').value.toUpperCase(),
-            currency_name: document.getElementById('modalCurrencyName').value,
-            symbol_float: parseInt(document.getElementById('modalSymbolFloat').value),
-            currency_symbol: document.getElementById('modalCurrencySymbol').value,
-            rate: parseFloat(document.getElementById('modalRate').value),
-            newRate: parseFloat(document.getElementById('modalNewRate').value) || 0,
-            mark: document.getElementById('modalMark').value,
-            create_time: isEditing ? rateData.find(item => item.id === editId).create_time : moment().unix(),
+    function saveRoleTask() {
+        const newRoleTask = {
+            id: isEditing ? editId : roleTaskData.length + 1,
+            notice_key: document.getElementById('modalNoticeKey').value,
+            task_type: document.getElementById('modalTaskType').value,
+            system_type: document.getElementById('modalSystemType').value,
+            priority_sort: document.getElementById('modalPrioritySort').value,
+            create_time: isEditing ? roleTaskData.find(item => item.id === editId).create_time : moment().unix(),
             update_time: moment().unix()
         };
 
         if (isEditing) {
-            const index = rateData.findIndex(item => item.id === editId);
-            rateData[index] = newRate;
+            const index = roleTaskData.findIndex(item => item.id === editId);
+            roleTaskData[index] = newRoleTask;
         } else {
-            rateData.push(newRate);
+            roleTaskData.push(newRoleTask);
         }
 
         closeModal();
-        renderRateList();
+        renderRoleTaskList();
     }
 
-    function deleteRateConfig(id) {
-        if (confirm('确定要删除此汇率配置吗？')) {
-            rateData = rateData.filter(item => item.id !== id);
-            renderRateList();
+    function deleteRoleTask(id) {
+        if (confirm('确定要删除此角色任务映射吗？')) {
+            roleTaskData = roleTaskData.filter(item => item.id !== id);
+            renderRoleTaskList();
         }
     }
 
     function batchDelete() {
         const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
         if (selectedIds.length === 0) {
-            alert('请先选择要删除的汇率配置');
+            alert('请先选择要删除的角色任务映射');
             return;
         }
-        if (confirm(`确定要删除 ${selectedIds.length} 个汇率配置吗？`)) {
-            rateData = rateData.filter(item => !selectedIds.includes(item.id));
-            renderRateList();
+        if (confirm(`确定要删除 ${selectedIds.length} 个角色任务映射吗？`)) {
+            roleTaskData = roleTaskData.filter(item => !selectedIds.includes(item.id));
+            renderRoleTaskList();
         }
-    }
-
-    function batchEditCurrency() {
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) {
-            alert('请先选择要修改的汇率配置');
-            return;
-        }
-        document.getElementById('selectedIds').value = selectedIds.join(', ');
-        document.getElementById('newCurrency').value = '';
-        document.getElementById('currencyModal').style.display = 'block';
-    }
-
-    function saveBatchCurrency() {
-        const newCurrency = document.getElementById('newCurrency').value.toUpperCase();
-        const selectedIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => parseInt(cb.dataset.id));
-        rateData = rateData.map(item => selectedIds.includes(item.id) ? { ...item, currency: newCurrency, update_time: moment().unix() } : item);
-        closeCurrencyModal();
-        renderRateList();
-    }
-
-    function openAuditModal(id) {
-        const rate = rateData.find(item => item.id === id);
-        if (!rate || rate.newRate <= 0) {
-            alert('此记录没有待审核的汇率');
-            return;
-        }
-        auditRateId = id;
-        document.getElementById('auditBasicInfo').innerHTML = `
-            <div class="ant-form-item">
-                <label>国家:</label>
-                <input type="text" value="${rate.country}" disabled>
-            </div>
-            <div class="ant-form-item">
-                <label>货币代码:</label>
-                <input type="text" value="${rate.currency}" disabled>
-            </div>
-            <div class="ant-form-item">
-                <label>货币名称:</label>
-                <input type="text" value="${rate.currency_name}" disabled>
-            </div>
-            <div class="ant-form-item">
-                <label>货币符号:</label>
-                <input type="text" value="${rate.currency_symbol}" disabled>
-            </div>
-        `;
-        document.getElementById('auditRate').value = rate.rate.toFixed(4);
-        document.getElementById('auditNewRate').value = rate.newRate.toFixed(4);
-        document.getElementById('auditModal').style.display = 'block';
-    }
-
-    function rejectNewRate() {
-        const index = rateData.findIndex(item => item.id === auditRateId);
-        if (index !== -1) {
-            rateData[index] = {
-                ...rateData[index],
-                newRate: 0,
-                update_time: moment().unix()
-            };
-        }
-        closeAuditModal();
-        renderRateList();
-    }
-
-    function acceptNewRate() {
-        const index = rateData.findIndex(item => item.id === auditRateId);
-        if (index !== -1) {
-            rateData[index] = {
-                ...rateData[index],
-                rate: rateData[index].newRate,
-                newRate: 0,
-                update_time: moment().unix()
-            };
-        }
-        closeAuditModal();
-        renderRateList();
     }
 
     function closeModal() {
-        document.getElementById('rateModal').style.display = 'none';
-    }
-
-    function closeCurrencyModal() {
-        document.getElementById('currencyModal').style.display = 'none';
-    }
-
-    function closeAuditModal() {
-        document.getElementById('auditModal').style.display = 'none';
-        auditRateId = null;
+        document.getElementById('roleTaskModal').style.display = 'none';
     }
 
     window.onload = () => {
@@ -536,7 +550,7 @@
         w3.includeHTML(() => {
             console.log('External HTML included');
             initMenus();
-            fetchRateData();
+            fetchRoleTaskData();
         });
     };
 </script>
