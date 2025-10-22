@@ -25,21 +25,34 @@
         .col-symbol-float { width: 8%; min-width: 60px; }
         .col-currency-symbol { width: 8%; min-width: 60px; }
         .col-rate { width: 10%; min-width: 80px; }
-        .col-create-time { width: 15%; min-width: 120px; }
-        .col-update-time { width: 15%; min-width: 120px; }
-        .col-actions { width: 15%; min-width: 100px; }
+        .col-new-rate { width: 10%; min-width: 80px; }
+        .col-create-time { width: 12%; min-width: 100px; }
+        .col-update-time { width: 12%; min-width: 100px; }
+        .col-actions { width: 15%; min-width: 120px; }
         .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1024px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 968px; overflow-y: auto; position: relative; }
-        .modal-content h3 { margin-top: 0; margin-bottom: 16px; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 600px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto; position: relative; }
+        .modal-content h3 { margin-top: 0; margin-bottom: 16px; color: #1a73e8; }
         .modal-buttons { text-align: right; margin-top: 20px; }
-        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer; border: none; background: none; }
+        .close-btn { position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; border: none; background: none; color: #666; }
+        .close-btn:hover { color: #ff4d4f; }
         .modal-content .ant-form-item { margin-bottom: 16px; display: flex; align-items: center; }
-        .modal-content .ant-form-item label { margin-right: 8px; width: 100px; text-align: right; color: rgba(0, 0, 0, 0.85); height: 32px; line-height: 32px; }
-        .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; width: auto; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .modal-content .ant-form-item label { margin-right: 16px; width: 120px; text-align: right; color: #333; font-weight: 500; }
+        .modal-content .ant-form-item input, .modal-content .ant-form-item select { flex: 1; padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px; box-sizing: border-box; }
         .modal-content .ant-form-item.textarea-item { display: block; }
         .modal-content .ant-form-item.textarea-item label { display: block; margin-bottom: 4px; }
-        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        .modal-content .ant-form-item.textarea-item textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #d9d9d9; border-radius: 4px; box-sizing: border-box; resize: vertical; }
+        /* 审核弹窗样式 */
+        .audit-modal-content { max-width: 500px; background: #f9f9f9; border: 2px solid #1a73e8; }
+        .audit-modal-content .ant-form-item.rate-item { background: #e6f7ff; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
+        .audit-modal-content .ant-form-item.new-rate-item { background: #fff1f0; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
+        .audit-modal-content .ant-form-item input[disabled] { background: transparent; border: none; font-size: 16px; font-weight: bold; color: #000; }
+        .audit-modal-content .ant-form-item label { color: #555; }
+        .audit-modal-content .modal-buttons button { padding: 8px 16px; font-size: 14px; }
+        .audit-modal-content .modal-buttons .ant-btn-primary { background: #1a73e8; border-color: #1a73e8; color: #fff; }
+        .audit-modal-content .modal-buttons .ant-btn-primary:hover { background: #40c4ff; border-color: #40c4ff; }
+        .audit-modal-content .modal-buttons .ant-btn { background: #d9d9d9; border-color: #d9d9d9; color: #333; }
+        .audit-modal-content .modal-buttons .ant-btn:hover { background: #bfbfbf; border-color: #bfbfbf; }
     </style>
 </head>
 <body>
@@ -88,6 +101,7 @@
                                         <div class="col-symbol-float">符号位置</div>
                                         <div class="col-currency-symbol">货币符号</div>
                                         <div class="col-rate">汇率</div>
+                                        <div class="col-new-rate">新汇率</div>
                                         <div class="col-create-time">创建时间</div>
                                         <div class="col-update-time">更新时间</div>
                                         <div class="col-actions">操作</div>
@@ -166,6 +180,10 @@
                         <label>汇率:</label>
                         <input type="number" id="modalRate" step="0.0001" min="0">
                     </div>
+                    <div class="ant-form-item">
+                        <label>新汇率:</label>
+                        <input type="number" id="modalNewRate" step="0.0001" min="0">
+                    </div>
                     <div class="ant-form-item textarea-item">
                         <label>备注:</label>
                         <textarea id="modalMark" rows="5" maxlength="256"></textarea>
@@ -200,11 +218,33 @@
             </form>
         </div>
     </div>
+
+    <!-- 审核弹窗 -->
+    <div id="auditModal" class="modal">
+        <div class="modal-content audit-modal-content">
+            <button class="close-btn" onclick="closeAuditModal()">×</button>
+            <h3>审核汇率</h3>
+            <div id="auditBasicInfo"></div>
+            <div class="ant-form-item rate-item">
+                <label>当前汇率:</label>
+                <input type="text" id="auditRate" disabled>
+            </div>
+            <div class="ant-form-item new-rate-item">
+                <label>新汇率:</label>
+                <input type="text" id="auditNewRate" disabled>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="ant-btn" onclick="rejectNewRate()">拒绝</button>
+                <button type="button" class="ant-btn ant-btn-primary" onclick="acceptNewRate()">接受</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     let rateData = [];
     let ratePage = 1, ratePerPage = 20;
+    let auditRateId = null;
 
     function fetchRateData() {
         console.log('Fetching rate data...');
@@ -217,11 +257,12 @@
             const rate = {
                 id: i,
                 country: countries[idx],
-                currency: currencies[idx] + (i % 10), // 避免重复
+                currency: currencies[idx] + (i % 10),
                 currency_name: `${countries[idx]} Dollar`,
-                symbol_float: Math.random() > 0.5 ? 1 : 0, // 0:靠左, 1:靠右
+                symbol_float: Math.random() > 0.5 ? 1 : 0,
                 currency_symbol: symbols[idx],
                 rate: parseFloat((Math.random() * 100).toFixed(4)),
+                newRate: Math.random() > 0.7 ? parseFloat((Math.random() * 100).toFixed(4)) : 0,
                 mark: `Rate config for ${countries[idx]} - ${i}`,
                 create_time: moment().subtract(Math.floor(Math.random() * 60), 'days').unix(),
                 update_time: moment().subtract(Math.floor(Math.random() * 30), 'days').unix()
@@ -251,9 +292,11 @@
                 <div class="col-symbol-float">${rate.symbol_float === 0 ? '靠左' : '靠右'}</div>
                 <div class="col-currency-symbol">${rate.currency_symbol}</div>
                 <div class="col-rate">${rate.rate.toFixed(4)}</div>
+                <div class="col-new-rate">${rate.newRate > 0 ? rate.newRate.toFixed(4) : '-'}</div>
                 <div class="col-create-time">${moment.unix(rate.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
                 <div class="col-update-time">${moment.unix(rate.update_time).format('YYYY-MM-DD HH:mm:ss')}</div>
                 <div class="col-actions">
+                    ${rate.newRate > 0 ? `<button class="ant-btn ant-btn-primary" onclick="openAuditModal(${rate.id})">审核</button>` : ''}
                     <button class="ant-btn" onclick="editRateConfig(${rate.id})">编辑</button>
                     <button class="ant-btn ant-btn-danger" onclick="deleteRateConfig(${rate.id})">删除</button>
                 </div>
@@ -328,6 +371,7 @@
         document.getElementById('modalSymbolFloat').value = '0';
         document.getElementById('modalCurrencySymbol').value = '$';
         document.getElementById('modalRate').value = '1.0000';
+        document.getElementById('modalNewRate').value = '0';
         document.getElementById('modalMark').value = '';
         document.getElementById('rateModal').style.display = 'block';
     }
@@ -346,6 +390,7 @@
         document.getElementById('modalSymbolFloat').value = rate.symbol_float;
         document.getElementById('modalCurrencySymbol').value = rate.currency_symbol;
         document.getElementById('modalRate').value = rate.rate.toFixed(4);
+        document.getElementById('modalNewRate').value = rate.newRate > 0 ? rate.newRate.toFixed(4) : '0';
         document.getElementById('modalMark').value = rate.mark;
         document.getElementById('modalCreateTime').value = moment.unix(rate.create_time).format('YYYY-MM-DDTHH:mm');
         document.getElementById('modalUpdateTime').value = moment.unix(rate.update_time).format('YYYY-MM-DDTHH:mm');
@@ -358,9 +403,10 @@
             country: document.getElementById('modalCountry').value,
             currency: document.getElementById('modalCurrency').value.toUpperCase(),
             currency_name: document.getElementById('modalCurrencyName').value,
-            symbol_float: parseInt(document.getElementById('modalSymbolFloat').value), // 0:靠左, 1:靠右
+            symbol_float: parseInt(document.getElementById('modalSymbolFloat').value),
             currency_symbol: document.getElementById('modalCurrencySymbol').value,
             rate: parseFloat(document.getElementById('modalRate').value),
+            newRate: parseFloat(document.getElementById('modalNewRate').value) || 0,
             mark: document.getElementById('modalMark').value,
             create_time: isEditing ? rateData.find(item => item.id === editId).create_time : moment().unix(),
             update_time: moment().unix()
@@ -415,12 +461,74 @@
         renderRateList();
     }
 
+    function openAuditModal(id) {
+        const rate = rateData.find(item => item.id === id);
+        if (!rate || rate.newRate <= 0) {
+            alert('此记录没有待审核的汇率');
+            return;
+        }
+        auditRateId = id;
+        document.getElementById('auditBasicInfo').innerHTML = `
+            <div class="ant-form-item">
+                <label>国家:</label>
+                <input type="text" value="${rate.country}" disabled>
+            </div>
+            <div class="ant-form-item">
+                <label>货币代码:</label>
+                <input type="text" value="${rate.currency}" disabled>
+            </div>
+            <div class="ant-form-item">
+                <label>货币名称:</label>
+                <input type="text" value="${rate.currency_name}" disabled>
+            </div>
+            <div class="ant-form-item">
+                <label>货币符号:</label>
+                <input type="text" value="${rate.currency_symbol}" disabled>
+            </div>
+        `;
+        document.getElementById('auditRate').value = rate.rate.toFixed(4);
+        document.getElementById('auditNewRate').value = rate.newRate.toFixed(4);
+        document.getElementById('auditModal').style.display = 'block';
+    }
+
+    function rejectNewRate() {
+        const index = rateData.findIndex(item => item.id === auditRateId);
+        if (index !== -1) {
+            rateData[index] = {
+                ...rateData[index],
+                newRate: 0,
+                update_time: moment().unix()
+            };
+        }
+        closeAuditModal();
+        renderRateList();
+    }
+
+    function acceptNewRate() {
+        const index = rateData.findIndex(item => item.id === auditRateId);
+        if (index !== -1) {
+            rateData[index] = {
+                ...rateData[index],
+                rate: rateData[index].newRate,
+                newRate: 0,
+                update_time: moment().unix()
+            };
+        }
+        closeAuditModal();
+        renderRateList();
+    }
+
     function closeModal() {
         document.getElementById('rateModal').style.display = 'none';
     }
 
     function closeCurrencyModal() {
         document.getElementById('currencyModal').style.display = 'none';
+    }
+
+    function closeAuditModal() {
+        document.getElementById('auditModal').style.display = 'none';
+        auditRateId = null;
     }
 
     window.onload = () => {
