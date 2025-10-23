@@ -23,6 +23,20 @@
         .col-field-list { width: 20%; min-width: 120px; }
         .col-data-value-list { width: 15%; min-width: 100px; }
         .col-actions { width: 15%; min-width: 120px; }
+        .upload-preview { margin-top: 10px; }
+        .upload-preview img { max-width: 100px; margin-right: 5px; }
+        .upload-preview .file-item { display: inline-block; margin-right: 10px; }
+        .custom-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #ccc; z-index: 1000; width: 600px; max-height: 80vh; overflow-y: auto; }
+        .custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+        .custom-modal-tabs { display: flex; margin-bottom: 10px; }
+        .custom-modal-tab { padding: 10px; cursor: pointer; border-bottom: 2px solid transparent; }
+        .custom-modal-tab.active { border-bottom: 2px solid blue; }
+        .custom-modal-content { margin-bottom: 20px; }
+        .custom-modal-field { margin-bottom: 10px; }
+        .custom-modal-field label { display: block; margin-bottom: 5px; }
+        .custom-modal-buttons { text-align: right; }
+        .ant-table { width: 100%; border-collapse: collapse; }
+        .ant-table th, .ant-table td { border: 1px solid #ddd; padding: 8px; }
     </style>
 </head>
 <body>
@@ -71,50 +85,387 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // 模拟数据生成
+    // 数据类型
     const dataTypes = [
-        { value: 0, label: '正常' },
-        { value: 1, label: '换货' }
+        { value: 0, label: '手动发货' },
+        { value: 1, label: '自动发货' },
+        { value: 2, label: '自动换货' }
     ];
     const fieldListOptions = [
         'tracking_number', 'carrier', 'weight', 'dimensions', 'status',
         'reason', 'replacement_item', 'quantity', 'return_date', 'notes'
     ];
 
-    window.tableConfig = {
-        tableName: 'orders_data',
-        tableTitle: '订单数据',
-        sampleCount: 200,
-        defaultPerPage: 20,
-        fields: [
-            { name: 'id', isSystemField: true, generator: id => id },
-            { name: 'orders_id', generator: () => randomInt(1, 1000) },
-            { name: 'delivery_time', isSystemField: true, generator: () => moment().subtract(randomInt(1, 180), 'days').unix() },
-            { name: 'data_type', generator: () => getRandomItem(dataTypes).value },
-            { name: 'download_time', isSystemField: true, generator: () => randomInt(0, 1) ? moment().subtract(randomInt(1, 30), 'days').unix() : 0 },
-            {
-                name: 'field_list',
-                generator: () => {
-                    const count = randomInt(1, 5);
-                    const fields = fieldListOptions.sort(() => 0.5 - Math.random()).slice(0, count);
-                    return JSON.stringify(fields);
-                }
-            },
-            {
-                name: 'data_value_list',
-                generator: () => {
-                    const count = randomInt(1, 5);
-                    const fields = fieldListOptions.sort(() => 0.5 - Math.random()).slice(0, count);
-                    return JSON.stringify(fields);
-                }
+    // 模拟数据存储
+    let simulatedData = [];
+    for (let i = 1; i <= 200; i++) {
+        let item = { id: i };
+        item.orders_id = randomInt(1, 1000);
+        item.delivery_time = moment().subtract(randomInt(1, 180), 'days').unix();
+        item.data_type = getRandomItem(dataTypes).value;
+        item.download_time = randomInt(0, 1) ? moment().subtract(randomInt(1, 30), 'days').unix() : 0;
+        const count = randomInt(1, 5);
+        const fields = fieldListOptions.sort(() => 0.5 - Math.random()).slice(0, count);
+        item.field_list = JSON.stringify(fields);
+        if (item.data_type === 1 || item.data_type === 2) {
+            const values = Array.from({ length: count }, () => `value_${randomInt(100, 999)}`);
+            item.data_value_list = JSON.stringify(values);
+        } else {
+            item.data_value_list = JSON.stringify({ description: '手动发货描述示例', files: [] });
+        }
+        simulatedData.push(item);
+    }
+
+    // 自定义编辑记录函数
+    function customEditRecord(id) {
+        const item = simulatedData.find(d => d.id === id);
+        if (!item) return;
+
+        // 创建模态叠加层
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-modal-overlay';
+        document.body.appendChild(overlay);
+
+        // 创建模态
+        const modal = document.createElement('div');
+        modal.className = 'custom-modal';
+        document.body.appendChild(modal);
+
+        // 选项卡
+        const tabs = document.createElement('div');
+        tabs.className = 'custom-modal-tabs';
+        const basicTab = document.createElement('div');
+        basicTab.className = 'custom-modal-tab active';
+        basicTab.textContent = '基本信息';
+        const dataTab = document.createElement('div');
+        dataTab.className = 'custom-modal-tab';
+        dataTab.textContent = '数据信息';
+        tabs.appendChild(basicTab);
+        tabs.appendChild(dataTab);
+        modal.appendChild(tabs);
+
+        // 内容容器
+        const content = document.createElement('div');
+        content.className = 'custom-modal-content';
+        modal.appendChild(content);
+
+        // 按钮
+        const buttons = document.createElement('div');
+        buttons.className = 'custom-modal-buttons';
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'ant-btn';
+        cancelBtn.textContent = '取消';
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'ant-btn ant-btn-primary';
+        saveBtn.textContent = '保存';
+        saveBtn.style.marginLeft = '8px';
+        buttons.appendChild(cancelBtn);
+        buttons.appendChild(saveBtn);
+        modal.appendChild(buttons);
+
+        // 渲染基本信息
+        function renderBasicTab() {
+            content.innerHTML = '';
+            // 订单ID
+            const ordersIdField = createSelectField('orders_id', '订单ID', Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `订单 ${i + 1}` })), item.orders_id);
+            content.appendChild(ordersIdField);
+
+            // 配送时间
+            const deliveryTimeField = createDateTimeField('delivery_time', '配送时间', moment.unix(item.delivery_time).format('YYYY-MM-DDTHH:mm'));
+            content.appendChild(deliveryTimeField);
+
+            // 数据类型
+            const dataTypeField = createSelectField('data_type', '数据类型', dataTypes, item.data_type, (value) => {
+                item.data_type = parseInt(value);
+                if (currentTab === 'data') renderDataTab();
+            });
+            content.appendChild(dataTypeField);
+
+            // 下载时间
+            const downloadTimeField = createDateTimeField('download_time', '下载时间', item.download_time ? moment.unix(item.download_time).format('YYYY-MM-DDTHH:mm') : '');
+            content.appendChild(downloadTimeField);
+
+            // ID (只读)
+            const idField = createTextField('id', 'ID', item.id, true);
+            content.appendChild(idField);
+        }
+
+        // 渲染数据信息
+        function renderDataTab() {
+            content.innerHTML = '';
+            const dataType = item.data_type;
+            if (dataType === 1 || dataType === 2) {
+                // 自动发货/自动换货：表格
+                let fields = [];
+                let values = [];
+                try {
+                    fields = JSON.parse(item.field_list || '[]');
+                    values = JSON.parse(item.data_value_list || '[]');
+                } catch (e) {}
+
+                // 表格
+                const table = document.createElement('table');
+                table.className = 'ant-table';
+                const thead = document.createElement('thead');
+                const tr = document.createElement('tr');
+                fields.forEach(field => {
+                    const th = document.createElement('th');
+                    th.textContent = field;
+                    tr.appendChild(th);
+                });
+                thead.appendChild(tr);
+                table.appendChild(thead);
+                const tbody = document.createElement('tbody');
+                const tr2 = document.createElement('tr');
+                values.forEach((value, index) => {
+                    const td = document.createElement('td');
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = value;
+                    input.onchange = (e) => values[index] = e.target.value;
+                    td.appendChild(input);
+                    tr2.appendChild(td);
+                });
+                tbody.appendChild(tr2);
+                table.appendChild(tbody);
+                content.appendChild(table);
+
+                // 字段列表编辑
+                const fieldListField = createTagField('field_list', '字段列表', fieldListOptions, fields, (newFields) => {
+                    fields = newFields;
+                    item.field_list = JSON.stringify(newFields);
+                    item.data_value_list = JSON.stringify(newFields.map(() => '')); // 重置值
+                    renderDataTab();
+                });
+                content.appendChild(fieldListField);
+            } else {
+                // 手动发货：描述 + 上传
+                let description = '';
+                let files = [];
+                try {
+                    const data = JSON.parse(item.data_value_list || '{}');
+                    description = data.description || '';
+                    files = data.files || [];
+                } catch (e) {}
+
+                const descField = document.createElement('div');
+                descField.className = 'custom-modal-field';
+                const descLabel = document.createElement('label');
+                descLabel.textContent = '发货内容描述：';
+                const descTextarea = document.createElement('textarea');
+                descTextarea.rows = 5;
+                descTextarea.style.width = '100%';
+                descTextarea.value = description;
+                descTextarea.onchange = (e) => description = e.target.value;
+                descField.appendChild(descLabel);
+                descField.appendChild(descTextarea);
+                content.appendChild(descField);
+
+                const uploadField = document.createElement('div');
+                uploadField.className = 'custom-modal-field';
+                const uploadLabel = document.createElement('label');
+                uploadLabel.textContent = '上传文件/图片：';
+                const uploadInput = document.createElement('input');
+                uploadInput.type = 'file';
+                uploadInput.multiple = true;
+                uploadInput.accept = 'image/*, .pdf, .txt, .doc, .docx';
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'upload-preview';
+                files.forEach(file => {
+                    previewDiv.appendChild(createPreviewItem(file));
+                });
+                uploadInput.addEventListener('change', (e) => {
+                    files = Array.from(e.target.files);
+                    previewDiv.innerHTML = '';
+                    files.forEach(file => {
+                        previewDiv.appendChild(createPreviewItem(file));
+                    });
+                });
+                uploadField.appendChild(uploadLabel);
+                uploadField.appendChild(uploadInput);
+                uploadField.appendChild(previewDiv);
+                content.appendChild(uploadField);
             }
-        ],
-        actionButtons: [
-            { label: '添加', className: 'ant-btn ant-btn-primary', action: 'addRecord' },
-            { label: '批量删除', className: 'ant-btn ant-btn-danger', action: 'batchDelete' },
-            { label: '批量修改类型', className: 'ant-btn ant-btn-default', color: '#fa8c16', field: { name: 'data_type', label: '数据类型', type: 'select', options: dataTypes } }
-        ],
-        listFields: [
+        }
+
+        // 创建选择字段
+        function createSelectField(name, label, options, value, onChange) {
+            const field = document.createElement('div');
+            field.className = 'custom-modal-field';
+            const lbl = document.createElement('label');
+            lbl.textContent = label;
+            const sel = document.createElement('select');
+            sel.name = name;
+            sel.style.width = '100%';
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                if (opt.value == value) option.selected = true;
+                sel.appendChild(option);
+            });
+            if (onChange) sel.onchange = (e) => onChange(e.target.value);
+            field.appendChild(lbl);
+            field.appendChild(sel);
+            return field;
+        }
+
+        // 创建日期时间字段
+        function createDateTimeField(name, label, value) {
+            const field = document.createElement('div');
+            field.className = 'custom-modal-field';
+            const lbl = document.createElement('label');
+            lbl.textContent = label;
+            const inp = document.createElement('input');
+            inp.type = 'datetime-local';
+            inp.name = name;
+            inp.value = value;
+            inp.style.width = '100%';
+            field.appendChild(lbl);
+            field.appendChild(inp);
+            return field;
+        }
+
+        // 创建文本字段
+        function createTextField(name, label, value, readonly = false) {
+            const field = document.createElement('div');
+            field.className = 'custom-modal-field';
+            const lbl = document.createElement('label');
+            lbl.textContent = label;
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.name = name;
+            inp.value = value;
+            inp.readOnly = readonly;
+            inp.style.width = '100%';
+            field.appendChild(lbl);
+            field.appendChild(inp);
+            return field;
+        }
+
+        // 创建标签字段
+        function createTagField(name, label, options, selected, onChange) {
+            const field = document.createElement('div');
+            field.className = 'custom-modal-field';
+            const lbl = document.createElement('label');
+            lbl.textContent = label;
+            const tagsDiv = document.createElement('div');
+            tagsDiv.style.marginBottom = '10px';
+            selected.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'ant-tag ant-tag-blue';
+                span.style.marginRight = '5px';
+                span.textContent = tag;
+                const close = document.createElement('span');
+                close.textContent = 'x';
+                close.style.cursor = 'pointer';
+                close.style.marginLeft = '5px';
+                close.onclick = () => {
+                    selected = selected.filter(t => t !== tag);
+                    onChange(selected);
+                };
+                span.appendChild(close);
+                tagsDiv.appendChild(span);
+            });
+            const sel = document.createElement('select');
+            sel.style.width = '100%';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = '选择字段';
+            sel.appendChild(defaultOption);
+            options.forEach(opt => {
+                if (!selected.includes(opt)) {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    sel.appendChild(option);
+                }
+            });
+            sel.onchange = (e) => {
+                if (e.target.value) {
+                    selected.push(e.target.value);
+                    onChange(selected);
+                }
+                sel.value = ''; // 重置选择
+            };
+            field.appendChild(lbl);
+            field.appendChild(tagsDiv);
+            field.appendChild(sel);
+            return field;
+        }
+
+        // 创建预览项
+        function createPreviewItem(file) {
+            const div = document.createElement('div');
+            div.className = 'file-item';
+            if (file.type && file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.alt = file.name;
+                div.appendChild(img);
+            }
+            const span = document.createElement('span');
+            span.textContent = file.name;
+            div.appendChild(span);
+            return div;
+        }
+
+        // 选项卡切换
+        let currentTab = 'basic';
+        basicTab.onclick = () => {
+            basicTab.classList.add('active');
+            dataTab.classList.remove('active');
+            currentTab = 'basic';
+            renderBasicTab();
+        };
+        dataTab.onclick = () => {
+            dataTab.classList.add('active');
+            basicTab.classList.remove('active');
+            currentTab = 'data';
+            renderDataTab();
+        };
+
+        // 初始渲染
+        renderBasicTab();
+
+        // 取消
+        cancelBtn.onclick = () => {
+            document.body.removeChild(modal);
+            document.body.removeChild(overlay);
+        };
+
+        // 保存
+        saveBtn.onclick = () => {
+            // 更新基本信息
+            item.orders_id = parseInt(content.querySelector('select[name="orders_id"]').value);
+            item.delivery_time = moment(content.querySelector('input[name="delivery_time"]').value).unix();
+            item.data_type = parseInt(content.querySelector('select[name="data_type"]').value);
+            const downloadInput = content.querySelector('input[name="download_time"]');
+            item.download_time = downloadInput.value ? moment(downloadInput.value).unix() : 0;
+
+            // 更新数据信息
+            if (item.data_type === 1 || item.data_type === 2) {
+                const inputs = content.querySelectorAll('td input');
+                let newValues = [];
+                inputs.forEach(inp => newValues.push(inp.value));
+                item.data_value_list = JSON.stringify(newValues);
+            } else {
+                const desc = content.querySelector('textarea').value;
+                const files = Array.from(content.querySelector('input[type="file"]').files).map(f => ({ name: f.name, type: f.type }));
+                item.data_value_list = JSON.stringify({ description: desc, files });
+                item.field_list = '[]';
+            }
+
+            // 刷新列表
+            renderTable();
+            document.body.removeChild(modal);
+            document.body.removeChild(overlay);
+        };
+    }
+
+    // 渲染表格
+    function renderTable() {
+        const listFields = [
             { name: 'id', label: 'ID', className: 'col-id' },
             { name: 'orders_id', label: '订单ID', className: 'col-orders-id', formatter: v => `订单 ${v}` },
             { name: 'delivery_time', label: '配送时间', className: 'col-delivery-time', formatter: v => moment.unix(v).format('YYYY-MM-DD HH:mm:ss') },
@@ -144,60 +495,38 @@
                 label: '操作',
                 className: 'col-actions',
                 formatter: (_, item) => `
-            <button class="ant-btn" onclick="editRecord(${item.id})" style="margin-right: 8px;">编辑</button>
-            <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})" style="margin-right: 8px;">删除</button>
-            <button class="ant-btn" onclick="alert('跳转 打开 商品库存 并筛选 对应条件')" style="margin-right: 8px;">查看</button>
-        `
+                    <button class="ant-btn edit-btn" data-id="${item.id}" style="margin-right: 8px;">编辑</button>
+                    <button class="ant-btn ant-btn-danger" onclick="deleteRecord(${item.id})" style="margin-right: 8px;">删除</button>
+                    <button class="ant-btn" onclick="alert('跳转 打开 商品库存 并筛选 对应条件')" style="margin-right: 8px;">查看</button>
+                `
             }
-        ],
-        filterFields: [
-            { id: 'orders_id', type: 'select', options: [{ value: '', label: '全部订单' }, ...Array.from({ length: 15 }, (_, i) => ({ value: `${i + 1}`, label: `订单 ${i + 1}` }))], filter: (data, value) => value === '' ? data : data.filter(d => d.orders_id === parseInt(value)) },
-            { id: 'data_type', type: 'select', options: [{ value: '', label: '全部类型' }, ...dataTypes], filter: (data, value) => value === '' ? data : data.filter(d => d.data_type === parseInt(value)) },
-            { id: 'startDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.delivery_time).isSameOrAfter(value)) : data },
-            { id: 'endDate', type: 'date', filter: (data, value) => value ? data.filter(d => moment.unix(d.delivery_time).isSameOrBefore(value)) : data }
-        ],
-        modalTabs: [
-            {
-                id: 'basic',
-                title: '基本信息',
-                fields: [
-                    { name: 'orders_id', label: '订单ID', type: 'select', options: () => Array.from({ length: 15 }, (_, i) => ({ value: i + 1, label: `订单 ${i + 1}` })), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'delivery_time', label: '正常时间', type: 'datetime-local', formatter: v => moment.unix(v).format('YYYY-MM-DDTHH:mm'), showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'data_type', label: '数据类型', type: 'select', options: dataTypes, showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'download_time', label: '下载时间', type: 'datetime-local', formatter: v => v ? moment.unix(v).format('YYYY-MM-DDTHH:mm') : '', showInAdd: true, showInEdit: true, editableInAdd: true, editableInEdit: true },
-                    { name: 'id', label: 'ID', type: 'text', showInAdd: false, showInEdit: true, editableInAdd: false, editableInEdit: false }
-                ]
-            },
-            {
-                id: 'data',
-                title: '数据信息',
-                fields: [
-                    {
-                        name: 'field_list',
-                        label: '字段列表',
-                        type: 'tag',
-                        options: fieldListOptions,
-                        color: 'blue',
-                        allowCustom: false,
-                        showInAdd: true,
-                        showInEdit: true,
-                        editableInAdd: true,
-                        editableInEdit: true
-                    },
-                    {
-                        name: 'data_value_list',
-                        label: '数据值',
-                        type: 'textarea',
-                        rows: 5,
-                        showInAdd: true,
-                        showInEdit: true,
-                        editableInAdd: true,
-                        editableInEdit: true
-                    }
-                ]
-            }
-        ]
-    };
+        ];
+
+        const listDiv = document.getElementById('orders-data-list');
+        listDiv.innerHTML = '<table class="ant-table"><thead><tr>' +
+            listFields.map(f => `<th class="${f.className}">${f.label}</th>`).join('') +
+            '</tr></thead><tbody>' +
+            simulatedData.slice(0, 20).map(item =>
+                '<tr>' + listFields.map(f => `<td class="${f.className}">${f.formatter ? f.formatter(item[f.name], item) : item[f.name]}</td>`).join('') + '</tr>'
+            ).join('') +
+            '</tbody></table>';
+
+        // 重新绑定编辑按钮事件
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.onclick = () => customEditRecord(parseInt(btn.dataset.id));
+        });
+    }
+
+    // 删除记录（模拟）
+    function deleteRecord(id) {
+        simulatedData = simulatedData.filter(d => d.id !== id);
+        renderTable();
+    }
+
+    // 页面加载时渲染表格
+    document.addEventListener('DOMContentLoaded', () => {
+        renderTable();
+    });
 
     // 支持 Enter 键触发查询
     document.addEventListener('keydown', (e) => {
