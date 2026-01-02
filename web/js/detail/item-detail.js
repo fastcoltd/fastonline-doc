@@ -1,3 +1,14 @@
+
+const stickyHeader = document.getElementById('stickyHeader');
+const stickyHeaderHeight = stickyHeader.offsetHeight;
+const pageContent = document.querySelector('.page-content');
+const pageFix = document.querySelector('.page-fix-box');
+const pageHead = document.querySelector('.page-head');
+const itemDetailLeftBox = document.querySelector('.item-detail-left-box')
+const pageHeadHeight = pageHead.offsetHeight;
+const footer = document.getElementsByTagName('footer')[0];
+const footerHeight = footer.offsetHeight;
+const bodyElement = document.getElementsByTagName('body')[0];
 const sort = new SortSelector();
 function sortItems(value) {
     console.log('sort items', value);
@@ -83,7 +94,118 @@ function renderItems(items) {
         container.appendChild(itemElement);
     });
 }
+function renderStarsStatisticsChart() {
+    let dom = document.getElementById('starsStatisticsEchart')
+    var chartInstance = echarts.init(dom)
+    var datas = [118, 50, 20, 10, 10]
+    let starNames = ['5星', '4星', '3星', '2星', '1星']
+    let maxVal = Math.max(...datas)
+    let maxArr = [];
+    for (let i = 0; i < datas.length; i++) {
+        maxArr.push(maxVal + 20)
+    }
+    let option = {
+        tooltip: {
+            trigger: 'axis',
+            formatter: '{b} : {c}',
+        },
+        legend: {
+            show: false
+        },
+        grid: {
+            left: 50,
+            right: 20,
+            top: 20,
+            bottom: 0
+        },
+        xAxis: {
+            show: true,
+            position: 'top',
+            type: 'value',
+            max: 'dataMax',
+            axisLine: {
+                show: true, // 确保这一项设置为 true
+                lineStyle: {
+                    color: '#eaeaea', // 轴线颜色
+                    width: 1, // 轴线宽度
+                }
+            },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    type: 'dashed'
+                }
+            },
+            axisLabel: {
+                color: '#333'
+            }
 
+        },
+        yAxis: [{
+            type: 'category',
+            inverse: true,
+            axisLine: {
+                show: true,
+                lineStyle: {
+                    color: '#eaeaea'
+                }
+            },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    type: 'dashed'
+                }
+            },
+            axisTick: {
+                show: false
+            },
+            data: starNames,
+            axisLabel: {
+                margin: 40,
+                fontSize: 17,
+                align: 'left',
+                color: '#333'
+            }
+        }],
+        series: [{
+            z: 2,
+            name: 'value',
+            type: 'bar',
+            barWidth: 20,
+            zlevel: 1,
+            data: datas,
+            itemStyle: {
+                normal: {
+                    color: '#8979FF'
+                }
+            },
+            label: {
+                show: true,
+                position: 'right',
+                color: '#000',
+                fontSize: 12
+            }
+        },
+        {
+            name: '背景',
+            type: 'bar',
+            barWidth: 20,
+            barGap: '-100%',
+            itemStyle: {
+                normal: {
+                    color: '#D6DBED66',
+                }
+            },
+            data: maxArr,
+        }
+
+        ]
+    };
+    chartInstance.setOption(option)
+}
+if (bodyElement.offsetWidth >= 768) {
+    renderStarsStatisticsChart()
+}
 // 创建商品元素 - 完全按照Figma设计
 function createItemElement(item) {
     const div = document.createElement('div');
@@ -174,12 +296,11 @@ function createItemElement(item) {
 document.addEventListener("DOMContentLoaded", function () {
     const similar = new Carousel('best-items', 20);
     const link = new LinkRef('page-link', 'item-detail-left-group');
-    const body = document.getElementsByTagName('body')[0];
     const screenshot = document.querySelector('.item-detail-screenshot');
     const screenshotContent = screenshot.querySelector('.item-detail-screenshot-content');
     const screenshotRightMore = screenshot.querySelector('.item-detail-screenshot-right-box');
     const screenshotLeftMore = screenshot.querySelector('.item-detail-screenshot-left-box');
-    const isMobile = body.offsetWidth <= 768;
+    const isMobile = bodyElement.offsetWidth <= 768;
     // screenshotContent.addEventListener('wheel', { passive: window.innerWidth <= 750 });
     // screenshotContent.addEventListener('touchmove', { passive: window.innerWidth <= 750 });
     let screenshotScrollOffsetX = 0
@@ -201,7 +322,44 @@ document.addEventListener("DOMContentLoaded", function () {
         screenshotContent.scrollLeft = screenshotScrollOffsetX;
         screenshotScroll();
     })
-
+    $('#increase-qty').on('click', e => {
+        $('#decrease-qty').removeClass('disabled')
+        let val = Number($('#quantity-display').val()) + 1
+        if (val >= 99) {
+            val = 99
+            $('#increase-qty').addClass('disabled')
+        } else {
+            $('#increase-qty').removeClass('disabled')
+        }
+        $('#quantity-display').val(val)
+    })
+    $('#decrease-qty').on('click', e => {
+        $('#increase-qty').removeClass('disabled')
+        let val = Number($('#quantity-display').val()) - 1
+        if (val <= 1) {
+            val = 1
+            $('#decrease-qty').addClass('disabled')
+        } else {
+            $('#decrease-qty').removeClass('disabled')
+        }
+        $('#quantity-display').val(val)
+    })
+    $('#quantity-display').on('input', e => {
+        let val = $(e.target).val()
+        $('#increase-qty').removeClass('disabled')
+        $('#decrease-qty').removeClass('disabled')
+        if (val <= 1) {
+            val = 1
+            $('#decrease-qty').addClass('disabled')
+        } else if(val >= 99) {
+            val = 99
+            $('#increase-qty').addClass('disabled')
+        }
+        $(e.target).val(val)
+    })
+    $('#buy-now-btn').on('click', () => {
+        console.log('Buy~')
+    })
     function screenshotScroll() {
         if (isMobile) { return }
         const width = screenshotContent.clientWidth;
@@ -279,14 +437,92 @@ document.addEventListener("DOMContentLoaded", function () {
         const close = statistics.querySelector('.item-detail-right-close');
         close.addEventListener('click', function (event) {
             statistics.style.display = 'none';
-            body.classList.toggle('modal-open', false);
         });
         if (statisticsStyle.display === 'none') {
             statistics.style.display = 'flex';
-            body.classList.toggle('modal-open', true);
         } else {
             statistics.style.display = 'none';
-            body.classList.toggle('modal-open', false);
         }
+        renderStarsStatisticsChart()
     });
 });
+
+
+// 滚动监听事件
+const handleScroll = debounce(function () {
+    updateStickyHeader();
+}, 16, {
+    leading: true,
+    trailing: false,
+});
+
+window.addEventListener('scroll', handleScroll, { passive: true });
+
+// 页面加载时调整位置
+document.addEventListener('DOMContentLoaded', adjustFilterPosition);
+
+// 更新sticky header状态
+function updateStickyHeader() {
+    if (!stickyHeader) return;
+    const scrollTop = document.documentElement.scrollTop;
+    if (scrollTop > pageHeadHeight) {
+        stickyHeader.classList.add('is-sticky');
+    } else {
+        stickyHeader.classList.remove('is-sticky');
+    }
+    adjustFilterPosition();
+}
+updateStickyHeader();
+
+// 动态调整过滤器位置
+function adjustFilterPosition() {
+    const headIsSticky = stickyHeader.classList.contains('is-sticky');
+    if (!pageFix) return;
+    if (bodyElement.offsetWidth < 768) {
+        const pageFixVisble = pageFix.dataset.visible;
+        if (!pageFixVisble) {
+            return;
+        }
+        if (headIsSticky) {
+            Object.assign(pageFix.style, {
+                position: 'fixed',
+                left: 16 + 'px',
+                top: stickyHeaderHeight + 20 + 'px',
+                maxHeight: `calc(100vh - ${stickyHeaderHeight + 40}px)`
+            });
+            return;
+        }
+        Object.assign(pageFix.style, {
+            position: 'relative',
+            left: 0,
+            top: 20 + 'px',
+            maxHeight: `calc(100vh - ${stickyHeaderHeight + pageHeadHeight + 40}px)`
+        });
+        return;
+    };
+    pageFix.classList.toggle('is-sticky', headIsSticky);
+    // 计算页面头部所有固定元素的总高度
+    let totalHeight = stickyHeaderHeight;
+    if (pageHead && !headIsSticky) {
+        totalHeight += pageHeadHeight;
+    }
+    // 设置过滤器的位置和高度
+    if (!headIsSticky) {
+        // 非sticky状态：相对于page-content定位
+        Object.assign(pageFix.style, {
+            top: '20px',
+            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
+        });
+    } else {
+        let top = totalHeight + 20
+        let menuContainerScrollTop = itemDetailLeftBox.scrollHeight - document.documentElement.scrollTop - pageFix.clientHeight + pageHeadHeight
+        if (menuContainerScrollTop < 0) {
+            top = totalHeight + menuContainerScrollTop
+        }
+        // sticky状态：固定定位
+        Object.assign(pageFix.style, {
+            top: top + 'px',
+            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
+        });
+    }
+}

@@ -72,7 +72,7 @@ LinkRef.prototype.updateActiveLink = function () {
     }
 
     // 如果还是没有找到，使用第一个section
-    if (!activeSection && this.sections.length > 0) {
+    if (!activeSection && this.sections.length > 0 || scrollTop == 0) {
         activeSection = this.sections[0];
     }
 

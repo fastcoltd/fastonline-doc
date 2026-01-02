@@ -1,4 +1,4 @@
-const headerLoginButton = document.getElementById('header-login');
+const headerJoinButton = document.getElementById('header-join');
 const headerSignInButton = document.getElementById('header-signin');
 const signin = document.getElementById('signin');
 const signinCloseButton = document.getElementById('signin-close');
@@ -17,7 +17,7 @@ loginForm.addEventListener('submit', function (e) {
         loginSuccess = true;
         return;
     }
-    user = new UserInfo('Test', 'https://avatars.githubusercontent.com/u/10436682?v=4', 'fastresp@163.com', '10436682', 1, new Date('1998-01-01'), 'China');
+    window.user = new UserInfo('Test', 'https://avatars.githubusercontent.com/u/10436682?v=4', 'fastresp@163.com', '10436682', 1, new Date('1998-01-01'), 'China');
     signin.style.display = 'none';
     body.classList.toggle('modal-open', false);
     dismissHomeMenuPage();
@@ -34,13 +34,13 @@ signinCloseButton.addEventListener('click', function () {
     body.classList.toggle('modal-open', false);
 });
 
-function showSigninLoginPage() {
-    signinNavArray = ['login']
+function showJoinFn() {
+    signinNavArray = ['regist']
     setup();
 }
 
-function showSigninRegistPage() {
-    signinNavArray = ['regist']
+function showSigninFn() {
+    signinNavArray = ['login']
     setup();
 }
 
@@ -50,12 +50,12 @@ signinBackButton.addEventListener('click', function () {
     displaySigninPage();
 });
 
-headerLoginButton.addEventListener('click', function () {
-    showSigninLoginPage();
+headerJoinButton.addEventListener('click', function () {
+    showJoinFn();
 })
 
 headerSignInButton.addEventListener('click', function () {
-    showSigninRegistPage();
+    showSigninFn();
 })
 
 function displayBackButton() {

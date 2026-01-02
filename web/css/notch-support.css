@@ -2,95 +2,78 @@
  * 刘海屏（Notch）兼容性样式
  * 支持 iPhone X 及以上机型的安全区域适配
  */
-
 /* 基础刘海屏支持 */
 :root {
-    /* 定义安全区域变量，提供回退值 */
-    --safe-area-inset-top: env(safe-area-inset-top, 0);
-    --safe-area-inset-left: env(safe-area-inset-left, 0);
-    --safe-area-inset-right: env(safe-area-inset-right, 0);
-    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0);
-
-    /* 状态栏高度（iPhone X系列为44px） */
-    --status-bar-height: max(env(safe-area-inset-top), 44px);
+  /* 定义安全区域变量，提供回退值 */
+  --safe-area-inset-top: env(safe-area-inset-top, 0);
+  --safe-area-inset-left: env(safe-area-inset-left, 0);
+  --safe-area-inset-right: env(safe-area-inset-right, 0);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0);
+  /* 状态栏高度（iPhone X系列为44px） */
+  --status-bar-height: max(env(safe-area-inset-top), 44px);
 }
-
 /* 全局安全区域适配 */
 html {
-    /* 确保页面覆盖整个屏幕 */
-    height: 100%;
-    min-height: 100vh;
-    /* 在iOS Safari中启用安全区域 */
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
+  /* 确保页面覆盖整个屏幕 */
+  height: 100%;
+  min-height: 100vh;
+  /* 在iOS Safari中启用安全区域 */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
 }
-
 body {
-    /* 基础安全区域内边距 - 确保在所有设备上生效 */
-    padding-top: var(--safe-area-inset-top) !important;
-    /* 确保最小高度包含安全区域 */
-    min-height: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
-    /* 兼容性回退 - 为不支持env()的浏览器 */
-    padding-top: env(safe-area-inset-top, 0) !important;
+  /* 基础安全区域内边距 - 确保在所有设备上生效 */
+  padding-top: var(--safe-area-inset-top) !important;
+  /* 确保最小高度包含安全区域 */
+  min-height: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
+  /* 兼容性回退 - 为不支持env()的浏览器 */
+  padding-top: env(safe-area-inset-top, 0) !important;
 }
-
 footer {
-    padding-top: 2.5rem;
-    padding-bottom: 2.5rem !important;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem !important;
 }
-
 /* iPhone X/11/12/13/14 系列特定适配 */
-@media screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3),
-screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
-screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3),
-screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3),
-screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) {
-    footer {
-        padding-bottom: 2.5rem !important;
-        padding-bottom: max(env(safe-area-inset-bottom), 2.5rem) !important;
-    }
-
-    /* 强制为有刘海的iPhone设置顶部安全距离 */
-    body {
-        padding-top: 44px !important;
-        padding-top: max(env(safe-area-inset-top), 44px) !important;
-    }
+@media screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3), screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2), screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3), screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3), screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) {
+  footer {
+    padding-bottom: 2.5rem !important;
+    padding-bottom: max(env(safe-area-inset-bottom), 2.5rem) !important;
+  }
+  /* 强制为有刘海的iPhone设置顶部安全距离 */
+  body {
+    padding-top: 44px !important;
+    padding-top: max(env(safe-area-inset-top), 44px) !important;
+  }
 }
-
 /* iOS Safari 特殊处理 */
 @supports (-webkit-overflow-scrolling: touch) {
-    body {
-        /* 在iOS Safari中强制启用安全区域 */
-        padding-top: env(safe-area-inset-top, 44px) !important;
-    }
-
-    footer {
-        padding-bottom: 2.5rem !important;
-        /* 在iOS Safari中强制启用安全区域 */
-        padding-bottom: env(safe-area-inset-bottom, 2.5rem) !important;
-    }
+  body {
+    /* 在iOS Safari中强制启用安全区域 */
+    padding-top: env(safe-area-inset-top, 44px) !important;
+  }
+  footer {
+    padding-bottom: 2.5rem !important;
+    /* 在iOS Safari中强制启用安全区域 */
+    padding-bottom: env(safe-area-inset-bottom, 2.5rem) !important;
+  }
 }
-
 /* 全屏模式下的适配 */
 @media screen and (display-mode: fullscreen) {
-    body {
-        /* 全屏模式下确保所有安全区域都被考虑 */
-        padding-top: var(--safe-area-inset-top);
-    }
-
-    footer {
-        padding-bottom: 2.5rem !important;
-        /* 全屏模式下确保所有安全区域都被考虑 */
-        padding-bottom: var(--safe-area-inset-bottom);
-    }
+  body {
+    /* 全屏模式下确保所有安全区域都被考虑 */
+    padding-top: var(--safe-area-inset-top);
+  }
+  footer {
+    padding-bottom: 2.5rem !important;
+    /* 全屏模式下确保所有安全区域都被考虑 */
+    padding-bottom: var(--safe-area-inset-bottom);
+  }
 }
-
 /* PWA模式下的适配 */
 @media screen and (display-mode: standalone) {
-
-    /* PWA应用模式下的特殊处理 */
-    .pwa-header {
-        /* 为PWA头部添加额外的状态栏空间 */
-        padding-top: calc(var(--safe-area-inset-top) + var(--status-bar-height));
-    }
+  /* PWA应用模式下的特殊处理 */
+  .pwa-header {
+    /* 为PWA头部添加额外的状态栏空间 */
+    padding-top: calc(var(--safe-area-inset-top) + var(--status-bar-height));
+  }
 }

@@ -9,7 +9,7 @@ const footerHeight = footer.offsetHeight;
 // 滚动监听事件
 const handleScroll = debounce(function () {
     updateStickyHeader();
-}, 10);
+}, 16);
 
 window.addEventListener('scroll', handleScroll, { passive: true });
 

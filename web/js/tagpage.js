@@ -152,7 +152,7 @@ function createBestItemElement(item) {
 
   div.innerHTML = `
            <img class="best-items-item-icon" src="{{item.image}}" />
-           <img class="item-like" src="image/like.png" />
+           <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
            <div class="best-items-item-content">
             <div class="item-title-box">
               <div class="item-mark item-mark1">{{item.mark}}</div>
@@ -215,7 +215,7 @@ function createStoreItemElement(item) {
   const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
   div.innerHTML = `
-           <img class="item-like" src="image/like.png" />
+           <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
             <div class="store-item-user-box">
               <img class="store-item-icon" src="{{item.image}}" />
               <div class="store-item-name-box">
@@ -288,7 +288,7 @@ function createCompaignItemElement(item) {
 
   div.innerHTML = `
            <img class="compaign-item-icon" src="{{item.image}}" />
-            <img class="item-like" src="image/like.png" />
+            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
             <div class="compaign-item-content">
               <a href="compaign-detail.html?name=compaign-name" target="_self" class="item-title-box">
                 <div class="item-mark item-mark1">compaign.mark</div>
@@ -350,7 +350,7 @@ function createPostItemElement(item) {
 
   div.innerHTML = `
            <img class="post-item-icon" src="{{item.image}}" />
-            <img class="item-like" src="image/like.png" />
+            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
             <div class="post-item-content">
               <a href="post-detail.html?name=post-name" class="item-title-box">
                 <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>

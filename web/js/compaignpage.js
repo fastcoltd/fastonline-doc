@@ -87,7 +87,7 @@ function createItemElement(item) {
 
   div.innerHTML = `
            <img class="compaign-item-icon" src="{{item.image}}" />
-            <img class="item-like" src="image/like.png" />
+            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
             <div class="compaign-item-content">
               <a href="compaign-detail.html?name=compaign-name" target="_self" class="item-title-box">
                 <div class="item-mark item-mark1">compaign.mark</div>

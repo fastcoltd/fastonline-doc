@@ -15,20 +15,25 @@ window.addEventListener('DOMContentLoaded', function () {
     const isMobile = body.offsetWidth <= 768;
     // brandContent.addEventListener('wheel', { passive: window.innerWidth <= 750 });
     // brandContent.addEventListener('touchmove', { passive: window.innerWidth <= 750 });
-    let brandScrollOffsetX = 0
-    const brandContentScroll = brandContent.scrollWidth > brandContent.clientWidth;
-    brandRightMore.style.display = (brandContentScroll && !isMobile) ? 'block' : 'none';
+    let brandScrollOffsetX = brandContent.scrollLeft
+    let maxBrandScrollOffsetX = brandContent.scrollWidth - brandContent.clientWidth
     brandRightMore.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
-        brandScrollOffsetX += 336;
+        brandScrollOffsetX += 100;
+        if (brandScrollOffsetX > maxBrandScrollOffsetX) {
+            brandScrollOffsetX = maxBrandScrollOffsetX
+        }
         brandContent.scrollLeft = brandScrollOffsetX;
         brandScroll();
     })
     brandLeftMore.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
-        brandScrollOffsetX -= 336;
+        brandScrollOffsetX -= 100;
+        if (brandScrollOffsetX < 0) {
+            brandScrollOffsetX = 0
+        }
         brandContent.scrollLeft = brandScrollOffsetX;
         brandScroll();
     })
@@ -37,16 +42,23 @@ window.addEventListener('DOMContentLoaded', function () {
         if (isMobile) { return }
         const width = brandContent.clientWidth;
         const offsetX = brandContent.scrollLeft;
+        let maxBrandScrollOffsetX = brandContent.scrollWidth - brandContent.clientWidth
         const scrollWidth = brandContent.scrollWidth;
-        if (offsetX + width >= scrollWidth) {
-            brandRightMore.style.display = 'none';
+
+        if (offsetX >= maxBrandScrollOffsetX) {
+            brandRightMore.style.cursor = 'not-allowed';
+            brandRightMore.style.opacity = '0.3';
         } else {
-            brandRightMore.style.display = 'block';
+            brandRightMore.style.cursor = 'pointer';
+            brandRightMore.style.opacity = '1';
         }
-        if (offsetX > 0) {
-            brandLeftMore.style.display = 'block';
+        if (offsetX <= 0) {
+            brandLeftMore.style.cursor = 'not-allowed';
+            brandLeftMore.style.opacity = '0.3';
         } else {
-            brandLeftMore.style.display = 'none';
+            brandLeftMore.style.cursor = 'pointer';
+            brandLeftMore.style.opacity = '1';
         }
     }
+    brandScroll()
 })

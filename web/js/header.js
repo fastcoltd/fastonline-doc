@@ -1,21 +1,11 @@
+
 document.addEventListener('DOMContentLoaded', function () {
+    const body = document.getElementsByTagName('body')[0];
     this.headerSearchMenu = new HeaderMenu('.header-search-box-label', '.header-search-box-label-icon', '.header-search-box-label-text', 'items');
     this.headerResourceMenu = new HeaderMenu('.header-items-label-resource', '.header-items-label-icon', '', '');
     this.headerPostMenu = new HeaderMenu('.header-items-label-post', '.header-items-label-icon', '', '');
     this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', '.header-search-mobile-box-label-icon', '.header-search-mobile-box-label-text', 'items')
     refreshHeaderUserUI();
-    function refreshHeaderUserUI() {
-        const signinButtonEle = document.getElementById('header-signin');
-        const loginButtonEle = document.getElementById('header-login');
-        const headerUser = document.getElementById('header-user');
-        signinButtonEle.style.display = !user ? '' : 'none';
-        loginButtonEle.style.display = !user ? '' : 'none';
-        headerUser.style.display = !user ? 'none' : '';
-        if (user) {
-            const headerUserAvatar = headerUser.querySelector('.header-user-icon');
-            headerUserAvatar.src = user.avatar;
-        }
-    }
 
     const homeMenuPage = document.querySelector('.home-menu-page');
     const headerMenu = document.querySelector('.header-menu-box');
@@ -30,10 +20,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const homeMenuLgoinEle = homeMenuPage.querySelector('.home-menu-signin-text');
         const homeMenuUserLine = homeMenuPage.querySelector('.home-menu-seperate-line');
         homeMenuLgoinEle.addEventListener('click', function (e) {
-            showSigninLoginPage();
+            showSigninFn();
         })
         homeMenuRegistEle.addEventListener('click', function (e) {
-            showSigninRegistPage();
+            showJoinFn();
         })
         const homeMenuLogoutEle = homeMenuUserEle.querySelector('.home-menu-user-logout');
         homeMenuLogoutEle.addEventListener('click', function (e) {
@@ -62,12 +52,46 @@ document.addEventListener('DOMContentLoaded', function () {
     homeMenuBack.addEventListener('click', function (e) {
         dismissHomeMenuPage()
     })
-    function dismissHomeMenuPage() {
-        homeMenuPage.style.width = '0';
-        homeMenuPage.style.display = 'none';
-        body.classList.toggle('modal-open', false);
-    }
-
+    $('.scroll-to-top').on('click', function () {
+        scrollToTop()
+    })
+    $('.kefu-icon').on('click', function () {
+        alert('你好，客服为您服务')
+    })
+    $('.icon-aixin').on('click', function (e) {
+        let like = $(this).data('like')
+        if(like) {
+            $(this).data('like', 0)
+            $(this).css({color: '#F4F4F4'})
+        } else {
+            $(this).data('like', 1)
+            $(this).css({color: '#FF1B20'})
+        }
+    })
+    $('.header-avatar').on('click', function() {
+        $('.center-wrapper').show()
+    })
+    $('.center-wrapper .close-icon').on('click', function() {
+        $('.center-wrapper').hide()
+    })
+    $('.icon-arrow_up').on('click', function () {
+        $(this).parents('.account-item-center').toggleClass('account-item-center-hide')
+    })
+    $('.icon-youjian').on('click', function() {
+        if (body.offsetWidth < 768) {
+            $('.notice-items-wrapper').toggle()   
+        }
+    })
+    $('.icon-youjian').on('mouseover', function() {
+        if (body.offsetWidth >= 768) {
+            $('.notice-items-wrapper').show()   
+        }
+    })
+    $('.icon-youjian').on('mouseout', function() {
+        if (body.offsetWidth >= 768) {
+            $('.notice-items-wrapper').hide()   
+        }
+    })
     for (let i = 0; i < homeMenuTitles.length; i++) {
         const title = homeMenuTitles[i];
         title.addEventListener('click', function (e) {
@@ -233,4 +257,67 @@ class HeaderMenu {
         this.selectedText = defaultValue;
         this.updateSelectedState(defaultValue);
     }
+}
+function dismissHomeMenuPage() {
+    const body = document.getElementsByTagName('body')[0];
+    const homeMenuPage = document.querySelector('.home-menu-page');
+    homeMenuPage.style.width = '0';
+    homeMenuPage.style.display = 'none';
+    body.classList.toggle('modal-open', false);
+}
+function refreshHeaderUserUI() {
+    let user = !window.user
+    const signinButtonEle = document.getElementById('header-signin');
+    const headerJoinButton = document.getElementById('header-join');
+    const headerUser = document.getElementById('header-user');
+    signinButtonEle.style.display = !user ? '' : 'none';
+    headerJoinButton.style.display = !user ? '' : 'none';
+    headerUser.style.display = !user ? 'none' : '';
+
+    if (user) {
+        // const headerUserAvatar = headerUser.querySelector('.header-user-icon');
+        // headerUserAvatar.src = user.avatar;
+    }
+}
+function handleEnterFn(e) {
+    console.log(e.target.value, '222222222', e)
+}
+function handleSearchFn(e) {
+    let input = e.target.previousElementSibling
+    console.log(input.value)
+}
+function searchAction(params) {
+    console.log(params, 'sdf')
+}
+function linearGradientColor(colorBegin, colorEnd, config = {}) {
+    let otherInfo = {
+        startOffset: 0,
+        endOffset: 1,
+        durationInfo: [0, 0, 0, 1]
+    }
+    if (config.startOffset) {
+        otherInfo.startOffset = config.startOffset
+    }
+    if (config.endOffset) {
+        otherInfo.endOffset = config.endOffset
+    }
+    if (config.durationInfo) {
+        otherInfo.durationInfo = config.durationInfo
+    }
+    return new echarts.graphic.LinearGradient(...otherInfo.durationInfo, [
+        {
+            offset: otherInfo.startOffset,
+            color: colorBegin
+        },
+        {
+            offset: otherInfo.endOffset,
+            color: colorEnd
+        }
+    ])
+}
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    })
 }

@@ -86,7 +86,7 @@ function createItemElement(item) {
   const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
   div.innerHTML = `
-            <img class="item-like" src="image/like.png" />
+            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
             <div class="store-item-user-box">
               <img class="store-item-icon" src="{{item.image}}" />
               <div class="store-item-name-box">

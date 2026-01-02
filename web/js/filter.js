@@ -1,18 +1,19 @@
-// Filter page JavaScript functionality
-document.addEventListener('DOMContentLoaded', function () {
+$(document).ready(function () {
 
     // Get all necessary elements
     const container = document.querySelector('.filter-container');
     const header = document.querySelector('.filter-header');
     const backBtn = document.querySelector('.filter-back-btn');
-    const clearBtn = document.querySelector('.filter-clear-btn');
-    const applyBtn = document.querySelector('.filter-apply-btn');
+    // const clearBtn = document.querySelector('.filter-clear-btn');
     const filterGroups = document.querySelectorAll('.filter-group');
     const tagCloseButtons = document.querySelectorAll('.filter-tag-close');
     const filterInputs = document.querySelectorAll('.filter-input');
     const customSelects = document.querySelectorAll('.filter-custom-select');
-    const dropdownOverlay = document.querySelector('.filter-dropdown-overlay');
     const filterBox = document.querySelector('.page-filter-box');
+
+    let currentSelect = null;
+    let selectedTags = new Set([]); // 已选择的标签
+    let scrollPosition = 0; // 记录滚动位置
     // 下拉框选项数据
     const selectOptions = {
         brand: [
@@ -41,35 +42,96 @@ document.addEventListener('DOMContentLoaded', function () {
             { value: 'return-policy', text: 'Return Policy' },
             { value: 'shipping', text: 'Shipping' },
             { value: 'support', text: 'Support' }
-        ],
-        'attribute-value': {
-            'warranty': [
-                { value: '1-year', text: '1 Year' },
-                { value: '2-year', text: '2 Years' },
-                { value: 'lifetime', text: 'Lifetime' }
-            ],
-            'return-policy': [
-                { value: '7-days', text: '7 Days' },
-                { value: '14-days', text: '14 Days' },
-                { value: '30-days', text: '30 Days' }
-            ],
-            'shipping': [
-                { value: 'free', text: 'Free Shipping' },
-                { value: 'express', text: 'Express' },
-                { value: 'standard', text: 'Standard' }
-            ],
-            'support': [
-                { value: '24-7', text: '24/7 Support' },
-                { value: 'business-hours', text: 'Business Hours' },
-                { value: 'email-only', text: 'Email Only' }
-            ]
-        }
+        ]
     };
+    const attributeValue = {
+        'warranty': [
+            { value: '1-year', text: '1 Year' },
+            { value: '2-year', text: '2 Years' },
+            { value: 'lifetime', text: 'Lifetime' }
+        ],
+        'return-policy': [
+            { value: '7-days', text: '7 Days' },
+            { value: '14-days', text: '14 Days' },
+            { value: '30-days', text: '30 Days' }
+        ],
+        'shipping': [
+            { value: 'free', text: 'Free Shipping' },
+            { value: 'express', text: 'Express' },
+            { value: 'standard', text: 'Standard' }
+        ],
+        'support': [
+            { value: '24-7', text: '24/7 Support' },
+            { value: 'business-hours', text: 'Business Hours' },
+            { value: 'email-only', text: 'Email Only' }
+        ]
+    }
 
-    let currentSelect = null;
-    let selectedTags = new Set([]); // 已选择的标签
-    let scrollPosition = 0; // 记录滚动位置
+    $('div.filter-custom-select').each(function () {
+        let dataType = $(this).data('type')
+        let select = this
+        // 生成下拉内容
+        generateDropdownHtml($(this));
+        if (dataType == 'attribute-value') {
+            $(this).addClass('disabled')
+        }
+        let that = this
+        $(this).on('click', '.filter-dropdown-item', function (e) {
+            let value = $(e.target).data('value')
+            let option = {
+                value,
+                text: $(e.target).text()
+            }
+            
+            if (value && dataType == 'tag') {
+                // 处理标签多选
+            if (!selectedTags.has(option.value)) {
+                addTag(option);
+                $(select).removeClass('active')
+            } else {
+                $(select).removeClass('active')
+            }
+            } else {
+                $(that).attr('data-value', value)
+                $(that).find('.filter-custom-select-text').text($(e.target).text())
+                $(that).toggleClass('active')
+            }
+            filterCount()
+            if (value && dataType == 'attribute-name') {
+                generateAttrVal(value)
+            }
+        })
+    })
+    $(document).on('blur', '.filter-input', function() {
+        filterCount()
+    })
+    function filterCount() {
+        let count = selectedTags.size
+        $nameInput = $('.name-input')
+        $priceInputMin = $('.price-input-min')
+        $priceInputMax = $('.price-input-max')
+        $numberInputMin = $('.number-input-min')
+        $numberInputMax = $('.number-input-max')
+        $filterCustomSelect = $('.filter-custom-select').not('[data-value=""]')
+        count += $filterCustomSelect.length
+        if($nameInput.val()) {
+            count += 1 
+        }
+        if($priceInputMin.val()) {
+            count += 1 
+        }
+        if($priceInputMax.val()) {
+            count += 1 
+        }
+        if($numberInputMin.val()) {
+            count += 1 
+        }
+        if($numberInputMax.val()) {
+            count += 1 
+        }
 
+        $('.page-filter-num').text(`(${count})`)
+    }
     if (filterBox) {
         filterBox.addEventListener('click', function () {
             const containerStyle = window.getComputedStyle(container);
@@ -90,19 +152,82 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Clear all functionality
-    if (clearBtn) {
-        clearBtn.addEventListener('click', function () {
-            clearAllFilters();
-        });
-    }
+    // if (clearBtn) {
+    //     clearBtn.addEventListener('click', function () {
+    //         clearAllFilters();
+    //     });
+    // }
 
     // Apply button functionality
-    if (applyBtn) {
-        applyBtn.addEventListener('click', function () {
-            applyFilters();
-        });
-    }
+    // if (applyBtn) {
+    //     applyBtn.addEventListener('click', function () {
+    //         applyFilters();
+    //     });
+    // }
+    $('.filter-apply-btn').on('click', function () {
+        startFitterData()
+    })
+    $('.page-sort-icon').on('click', function () {
+        $('.sort-container').toggle()
+    })
+    $('.sort-item').on('click', function () {
+        console.log($(this).data('value'))
+        $('.page-sort-icon').attr('data-value', $(this).data('value'))
+        $('.sort-container').hide()
+        startFitterData()
+    })
+    $('.filter-clear-btn').on('click', function() {
+        $nameInput = $('.name-input')
+        $priceInputMin = $('.price-input-min')
+        $priceInputMax = $('.price-input-max')
+        $numberInputMin = $('.number-input-min')
+        $numberInputMax = $('.number-input-max')
+        $filterCustomSelect = $('.filter-custom-select').not('[data-value=""]')
+        $nameInput.val('')
+        $priceInputMin.val('')
+        $priceInputMax.val('')
+        $numberInputMin.val('')
+        $numberInputMax.val('')
+        $('.filter-custom-select[data-type="brand"]').attr('data-value', '').find('.filter-custom-select-text').text('Select Brand')
+        $('.filter-custom-select[data-type="service"]').attr('data-value', '').find('.filter-custom-select-text').text('Select service')
+        $('.filter-custom-select[data-type="attribute-name"]').attr('data-value', '').find('.filter-custom-select-text').text('select attribute')
+        $('.filter-custom-select[data-type="attribute-value"]').attr('data-value', '').find('.filter-custom-select-text').text('select value')
+        $('.filter-custom-select[data-type="tag"]').find('.filter-tags').html('')
+        selectedTags.clear();
+        $('.page-sort-icon').attr('data-value', '')
+        filterCount()
+        startFitterData()
+    })
+    function startFitterData() {
+        $nameInput = $('.name-input')
+        $priceInputMin = $('.price-input-min')
+        $priceInputMax = $('.price-input-max')
+        $numberInputMin = $('.number-input-min')
+        $numberInputMax = $('.number-input-max')
+        $filterCustomSelect = $('.filter-custom-select').not('[data-value=""]')
 
+
+        const filters = {
+            name: $nameInput.val() || '',
+            brand: $('.filter-custom-select[data-type="brand"]').attr('data-value') || '',
+            service: $('.filter-custom-select[data-type="service"]').attr('data-value') || '',
+            tags: Array.from(selectedTags),
+            attributes: {
+                name: $('.filter-custom-select[data-type="attribute-name"]').attr('data-value') || '',
+                value: $('.filter-custom-select[data-type="attribute-value"]').attr('data-value') || ''
+            },
+            price: {
+                min: $priceInputMin.val() || '',
+                max: $priceInputMax.val() || ''
+            },
+            inventory: {
+                min: $numberInputMin.val() || '',
+                max: $numberInputMax.val() || ''
+            },
+            sortBy: $('.page-sort-icon').attr('data-value') || ''
+        };
+        console.log(filters, '---')
+    }
     // Filter group expand/collapse functionality
     filterGroups.forEach(function (group) {
         const header = group.querySelector('.filter-group-header');
@@ -164,19 +289,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (trigger) {
             trigger.addEventListener('click', function (e) {
                 e.stopPropagation();
+                if ($(select).hasClass('disabled')) {
+                    return
+                }
                 openDropdown(select);
             });
         }
     });
-
-    // Dropdown overlay click to close
-    if (dropdownOverlay) {
-        dropdownOverlay.addEventListener('click', function (e) {
-            if (e.target === dropdownOverlay) {
-                closeDropdown();
-            }
-        });
-    }
 
     // 禁止页面滚动
     function disableScroll() {
@@ -196,145 +315,57 @@ document.addEventListener('DOMContentLoaded', function () {
     function toggleFilterGroup(group) {
         const content = group.querySelector('.filter-group-content');
         const icon = group.querySelector('.filter-expand-icon');
-
+        customSelects.forEach(s => {
+            s.classList.remove('active')
+        });
         if (group.classList.contains('collapsed')) {
             // Expand
             group.classList.remove('collapsed');
             content.style.display = 'flex';
-            icon.style.transform = 'rotate(0deg)';
+            icon.style.transform = 'rotate(180deg)';
         } else {
             // Collapse
             group.classList.add('collapsed');
             content.style.display = 'none';
-            icon.style.transform = 'rotate(-90deg)';
+            icon.style.transform = 'rotate(90deg)';
         }
     }
 
     function openDropdown(selectElement) {
         currentSelect = selectElement;
-        const selectType = getSelectType(selectElement);
-        let options = [];
 
         // 关闭其他下拉框
-        customSelects.forEach(s => s.classList.remove('active'));
-        selectElement.classList.add('active');
-
-        // 获取选项数据
-        if (selectType === 'attribute-value') {
-            const attributeNameSelect = document.querySelector('[data-type="attribute-name"]');
-            const attributeName = attributeNameSelect ? attributeNameSelect.dataset.value : '';
-            options = selectOptions['attribute-value'][attributeName] || [];
-        } else if (selectType === 'tag') {
-            options = selectOptions.tag;
-        } else {
-            options = selectOptions[selectType] || [];
-        }
-
-        // 生成下拉内容
-        generateDropdownContent(options, selectType);
-
-        // 禁止页面滚动
-        disableScroll();
-
-        // 在禁用滚动后计算并设置下拉框位置
-        positionDropdown(selectElement, options);
-
-        // 显示下拉框
-        dropdownOverlay.classList.add('show');
-    }
-
-    function positionDropdown(selectElement, options = []) {
-        const dropdownPanel = dropdownOverlay.querySelector('.filter-dropdown-panel');
-        const rect = selectElement.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        const viewportHeight = containerRect.height;
-        const viewportWidth = containerRect.width;
-
-        // 设置宽度与触发元素相同
-        dropdownPanel.style.width = rect.width + 'px';
-
-        // 计算垂直位置
-        const dropdownHeight = Math.min(200, options.length * 45); // 估算高度
-
-        let top, left;
-
-        // 检查body是否处于固定定位状态
-        const isScrollDisabled = document.body.classList.contains('scroll-disabled');
-
-        // 显示在下方
-        if (isScrollDisabled) {
-            // body固定定位时，直接使用getBoundingClientRect的值
-            top = rect.bottom + 4;
-        } else {
-            top = rect.bottom + 4;
-        }
-
-        // 计算水平位置
-        if (isScrollDisabled) {
-            // body固定定位时，直接使用getBoundingClientRect的值
-            left = rect.left;
-        } else {
-            left = rect.left + window.scrollX;
-        }
-
-        // 确保不超出视口右边界
-        if (left + rect.width > viewportWidth) {
-            left = viewportWidth - rect.width;
-        }
-
-        // 确保不超出视口左边界
-        if (left < 0) {
-            left = 0;
-            dropdownPanel.style.width = viewportWidth + 'px';
-        }
-
-        // 确保垂直位置不超出视口
-        if (top < 0) {
-            top = 0;
-        }
-        if (top + dropdownHeight > viewportHeight - 0) {
-            top = viewportHeight - dropdownHeight - 0;
-        }
-
-        dropdownPanel.style.top = top - containerRect.top + 'px';
-        dropdownPanel.style.left = left + 'px';
-    }
-
-    function generateDropdownContent(options, selectType) {
-        const dropdownContent = dropdownOverlay.querySelector('.filter-dropdown-content');
-
-        dropdownContent.innerHTML = '';
-
-        // 生成选项
-        options.forEach(function (option) {
-            const item = document.createElement('div');
-            item.className = 'filter-dropdown-item';
-
-            // 检查是否已选中
-            if (currentSelect && currentSelect.dataset.value === option.value) {
-                item.classList.add('selected');
+        customSelects.forEach(s => {
+            if (s != selectElement) {
+                s.classList.remove('active')
             }
-
-            // 对于标签类型，检查是否已被选择
-            if (selectType === 'tag' && selectedTags.has(option.value)) {
-                item.classList.add('disabled');
-            }
-
-            const itemText = document.createElement('span');
-            itemText.className = 'filter-dropdown-item-text';
-            itemText.textContent = option.text;
-            item.appendChild(itemText);
-
-            item.addEventListener('click', function () {
-                if (!item.classList.contains('disabled')) {
-                    selectOption(option, selectType);
-                }
-            });
-
-            dropdownContent.appendChild(item);
         });
+        $(selectElement).toggleClass('active')
     }
-
+    function generateDropdownHtml(item) {
+        let options = selectOptions[item.data('type')]
+        let htmlStr = ''
+        if (options && options.length) {
+            options.forEach(function (option) {
+                htmlStr += `<div class="filter-dropdown-item" data-value="${option.value}"><span
+            class="filter-dropdown-item-text" data-value="${option.value}">${option.text}</span></div>`
+            })
+            item.find('.filter-dropdown-content').html(htmlStr)
+        }
+    }
+    function generateAttrVal(val) {
+        let $attributeValue = $('[data-type="attribute-value"]')
+        $attributeValue.removeClass('disabled')
+        let options = attributeValue[val]
+        let htmlStr = ''
+        if (options && options.length) {
+            options.forEach(function (option) {
+                htmlStr += `<div class="filter-dropdown-item" data-value="${option.value}"><span
+            class="filter-dropdown-item-text" data-value="${option.value}">${option.text}</span></div>`
+            })
+            $attributeValue.find('.filter-dropdown-content').html(htmlStr)
+        }
+    }
     function selectOption(option, selectType) {
         if (!currentSelect) return;
 
@@ -398,7 +429,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function closeDropdown() {
-        dropdownOverlay.classList.remove('show');
         customSelects.forEach(s => s.classList.remove('active'));
 
         // 恢复页面滚动
@@ -461,11 +491,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function clearAllFilters() {
-        // 先关闭下拉框
-        if (dropdownOverlay.classList.contains('show')) {
-            closeDropdown();
-        }
-
         // Clear all input fields
         filterInputs.forEach(function (input) {
             input.value = '';
@@ -579,14 +604,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function applyFilters() {
-        // 先关闭下拉框
-        if (dropdownOverlay.classList.contains('show')) {
-            closeDropdown();
-        }
         const filters = getAllSelectValues();
-
-
-        console.log('Applied filters:', filters);
         showMessage('Filters applied successfully');
         applyFiltersToResults(filters);
     }
@@ -683,40 +701,41 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Close dropdown on escape key
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            if (dropdownOverlay.classList.contains('show')) {
-                closeDropdown();
-            } else if (backBtn) {
-                backBtn.click();
-            }
-        } else if (e.key === 'Enter' && e.ctrlKey) {
-            if (applyBtn) {
-                applyBtn.click();
-            }
-        }
-    });
+    // document.addEventListener('keydown', function (e) {
+    //     if (e.key === 'Escape') {
+    //         if (dropdownOverlay.classList.contains('show')) {
+    //             closeDropdown();
+    //         } else if (backBtn) {
+    //             backBtn.click();
+    //         }
+    //     } else if (e.key === 'Enter' && e.ctrlKey) {
+    //         if (applyBtn) {
+    //             applyBtn.click();
+    //         }
+    //     }
+    // });
 
     // Add CSS for error state and transitions
-    const style = document.createElement('style');
-    style.textContent = `
-        .filter-input.error {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(255, 27, 32, 0.2);
-        }
-        
-        .filter-tag {
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-        
-        .filter-dropdown-overlay {
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    `;
-    document.head.appendChild(style);
-}); 
+    // const style = document.createElement('style');
+    // style.textContent = `
+    //     .filter-input.error {
+    //         border-color: var(--primary-color);
+    //         box-shadow: 0 0 0 2px rgba(255, 27, 32, 0.2);
+    //     }
+
+    //     .filter-tag {
+    //         transition: opacity 0.2s ease, transform 0.2s ease;
+    //     }
+
+    //     .filter-dropdown-overlay {
+    //         animation: fadeIn 0.3s ease;
+    //     }
+
+    //     @keyframes fadeIn {
+    //         from { opacity: 0; }
+    //         to { opacity: 1; }
+    //     }
+    // `;
+    // document.head.appendChild(style);
+
+})

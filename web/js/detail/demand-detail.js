@@ -279,16 +279,16 @@ function generateCaptcha() {
     return result;
 }
 
-function refreshCaptcha() {
-    const captchaCode = document.getElementById('captchaCode');
-    captchaCode.textContent = generateCaptcha();
+// function refreshCaptcha() {
+//     const captchaCode = document.getElementById('captchaCode');
+//     captchaCode.textContent = generateCaptcha();
     
-    // 添加刷新动画
-    captchaCode.style.opacity = '0.5';
-    setTimeout(() => {
-        captchaCode.style.opacity = '1';
-    }, 200);
-}
+//     // 添加刷新动画
+//     captchaCode.style.opacity = '0.5';
+//     setTimeout(() => {
+//         captchaCode.style.opacity = '1';
+//     }, 200);
+// }
 
 // 表单验证
 function validateForm() {
