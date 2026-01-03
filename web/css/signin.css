@@ -9,6 +9,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  /* Custom Select styles */
 }
 .signin-bg .signin-container {
   width: 62.5rem;
@@ -125,8 +126,9 @@
   font-weight: 400;
   color: var(--primary-color);
 }
-.signin-bg .signin-form-button {
-  margin-top: 6.25rem;
+.signin-bg .signin-form-button,
+.signin-bg .registere-btn {
+  margin-top: 4.25rem;
   width: 100%;
   height: 6rem;
   background: var(--primary-color);
@@ -242,6 +244,121 @@
   flex-direction: column;
   gap: 1.25rem;
 }
+.signin-bg .signin-regist-form-tool-box .agree-wrapper {
+  display: flex;
+  align-items: center;
+}
+.signin-bg .signin-regist-form-tool-box .agree-wrapper .agree-label {
+  margin-left: 1rem;
+  font-size: 1.5rem;
+}
+.signin-bg .filter-custom-select {
+  position: relative;
+  width: 100%;
+}
+.signin-bg .filter-custom-select .filter-dropdown-panel {
+  width: 100%;
+  position: absolute;
+  background-color: #fff;
+  border: 0.125rem solid #F4F4F4;
+  border-radius: 1.25rem;
+  box-shadow: 0 0.5rem 1.5rem 0 rgba(0, 0, 0, 0.15);
+  max-height: 25rem;
+  overflow: hidden;
+  z-index: 60;
+  opacity: 1;
+  transition: display 0.2s ease;
+  display: none;
+}
+.signin-bg .filter-custom-select.active .filter-dropdown-panel {
+  display: block;
+}
+.signin-bg .filter-custom-select.disabled .filter-custom-select-trigger {
+  cursor: not-allowed;
+}
+.signin-bg .filter-custom-select-trigger {
+  margin-top: 2rem;
+  width: 100%;
+  height: 6rem;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  background-color: #f2f2f2;
+  /* transition: border-color 0.2s ease; */
+}
+.signin-bg .filter-custom-select-text {
+  font-family: var(--primary-arialfont);
+  font-weight: 400;
+  font-size: 1.75rem;
+  line-height: 2.5rem;
+  color: #000;
+  flex: 1;
+  text-align: left;
+}
+.signin-bg .filter-custom-select-text.placeholder {
+  color: var(--gray-color);
+}
+.signin-bg .filter-select-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  transform: rotate(180deg);
+}
+.signin-bg .filter-select-arrow .icon-arrow_up {
+  font-size: 1.5rem;
+}
+.signin-bg .filter-custom-select.active .filter-select-arrow {
+  transform: rotate(0deg);
+}
+.signin-bg .filter-dropdown-content {
+  background-color: #fff;
+  padding: 0;
+  max-height: 25rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #C5C5C5 transparent;
+}
+.signin-bg .filter-dropdown-item {
+  padding: 1.5rem 2rem;
+  border-bottom: 0.125rem solid #F4F4F4;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.signin-bg .filter-dropdown-item:last-child {
+  border-bottom: none;
+}
+.signin-bg .filter-dropdown-item:hover {
+  background-color: #F9F9F9;
+}
+.signin-bg .filter-dropdown-item.selected {
+  background-color: #F9F9F9;
+}
+.signin-bg .filter-dropdown-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.signin-bg .filter-dropdown-item.disabled:hover {
+  background-color: transparent;
+}
+.signin-bg .filter-dropdown-item-text {
+  font-family: var(--primary-arialfont);
+  font-weight: 400;
+  font-size: 1.75rem;
+  line-height: 2.5rem;
+  color: #000;
+  text-align: left;
+}
+.signin-bg .filter-dropdown-item.disabled .filter-dropdown-item-text {
+  color: #999;
+}
+.signin-bg .filter-dropdown-item.selected .filter-dropdown-item-text {
+  color: #000;
+  font-weight: 400;
+}
 .signin-bg .signin-regist-form-tool-item {
   width: 100%;
   display: flex;
@@ -310,18 +427,31 @@
   }
   .signin-form-title {
     margin-top: 0;
+    margin-bottom: 1rem;
   }
   .signin-login-form-tool-box {
     margin-top: 1.25rem;
   }
-  .signin-form-button {
+  .signin-login-form-tool-box .remember-wrapper {
+    display: flex;
+    align-items: center;
+  }
+  .signin-login-form-tool-box .remember-wrapper .remember-label {
+    margin-left: 1rem;
+    font-size: 1.5rem;
+  }
+  .signin-form-button,
+  .registere-btn {
     margin-top: 2.5rem;
+    cursor: pointer;
   }
   .login-google-box {
     margin-top: 2.5rem;
+    cursor: pointer;
   }
   .login-apple-box {
     margin-top: 1.25rem;
+    cursor: pointer;
   }
   .signin-otherway-box {
     margin-top: 1.25rem;
@@ -381,7 +511,8 @@
     width: 2.5rem;
     height: 2.5rem;
   }
-  .signin-bg .signin-form-button {
+  .signin-bg .signin-form-button,
+  .signin-bg .registere-btn {
     margin-top: 3.75rem;
   }
   .signin-bg .login-google-box {

@@ -266,7 +266,7 @@ function dismissHomeMenuPage() {
     body.classList.toggle('modal-open', false);
 }
 function refreshHeaderUserUI() {
-    let user = !window.user
+    let user = window.user
     const signinButtonEle = document.getElementById('header-signin');
     const headerJoinButton = document.getElementById('header-join');
     const headerUser = document.getElementById('header-user');

@@ -58,19 +58,6 @@ window.addEventListener('scroll', handleScroll, { passive: true });
 // 页面加载时调整位置
 document.addEventListener('DOMContentLoaded', adjustFilterPosition);
 
-// 防抖函数
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
 // 更新sticky header状态
 function updateStickyHeader() {
     if (!stickyHeader) return;

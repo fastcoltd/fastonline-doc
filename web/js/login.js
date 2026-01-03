@@ -6,7 +6,49 @@ const signinBackButton = document.getElementById('signin-back');
 const body = document.getElementsByTagName('body')[0];
 const loginForm = document.getElementById('signin-login-form');
 const loginAccoutErrTipEle = document.getElementById('signin-login-accout-tip');
-
+let countryList = [
+    { value: 'china', text: 'China' },
+    { value: 'english', text: 'English' }
+]
+$('div.filter-custom-select[data-type="countryList"]').each(function () {
+    // 生成下拉内容
+    generateDropdownHtml($(this));
+    let that = this
+    $(that).on('click', '.filter-dropdown-item', function (e) {
+        e.stopPropagation();
+        let value = $(e.target).data('value')
+        let text = $(e.target).text()
+        $(that).attr('data-value', value)
+        $(that).find('.filter-custom-select-text').text(text)
+        $(that).toggleClass('active')
+    })
+    $(that).on('click', function () {
+        $(this).toggleClass('active')
+    })
+})
+$('.registere-btn').on('click', function() {
+    let postData = {
+        firstName: $('#firstname').val(),
+        lastName: $('#lastname').val(),
+        account: $('.regist-account-input').val(),
+        password: $('.regist-account-password').val(),
+        country: $('.filter-custom-select[data-type="countryList"]').attr('data-value'),
+        agree1: $('#agree1').prop('checked'),
+        agree2: $('#agree2').prop('checked')
+    }
+    console.log(postData, '00000')
+})
+function generateDropdownHtml(item) {
+    let options = countryList
+    let htmlStr = ''
+    if (options && options.length) {
+        options.forEach(function (option) {
+            htmlStr += `<div class="filter-dropdown-item" data-value="${option.value}"><span
+        class="filter-dropdown-item-text" data-value="${option.value}">${option.text}</span></div>`
+        })
+        item.find('.filter-dropdown-content').html(htmlStr)
+    }
+}
 let user = null
 let loginSuccess = false
 loginForm.addEventListener('submit', function (e) {
@@ -120,20 +162,6 @@ function showLogin() {
         displaySigninPage();
         displayBackButton();
     });
-
-    const resetpwdButton = document.getElementById('signin-form-tool-box-resetpwd');
-    resetpwdButton.addEventListener('click', function () {
-        updateSigninNavArray('resetpwd');
-        displaySigninPage();
-        displayBackButton();
-    });
-
-    const rememberIcon = document.getElementsByClassName('signin-login-form-remember-icon')[0];
-    const rememberButton = document.getElementById('signin-form-tool-box-remember');
-    rememberButton.addEventListener('click', function () {
-        loginRemember = !loginRemember;
-        rememberIcon.setAttribute('src', loginRemember ? 'image/checked.png' : 'image/unchecked.png')
-    });
 }
 
 function showRegist() {
@@ -142,19 +170,6 @@ function showRegist() {
         updateSigninNavArray('login');
         displaySigninPage();
         displayBackButton();
-    });
-
-    const rememberIcon1 = document.getElementsByClassName('signin-form-regist-form-remember-icon1')[0];
-    const rememberButton1 = document.getElementById('signin-form-regist-form-remember1');
-    const rememberIcon2 = document.getElementsByClassName('signin-form-regist-form-remember-icon1')[0];
-    const rememberButton2 = document.getElementById('signin-form-regist-form-remember1');
-    rememberButton1.addEventListener('click', function () {
-        registRemember1 = !registRemember1;
-        rememberIcon1.setAttribute('src', registRemember1 ? 'image/checked.png' : 'image/unchecked.png')
-    });
-    rememberButton2.addEventListener('click', function () {
-        registRemember2 = !registRemember2;
-        rememberIcon2.setAttribute('src', registRemember2 ? 'image/checked.png' : 'image/unchecked.png')
     });
 }
 
