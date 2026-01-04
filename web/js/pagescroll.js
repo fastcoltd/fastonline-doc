@@ -6,6 +6,7 @@ const pageHead = document.querySelector('.page-head');
 const pageHeadHeight = pageHead.offsetHeight;
 const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
+const listContainer = document.querySelector('.list-container')
 // 滚动监听事件
 const handleScroll = debounce(function () {
     updateStickyHeader();
@@ -83,10 +84,15 @@ function adjustFilterPosition() {
             maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
         });
     } else {
+        let top = totalHeight + 20
+        let menuContainerScrollTop = listContainer.scrollHeight - document.documentElement.scrollTop - pageFix.clientHeight + pageHeadHeight
+        if (menuContainerScrollTop < 0) {
+            top = totalHeight + menuContainerScrollTop
+        }
         // sticky状态：固定定位
         Object.assign(pageFix.style, {
-            top: totalHeight + 20 + 'px',
-            maxHeight: `calc(100vh - ${totalHeight + footerHeight + 40}px)` // 添加max-height
+            top: top + 'px',
+            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
         });
     }
 }

@@ -167,11 +167,11 @@ $(document).ready(function () {
     $('.filter-apply-btn').on('click', function () {
         startFitterData()
     })
-    $('.page-sort-icon').on('click', function () {
+    $('.page-sort-icon').on('click', function (e) {
+        e.stopPropagation()
         $('.sort-container').toggle()
     })
     $('.sort-item').on('click', function () {
-        console.log($(this).data('value'))
         $('.page-sort-icon').attr('data-value', $(this).data('value'))
         $('.sort-container').hide()
         startFitterData()
