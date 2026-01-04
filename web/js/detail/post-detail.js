@@ -311,3 +311,12 @@ function adjustFilterPosition() {
         });
     }
 }
+$(document).ready(function () {
+    $('.submit-btn').on('click', function() {
+        let params = {
+            content: $('.comment-textarea').val(),
+            captcha: $('.captcha-input').val()
+        }
+        console.log(params, '000')
+    })
+})

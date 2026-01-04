@@ -152,3 +152,31 @@ pagination.onPageSizeChange = (page, pageSize) => {
   console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
   reloadItems();
 };
+
+
+$(document).ready(function () {
+  $('.page-dropdown-select').on('click', function() {
+    $(this).toggleClass('active')
+  })
+  $('.page-dropdown-item').on('click', function() {
+    let value = $(this).attr('data-value')
+    let text = $(this).find('.title').text()
+    $('#selectedCategory').attr('data-value', value).text(text)
+    searchData()
+  })
+  $('.sort-item').on('click', function () {
+    $('.page-sort-icon').attr('data-value', $(this).attr('data-value'))
+    searchData()
+  })
+  $('.page-search-icon').on('click', function() {
+    searchData()
+  })
+})
+function searchData () {
+  let params = {
+    category: $('#selectedCategory').attr('data-value'),
+    name: $('#searchInput').val(),
+    sortBy: $('.page-sort-icon').attr('data-value')
+  }
+  console.log(params, 'dddd')
+}
