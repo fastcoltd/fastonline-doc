@@ -279,12 +279,26 @@ function refreshHeaderUserUI() {
         // headerUserAvatar.src = user.avatar;
     }
 }
+function setSearchData () {
+    if (!window.Qs) {
+        return
+    }
+    let params = Qs.parse(location.href.split('?')[1])
+    console.log(params, '999')
+    $('.header-search-box-label-text, .header-search-mobile-box-label-text').text(params.type)
+    $('.header-search-mobile-box-input-box-input, .header-search-box-input-box-input').val(params.q)
+}
 function handleEnterFn(e) {
-    console.log(e.target.value, '222222222', e)
+    if (e.key == 'Enter') {
+        let input = e.target
+        let type = $('.header-search-box-label-text').text()
+        window.open(`search-all.html?q=${input.value.trim()}&type=${type}`, '_self')
+    }
 }
 function handleSearchFn(e) {
     let input = e.target.previousElementSibling
-    console.log(input.value)
+    let type = $('.header-search-box-label-text').text()
+    window.open(`search-all.html?q=${input.value.trim()}&type=${type}`, '_self')
 }
 function searchAction(params) {
     console.log(params, 'sdf')
@@ -321,3 +335,6 @@ function scrollToTop() {
         behavior: 'smooth'
     })
 }
+$(document).ready(function () {
+    setSearchData()
+})
