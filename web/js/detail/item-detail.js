@@ -203,8 +203,167 @@ function renderStarsStatisticsChart() {
     };
     chartInstance.setOption(option)
 }
+function randerOverviewStatisticschart() {
+    let dom = document.getElementById('overviewStatisticsEchart')
+
+    var chartInstance = echarts.init(dom)
+    let option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985'
+                }
+            }
+        },
+        grid: {
+            left: 50,
+            right: 20,
+            top: 20,
+            bottom: 50
+        },
+        legend: {
+            data: ['Goods rate', 'Response rate', 'Sufficient rate'],
+            top: 'auto',
+            bottom: 0
+        },
+        xAxis: [
+            {
+                type: 'category',
+                boundaryGap: false,
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
+        series: [
+            {
+                name: 'Goods rate',
+                type: 'line',
+                smooth: true,
+                stack: 'Total',
+                areaStyle: {},
+                color: linearGradientColor('rgba(137, 121, 255, 0.8)', 'rgba(137, 121, 255, 0.1)'),
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [120, 132, 101, 134, 90, 230, 210]
+            },
+            {
+                name: 'Response rate',
+                type: 'line',
+                smooth: true,
+                stack: 'Total',
+                areaStyle: {},
+                color: linearGradientColor('rgba(255, 146, 138, 0.8)', 'rgba(255, 146, 138, 0.1)'),
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [220, 182, 191, 234, 290, 330, 310]
+            },
+            {
+                name: 'Sufficient rate',
+                type: 'line',
+                smooth: true,
+                stack: 'Total',
+                areaStyle: {},
+                color: linearGradientColor('rgba(60, 195, 223, 0.8)', 'rgba(60, 195, 223, 0.1)'),
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [150, 232, 201, 154, 190, 330, 410]
+            }
+        ]
+    }
+    chartInstance.setOption(option)
+}
+
+function randerSalesCountStatisticschart() {
+    let dom = document.getElementById('salesCountStatisticsEchart')
+
+    var chartInstance = echarts.init(dom)
+    let option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985'
+                }
+            }
+        },
+        grid: {
+            left: 50,
+            right: 20,
+            top: 20,
+            bottom: 70
+        },
+        legend: {
+            data: ['Sales volume', 'After-sales volume', 'New volume'],
+            top: 'auto',
+            bottom: 0
+        },
+        xAxis: [
+            {
+                type: 'category',
+                boundaryGap: false,
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
+        series: [
+            {
+                name: 'Sales volume',
+                type: 'line',
+                smooth: true,
+                stack: 'Total',
+                areaStyle: {},
+                color: linearGradientColor('rgba(0, 148, 178, 0.8)', 'rgba(0, 148, 178, 0.1)'),
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [120, 132, 101, 134, 90, 230, 210]
+            },
+            {
+                name: 'After-sales volume',
+                type: 'line',
+                smooth: true,
+                stack: 'Total',
+                areaStyle: {},
+                color: linearGradientColor('rgba(239, 191, 1, 0.8)', 'rgba(239, 191, 1, 0.1)'),
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [220, 182, 191, 234, 290, 330, 310]
+            },
+            {
+                name: 'New volume',
+                type: 'line',
+                smooth: true,
+                stack: 'Total',
+                areaStyle: {},
+                color: linearGradientColor('rgba(5, 66, 224, 0.8)', 'rgba(5, 66, 224, 0.1)'),
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [150, 232, 201, 154, 190, 330, 410]
+            }
+        ]
+    }
+    chartInstance.setOption(option)
+}
 if (bodyElement.offsetWidth >= 768) {
     renderStarsStatisticsChart()
+    randerSalesCountStatisticschart()
+    randerOverviewStatisticschart()
 }
 // 创建商品元素 - 完全按照Figma设计
 function createItemElement(item) {
@@ -351,7 +510,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (val <= 1) {
             val = 1
             $('#decrease-qty').addClass('disabled')
-        } else if(val >= 99) {
+        } else if (val >= 99) {
             val = 99
             $('#increase-qty').addClass('disabled')
         }
@@ -444,6 +603,8 @@ document.addEventListener("DOMContentLoaded", function () {
             statistics.style.display = 'none';
         }
         renderStarsStatisticsChart()
+        randerSalesCountStatisticschart()
+        randerOverviewStatisticschart()
     });
 });
 
