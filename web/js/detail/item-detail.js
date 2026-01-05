@@ -617,7 +617,7 @@ const handleScroll = debounce(function () {
     trailing: false,
 });
 
-window.addEventListener('scroll', handleScroll, { passive: true });
+window.addEventListener('scroll', updateStickyHeader, { passive: true });
 
 // 页面加载时调整位置
 document.addEventListener('DOMContentLoaded', adjustFilterPosition);

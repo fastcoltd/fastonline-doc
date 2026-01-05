@@ -227,34 +227,27 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-
+const listContainer = document.querySelector('.list-container')
 // 滚动监听事件
 const handleScroll = debounce(function () {
     updateStickyHeader();
-}, 16, {
-    leading: true,
-    trailing: false,
-});
+}, 4);
 
-window.addEventListener('scroll', handleScroll, { passive: true });
+window.addEventListener('scroll', updateStickyHeader, { passive: true });
 
 // 页面加载时调整位置
 document.addEventListener('DOMContentLoaded', adjustFilterPosition);
 
 // 更新sticky header状态
 function updateStickyHeader() {
-
-    if (!stickyHeader) {
-        // console.log(menuContainer.scrollHeight, '000000000')
+    if (!stickyHeader) return;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    if (scrollTop > pageHeadHeight) {
+        stickyHeader.classList.add('is-sticky');
     } else {
-        const scrollTop = document.documentElement.scrollTop;
-        if (scrollTop > pageHeadHeight) {
-            stickyHeader.classList.add('is-sticky');
-        } else {
-            stickyHeader.classList.remove('is-sticky');
-        }
-        adjustFilterPosition();
+        stickyHeader.classList.remove('is-sticky');
     }
+    adjustFilterPosition();
 }
 updateStickyHeader();
 
@@ -300,7 +293,7 @@ function adjustFilterPosition() {
         });
     } else {
         let top = totalHeight + 20
-        let menuContainerScrollTop = articleContent.scrollHeight - document.documentElement.scrollTop - menuContainer.clientHeight + pageHeadHeight
+        let menuContainerScrollTop = articleContent.scrollHeight - document.documentElement.scrollTop - pageFix.clientHeight + pageHeadHeight
         if (menuContainerScrollTop < 0) {
             top = totalHeight + menuContainerScrollTop
         }
@@ -311,6 +304,7 @@ function adjustFilterPosition() {
         });
     }
 }
+
 $(document).ready(function () {
     $('.submit-btn').on('click', function() {
         let params = {

@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
         adjustLinkPosition();
     }, 10);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', adjustLinkPosition, { passive: true });
 
     // 页面加载时调整位置
     adjustLinkPosition();
