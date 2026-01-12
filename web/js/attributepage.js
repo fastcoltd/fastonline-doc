@@ -295,7 +295,7 @@ function createDemandItemElement(item) {
                                 <div class="demand-item-bidder-avatar-more">+2</div>
                             </div>
                         </div>
-                        <div class="item-button-box ${Math.random() > 0.5 ? 'active' : ''}">
+                        <div class="item-button-box demand-button">
                             Bid Now</div>
          `;
 

@@ -2175,7 +2175,7 @@ button {
   font-size: 2.5rem;
   line-height: 3rem;
 }
-.item-price-discount {
+.item-price-original {
   display: inline-block;
   font-size: 1.75rem;
   line-height: 2.75rem;
@@ -2228,7 +2228,7 @@ button {
   .item-stock-icon {
     display: inline-block;
   }
-  .item-price-discount {
+  .item-price-original {
     font-size: 1.5rem;
     line-height: 2.25rem;
   }
@@ -2247,5 +2247,156 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+}
+.item-buy-mask {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 500;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
+.item-buy-mask .close-btn-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 2rem 2rem 0;
+}
+.item-buy-mask .close-btn-wrapper .close-buy-modal-btn {
+  width: 2.5rem;
+  cursor: pointer;
+}
+.item-buy-mask .item-buy-wrapper {
+  width: 55rem;
+  height: 60rem;
+  background: #fff;
+  border-radius: 1.25rem;
+  position: relative;
+  /* 数量选择器和购买按钮 */
+}
+.item-buy-mask .item-buy-wrapper .item-list {
+  padding: 2rem;
+}
+.item-buy-mask .item-buy-wrapper .item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+.item-buy-mask .item-buy-wrapper .update-time {
+  padding-left: 1rem;
+}
+.item-buy-mask .item-buy-wrapper .item-price-wrapper,
+.item-buy-mask .item-buy-wrapper .purchase-wholesale-badge-wrapper {
+  display: flex;
+  align-items: center;
+  column-gap: 1rem;
+}
+.item-buy-mask .item-buy-wrapper .purchase-wholesale-badge {
+  padding: 1rem 0.75rem;
+  border: 0.125rem solid #C5C5C5;
+  border-radius: 1.25rem;
+  display: flex;
+  align-items: center;
+  font-family: var(--primary-popfont);
+  font-weight: 500;
+  font-size: 1.75rem;
+  line-height: 2.75rem;
+  color: #000000;
+}
+.item-buy-mask .item-buy-wrapper .purchase-controls {
+  border: 0.125rem solid #C5C5C5;
+  border-radius: 1.25rem;
+  display: flex;
+  padding: 0;
+}
+.item-buy-mask .item-buy-wrapper .purchase-qty-btn {
+  width: 4.5rem;
+  height: 4.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+.item-buy-mask .item-buy-wrapper .purchase-qty-btn.purchase-qty-btn-left {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+.item-buy-mask .item-buy-wrapper .purchase-qty-btn.purchase-qty-btn-right {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+.item-buy-mask .item-buy-wrapper .purchase-qty-btn.disabled {
+  background: var(--gray-color);
+  color: #fff;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.item-buy-mask .item-buy-wrapper .purchase-qty-display {
+  width: 6rem;
+  height: 4.5rem;
+  padding: 0 2rem;
+  border: none;
+  border-left: 0.125rem solid #C5C5C5;
+  border-right: 0.125rem solid #C5C5C5;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Lexend', sans-serif;
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 2.25rem;
+  color: #060709;
+}
+.item-buy-mask .item-buy-wrapper .purchase-buy-btn {
+  width: calc(100% - 4rem);
+  height: 6.25rem;
+  background: var(--primary-color);
+  border: none;
+  border-radius: 3rem;
+  box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--primary-popfont);
+  font-weight: 500;
+  font-size: 1.75rem;
+  line-height: 2.75rem;
+  color: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  bottom: 2rem;
+}
+@media screen and (max-width: 768px) {
+  .item-buy-mask {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 500;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .item-buy-mask .item-buy-wrapper {
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #fff;
+    border-radius: 0;
   }
 }

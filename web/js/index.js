@@ -37,9 +37,6 @@ window.addEventListener('DOMContentLoaded', function () {
         brandContent.scrollLeft = brandScrollOffsetX;
         brandScroll();
     })
-    $('.demand-button').on('click', function() {
-        alert('bid it')
-    })
 
     function brandScroll() {
         if (isMobile) { return }

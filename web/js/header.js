@@ -340,19 +340,53 @@ $(document).ready(function () {
     $('.item-buy-btn').on('click', function () {
         let userInfo = JSON.parse(sessionStorage.getItem('user') || '{}')
         if (userInfo.id) {
-            alert('开始购买')
+            $('.item-buy-mask').css({
+                display: 'flex'
+            })
         } else {
             $('#header-signin').trigger('click')
         }
 
     })
-    $('.item-buy-btn').on('click', function () {
-        let userInfo = JSON.parse(sessionStorage.getItem('user') || '{}')
-        if (userInfo.id) {
-            alert('开始购买')
-        } else {
-            $('#header-signin').trigger('click')
-        }
 
+    $('.demand-button').on('click', function () {
+        alert('bid it')
     })
+    $('.purchase-qty-btn-left').on('click', function () {
+        let count = Number($('.purchase-qty-display').val()) - 1
+        $('.purchase-qty-display').val(count)
+        changeBuyCount()
+    })
+    $('.purchase-qty-btn-right').on('click', function () {
+        let count = Number($('.purchase-qty-display').val()) + 1
+        $('.purchase-qty-display').val(count)
+        changeBuyCount()
+    })
+    $('.purchase-buy-btn').on('click', function() {
+        let count = Number($('.purchase-qty-display').val())
+        console.log(count, '数量')
+    })
+    $('.close-buy-modal-btn').on('click', function() {
+        $('.item-buy-mask').hide()
+    })
+    function changeBuyCount() {
+        let totalCount = Number($('.goods-count').text())
+        let count = Number($('.purchase-qty-display').val())
+        if (count < 2) {
+            $('.purchase-qty-display').val(1)
+            $('.purchase-qty-btn-left').addClass('disabled')
+        } else {
+            $('.purchase-qty-btn-left').removeClass('disabled')
+        }
+        if (count >= totalCount) {
+            $('.purchase-qty-display').val(totalCount)
+            $('.purchase-qty-btn-right').addClass('disabled')
+        } else {
+            $('.purchase-qty-btn-right').removeClass('disabled')
+        }
+        let totalPrice = Number($('.item-buy-wrapper .item-price').attr('data-value')) * Number($('.purchase-qty-display').val())
+
+        $('.total-price').text(`$${totalPrice}`)
+    }
+    changeBuyCount()
 })
