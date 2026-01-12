@@ -52,46 +52,6 @@ document.addEventListener('DOMContentLoaded', function () {
     homeMenuBack.addEventListener('click', function (e) {
         dismissHomeMenuPage()
     })
-    $('.scroll-to-top').on('click', function () {
-        scrollToTop()
-    })
-    $('.kefu-icon').on('click', function () {
-        alert('你好，客服为您服务')
-    })
-    $('.icon-aixin').on('click', function (e) {
-        let like = $(this).data('like')
-        if(like) {
-            $(this).data('like', 0)
-            $(this).css({color: '#F4F4F4'})
-        } else {
-            $(this).data('like', 1)
-            $(this).css({color: '#FF1B20'})
-        }
-    })
-    $('.header-avatar').on('click', function() {
-        $('.center-wrapper').show()
-    })
-    $('.center-wrapper .close-icon').on('click', function() {
-        $('.center-wrapper').hide()
-    })
-    $('.icon-arrow_up').on('click', function () {
-        $(this).parents('.account-item-center').toggleClass('account-item-center-hide')
-    })
-    $('.icon-youjian').on('click', function() {
-        if (body.offsetWidth < 768) {
-            $('.notice-items-wrapper').toggle()   
-        }
-    })
-    $('.icon-youjian').on('mouseover', function() {
-        if (body.offsetWidth >= 768) {
-            $('.notice-items-wrapper').show()   
-        }
-    })
-    $('.icon-youjian').on('mouseout', function() {
-        if (body.offsetWidth >= 768) {
-            $('.notice-items-wrapper').hide()   
-        }
-    })
     for (let i = 0; i < homeMenuTitles.length; i++) {
         const title = homeMenuTitles[i];
         title.addEventListener('click', function (e) {
@@ -279,7 +239,7 @@ function refreshHeaderUserUI() {
         // headerUserAvatar.src = user.avatar;
     }
 }
-function setSearchData () {
+function setSearchData() {
     if (!window.Qs) {
         return
     }
@@ -337,4 +297,62 @@ function scrollToTop() {
 }
 $(document).ready(function () {
     setSearchData()
+    $('.scroll-to-top').on('click', function () {
+        scrollToTop()
+    })
+    $('.kefu-icon').on('click', function () {
+        alert('你好，客服为您服务')
+    })
+    $('.icon-aixin').on('click', function (e) {
+        let like = $(this).data('like')
+        if (like) {
+            $(this).data('like', 0)
+            $(this).css({ color: '#F4F4F4' })
+        } else {
+            $(this).data('like', 1)
+            $(this).css({ color: '#FF1B20' })
+        }
+    })
+    $('.header-avatar').on('click', function () {
+        $('.center-wrapper').show()
+    })
+    $('.center-wrapper .close-icon').on('click', function () {
+        $('.center-wrapper').hide()
+    })
+    $('.icon-arrow_up').on('click', function () {
+        $(this).parents('.account-item-center').toggleClass('account-item-center-hide')
+    })
+    $('.icon-youjian').on('click', function () {
+        if (body.offsetWidth < 768) {
+            $('.notice-items-wrapper').toggle()
+        }
+    })
+    $('.icon-youjian').on('mouseover', function () {
+        if (body.offsetWidth >= 768) {
+            $('.notice-items-wrapper').show()
+        }
+    })
+    $('.icon-youjian').on('mouseout', function () {
+        if (body.offsetWidth >= 768) {
+            $('.notice-items-wrapper').hide()
+        }
+    })
+    $('.item-buy-btn').on('click', function () {
+        let userInfo = JSON.parse(sessionStorage.getItem('user') || '{}')
+        if (userInfo.id) {
+            alert('开始购买')
+        } else {
+            $('#header-signin').trigger('click')
+        }
+
+    })
+    $('.item-buy-btn').on('click', function () {
+        let userInfo = JSON.parse(sessionStorage.getItem('user') || '{}')
+        if (userInfo.id) {
+            alert('开始购买')
+        } else {
+            $('#header-signin').trigger('click')
+        }
+
+    })
 })

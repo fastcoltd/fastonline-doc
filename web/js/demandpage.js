@@ -273,3 +273,9 @@ function adjustFilterPosition() {
     });
   }
 }
+
+$(document).ready(function () {
+  $('.item-button-box').on('click', function () {
+    alert('bid it')
+  })
+})

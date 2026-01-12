@@ -10,42 +10,42 @@ const footerHeight = footer.offsetHeight;
 const listContainer = document.querySelector('.list-container')
 const list = new PageList();
 function sortItems(value) {
-  console.log('sort items', value);
+    console.log('sort items', value);
 }
 
 // 初始化分页组件
 const pagination = new Pagination({
-  current: 1,
-  pageSize: 20,
-  total: 285,
-  showSizeChanger: true,
-  showQuickJumper: true
+    current: 1,
+    pageSize: 20,
+    total: 285,
+    showSizeChanger: true,
+    showQuickJumper: true
 });
 
 // 页面变化回调
 pagination.onPageChange = (page, pageSize) => {
-  console.log(`页面变化: 第${page}页, 每页${pageSize}条`);
-  list.loadItems();
+    console.log(`页面变化: 第${page}页, 每页${pageSize}条`);
+    list.loadItems();
 };
 
 // 页面大小变化回调
 pagination.onPageSizeChange = (page, pageSize) => {
-  console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
-  list.reloadItems();
+    console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
+    list.reloadItems();
 };
 
- // 页面加载完成后初始化
- document.addEventListener('DOMContentLoaded', () => {
-  this.layout = new PageLayout();
-//   this.sort = new SortSelector();
-  $('.load-more').on('click', function () {
-      let htmlStr = $('.item-all-items-pager').html()
-      $('.loading').show()
-      setTimeout(() => {
-          $('.item-all-items-pager').append(htmlStr)
-          $('.loading').hide()
-      }, 2000)
-  })
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', () => {
+    this.layout = new PageLayout();
+    //   this.sort = new SortSelector();
+    $('.load-more').on('click', function () {
+        let htmlStr = $('.item-all-items-pager').html()
+        $('.loading').show()
+        setTimeout(() => {
+            $('.item-all-items-pager').append(htmlStr)
+            $('.loading').hide()
+        }, 2000)
+    })
 });
 
 // 滚动监听事件
@@ -112,15 +112,15 @@ function adjustFilterPosition() {
             maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
         });
     } else {
-      let top = totalHeight + 20
-      let menuContainerScrollTop = listContainer.scrollHeight - document.documentElement.scrollTop - pageFix.clientHeight + pageHeadHeight
-      if (menuContainerScrollTop < 0) {
-          top = totalHeight + menuContainerScrollTop
-      }
-      // sticky状态：固定定位
-      Object.assign(pageFix.style, {
-          top: top + 'px',
-          maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
-      });
+        let top = totalHeight + 20
+        let menuContainerScrollTop = listContainer.scrollHeight - document.documentElement.scrollTop - pageFix.clientHeight + pageHeadHeight
+        if (menuContainerScrollTop < 0) {
+            top = totalHeight + menuContainerScrollTop
+        }
+        // sticky状态：固定定位
+        Object.assign(pageFix.style, {
+            top: top + 'px',
+            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
+        });
     }
 }

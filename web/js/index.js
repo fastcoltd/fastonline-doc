@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', function () {
     brandRightMore.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
-        brandScrollOffsetX += 100;
+        brandScrollOffsetX += 200;
         if (brandScrollOffsetX > maxBrandScrollOffsetX) {
             brandScrollOffsetX = maxBrandScrollOffsetX
         }
@@ -30,12 +30,15 @@ window.addEventListener('DOMContentLoaded', function () {
     brandLeftMore.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
-        brandScrollOffsetX -= 100;
+        brandScrollOffsetX -= 200;
         if (brandScrollOffsetX < 0) {
             brandScrollOffsetX = 0
         }
         brandContent.scrollLeft = brandScrollOffsetX;
         brandScroll();
+    })
+    $('.demand-button').on('click', function() {
+        alert('bid it')
     })
 
     function brandScroll() {
