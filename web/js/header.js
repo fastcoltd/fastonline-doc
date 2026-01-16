@@ -338,6 +338,9 @@ $(document).ready(function () {
         }
     })
     $('.item-buy-btn').on('click', function () {
+        if ($(this).hasClass('disabled')) {
+            return
+        }
         let userInfo = JSON.parse(sessionStorage.getItem('user') || '{}')
         if (userInfo.id) {
             $('.item-buy-mask').css({
