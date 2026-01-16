@@ -362,11 +362,11 @@ $(document).ready(function () {
         $('.purchase-qty-display').val(count)
         changeBuyCount()
     })
-    $('.purchase-buy-btn').on('click', function() {
+    $('.purchase-buy-btn').on('click', function () {
         let count = Number($('.purchase-qty-display').val())
         console.log(count, '数量')
     })
-    $('.close-buy-modal-btn').on('click', function() {
+    $('.close-buy-modal-btn').on('click', function () {
         $('.item-buy-mask').hide()
     })
     function changeBuyCount() {
@@ -389,4 +389,34 @@ $(document).ready(function () {
         $('.total-price').text(`$${totalPrice}`)
     }
     changeBuyCount()
+    $(document).on('scroll', computedSideIconPosition)
+    computedSideIconPosition()
 })
+function computedSideIconPosition() {
+    let contentWidth = $('header').width()
+    let slidePaddingWidth = ($('body').width() - contentWidth) / 2
+    var element = $('.common-footer-wrapper');
+    var elementTop = element.offset().top;
+    var windowScrollTop = $(window).scrollTop();
+    var windowHeight = $(window).height();
+    
+    if (parseInt(windowScrollTop + windowHeight - elementTop) < 0) {
+        $('.slide-btns-wrapper').css({
+            bottom: `10rem`
+        })
+    } else {
+        $('.slide-btns-wrapper').css({
+            bottom: `calc(10rem + ${parseInt(windowScrollTop + windowHeight - elementTop)}px)`
+        })
+    }
+
+    if (slidePaddingWidth > 46) {
+        $('.slide-btns-wrapper').css({
+            left: `${contentWidth + slidePaddingWidth + 10}px`
+        })
+    } else {
+        $('.slide-btns-wrapper').css({
+            left: `${contentWidth + slidePaddingWidth - 36}px`
+        })
+    }
+}
