@@ -10,7 +10,7 @@ let countryList = [
     { value: 'china', text: 'China' },
     { value: 'english', text: 'English' }
 ]
-$('div.filter-custom-select[data-type="countryList"]').each(function () {
+$('.signin-regist-form .filter-custom-select[data-type="countryList"]').each(function () {
     // 生成下拉内容
     generateDropdownHtml($(this));
     let that = this
@@ -32,7 +32,7 @@ $('.registere-btn').on('click', function() {
         lastName: $('#lastname').val(),
         account: $('.regist-account-input').val(),
         password: $('.regist-account-password').val(),
-        country: $('.filter-custom-select[data-type="countryList"]').attr('data-value'),
+        country: $('.signin-regist-form .filter-custom-select[data-type="countryList"]').attr('data-value'),
         agree1: $('#agree1').prop('checked'),
         agree2: $('#agree2').prop('checked')
     }

@@ -296,6 +296,143 @@ function scrollToTop() {
     })
 }
 $(document).ready(function () {
+    $('.registere-btn').on('click', function () {
+        let postData = {
+            firstName: $('#firstname').val(),
+            lastName: $('#lastname').val(),
+            account: $('.regist-account-input').val(),
+            password: $('.regist-account-password').val(),
+            country: $('.language-gmt-country-content .filter-custom-select[data-type="countryList"]').attr('data-value'),
+            agree1: $('#agree1').prop('checked'),
+            agree2: $('#agree2').prop('checked')
+        }
+        console.log(postData, '00000')
+    })
+    let optionsMap = {
+        switchLanguage: [
+            { value: 'china', text: 'China' },
+            { value: 'english', text: 'English' }
+        ],
+        switchGmt: [
+            {
+                value: 'GMT+1',
+                text: 'GMT+1'
+            },
+            {
+                value: 'GMT+2',
+                text: 'GMT+2'
+            },
+            {
+                value: 'GMT+3',
+                text: 'GMT+3'
+            },
+            {
+                value: 'GMT+4',
+                text: 'GMT+4'
+            },
+            {
+                value: 'GMT+5',
+                text: 'GMT+5'
+            },
+            {
+                value: 'GMT+6',
+                text: 'GMT+6'
+            },
+            {
+                value: 'GMT+7',
+                text: 'GMT+7'
+            },
+            {
+                value: 'GMT+8',
+                text: 'GMT+8'
+            },
+            ,
+            {
+                value: 'GMT+9',
+                text: 'GMT+9'
+            }
+        ],
+        switchCurrency: [
+            {
+                value: 'BMD',
+                text: 'BMD'
+            },
+            {
+                value: 'RMB',
+                text: 'RMB'
+            }
+        ]
+    }
+    $('.language-gmt-country-content .filter-custom-select').each(function () {
+        // 生成下拉内容
+        generateDropdownHtml($(this));
+        let that = this
+        $(that).on('click', '.filter-dropdown-item', function (e) {
+            e.stopPropagation();
+            let value = $(e.target).data('value')
+            let text = $(e.target).text()
+            let switchType = $(that).attr('data-type')
+            $(that).attr('data-value', value)
+            $(that).find('.filter-custom-select-text').text(text)
+            $(that).toggleClass('active')
+            if (switchType == 'switchLanguage') {
+                $('.language-btn').text(text)
+                console.log('语言已经切换成：', value)
+            } else if (switchType == 'switchGmt') {
+                $('.gmt-btn').text(text)
+                console.log('时区已经切换成：', value)
+            } else if (switchType == 'switchCurrency') {
+                $('.currency-btn').text(text)
+                console.log('币种已经切换成：', value)
+            }
+            $('.language-gmt-country-close-btn').trigger('click')
+        })
+        $(that).on('click', function () {
+            $(this).toggleClass('active')
+        })
+    })
+    $('.language-btn').on('click', function () {
+        $('.language-gmt-country-mask').css({
+            display: 'flex'
+        })
+        $('.filter-custom-select').hide()
+        $('.filter-custom-select[data-type="switchLanguage"]').show()
+        $('.language-gmt-country-content .filter-custom-select').removeClass('active')
+    })
+    $('.gmt-btn').on('click', function () {
+        $('.language-gmt-country-mask').css({
+            display: 'flex'
+        })
+        $('.filter-custom-select').hide()
+        $('.filter-custom-select[data-type="switchGmt"]').show()
+        $('.language-gmt-country-content .filter-custom-select').removeClass('active')
+    })
+    $('.currency-btn').on('click', function () {
+        $('.language-gmt-country-mask').css({
+            display: 'flex'
+        })
+        $('.filter-custom-select').hide()
+        $('.filter-custom-select[data-type="switchCurrency"]').show()
+        $('.language-gmt-country-content .filter-custom-select').removeClass('active')
+    })
+    $('.language-gmt-country-close-btn').on('click', function () {
+        $('.language-gmt-country-mask').css({
+            display: 'none'
+        })
+        $('.filter-custom-select').hide()
+    })
+    function generateDropdownHtml(item) {
+        let options = optionsMap[item.attr('data-type')]
+        let htmlStr = ''
+        if (options && options.length) {
+            options.forEach(function (option) {
+                htmlStr += `<div class="filter-dropdown-item" data-value="${option.value}"><span
+            class="filter-dropdown-item-text" data-value="${option.value}">${option.text}</span></div>`
+            })
+            item.find('.filter-dropdown-content').html(htmlStr)
+        }
+    }
+
     setSearchData()
     $('.scroll-to-top').on('click', function () {
         scrollToTop()
@@ -402,7 +539,7 @@ function computedSideIconPosition() {
     var elementTop = element.offset().top;
     var windowScrollTop = $(window).scrollTop();
     var windowHeight = $(window).height();
-    
+
     if (parseInt(windowScrollTop + windowHeight - elementTop) < 0) {
         $('.slide-btns-wrapper').css({
             bottom: `10rem`

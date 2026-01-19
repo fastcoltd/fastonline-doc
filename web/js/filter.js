@@ -8,7 +8,7 @@ $(document).ready(function () {
     const filterGroups = document.querySelectorAll('.filter-group');
     const tagCloseButtons = document.querySelectorAll('.filter-tag-close');
     const filterInputs = document.querySelectorAll('.filter-input');
-    const customSelects = document.querySelectorAll('.filter-custom-select');
+    const customSelects = document.querySelectorAll('.filter-content .filter-custom-select');
     const filterBox = document.querySelector('.page-filter-box');
 
     let currentSelect = null;
@@ -67,7 +67,7 @@ $(document).ready(function () {
         ]
     }
 
-    $('div.filter-custom-select').each(function () {
+    $('.filter-content .filter-custom-select').each(function () {
         let dataType = $(this).data('type')
         let select = this
         // 生成下拉内容
@@ -112,7 +112,7 @@ $(document).ready(function () {
         $priceInputMax = $('.price-input-max')
         $numberInputMin = $('.number-input-min')
         $numberInputMax = $('.number-input-max')
-        $filterCustomSelect = $('.filter-custom-select').not('[data-value=""]')
+        $filterCustomSelect = $('.filter-content .filter-custom-select').not('[data-value=""]')
         count += $filterCustomSelect.length
         if($nameInput.val()) {
             count += 1 
@@ -182,7 +182,7 @@ $(document).ready(function () {
         $priceInputMax = $('.price-input-max')
         $numberInputMin = $('.number-input-min')
         $numberInputMax = $('.number-input-max')
-        $filterCustomSelect = $('.filter-custom-select').not('[data-value=""]')
+        $filterCustomSelect = $('.filter-content .filter-custom-select').not('[data-value=""]')
         $nameInput.val('')
         $priceInputMin.val('')
         $priceInputMax.val('')
