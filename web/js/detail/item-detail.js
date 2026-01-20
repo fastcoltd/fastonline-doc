@@ -481,6 +481,77 @@ document.addEventListener("DOMContentLoaded", function () {
         screenshotContent.scrollLeft = screenshotScrollOffsetX;
         screenshotScroll();
     })
+    let complaintList = [
+        { value: '1', text: '商品问题' },
+        { value: '2', text: '店铺问题' },
+        { value: '3', text: '物流问题' }
+    ]
+    $('.item-complaint-mask .filter-custom-select[data-type="switchComplaintType"]').each(function () {
+        // 生成下拉内容
+        generateDropdownHtml($(this));
+        let that = this
+        $(that).on('click', '.filter-dropdown-item', function (e) {
+            e.stopPropagation();
+            let value = $(e.target).data('value')
+            let text = $(e.target).text()
+            $(that).attr('data-value', value)
+            $(that).find('.filter-custom-select-text').text(text)
+            $(that).toggleClass('active')
+        })
+        $(that).on('click', function () {
+            $(this).toggleClass('active')
+        })
+    })
+    function generateDropdownHtml(item) {
+        let options = complaintList
+        let htmlStr = ''
+        if (options && options.length) {
+            options.forEach(function (option) {
+                htmlStr += `<div class="filter-dropdown-item" data-value="${option.value}"><span
+            class="filter-dropdown-item-text" data-value="${option.value}">${option.text}</span></div>`
+            })
+            item.find('.filter-dropdown-content').html(htmlStr)
+        }
+    }
+    $('.item-detail-share').on('click', function() {
+        $('.item-share-mask').css({
+            display: 'flex'
+        })
+    })
+    $('.item-share-close-btn').on('click', function() {
+        $('.item-share-mask').css({
+            display: 'none'
+        })
+    })
+    $('.item-detail-more').on('click', function () {
+        $('.item-complaint-mask').css({
+            display: 'flex'
+        })
+    })
+    $('.item-complaint-close-btn').on('click', function() {
+        $('.item-complaint-mask').css({
+            display: 'none'
+        })
+        $('.item-complaint-mask .filter-custom-select[data-type="switchComplaintType"]').removeClass('active')
+    })
+    $('.item-complaint-mask .submit-btn').on('click', function() {
+        let data = {
+            complaintType: $('.item-complaint-mask .filter-custom-select[data-type="switchComplaintType"]').attr('data-value'),
+            des: $('.item-complaint-mask .complaint-textarea').val()
+        }
+        console.log(data, '----')
+        if (!data.des) {
+            $('.complaint-textarea').css({
+                border: '0.125rem solid #FF1b20'
+            })
+            return
+        } else {
+            $('.complaint-textarea').css({
+                border: '0.125rem solid #C5C5C5'
+            })
+        }
+        $('.item-complaint-close-btn').trigger('click')
+    })
     $('#increase-qty').on('click', e => {
         $('#decrease-qty').removeClass('disabled')
         let val = Number($('#quantity-display').val()) + 1

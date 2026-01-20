@@ -490,6 +490,9 @@ $(document).ready(function () {
     })
 
     $('.demand-button').on('click', function () {
+        if ($(this).hasClass('disabled')) {
+            return
+        }
         alert('bid it')
     })
     $('.purchase-qty-btn-left').on('click', function () {
