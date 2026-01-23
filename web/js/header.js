@@ -440,7 +440,7 @@ $(document).ready(function () {
     $('.kefu-icon').on('click', function () {
         alert('你好，客服为您服务')
     })
-    $('.icon-aixin').on('click', function (e) {
+    $('body').on('click', '.icon-aixin', function (e) {
         let like = $(this).data('like')
         if (like) {
             $(this).data('like', 0)
@@ -474,7 +474,7 @@ $(document).ready(function () {
             $('.notice-items-wrapper').hide()
         }
     })
-    $('.item-buy-btn').on('click', function () {
+    $('body').on('click', '.item-buy-btn', function () {
         if ($(this).hasClass('disabled')) {
             return
         }
@@ -489,7 +489,7 @@ $(document).ready(function () {
 
     })
 
-    $('.demand-button').on('click', function () {
+    $('body').on('click', '.demand-button', function () {
         if ($(this).hasClass('disabled')) {
             return
         }

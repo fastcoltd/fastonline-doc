@@ -87,6 +87,7 @@ LinkRef.prototype.updateNavigation = function (activeSectionId) {
     this.pageIndexs.forEach(function (item) {
         if (item.id === activeSectionId) {
             item.classList.add('active');
+            item.scrollIntoView({behavior: "smooth", block: "nearest"});
         } else {
             item.classList.remove('active');
         }
