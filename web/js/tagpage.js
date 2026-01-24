@@ -19,6 +19,11 @@ brandPageIndexs.forEach(function (item) {
     e.currentTarget.classList.add('active');
     pageType = e.currentTarget.id;
     changePageType(pageType);
+    if (pageType == 'post-item') {
+      $('.layout-controls-box').hide()
+    } else {
+      $('.layout-controls-box').show()
+    }
   });
 });
 
