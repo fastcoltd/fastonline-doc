@@ -203,8 +203,8 @@ class Pagination {
             } else {
                 // 当前页在中间
                 pages.push(1);
-                const centerStart = current - Math.floor(centerPages / 2);
-                const centerEnd = current + Math.floor(centerPages / 2);
+                const centerStart = current - Math.floor(centerPages / 2) - 1;
+                const centerEnd = current + Math.floor(centerPages / 2) + 1;
 
                 // 左侧省略号
                 if (centerStart > 2) {

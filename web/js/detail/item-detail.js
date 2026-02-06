@@ -680,14 +680,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// 滚动监听事件
-const handleScroll = debounce(function () {
-    updateStickyHeader();
-}, 16, {
-    leading: true,
-    trailing: false,
-});
-
 window.addEventListener('scroll', updateStickyHeader, { passive: true });
 
 // 页面加载时调整位置

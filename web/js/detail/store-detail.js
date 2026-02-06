@@ -282,7 +282,7 @@ function adjustFilterPosition() {
                 position: 'fixed',
                 left: 16 + 'px',
                 top: stickyHeaderHeight + 20 + 'px',
-                maxHeight: `calc(100vh - ${stickyHeaderHeight + 40}px)`
+                // maxHeight: `calc(100vh - ${stickyHeaderHeight + 40}px)`
             });
             return;
         }
@@ -290,7 +290,7 @@ function adjustFilterPosition() {
             position: 'relative',
             left: 0,
             top: 20 + 'px',
-            maxHeight: `calc(100vh - ${stickyHeaderHeight + pageHeadHeight + 40}px)`
+            // maxHeight: `calc(100vh - ${stickyHeaderHeight + pageHeadHeight + 40}px)`
         });
         return;
     };
@@ -305,7 +305,7 @@ function adjustFilterPosition() {
         // 非sticky状态：相对于page-content定位
         Object.assign(pageFix.style, {
             top: '20px',
-            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
+            // maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
         });
     } else {
         let top = totalHeight + 20
@@ -316,7 +316,7 @@ function adjustFilterPosition() {
         // sticky状态：固定定位
         Object.assign(pageFix.style, {
             top: top + 'px',
-            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
+            // maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
         });
     }
 }

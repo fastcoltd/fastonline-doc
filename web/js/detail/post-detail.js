@@ -7,7 +7,7 @@ const pageHead = document.querySelector('.page-head');
 const pageHeadHeight = pageHead.offsetHeight;
 const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
-
+const listContainer = document.querySelector('.list-container')
 const menuContainer = document.querySelector('.table-of-container');
 
 const close = menuContainer.querySelector('.table-of-container-close');
@@ -227,11 +227,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-const listContainer = document.querySelector('.list-container')
-// 滚动监听事件
-const handleScroll = debounce(function () {
-    updateStickyHeader();
-}, 4);
 
 window.addEventListener('scroll', updateStickyHeader, { passive: true });
 

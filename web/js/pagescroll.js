@@ -7,10 +7,6 @@ const pageHeadHeight = pageHead.offsetHeight;
 const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
 const listContainer = document.querySelector('.list-container')
-// 滚动监听事件
-const handleScroll = debounce(function () {
-    updateStickyHeader();
-}, 16);
 
 window.addEventListener('scroll', updateStickyHeader, { passive: true });
 
