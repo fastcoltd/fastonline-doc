@@ -58,6 +58,16 @@ class HomeMenu {
         this.menuContainer.style.display = 'flex';
         this.menuContainer.style.top = rect.height + 2 + 'px';
         this.menuButton.classList.toggle('active', true);
+        $(this.menuButton).find('.top-menu-more-box-left').css({
+            left: this.menuButton.offsetLeft - this.menuContent.scrollLeft > 0 ?`${this.menuButton.offsetLeft - this.menuContent.scrollLeft}px` : '0px'
+        })
+        $(this.menuButton).find('.top-menu-more-box-center').css({
+            left: '50%',
+            transform: 'translateX(-50%)'
+        })
+        $(this.menuButton).find('.top-menu-more-box-right').css({
+            right: rect.width - this.menuButton.offsetLeft - $(this.menuButton).width()/2 > 0 ? `${rect.width - this.menuButton.offsetLeft - $(this.menuButton).width()/2}px` : '0px'
+        })
     }
 
     dimissMenuContainer() {
