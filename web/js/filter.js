@@ -112,7 +112,6 @@ $(document).ready(function () {
     })
     function filterCount() {
         let count = selectedTags.size + selectedAttrs.size
-        console.log(selectedAttrs.size, '000000', selectedAttrs)
         $nameInput = $('.name-input')
         $priceInputMin = $('.price-input-min')
         $priceInputMax = $('.price-input-max')
@@ -231,7 +230,6 @@ $(document).ready(function () {
             },
             sortBy: $('.page-sort-icon').attr('data-value') || ''
         };
-        console.log(filters, '---')
     }
     // Filter group expand/collapse functionality
     filterGroups.forEach(function (group) {
@@ -455,11 +453,8 @@ $(document).ready(function () {
         const attr = closeBtn.closest('.filter-attr');
         if (attr) {
             const attrText = $(attr).find('.filter-attr-text').attr('data-value');
-            console.log(attrText, '8888888888')
             // 从选中集合中移除
             selectedAttrs.forEach(item => {
-                console.log(item, '-------', item)
-                console.log(item == attrText)
                 if (item == attrText) {
                     selectedAttrs.delete(item);
                 }
