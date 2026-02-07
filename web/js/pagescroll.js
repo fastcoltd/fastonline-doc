@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', adjustFilterPosition);
 function updateStickyHeader() {
     if (!stickyHeader) return;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    if (scrollTop > pageHeadHeight) {
+    if (scrollTop >= pageHeadHeight) {
         stickyHeader.classList.add('is-sticky');
     } else {
         stickyHeader.classList.remove('is-sticky');

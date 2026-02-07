@@ -11,6 +11,6 @@ tags.forEach(function (item) {
         tags.forEach(item => item.classList.remove('active'));
         e.currentTarget.classList.add('active');
         tagValue = e.currentTarget.textContent;
-        reloadItems();
+        // reloadItems();
     });
 });
