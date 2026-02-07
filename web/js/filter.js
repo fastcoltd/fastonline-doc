@@ -13,6 +13,7 @@ $(document).ready(function () {
 
     let currentSelect = null;
     let selectedTags = new Set([]); // 已选择的标签
+    let selectedAttrs = new Set([]); // 已选择的属性
     let scrollPosition = 0; // 记录滚动位置
     // 下拉框选项数据
     const selectOptions = {
@@ -46,24 +47,24 @@ $(document).ready(function () {
     };
     const attributeValue = {
         'warranty': [
-            { value: '1-year', text: '1 Year' },
-            { value: '2-year', text: '2 Years' },
-            { value: 'lifetime', text: 'Lifetime' }
+            { value: 'warranty:year', text: 'warranty:Year' },
+            { value: 'warranty:month', text: 'warranty:month' },
+            { value: 'warranty:lifetime', text: 'warranty:Lifetime' }
         ],
         'return-policy': [
-            { value: '7-days', text: '7 Days' },
-            { value: '14-days', text: '14 Days' },
-            { value: '30-days', text: '30 Days' }
+            { value: 'return-policy:7-days', text: 'return-policy:7 Days' },
+            { value: 'return-policy:14-days', text: 'return-policy:14 Days' },
+            { value: 'return-policy:30-days', text: 'return-policy:30 Days' }
         ],
         'shipping': [
-            { value: 'free', text: 'Free Shipping' },
-            { value: 'express', text: 'Express' },
-            { value: 'standard', text: 'Standard' }
+            { value: 'shipping:free-shipping', text: 'shipping:Free Shipping' },
+            { value: 'shipping:express', text: 'shipping:Express' },
+            { value: 'shipping:standard', text: 'shipping:Standard' }
         ],
         'support': [
-            { value: '24-7', text: '24/7 Support' },
-            { value: 'business-hours', text: 'Business Hours' },
-            { value: 'email-only', text: 'Email Only' }
+            { value: 'support:24-7', text: 'support:24/7 Support' },
+            { value: 'support:business-hours', text: 'support:Business Hours' },
+            { value: 'support:email-only', text: 'support:Email Only' }
         ]
     }
 
@@ -82,15 +83,19 @@ $(document).ready(function () {
                 value,
                 text: $(e.target).text()
             }
-            
+
             if (value && dataType == 'tag') {
                 // 处理标签多选
-            if (!selectedTags.has(option.value)) {
-                addTag(option);
+                if (!selectedTags.has(option.value)) {
+                    addTag(option);
+                }
                 $(select).removeClass('active')
-            } else {
+            } else if (value && dataType == 'attribute-value') {
+                // 处理标签多选
+                if (!selectedAttrs.has(option.value)) {
+                    addAttr(option);
+                }
                 $(select).removeClass('active')
-            }
             } else {
                 $(that).attr('data-value', value)
                 $(that).find('.filter-custom-select-text').text($(e.target).text())
@@ -102,32 +107,33 @@ $(document).ready(function () {
             }
         })
     })
-    $(document).on('blur', '.filter-input', function() {
+    $(document).on('blur', '.filter-input', function () {
         filterCount()
     })
     function filterCount() {
-        let count = selectedTags.size
+        let count = selectedTags.size + selectedAttrs.size
+        console.log(selectedAttrs.size, '000000', selectedAttrs)
         $nameInput = $('.name-input')
         $priceInputMin = $('.price-input-min')
         $priceInputMax = $('.price-input-max')
         $numberInputMin = $('.number-input-min')
         $numberInputMax = $('.number-input-max')
-        $filterCustomSelect = $('.filter-content .filter-custom-select').not('[data-value=""]')
+        $filterCustomSelect = $('.filter-content .filter-custom-select-count').not('[data-value=""]').not('[data-value="attribute-name"]').not('[data-value="attribute-value"]').not('[data-value="tag"]')
         count += $filterCustomSelect.length
-        if($nameInput.val()) {
-            count += 1 
+        if ($nameInput.val()) {
+            count += 1
         }
-        if($priceInputMin.val()) {
-            count += 1 
+        if ($priceInputMin.val()) {
+            count += 1
         }
-        if($priceInputMax.val()) {
-            count += 1 
+        if ($priceInputMax.val()) {
+            count += 1
         }
-        if($numberInputMin.val()) {
-            count += 1 
+        if ($numberInputMin.val()) {
+            count += 1
         }
-        if($numberInputMax.val()) {
-            count += 1 
+        if ($numberInputMax.val()) {
+            count += 1
         }
 
         $('.page-filter-num').text(`(${count})`)
@@ -176,7 +182,7 @@ $(document).ready(function () {
         $('.sort-container').hide()
         startFitterData()
     })
-    $('.filter-clear-btn').on('click', function() {
+    $('.filter-clear-btn').on('click', function () {
         $nameInput = $('.name-input')
         $priceInputMin = $('.price-input-min')
         $priceInputMax = $('.price-input-max')
@@ -193,7 +199,9 @@ $(document).ready(function () {
         $('.filter-custom-select[data-type="attribute-name"]').attr('data-value', '').find('.filter-custom-select-text').text('select attribute')
         $('.filter-custom-select[data-type="attribute-value"]').attr('data-value', '').find('.filter-custom-select-text').text('select value')
         $('.filter-custom-select[data-type="tag"]').find('.filter-tags').html('')
+        $('.filter-custom-select[data-type="attribute-value"]').find('.filter-tags').html('')
         selectedTags.clear();
+        selectedAttrs.clear();
         $('.page-sort-icon').attr('data-value', '')
         filterCount()
         startFitterData()
@@ -212,10 +220,7 @@ $(document).ready(function () {
             brand: $('.filter-custom-select[data-type="brand"]').attr('data-value') || '',
             service: $('.filter-custom-select[data-type="service"]').attr('data-value') || '',
             tags: Array.from(selectedTags),
-            attributes: {
-                name: $('.filter-custom-select[data-type="attribute-name"]').attr('data-value') || '',
-                value: $('.filter-custom-select[data-type="attribute-value"]').attr('data-value') || ''
-            },
+            attributes: Array.from(selectedAttrs),
             price: {
                 min: $priceInputMin.val() || '',
                 max: $priceInputMax.val() || ''
@@ -322,12 +327,12 @@ $(document).ready(function () {
             // Expand
             group.classList.remove('collapsed');
             content.style.display = 'flex';
-            icon.style.transform = 'rotate(180deg)';
+            icon.style.transform = 'rotate(0deg)';
         } else {
             // Collapse
             group.classList.add('collapsed');
             content.style.display = 'none';
-            icon.style.transform = 'rotate(90deg)';
+            icon.style.transform = 'rotate(180deg)';
         }
     }
 
@@ -366,34 +371,27 @@ $(document).ready(function () {
             $attributeValue.find('.filter-dropdown-content').html(htmlStr)
         }
     }
-    function selectOption(option, selectType) {
-        if (!currentSelect) return;
+    function addAttr(option) {
+        selectedAttrs.add(option.value);
 
-        const textElement = currentSelect.querySelector('.filter-custom-select-text');
+        const attrsContainer = document.querySelector('.filter-attrs');
+        const newAttr = document.createElement('div');
+        newAttr.className = 'filter-attr';
+        newAttr.innerHTML = `
+            <span class="filter-attr-text" data-value="${option.value}">${option.text}</span>
+            <svg class="filter-attr-close" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M9 3L3 9M3 3L9 9" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        `;
 
-        if (selectType === 'tag') {
-            // 处理标签多选
-            if (!selectedTags.has(option.value)) {
-                addTag(option);
-            }
-        } else {
-            // 处理单选
-            currentSelect.dataset.value = option.value;
-            textElement.textContent = option.text;
-            textElement.classList.remove('placeholder');
+        const closeBtn = newAttr.querySelector('.filter-attr-close');
+        closeBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            removeAttr(this);
+        });
 
-            // 如果是属性名称改变，清空属性值
-            if (selectType === 'attribute-name') {
-                const attributeValueSelect = document.querySelector('[data-type="attribute-value"]');
-                if (attributeValueSelect) {
-                    clearSelect(attributeValueSelect);
-                }
-            }
-        }
-
-        closeDropdown();
+        attrsContainer.appendChild(newAttr);
     }
-
     function addTag(option) {
         selectedTags.add(option.value);
 
@@ -401,7 +399,7 @@ $(document).ready(function () {
         const newTag = document.createElement('div');
         newTag.className = 'filter-tag';
         newTag.innerHTML = `
-            <span class="filter-tag-text">${option.text}</span>
+            <span class="filter-tag-text" data-value="${option.value}">${option.text}</span>
             <svg class="filter-tag-close" width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M9 3L3 9M3 3L9 9" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -453,7 +451,29 @@ $(document).ready(function () {
 
         return 'generic';
     }
+    function removeAttr(closeBtn) {
+        const attr = closeBtn.closest('.filter-attr');
+        if (attr) {
+            const attrText = $(attr).find('.filter-attr-text').attr('data-value');
+            console.log(attrText, '8888888888')
+            // 从选中集合中移除
+            selectedAttrs.forEach(item => {
+                console.log(item, '-------', item)
+                console.log(item == attrText)
+                if (item == attrText) {
+                    selectedAttrs.delete(item);
+                }
+            });
+            attr.style.opacity = '0';
+            attr.style.transform = 'scale(0.8)';
 
+            setTimeout(function () {
+                attr.remove();
+                updateTagsLayout();
+                filterCount()
+            }, 200);
+        }
+    }
     function removeTag(closeBtn) {
         const tag = closeBtn.closest('.filter-tag');
         if (tag) {
@@ -474,6 +494,7 @@ $(document).ready(function () {
                 tag.remove();
                 updateTagsLayout();
             }, 200);
+            filterCount()
         }
     }
 
@@ -488,35 +509,17 @@ $(document).ready(function () {
                 }
             }
         }
-    }
 
-    function clearAllFilters() {
-        // Clear all input fields
-        filterInputs.forEach(function (input) {
-            input.value = '';
-        });
-
-        // Reset all custom select boxes
-        customSelects.forEach(function (select) {
-            clearSelect(select);
-        });
-
-        // Remove all tags
-        const tags = document.querySelectorAll('.filter-tag');
-        tags.forEach(function (tag) {
-            tag.remove();
-        });
-        selectedTags.clear();
-
-        // Reset tag select
-        const tagSelect = document.querySelector('.multiselect');
-        if (tagSelect) {
-            const textElement = tagSelect.querySelector('.filter-custom-select-text');
-            textElement.textContent = 'Select tags';
-            textElement.classList.add('placeholder');
+        const attrsContainer = document.querySelector('.filter-attrs');
+        if (attrsContainer) {
+            const attrs = attrsContainer.querySelectorAll('.filter-attr');
+            if (attrs.length === 0) {
+                const attrSelect = document.querySelector('[data-type="attribute-value"], .multiselect');
+                if (attrSelect) {
+                    clearSelect(attrSelect);
+                }
+            }
         }
-
-        showMessage('All filters cleared');
     }
 
     function getAllSelectValues() {
@@ -525,10 +528,7 @@ $(document).ready(function () {
             brand: '',
             service: '',
             tags: Array.from(selectedTags),
-            attributes: {
-                name: '',
-                value: ''
-            },
+            attributes: Array.from(selectedAttrs),
             price: {
                 min: '',
                 max: ''
