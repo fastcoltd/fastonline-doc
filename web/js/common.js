@@ -488,7 +488,29 @@ $(document).ready(function () {
         }
 
     })
-
+    $('.cookies-accept-btn').on('click', function () {
+        alert('接受cookies')
+    })
+    $('.cookies-customize-btn').on('click', function () {
+        $('.cookies-feature-wrapper').show()
+        $(this).hide()
+    })
+    $('.feature-accept-btn').on('click', function() {
+        let $cookiesFeature1 = $('#cookiesFeature1')
+        let $cookiesFeature2 = $('#cookiesFeature2')
+        let $cookiesFeature3 = $('#cookiesFeature3')
+        let postData = []
+        if($cookiesFeature1.prop('checked')) {
+            postData.push('custom1')
+        }
+        if($cookiesFeature2.prop('checked')) {
+            postData.push('custom2')
+        }
+        if($cookiesFeature3.prop('checked')) {
+            postData.push('custom3')
+        }
+        alert(`Save Preferences:${postData.join(',')}`)
+    })
     $('body').on('click', '.demand-button', function () {
         if ($(this).hasClass('disabled')) {
             return
