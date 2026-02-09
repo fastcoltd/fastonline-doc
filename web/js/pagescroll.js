@@ -6,7 +6,7 @@ const pageHead = document.querySelector('.page-head');
 const pageHeadHeight = pageHead.offsetHeight;
 const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
-const listContainer = document.querySelector('.list-container')
+const listContainer = document.querySelector('.list-container-page-scoll')
 
 window.addEventListener('scroll', updateStickyHeader, { passive: true });
 
