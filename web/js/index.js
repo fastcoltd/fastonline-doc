@@ -20,31 +20,32 @@ window.addEventListener('DOMContentLoaded', function () {
     brandRightMore.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
-        brandScrollOffsetX += 200;
+        brandScrollOffsetX += $('.brand-item').width() * 2;
         if (brandScrollOffsetX > maxBrandScrollOffsetX) {
             brandScrollOffsetX = maxBrandScrollOffsetX
         }
         brandContent.scrollLeft = brandScrollOffsetX;
-        brandScroll();
+        requestAnimationFrame(() => {
+            brandScroll(brandScrollOffsetX);
+        });
     })
     brandLeftMore.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
-        brandScrollOffsetX -= 200;
+        brandScrollOffsetX -= $('.brand-item').width() * 2;
         if (brandScrollOffsetX < 0) {
             brandScrollOffsetX = 0
         }
         brandContent.scrollLeft = brandScrollOffsetX;
-        brandScroll();
+        requestAnimationFrame(() => {
+            brandScroll(brandScrollOffsetX);
+        });
     })
 
-    function brandScroll() {
+    function brandScroll(brandScrollOffsetX) {
         if (isMobile) { return }
-        const width = brandContent.clientWidth;
-        const offsetX = brandContent.scrollLeft;
+        const offsetX = brandScrollOffsetX;
         let maxBrandScrollOffsetX = brandContent.scrollWidth - brandContent.clientWidth
-        const scrollWidth = brandContent.scrollWidth;
-
         if (offsetX >= maxBrandScrollOffsetX) {
             brandRightMore.style.cursor = 'not-allowed';
             brandRightMore.style.opacity = '0.3';
