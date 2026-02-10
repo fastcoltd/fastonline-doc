@@ -250,6 +250,10 @@
 
 .layout-vertical .item-tag-box {
     margin-top: 0.75rem;
+    max-height: 11rem;
+    height: 10rem;
+    padding: 1rem 0;
+    align-items: flex-start;
 }
 
 .layout-horizontal .item-tag-box {
@@ -357,17 +361,25 @@
 
 .layout-vertical .demand-item .item-button-box {
     margin-top: 3.75rem;
+}
 
-    &:hover {
-        background: white;
-        border: var(--primary-color) solid 0.125rem;
-        color: var(--primary-color);
-        box-shadow: none;
-    }
+.item-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+    /* 限制文本为2行 */
+    overflow: hidden;
+    height: 10rem;
+}
+
+.font-weight-bold {
+    font-weight: bold;
 }
 
 @media screen and (min-width: 769px) {
     .layout-horizontal .demand-item .item-button-box {
+        width: 37.5rem;
         right: 3.75rem;
         bottom: 3.25rem;
         height: 5rem;
@@ -384,5 +396,20 @@
     .layout-horizontal .demand-item .item-button-box {
         margin-top: 1.25rem;
         position: relative;
+    }
+    .layout-horizontal .item-title {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        white-space: normal;
+        /* 限制文本为2行 */
+        overflow: hidden;
+        height: 4rem;
+    }
+    .layout-horizontal .item-tag-box {
+        padding: 1rem 0;
+        flex-wrap: wrap;
+        height: 7rem;
+        max-height: 7rem;
     }
 }
