@@ -555,6 +555,7 @@ $(document).ready(function () {
     }
     changeBuyCount()
     $(document).on('scroll', computedSideIconPosition)
+    $(window).on('resize', computedSideIconPosition)
     computedSideIconPosition()
 })
 function computedSideIconPosition() {
