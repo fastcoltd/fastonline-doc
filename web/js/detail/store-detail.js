@@ -258,7 +258,7 @@ function debounce(func, wait) {
 function updateStickyHeader() {
     if (!stickyHeader) return;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    if (scrollTop > pageHeadHeight) {
+    if (scrollTop + $('.page-link-box').height() > pageHeadHeight) {
         stickyHeader.classList.add('is-sticky');
     } else {
         stickyHeader.classList.remove('is-sticky');

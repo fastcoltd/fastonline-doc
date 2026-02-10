@@ -180,3 +180,11 @@ function searchData () {
   }
   console.log(params, 'dddd')
 }
+$(document).ready(function () {
+  $('.resource-action-like-icon, .icon-is-dianzan').on('click', function() {
+    $(this).parent('.resource-action-group').toggleClass('has-activate')
+  })
+  $('.resource-action-unlike-icon, .icon-not-dianzan').on('click', function() {
+    $(this).parent('.resource-action-group').toggleClass('has-activate')
+  })
+})

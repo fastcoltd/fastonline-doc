@@ -153,11 +153,9 @@ const pagination = new Pagination({
 // 页面变化回调
 pagination.onPageChange = (page, pageSize) => {
   console.log(`页面变化: 第${page}页, 每页${pageSize}条`);
-  loadItems();
 };
 
 // 页面大小变化回调
 pagination.onPageSizeChange = (page, pageSize) => {
   console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
-  reloadItems();
 };
