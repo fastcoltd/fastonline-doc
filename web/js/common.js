@@ -226,7 +226,8 @@ function dismissHomeMenuPage() {
     body.classList.toggle('modal-open', false);
 }
 function refreshHeaderUserUI() {
-    let user = window.user
+    // 上线后去掉  方便调试登录情况 isLogin
+    let user = window.user || location.href.indexOf('isLogin') > -1
     const signinButtonEle = document.getElementById('header-signin');
     const headerJoinButton = document.getElementById('header-join');
     const headerUser = document.getElementById('header-user');
