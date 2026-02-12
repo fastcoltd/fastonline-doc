@@ -21,4 +21,10 @@ document.addEventListener('DOMContentLoaded', function () {
             body.classList.toggle('modal-open', false);
         }
     });
+    $('.resource-action-like-icon, .icon-is-dianzan').on('click', function() {
+        $(this).parent('.resource-action-group').toggleClass('has-activate')
+      })
+      $('.resource-action-unlike-icon, .icon-not-dianzan').on('click', function() {
+        $(this).parent('.resource-action-group').toggleClass('has-activate')
+      })
 });
