@@ -546,6 +546,7 @@
   flex-direction: row;
   align-items: center;
   gap: 1.25rem;
+  scroll-behavior: smooth;
 }
 .item-detail-screenshot-content::-webkit-scrollbar {
   display: none;
@@ -609,6 +610,12 @@
   .item-detail-screenshot-right-box {
     display: none;
   }
+}
+.item-detail-description-box {
+  padding: 2.5rem;
+  border-radius: 2.5rem;
+  border: 0.125rem solid #F0F0F3;
+  margin-bottom: 2rem;
 }
 .item-detail-description {
   width: 100%;
@@ -1145,11 +1152,39 @@
 .item-detail-review-tool-item {
   gap: 0.5rem;
 }
+.item-detail-review-tool-item.has-activate .iconfont {
+  display: inline-block;
+}
+.item-detail-review-tool-item.has-activate .item-detail-review-tool-icon {
+  display: none;
+}
 .item-detail-review-tool-icon {
   width: 2.25rem;
   height: 2.25rem;
+  cursor: pointer;
+}
+.load-more {
+  display: flex;
+  width: 25rem;
+  height: 6.25rem;
+  border-radius: 5rem;
+  margin-left: 0;
+}
+.load-more .load-more-text {
+  font-size: 1.75rem;
+}
+.load-more:hover {
+  background: var(--primary-color);
+}
+.load-more:hover .load-more-text {
+  color: #fff;
 }
 @media screen and (max-width: 768px) {
+  .load-more {
+    width: 100%;
+    height: 3.75rem;
+    border-radius: 0.5rem;
+  }
   .item-detail-left-subtitle-box {
     margin-top: -2rem;
     margin-bottom: 0;
@@ -1511,4 +1546,14 @@
   border-radius: 1rem;
   color: #fff;
   cursor: pointer;
+}
+.icon-dianzan {
+  display: none;
+  color: #1E9FDB;
+  font-size: 2.25rem;
+  cursor: pointer;
+}
+.icon-dianzan.icon-not-dianzan {
+  color: #FD8E2D;
+  transform: rotate(180deg);
 }

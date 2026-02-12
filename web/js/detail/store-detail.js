@@ -84,6 +84,14 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeSearch();
     initializeDropdowns();
     initializeValidation();
+
+    $('.item-detail-review-tool-icon-yes').on('click', function() {
+        console.log($(this).parent())
+        $(this).parent().toggleClass('has-activate')
+    })
+    $('.item-detail-review-tool-icon-no').on('click', function() {
+        $(this).parent().toggleClass('has-activate')
+    })
 })
 
 

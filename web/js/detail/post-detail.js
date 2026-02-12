@@ -301,11 +301,51 @@ function adjustFilterPosition() {
 }
 
 $(document).ready(function () {
-    $('.submit-btn').on('click', function() {
+    $('.submit-btn').on('click', function () {
         let params = {
             content: $('.comment-textarea').val(),
             captcha: $('.captcha-input').val()
         }
         console.log(params, '000')
     })
+    $('.unlock-btn').on('click', function () {
+        alert('前去购买')
+    })
+    $('.reading-mode-btn').on('click', function () {
+        $(this).parent().toggleClass('is-reading-mode')
+    })
+    $('.post-detail-review-tool-icon-like, .icon-is-dianzan').on('click', function () {
+        $(this).parent('.post-detail-review-tool-item').toggleClass('has-activate')
+    })
+    $('.post-detail-review-tool-icon-unlike, .icon-not-dianzan').on('click', function () {
+        $(this).parent('.post-detail-review-tool-item').toggleClass('has-activate')
+    })
+    document.querySelectorAll('.star-list').forEach(function(starList, index) {
+        lightStar(starList)
+    })
+    function lightStar (starList) {
+        let index = -1;	//被点击的星星的索引，初始化
+
+        //获取相关元素
+        let ul = document.querySelector('.star-list');	//容器
+        let liArr = starList.children;	//所有星星li的集合
+        for (let i = 0; i < liArr.length; i++) {
+            liArr[i].num = i;	//存储当前索引值
+            liArr[i].onmouseenter = function () {
+                //1 鼠标移入哪个星星，哪个星星及其前面的星星都高亮
+                light(this.num);
+            }
+        }
+        // 点亮
+        function light(index) {
+            //先把所有星星都熄灭
+            for (let i = 0; i < liArr.length; i++) {
+                liArr[i].style.background = 'url(image/star-un-16.png) no-repeat 100% 100%';
+            }
+            for (let i = 0; i <= index; i++) {
+                liArr[i].style.background = 'url(image/star-16.png) no-repeat 100% 100%';
+            }
+        }
+        light(index);
+    }
 })

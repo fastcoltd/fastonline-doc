@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>五星评分</title>
+	<style type="text/css">
+		.service-item {
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+			gap: 8px;
+		}
+
+		.star-list {
+			padding: 0;
+			margin: 0;
+			list-style: none;
+			height: 16px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.star-list .star {
+			/* 背景设置成未被点亮的星星 */
+			background: url(image/star-un-16.png) no-repeat 100% 100%;
+			width: 16px;
+			height: 16px;
+		}
+	</style>
+
+</head>
+
+<body>
+	<div class="service-item">
+		<ul class="star-list">
+			<li class="star"> </li>
+			<li class="star"> </li>
+			<li class="star"> </li>
+			<li class="star"> </li>
+			<li class="star"> </li>
+		</ul>
+		<span class="star-count"></span>
+	</div>
+	<script>
+		var index = 1;	//被点击的星星的索引，初始化
+
+		//获取相关元素
+		var ul = document.querySelector('.star-list');	//容器
+		var liArr = ul.children;	//所有星星li的集合
+		for (var i = 0; i < liArr.length; i++) {
+			liArr[i].num = i;	//存储当前索引值
+			liArr[i].onmouseenter = function () {
+				//1 鼠标移入哪个星星，哪个星星及其前面的星星都高亮
+				light(this.num);
+			}
+		}
+		// 点亮
+		function light(index) {
+			//先把所有星星都熄灭
+			for (var i = 0; i < liArr.length; i++) {
+				liArr[i].style.background = 'url(image/star-un-16.png) no-repeat 100% 100%';
+			}
+			for (var i = 0; i <= index; i++) {
+				liArr[i].style.background = 'url(image/star-16.png) no-repeat 100% 100%';
+			}
+		}
+		light(index);
+	</script>
+</body>
+
+</html>
