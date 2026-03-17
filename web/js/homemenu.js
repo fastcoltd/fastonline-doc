@@ -122,9 +122,21 @@ $(document).ready(function () {
             menuleftMore.style.display = 'none';
             topMenuBox.style.padding = '0'
         } else {
-            menuRightMore.style.display = 'block';
-            menuleftMore.style.display = 'block';
-            topMenuBox.style.padding = '0 3rem';
+            const canScrollLeft = offsetX > 0;
+            const canScrollRight = offsetX < maxMenuScrollOffsetX;
+
+            menuRightMore.style.display = canScrollRight ? 'block' : 'none';
+            menuleftMore.style.display = canScrollLeft ? 'block' : 'none';
+
+            if (canScrollLeft && canScrollRight) {
+                topMenuBox.style.padding = '0 3rem';
+            } else if (canScrollLeft && !canScrollRight) {
+                topMenuBox.style.padding = '0 0 0 3rem';
+            } else if (!canScrollLeft && canScrollRight) {
+                topMenuBox.style.padding = '0 3rem 0 0';
+            } else {
+                topMenuBox.style.padding = '0';
+            }
         }
         if (offsetX >= maxMenuScrollOffsetX) {
             menuRightMore.style.cursor = 'not-allowed';
@@ -142,6 +154,7 @@ $(document).ready(function () {
         }
     }
     menuScroll()
+    menuContent.addEventListener('scroll', menuScroll, { passive: true })
     window.addEventListener('resize', function (event) {
         menuScroll();
     })
