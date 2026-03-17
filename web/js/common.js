@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const body = document.getElementsByTagName('body')[0];
     this.headerSearchMenu = new HeaderMenu('.header-search-box-label', '.header-search-box-label-icon', '.header-search-box-label-text', 'items');
     this.headerResourceMenu = new HeaderMenu('.header-items-label-resource', '.header-items-label-icon', '', '');
-    this.headerPostMenu = new HeaderMenu('.header-items-label-post', '.header-items-label-icon', '', '');
+    this.headerPostMenu = new HeaderMenu('.header-items-label-post', '.header-items-label-icon', '', 'Blog');
     this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', '.header-search-mobile-box-label-icon', '.header-search-mobile-box-label-text', 'items')
     refreshHeaderUserUI();
 
