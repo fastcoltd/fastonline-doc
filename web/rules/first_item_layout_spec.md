@@ -23,7 +23,7 @@
       .item-service-box
       .item-tag-box
     .item-button-box.item-buy-btn.disabled
-    .item-button-box.item-buy-btn.disabled.item-buy-btn-red
+    .item-button-box.item-buy-btn.item-buy-btn-red
 ```
 
 ## 全局基准
@@ -137,6 +137,9 @@
 - 文本：`BUY NOW`，`1.75rem/2.75rem`（14px/22px），`Roboto 400`
 - 默认（灰色）态：背景 `#F4F4F4`，文字 `rgba(0,0,0,0.85)`，边框无（如 `.item-buy-btn.disabled`）
 - 红色变体（按 Figma 红色按钮标注）：背景 `#FF1B20`，文字 `rgba(255,255,255,0.85)`，边框无（如 `.item-buy-btn.item-buy-btn-red`）
+- 交互规则：
+  - 灰色（带 `.disabled`）不可点击
+  - 红色（`.item-buy-btn-red` 且不带 `.disabled`）可点击
 
 ## 后续修改建议（给 Codex）
 - 修改第 N 个 item 时，优先复用第一张卡片结构与类名。
