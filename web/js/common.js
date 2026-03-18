@@ -1,5 +1,48 @@
 
 document.addEventListener('DOMContentLoaded', function () {
+    function applyStarFill(node) {
+        if (!node || node.nodeType !== 1 || !node.classList || !node.classList.contains('stars-inner')) {
+            return;
+        }
+        if (node.style.getPropertyValue('--star-fill')) {
+            return;
+        }
+        let fill = '';
+        const legacyWidth = (node.style.width || '').trim();
+        if (legacyWidth && legacyWidth.endsWith('%')) {
+            fill = legacyWidth;
+        } else {
+            const scoreNode = node.closest('.item-star-box')?.querySelector('.item-star-score');
+            const score = parseFloat((scoreNode?.textContent || '').trim());
+            if (!Number.isNaN(score)) {
+                fill = `${Math.max(0, Math.min(5, score)) / 5 * 100}%`;
+            }
+        }
+        if (fill) {
+            node.style.setProperty('--star-fill', fill);
+        }
+    }
+
+    function initStarFill(root) {
+        if (!root || !root.querySelectorAll) {
+            return;
+        }
+        root.querySelectorAll('.stars-inner').forEach(applyStarFill);
+        if (root.matches && root.matches('.stars-inner')) {
+            applyStarFill(root);
+        }
+    }
+
+    initStarFill(document);
+    const starObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                initStarFill(node);
+            });
+        });
+    });
+    starObserver.observe(document.body, { childList: true, subtree: true });
+
     const body = document.getElementsByTagName('body')[0];
     this.headerSearchMenu = new HeaderMenu('.header-search-box-label', '.header-search-box-label-icon', '.header-search-box-label-text', 'items');
     this.headerResourceMenu = new HeaderMenu('.header-items-label-resource', '.header-items-label-icon', '', '');
