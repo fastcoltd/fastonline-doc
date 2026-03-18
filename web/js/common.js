@@ -441,15 +441,24 @@ $(document).ready(function () {
     $('.kefu-icon').on('click', function () {
         alert('你好，客服为您服务')
     })
-    $('body').on('click', '.icon-aixin', function (e) {
-        let like = $(this).data('like')
-        if (like) {
-            $(this).data('like', 0)
-            $(this).css({ color: '#F4F4F4' })
-        } else {
-            $(this).data('like', 1)
-            $(this).css({ color: '#FF1B20' })
+    const AIXIN_NORMAL_SRC = 'image/Vector_nor.png'
+    const AIXIN_SELECTED_SRC = 'image/Vector_sel.png'
+
+    function syncAixinState($icon) {
+        const like = Number($icon.data('like')) === 1
+        $icon.attr('aria-pressed', like ? 'true' : 'false')
+        if ($icon.is('img')) {
+            $icon.attr('src', like ? AIXIN_SELECTED_SRC : AIXIN_NORMAL_SRC)
+            return
         }
+        $icon.css({ color: like ? '#FF1B20' : '#D9D9D9' })
+    }
+
+    $('body').on('click', '.icon-aixin', function () {
+        const $icon = $(this)
+        const like = Number($icon.data('like')) === 1
+        $icon.data('like', like ? 0 : 1)
+        syncAixinState($icon)
     })
     $('.header-avatar').on('click', function () {
         $('.center-wrapper').show()
