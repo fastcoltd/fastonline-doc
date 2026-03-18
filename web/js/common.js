@@ -8,14 +8,14 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         let fill = '';
-        const legacyWidth = (node.style.width || '').trim();
-        if (legacyWidth && legacyWidth.endsWith('%')) {
-            fill = legacyWidth;
+        const scoreNode = node.closest('.item-star-box')?.querySelector('.item-star-score');
+        const score = parseFloat((scoreNode?.textContent || '').trim());
+        if (!Number.isNaN(score)) {
+            fill = `${Math.max(0, Math.min(5, score)) / 5 * 100}%`;
         } else {
-            const scoreNode = node.closest('.item-star-box')?.querySelector('.item-star-score');
-            const score = parseFloat((scoreNode?.textContent || '').trim());
-            if (!Number.isNaN(score)) {
-                fill = `${Math.max(0, Math.min(5, score)) / 5 * 100}%`;
+            const legacyWidth = (node.style.width || '').trim();
+            if (legacyWidth && legacyWidth.endsWith('%')) {
+                fill = legacyWidth;
             }
         }
         if (fill) {
