@@ -46,6 +46,22 @@
 - 高度：`26.25rem`（210px）
 - 圆角：`3.75rem`（30px）
 
+### 2.1) 收藏按钮（选中/取消）
+- 位置：卡片右上角（基于 `.best-items-item` 绝对定位）
+- 尺寸：`24 x 24`
+- 结构：使用图片，不使用远程字体，不使用 CSS 画图
+- 资源：
+  - 取消收藏：`image/Vector_nor.png`
+  - 已收藏：`image/Vector_sel.png`
+- 推荐 HTML：
+```html
+<img class="icon-aixin" data-like="1" src="image/Vector_sel.png" alt="收藏按钮" aria-label="收藏" aria-pressed="true" />
+```
+- 交互规则：
+  - `data-like="1"`：已收藏，`src = image/Vector_sel.png`
+  - `data-like="0"`：未收藏，`src = image/Vector_nor.png`
+  - 点击时在 `1/0` 间切换，并同步 `aria-pressed`（`true/false`）
+
 ### 3) 内容主列
 - 选择器：`.best-items-item-content`
 - 子项纵向间距：`gap: 1.25rem`（10px）
