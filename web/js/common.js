@@ -542,7 +542,7 @@ $(document).ready(function () {
 
     })
     $('.cookies-accept-btn').on('click', function () {
-        alert('接受cookies')
+        $(this).closest('.cookies-tips-wrapper').hide()
     })
     $('.cookies-customize-btn').on('click', function () {
         $('.cookies-feature-wrapper').show()

@@ -1709,16 +1709,45 @@ button {
 .common-footer-wrapper .left-part-wrapper {
   display: flex;
   align-items: center;
-  column-gap: 1.25rem;
+  column-gap: 0;
 }
 .common-footer-wrapper .left-part-wrapper .follow-us-text {
   color: #f4f4f4;
   white-space: nowrap;
 }
 .common-footer-wrapper .left-part-wrapper .iconfont {
-  color: #f4f4f4;
-  font-size: 2.5rem;
-  line-height: 1;
+  display: inline-block;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 0;
+  line-height: 0;
+}
+.common-footer-wrapper .left-part-wrapper .iconfont::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.common-footer-wrapper .left-part-wrapper .icon-facebook1 {
+  margin-left: 1.8301rem;
+}
+.common-footer-wrapper .left-part-wrapper .icon-logo2 {
+  margin-left: 1.25rem;
+}
+.common-footer-wrapper .left-part-wrapper .icon-instagram {
+  margin-left: 1.25rem;
+}
+.common-footer-wrapper .left-part-wrapper .icon-facebook1::before {
+  background-image: url("../image/footer-follow-facebook.svg");
+}
+.common-footer-wrapper .left-part-wrapper .icon-logo2::before {
+  background-image: url("../image/footer-follow-twitter.svg");
+}
+.common-footer-wrapper .left-part-wrapper .icon-instagram::before {
+  background-image: url("../image/footer-follow-instagram.svg");
 }
 .common-footer-wrapper .right-part-wrapper {
   display: flex;
@@ -1776,8 +1805,8 @@ button {
   .common-footer-wrapper .bottom-copy-right-content .left-part-wrapper {
     margin-bottom: 1.25rem;
   }
-  .common-footer-wrapper .bottom-copy-right-content .left-part-wrapper .iconfont {
-    color: var(--font-black-color);
+  .common-footer-wrapper .bottom-copy-right-content .left-part-wrapper .iconfont::before {
+    filter: brightness(0);
   }
   .common-footer-wrapper .bottom-copy-right-content .right-part-wrapper {
     row-gap: 1rem;
