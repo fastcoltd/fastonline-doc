@@ -1877,23 +1877,35 @@ button {
     z-index: 49;
     width: 100%;
     background-color: #1d242d;
-
-    .icon-instagram {
-        font-size: 2.25rem;
-    }
+    padding-top: 5rem;
+    padding-bottom: 3.25rem;
 
     .footer-content {
-        margin: 0 auto;
+        margin: 0 auto 7.5rem;
         max-width: var(--container-width);
         display: flex;
         justify-content: space-between;
+        align-items: flex-start;
     }
 
     .footer-item-content {
+        width: 19.625rem;
         display: flex;
         flex-direction: column;
         gap: 2.5rem;
         align-items: flex-start;
+    }
+
+    .footer-item-content:nth-child(2) {
+        width: 16.875rem;
+    }
+
+    .footer-item-content:nth-child(3) {
+        width: 34.625rem;
+    }
+
+    .footer-item-content:nth-child(4) {
+        width: 13.5rem;
     }
 
     .footer-item-title-box {
@@ -1909,12 +1921,16 @@ button {
         line-height: 2.75rem;
         font-weight: 600;
         font-family: var(--primary-popfont);
-        text-decoration: underline;
+        text-decoration: none;
+    }
+
+    .footer-item-content:not(:first-child) .footer-item-title {
+        font-family: var(--primary-robotofont);
     }
 
     .footer-item-title-icon {
         width: 3rem;
-        height: 3ren;
+        height: 3rem;
         display: none;
     }
 
@@ -1930,20 +1946,25 @@ button {
         line-height: 2.75rem;
         font-weight: 400;
         font-family: var(--primary-popfont);
+        text-decoration: none;
+        white-space: nowrap;
     }
 
     .footer-line {
-        margin: 3rem 0 2rem 0;
+        margin: 0;
         border-top: 0.125rem solid #6D6D6D;
     }
 
     .bottom-copy-right-content {
         margin: 0 auto;
         max-width: var(--container-width);
+        padding-top: 2.25rem;
         display: flex;
-        justify-content: space-between;
-        color: var(--font-white-color);
+        align-items: center;
+        color: #f4f4f4;
         font-size: 1.75rem;
+        line-height: 2.75rem;
+        font-family: var(--primary-robotofont);
 
         .footer-logo {
             display: none;
@@ -1954,42 +1975,52 @@ button {
         display: flex;
         align-items: center;
         column-gap: 1.25rem;
+
+        .follow-us-text {
+            color: #f4f4f4;
+            white-space: nowrap;
+        }
     }
 
     .left-part-wrapper .iconfont {
-        color: var(--font-white-color);
+        color: #f4f4f4;
+        font-size: 2.5rem;
+        line-height: 1;
     }
 
     .right-part-wrapper {
         display: flex;
         align-items: center;
-        color: var(--font-dark-grey-color);
+        margin-left: auto;
+        column-gap: 5.375rem;
+        color: #f0f0f3;
 
         .language-btn {
             cursor: pointer;
-            color: #FAFAFA;
+            color: #f0f0f3;
         }
 
         .gmt-btn {
             cursor: pointer;
-            color: #FAFAFA;
-            margin-left: 0.5rem;
+            color: #f0f0f3;
         }
 
         .currency-btn {
-            margin-left: 1.25rem;
             cursor: pointer;
-            color: #6D6D6D;
+            color: #f0f0f3;
         }
 
         .copy-right {
-            color: var(--font-white-color);
+            color: #f4f4f4;
+            white-space: nowrap;
         }
     }
 
     .right-part-wrapper .item-gmt {
-        margin-left: 3rem;
-        margin-right: 1.25rem;
+        display: flex;
+        align-items: center;
+        column-gap: 1.25rem;
+        white-space: nowrap;
     }
 
 
@@ -1999,12 +2030,15 @@ button {
 @media screen and (max-width: 768px) {
     .common-footer-wrapper {
         background-color: #fff;
+        padding: 0;
 
         .footer-line {
+            margin: 3rem 0 2rem 0;
             border-top: .125rem solid #eaeaea;
         }
 
         .bottom-copy-right-content {
+            padding-top: 0;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -2031,6 +2065,8 @@ button {
             .right-part-wrapper {
                 row-gap: 1rem;
                 flex-direction: column;
+                margin-left: 0;
+                column-gap: 0;
 
                 .language-btn {
                     color: #6D6D6DCC;
@@ -2068,11 +2104,13 @@ button {
         }
 
         .footer-content {
+            margin: 0 auto;
             flex-direction: column;
             gap: 3.75rem;
         }
 
         .footer-item-content {
+            width: 100%;
             gap: 1.25rem;
             align-items: flex-start;
         }
