@@ -1,6 +1,7 @@
 const headerJoinButton = document.getElementById('header-join');
 const headerSignInButton = document.getElementById('header-signin');
 const signin = document.getElementById('signin');
+const signinContainer = signin ? signin.querySelector('.signin-container') : null;
 const signinCloseButton = document.getElementById('signin-close');
 const signinBackButton = document.getElementById('signin-back');
 const body = document.getElementsByTagName('body')[0];
@@ -114,10 +115,16 @@ function displaySigninPage() {
     resetpwd.style.display = 'none';
     login.style.display = 'none';
     const lastSigninType = signinNavArray[signinNavArray.length - 1];
+    if (signinContainer) {
+        const isRegist = lastSigninType === 'regist';
+        signinContainer.classList.toggle('signin-container-regist', isRegist);
+        signinContainer.classList.toggle('signin-container-login', !isRegist);
+    }
     if (lastSigninType === 'login') {
         login.style.display = 'flex';
         showLogin();
     } else if (lastSigninType === 'regist') {
+        syncRegistContent();
         regist.style.display = 'flex';
         showRegist();
     } else if (lastSigninType === 'resetpwd') {
@@ -171,6 +178,49 @@ function showRegist() {
         displaySigninPage();
         displayBackButton();
     });
+}
+
+function syncRegistContent() {
+    const regist = document.getElementById('signin-regist');
+    if (!regist) return;
+    const titleList = regist.querySelectorAll('.signin-form-title');
+    if (titleList[0]) titleList[0].textContent = 'First Name';
+    if (titleList[1]) titleList[1].textContent = 'Last Name';
+    if (titleList[2]) titleList[2].textContent = 'Email Address';
+    if (titleList[3]) titleList[3].textContent = 'Password';
+
+    const passwordInput = regist.querySelector('.regist-account-password');
+    if (passwordInput) {
+        passwordInput.setAttribute('placeholder', 'Enter password');
+    }
+    const firstNameInput = regist.querySelector('#firstname');
+    if (firstNameInput) {
+        firstNameInput.setAttribute('placeholder', 'First name');
+    }
+    const lastNameInput = regist.querySelector('#lastname');
+    if (lastNameInput) {
+        lastNameInput.setAttribute('placeholder', 'Last Name');
+    }
+    const countryPlaceholder = regist.querySelector('.filter-custom-select-text.placeholder');
+    if (countryPlaceholder) {
+        countryPlaceholder.textContent = 'Select Country';
+    }
+    const splitText = regist.querySelector('.signin-line-text');
+    if (splitText) {
+        splitText.textContent = 'or';
+    }
+    const otherwayText = regist.querySelector('#signin-regist-login .signin-otherway-text');
+    if (otherwayText) {
+        otherwayText.textContent = 'Already registered to Fastresp?';
+    }
+    const agree1 = regist.querySelector('#agree1');
+    if (agree1) {
+        agree1.checked = true;
+    }
+    const agree2 = regist.querySelector('#agree2');
+    if (agree2) {
+        agree2.checked = false;
+    }
 }
 
 function showResetpwd() {
