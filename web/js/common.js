@@ -522,6 +522,17 @@ $(document).ready(function () {
         $icon.data('like', like ? 0 : 1)
         syncAixinState($icon)
     })
+    function closeCenterWrapper() {
+        const modalBody = document.body;
+        const modalHtml = document.documentElement;
+        const $centerWrapper = $('.center-wrapper');
+        if ($centerWrapper.is(':visible')) {
+            modalBody.classList.toggle('modal-open', false);
+            modalHtml.classList.toggle('modal-open', false);
+            $centerWrapper.hide();
+        }
+    }
+
     $('.header-avatar').on('click', function () {
         const modalBody = document.body;
         const modalHtml = document.documentElement;
@@ -540,11 +551,15 @@ $(document).ready(function () {
         $('.center-wrapper').show()
     })
     $('.center-wrapper .close-icon').on('click', function () {
-        const modalBody = document.body;
-        const modalHtml = document.documentElement;
-        modalBody.classList.toggle('modal-open', false);
-        modalHtml.classList.toggle('modal-open', false);
-        $('.center-wrapper').hide()
+        closeCenterWrapper()
+    })
+    $(document).on('click', function (e) {
+        const $target = $(e.target);
+        const isInCenterWrapper = $target.closest('.center-wrapper').length > 0;
+        const isOnAvatarTrigger = $target.closest('.header-avatar').length > 0;
+        if (!isInCenterWrapper && !isOnAvatarTrigger) {
+            closeCenterWrapper();
+        }
     })
     $('.icon-arrow_up').on('click', function () {
         $(this).parents('.account-item-center').toggleClass('account-item-center-hide')
