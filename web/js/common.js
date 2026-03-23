@@ -523,6 +523,16 @@ $(document).ready(function () {
         syncAixinState($icon)
     })
     $('.header-avatar').on('click', function () {
+        const $centerWrapper = $('.center-wrapper');
+        $centerWrapper.find('.account-item-center').removeClass('account-item-center-hide');
+        $centerWrapper.find('.account-content-wrapper').scrollTop(0);
+        $centerWrapper.find('.store-center .title').text('Store center');
+        $centerWrapper.find('.member-center .other-wrapper').each(function () {
+            const $otherWrapper = $(this);
+            if ($otherWrapper.find('.home-menu-other-text.logout-text').length === 0) {
+                $otherWrapper.append('<p class="home-menu-other-text logout-text">logout</p>');
+            }
+        });
         $('.center-wrapper').show()
     })
     $('.center-wrapper .close-icon').on('click', function () {

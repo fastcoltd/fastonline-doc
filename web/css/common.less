@@ -1347,23 +1347,26 @@ button {
 
 .center-wrapper {
     display: none;
-    width: 46.875rem;
+    width: 53.25rem;
     height: 86rem;
     position: fixed;
-    top: 9rem;
-    margin-right: -1.25rem;
+    top: 9.5rem;
     right: calc((100vw - var(--container-width)) / 2);
-    z-index: 200;
+    z-index: 250;
     background-color: #fff;
-    padding: 0 1rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 0 0.75rem rgba(0, 0, 0, 0.06);
+    padding: 2.5rem;
     overflow: hidden;
+    margin-right: 0;
 
     .account-top-wrapper {
+        width: 100%;
+        height: 5rem;
         display: flex;
         align-items: center;
-        justify-content: center;
-        padding: 2.5rem 1.5rem;
-        overflow-y: auto;
+        justify-content: flex-start;
+        padding: 0;
     }
 
     .avatar-box {
@@ -1382,28 +1385,36 @@ button {
 
     .account-info-box {
         flex: 1;
-        padding: 1.25rem;
+        min-height: 5rem;
+        padding: 0 0 0 1.25rem;
         box-sizing: border-box;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
 
         .name {
+            font-family: var(--primary-popfont);
             font-size: 1.875rem;
             font-weight: 600;
             color: #000;
-            padding-bottom: 1rem;
+            line-height: 2.5rem;
+            padding-bottom: 0.125rem;
         }
 
         .email {
+            font-family: var(--primary-popfont);
             font-weight: 400;
             font-size: 1.5rem;
             color: #6D6D6D;
-            padding-bottom: 1rem;
+            line-height: 2.25rem;
+            padding-bottom: 0;
         }
 
         .close-icon {
             position: absolute;
-            right: 1.5rem;
-            top: 3rem;
+            right: 0;
+            top: 1.25rem;
             cursor: pointer;
             width: 3rem;
             height: 3rem;
@@ -1463,26 +1474,58 @@ button {
     }
 
     .account-content-wrapper {
-        height: calc(100% - 15.5rem);
-        padding: 2rem 1.5rem;
+        width: 48.25rem;
+        height: 71rem;
+        margin-top: 2.5rem;
+        padding: 2.5rem 0 0 0;
         box-sizing: border-box;
         overflow-y: auto;
         display: flex;
         align-items: flex-start;
         justify-content: flex-start;
+        column-gap: 5rem;
         border-top: 0.125rem solid #f4f4f4;
+        position: relative;
+        scrollbar-width: thin;
+        scrollbar-color: #C5C5C5 transparent;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 25.974rem;
+            width: 0.125rem;
+            background-color: #F4F4F4;
+            pointer-events: none;
+        }
+
+        &::-webkit-scrollbar {
+            width: 0.75rem;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #C5C5C5;
+            border-radius: 0.5rem;
+        }
 
 
         .store-center {
-            width: 50%;
+            width: 21rem;
             box-sizing: border-box;
-            padding: 2.5rem 1.5rem 3rem;
+            padding: 0;
 
             .title-wrapper {
+                font-family: var(--primary-popfont);
                 font-size: 2rem;
-                color: #FF7A02;
-                font-weight: 600;
-                padding-bottom: 2rem;
+                line-height: 2.9rem;
+                color: #000;
+                font-weight: 500;
+                padding-bottom: 1.5rem;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
@@ -1496,32 +1539,38 @@ button {
             &.account-item-center-hide {
                 .title-wrapper {
                     .icon-arrow_up {
-                        transform: rotate(180deg);
+                        display: none;
                     }
                 }
 
                 .store-center-list {
-                    display: none;
+                    display: flex;
                 }
             }
 
-            .store-center-list {}
+            .store-center-list {
+                display: flex;
+                flex-direction: column;
+                row-gap: 1.25rem;
+            }
 
             .store-center-li {
                 width: 100%;
                 display: flex;
                 align-items: center;
-                margin-bottom: 1.5rem;
+                margin-bottom: 0;
             }
 
             .icon {
-                width: 2.5rem;
-                height: 2.5rem;
+                display: none;
             }
 
             .name {
+                font-family: var(--primary-popfont);
                 font-size: 1.75rem;
-                padding-left: 1rem;
+                line-height: 2.5375rem;
+                color: #6D6D6D;
+                padding-left: 0;
                 flex: 1;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -1530,16 +1579,18 @@ button {
         }
 
         .member-center {
-            width: 50%;
+            width: 21rem;
             box-sizing: border-box;
-            padding: 2rem 1.5rem;
-            border-left: 0.125rem solid #f4f4f4;
+            padding: 0;
+            border-left: none;
 
             .title-wrapper {
+                font-family: var(--primary-popfont);
                 font-size: 2rem;
-                color: #06C70C;
-                font-weight: 600;
-                padding-bottom: 2rem;
+                line-height: 2.9rem;
+                color: #000;
+                font-weight: 500;
+                padding-bottom: 1.5rem;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
@@ -1553,32 +1604,38 @@ button {
             &.account-item-center-hide {
                 .title-wrapper {
                     .icon-arrow_up {
-                        transform: rotate(180deg);
+                        display: none;
                     }
                 }
 
                 .member-center-list {
-                    display: none;
+                    display: flex;
                 }
             }
 
-            .member-center-list {}
+            .member-center-list {
+                display: flex;
+                flex-direction: column;
+                row-gap: 1.25rem;
+            }
 
             .member-center-li {
                 width: 100%;
                 display: flex;
                 align-items: center;
-                margin-bottom: 1.5rem;
+                margin-bottom: 0;
             }
 
             .icon {
-                width: 2.5rem;
-                height: 2.5rem;
+                display: none;
             }
 
             .name {
+                font-family: var(--primary-popfont);
                 font-size: 1.75rem;
-                padding-left: 1rem;
+                line-height: 2.5375rem;
+                color: #6D6D6D;
+                padding-left: 0;
                 flex: 1;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -1587,7 +1644,7 @@ button {
         }
 
         .other-wrapper {
-            padding-top: 1.5rem;
+            padding-top: 2.5rem;
 
             .split-line {
                 border-top: 0.125rem solid #F4F4F4;
@@ -1597,11 +1654,12 @@ button {
                 width: 100%;
                 font-family: var(--primary-popfont);
                 font-size: 2rem;
-                line-height: 3rem;
-                color: #6D6D6D;
+                line-height: 2.9rem;
+                color: #000;
                 font-weight: 400;
                 cursor: pointer;
-                padding-top: 2rem;
+                padding-top: 0;
+                margin-top: 2.5rem;
             }
         }
     }
