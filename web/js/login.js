@@ -162,6 +162,7 @@ function displaySigninPage() {
         twofa.style.display = 'flex';
         show2fa();
     } else if (lastSigninType === 'reset2fa') {
+        syncReset2faContent();
         reset2fa.style.display = 'flex';
         showReset2fa();
     }
@@ -248,6 +249,31 @@ function syncRegistContent() {
     const agree2 = regist.querySelector('#agree2');
     if (agree2) {
         agree2.checked = false;
+    }
+}
+
+function syncReset2faContent() {
+    const reset2fa = document.getElementById('signin-reset-2fa');
+    if (!reset2fa) return;
+
+    const tip = reset2fa.querySelector('.signin-form-tip');
+    if (tip) {
+        tip.textContent = 'We have sent a 2FA reset email to jean***********@yahoo.com';
+    }
+
+    const timeText = reset2fa.querySelector('.signin-form-time');
+    if (timeText) {
+        timeText.textContent = 'Send 30s';
+    }
+
+    const submitButton = reset2fa.querySelector('.signin-form-button');
+    if (submitButton) {
+        submitButton.textContent = 'Verify';
+    }
+
+    const splitText = reset2fa.querySelector('.signin-line-text');
+    if (splitText) {
+        splitText.textContent = 'or';
     }
 }
 
