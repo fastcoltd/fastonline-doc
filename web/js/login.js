@@ -79,7 +79,7 @@ loginForm.addEventListener('submit', function (e) {
         twofaCodeErrTipEle.style.display = 'none';
         twofaCodeErrTipEle.textContent = '';
     }
-    updateSigninNavArray('2fa');
+    signinNavArray = ['login', '2fa'];
     displaySigninPage();
     displayBackButton();
 })
@@ -141,8 +141,10 @@ function displaySigninPage() {
     const lastSigninType = signinNavArray[signinNavArray.length - 1];
     if (signinContainer) {
         const isRegist = lastSigninType === 'regist';
+        const isTwoStep = lastSigninType === '2fa' || lastSigninType === 'reset2fa';
         signinContainer.classList.toggle('signin-container-regist', isRegist);
-        signinContainer.classList.toggle('signin-container-login', !isRegist);
+        signinContainer.classList.toggle('signin-container-2fa', isTwoStep);
+        signinContainer.classList.toggle('signin-container-login', !isRegist && !isTwoStep);
     }
     if (lastSigninType === 'login') {
         login.style.display = 'flex';
