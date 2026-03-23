@@ -5,6 +5,7 @@ const signinContainer = signin ? signin.querySelector('.signin-container') : nul
 const signinCloseButton = document.getElementById('signin-close');
 const signinBackButton = document.getElementById('signin-back');
 const body = document.getElementsByTagName('body')[0];
+const html = document.documentElement;
 const loginForm = document.getElementById('signin-login-form');
 const twofaForm = document.getElementById('signin-2fa-form');
 const loginAccoutErrTipEle = document.getElementById('signin-login-accout-tip');
@@ -54,6 +55,23 @@ function generateDropdownHtml(item) {
 }
 let user = null
 let loginSuccess = false
+
+function toggleSigninModalOpen(isOpen) {
+    if (!body) {
+        return;
+    }
+    if (isOpen) {
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        body.style.setProperty('--scrollbar-width', `${Math.max(0, scrollbarWidth)}px`);
+    } else {
+        body.style.removeProperty('--scrollbar-width');
+    }
+    body.classList.toggle('modal-open', isOpen);
+    if (html) {
+        html.classList.toggle('modal-open', isOpen);
+    }
+}
+
 function doSigninAction(errorTipEle) {
     if (!loginSuccess) {
         if (errorTipEle) {
@@ -65,7 +83,7 @@ function doSigninAction(errorTipEle) {
     }
     window.user = new UserInfo('Test', 'https://avatars.githubusercontent.com/u/10436682?v=4', 'fastresp@163.com', '10436682', 1, new Date('1998-01-01'), 'China');
     signin.style.display = 'none';
-    body.classList.toggle('modal-open', false);
+    toggleSigninModalOpen(false);
     dismissHomeMenuPage();
     refreshHeaderUserUI();
 }
@@ -98,7 +116,7 @@ let registRemember2 = false
 
 signinCloseButton.addEventListener('click', function () {
     signin.style.display = 'none';
-    body.classList.toggle('modal-open', false);
+    toggleSigninModalOpen(false);
 });
 
 function showJoinFn() {
@@ -174,7 +192,7 @@ function setup() {
     registRemember2 = false;
 
 
-    body.classList.toggle('modal-open', true);
+    toggleSigninModalOpen(true);
     signin.style.display = 'flex';
 
     displayBackButton();
