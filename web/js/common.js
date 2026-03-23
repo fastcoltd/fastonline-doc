@@ -523,19 +523,13 @@ $(document).ready(function () {
         syncAixinState($icon)
     })
     function closeCenterWrapper() {
-        const modalBody = document.body;
-        const modalHtml = document.documentElement;
         const $centerWrapper = $('.center-wrapper');
         if ($centerWrapper.is(':visible')) {
-            modalBody.classList.toggle('modal-open', false);
-            modalHtml.classList.toggle('modal-open', false);
             $centerWrapper.hide();
         }
     }
 
     $('.header-avatar').on('click', function () {
-        const modalBody = document.body;
-        const modalHtml = document.documentElement;
         const $centerWrapper = $('.center-wrapper');
         $centerWrapper.find('.account-item-center').removeClass('account-item-center-hide');
         $centerWrapper.find('.account-content-wrapper').scrollTop(0);
@@ -546,8 +540,6 @@ $(document).ready(function () {
                 $otherWrapper.append('<p class="home-menu-other-text logout-text">logout</p>');
             }
         });
-        modalBody.classList.toggle('modal-open', true);
-        modalHtml.classList.toggle('modal-open', true);
         $('.center-wrapper').show()
     })
     $('.center-wrapper .close-icon').on('click', function () {
