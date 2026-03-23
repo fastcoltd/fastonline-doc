@@ -10,6 +10,16 @@
 - 根目录 `*.html` 不作为手工修改入口，必须通过构建生成。
 - 如果需要复用内容，使用 include 占位：
   - `<!-- @include ../partials/xxx.html -->`
+- 对于跨模块重复子结构（例如评分组件），必须优先抽到 `src/partials/components`。
+- 允许 partial 嵌套 include（partial 内继续 include 组件 partial）。
+- 存在文案/数值差异时，使用 include 参数（JSON）传值，避免复制整段结构。
+
+示例：
+
+```html
+<!-- @include ../partials/components/rating-score-only.html {"width":"84%","score":"4.2"} -->
+<!-- @include ../partials/components/rating-with-count.html {"width":"83%","score":"4.3","recommend":"(200)"} -->
+```
 
 ## 3. 构建与预览
 - 单次构建（将源码编译到根目录）：
@@ -34,3 +44,5 @@ node scripts/watch-pages.js
 ## 5. 后续扩展建议
 - 新增可复用模块时，优先放到 `src/partials`。
 - 页面内仅保留 include 占位，减少重复代码和多处维护成本。
+- 组件目录建议：`src/partials/components`。
+- 命名建议：`业务-组件-状态`，例如 `rating-with-count`、`rating-score-only`。

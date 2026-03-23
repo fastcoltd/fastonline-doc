@@ -7,9 +7,46 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 const SRC_PAGES_DIR = path.join(ROOT_DIR, "src", "pages");
 const INCLUDE_RE = /<!--\s*@include\s+(.+?)\s*-->/g;
 
+function parseIncludeDirective(rawRef, filePath) {
+  const trimmed = rawRef.trim();
+  const jsonStart = trimmed.indexOf("{");
+
+  let includeRef = trimmed;
+  let vars = {};
+
+  if (jsonStart !== -1) {
+    includeRef = trimmed.slice(0, jsonStart).trim();
+    const jsonText = trimmed.slice(jsonStart).trim();
+    try {
+      vars = JSON.parse(jsonText);
+    } catch (error) {
+      throw new Error(
+        `Invalid include params JSON in ${path.relative(
+          ROOT_DIR,
+          filePath
+        )}: ${jsonText}`
+      );
+    }
+  }
+
+  includeRef = includeRef.replace(/^['"]|['"]$/g, "");
+  if (!includeRef) {
+    throw new Error(`Include path is empty in ${path.relative(ROOT_DIR, filePath)}`);
+  }
+
+  return { includeRef, vars };
+}
+
+function applyTemplateVars(content, vars) {
+  return content.replace(/{{\s*([A-Za-z0-9_.-]+)\s*}}/g, (_, key) => {
+    const value = vars[key];
+    return value === undefined || value === null ? "" : String(value);
+  });
+}
+
 function resolveIncludes(filePath, content, stack = []) {
   return content.replace(INCLUDE_RE, (_, rawRef) => {
-    const includeRef = rawRef.trim().replace(/^['"]|['"]$/g, "");
+    const { includeRef, vars } = parseIncludeDirective(rawRef, filePath);
     const includePath = path.resolve(path.dirname(filePath), includeRef);
 
     if (stack.includes(includePath)) {
@@ -27,7 +64,8 @@ function resolveIncludes(filePath, content, stack = []) {
     }
 
     const includeContent = fs.readFileSync(includePath, "utf8");
-    return resolveIncludes(includePath, includeContent, [...stack, includePath]);
+    const resolvedContent = resolveIncludes(includePath, includeContent, [...stack, includePath]);
+    return applyTemplateVars(resolvedContent, vars);
   });
 }
 
