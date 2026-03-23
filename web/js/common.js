@@ -523,6 +523,8 @@ $(document).ready(function () {
         syncAixinState($icon)
     })
     $('.header-avatar').on('click', function () {
+        const modalBody = document.body;
+        const modalHtml = document.documentElement;
         const $centerWrapper = $('.center-wrapper');
         $centerWrapper.find('.account-item-center').removeClass('account-item-center-hide');
         $centerWrapper.find('.account-content-wrapper').scrollTop(0);
@@ -533,9 +535,15 @@ $(document).ready(function () {
                 $otherWrapper.append('<p class="home-menu-other-text logout-text">logout</p>');
             }
         });
+        modalBody.classList.toggle('modal-open', true);
+        modalHtml.classList.toggle('modal-open', true);
         $('.center-wrapper').show()
     })
     $('.center-wrapper .close-icon').on('click', function () {
+        const modalBody = document.body;
+        const modalHtml = document.documentElement;
+        modalBody.classList.toggle('modal-open', false);
+        modalHtml.classList.toggle('modal-open', false);
         $('.center-wrapper').hide()
     })
     $('.icon-arrow_up').on('click', function () {
