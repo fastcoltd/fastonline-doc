@@ -138,6 +138,8 @@ function displaySigninPage() {
     regist.style.display = 'none';
     resetpwd.style.display = 'none';
     login.style.display = 'none';
+    twofa.style.display = 'none';
+    reset2fa.style.display = 'none';
     const lastSigninType = signinNavArray[signinNavArray.length - 1];
     if (signinContainer) {
         const isRegist = lastSigninType === 'regist';
