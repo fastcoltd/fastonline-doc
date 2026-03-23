@@ -12,3 +12,4 @@
 - 所有.css 的修改，需要同步到.less（如果有），保持源码与编译产物一致
 - 在修改或者开发完成以后，不需要调用chrome mcp来确认结果是否 1：1 还原，我会自己确认
 - 在完成代码修改后，需要检查是否有语法错误，避免出错
+- HTML 修改必须遵循 `rules/source_build_rule.md`：只改 `src/pages`/`src/partials` 源码，根目录 `*.html` 通过 `node scripts/build-pages.js` 生成，不允许只改根目录产物
