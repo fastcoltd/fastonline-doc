@@ -274,13 +274,32 @@ function refreshHeaderUserUI() {
     const signinButtonEle = document.getElementById('header-signin');
     const headerJoinButton = document.getElementById('header-join');
     const headerUser = document.getElementById('header-user');
+    if (!signinButtonEle || !headerJoinButton || !headerUser) {
+        return;
+    }
     signinButtonEle.style.display = !user ? '' : 'none';
     headerJoinButton.style.display = !user ? '' : 'none';
     headerUser.style.display = !user ? 'none' : '';
 
+    const badgeEle = headerUser.querySelector('.badge');
+    if (badgeEle) {
+        badgeEle.textContent = '20';
+    }
+
     if (user) {
-        // const headerUserAvatar = headerUser.querySelector('.header-user-icon');
-        // headerUserAvatar.src = user.avatar;
+        const avatarTextEle = headerUser.querySelector('.header-user-avatar-box');
+        const avatarImageEle = headerUser.querySelector('.header-user-icon');
+        let avatarLabel = 'E';
+        if (typeof user === 'object' && user !== null && user.name) {
+            avatarLabel = user.name.trim().charAt(0).toUpperCase() || 'E';
+        }
+        if (avatarTextEle) {
+            avatarTextEle.textContent = avatarLabel;
+            avatarTextEle.style.display = 'flex';
+        }
+        if (avatarImageEle) {
+            avatarImageEle.style.display = 'none';
+        }
     }
 }
 function setSearchData() {
