@@ -6,7 +6,9 @@ const signinCloseButton = document.getElementById('signin-close');
 const signinBackButton = document.getElementById('signin-back');
 const body = document.getElementsByTagName('body')[0];
 const loginForm = document.getElementById('signin-login-form');
+const twofaForm = document.getElementById('signin-2fa-form');
 const loginAccoutErrTipEle = document.getElementById('signin-login-accout-tip');
+const twofaCodeErrTipEle = document.getElementById('signin-2fa-code-tip');
 let countryList = [
     { value: 'china', text: 'China' },
     { value: 'english', text: 'English' }
@@ -52,11 +54,12 @@ function generateDropdownHtml(item) {
 }
 let user = null
 let loginSuccess = false
-loginForm.addEventListener('submit', function (e) {
-    e.preventDefault();
+function doSigninAction(errorTipEle) {
     if (!loginSuccess) {
-        loginAccoutErrTipEle.style.display = '';
-        loginAccoutErrTipEle.textContent = '请输入正确账号';
+        if (errorTipEle) {
+            errorTipEle.style.display = '';
+            errorTipEle.textContent = '请输入正确账号';
+        }
         loginSuccess = true;
         return;
     }
@@ -65,7 +68,28 @@ loginForm.addEventListener('submit', function (e) {
     body.classList.toggle('modal-open', false);
     dismissHomeMenuPage();
     refreshHeaderUserUI();
+}
+
+loginForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (loginAccoutErrTipEle) {
+        loginAccoutErrTipEle.style.display = 'none';
+    }
+    if (twofaCodeErrTipEle) {
+        twofaCodeErrTipEle.style.display = 'none';
+        twofaCodeErrTipEle.textContent = '';
+    }
+    updateSigninNavArray('2fa');
+    displaySigninPage();
+    displayBackButton();
 })
+
+if (twofaForm) {
+    twofaForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        doSigninAction(twofaCodeErrTipEle);
+    })
+}
 
 let signinNavArray = []
 let loginRemember = false
