@@ -25,11 +25,20 @@ class PageLayout {
         this.currentLayout = layout;
         const container = document.querySelectorAll('.items-container');
         const buttons = document.querySelectorAll('.layout-switch');
+        const splitContainers = document.querySelectorAll('.items-container[data-layout]');
 
         // 更新按钮状态
         buttons.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.layout === layout);
         });
+
+        // item-all 页面的横竖屏独立结构：按 data-layout 切换容器显示
+        if (splitContainers.length > 0) {
+            splitContainers.forEach(item => {
+                item.classList.toggle('is-active', item.dataset.layout === layout);
+            });
+            return;
+        }
 
         // 更新容器类名
         container.forEach(item => {

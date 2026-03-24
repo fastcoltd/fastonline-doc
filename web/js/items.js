@@ -30,10 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
     this.layout = new PageLayout();
     //   this.sort = new SortSelector();
     $('.load-more').on('click', function () {
-        let htmlStr = $('.item-all-items-pager').html()
         $('.loading').show()
         setTimeout(() => {
-            $('.item-all-items-pager').append(htmlStr)
+            $('.item-all-items-pager').each(function () {
+                const htmlStr = $(this).html();
+                $(this).append(htmlStr);
+            });
             $('.loading').hide()
         }, 2000)
     })
