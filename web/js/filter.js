@@ -109,6 +109,9 @@ $(document).ready(function () {
     })
     $(document).on('blur', '.filter-input', function () {
         filterCount()
+        if ($(this).hasClass('price-input') || $(this).hasClass('number-input')) {
+            updateSpinnerState(this)
+        }
     })
     function filterCount() {
         let count = selectedTags.size + selectedAttrs.size
@@ -203,6 +206,7 @@ $(document).ready(function () {
         selectedAttrs.clear();
         $('.page-sort-icon').attr('data-value', '')
         filterCount()
+        updateAllSpinnerStates()
         startFitterData()
     })
     function startFitterData() {
@@ -255,6 +259,9 @@ $(document).ready(function () {
         input.addEventListener('input', function () {
             validateInput(this);
             restrictNumberInput(this);
+            if (this.classList.contains('price-input') || this.classList.contains('number-input')) {
+                updateSpinnerState(this);
+            }
         });
 
         // 阻止非数字字符输入（针对数字类型输入框）
@@ -285,6 +292,110 @@ $(document).ready(function () {
             }
         });
     });
+
+    // Spinner icon click: top half increases, bottom half decreases
+    $(document).on('click', '.item-all-filter-container .filter-currency-icon, .item-all-filter-container .filter-number-icon', function (e) {
+        const inputWrapper = this.closest('.filter-price-input, .filter-number-input');
+        if (!inputWrapper) return;
+
+        const input = inputWrapper.querySelector('.filter-input');
+        if (!input) return;
+
+        const rect = this.getBoundingClientRect();
+        const clickOffsetY = e.clientY - rect.top;
+        const isIncrease = clickOffsetY <= rect.height / 2;
+
+        if (!isIncrease && getInputNumericValue(input) <= 0) {
+            updateSpinnerState(input);
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
+        applySpinnerStep(input, isIncrease);
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    function applySpinnerStep(input, isIncrease) {
+        const stepAttr = input.getAttribute('step');
+        const minAttr = input.getAttribute('min');
+        const maxAttr = input.getAttribute('max');
+
+        const step = Number.parseFloat(stepAttr);
+        const min = Number.parseFloat(minAttr);
+        const max = Number.parseFloat(maxAttr);
+
+        const safeStep = Number.isFinite(step) && step > 0 ? step : 1;
+        const hasMin = Number.isFinite(min);
+        const hasMax = Number.isFinite(max);
+        const precision = getStepPrecision(safeStep);
+
+        let current = Number.parseFloat(input.value);
+        if (!Number.isFinite(current)) {
+            current = hasMin ? min : 0;
+        }
+
+        let next = isIncrease ? (current + safeStep) : (current - safeStep);
+
+        if (hasMin && next < min) {
+            next = min;
+        }
+        if (hasMax && next > max) {
+            next = max;
+        }
+
+        if (precision > 0) {
+            next = Number.parseFloat(next.toFixed(precision));
+        }
+
+        if (input.classList.contains('number-input')) {
+            next = Math.round(next);
+        }
+
+        input.value = formatSpinnerValue(next, precision, input.classList.contains('number-input'));
+        validateInput(input);
+        restrictNumberInput(input);
+        updateSpinnerState(input);
+        filterCount();
+    }
+
+    function getInputNumericValue(input) {
+        const parsed = Number.parseFloat(input.value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function updateSpinnerState(input) {
+        const inputWrapper = input.closest('.filter-price-input, .filter-number-input');
+        if (!inputWrapper) return;
+
+        const spinner = inputWrapper.querySelector('.filter-currency-icon, .filter-number-icon');
+        if (!spinner) return;
+
+        spinner.classList.toggle('decrease-disabled', getInputNumericValue(input) <= 0);
+    }
+
+    function updateAllSpinnerStates() {
+        document.querySelectorAll('.item-all-filter-container .price-input, .item-all-filter-container .number-input').forEach(function (input) {
+            updateSpinnerState(input);
+        });
+    }
+
+    function getStepPrecision(step) {
+        const stepText = String(step);
+        const decimalIndex = stepText.indexOf('.');
+        return decimalIndex === -1 ? 0 : (stepText.length - decimalIndex - 1);
+    }
+
+    function formatSpinnerValue(value, precision, isInteger) {
+        if (isInteger) {
+            return String(Math.round(value));
+        }
+        if (precision <= 0) {
+            return String(value);
+        }
+        return value.toFixed(precision).replace(/\.?0+$/, '');
+    }
 
     // Custom select functionality
     customSelects.forEach(function (select) {
@@ -765,4 +876,5 @@ $(document).ready(function () {
     // `;
     // document.head.appendChild(style);
 
+    updateAllSpinnerStates();
 })
