@@ -9,6 +9,7 @@ const footerHeight = footer.offsetHeight;
 const listContainer = document.querySelector('.list-container-page-scoll')
 
 window.addEventListener('scroll', updateStickyHeader, { passive: true });
+window.addEventListener('resize', adjustFilterPosition);
 
 // 页面加载时调整位置
 document.addEventListener('DOMContentLoaded', adjustFilterPosition);
@@ -26,6 +27,18 @@ function updateStickyHeader() {
 }
 updateStickyHeader();
 
+function syncStickyHorizontalPosition(headIsSticky) {
+    if (!pageFix) return;
+    if (!headIsSticky || !pageContent) {
+        pageFix.style.left = '';
+        pageFix.style.transform = '';
+        return;
+    }
+    const pageContentRect = pageContent.getBoundingClientRect();
+    pageFix.style.left = `${pageContentRect.left}px`;
+    pageFix.style.transform = 'none';
+}
+
 // 动态调整过滤器位置
 function adjustFilterPosition() {
     const body = document.getElementsByTagName('body')[0];
@@ -40,6 +53,7 @@ function adjustFilterPosition() {
             Object.assign(pageFix.style, {
                 position: 'fixed',
                 left: 16 + 'px',
+                transform: 'none',
                 top: stickyHeaderHeight + 20 + 'px',
                 maxHeight: `calc(100vh - ${stickyHeaderHeight + 40}px)`
             });
@@ -47,13 +61,15 @@ function adjustFilterPosition() {
         }
         Object.assign(pageFix.style, {
             position: 'relative',
-            left: 0,
+            left: '',
+            transform: '',
             top: 20 + 'px',
             maxHeight: `calc(100vh - ${stickyHeaderHeight + pageHeadHeight + 40}px)`
         });
         return;
     };
     pageFix.classList.toggle('is-sticky', headIsSticky);
+    syncStickyHorizontalPosition(headIsSticky);
     // 计算页面头部所有固定元素的总高度
     let totalHeight = stickyHeaderHeight;
     if (pageHead && !headIsSticky) {
