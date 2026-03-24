@@ -344,6 +344,20 @@ $(document).ready(function () {
             }
         });
         $(selectElement).toggleClass('active')
+        if ($(selectElement).hasClass('active')) {
+            syncDropdownSelectedState(selectElement)
+        }
+    }
+    function syncDropdownSelectedState(selectElement) {
+        if (!selectElement || !selectElement.dataset) return
+        const dataType = selectElement.dataset.type
+        if (!dataType) return
+        const selectedSet = dataType === 'tag' ? selectedTags : (dataType === 'attribute-value' ? selectedAttrs : null)
+        if (!selectedSet) return
+        selectElement.querySelectorAll('.filter-dropdown-item').forEach(item => {
+            const value = item.getAttribute('data-value')
+            item.classList.toggle('selected', selectedSet.has(value))
+        })
     }
     function generateDropdownHtml(item) {
         let options = selectOptions[item.data('type')]
@@ -354,6 +368,7 @@ $(document).ready(function () {
             class="filter-dropdown-item-text" data-value="${option.value}">${option.text}</span></div>`
             })
             item.find('.filter-dropdown-content').html(htmlStr)
+            syncDropdownSelectedState(item[0])
         }
     }
     function generateAttrVal(val) {
@@ -367,6 +382,7 @@ $(document).ready(function () {
             class="filter-dropdown-item-text" data-value="${option.value}">${option.text}</span></div>`
             })
             $attributeValue.find('.filter-dropdown-content').html(htmlStr)
+            syncDropdownSelectedState($attributeValue[0])
         }
     }
     function addAttr(option) {
@@ -378,7 +394,7 @@ $(document).ready(function () {
         newAttr.innerHTML = `
             <span class="filter-attr-text" data-value="${option.value}">${option.text}</span>
             <svg class="filter-attr-close" width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M9 3L3 9M3 3L9 9" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 3L3 9M3 3L9 9" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         `;
 
@@ -389,6 +405,10 @@ $(document).ready(function () {
         });
 
         attrsContainer.appendChild(newAttr);
+        const attrSelect = document.querySelector('[data-type="attribute-value"]');
+        if (attrSelect) {
+            syncDropdownSelectedState(attrSelect);
+        }
     }
     function addTag(option) {
         selectedTags.add(option.value);
@@ -410,6 +430,10 @@ $(document).ready(function () {
         });
 
         tagsContainer.appendChild(newTag);
+        const tagSelect = document.querySelector('[data-type="tag"]');
+        if (tagSelect) {
+            syncDropdownSelectedState(tagSelect);
+        }
     }
 
     function clearSelect(selectElement) {
@@ -466,6 +490,10 @@ $(document).ready(function () {
                 attr.remove();
                 updateTagsLayout();
                 filterCount()
+                const attrSelect = document.querySelector('[data-type="attribute-value"]');
+                if (attrSelect) {
+                    syncDropdownSelectedState(attrSelect);
+                }
             }, 200);
         }
     }
@@ -488,6 +516,10 @@ $(document).ready(function () {
             setTimeout(function () {
                 tag.remove();
                 updateTagsLayout();
+                const tagSelect = document.querySelector('[data-type="tag"]');
+                if (tagSelect) {
+                    syncDropdownSelectedState(tagSelect);
+                }
             }, 200);
             filterCount()
         }
