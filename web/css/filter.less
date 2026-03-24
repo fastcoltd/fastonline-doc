@@ -803,17 +803,24 @@ body.scroll-disabled {
         }
         .filter-content {
             overflow-y: visible;
+            width: 40.375rem;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
         }
         .filter-group {
-            padding: 2.5rem 0;
+            width: 100%;
+            padding: 0;
         }
         .filter-group.filter-group-bottom-half {
-            padding-bottom: 2.5rem;
+            padding-bottom: 0;
+            margin-bottom: 2.5rem;
         }
         .filter-group.filter-group-top-half {
-            padding-top: 2.5rem;
+            padding-top: 0;
         }
         .filter-group-header {
+            height: 3rem;
             margin-bottom: 2rem;
         }
         .filter-group-title {
@@ -824,6 +831,17 @@ body.scroll-disabled {
         }
         .filter-group-content {
             gap: 2rem;
+        }
+        .filter-content > .filter-group:first-child .filter-group-header {
+            justify-content: flex-start;
+            cursor: default;
+            pointer-events: none;
+        }
+        .filter-content > .filter-group:first-child .filter-expand-icon {
+            display: none;
+        }
+        .filter-content > .filter-group:first-child .filter-group-content {
+            gap: 0;
         }
         .filter-group-content.filter-group-content-attr {
             display: flex;
@@ -838,6 +856,7 @@ body.scroll-disabled {
         .filter-input,
         .filter-custom-select-trigger {
             height: 4.625rem;
+            border: 0.125rem solid #C5C5C5;
             border-radius: 1.25rem;
             padding: 1.5rem;
         }
@@ -847,11 +866,55 @@ body.scroll-disabled {
             font-weight: 400;
             line-height: 2.625rem;
         }
+        .filter-input::placeholder {
+            color: #6D6D6D;
+        }
+        .filter-custom-select-trigger {
+            align-items: center;
+        }
         .filter-custom-select-text {
             font-family: 'Inter', var(--primary-popfont);
             font-size: 1.875rem;
             font-weight: 400;
             line-height: 2.625rem;
+        }
+        .filter-custom-select-text.placeholder {
+            color: #6D6D6D;
+        }
+        .filter-expand-icon,
+        .filter-select-arrow {
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .filter-expand-icon .iconfont,
+        .filter-select-arrow .iconfont {
+            display: none;
+        }
+        .filter-expand-icon::before,
+        .filter-select-arrow::before {
+            content: '';
+            display: block;
+            width: 0.75rem;
+            height: 0.75rem;
+            border-right: 0.1875rem solid #000;
+            border-bottom: 0.1875rem solid #000;
+            transform: rotate(-135deg);
+            box-sizing: border-box;
+        }
+        .filter-select-arrow::before {
+            border-color: #6D6D6D;
+        }
+        .filter-custom-select.disabled .filter-custom-select-trigger {
+            border-color: #F4F4F4;
+        }
+        .filter-custom-select.disabled .filter-custom-select-text {
+            color: #C5C5C5;
+        }
+        .filter-custom-select.disabled .filter-select-arrow::before {
+            border-color: #C5C5C5;
         }
         .filter-tags,
         .filter-attrs {
@@ -885,13 +948,27 @@ body.scroll-disabled {
             background: #D9D9D9;
             flex-shrink: 0;
         }
+        .filter-currency-icon,
+        .filter-number-icon {
+            right: 1.5rem;
+            font-size: 1.5rem;
+            line-height: 1.5rem;
+            color: #AAA;
+        }
+        .filter-number-icon {
+            color: #C5C5C5;
+        }
         .filter-divider {
             border: 0;
             height: 0.125rem;
             background: #E5E5E5;
+            width: 100%;
+            margin: 2.5rem 0;
         }
         .filter-footer {
             margin-top: 2.5rem;
+            width: 40.375rem;
+            max-width: 100%;
         }
         .filter-apply-btn {
             height: 6rem;
