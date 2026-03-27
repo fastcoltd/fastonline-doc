@@ -25,6 +25,14 @@
     <link rel="stylesheet" href="css/signin.css" />
     <link rel="stylesheet" href="css/page.css" />
     <link rel="stylesheet" href="css/demand.css" />
+    <style>
+@media screen and (min-width: 769px), (hover: hover) and (pointer: fine) {
+            .layout-vertical.items-container.demand-all-figma-container .demand-item .item-button-box.demand-all-figma-button {
+                margin-top: calc(2.75rem + 20px) !important;
+                height: 50px !important;
+            }
+        }
+    </style>
 </head>
 
 <body style="background: white;">
@@ -3995,6 +4003,17 @@
     <script src="js/pagelist.js"></script>
     <script src="js/pagination.js"></script>
     <script src="js/demandpage.js"></script>
+    <script>
+        (function () {
+            var isDesktop = window.matchMedia('screen and (min-width: 769px), (hover: hover) and (pointer: fine)').matches;
+            if (!isDesktop) return;
+            var selector = '.layout-vertical.items-container.demand-all-figma-container .demand-item .item-button-box.demand-all-figma-button';
+            document.querySelectorAll(selector).forEach(function (button) {
+                button.style.marginTop = 'calc(2.75rem + 20px)';
+                button.style.setProperty('height', '50px', 'important');
+            });
+        })();
+    </script>
 </body>
 
 </html>
