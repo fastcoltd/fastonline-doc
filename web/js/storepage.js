@@ -175,10 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
   this.layout = new PageLayout();
   // this.sort = new SortSelector();
   $('.load-more').on('click', function () {
-      let htmlStr = $('.store-all-items-pager').html()
+      const $activePager = $('.items-container[data-layout].is-active .store-all-items-pager');
+      const $targetPager = $activePager.length ? $activePager : $('.store-all-items-pager').first();
+      let htmlStr = $targetPager.html()
       $('.loading').show()
       setTimeout(() => {
-          $('.store-all-items-pager').append(htmlStr)
+          $targetPager.append(htmlStr)
           $('.loading').hide()
       }, 2000)
   })
