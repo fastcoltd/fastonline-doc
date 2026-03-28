@@ -1,18 +1,50 @@
 $(document).ready(function () {
     const link = new LinkRef('page-link', 'brand-section');
     const headDetailBox = document.querySelector('.page-header-desc-right-detail-box');
-    const text = headDetailBox.querySelector('.page-header-desc-right-detail-text');
-    const button = headDetailBox.querySelector('.page-header-desc-right-detail-toggle-btn');
-    button.addEventListener('click', function () {
-        const isToggle = text.classList.contains('is-toggle');
-        if (isToggle) {
+    if (headDetailBox) {
+        const text = headDetailBox.querySelector('.page-header-desc-right-detail-text');
+        const button = headDetailBox.querySelector('.page-header-desc-right-detail-toggle-btn');
+        if (text && button) {
+            const syncToggleVisibility = () => {
+                const isExpanded = text.classList.contains('is-toggle');
+                if (isExpanded) {
+                    text.classList.remove('is-toggle');
+                }
+                const needToggle = text.scrollWidth > text.clientWidth + 1;
+                if (needToggle) {
+                    button.style.display = 'inline-block';
+                    if (isExpanded) {
+                        text.classList.add('is-toggle');
+                        button.textContent = 'Show Less';
+                    } else {
+                        button.textContent = 'Show More';
+                    }
+                } else {
+                    text.classList.remove('is-toggle');
+                    button.style.display = 'none';
+                    button.textContent = 'Show More';
+                }
+            };
+
             text.classList.remove('is-toggle');
-            button.innerHTML = 'Show Detail';
-        } else {
-            text.classList.add('is-toggle');
-            button.innerHTML = 'Show Less';
+            button.textContent = 'Show More';
+            button.addEventListener('click', function () {
+                const isToggle = text.classList.contains('is-toggle');
+                if (isToggle) {
+                    text.classList.remove('is-toggle');
+                    button.textContent = 'Show More';
+                } else {
+                    text.classList.add('is-toggle');
+                    button.textContent = 'Show Less';
+                }
+            });
+            syncToggleVisibility();
+            window.addEventListener('resize', syncToggleVisibility);
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(syncToggleVisibility);
+            }
         }
-    })
+    }
     $('.faq-header-title').on('click', function () {
         $(this).parents('.faq-itme').find('.faq-header-arrow-icon').toggleClass('open')
         $(this).parents('.faq-item').find('.faq-content').toggle(100)
