@@ -695,8 +695,8 @@ document.addEventListener('DOMContentLoaded', adjustFilterPosition);
 // 更新sticky header状态
 function updateStickyHeader() {
     if (!stickyHeader) return;
-    const scrollTop = document.documentElement.scrollTop;
-    if (scrollTop > pageHeadHeight) {
+    const stickyTop = stickyHeader.getBoundingClientRect().top;
+    if (stickyTop <= 0) {
         stickyHeader.classList.add('is-sticky');
     } else {
         stickyHeader.classList.remove('is-sticky');
