@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeSearch();
     initializeDropdowns();
     initializeValidation();
+    initializeOverviewTimeTabs();
 
     $('.item-detail-review-tool-icon-yes').on('click', function() {
         console.log($(this).parent())
@@ -94,6 +95,41 @@ document.addEventListener('DOMContentLoaded', function () {
         $(this).parent().toggleClass('has-activate')
     })
 })
+
+function initializeOverviewTimeTabs() {
+    const tabItems = document.querySelectorAll('.overview-header .tabs-container .tab-item');
+    if (!tabItems.length) return;
+
+    const setActive = (targetTab) => {
+        tabItems.forEach(tab => {
+            const isActive = tab === targetTab;
+            tab.classList.toggle('active', isActive);
+            tab.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+    };
+
+    tabItems.forEach(tab => {
+        if (!tab.querySelector('.ink-bar')) {
+            const inkBar = document.createElement('div');
+            inkBar.className = 'ink-bar';
+            tab.insertBefore(inkBar, tab.firstChild);
+        }
+        tab.setAttribute('role', 'button');
+        tab.setAttribute('tabindex', '0');
+        tab.setAttribute('aria-pressed', tab.classList.contains('active') ? 'true' : 'false');
+
+        tab.addEventListener('click', function () {
+            setActive(tab);
+        });
+
+        tab.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                setActive(tab);
+            }
+        });
+    });
+}
 
 
 
