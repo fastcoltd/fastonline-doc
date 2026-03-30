@@ -1060,7 +1060,7 @@
         <div class="store-avatar-section">
           <div class="store-avatar-container">
             <div class="store-avatar">
-              <img src="https://dummyimage.com/120x120" alt="Store Avatar" class="store-avatar-img">
+              <img src="image/detailpage/store-main-avatar.png" alt="Store Avatar" class="store-avatar-img">
             </div>
             <div class="online-indicator"></div>
           </div>
@@ -1072,7 +1072,7 @@
 
           <!-- 标签 -->
           <div class="item-mark-box">
-            <span class="item-mark" style="background: linear-gradient(to right, #ff4d10, #ff7a02);">HOT</span>
+            <span class="item-mark" style="background: linear-gradient(to right, #9216AA, #E75CEE);">HOT</span>
             <span class="item-mark" style="background: linear-gradient(to right, #0567C4, #0BB4E0);">Limited time
               sale</span>
           </div>
@@ -1081,7 +1081,7 @@
           <div class="store-details">
             <div class="detail-item">
               <img class="detail-icon" src="image/icon-wz.png" />
-              <span class="detail-text">Saint Helena__English</span>
+              <span class="detail-text">Saint Helena&nbsp;&nbsp;English</span>
             </div>
 
             <div class="detail-item">
@@ -1136,26 +1136,26 @@
         <div class="team-members">
           <div class="team-member">
             <div class="member-avatar">
-              <img src="https://dummyimage.com/60x60" alt="Team Member">
+              <img src="image/detailpage/store-team-avatar-a.png" alt="Team Member">
               <div class="member-status online"></div>
             </div>
-            <span class="member-name">Thelma LCFO</span>
+            <span class="member-name">Thelma<br>CFO</span>
           </div>
 
           <div class="team-member">
             <div class="member-avatar">
-              <img src="https://dummyimage.com/60x60" alt="Team Member">
+              <img src="image/detailpage/store-team-avatar-b.png" alt="Team Member">
               <div class="member-status online"></div>
             </div>
-            <span class="member-name">Thelma LCFO</span>
+            <span class="member-name">Thelma<br>CFO</span>
           </div>
 
           <div class="team-member">
             <div class="member-avatar">
-              <img src="https://dummyimage.com/60x60" alt="Team Member">
+              <img src="image/detailpage/store-team-avatar-b.png" alt="Team Member">
               <div class="member-status offline"></div>
             </div>
-            <span class="member-name">Thelma LCFO</span>
+            <span class="member-name">Thelma<br>CFO</span>
           </div>
         </div>
       </div>
@@ -2688,16 +2688,40 @@
     });
   </script>
   <script>
+    function createLegendFormatter(strikeNames) {
+      const strikeSet = new Set(strikeNames);
+      return function (name) {
+        return strikeSet.has(name) ? `{strike|${name}}` : `{normal|${name}}`;
+      };
+    }
+
+    function createLegendTextStyle() {
+      return {
+        fontFamily: 'Inter, sans-serif',
+        fontSize: 12,
+        color: 'rgba(0, 0, 0, 0.7)',
+        rich: {
+          normal: {
+            color: 'rgba(0, 0, 0, 0.7)',
+            fontSize: 12,
+            lineHeight: 15
+          },
+          strike: {
+            color: 'rgba(0, 0, 0, 0.7)',
+            fontSize: 12,
+            lineHeight: 15,
+            textDecoration: 'line-through'
+          }
+        }
+      };
+    }
+
     function randerStarsStatisticschart() {
       let dom = document.getElementById('starsStatisticsEchart')
       var chartInstance = echarts.init(dom)
-      var datas = [118, 50, 20, 10, 10]
+      var datas = [80, 72, 60, 10, 2]
       let starNames = ['5星', '4星', '3星', '2星', '1星']
-      let maxVal = Math.max(...datas)
-      let maxArr = [];
-      for (let i = 0; i < datas.length; i++) {
-        maxArr.push(maxVal + 20)
-      }
+      let maxArr = Array(datas.length).fill(100)
       let option = {
         tooltip: {
           trigger: 'axis',
@@ -2707,8 +2731,8 @@
           show: false
         },
         grid: {
-          left: 50,
-          right: 20,
+          left: 28,
+          right: 0,
           top: 20,
           bottom: 0
         },
@@ -2716,22 +2740,26 @@
           show: true,
           position: 'top',
           type: 'value',
-          max: 'dataMax',
+          min: 0,
+          max: 100,
+          interval: 20,
           axisLine: {
-            show: true, // 确保这一项设置为 true
+            show: true,
             lineStyle: {
-              color: '#eaeaea', // 轴线颜色
-              width: 1, // 轴线宽度
+              color: 'rgba(0, 0, 26, 0.3)',
+              width: 1
             }
           },
           splitLine: {
             show: true,
             lineStyle: {
-              type: 'dashed'
+              type: 'dashed',
+              color: 'rgba(0, 0, 26, 0.15)'
             }
           },
           axisLabel: {
-            color: '#333'
+            color: 'rgba(0, 0, 0, 0.7)',
+            fontSize: 12
           }
 
         },
@@ -2741,13 +2769,15 @@
           axisLine: {
             show: true,
             lineStyle: {
-              color: '#eaeaea'
+              color: 'rgba(0, 0, 26, 0.3)',
+              width: 1
             }
           },
           splitLine: {
             show: true,
             lineStyle: {
-              type: 'dashed'
+              type: 'dashed',
+              color: 'rgba(0, 0, 26, 0.15)'
             }
           },
           axisTick: {
@@ -2755,29 +2785,30 @@
           },
           data: starNames,
           axisLabel: {
-            margin: 40,
-            fontSize: 17,
+            margin: 8,
+            fontSize: 12,
             align: 'left',
-            color: '#333'
+            color: 'rgba(0, 0, 0, 0.7)'
           }
         }],
         series: [{
           z: 2,
-          name: 'value',
+          name: 'Value',
           type: 'bar',
           barWidth: 20,
           zlevel: 1,
           data: datas,
           itemStyle: {
             normal: {
-              color: '#9E95FB'
+              color: '#8979FF',
+              opacity: 0.8
             }
           },
           label: {
             show: true,
             position: 'right',
-            color: '#000',
-            fontSize: 12
+            color: 'rgba(0, 0, 0, 0.7)',
+            fontSize: 10
           }
         },
         {
@@ -2787,7 +2818,7 @@
           barGap: '-100%',
           itemStyle: {
             normal: {
-              color: '#D6DBED66',
+              color: 'rgba(214, 219, 237, 0.4)',
             }
           },
           data: maxArr,
@@ -2813,26 +2844,67 @@
           }
         },
         grid: {
-          left: 50,
-          right: 20,
-          top: 20,
-          bottom: 50
+          left: 0,
+          right: 0,
+          top: 10,
+          bottom: 44
         },
         legend: {
+          itemWidth: 16,
+          itemHeight: 2,
+          itemGap: 16,
+          textStyle: createLegendTextStyle(),
+          formatter: createLegendFormatter(['Goods rate', 'Response rate']),
+          selected: {
+            'Goods rate': false,
+            'Response rate': false,
+            'Sufficient rate': true
+          },
           data: ['Goods rate', 'Response rate', 'Sufficient rate'],
-          top: 'auto',
           bottom: 0
         },
         xAxis: [
           {
             type: 'category',
             boundaryGap: false,
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            axisLine: {
+              lineStyle: {
+                color: 'rgba(0, 0, 26, 0.3)'
+              }
+            },
+            axisTick: {
+              show: false
+            },
+            axisLabel: {
+              fontSize: 12,
+              color: 'rgba(0, 0, 0, 0.7)'
+            },
+            data: ['7d', '6d', '5d', '4d', '3d', '2d', '1d']
           }
         ],
         yAxis: [
           {
-            type: 'value'
+            type: 'value',
+            min: 0,
+            max: 100,
+            interval: 50,
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            axisLabel: {
+              fontSize: 12,
+              color: 'rgba(0, 0, 0, 0.7)'
+            },
+            splitLine: {
+              show: true,
+              lineStyle: {
+                type: 'dashed',
+                color: 'rgba(0, 0, 26, 0.15)'
+              }
+            }
           }
         ],
         series: [
@@ -2840,37 +2912,70 @@
             name: 'Goods rate',
             type: 'line',
             smooth: true,
-            stack: 'Total',
-            areaStyle: {},
-            color: linearGradientColor('rgba(137, 121, 255, 0.8)', 'rgba(137, 121, 255, 0.1)'),
+            symbol: 'circle',
+            symbolSize: 6,
+            areaStyle: {
+              color: linearGradientColor('rgba(137, 121, 255, 0.3)', 'rgba(137, 121, 255, 0)')
+            },
+            lineStyle: {
+              color: '#8979FF',
+              width: 2
+            },
+            itemStyle: {
+              color: '#FFFFFF',
+              borderColor: '#8979FF',
+              borderWidth: 1.5
+            },
             emphasis: {
               focus: 'series'
             },
-            data: [120, 132, 101, 134, 90, 230, 210]
+            data: [24, 40, 29, 55, 79, 70, 61]
           },
           {
             name: 'Response rate',
             type: 'line',
             smooth: true,
-            stack: 'Total',
-            areaStyle: {},
-            color: linearGradientColor('rgba(255, 146, 138, 0.8)', 'rgba(255, 146, 138, 0.1)'),
+            symbol: 'circle',
+            symbolSize: 6,
+            areaStyle: {
+              color: linearGradientColor('rgba(255, 146, 138, 0.3)', 'rgba(255, 146, 138, 0)')
+            },
+            lineStyle: {
+              color: '#FF928A',
+              width: 2
+            },
+            itemStyle: {
+              color: '#FFFFFF',
+              borderColor: '#FF928A',
+              borderWidth: 1.5
+            },
             emphasis: {
               focus: 'series'
             },
-            data: [220, 182, 191, 234, 290, 330, 310]
+            data: [19, 15, 14, 32, 25, 15, 17]
           },
           {
             name: 'Sufficient rate',
             type: 'line',
             smooth: true,
-            stack: 'Total',
-            areaStyle: {},
-            color: linearGradientColor('rgba(60, 195, 223, 0.8)', 'rgba(60, 195, 223, 0.1)'),
+            symbol: 'circle',
+            symbolSize: 6,
+            areaStyle: {
+              color: linearGradientColor('rgba(60, 195, 223, 0.3)', 'rgba(60, 195, 223, 0)')
+            },
+            lineStyle: {
+              color: '#3CC3DF',
+              width: 2
+            },
+            itemStyle: {
+              color: '#FFFFFF',
+              borderColor: '#3CC3DF',
+              borderWidth: 1.5
+            },
             emphasis: {
               focus: 'series'
             },
-            data: [150, 232, 201, 154, 190, 330, 410]
+            data: [10, 10, 10, 10, 10, 30, 24]
           }
         ]
       }
@@ -2892,26 +2997,67 @@
           }
         },
         grid: {
-          left: 50,
-          right: 20,
-          top: 20,
-          bottom: 70
+          left: 0,
+          right: 0,
+          top: 10,
+          bottom: 44
         },
         legend: {
+          itemWidth: 16,
+          itemHeight: 2,
+          itemGap: 16,
+          textStyle: createLegendTextStyle(),
+          formatter: createLegendFormatter(['Sales volume']),
+          selected: {
+            'Sales volume': false,
+            'After-sales volume': true,
+            'New volume': true
+          },
           data: ['Sales volume', 'After-sales volume', 'New volume'],
-          top: 'auto',
           bottom: 0
         },
         xAxis: [
           {
             type: 'category',
             boundaryGap: false,
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            axisLine: {
+              lineStyle: {
+                color: 'rgba(0, 0, 26, 0.3)'
+              }
+            },
+            axisTick: {
+              show: false
+            },
+            axisLabel: {
+              fontSize: 12,
+              color: 'rgba(0, 0, 0, 0.7)'
+            },
+            data: ['7d', '6d', '5d', '4d', '3d', '2d', '1d']
           }
         ],
         yAxis: [
           {
-            type: 'value'
+            type: 'value',
+            min: 0,
+            max: 100,
+            interval: 50,
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            axisLabel: {
+              fontSize: 12,
+              color: 'rgba(0, 0, 0, 0.7)'
+            },
+            splitLine: {
+              show: true,
+              lineStyle: {
+                type: 'dashed',
+                color: 'rgba(0, 0, 26, 0.15)'
+              }
+            }
           }
         ],
         series: [
@@ -2919,37 +3065,70 @@
             name: 'Sales volume',
             type: 'line',
             smooth: true,
-            stack: 'Total',
-            areaStyle: {},
-            color: linearGradientColor('rgba(0, 148, 178, 0.8)', 'rgba(0, 148, 178, 0.1)'),
+            symbol: 'diamond',
+            symbolSize: 6,
+            areaStyle: {
+              color: linearGradientColor('rgba(0, 148, 178, 0.25)', 'rgba(0, 148, 178, 0)')
+            },
+            lineStyle: {
+              color: '#0094B2',
+              width: 2
+            },
+            itemStyle: {
+              color: '#FFFFFF',
+              borderColor: '#0094B2',
+              borderWidth: 1.5
+            },
             emphasis: {
               focus: 'series'
             },
-            data: [120, 132, 101, 134, 90, 230, 210]
+            data: [100, 74, 77, 65, 56, 86, 75]
           },
           {
             name: 'After-sales volume',
             type: 'line',
             smooth: true,
-            stack: 'Total',
-            areaStyle: {},
-            color: linearGradientColor('rgba(239, 191, 1, 0.8)', 'rgba(239, 191, 1, 0.1)'),
+            symbol: 'diamond',
+            symbolSize: 6,
+            areaStyle: {
+              color: linearGradientColor('rgba(239, 191, 1, 0.25)', 'rgba(239, 191, 1, 0)')
+            },
+            lineStyle: {
+              color: '#EFBF01',
+              width: 2
+            },
+            itemStyle: {
+              color: '#FFFFFF',
+              borderColor: '#EFBF01',
+              borderWidth: 1.5
+            },
             emphasis: {
               focus: 'series'
             },
-            data: [220, 182, 191, 234, 290, 330, 310]
+            data: [100, 100, 49, 37, 29, 59, 52]
           },
           {
             name: 'New volume',
             type: 'line',
             smooth: true,
-            stack: 'Total',
-            areaStyle: {},
-            color: linearGradientColor('rgba(5, 66, 224, 0.8)', 'rgba(5, 66, 224, 0.1)'),
+            symbol: 'diamond',
+            symbolSize: 6,
+            areaStyle: {
+              color: linearGradientColor('rgba(5, 66, 224, 0.3)', 'rgba(5, 66, 224, 0)')
+            },
+            lineStyle: {
+              color: '#0542E0',
+              width: 2
+            },
+            itemStyle: {
+              color: '#FFFFFF',
+              borderColor: '#0542E0',
+              borderWidth: 1.5
+            },
             emphasis: {
               focus: 'series'
             },
-            data: [150, 232, 201, 154, 190, 330, 410]
+            data: [99, 100, 88, 92, 100, 100, 100]
           }
         ]
       }
