@@ -8,7 +8,6 @@ const pageHead = document.querySelector('.page-head');
 const pageHeadHeight = pageHead.offsetHeight;
 const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
-const pageRightBox = document.querySelector('.page-right-box')
 
 document.addEventListener('DOMContentLoaded', function () {
     const link = new LinkRef('page-link', 'item-detail-right-group');
@@ -304,29 +303,13 @@ function adjustFilterPosition() {
         });
         return;
     };
-    pageFix.classList.toggle('is-sticky', headIsSticky);
-    // 计算页面头部所有固定元素的总高度
-    let totalHeight = stickyHeaderHeight;
-    if (pageHead && !headIsSticky) {
-        totalHeight += pageHeadHeight;
-    }
-    // 设置过滤器的位置和高度
-    if (!headIsSticky) {
-        // 非sticky状态：相对于page-content定位
-        Object.assign(pageFix.style, {
-            top: '20px',
-            // maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
-        });
-    } else {
-        let top = totalHeight + 20
-        let menuContainerScrollTop = pageRightBox.scrollHeight - document.documentElement.scrollTop - pageFix.clientHeight + pageHeadHeight
-        if (menuContainerScrollTop < 0) {
-            top = totalHeight + menuContainerScrollTop
-        }
-        // sticky状态：固定定位
-        Object.assign(pageFix.style, {
-            top: top + 'px',
-            // maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
-        });
-    }
+    // store-detail 左侧信息区按页面线性滚动，避免阈值切换时跳动
+    pageFix.classList.remove('is-sticky');
+    Object.assign(pageFix.style, {
+        position: 'absolute',
+        left: '0',
+        transform: '',
+        top: '20px',
+        maxHeight: ''
+    });
 }
