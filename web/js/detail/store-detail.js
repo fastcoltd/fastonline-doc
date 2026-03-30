@@ -1,5 +1,7 @@
 const stickyHeader = document.getElementById('stickyHeader');
-const stickyHeaderHeight = stickyHeader.offsetHeight;
+const stickyHeaderHeight = stickyHeader && stickyHeader.classList.contains('page-top-sticky')
+    ? stickyHeader.offsetHeight
+    : 0;
 const pageContent = document.querySelector('.page-content');
 const pageFix = document.querySelector('.page-fix-box');
 const pageHead = document.querySelector('.page-head');
