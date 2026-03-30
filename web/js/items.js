@@ -29,7 +29,7 @@ pagination.onPageSizeChange = (page, pageSize) => {
 document.addEventListener('DOMContentLoaded', () => {
     this.layout = new PageLayout();
     //   this.sort = new SortSelector();
-    $('.load-more').on('click', function () {
+    $('#load-more').on('click', function () {
         $('.loading').show()
         setTimeout(() => {
             $('.item-all-items-pager').each(function () {

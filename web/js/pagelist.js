@@ -16,7 +16,9 @@ class PageList {
 
     // 绑定事件
     bindEvents() {
-        document.querySelector('.load-more').addEventListener('click', () => {
+        const loadMore = document.getElementById('load-more');
+        if (!loadMore) return;
+        loadMore.addEventListener('click', () => {
             this.loadItems(false);
         })
     }
@@ -46,9 +48,12 @@ class PageList {
     // 显示加载状态
     showLoading(show) {
         if (document.body.clientWidth > 768) { return }
+        const loadMore = document.getElementById('load-more');
+        if (!loadMore) return;
         this.isLoading = show;
-        const loading = document.querySelector('.loading');
-        const loadText = document.querySelector('.load-more-text');
+        const loading = loadMore.querySelector('.loading');
+        const loadText = loadMore.querySelector('.load-more-text');
+        if (!loading || !loadText) return;
         if (show) {
             loading.style.display = 'inline-block';
             loadText.style.display = 'none';
@@ -61,14 +66,16 @@ class PageList {
     showNoMore() {
         if (document.body.clientWidth > 768) { return }
         this.hasMore = false;
-        const moreBox = document.querySelector('.load-more');
+        const moreBox = document.getElementById('load-more');
+        if (!moreBox) return;
         moreBox.style.display = 'none';
     }
 
     resetNoMore() {
         if (document.body.clientWidth > 768) { return }
         this.hasMore = true;
-        const moreBox = document.querySelector('.load-more');
+        const moreBox = document.getElementById('load-more');
+        if (!moreBox) return;
         moreBox.style.display = 'flex';
     }
 }
