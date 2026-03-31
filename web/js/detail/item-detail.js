@@ -622,6 +622,9 @@ document.addEventListener("DOMContentLoaded", function () {
     rules.forEach(element => {
         const content = element.querySelector('.item-detail-rules-content');
         const moreButton = element.querySelector('.item-detail-rules-more-button');
+        if (!content || !moreButton) {
+            return;
+        }
         moreButton.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
