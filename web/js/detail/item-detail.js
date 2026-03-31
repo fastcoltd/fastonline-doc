@@ -628,6 +628,10 @@ document.addEventListener("DOMContentLoaded", function () {
         moreButton.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
+            const expandedText = content.dataset.expandedText;
+            if (expandedText) {
+                content.textContent = expandedText;
+            }
             content.classList.toggle('toggle', true);
             moreButton.style.display = 'none';
         })
