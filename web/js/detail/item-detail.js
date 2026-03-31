@@ -373,7 +373,7 @@ function createItemElement(item) {
     const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
     div.innerHTML = `
-           <div class="page-section">
+           <div class="page-section item-detail-review-card">
                             <div class="flex-column item-detail-review-box">
                                 <div class="flex-row item-detail-review-user-box">
                                     <img class="item-detail-review-user-avatar" src="用户头像" />
