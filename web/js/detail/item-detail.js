@@ -641,18 +641,15 @@ document.addEventListener("DOMContentLoaded", function () {
     faqs.forEach(element => {
         const content = element.querySelector('.item-detail-faq-content');
         const title = element.querySelector('.item-detail-faq-title-box');
-        const arrow = title.querySelector('.item-detail-faq-title-arrow');
         title.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
             if (content.style.display === 'none') {
                 title.classList.toggle('toggle', true);
-                content.style.display = 'inline-block';
-                arrow.style.transform = 'rotate(180deg)';
+                content.style.display = 'block';
             } else {
                 title.classList.toggle('toggle', false);
                 content.style.display = 'none';
-                arrow.style.transform = 'rotate(0deg)';
             }
         })
     });
