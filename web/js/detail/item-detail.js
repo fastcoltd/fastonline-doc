@@ -463,21 +463,25 @@ document.addEventListener("DOMContentLoaded", function () {
     // screenshotContent.addEventListener('wheel', { passive: window.innerWidth <= 750 });
     // screenshotContent.addEventListener('touchmove', { passive: window.innerWidth <= 750 });
     let screenshotScrollOffsetX = 0
+    const screenshotGap = parseFloat(window.getComputedStyle(screenshotContent).gap) || 0;
+    const screenshotItem = screenshotContent.querySelector('.item-detail-screenshot-item-icon');
+    const screenshotStep = (screenshotItem ? screenshotItem.clientWidth : 0) + screenshotGap;
     const screenshotContentScroll = screenshotContent.scrollWidth > screenshotContent.clientWidth;
     screenshotLeftMore.style.display = (screenshotContentScroll && !isMobile) ? 'flex' : 'none';
     screenshotRightMore.style.display = (screenshotContentScroll && !isMobile) ? 'flex' : 'none';
     screenshotScroll();
+    screenshotContent.addEventListener('scroll', screenshotScroll);
     screenshotRightMore.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
-        screenshotScrollOffsetX += 260;
+        screenshotScrollOffsetX = screenshotContent.scrollLeft + screenshotStep;
         screenshotContent.scrollLeft = screenshotScrollOffsetX;
         screenshotScroll();
     })
     screenshotLeftMore.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
-        screenshotScrollOffsetX -= 260;
+        screenshotScrollOffsetX = screenshotContent.scrollLeft - screenshotStep;
         screenshotContent.scrollLeft = screenshotScrollOffsetX;
         screenshotScroll();
     })

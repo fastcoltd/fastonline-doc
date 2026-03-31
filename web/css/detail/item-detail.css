@@ -585,11 +585,15 @@
 .item-detail-screenshot {
   position: relative;
   width: 100%;
-  padding: 2.5rem 6rem;
+  padding: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .item-detail-screenshot-content {
   overflow-x: auto;
-  /* pointer-events: none; */
   scrollbar-width: none;
   -ms-overflow-style: none;
   display: flex;
@@ -597,68 +601,65 @@
   align-items: center;
   gap: 1.25rem;
   scroll-behavior: smooth;
+  width: 109.375rem;
+  flex: 0 0 109.375rem;
 }
 .item-detail-screenshot-content::-webkit-scrollbar {
   display: none;
 }
 .item-detail-screenshot-item-icon {
   width: 25rem;
-  height: 16rem;
-  border-radius: 2rem;
+  height: 16.10825rem;
+  border-radius: 1.25rem;
   cursor: pointer;
+  flex: 0 0 auto;
+  object-fit: cover;
 }
+.item-detail-screenshot-left-box,
 .item-detail-screenshot-right-box {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
   width: 4.5rem;
   height: 4.5rem;
-  color: #f0f3f3;
+  min-width: 4.5rem;
+  color: #f0f0f3;
   border-radius: 50%;
   justify-content: center;
-  cursor: pointer;
+  align-items: center;
+  cursor: default;
+  pointer-events: none;
+  flex: 0 0 auto;
 }
-.item-detail-screenshot-right-box .iconfont {
-  font-size: 4rem;
-}
-.item-detail-screenshot-arrow {
-  font-family: var(--primary-popfont);
-  line-height: 2.25rem;
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: #fff;
-}
-.item-detail-screenshot-left-box {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+.item-detail-screenshot-arrow-icon {
   width: 4.5rem;
   height: 4.5rem;
-  color: #f0f3f3;
-  border-radius: 50%;
-  justify-content: center;
-  cursor: pointer;
+  display: block;
 }
-.item-detail-screenshot-left-box .iconfont {
-  font-size: 4rem;
+.item-detail-screenshot-arrow-icon-right {
+  transform: rotate(180deg);
 }
 .item-detail-screenshot-left-box.active,
 .item-detail-screenshot-right-box.active {
   color: var(--primary-color);
+  cursor: pointer;
+  pointer-events: auto;
 }
 @media screen and (max-width: 768px) {
   .item-detail-screenshot {
-    padding: 1.25rem 0;
+    padding: 1.25rem;
+    gap: 1rem;
   }
   .item-detail-screenshot-content {
-    gap: 2rem;
-    padding: 0 1.25rem;
+    width: 100%;
+    flex: 1 1 auto;
+    gap: 1rem;
+    padding: 0;
+  }
+  .item-detail-screenshot-item-icon {
+    width: 22rem;
+    height: 14.08rem;
   }
   .item-detail-screenshot-left-box,
   .item-detail-screenshot-right-box {
-    display: none;
+    display: none !important;
   }
 }
 .item-detail-description-box {
