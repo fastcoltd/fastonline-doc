@@ -376,15 +376,15 @@ function createItemElement(item) {
            <div class="page-section item-detail-review-card">
                             <div class="flex-column item-detail-review-box">
                                 <div class="flex-row item-detail-review-user-box">
-                                    <img class="item-detail-review-user-avatar" src="用户头像" />
+                                    <img class="item-detail-review-user-avatar" src="image/detailpage/review-main-avatar.png" />
                                     <div class="flex-column item-detail-review-user-name-box">
-                                        <span class="item-detail-review-user-name">用户名</span>
+                                        <span class="item-detail-review-user-name">Han Solo</span>
                                         <span class="item-detail-review-user-time">1 day ago</span>
                                     </div>
                                     <div class="flex-row item-detail-review-user-status-box">
                                         <img class="item-detail-review-user-status-icon"
                                             src="image/detailpage/repeat-client.png" />
-                                        <span class="item-detail-review-user-status-text">Repeat client</span>
+                                        <span class="item-detail-review-user-status-text">Repeat Client</span>
                                     </div>
                                 </div>
                                 <span class="item-detail-review-content">We supply a series of design principles,
@@ -398,33 +398,32 @@ function createItemElement(item) {
                                 <div class="item-star-box">
                                     <div class="star-bg">
                                         <div class="stars-outer">
-                                            <div class="stars-inner" style="width: 83%;"></div>
+                                            <div class="stars-inner" style="width: 100%;"></div>
                                         </div>
                                     </div>
-                                    <p class="item-star-score">4.3</p>
-                                    <p class="item-star-recommend">(200)</p>
+                                    <p class="item-star-score">5.0</p>
                                 </div>
                                 <div class="flex-row item-detail-review-info-box">
                                     <div class="flex-column item-detail-review-info-item">
-                                        <span class="item-detail-review-info-title">$666.6</span>
+                                        <span class="item-detail-review-info-title">$325.00</span>
                                         <span class="item-detail-review-info-desc">Price</span>
                                     </div>
                                     <div class="item-detail-review-info-line"></div>
                                     <div class="flex-column item-detail-review-info-item">
-                                        <span class="item-detail-review-info-title">333</span>
+                                        <span class="item-detail-review-info-title">213</span>
                                         <span class="item-detail-review-info-desc">Quantity</span>
                                     </div>
                                     <div class="item-detail-review-info-line"></div>
                                     <div class="flex-column item-detail-review-info-item icon">
-                                        <img class="item-detail-review-info-icon" src="review图片" />
+                                        <img class="item-detail-review-info-icon" src="image/detailpage/review-info-thumb.png" />
                                     </div>
                                 </div>
                             </div>
                             <div class="item-detail-review-line"></div>
                             <div class="flex-column item-detail-reiviewer-box">
                                 <div class="flex-row item-detail-reviewer-user-box">
-                                    <img class="item-detail-reviewer-user-icon" src="用户头像" />
-                                    <span class="item-detail-reviewer-user-name">用户名</span>
+                                    <img class="item-detail-reviewer-user-icon" src="image/detailpage/review-reply-avatar.png" />
+                                    <span class="item-detail-reviewer-user-name">Erinasa</span>
                                     <div class="item-detail-reviewer-user-empty"></div>
                                     <img class="item-detail-reviewer-arrow" src="image/detailpage/arrow-down.png" />
                                 </div>
@@ -440,12 +439,14 @@ function createItemElement(item) {
                         <div class="flex-row item-detail-review-tool-box">
                             <span class="item-detail-review-tool-text">Helpful?</span>
                             <div class="flex-row item-detail-review-tool-item" id="review-like">
-                                <img class="item-detail-review-tool-icon" src="image/like-count.png" />
-                                <span class="item-detail-review-tool-text">YES</span>
+                                <img class="item-detail-review-tool-icon item-detail-review-tool-icon-yes" src="image/detailpage/review-helpful-yes.svg" />
+                                <i class="iconfont icon-dianzan item-detail-review-tool-icon-yes"></i>
+                                <span class="item-detail-review-tool-text">Yes</span>
                             </div>
                             <div class="flex-row item-detail-review-tool-item" id="review-unlike">
-                                <img class="item-detail-review-tool-icon" src="image/unlike-count.png" />
-                                <span class="item-detail-review-tool-text">NO</span>
+                                <img class="item-detail-review-tool-icon item-detail-review-tool-icon-no" src="image/detailpage/review-helpful-no.svg" />
+                                <i class="iconfont icon-dianzan icon-not-dianzan item-detail-review-tool-icon-no"></i>
+                                <span class="item-detail-review-tool-text">No</span>
                             </div>
                         </div>
          `;
