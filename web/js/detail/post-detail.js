@@ -275,6 +275,11 @@ function adjustFilterPosition() {
         });
         return;
     };
+    // 清理移动端分支可能遗留的内联定位，避免桌面端横向偏移
+    pageFix.style.left = '';
+    pageFix.style.right = '';
+    pageFix.style.transform = '';
+
     pageFix.classList.toggle('is-sticky', headIsSticky);
     // 计算页面头部所有固定元素的总高度
     let totalHeight = stickyHeaderHeight;
