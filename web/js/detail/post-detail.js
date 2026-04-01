@@ -208,22 +208,24 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
     const menu = document.querySelector('.detail-page-menu');
-    menu.addEventListener('click', function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        const menuContainerStyle = window.getComputedStyle(menuContainer);
-        close.addEventListener('click', function (event) {
-            menuContainer.style.display = 'none';
-            body.classList.toggle('modal-open', false);
+    if (menu) {
+        menu.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const menuContainerStyle = window.getComputedStyle(menuContainer);
+            close.addEventListener('click', function (event) {
+                menuContainer.style.display = 'none';
+                body.classList.toggle('modal-open', false);
+            });
+            if (menuContainerStyle.display === 'none') {
+                menuContainer.style.display = 'block';
+                body.classList.toggle('modal-open', true);
+            } else {
+                menuContainer.style.display = 'none';
+                body.classList.toggle('modal-open', false);
+            }
         });
-        if (menuContainerStyle.display === 'none') {
-            menuContainer.style.display = 'block';
-            body.classList.toggle('modal-open', true);
-        } else {
-            menuContainer.style.display = 'none';
-            body.classList.toggle('modal-open', false);
-        }
-    });
+    }
 });
 
 
@@ -301,6 +303,9 @@ function adjustFilterPosition() {
 }
 
 $(document).ready(function () {
+    const $articleContent = $('.article-content');
+    $articleContent.addClass('is-unpaid').removeClass('is-paid');
+
     $('.submit-btn').on('click', function () {
         let params = {
             content: $('.comment-textarea').val(),
@@ -308,8 +313,10 @@ $(document).ready(function () {
         }
         console.log(params, '000')
     })
-    $('.unlock-btn').on('click', function () {
-        alert('前去购买')
+    $('.article-unlock-btn').on('click', function (event) {
+        event.preventDefault();
+        $articleContent.removeClass('is-unpaid').addClass('is-paid');
+        updateStickyHeader();
     })
     $('.reading-mode-btn').on('click', function () {
         $(this).parent().toggleClass('is-reading-mode')
