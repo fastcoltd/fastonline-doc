@@ -10,6 +10,10 @@
 
 .reads-tag-wrapper {
     column-gap: 5rem;
+    row-gap: 1.25rem;
+    flex-wrap: wrap;
+    width: 137.5rem;
+    max-width: 100%;
 }
 
 .product-info.layout-vertical {
@@ -18,7 +22,7 @@
 
 .product-info .item-title-box {
     gap: 1.25rem;
-    width: calc(100% - 3rem);
+    width: 100%;
 }
 
 .product-info .product-title {
@@ -27,17 +31,22 @@
     color: black;
     font-size: 3.5rem;
     line-height: 5rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 117.25rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .product-info .icon-aixin {
-    position: absolute;
-    right: 0;
-    top: 1rem;
+    position: relative;
+    right: unset;
+    top: unset;
+    margin-left: auto;
     width: 3rem;
     height: 3rem;
+    flex-shrink: 0;
 }
 
 /* 分类路径 */
@@ -71,21 +80,30 @@
 
 .item-mark-box {
     column-gap: 0.75rem;
+    margin-left: 1.25rem;
+    flex-shrink: 0;
 }
 
 .attribute-icon-wrapper {
-    column-gap: 2rem;
+    column-gap: 5rem;
+    row-gap: 1rem;
+    flex-wrap: wrap;
 }
 
-.item-star-box {
-    margin-right: calc(100% - 85rem);
+.info-section .item-star-box {
+    margin-right: 0;
+}
+
+.info-section .item-star-score,
+.info-section .item-star-recommend {
+    font-family: var(--primary-robotofont);
+}
+
+.info-section .item-star-recommend {
+    margin-left: 0;
 }
 
 @media screen and (max-width: 768px) {
-    .item-star-box {
-        margin-right: 0;
-    }
-
     .product-info {
         padding-bottom: 2rem;
     }
@@ -108,6 +126,7 @@
         position: absolute;
         right: 0;
         top: 1rem;
+        margin-left: 0;
         width: 2.75rem;
         height: 2.75rem;
     }
@@ -115,6 +134,7 @@
     .product-info .item-mark-box {
         width: 100%;
         gap: 0.75rem;
+        margin-left: 0;
     }
 
     .product-info .item-mark {
@@ -139,8 +159,17 @@
         line-height: 2.25rem;
     }
 
+    .attribute-icon-wrapper {
+        column-gap: 2.5rem;
+    }
+
     .product-info .item-tag-box {
         display: flex;
+    }
+
+    .reads-tag-wrapper {
+        width: 100%;
+        gap: 1.25rem;
     }
 }
 
@@ -149,7 +178,8 @@
     column-gap: 5rem;
     row-gap: 1.25rem;
     flex-wrap: wrap;
-    width: calc(100% - 45rem);
+    width: 98.75rem;
+    max-width: 100%;
 }
 
 .info-item {
@@ -167,30 +197,73 @@
 .info-item .avatar {
     width: 5rem;
     height: 5rem;
+    border: #F0F0F3 solid 0.125rem;
     border-radius: 50%;
+    overflow: hidden;
 }
 
 .info-item .name {
     font-size: 1.75rem;
-    line-height: 3rem;
+    line-height: 2.5rem;
     color: #000;
-    font-weight: 500;
+    font-weight: 400;
     font-family: var(--primary-popfont);
+}
+
+.info-name-primary {
+    color: var(--primary-color) !important;
+}
+
+.info-avatar-store {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+}
+
+.info-avatar-store-icon {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
 }
 
 .icons-section {
     gap: 1.25rem;
 }
 
-.icon {
+.meta-icon-frame {
     width: 5rem;
     height: 5rem;
+    border: #F0F0F3 solid 0.125rem;
     border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    flex-shrink: 0;
 }
 
-.info-section .item-tag-box {
+.meta-icon-image {
+    width: 3.75rem;
+    height: 3.75rem;
+    border-radius: 1rem;
+    object-fit: cover;
+}
+
+.reads-tag-wrapper .item-tag-box {
     margin-top: 0;
-    width: unset;
+    width: fit-content;
+    max-width: 100%;
+    flex-wrap: wrap;
+    max-height: none;
+}
+
+.reads-tag-wrapper .item-tag {
+    box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.02);
+}
+
+.reads-tag-wrapper .item-tag-text {
+    line-height: 2.75rem;
 }
 
 @media screen and (max-width: 768px) {
@@ -217,21 +290,28 @@
 
     .info-item .name {
         font-size: 1.5rem;
-        line-height: 3rem;
+        line-height: 2.25rem;
     }
 
     .icons-section {
         gap: 1.25rem;
     }
 
-    .icon {
+    .meta-icon-frame {
         width: 3.75rem;
         height: 3.75rem;
     }
 
-    .info-section .item-tag-box {
+    .meta-icon-image {
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 0.75rem;
+    }
+
+    .reads-tag-wrapper .item-tag-box {
         margin-top: 0;
         width: 100%;
+        max-width: 100%;
     }
 }
 
