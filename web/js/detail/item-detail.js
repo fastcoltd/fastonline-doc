@@ -203,10 +203,53 @@ function renderStarsStatisticsChart() {
     };
     chartInstance.setOption(option)
 }
-function randerOverviewStatisticschart() {
-    let dom = document.getElementById('overviewStatisticsEchart')
+let overviewCurrentPeriod = '7D';
 
-    var chartInstance = echarts.init(dom)
+function buildOverviewLabels(days) {
+    return Array.from({ length: days }, (_, index) => `D${index + 1}`);
+}
+
+function buildOverviewSeries(days, baseValue, stepValue, waveValue, jumpStartIndex, jumpValue) {
+    return Array.from({ length: days }, (_, index) => {
+        const wave = Math.round(Math.sin(index / 2) * waveValue);
+        const trend = baseValue + index * stepValue + wave;
+        const jump = index >= jumpStartIndex ? (index - jumpStartIndex + 1) * jumpValue : 0;
+        return Math.max(trend + jump, 0);
+    });
+}
+
+function getOverviewPeriodData(period) {
+    if (period === '14D') {
+        return {
+            labels: buildOverviewLabels(14),
+            goodsRate: buildOverviewSeries(14, 110, 6, 12, 10, 6),
+            responseRate: buildOverviewSeries(14, 310, 2, 18, 10, 8),
+            sufficientRate: buildOverviewSeries(14, 500, 8, 16, 10, 26)
+        };
+    }
+    if (period === '30D') {
+        return {
+            labels: buildOverviewLabels(30),
+            goodsRate: buildOverviewSeries(30, 90, 4, 10, 22, 6),
+            responseRate: buildOverviewSeries(30, 280, 3, 20, 22, 8),
+            sufficientRate: buildOverviewSeries(30, 460, 7, 18, 22, 20)
+        };
+    }
+    return {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        goodsRate: [120, 132, 101, 134, 90, 230, 210],
+        responseRate: [220, 182, 191, 234, 290, 330, 310],
+        sufficientRate: [150, 232, 201, 154, 190, 330, 410]
+    };
+}
+
+function randerOverviewStatisticschart(period = overviewCurrentPeriod) {
+    const dom = document.getElementById('overviewStatisticsEchart');
+    if (!dom) {
+        return;
+    }
+    const periodData = getOverviewPeriodData(period);
+    const chartInstance = echarts.getInstanceByDom(dom) || echarts.init(dom);
     let option = {
         tooltip: {
             trigger: 'axis',
@@ -232,7 +275,7 @@ function randerOverviewStatisticschart() {
             {
                 type: 'category',
                 boundaryGap: false,
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                data: periodData.labels
             }
         ],
         yAxis: [
@@ -251,7 +294,7 @@ function randerOverviewStatisticschart() {
                 emphasis: {
                     focus: 'series'
                 },
-                data: [120, 132, 101, 134, 90, 230, 210]
+                data: periodData.goodsRate
             },
             {
                 name: 'Response rate',
@@ -263,7 +306,7 @@ function randerOverviewStatisticschart() {
                 emphasis: {
                     focus: 'series'
                 },
-                data: [220, 182, 191, 234, 290, 330, 310]
+                data: periodData.responseRate
             },
             {
                 name: 'Sufficient rate',
@@ -275,11 +318,44 @@ function randerOverviewStatisticschart() {
                 emphasis: {
                     focus: 'series'
                 },
-                data: [150, 232, 201, 154, 190, 330, 410]
+                data: periodData.sufficientRate
             }
         ]
     }
-    chartInstance.setOption(option)
+    chartInstance.setOption(option, true)
+    overviewCurrentPeriod = period;
+}
+
+function initOverviewPeriodTabs() {
+    const tabs = document.querySelectorAll('.overview-header .tab-item');
+    if (!tabs.length) {
+        return;
+    }
+
+    tabs.forEach((tab) => {
+        const tabTextNode = tab.querySelector('.tab-text');
+        const period = (tabTextNode ? tabTextNode.textContent : '').trim().toUpperCase();
+        tab.dataset.period = period;
+        tab.addEventListener('click', function () {
+            if (!this.dataset.period) {
+                return;
+            }
+            tabs.forEach(item => item.classList.remove('active'));
+            this.classList.add('active');
+
+            const overviewChartDom = document.getElementById('overviewStatisticsEchart');
+            if (overviewChartDom && overviewChartDom.offsetParent !== null) {
+                randerOverviewStatisticschart(this.dataset.period);
+                return;
+            }
+            overviewCurrentPeriod = this.dataset.period;
+        });
+    });
+
+    const activeTab = document.querySelector('.overview-header .tab-item.active') || tabs[0];
+    const activePeriod = activeTab && activeTab.dataset ? activeTab.dataset.period : '7D';
+    overviewCurrentPeriod = activePeriod;
+    tabs.forEach(item => item.classList.toggle('active', item.dataset.period === activePeriod));
 }
 
 function randerSalesCountStatisticschart() {
@@ -456,6 +532,7 @@ function createItemElement(item) {
 document.addEventListener("DOMContentLoaded", function () {
     const similar = new Carousel('best-items', 20);
     const link = new LinkRef('page-link', 'item-detail-left-group');
+    initOverviewPeriodTabs();
     const screenshot = document.querySelector('.item-detail-screenshot');
     const screenshotContent = screenshot.querySelector('.item-detail-screenshot-content');
     const screenshotRightMore = screenshot.querySelector('.item-detail-screenshot-right-box');
