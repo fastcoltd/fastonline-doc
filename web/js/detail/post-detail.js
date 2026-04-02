@@ -108,9 +108,9 @@ function createItemElement(item) {
            <div class="page-section">
                             <div class="flex-column post-detail-review-box">
                                 <div class="flex-row post-detail-review-user-box">
-                                    <img class="post-detail-review-user-avatar" src="用户头像" />
+                                    <img class="post-detail-review-user-avatar" src="image/detailpage/review-main-avatar.png" />
                                     <div class="flex-column post-detail-review-user-name-box">
-                                        <span class="post-detail-review-user-name">用户名</span>
+                                        <span class="post-detail-review-user-name">Han Solo</span>
                                         <span class="post-detail-review-user-time">1 day ago</span>
                                     </div>
                                     <div class="flex-row post-detail-review-user-status-box">
@@ -130,10 +130,10 @@ function createItemElement(item) {
                                 <div class="item-star-box">
                                     <div class="star-bg">
                                         <div class="stars-outer">
-                                            <div class="stars-inner" style="width: 83%;"></div>
+                                            <div class="stars-inner" style="width: 100%;"></div>
                                         </div>
                                     </div>
-                                    <p class="item-star-score">4.3</p>
+                                    <p class="item-star-score">5.0</p>
                                     <p class="item-star-recommend">(200)</p>
                                 </div>
                                 <div class="flex-row post-detail-review-info-box">
@@ -155,8 +155,8 @@ function createItemElement(item) {
                             <div class="post-detail-review-line"></div>
                             <div class="flex-column post-detail-reiviewer-box">
                                 <div class="flex-row post-detail-reviewer-user-box">
-                                    <img class="post-detail-reviewer-user-icon" src="用户头像" />
-                                    <span class="post-detail-reviewer-user-name">用户名</span>
+                                    <img class="post-detail-reviewer-user-icon" src="image/detailpage/review-reply-avatar.png" />
+                                    <span class="post-detail-reviewer-user-name">Erinasa</span>
                                     <div class="post-detail-reviewer-user-empty"></div>
                                     <img class="post-detail-reviewer-arrow" src="image/detailpage/arrow-down.png" />
                                 </div>
@@ -173,11 +173,11 @@ function createItemElement(item) {
                             <span class="post-detail-review-tool-text">Helpful?</span>
                             <div class="flex-row post-detail-review-tool-item" id="review-like">
                                 <img class="post-detail-review-tool-icon" src="image/like-count.png" />
-                                <span class="post-detail-review-tool-text">YES</span>
+                                <span class="post-detail-review-tool-text">Yes</span>
                             </div>
                             <div class="flex-row post-detail-review-tool-item" id="review-unlike">
                                 <img class="post-detail-review-tool-icon" src="image/unlike-count.png" />
-                                <span class="post-detail-review-tool-text">NO</span>
+                                <span class="post-detail-review-tool-text">No</span>
                             </div>
                         </div>
          `;
