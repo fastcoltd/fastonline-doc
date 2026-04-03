@@ -7,12 +7,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const attributes = document.querySelectorAll(".tag-page-header-desc-tag-item");
   const brandPageIndexs = document.querySelectorAll(".page-link");
 
+  function syncItemAllBestItemsClass() {
+    document.querySelectorAll('#best-items-item #items-grid > .best-items-item').forEach(item => {
+      item.classList.add('item-all-best-items-item');
+    });
+  }
+
+  function getActiveItemPager() {
+    const $activePager = $('#best-items-item .items-container[data-layout].is-active .item-all-items-pager');
+    if ($activePager.length > 0) {
+      return $activePager.first();
+    }
+    const $defaultPager = $('#best-items-item .item-all-items-pager');
+    if ($defaultPager.length > 0) {
+      return $defaultPager.first();
+    }
+    return $('#best-items-item .items-pager').first();
+  }
+
   // 初始化 - 设置第一个链接为激活状态
   if (brandPageIndexs.length > 0) {
     brandPageIndexs[0].classList.add('active');
     pageType = brandPageIndexs[0].id;
     changePageType(pageType);
   }
+  syncItemAllBestItemsClass();
 
   if (attributes.length > 0) {
     attributes[0].classList.add('active');
@@ -49,6 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
         pageList = item;
       }
     });
+    if (type === 'best-items-item') {
+      syncItemAllBestItemsClass();
+    }
   }
   // 初始化分页组件
   const pagination = new Pagination({
@@ -71,20 +93,20 @@ document.addEventListener('DOMContentLoaded', () => {
   this.layout = new PageLayout();
   //   this.sort = new SortSelector();
   $('.load-more').on('click', function () {
-    let type = $('.page-link.active').attr('data-type')
-    let htmlStr = ''
+    let type = $('.page-link.active').attr('data-type');
+    let $targetPager = $();
     if (type == 'demand') {
-      htmlStr = $('#demand-item .items-pager').html()
+      $targetPager = $('#demand-item .items-pager').first();
     } else {
-      htmlStr = $('#best-items-item .items-pager').html()
+      $targetPager = getActiveItemPager();
     }
+    const htmlStr = $targetPager.html();
     $('.loading').show()
     $('.load-more-text').hide()
     setTimeout(() => {
-      if (type == 'demand') {
-        $('#demand-item .items-pager').append(htmlStr)
-      } else {
-        $('#best-items-item .items-pager').append(htmlStr)
+      $targetPager.append(htmlStr);
+      if (type != 'demand') {
+        syncItemAllBestItemsClass();
       }
       $('.loading').hide()
       $('.load-more-text').show()
