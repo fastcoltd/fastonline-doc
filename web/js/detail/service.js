@@ -73,6 +73,7 @@ function adjustFilterPosition() {
     const headIsSticky = stickyHeader.classList.contains('is-sticky');
     if (!pageFix) return;
     if (body.offsetWidth < 768) {
+        pageFix.classList.remove('is-sticky');
         const pageFixVisble = pageFix.dataset.visible;
         if (!pageFixVisble) {
             return;
@@ -94,31 +95,31 @@ function adjustFilterPosition() {
         });
         return;
     };
-    pageFix.classList.toggle('is-sticky', headIsSticky);
-    // 计算页面头部所有固定元素的总高度
-    let totalHeight = stickyHeaderHeight;
-    if (pageHead && !headIsSticky) {
-        totalHeight += pageHeadHeight;
+    if (!pageContent || !articleContent) return;
+
+    const articleTitle = document.querySelector('.article-title');
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const pageContentTop = pageContent.getBoundingClientRect().top + scrollTop;
+    const articleStartTop = (articleTitle ? articleTitle.getBoundingClientRect().top : articleContent.getBoundingClientRect().top) + scrollTop;
+    const stickyTop = stickyHeaderHeight + 20;
+    // 全程 fixed：从“与标题对齐”线性过渡到吸顶，避免切换跳变
+    const followTop = articleStartTop - scrollTop;
+    let top = Math.max(stickyTop, followTop);
+    pageFix.classList.add('is-sticky');
+
+    // 靠近 footer 时线性上推，避免突然跳变
+    const footerTop = footer.getBoundingClientRect().top + scrollTop;
+    const bottomPadding = 20;
+    const maxTop = footerTop - scrollTop - pageFix.offsetHeight - bottomPadding;
+    if (top > maxTop) {
+        top = maxTop;
     }
-    // 设置过滤器的位置和高度
-    if (!headIsSticky) {
-        // 非sticky状态：相对于page-content定位
-        Object.assign(pageFix.style, {
-            top: '20px',
-            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
-        });
-    } else {
-        let top = totalHeight + 20
-        let menuContainerScrollTop = articleContent.scrollHeight - document.documentElement.scrollTop - pageFix.clientHeight + pageHeadHeight
-        if (menuContainerScrollTop < 0) {
-            top = totalHeight + menuContainerScrollTop
-        }
-        // sticky状态：固定定位
-        Object.assign(pageFix.style, {
-            top: top + 'px',
-            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
-        });
-    }
+
+    const maxHeight = Math.max(0, window.innerHeight - top - 20);
+    Object.assign(pageFix.style, {
+        top: `${top}px`,
+        maxHeight: `${maxHeight}px`
+    });
 }
 
 
