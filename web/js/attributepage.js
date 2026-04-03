@@ -25,6 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
     return $('#best-items-item .items-pager').first();
   }
 
+  function getActiveDemandPager() {
+    const $activePager = $('#demand-item .items-container[data-layout].is-active .items-pager');
+    if ($activePager.length > 0) {
+      return $activePager.first();
+    }
+    return $('#demand-item .items-pager').first();
+  }
+
   // 初始化 - 设置第一个链接为激活状态
   if (brandPageIndexs.length > 0) {
     brandPageIndexs[0].classList.add('active');
@@ -96,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let type = $('.page-link.active').attr('data-type');
     let $targetPager = $();
     if (type == 'demand') {
-      $targetPager = $('#demand-item .items-pager').first();
+      $targetPager = getActiveDemandPager();
     } else {
       $targetPager = getActiveItemPager();
     }
