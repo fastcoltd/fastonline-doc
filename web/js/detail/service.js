@@ -3,10 +3,14 @@ const stickyHeaderHeight = stickyHeader.offsetHeight;
 const pageContent = document.querySelector('.page-content');
 const pageFix = document.querySelector('.page-fix-box');
 const pageHead = document.querySelector('.page-head');
-const pageHeadHeight = pageHead.offsetHeight;
 const footer = document.getElementsByTagName('footer')[0];
-const footerHeight = footer.offsetHeight;
 const articleContent = document.querySelector('.article-content')
+let headerHiddenOffset = 0;
+
+function getVisibleHeaderHeight() {
+    if (!stickyHeader) return 0;
+    return Math.max(0, stickyHeader.offsetHeight - headerHiddenOffset);
+}
 // 博客文章详情页面交互功能
 document.addEventListener('DOMContentLoaded', function () {
     const link = new LinkRef('toc-item', 'post-detail-section');
@@ -58,11 +62,18 @@ function debounce(func, wait) {
 function updateStickyHeader() {
     if (!stickyHeader) return;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    if (scrollTop > pageHeadHeight) {
-        stickyHeader.classList.add('is-sticky');
+
+    if (window.innerWidth >= 768) {
+        const fullHeaderHeight = stickyHeaderHeight;
+        headerHiddenOffset = Math.min(scrollTop, fullHeaderHeight);
+        stickyHeader.style.transform = `translate(-50%, -${headerHiddenOffset}px)`;
     } else {
-        stickyHeader.classList.remove('is-sticky');
+        headerHiddenOffset = 0;
+        stickyHeader.style.transform = '';
     }
+
+    const shouldSticky = scrollTop > 0;
+    stickyHeader.classList.toggle('is-sticky', shouldSticky);
     adjustFilterPosition();
 }
 updateStickyHeader();
@@ -71,6 +82,7 @@ updateStickyHeader();
 function adjustFilterPosition() {
     const body = document.getElementsByTagName('body')[0];
     const headIsSticky = stickyHeader.classList.contains('is-sticky');
+    const currentHeaderHeight = getVisibleHeaderHeight();
     if (!pageFix) return;
     if (body.offsetWidth < 768) {
         pageFix.classList.remove('is-sticky');
@@ -82,8 +94,8 @@ function adjustFilterPosition() {
             Object.assign(pageFix.style, {
                 position: 'fixed',
                 left: 16 + 'px',
-                top: stickyHeaderHeight + 20 + 'px',
-                maxHeight: `calc(100vh - ${stickyHeaderHeight + 40}px)`
+                top: currentHeaderHeight + 20 + 'px',
+                maxHeight: `calc(100vh - ${currentHeaderHeight + 40}px)`
             });
             return;
         }
@@ -91,7 +103,7 @@ function adjustFilterPosition() {
             position: 'relative',
             left: 0,
             top: 20 + 'px',
-            maxHeight: `calc(100vh - ${stickyHeaderHeight + pageHeadHeight + 40}px)`
+            maxHeight: `calc(100vh - ${currentHeaderHeight + pageHead.offsetHeight + 40}px)`
         });
         return;
     };
@@ -101,7 +113,7 @@ function adjustFilterPosition() {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const pageContentTop = pageContent.getBoundingClientRect().top + scrollTop;
     const articleStartTop = (articleTitle ? articleTitle.getBoundingClientRect().top : articleContent.getBoundingClientRect().top) + scrollTop;
-    const stickyTop = stickyHeaderHeight + 20;
+    const stickyTop = currentHeaderHeight + 20;
     // 全程 fixed：从“与标题对齐”线性过渡到吸顶，避免切换跳变
     const followTop = articleStartTop - scrollTop;
     let top = Math.max(stickyTop, followTop);
@@ -169,7 +181,7 @@ LinkRef.prototype.setup = function () {
 // 更新激活的导航链接
 LinkRef.prototype.updateActiveLink = function () {
     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const headerHeight = (this.stickyHeader) ? this.stickyHeader.offsetHeight : 0;
+    const headerHeight = getVisibleHeaderHeight();
     const offset = headerHeight; // 额外偏移量
     let activeSection = null;
     let closestDistance = Infinity;
@@ -227,7 +239,7 @@ LinkRef.prototype.scrollToSection = function (sectionId) {
         }
     });
     if (!targetSection) return;
-    const headerHeight = (this.stickyHeader) ? this.stickyHeader.offsetHeight : 0;
+    const headerHeight = getVisibleHeaderHeight();
     const targetTop = targetSection.offsetTop + headerHeight;
 
     this.isScrolling = true;
