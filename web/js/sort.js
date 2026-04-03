@@ -14,10 +14,10 @@ class SortSelector {
                 this.sortContainer.style.display = 'none';
                 return
             }
-            const rect = this.sortButton.getBoundingClientRect()
             this.sortContainer.style.display = 'block';
-            this.sortContainer.style.right = 0;
-            this.sortContainer.style.top = rect.height + 8 + 'px';
+            // 统一使用样式表中的定位，避免不同页面按钮高度差导致弹层位置不一致
+            this.sortContainer.style.removeProperty('right');
+            this.sortContainer.style.removeProperty('top');
         });
 
         // 绑定排序项点击事件
