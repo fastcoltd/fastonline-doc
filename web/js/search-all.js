@@ -192,9 +192,34 @@ const pagination = new Pagination({
     console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
     reloadItems();
   };
-  $(document).ready(function () {
-    $('.page-link').on('click', function() {
-        $('.page-link').removeClass('active')
-        $(this).addClass('active')
-    })
-  })
+const searchTabCardClassMap = {
+    items: 'search-card-first-item',
+    campaigns: 'search-card-second-item',
+    posts: 'search-card-third-item',
+    store: 'search-card-fourth-item',
+    demands: 'search-card-fifth-item'
+};
+
+function filterSearchCardsByType(type) {
+    const cards = document.querySelectorAll('.search-list-container .search-card');
+    const targetClass = searchTabCardClassMap[type];
+
+    cards.forEach((card) => {
+        const shouldShow = type === 'all' || (targetClass && card.classList.contains(targetClass));
+        card.style.display = shouldShow ? '' : 'none';
+    });
+}
+
+$(document).ready(function () {
+    const $pageLinks = $('.page-link');
+
+    $pageLinks.on('click', function () {
+        const selectedType = $(this).attr('data-key');
+        $pageLinks.removeClass('active');
+        $(this).addClass('active');
+        filterSearchCardsByType(selectedType);
+    });
+
+    const defaultType = $('.page-link.active').attr('data-key') || 'all';
+    filterSearchCardsByType(defaultType);
+});
