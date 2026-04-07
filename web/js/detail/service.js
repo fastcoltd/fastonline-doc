@@ -66,7 +66,10 @@ function updateStickyHeader() {
     if (window.innerWidth >= 768) {
         const fullHeaderHeight = stickyHeaderHeight;
         headerHiddenOffset = Math.min(scrollTop, fullHeaderHeight);
-        stickyHeader.style.transform = `translate(-50%, -${headerHiddenOffset}px)`;
+        const usesCenteredMainLayout = stickyHeader.classList.contains('page-top-sticky-main');
+        stickyHeader.style.transform = usesCenteredMainLayout
+            ? `translateY(-${headerHiddenOffset}px)`
+            : `translate(-50%, -${headerHiddenOffset}px)`;
     } else {
         headerHiddenOffset = 0;
         stickyHeader.style.transform = '';
