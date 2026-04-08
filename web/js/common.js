@@ -556,21 +556,89 @@ $(document).ready(function () {
     $('.icon-arrow_up').on('click', function () {
         $(this).parents('.account-item-center').toggleClass('account-item-center-hide')
     })
-    $('.icon-youjian').on('click', function () {
+    const $noticeItemsWrapper = $('.notice-items-wrapper');
+    const $headerNoticeTrigger = $('.header-user-box .item-notice');
+    let noticeHideTimer = null;
+
+    function positionNoticeItemsWrapper($trigger) {
+        if (body.offsetWidth < 768 || !$noticeItemsWrapper.length || !$trigger || !$trigger.length) {
+            return;
+        }
+        const triggerEl = $trigger.get(0);
+        const triggerRect = triggerEl.getBoundingClientRect();
+        const noticeWidth = $noticeItemsWrapper.outerWidth() || 0;
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth || body.offsetWidth;
+        const edgeGap = 12;
+        const topGap = 10;
+        const noticeArrowRatio = 0.7261;
+        let noticeLeft = triggerRect.left + triggerRect.width / 2 - (noticeWidth * noticeArrowRatio);
+        const minLeft = edgeGap;
+        const maxLeft = Math.max(edgeGap, viewportWidth - noticeWidth - edgeGap);
+        noticeLeft = Math.min(Math.max(noticeLeft, minLeft), maxLeft);
+
+        $noticeItemsWrapper.css({
+            top: `${triggerRect.bottom + topGap}px`,
+            left: `${noticeLeft}px`,
+            right: 'auto'
+        });
+    }
+
+    function showNoticeItems($trigger) {
+        if (noticeHideTimer) {
+            clearTimeout(noticeHideTimer);
+            noticeHideTimer = null;
+        }
+        positionNoticeItemsWrapper($trigger);
+        $noticeItemsWrapper.show();
+    }
+
+    function hideNoticeItemsWithDelay(delay) {
+        if (noticeHideTimer) {
+            clearTimeout(noticeHideTimer);
+        }
+        noticeHideTimer = setTimeout(function () {
+            $noticeItemsWrapper.hide();
+            noticeHideTimer = null;
+        }, delay);
+    }
+
+    $headerNoticeTrigger.on('click', function () {
         if (body.offsetWidth < 768) {
-            $('.notice-items-wrapper').toggle()
+            positionNoticeItemsWrapper($(this));
+            $noticeItemsWrapper.toggle();
         }
-    })
-    $('.icon-youjian').on('mouseover', function () {
+    });
+
+    $headerNoticeTrigger.on('mouseenter', function () {
         if (body.offsetWidth >= 768) {
-            $('.notice-items-wrapper').show()
+            showNoticeItems($(this));
         }
-    })
-    $('.icon-youjian').on('mouseout', function () {
+    });
+
+    $headerNoticeTrigger.on('mouseleave', function () {
         if (body.offsetWidth >= 768) {
-            $('.notice-items-wrapper').hide()
+            hideNoticeItemsWithDelay(120);
         }
-    })
+    });
+
+    $noticeItemsWrapper.on('mouseenter', function () {
+        if (body.offsetWidth >= 768 && noticeHideTimer) {
+            clearTimeout(noticeHideTimer);
+            noticeHideTimer = null;
+        }
+    });
+
+    $noticeItemsWrapper.on('mouseleave', function () {
+        if (body.offsetWidth >= 768) {
+            $noticeItemsWrapper.hide();
+        }
+    });
+
+    $(window).on('resize', function () {
+        if (body.offsetWidth >= 768 && $noticeItemsWrapper.is(':visible')) {
+            positionNoticeItemsWrapper($headerNoticeTrigger.first());
+        }
+    });
     $('body').on('click', '.item-buy-btn', function () {
         if ($(this).hasClass('disabled')) {
             return
