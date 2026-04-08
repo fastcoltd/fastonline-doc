@@ -21,10 +21,14 @@ document.addEventListener('DOMContentLoaded', function () {
             body.classList.toggle('modal-open', false);
         }
     });
-    $('.resource-action-like-icon, .icon-is-dianzan').on('click', function() {
-        $(this).parent('.resource-action-group').toggleClass('has-activate')
-      })
-      $('.resource-action-unlike-icon, .icon-not-dianzan').on('click', function() {
-        $(this).parent('.resource-action-group').toggleClass('has-activate')
-      })
+    $('.helpful-section-wrapper .resource-action-like-icon, .helpful-section-wrapper .resource-action-like .resource-action-label').on('click', function () {
+        const wrapper = $(this).closest('.helpful-section-wrapper')
+        wrapper.find('.resource-action-like').addClass('has-activate')
+        wrapper.find('.resource-action-unlike').removeClass('has-activate')
+    })
+    $('.helpful-section-wrapper .resource-action-unlike-icon, .helpful-section-wrapper .resource-action-unlike .resource-action-label').on('click', function () {
+        const wrapper = $(this).closest('.helpful-section-wrapper')
+        wrapper.find('.resource-action-unlike').addClass('has-activate')
+        wrapper.find('.resource-action-like').removeClass('has-activate')
+    })
 });
