@@ -1,11 +1,15 @@
+.page-top-sticky {
+  padding-top: 1.75rem;
+  padding-bottom: 1.75rem;
+}
 .product-info {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   position: relative;
-  padding-bottom: 2.5rem;
-  border-bottom: #F0F0F3 solid 0.125rem;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 .product-info.layout-vertical {
   margin-top: 0;
@@ -13,6 +17,14 @@
 .product-info .item-title-box {
   gap: 1.25rem;
   width: 100%;
+  align-items: center;
+}
+.product-title-mark-box {
+  flex: 1;
+  min-width: 0;
+  max-width: 144.375rem;
+  gap: 1.25rem;
+  align-items: center;
 }
 .product-info .product-title {
   font-family: var(--primary-popfont);
@@ -20,6 +32,9 @@
   color: black;
   font-size: 3.5rem;
   line-height: 5rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 117.25rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -49,59 +64,65 @@
   font-weight: 400;
   font-family: var(--primary-popfont);
 }
-.product-info .icon-aixin {
+.product-info .resource-detail-like-button {
   position: relative;
-}
-.product-title-box {
-  flex: 1;
-  flex-shrink: 1;
-  min-width: 0;
-  /* 确保flex项目可以收缩 */
-  overflow: hidden;
-  /* 隐藏溢出内容 */
-}
-.product-action-box {
+  right: unset;
+  top: unset;
+  margin-left: auto;
+  width: 3rem;
+  height: 3rem;
   flex-shrink: 0;
-  gap: 7.5rem;
-}
-.production-actions {
-  gap: 7.5rem;
-}
-.production-action-icon {
-  width: 4.5rem;
-  height: 4.5rem;
 }
 .item-mark-box {
-  column-gap: 0.75rem;
+  column-gap: 1.25rem;
+  flex-shrink: 0;
 }
 @media screen and (max-width: 768px) {
+  .page-top-sticky {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
   .product-info {
-    padding-bottom: 2rem;
+    padding-bottom: 0;
   }
   .product-info .item-title-box {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
+    position: relative;
   }
-  .product-title-box {
+  .product-title-mark-box {
     width: 100%;
-    /* 确保在移动端占满可用宽度 */
     max-width: 100%;
-    /* 防止溢出 */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-right: 4rem;
   }
   .product-info .product-title {
     font-size: 1.75rem;
     line-height: 2.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    width: 100%;
+    max-width: 100%;
+    white-space: normal;
+    word-break: break-word;
+    word-wrap: break-word;
   }
   .product-info .item-mark-box {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     gap: 0.75rem;
   }
   .product-info .item-mark {
     position: relative;
+  }
+  .product-info .resource-detail-like-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-left: 0;
+    width: 2.75rem;
+    height: 2.75rem;
   }
   .product-breadcrumb {
     display: none;
@@ -120,28 +141,17 @@
   .product-info .item-tag-box {
     display: flex;
   }
-  .product-action-box {
-    width: 100%;
-    justify-content: space-between;
-    gap: 0;
-  }
-  .production-actions {
-    gap: 1.25rem;
-  }
-  .production-action-icon {
-    width: 2.75rem;
-    height: 2.75rem;
-  }
 }
 /* 信息区域 */
 .info-section {
   column-gap: 5rem;
   row-gap: 1.25rem;
   flex-wrap: wrap;
-  width: calc(100% - 45rem);
+  width: 98.75rem;
+  max-width: 100%;
 }
 .info-item {
-  gap: 1.25rem;
+  gap: 1rem;
 }
 .info-item .label {
   font-size: 1.75rem;
@@ -157,9 +167,9 @@
 }
 .info-item .name {
   font-size: 1.75rem;
-  line-height: 3rem;
+  line-height: 2.5rem;
   color: #000;
-  font-weight: 500;
+  font-weight: 400;
   font-family: var(--primary-popfont);
 }
 .icons-section {
@@ -193,7 +203,7 @@
   }
   .info-item .name {
     font-size: 1.5rem;
-    line-height: 3rem;
+    line-height: 2.25rem;
   }
   .icons-section {
     gap: 1.25rem;
