@@ -27,6 +27,7 @@ class HomeMenu {
             });
         });
         this.menuButton.addEventListener('mouseenter', (e) => {
+            this.hideSiblingMenusImmediately();
             if (!this.menuContainer) { return }
             if (this.menuContainer === e.currentTarget || this.menuButton === e.currentTarget) {
                 this.topMenuTimer && clearTimeout(this.topMenuTimer)
@@ -68,6 +69,21 @@ class HomeMenu {
         $(this.menuButton).find('.top-menu-more-box-right').css({
             right: rect.width - this.menuButton.offsetLeft - $(this.menuButton).width()/2 > 0 ? `${rect.width - this.menuButton.offsetLeft - $(this.menuButton).width()/2}px` : '0px'
         })
+    }
+
+    hideSiblingMenusImmediately() {
+        if (!this.menuContent) { return }
+        const siblingItems = this.menuContent.querySelectorAll('.top-menu-item');
+        siblingItems.forEach((item) => {
+            if (item === this.menuButton) {
+                return;
+            }
+            item.classList.remove('active');
+            const siblingMenu = item.querySelector('.top-menu-more-box');
+            if (siblingMenu) {
+                siblingMenu.style.display = 'none';
+            }
+        });
     }
 
     dimissMenuContainer() {
