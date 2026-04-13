@@ -5,6 +5,11 @@ function LinkRef(linkId, sectionId) {
     this.setup();
 }
 
+// 统一使用文档绝对坐标，避免 section 在不同父容器时 offsetTop 失真
+LinkRef.prototype.getSectionTop = function (section) {
+    return section.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+}
+
 // 滚动监听事件
 LinkRef.prototype.handleScroll = function () {
     if (this.isScrolling) return;
@@ -50,7 +55,7 @@ LinkRef.prototype.updateActiveLink = function () {
     let closestDistance = Infinity;
     this.sections.forEach(section => {
         if (activeSection) { return }
-        const sectionTop = section.offsetTop;
+        const sectionTop = this.getSectionTop(section);
         const sectionBottom = sectionTop + section.offsetHeight;
         const distance = Math.abs(scrollTop + offset - sectionTop);
         // 检查当前section是否在可视区域内
@@ -64,7 +69,7 @@ LinkRef.prototype.updateActiveLink = function () {
     // 如果没有找到活跃的section，使用最接近顶部的section
     if (!activeSection) {
         this.sections.forEach(section => {
-            const sectionTop = section.offsetTop;
+            const sectionTop = this.getSectionTop(section);
             if (scrollTop + offset >= sectionTop - 20) {
                 activeSection = section;
             }
@@ -104,7 +109,7 @@ LinkRef.prototype.scrollToSection = function (sectionId) {
     });
     if (!targetSection) return;
     const headerHeight = (this.stickyHeader) ? this.stickyHeader.offsetHeight : 0;
-    const targetTop = targetSection.offsetTop - headerHeight;
+    const targetTop = this.getSectionTop(targetSection) - headerHeight;
 
     this.isScrolling = true;
 
