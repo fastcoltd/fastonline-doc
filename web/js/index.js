@@ -24,7 +24,15 @@ window.addEventListener('DOMContentLoaded', function () {
         return ($('.brand-item').width() || 0) * 2;
     }
 
+    function setBrandArrowDisabled(ele, disabled) {
+        ele.classList.toggle('brand-arrow-disabled', disabled);
+        ele.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+    }
+
     brandRightMore.addEventListener('click', function (event) {
+        if (brandRightMore.classList.contains('brand-arrow-disabled')) {
+            return;
+        }
         event.preventDefault();
         event.stopPropagation();
         const maxBrandScrollOffsetX = getBrandMaxScrollOffsetX();
@@ -38,6 +46,9 @@ window.addEventListener('DOMContentLoaded', function () {
         });
     })
     brandLeftMore.addEventListener('click', function (event) {
+        if (brandLeftMore.classList.contains('brand-arrow-disabled')) {
+            return;
+        }
         event.preventDefault();
         event.stopPropagation();
         brandScrollOffsetX -= getBrandScrollStep();
@@ -56,14 +67,23 @@ window.addEventListener('DOMContentLoaded', function () {
         const offsetX = brandContent.scrollLeft;
         const canScrollHorizontal = maxBrandScrollOffsetX > BRAND_SCROLL_EPSILON;
 
-        if (isMobile || !canScrollHorizontal) {
+        if (isMobile) {
             brandLeftMore.style.display = 'none';
             brandRightMore.style.display = 'none';
             return;
         }
 
-        brandLeftMore.style.display = offsetX <= BRAND_SCROLL_EPSILON ? 'none' : 'block';
-        brandRightMore.style.display = offsetX >= maxBrandScrollOffsetX - BRAND_SCROLL_EPSILON ? 'none' : 'block';
+        brandLeftMore.style.display = 'block';
+        brandRightMore.style.display = 'block';
+
+        if (!canScrollHorizontal) {
+            setBrandArrowDisabled(brandLeftMore, true);
+            setBrandArrowDisabled(brandRightMore, true);
+            return;
+        }
+
+        setBrandArrowDisabled(brandLeftMore, offsetX <= BRAND_SCROLL_EPSILON);
+        setBrandArrowDisabled(brandRightMore, offsetX >= maxBrandScrollOffsetX - BRAND_SCROLL_EPSILON);
     }
 
     brandContent.addEventListener('scroll', brandScroll, { passive: true });
