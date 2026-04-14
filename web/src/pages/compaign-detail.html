@@ -199,7 +199,6 @@
                         <li><a href="#section-4" target="_self">Provident eligendi quo hic magni.</a></li>
                         <li><a href="#section-5" target="_self">Items titleItems titleItems titleItems titleItems title...</a></li>
                         <li><a href="#section-6" target="_self">Comments</a></li>
-                        <li><a href="#section-7" target="_self">Related Items</a></li>
                     </ul>
                 </nav>
             </aside>
@@ -282,6 +281,7 @@
         function initCompaignDetailStickySummary() {
             const stickyHead = document.querySelector('.page-top-sticky-main');
             const summary = document.querySelector('.compaign-detail-summary');
+            const sideAnchor = document.querySelector('.compaign-detail-main-right');
 
             if (!summary) {
                 return;
@@ -309,7 +309,17 @@
                 const visibleHeaderHeight = getCompaignDetailHeaderVisibleHeight();
                 summary.style.top = visibleHeaderHeight + 'px';
                 const summaryRect = summary.getBoundingClientRect();
-                summary.classList.toggle('is-sticky', summaryRect.top <= visibleHeaderHeight + 1);
+                const summaryIsSticky = summaryRect.top <= visibleHeaderHeight + 1;
+                summary.classList.toggle('is-sticky', summaryIsSticky);
+
+                if (sideAnchor) {
+                    if (window.innerWidth > 980) {
+                        const sideTop = getCompaignDetailStickyOffset() + 20;
+                        sideAnchor.style.top = sideTop + 'px';
+                    } else {
+                        sideAnchor.style.top = '';
+                    }
+                }
             };
 
             window.addEventListener('scroll', syncStickyState, { passive: true });
