@@ -216,26 +216,14 @@
   background: #fff;
   height: 89.25rem;
   overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.compaign-detail-side-nav::after {
-  content: "";
-  position: absolute;
-  top: 19.9063rem;
-  right: 0.25rem;
-  width: 0.75rem;
-  height: 41.1001rem;
-  border-radius: 99rem;
-  background: #c5c5c5;
-  z-index: 1;
-  pointer-events: none;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #c5c5c5 transparent;
 }
 
 .compaign-detail-side-nav::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 .compaign-detail-side-nav::-webkit-scrollbar-track {
@@ -248,6 +236,7 @@
 }
 
 .compaign-detail-side-list {
+  width: 100%;
   margin: 0;
   padding-left: 2.625rem;
   display: flex;
@@ -256,7 +245,9 @@
 }
 
 .compaign-detail-side-list li {
-  width: 46.25rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   color: #000;
   font-family: "Inter", var(--primary-popfont);
   font-size: 1.75rem;
@@ -277,14 +268,16 @@
 .compaign-detail-side-list a {
   display: block;
   width: 100%;
-  max-width: 46.25rem;
+  max-width: 100%;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
   font-weight: inherit;
   color: inherit;
   text-decoration: none;
-  word-break: break-word;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
 .compaign-detail-recommend-section {
@@ -343,10 +336,6 @@
     height: auto;
     max-height: none;
     overflow-y: visible;
-  }
-
-  .compaign-detail-side-nav::after {
-    display: none;
   }
 
   .compaign-detail-recommend-list .layout-vertical .compaign-item {
