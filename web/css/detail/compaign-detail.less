@@ -14,10 +14,37 @@
   top: 0;
   z-index: 45;
   background: #fff;
+  border: none;
 }
 
 .compaign-detail-summary.is-sticky {
-  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.08);
+  box-shadow: none;
+  border-bottom: none;
+}
+
+.compaign-detail-summary.is-sticky::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 50vw);
+  top: calc(100% + 2.5rem);
+  width: 100vw;
+  height: 0.125rem;
+  background: #E5E5E5;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.compaign-detail-summary.is-sticky::before {
+  content: '';
+  position: absolute;
+  left: calc(50% - 50vw);
+  top: 100%;
+  width: 100vw;
+  height: 2.5rem;
+  background: #fff;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .compaign-detail-summary-head {
@@ -140,6 +167,10 @@
   width: 100%;
   height: 0.125rem;
   background: #f0f0f3;
+}
+
+.compaign-detail-summary.is-sticky + .compaign-detail-divider {
+  visibility: hidden;
 }
 
 .compaign-detail-main-section {
@@ -407,6 +438,18 @@
 
   .compaign-detail-summary.is-sticky {
     box-shadow: none;
+  }
+
+  .compaign-detail-summary.is-sticky::after {
+    content: none;
+  }
+
+  .compaign-detail-summary.is-sticky::before {
+    content: none;
+  }
+
+  .compaign-detail-summary.is-sticky + .compaign-detail-divider {
+    visibility: visible;
   }
 
   .compaign-detail-page-content {
