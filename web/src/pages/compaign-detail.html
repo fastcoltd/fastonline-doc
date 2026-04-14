@@ -259,6 +259,64 @@
 
         refreshHeaderUserUI();
 
+        function getCompaignDetailHeaderVisibleHeight() {
+            const stickyHead = document.querySelector('.page-top-sticky-main');
+            if (!stickyHead || window.innerWidth < 768) {
+                return 0;
+            }
+            const rect = stickyHead.getBoundingClientRect();
+            return Math.max(0, rect.bottom);
+        }
+
+        function getCompaignDetailStickyOffset() {
+            const summary = document.querySelector('.compaign-detail-summary');
+            const headerVisibleHeight = getCompaignDetailHeaderVisibleHeight();
+            if (!summary || window.innerWidth < 768) {
+                return headerVisibleHeight;
+            }
+            const summaryRect = summary.getBoundingClientRect();
+            const summaryIsSticky = summaryRect.top <= headerVisibleHeight + 1;
+            return headerVisibleHeight + (summaryIsSticky ? summary.offsetHeight : 0);
+        }
+
+        function initCompaignDetailStickySummary() {
+            const stickyHead = document.querySelector('.page-top-sticky-main');
+            const summary = document.querySelector('.compaign-detail-summary');
+
+            if (!summary) {
+                return;
+            }
+
+            if (stickyHead) {
+                stickyHead.style.transition = 'none';
+                stickyHead.style.willChange = 'transform';
+            }
+
+            const syncStickyState = function () {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+                if (stickyHead) {
+                    if (window.innerWidth >= 768) {
+                        const fullHeaderHeight = stickyHead.offsetHeight;
+                        const hiddenOffset = Math.min(scrollTop, fullHeaderHeight);
+                        stickyHead.style.transform = 'translateY(-' + hiddenOffset + 'px)';
+                    } else {
+                        stickyHead.style.transform = '';
+                    }
+                    stickyHead.classList.toggle('is-sticky', scrollTop > 0);
+                }
+
+                const visibleHeaderHeight = getCompaignDetailHeaderVisibleHeight();
+                summary.style.top = visibleHeaderHeight + 'px';
+                const summaryRect = summary.getBoundingClientRect();
+                summary.classList.toggle('is-sticky', summaryRect.top <= visibleHeaderHeight + 1);
+            };
+
+            window.addEventListener('scroll', syncStickyState, { passive: true });
+            window.addEventListener('resize', syncStickyState);
+            syncStickyState();
+        }
+
         function initCompaignDetailAnchors() {
             const navItems = Array.from(document.querySelectorAll('.compaign-detail-side-list li'));
             const navLinks = Array.from(document.querySelectorAll('.compaign-detail-side-list a[href^="#"]'));
@@ -267,12 +325,8 @@
                 return;
             }
 
-            const getHeaderHeight = function () {
-                const stickyHead = document.querySelector('.page-top-sticky-main');
-                if (!stickyHead) {
-                    return 0;
-                }
-                return stickyHead.getBoundingClientRect().height;
+            const getCurrentOffset = function () {
+                return getCompaignDetailStickyOffset();
             };
 
             const setActiveByHash = function (hash) {
@@ -300,7 +354,7 @@
                 if (!sections.length) {
                     return;
                 }
-                const currentTop = window.pageYOffset + getHeaderHeight() + 32;
+                const currentTop = window.pageYOffset + getCurrentOffset() + 20;
                 let activeSection = sections[0];
 
                 sections.forEach(function (section) {
@@ -324,7 +378,7 @@
                         return;
                     }
                     event.preventDefault();
-                    const targetTop = target.getBoundingClientRect().top + window.pageYOffset - getHeaderHeight() - 20;
+                    const targetTop = target.getBoundingClientRect().top + window.pageYOffset - getCurrentOffset() - 20;
                     window.scrollTo({
                         top: Math.max(0, targetTop),
                         behavior: 'smooth'
@@ -339,7 +393,10 @@
             updateActiveByScroll();
         }
 
-        document.addEventListener('DOMContentLoaded', initCompaignDetailAnchors);
+        document.addEventListener('DOMContentLoaded', function () {
+            initCompaignDetailStickySummary();
+            initCompaignDetailAnchors();
+        });
     </script>
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/user.js"></script>
