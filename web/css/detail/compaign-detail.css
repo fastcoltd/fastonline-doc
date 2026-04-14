@@ -202,44 +202,89 @@
 }
 
 .compaign-detail-main-right {
-  width: 41rem;
+  width: 51.2588rem;
   flex-shrink: 0;
 }
 
 .compaign-detail-side-nav {
   width: 100%;
   border: 0.125rem solid #f0f0f3;
-  border-radius: 2rem;
+  border-radius: 2.5rem;
   padding: 2.5rem;
   position: sticky;
   top: 16rem;
   background: #fff;
-  max-height: 71.5rem;
+  height: 89.25rem;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.compaign-detail-side-nav::after {
+  content: "";
+  position: absolute;
+  top: 19.9063rem;
+  right: 0.25rem;
+  width: 0.75rem;
+  height: 41.1001rem;
+  border-radius: 99rem;
+  background: #c5c5c5;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.compaign-detail-side-nav::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.compaign-detail-side-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.compaign-detail-side-nav::-webkit-scrollbar-thumb {
+  background: #c5c5c5;
+  border-radius: 99rem;
 }
 
 .compaign-detail-side-list {
   margin: 0;
-  padding-left: 2rem;
+  padding-left: 2.625rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
 .compaign-detail-side-list li {
-  color: #242424;
+  width: 46.25rem;
+  color: #000;
+  font-family: "Inter", var(--primary-popfont);
+  font-size: 1.75rem;
+  line-height: 2.75rem;
+  font-weight: 400;
+}
+
+.compaign-detail-side-list li::marker {
+  color: currentColor;
+  font-size: 1.5rem;
 }
 
 .compaign-detail-side-list li.is-active {
   color: #ff1b20;
+  font-weight: 500;
 }
 
 .compaign-detail-side-list a {
-  font-family: var(--primary-popfont);
-  font-size: 1.75rem;
-  line-height: 2.75rem;
-  font-weight: 400;
+  display: block;
+  width: 100%;
+  max-width: 46.25rem;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
   color: inherit;
+  text-decoration: none;
+  word-break: break-word;
 }
 
 .compaign-detail-recommend-section {
@@ -272,7 +317,7 @@
   }
 
   .compaign-detail-main-right {
-    width: 36rem;
+    width: 45rem;
   }
 
   .compaign-detail-recommend-list .layout-vertical .compaign-detail-recommend-grid {
@@ -295,7 +340,13 @@
 
   .compaign-detail-side-nav {
     position: static;
+    height: auto;
     max-height: none;
+    overflow-y: visible;
+  }
+
+  .compaign-detail-side-nav::after {
+    display: none;
   }
 
   .compaign-detail-recommend-list .layout-vertical .compaign-item {
@@ -374,6 +425,10 @@
   .compaign-detail-side-list {
     gap: 1rem;
     padding-left: 1.6rem;
+  }
+
+  .compaign-detail-side-list li {
+    width: 100%;
   }
 
   .compaign-detail-side-list a {
