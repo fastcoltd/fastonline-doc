@@ -503,7 +503,7 @@ $(document).ready(function () {
     $('.kefu-icon').on('click', function () {
         alert('你好，客服为您服务')
     })
-    const AIXIN_NORMAL_SRC = 'image/Vector_nor.png'
+    const AIXIN_NORMAL_SRC = 'image/Vector_nor.svg'
     const AIXIN_SELECTED_SRC = 'image/Vector_sel.png'
 
     function syncAixinState($icon) {
@@ -513,7 +513,7 @@ $(document).ready(function () {
             $icon.attr('src', like ? AIXIN_SELECTED_SRC : AIXIN_NORMAL_SRC)
             return
         }
-        $icon.css({ color: like ? '#FF1B20' : '#D9D9D9' })
+        $icon.css({ color: like ? '#FF1B20' : '#C5C5C5' })
     }
 
     $('body').on('click', '.icon-aixin', function () {
