@@ -1,0 +1,71 @@
+<script>
+    function dismissHomeMenuPage() {}
+
+    function refreshHeaderUserUI() {
+        var user = window.user || location.href.indexOf('isLogin') > -1;
+        var signinButton = document.getElementById('header-signin');
+        var joinButton = document.getElementById('header-join');
+        var userBox = document.getElementById('header-user');
+
+        if (!signinButton || !joinButton || !userBox) {
+            return;
+        }
+
+        signinButton.style.display = user ? 'none' : '';
+        joinButton.style.display = user ? 'none' : '';
+        userBox.style.display = user ? '' : 'none';
+
+        if (!user) {
+            return;
+        }
+
+        var avatarText = userBox.querySelector('.header-user-avatar-box');
+        var avatarImage = userBox.querySelector('.header-user-icon');
+        var username = typeof user === 'object' && user.name ? user.name.trim() : '';
+        var avatarLabel = username ? username.charAt(0).toUpperCase() : 'E';
+
+        if (avatarText) {
+            avatarText.textContent = avatarLabel;
+            avatarText.style.display = 'flex';
+        }
+
+        if (avatarImage) {
+            avatarImage.style.display = 'none';
+        }
+    }
+
+    refreshHeaderUserUI();
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var pageMode = '{{auth_mode}}';
+        var signinElement = document.getElementById('signin');
+
+        if (!signinElement || typeof displaySigninPage !== 'function' || typeof displayBackButton !== 'function') {
+            return;
+        }
+
+        var navModeMap = {
+            'login': ['login'],
+            'join': ['login', 'regist'],
+            '2fa': ['login', '2fa'],
+            'reset-2fa': ['login', '2fa', 'reset2fa'],
+            'reset-password': ['login', 'resetpwd']
+        };
+
+        signinElement.classList.add('signin-bg-static-page');
+        signinElement.style.display = 'flex';
+        signinNavArray = (navModeMap[pageMode] || navModeMap.login).slice();
+        displaySigninPage();
+        displayBackButton();
+
+        if (typeof signinCloseButton !== 'undefined' && signinCloseButton) {
+            signinCloseButton.addEventListener('click', function (event) {
+                if (!signinElement.classList.contains('signin-bg-static-page')) {
+                    return;
+                }
+                event.preventDefault();
+                event.stopImmediatePropagation();
+            }, true);
+        }
+    });
+</script>
