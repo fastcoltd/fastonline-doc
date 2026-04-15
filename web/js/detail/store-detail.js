@@ -339,32 +339,34 @@ function adjustFilterPosition() {
         });
         return;
     };
-    pageFix.classList.toggle('is-sticky', headIsSticky);
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const pageContentRect = pageContent ? pageContent.getBoundingClientRect() : null;
+    const pageContentTopDoc = pageContentRect ? pageContentRect.top + scrollTop : 0;
+    const baseTop = 20;
+    const stickyTop = stickyHeaderHeight + baseTop;
+    // 仅当左侧模块自然滚动到吸附线时，才切换 fixed，避免“突跳”
+    const shouldSticky = headIsSticky && (scrollTop + stickyTop >= pageContentTopDoc + baseTop);
 
-    // 计算页面头部所有固定元素的总高度
-    let totalHeight = stickyHeaderHeight;
-    if (pageHead && !headIsSticky) {
-        totalHeight += pageHeadHeight;
-    }
+    pageFix.classList.toggle('is-sticky', shouldSticky);
 
-    // 非吸顶状态：保持原始位置
-    if (!headIsSticky) {
+    // 非吸顶状态：保持原始位置，线性随页面滚动
+    if (!shouldSticky) {
+        const currentTop = pageFix.getBoundingClientRect().top;
+        const nonStickyMaxHeight = Math.max(100, window.innerHeight - currentTop - baseTop);
         Object.assign(pageFix.style, {
             left: '',
             transform: '',
-            top: '20px',
-            maxHeight: ''
+            top: `${baseTop}px`,
+            maxHeight: `${nonStickyMaxHeight}px`
         });
         return;
     }
 
     // 吸顶状态：顶部吸附，同时在接近 footer 时上推，避免遮挡底部
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const stickyTop = totalHeight + 20;
     let top = stickyTop;
     if (footer) {
         const footerTop = footer.getBoundingClientRect().top + scrollTop;
-        const maxTop = footerTop - scrollTop - pageFix.offsetHeight - 20;
+        const maxTop = footerTop - scrollTop - pageFix.offsetHeight - baseTop;
         if (maxTop < stickyTop) {
             top = maxTop;
         }
