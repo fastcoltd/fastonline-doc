@@ -342,6 +342,7 @@ function adjustFilterPosition() {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const pageContentRect = pageContent ? pageContent.getBoundingClientRect() : null;
     const pageContentTopDoc = pageContentRect ? pageContentRect.top + scrollTop : 0;
+    const pageContentLeft = pageContentRect ? pageContentRect.left : 0;
     const baseTop = 20;
     const stickyTop = stickyHeaderHeight + baseTop;
     // 仅当左侧模块自然滚动到吸附线时，才切换 fixed，避免“突跳”
@@ -354,9 +355,9 @@ function adjustFilterPosition() {
         const currentTop = pageFix.getBoundingClientRect().top;
         const nonStickyMaxHeight = Math.max(100, window.innerHeight - currentTop - baseTop);
         Object.assign(pageFix.style, {
-            position: '',
-            left: '',
-            transform: '',
+            position: 'absolute',
+            left: '0px',
+            transform: 'none',
             top: `${baseTop}px`,
             maxHeight: `${nonStickyMaxHeight}px`
         });
@@ -374,9 +375,9 @@ function adjustFilterPosition() {
     }
 
     Object.assign(pageFix.style, {
-        position: '',
-        left: '',
-        transform: '',
+        position: 'fixed',
+        left: `${pageContentLeft}px`,
+        transform: 'none',
         top: `${top}px`,
         maxHeight: `calc(100vh - ${stickyTop + 20}px)`
     });
