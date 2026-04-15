@@ -8,6 +8,7 @@ const pageHead = document.querySelector('.page-head');
 const pageHeadHeight = pageHead.offsetHeight;
 const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
+let storeLeftScrollTimer = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     const link = new LinkRef('page-link', 'item-detail-right-group');
@@ -86,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeDropdowns();
     initializeValidation();
     initializeOverviewTimeTabs();
+    initializeStoreLeftScrollbar();
 
     $('.item-detail-review-tool-icon-yes').on('click', function() {
         console.log($(this).parent())
@@ -95,6 +97,19 @@ document.addEventListener('DOMContentLoaded', function () {
         $(this).parent().toggleClass('has-activate')
     })
 })
+
+function initializeStoreLeftScrollbar() {
+    if (!pageFix) return;
+    pageFix.addEventListener('scroll', function () {
+        pageFix.classList.add('is-scrolling');
+        if (storeLeftScrollTimer) {
+            clearTimeout(storeLeftScrollTimer);
+        }
+        storeLeftScrollTimer = setTimeout(function () {
+            pageFix.classList.remove('is-scrolling');
+        }, 450);
+    }, { passive: true });
+}
 
 function initializeOverviewTimeTabs() {
     const tabItems = document.querySelectorAll('.overview-header .tabs-container .tab-item');
