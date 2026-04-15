@@ -133,27 +133,10 @@ $(document).ready(function () {
 
         const offsetX = Math.ceil(menuContent.scrollLeft);
         let maxMenuScrollOffsetX = menuContent.scrollWidth - menuContent.clientWidth
-        if (maxMenuScrollOffsetX <= 0) {
-            menuRightMore.style.display = 'none';
-            menuleftMore.style.display = 'none';
-            topMenuBox.style.padding = '0'
-        } else {
-            const canScrollLeft = offsetX > 0;
-            const canScrollRight = offsetX < maxMenuScrollOffsetX;
-
-            menuRightMore.style.display = canScrollRight ? 'block' : 'none';
-            menuleftMore.style.display = canScrollLeft ? 'block' : 'none';
-
-            if (canScrollLeft && canScrollRight) {
-                topMenuBox.style.padding = '0 3rem';
-            } else if (canScrollLeft && !canScrollRight) {
-                topMenuBox.style.padding = '0 0 0 3rem';
-            } else if (!canScrollLeft && canScrollRight) {
-                topMenuBox.style.padding = '0 3rem 0 0';
-            } else {
-                topMenuBox.style.padding = '0';
-            }
-        }
+        // 左右箭头始终显示；是否可滚动通过透明度和光标态表达
+        menuRightMore.style.display = 'block';
+        menuleftMore.style.display = 'block';
+        topMenuBox.style.padding = '0 3rem';
         if (offsetX >= maxMenuScrollOffsetX) {
             menuRightMore.style.cursor = 'not-allowed';
             menuRightMore.style.opacity = '0.3';
