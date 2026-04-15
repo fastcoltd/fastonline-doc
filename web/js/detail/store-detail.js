@@ -339,13 +339,41 @@ function adjustFilterPosition() {
         });
         return;
     };
-    // store-detail 左侧信息区按页面线性滚动，避免阈值切换时跳动
-    pageFix.classList.remove('is-sticky');
+    pageFix.classList.toggle('is-sticky', headIsSticky);
+
+    // 计算页面头部所有固定元素的总高度
+    let totalHeight = stickyHeaderHeight;
+    if (pageHead && !headIsSticky) {
+        totalHeight += pageHeadHeight;
+    }
+
+    // 非吸顶状态：保持原始位置
+    if (!headIsSticky) {
+        Object.assign(pageFix.style, {
+            left: '',
+            transform: '',
+            top: '20px',
+            maxHeight: ''
+        });
+        return;
+    }
+
+    // 吸顶状态：顶部吸附，同时在接近 footer 时上推，避免遮挡底部
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const stickyTop = totalHeight + 20;
+    let top = stickyTop;
+    if (footer) {
+        const footerTop = footer.getBoundingClientRect().top + scrollTop;
+        const maxTop = footerTop - scrollTop - pageFix.offsetHeight - 20;
+        if (maxTop < stickyTop) {
+            top = maxTop;
+        }
+    }
+
     Object.assign(pageFix.style, {
-        position: 'absolute',
-        left: '0',
+        left: '',
         transform: '',
-        top: '20px',
-        maxHeight: ''
+        top: `${top}px`,
+        maxHeight: `calc(100vh - ${stickyTop + 20}px)`
     });
 }
