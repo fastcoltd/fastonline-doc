@@ -276,12 +276,10 @@ function clearAllInputs() {
     document.getElementById('tagInput').value = '';
 }
 
-// 滚动监听事件
-const handleScroll = debounce(function () {
+// 滚动监听事件：每次滚动立即更新，避免快速滚动时出现“先越过再吸附”的突跳
+window.addEventListener('scroll', function () {
     updateStickyHeader();
-}, 16);
-
-window.addEventListener('scroll', handleScroll, { passive: true });
+}, { passive: true });
 
 // 页面加载时调整位置
 document.addEventListener('DOMContentLoaded', adjustFilterPosition);
@@ -303,7 +301,9 @@ function debounce(func, wait) {
 function updateStickyHeader() {
     if (!stickyHeader) return;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    if (scrollTop + $('.page-link-box').height() > pageHeadHeight) {
+    const pageLink = document.querySelector('.page-link-box');
+    const pageLinkHeight = pageLink ? pageLink.offsetHeight : 0;
+    if (scrollTop + pageLinkHeight > pageHeadHeight) {
         stickyHeader.classList.add('is-sticky');
     } else {
         stickyHeader.classList.remove('is-sticky');
@@ -354,6 +354,7 @@ function adjustFilterPosition() {
         const currentTop = pageFix.getBoundingClientRect().top;
         const nonStickyMaxHeight = Math.max(100, window.innerHeight - currentTop - baseTop);
         Object.assign(pageFix.style, {
+            position: '',
             left: '',
             transform: '',
             top: `${baseTop}px`,
@@ -373,6 +374,7 @@ function adjustFilterPosition() {
     }
 
     Object.assign(pageFix.style, {
+        position: '',
         left: '',
         transform: '',
         top: `${top}px`,
