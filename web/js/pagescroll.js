@@ -7,6 +7,7 @@ const pageHeadHeight = pageHead.offsetHeight;
 const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
 const listContainer = document.querySelector('.list-container-page-scoll')
+const isBrandPageIndexBox = pageFix && pageFix.classList.contains('brand-page-index-box');
 
 window.addEventListener('scroll', updateStickyHeader, { passive: true });
 window.addEventListener('resize', adjustFilterPosition);
@@ -45,27 +46,54 @@ function adjustFilterPosition() {
     const body = document.getElementsByTagName('body')[0];
     const headIsSticky = stickyHeader.classList.contains('is-sticky');
     if (!pageFix) return;
+    if (isBrandPageIndexBox) {
+        const headerElement = document.querySelector('.page-head header');
+        const topMenuElement = document.querySelector('.page-head .top-menu-container');
+        const footerElement = document.querySelector('footer.common-footer-wrapper') || footer;
+        const headerHeightCurrent = headerElement ? headerElement.offsetHeight : 0;
+        const topMenuHeightCurrent = topMenuElement ? topMenuElement.offsetHeight : 0;
+        const footerHeightCurrent = footerElement ? footerElement.offsetHeight : 0;
+        const pageContentRect = pageContent ? pageContent.getBoundingClientRect() : null;
+        const baseTop = headerHeightCurrent + topMenuHeightCurrent;
+        const contentTop = pageContentRect ? pageContentRect.top : baseTop;
+        const fixedTop = Math.max(baseTop, contentTop);
+        const anchorHeight = Math.max(window.innerHeight - fixedTop - footerHeightCurrent, 0);
+        Object.assign(pageFix.style, {
+            position: 'fixed',
+            left: pageContentRect ? `${pageContentRect.left}px` : '',
+            transform: 'none',
+            top: `${fixedTop}px`,
+            height: `${anchorHeight}px`,
+            maxHeight: `${anchorHeight}px`,
+            overflowY: 'visible'
+        });
+        return;
+    }
     if (body.offsetWidth < 768) {
         const pageFixVisble = pageFix.dataset.visible;
         if (!pageFixVisble) {
             return;
         }
         if (headIsSticky) {
+            const pageFixHeight = `calc(100vh - ${stickyHeaderHeight + 40}px)`;
             Object.assign(pageFix.style, {
                 position: 'fixed',
                 left: 16 + 'px',
                 transform: 'none',
                 top: stickyHeaderHeight + 20 + 'px',
-                maxHeight: `calc(100vh - ${stickyHeaderHeight + 40}px)`
+                maxHeight: pageFixHeight,
+                height: isBrandPageIndexBox ? pageFixHeight : ''
             });
             return;
         }
+        const pageFixHeight = `calc(100vh - ${stickyHeaderHeight + pageHeadHeight + 40}px)`;
         Object.assign(pageFix.style, {
             position: 'relative',
             left: '',
             transform: '',
             top: 20 + 'px',
-            maxHeight: `calc(100vh - ${stickyHeaderHeight + pageHeadHeight + 40}px)`
+            maxHeight: pageFixHeight,
+            height: isBrandPageIndexBox ? pageFixHeight : ''
         });
         return;
     };
@@ -78,10 +106,12 @@ function adjustFilterPosition() {
     }
     // 设置过滤器的位置和高度
     if (!headIsSticky) {
+        const pageFixHeight = `calc(100vh - ${totalHeight + 40}px)`;
         // 非sticky状态：相对于page-content定位
         Object.assign(pageFix.style, {
             top: '20px',
-            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
+            maxHeight: pageFixHeight, // 添加max-height
+            height: isBrandPageIndexBox ? pageFixHeight : ''
         });
     } else {
         let top = totalHeight + 20
@@ -89,10 +119,12 @@ function adjustFilterPosition() {
         if (menuContainerScrollTop < 0) {
             top = totalHeight + menuContainerScrollTop
         }
+        const pageFixHeight = `calc(100vh - ${totalHeight + 40}px)`;
         // sticky状态：固定定位
         Object.assign(pageFix.style, {
             top: top + 'px',
-            maxHeight: `calc(100vh - ${totalHeight + 40}px)` // 添加max-height
+            maxHeight: pageFixHeight, // 添加max-height
+            height: isBrandPageIndexBox ? pageFixHeight : ''
         });
     }
 }
