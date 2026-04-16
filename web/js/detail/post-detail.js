@@ -185,28 +185,68 @@ function createItemElement(item) {
     return div;
 }
 
+function bindReviewItemEvents(element) {
+    if (!element) {
+        return;
+    }
+    const reviewer = element.querySelector('.post-detail-reiviewer-box');
+    if (!reviewer) {
+        return;
+    }
+    const user = reviewer.querySelector('.post-detail-reviewer-user-box');
+    const arrow = user ? user.querySelector('.post-detail-reviewer-arrow') : null;
+    const content = reviewer.querySelector('.post-detail-reviewer-content');
+    if (!user || !arrow || !content) {
+        return;
+    }
+    if (user.dataset.boundReviewToggle === 'true') {
+        return;
+    }
+    user.dataset.boundReviewToggle = 'true';
+    user.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (content.style.display === 'none') {
+            content.style.display = 'inline-block';
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            content.style.display = 'none';
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    });
+}
+
 // 博客文章详情页面交互功能
 document.addEventListener('DOMContentLoaded', function () {
     const relateItems = new Carousel('best-items', 20);
     const link = new LinkRef('toc-item', 'post-detail-section');
     const reviews = document.querySelectorAll('.post-detail-review-item');
     reviews.forEach(element => {
-        const reviewer = element.querySelector('.post-detail-reiviewer-box');
-        const user = reviewer.querySelector('.post-detail-reviewer-user-box')
-        const arrow = user.querySelector('.post-detail-reviewer-arrow');
-        const content = reviewer.querySelector('.post-detail-reviewer-content');
-        user.addEventListener('click', function (event) {
+        bindReviewItemEvents(element);
+    });
+    const loadMore = document.getElementById('load-more');
+    if (loadMore && document.body.clientWidth > 768) {
+        loadMore.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            if (content.style.display === 'none') {
-                content.style.display = 'inline-block';
-                arrow.style.transform = 'rotate(180deg)';
-            } else {
-                content.style.display = 'none';
-                arrow.style.transform = 'rotate(0deg)';
+            const reviewList = document.querySelector('.post-detail-review-list');
+            const reviewTemplate = reviewList ? reviewList.querySelector('.post-detail-review-item') : null;
+            if (!reviewList || !reviewTemplate) {
+                return;
             }
+            const newReview = reviewTemplate.cloneNode(true);
+            const replyContent = newReview.querySelector('.post-detail-reviewer-content');
+            const replyArrow = newReview.querySelector('.post-detail-reviewer-arrow');
+            if (replyContent) {
+                replyContent.style.display = 'none';
+            }
+            if (replyArrow) {
+                replyArrow.style.transform = 'rotate(0deg)';
+            }
+            reviewList.appendChild(newReview);
+            bindReviewItemEvents(newReview);
         });
-    });
+    }
     const menu = document.querySelector('.detail-page-menu');
     if (menu) {
         menu.addEventListener('click', function (event) {
@@ -326,10 +366,10 @@ $(document).ready(function () {
     $('.reading-mode-btn').on('click', function () {
         $(this).parent().toggleClass('is-reading-mode')
     })
-    $('.post-detail-review-tool-icon-like, .icon-is-dianzan').on('click', function () {
+    $(document).on('click', '.post-detail-review-tool-icon-like, .icon-is-dianzan', function () {
         $(this).parent('.post-detail-review-tool-item').toggleClass('has-activate')
     })
-    $('.post-detail-review-tool-icon-unlike, .icon-not-dianzan').on('click', function () {
+    $(document).on('click', '.post-detail-review-tool-icon-unlike, .icon-not-dianzan', function () {
         $(this).parent('.post-detail-review-tool-item').toggleClass('has-activate')
     })
     document.querySelectorAll('.star-list').forEach(function(starList, index) {
