@@ -501,9 +501,9 @@ function createItemElement(item) {
                                     <img class="item-detail-reviewer-user-icon" src="image/detailpage/review-reply-avatar.png" />
                                     <span class="item-detail-reviewer-user-name">Erinasa</span>
                                     <div class="item-detail-reviewer-user-empty"></div>
-                                    <img class="item-detail-reviewer-arrow" src="image/detailpage/arrow-down.png" />
+                                    <img class="item-detail-reviewer-arrow" src="image/detailpage/arrow-down.png" style="transform: rotate(180deg);" />
                                 </div>
-                                <span class="item-detail-reviewer-content" style="display: none;">Incidunt velit eveniet
+                                <span class="item-detail-reviewer-content">Incidunt velit eveniet
                                     sint.
                                     Tempore est et quaerat
                                     quia. Nam consequatur tenetur quia ut sed esse molestias. Nulla enim vel et porro
