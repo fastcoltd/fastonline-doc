@@ -14,22 +14,16 @@ function sortItems(value) {
     console.log('sort items', value);
 }
 
+const REVIEW_INCREMENT_COUNT = 1;
 const list = new PageList();
+list.itemsPerPage = REVIEW_INCREMENT_COUNT;
 
 // 加载商品数据
 async function loadItems() {
     console.log('load items');
     try {
-        // 模拟API调用
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
         const items = generateMockItems();
         renderItems(items);
-
-        // 模拟没有更多数据的情况
-        if (Math.random() > 0.8) {
-            list.showNoMore();
-        }
 
     } catch (error) {
         console.error('加载商品失败:', error);
@@ -92,6 +86,38 @@ function renderItems(items) {
     items.forEach(item => {
         const itemElement = createItemElement(item);
         container.appendChild(itemElement);
+        bindReviewItemEvents(itemElement);
+    });
+}
+
+function bindReviewItemEvents(element) {
+    if (!element) {
+        return;
+    }
+    const reviewer = element.querySelector('.item-detail-reiviewer-box');
+    if (!reviewer) {
+        return;
+    }
+    const user = reviewer.querySelector('.item-detail-reviewer-user-box');
+    const arrow = user ? user.querySelector('.item-detail-reviewer-arrow') : null;
+    const content = reviewer.querySelector('.item-detail-reviewer-content');
+    if (!user || !arrow || !content) {
+        return;
+    }
+    if (user.dataset.boundReviewToggle === 'true') {
+        return;
+    }
+    user.dataset.boundReviewToggle = 'true';
+    user.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (content.style.display === 'none') {
+            content.style.display = 'inline-block';
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            content.style.display = 'none';
+            arrow.style.transform = 'rotate(0deg)';
+        }
     });
 }
 function renderStarsStatisticsChart() {
@@ -672,13 +698,20 @@ document.addEventListener("DOMContentLoaded", function () {
     $('#buy-now-btn').on('click', () => {
         console.log('Buy~')
     })
-    $('.item-detail-review-tool-icon-yes').on('click', function() {
-        console.log($(this).parent())
+    $(document).on('click', '.item-detail-review-tool-icon-yes', function() {
         $(this).parent().toggleClass('has-activate')
     })
-    $('.item-detail-review-tool-icon-no').on('click', function() {
+    $(document).on('click', '.item-detail-review-tool-icon-no', function() {
         $(this).parent().toggleClass('has-activate')
     })
+    const loadMore = document.getElementById('load-more');
+    if (loadMore && bodyElement.offsetWidth > 768) {
+        loadMore.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            renderItems(generateMockItems());
+        })
+    }
     function screenshotScroll() {
         if (isMobile) { return }
         const width = screenshotContent.clientWidth;
@@ -734,21 +767,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const reviews = document.querySelectorAll('.item-detail-review-item');
     reviews.forEach(element => {
-        const reviewer = element.querySelector('.item-detail-reiviewer-box');
-        const user = reviewer.querySelector('.item-detail-reviewer-user-box')
-        const arrow = user.querySelector('.item-detail-reviewer-arrow');
-        const content = reviewer.querySelector('.item-detail-reviewer-content');
-        user.addEventListener('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            if (content.style.display === 'none') {
-                content.style.display = 'inline-block';
-                arrow.style.transform = 'rotate(180deg)';
-            } else {
-                content.style.display = 'none';
-                arrow.style.transform = 'rotate(0deg)';
-            }
-        });
+        bindReviewItemEvents(element);
     });
 
     const menu = document.querySelector('.detail-page-menu');
