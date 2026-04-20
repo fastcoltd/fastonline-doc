@@ -172,54 +172,28 @@ class Pagination {
         const pages = [];
         const current = this.currentPage;
         const total = this.totalPages;
-        let maxVisible = this.calculateMaxVisiblePages();
-        maxVisible = Math.max(5, maxVisible);
+        const rangeStart = Math.max(1, current - 2);
+        const rangeEnd = Math.min(total, current + 2);
 
-        if (total <= maxVisible) {
-            // 总页数不多，显示所有页码
-            for (let i = 1; i <= total; i++) {
-                pages.push(i);
-            }
-        } else {
-            // 需要使用省略号的情况
-            const sidePages = 2; // 首尾各显示的页数
-            const centerPages = maxVisible - 4; // 中间区域可显示的页数（减去首尾页和两个省略号）
-            if (current <= sidePages + centerPages) {
-                // 当前页在前半部分
-                for (let i = 1; i <= Math.min(maxVisible - 2, total - 1); i++) {
-                    pages.push(i);
-                }
-                if (total > maxVisible - 2) {
-                    pages.push('...');
-                    pages.push(total);
-                }
-            } else if (current >= total - sidePages - centerPages + 1) {
-                // 当前页在后半部分
-                pages.push(1);
+        // 当前页窗口左侧（首页 + 可选省略号）
+        if (rangeStart > 1) {
+            pages.push(1);
+            if (rangeStart > 2) {
                 pages.push('...');
-                for (let i = Math.max(total - maxVisible + 3, 2); i <= total; i++) {
-                    pages.push(i);
-                }
-            } else {
-                // 当前页在中间
-                pages.push(1);
-                const centerStart = current - Math.floor(centerPages / 2) - 1;
-                const centerEnd = current + Math.floor(centerPages / 2) + 1;
-
-                // 左侧省略号
-                if (centerStart > 2) {
-                    pages.push('...');
-                }
-                // 中间页码
-                for (let i = Math.max(2, centerStart); i <= Math.min(total - 1, centerEnd); i++) {
-                    pages.push(i);
-                }
-                // 右侧省略号
-                if (centerEnd < total - 1) {
-                    pages.push('...');
-                }
-                pages.push(total);
             }
+        }
+
+        // 当前页及前后两页
+        for (let i = rangeStart; i <= rangeEnd; i++) {
+            pages.push(i);
+        }
+
+        // 当前页窗口右侧（可选省略号 + 末页）
+        if (rangeEnd < total) {
+            if (rangeEnd < total - 1) {
+                pages.push('...');
+            }
+            pages.push(total);
         }
 
         return pages;
