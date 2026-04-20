@@ -660,41 +660,87 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         $('.item-complaint-close-btn').trigger('click')
     })
-    $('#increase-qty').on('click', e => {
-        $('#decrease-qty').removeClass('disabled')
-        let val = Number($('#quantity-display').val()) + 1
-        if (val >= 99) {
-            val = 99
-            $('#increase-qty').addClass('disabled')
+    const $quantityDisplay = $('#quantity-display')
+    const $increaseQtyButton = $('#increase-qty')
+    const $decreaseQtyButton = $('#decrease-qty')
+    const $totalPrice = $('.item-detail-purchase-total-price')
+
+    function parsePriceText(text) {
+        const safeText = (text || '').trim()
+        const symbolMatch = safeText.match(/^[^\d-]*/)
+        const symbol = symbolMatch ? symbolMatch[0] : ''
+        const numericRaw = safeText.replace(/[^0-9.,-]/g, '').replace(/,/g, '')
+        const decimalMatch = numericRaw.match(/\.(\d+)$/)
+        const decimals = decimalMatch ? decimalMatch[1].length : 0
+        const value = Number(numericRaw) || 0
+        return {
+            symbol,
+            decimals,
+            value
+        }
+    }
+
+    const priceTemplate = parsePriceText($totalPrice.text())
+
+    function clampQuantity(rawValue) {
+        let value = parseInt(rawValue, 10)
+        if (Number.isNaN(value)) {
+            value = 1
+        }
+        if (value <= 1) {
+            return 1
+        }
+        if (value >= 99) {
+            return 99
+        }
+        return value
+    }
+
+    function updateQuantityButtons(quantity) {
+        if (quantity <= 1) {
+            $decreaseQtyButton.addClass('disabled')
         } else {
-            $('#increase-qty').removeClass('disabled')
+            $decreaseQtyButton.removeClass('disabled')
         }
-        $('#quantity-display').val(val)
-    })
-    $('#decrease-qty').on('click', e => {
-        $('#increase-qty').removeClass('disabled')
-        let val = Number($('#quantity-display').val()) - 1
-        if (val <= 1) {
-            val = 1
-            $('#decrease-qty').addClass('disabled')
+        if (quantity >= 99) {
+            $increaseQtyButton.addClass('disabled')
         } else {
-            $('#decrease-qty').removeClass('disabled')
+            $increaseQtyButton.removeClass('disabled')
         }
-        $('#quantity-display').val(val)
-    })
-    $('#quantity-display').on('input', e => {
-        let val = $(e.target).val()
-        $('#increase-qty').removeClass('disabled')
-        $('#decrease-qty').removeClass('disabled')
-        if (val <= 1) {
-            val = 1
-            $('#decrease-qty').addClass('disabled')
-        } else if (val >= 99) {
-            val = 99
-            $('#increase-qty').addClass('disabled')
+    }
+
+    function updateTotalPrice(quantity) {
+        if (!$totalPrice.length) {
+            return
         }
-        $(e.target).val(val)
+        const totalValue = priceTemplate.value * quantity
+        const amountText = priceTemplate.decimals > 0
+            ? totalValue.toFixed(priceTemplate.decimals)
+            : String(Math.round(totalValue))
+        $totalPrice.text(`${priceTemplate.symbol}${amountText}`)
+    }
+
+    function applyQuantity(rawValue) {
+        const quantity = clampQuantity(rawValue)
+        $quantityDisplay.val(quantity)
+        updateQuantityButtons(quantity)
+        updateTotalPrice(quantity)
+    }
+
+    $increaseQtyButton.on('click', () => {
+        applyQuantity(Number($quantityDisplay.val()) + 1)
     })
+
+    $decreaseQtyButton.on('click', () => {
+        applyQuantity(Number($quantityDisplay.val()) - 1)
+    })
+
+    $quantityDisplay.on('input', e => {
+        applyQuantity($(e.target).val())
+    })
+
+    applyQuantity($quantityDisplay.val())
+
     $('#buy-now-btn').on('click', () => {
         console.log('Buy~')
     })
