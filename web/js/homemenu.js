@@ -133,24 +133,17 @@ $(document).ready(function () {
 
         const offsetX = Math.ceil(menuContent.scrollLeft);
         let maxMenuScrollOffsetX = menuContent.scrollWidth - menuContent.clientWidth
-        // 左右箭头始终显示；是否可滚动通过透明度和光标态表达
-        menuRightMore.style.display = 'block';
-        menuleftMore.style.display = 'block';
+        const canScrollLeft = offsetX > 0;
+        const canScrollRight = offsetX < maxMenuScrollOffsetX;
+
+        // 不可滚动方向隐藏对应箭头
+        menuRightMore.style.display = canScrollRight ? 'block' : 'none';
+        menuleftMore.style.display = canScrollLeft ? 'block' : 'none';
         topMenuBox.style.padding = '0 3rem';
-        if (offsetX >= maxMenuScrollOffsetX) {
-            menuRightMore.style.cursor = 'not-allowed';
-            menuRightMore.style.opacity = '0.3';
-        } else {
-            menuRightMore.style.cursor = 'pointer';
-            menuRightMore.style.opacity = '1';
-        }
-        if (offsetX <= 0) {
-            menuleftMore.style.cursor = 'not-allowed';
-            menuleftMore.style.opacity = '0.3';
-        } else {
-            menuleftMore.style.cursor = 'pointer';
-            menuleftMore.style.opacity = '1';
-        }
+        menuRightMore.style.cursor = 'pointer';
+        menuRightMore.style.opacity = '1';
+        menuleftMore.style.cursor = 'pointer';
+        menuleftMore.style.opacity = '1';
     }
     menuScroll()
     menuContent.addEventListener('scroll', menuScroll, { passive: true })
