@@ -1263,13 +1263,7 @@
     .figma-best-item .item-title-box {
         align-items: center;
         min-height: 10rem;
-    }
-
-    .figma-best-item .item-mark {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        align-self: center;
+        gap: 0;
     }
 
     .figma-best-item .item-title {
@@ -1281,6 +1275,24 @@
         text-overflow: ellipsis;
         height: auto;
         max-height: 10rem;
+    }
+
+    .figma-best-item .item-title-inline-flow .item-mark {
+        display: inline-flex;
+        position: static;
+        vertical-align: middle;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1.25rem;
+    }
+
+    .figma-best-item .item-title-inline-flow .item-title-text {
+        display: inline;
+    }
+
+    .figma-best-item .item-title-inline-flow .item-mark:empty {
+        display: none;
+        margin-right: 0;
     }
 
     .figma-best-item .item-stock {
@@ -2208,5 +2220,11 @@
     &.icon-not-dianzan {
         color: #FD8E2D;
         transform: rotate(180deg);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .item-detail-pager .figma-best-item .item-title-inline-flow .item-mark {
+        margin-right: 0.75rem;
     }
 }
