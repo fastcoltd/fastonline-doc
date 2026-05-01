@@ -522,15 +522,15 @@ $(document).ready(function () {
         $icon.data('like', like ? 0 : 1)
         syncAixinState($icon)
     })
-    function closeCenterWrapper() {
-        const $centerWrapper = $('.center-wrapper');
-        if ($centerWrapper.is(':visible')) {
-            $centerWrapper.hide();
-        }
-    }
+    const $centerWrapper = $('.center-wrapper');
+    const $headerAvatarTrigger = $('.header-avatar');
+    let centerWrapperHideTimer = null;
 
-    $('.header-avatar').on('click', function () {
-        const $centerWrapper = $('.center-wrapper');
+    function showCenterWrapper() {
+        if (centerWrapperHideTimer) {
+            clearTimeout(centerWrapperHideTimer);
+            centerWrapperHideTimer = null;
+        }
         $centerWrapper.find('.account-item-center').removeClass('account-item-center-hide');
         $centerWrapper.find('.account-content-wrapper').scrollTop(0);
         $centerWrapper.find('.store-center .title').text('Store center');
@@ -540,8 +540,58 @@ $(document).ready(function () {
                 $otherWrapper.append('<p class="home-menu-other-text logout-text">logout</p>');
             }
         });
-        $('.center-wrapper').show()
+        $centerWrapper.show();
+    }
+
+    function closeCenterWrapper() {
+        if (centerWrapperHideTimer) {
+            clearTimeout(centerWrapperHideTimer);
+            centerWrapperHideTimer = null;
+        }
+        if ($centerWrapper.is(':visible')) {
+            $centerWrapper.hide();
+        }
+    }
+
+    function hideCenterWrapperWithDelay(delay) {
+        if (centerWrapperHideTimer) {
+            clearTimeout(centerWrapperHideTimer);
+        }
+        centerWrapperHideTimer = setTimeout(function () {
+            $centerWrapper.hide();
+            centerWrapperHideTimer = null;
+        }, delay);
+    }
+
+    $headerAvatarTrigger.on('click', function () {
+        showCenterWrapper();
     })
+
+    $headerAvatarTrigger.on('mouseenter', function () {
+        if (window.innerWidth >= 768) {
+            showCenterWrapper();
+        }
+    });
+
+    $headerAvatarTrigger.on('mouseleave', function () {
+        if (window.innerWidth >= 768) {
+            hideCenterWrapperWithDelay(120);
+        }
+    });
+
+    $centerWrapper.on('mouseenter', function () {
+        if (window.innerWidth >= 768 && centerWrapperHideTimer) {
+            clearTimeout(centerWrapperHideTimer);
+            centerWrapperHideTimer = null;
+        }
+    });
+
+    $centerWrapper.on('mouseleave', function () {
+        if (window.innerWidth >= 768) {
+            hideCenterWrapperWithDelay(120);
+        }
+    });
+
     $('.center-wrapper .close-icon').on('click', function () {
         closeCenterWrapper()
     })
