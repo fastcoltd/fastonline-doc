@@ -168,9 +168,23 @@ function createItemElement(item) {
 
   return div;
 }
-document.addEventListener("DOMContentLoaded", function () {
+function initDemandSummaryStickyLayer() {
+  const summaryCard = document.querySelector('.demand-summary-card');
+  if (!summaryCard) {
+    return;
+  }
 
-});
+  const syncStickyState = function () {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const summaryRect = summaryCard.getBoundingClientRect();
+    const isSticky = scrollTop > 0 && summaryRect.top <= 0.5;
+    summaryCard.classList.toggle('is-sticky', isSticky);
+  };
+
+  window.addEventListener('scroll', syncStickyState, { passive: true });
+  window.addEventListener('resize', syncStickyState);
+  syncStickyState();
+}
 
 // 初始化分页组件
 const pagination = new Pagination({
@@ -417,6 +431,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initializeCharacterCount();
   initializeFileUpload();
   refreshCaptcha();
+  initDemandSummaryStickyLayer();
 });
 
 // 自动保存草稿（可选功能）
