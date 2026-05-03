@@ -50,6 +50,66 @@ document.addEventListener('DOMContentLoaded', function () {
     this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', '.header-search-mobile-box-label-icon', '.header-search-mobile-box-label-text', 'items')
     refreshHeaderUserUI();
 
+    function setHomeMenuSectionDisplay(sectionBox, shouldOpen) {
+        const titleArrow = sectionBox.querySelector('.home-menu-item-title-arrow');
+        const titleContent = sectionBox.querySelector('.home-menu-item-content');
+        if (!titleContent) {
+            return;
+        }
+        titleContent.style.display = shouldOpen ? 'flex' : 'none';
+        if (titleArrow) {
+            titleArrow.style.transform = shouldOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+    }
+
+    function ensureMobileMenuExtraPostsRow(homeMenuRoot) {
+        if (homeMenuRoot.querySelector('.home-menu-item-title-box-mobile-extra-posts')) {
+            return;
+        }
+        const sellerTextNode = homeMenuRoot.querySelector('.home-menu-seller-text');
+        if (!sellerTextNode) {
+            return;
+        }
+        const extraPostsTitleBox = document.createElement('div');
+        extraPostsTitleBox.className = 'home-menu-item-title-box home-menu-item-title-box-mobile-extra-posts';
+        extraPostsTitleBox.innerHTML = `
+            <div class="home-menu-item-title-content">
+                <p class="home-menu-item-title">Posts</p>
+                <img class="home-menu-item-title-arrow" src="image/more-arrow.png" />
+            </div>
+        `;
+        sellerTextNode.insertAdjacentElement('afterend', extraPostsTitleBox);
+    }
+
+    function normalizeHomeMenuForMobile(homeMenuRoot) {
+        if (window.innerWidth > 768) {
+            return;
+        }
+        const joinTextNode = homeMenuRoot.querySelector('.home-menu-login-text');
+        if (joinTextNode) {
+            joinTextNode.textContent = 'Join Fastresp';
+        }
+
+        const firstMenuTitleNode = homeMenuRoot.querySelector('.home-menu-item-title');
+        if (firstMenuTitleNode && firstMenuTitleNode.textContent.trim() === 'Browser Service') {
+            firstMenuTitleNode.textContent = 'Browse services';
+        }
+
+        ensureMobileMenuExtraPostsRow(homeMenuRoot);
+        const homeMenuTitleBoxes = homeMenuRoot.querySelectorAll('.home-menu-item-title-box');
+        for (let i = 0; i < homeMenuTitleBoxes.length; i++) {
+            const titleBox = homeMenuTitleBoxes[i];
+            const titleArrow = titleBox.querySelector('.home-menu-item-title-arrow');
+            const titleContent = titleBox.querySelector('.home-menu-item-content');
+            if (titleContent) {
+                titleContent.style.display = 'none';
+            }
+            if (titleArrow) {
+                titleArrow.style.transform = 'rotate(0deg)';
+            }
+        }
+    }
+
     const homeMenuPage = document.querySelector('.home-menu-page');
     const headerMenu = document.querySelector('.header-menu-box');
     const homeMenuBack = homeMenuPage.querySelector('.home-menu-back');
@@ -62,18 +122,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const homeMenuRegistEle = homeMenuPage.querySelector('.home-menu-login-box');
         const homeMenuLgoinEle = homeMenuPage.querySelector('.home-menu-signin-text');
         const homeMenuUserLine = homeMenuPage.querySelector('.home-menu-seperate-line');
-        homeMenuLgoinEle.addEventListener('click', function (e) {
+        normalizeHomeMenuForMobile(homeMenuPage);
+        homeMenuLgoinEle.onclick = function (e) {
             showSigninFn();
-        })
-        homeMenuRegistEle.addEventListener('click', function (e) {
+        };
+        homeMenuRegistEle.onclick = function (e) {
             showJoinFn();
-        })
+        };
         const homeMenuLogoutEle = homeMenuUserEle.querySelector('.home-menu-user-logout');
-        homeMenuLogoutEle.addEventListener('click', function (e) {
+        homeMenuLogoutEle.onclick = function (e) {
             user = null;
             dismissHomeMenuPage();
             refreshHeaderUserUI();
-        })
+        };
         if (user) {
             homeMenuRegistEle.style.display = 'none';
             homeMenuLgoinEle.style.display = 'none';
@@ -98,7 +159,6 @@ document.addEventListener('DOMContentLoaded', function () {
     for (let i = 0; i < homeMenuTitles.length; i++) {
         const title = homeMenuTitles[i];
         title.addEventListener('click', function (e) {
-            const titleArrow = e.currentTarget.querySelector('.home-menu-item-title-arrow');
             const titleContent = e.currentTarget.querySelector('.home-menu-item-content');
             if (!titleContent) {
                 return
@@ -106,6 +166,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const itemContentList = titleContent.querySelectorAll('.home-menu-item-content-item')
             for (let j = 0; j < itemContentList.length; j++) {
                 const item = itemContentList[j];
+                if (item.dataset.mobileMenuEventBound === '1') {
+                    continue;
+                }
+                item.dataset.mobileMenuEventBound = '1';
                 item.addEventListener('click', function (e) {
                     e.stopPropagation();
                     const ele = e.currentTarget;
@@ -113,20 +177,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     const homeMenusecondPage = ele.querySelector('.home-menu-second-page');
                     homeMenusecondPage.style.display = 'flex';
                     const homeMenuSeconPageTitleBoxEle = homeMenusecondPage.querySelector('.home-menu-second-page-title-box');
-                    homeMenuSeconPageTitleBoxEle.addEventListener('click', function (e) {
+                    homeMenuSeconPageTitleBoxEle.onclick = function (e) {
                         e.preventDefault();
                         e.stopPropagation();
                         homeMenusecondPage.style.display = 'none';
-                    })
-                })
+                    };
+                });
             }
-            if (titleContent.style.display === 'none') {
-                titleContent.style.display = 'flex';
-                titleArrow.style.transform = 'rotate(0deg)';
-            } else {
-                titleContent.style.display = 'none';
-                titleArrow.style.transform = 'rotate(-90deg)';
-            }
+            const isTitleContentHidden = titleContent.style.display === 'none' || window.getComputedStyle(titleContent).display === 'none';
+            setHomeMenuSectionDisplay(e.currentTarget, isTitleContentHidden);
         })
     }
 
