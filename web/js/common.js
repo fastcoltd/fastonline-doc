@@ -131,27 +131,27 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const footerContent = document.querySelector('.footer-content');
-    const footerItems = footerContent.querySelectorAll('.footer-item-content');
-    footerItems.forEach(item => {
-        const itemTitleBox = item.querySelector('.footer-item-title-box');
-        const itemTitleIcon = itemTitleBox.querySelector('.footer-item-title-icon');
-        const itemTitleIconStyle = window.getComputedStyle(itemTitleIcon);
-        if (itemTitleIconStyle.display === 'none') {
-            return;
-        }
-        const itemDescBox = item.querySelector('.footer-item-desc-box');
-        itemTitleBox.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const itemDescStyle = window.getComputedStyle(itemDescBox);
-            if (itemDescStyle.display === 'none') {
-                itemDescBox.style.display = 'flex';
-                itemTitleIcon.style.transform = 'rotate(0deg)';
-            } else {
-                itemDescBox.style.display = 'none';
-                itemTitleIcon.style.transform = 'rotate(180deg)';
+    if (footerContent) {
+        const footerItems = footerContent.querySelectorAll('.footer-item-content');
+        footerItems.forEach(item => {
+            const itemTitleBox = item.querySelector('.footer-item-title-box');
+            const itemTitleIcon = itemTitleBox.querySelector('.footer-item-title-icon');
+            const itemTitleIconStyle = window.getComputedStyle(itemTitleIcon);
+            if (itemTitleIconStyle.display === 'none') {
+                return;
             }
+            const itemDescBox = item.querySelector('.footer-item-desc-box');
+            const defaultOpen = item.classList.contains('footer-item-content-open');
+            item.classList.toggle('is-open', defaultOpen);
+            itemDescBox.style.display = defaultOpen ? 'flex' : 'none';
+            itemTitleBox.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const isOpen = item.classList.contains('is-open');
+                item.classList.toggle('is-open', !isOpen);
+                itemDescBox.style.display = isOpen ? 'none' : 'flex';
+            });
         });
-    });
+    }
 })
 
 class HeaderMenu {

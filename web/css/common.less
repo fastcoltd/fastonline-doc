@@ -2096,6 +2096,18 @@ button {
         width: 3rem;
         height: 3rem;
         display: none;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 50%;
+    }
+
+    .footer-item-title-icon::before {
+        content: "\e68c";
+        font-family: "iconfont" !important;
+        font-size: 1.25rem;
+        color: currentColor;
+        line-height: 1;
     }
 
     .footer-item-desc-box {
@@ -2250,19 +2262,32 @@ button {
 @media screen and (max-width: 768px) {
     .common-footer-wrapper {
         background-color: #fff;
-        padding: 0;
+        padding: 2rem 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+        overflow: hidden;
 
         .footer-line {
-            margin: 3rem 0 2rem 0;
+            width: 100%;
+            margin: 0;
             border-top: .125rem solid #eaeaea;
         }
 
         .bottom-copy-right-content {
             padding-top: 0;
+            margin: 0;
+            max-width: 100%;
+            width: 100%;
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: var(--font-black-color);
+            gap: 1.25rem;
+            color: #000;
+            font-size: 1.5rem;
+            line-height: 2.75rem;
+            font-family: var(--primary-robotofont);
 
             .follow-us-text {
                 display: none;
@@ -2270,38 +2295,92 @@ button {
 
             .footer-logo {
                 display: block;
-                width: 10rem;
-                margin-bottom: 1.25rem;
+                width: 10.825rem;
+                margin-bottom: 0;
+                order: 1;
             }
 
             .left-part-wrapper {
-                margin-bottom: 1.25rem;
+                order: 3;
+                margin-bottom: 0;
+                gap: 3.25rem;
+                column-gap: 3.25rem;
+
+                .iconfont {
+                    width: 2.5rem;
+                    height: 2.5rem;
+                    border-radius: 50%;
+                    background-color: #000;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                }
 
                 .iconfont::before {
-                    filter: brightness(0);
+                    content: "";
+                    font-family: "iconfont" !important;
+                    font-size: 1.5rem;
+                    color: #fff;
+                    line-height: 1;
+                    width: auto;
+                    height: auto;
+                    background: none !important;
+                }
+
+                .icon-facebook1::before {
+                    content: "\e642";
+                }
+
+                .icon-logo2::before {
+                    content: "\e63f";
+                }
+
+                .icon-instagram::before {
+                    content: "\e602";
                 }
             }
 
             .right-part-wrapper {
-                row-gap: 1rem;
-                flex-direction: column;
-                margin-left: 0;
-                column-gap: 0;
+                order: 2;
+                display: contents;
+
+                .copy-right {
+                    order: 2;
+                    color: #000;
+                    white-space: nowrap;
+                    text-align: center;
+                    font-size: 1.5rem;
+                    font-weight: 400;
+                    line-height: 2.75rem;
+                }
 
                 .language-btn {
-                    color: #6D6D6DCC;
+                    color: rgba(109, 109, 109, 0.8);
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    line-height: 2.75rem;
                 }
 
                 .gmt-btn {
-                    color: #6D6D6DCC;
+                    color: rgba(109, 109, 109, 0.8);
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    line-height: 2.75rem;
                 }
 
                 .currency-btn {
-                    color: #6D6D6DCC;
+                    color: rgba(109, 109, 109, 0.8);
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    line-height: 2.75rem;
                 }
 
-                .copy-right {
-                    color: var(--font-black-color);
+                .item-gmt {
+                    order: 4;
+                    display: flex;
+                    align-items: center;
+                    column-gap: 2.25rem;
+                    white-space: nowrap;
                 }
             }
         }
@@ -2324,9 +2403,10 @@ button {
         }
 
         .footer-content {
-            margin: 0 auto;
+            margin: 0;
+            max-width: 100%;
             flex-direction: column;
-            gap: 3.75rem;
+            gap: 1.25rem;
         }
 
         .footer-item-content {
@@ -2335,16 +2415,47 @@ button {
             align-items: flex-start;
         }
 
+        .footer-item-content:nth-child(2),
+        .footer-item-content:nth-child(3),
+        .footer-item-content:nth-child(4) {
+            width: 100%;
+        }
+
         .footer-item-title {
             color: #000000;
+            font-size: 1.75rem;
+            font-weight: 600;
+            line-height: 2.75rem;
+            font-family: var(--primary-robotofont);
         }
 
         .footer-item-title-icon {
-            display: inline-block;
+            display: inline-flex;
+            width: 3rem;
+            height: 3rem;
+            color: #111;
+            border-radius: 50%;
+            transition: background-color .2s ease;
+        }
+
+        .footer-item-content.is-open .footer-item-title-icon {
+            background-color: #e8e8e8;
+        }
+
+        .footer-item-content:not(.is-open) .footer-item-title-icon::before {
+            transform: rotate(180deg);
         }
 
         .footer-item-text {
             color: rgba(0, 0, 0, 0.8);
+            font-size: 1.75rem;
+            line-height: 2.75rem;
+            font-family: var(--primary-robotofont);
+        }
+
+        .footer-item-content.is-open .footer-item-desc-box {
+            display: flex;
+            gap: 1.25rem;
         }
     }
 }
