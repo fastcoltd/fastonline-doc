@@ -1731,21 +1731,29 @@ button {
     position: fixed;
     top: 0;
     left: 0;
+    right: auto;
     z-index: 200;
     background-color: #fff;
-    padding: 0 1rem;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 26px 26px 10px;
+    box-sizing: border-box;
     margin-right: 0;
+    overflow: hidden;
   }
   .center-wrapper .account-top-wrapper {
+    width: 100%;
+    height: auto;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 2.5rem 1.5rem;
-    overflow-y: auto;
+    justify-content: flex-start;
+    padding: 0;
+    overflow: visible;
   }
   .center-wrapper .avatar-box {
-    width: 10.5rem;
-    height: 10.5rem;
+    width: 84px;
+    height: 84px;
+    flex: 0 0 84px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -1753,45 +1761,62 @@ button {
     border-radius: 50%;
     background-color: #1E9FDB;
     color: #fff;
-    font-size: 3.75rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 30px;
+    line-height: 20px;
     font-weight: 500;
   }
   .center-wrapper .account-info-box {
     flex: 1;
-    padding: 1.25rem;
+    min-height: 84px;
+    padding: 5px 0 5px 11px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
   }
   .center-wrapper .account-info-box .name {
-    font-size: 1.875rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 20px;
     font-weight: 600;
     color: #000;
-    padding-bottom: 1rem;
+    padding-bottom: 6px;
   }
   .center-wrapper .account-info-box .email {
+    font-family: 'Inter', sans-serif;
     font-weight: 400;
-    font-size: 1.5rem;
+    font-size: 12px;
+    line-height: 20px;
     color: #6D6D6D;
-    padding-bottom: 1rem;
+    padding-bottom: 6px;
   }
   .center-wrapper .account-info-box .close-icon {
     display: none;
   }
-  .center-wrapper .account-info-box .icon-jinbi1 {
-    font-size: 2.5rem;
-    color: #C5C5C5;
-  }
   .center-wrapper .account-info-box .account-data-wrapper {
     display: flex;
     align-items: center;
-    column-gap: 2.5rem;
+    column-gap: 14px;
   }
   .center-wrapper .account-info-box .money-box {
     display: flex;
     align-items: center;
-    column-gap: 1.25rem;
+    column-gap: 6px;
+  }
+  .center-wrapper .account-info-box .money-box .icon-jinbi1 {
+    display: block;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    font-size: 0;
+    color: transparent;
+    background: url(../image/account-center-mobile/money-icon.svg) no-repeat center / 20px 20px;
   }
   .center-wrapper .account-info-box .money-box .money {
-    font-size: 2rem;
+    font-family: var(--primary-popfont);
+    font-size: 16px;
+    line-height: 23.2px;
     color: var(--font-red-color);
     font-weight: 500;
   }
@@ -1799,119 +1824,213 @@ button {
     display: flex;
     align-items: center;
     position: relative;
-    margin-left: 5rem;
+    margin-left: 0;
   }
   .center-wrapper .account-info-box .notice-box .icon-youjian {
-    font-size: 2.5rem;
+    display: block;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    font-size: 0;
+    color: transparent;
+    background: url(../image/account-center-mobile/mail-icon.svg) no-repeat center / 24px 24px;
   }
   .center-wrapper .account-info-box .notice-box .count {
     position: absolute;
-    min-width: 2rem;
-    height: 2rem;
-    background: var(--primary-color);
+    min-width: 20px;
+    height: 20px;
+    border: 1px solid #fff;
+    background: #FF4C10;
     color: #fff;
-    top: -1rem;
-    left: 1rem;
-    border-radius: 1rem;
+    top: -8px;
+    left: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    padding: 0 0.5rem;
+    font-family: 'PingFang SC', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 0 4px;
     line-height: 1;
   }
   .center-wrapper .account-content-wrapper {
-    height: calc(100vh - 24rem);
-    padding: 2rem 1.5rem;
+    width: 100%;
+    height: calc(100vh - 206px);
+    margin-top: 20px;
+    padding: 20px 0 0;
     box-sizing: border-box;
     overflow-y: auto;
     display: block;
-    border-top: none;
+    border-top: 1px solid #ECECEC;
+    scrollbar-width: thin;
+    scrollbar-color: #C0C0C0 transparent;
+  }
+  .center-wrapper .account-content-wrapper::before {
+    display: none;
+  }
+  .center-wrapper .account-content-wrapper::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+    display: block;
+  }
+  .center-wrapper .account-content-wrapper::-webkit-scrollbar-thumb {
+    background-color: #C0C0C0;
+    border-radius: 999px;
+  }
+  .center-wrapper .account-content-wrapper::-webkit-scrollbar-track {
+    background: transparent;
   }
   .center-wrapper .account-content-wrapper .store-center {
     width: 100%;
-    padding: 2.5rem 1.5rem 3rem;
-    border-top: 0.125rem solid #F4F4F4;
+    padding: 0;
+    border-top: none;
   }
   .center-wrapper .account-content-wrapper .store-center .title-wrapper {
-    font-size: 2rem;
+    font-family: var(--primary-popfont);
+    height: 24px;
+    font-size: 16px;
+    line-height: 23.2px;
     color: #FF7A02;
-    font-weight: 600;
-    padding-bottom: 2rem;
+    font-weight: 500;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .center-wrapper .account-content-wrapper .store-center .title-wrapper .icon-arrow_up {
+    width: 12px;
+    height: 12px;
+    flex: 0 0 12px;
+    font-size: 0;
+    color: transparent;
+    background: url(../image/account-center-mobile/section-chevron.svg) no-repeat center / 12px 12px;
+    transform: rotate(90deg);
+    transition: transform 0.2s ease;
+  }
+  .center-wrapper .account-content-wrapper .store-center.account-item-center-hide .title-wrapper .icon-arrow_up {
+    transform: rotate(0deg);
+  }
+  .center-wrapper .account-content-wrapper .store-center.account-item-center-hide .store-center-list {
+    display: none;
   }
   .center-wrapper .account-content-wrapper .store-center .store-center-list {
     display: flex;
-    align-items: center;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
     flex-wrap: wrap;
-    column-gap: 1rem;
-    row-gap: 2rem;
+    column-gap: 30px;
+    row-gap: 20px;
+    margin-top: 20px;
   }
   .center-wrapper .account-content-wrapper .store-center .store-center-li {
-    width: calc(50% - 0.5rem);
+    width: 140px;
     display: flex;
     align-items: center;
+    column-gap: 6px;
+    overflow: hidden;
   }
   .center-wrapper .account-content-wrapper .store-center .icon {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    display: block;
   }
   .center-wrapper .account-content-wrapper .store-center .name {
-    font-size: 1.75rem;
-    padding-left: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 20.3px;
+    padding-left: 0;
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #000;
   }
   .center-wrapper .account-content-wrapper .member-center {
     width: 100%;
-    padding: 2rem 1.5rem;
-    border-top: 0.125rem solid #F4F4F4;
+    margin-top: 20px;
+    padding: 20px 0 0;
+    border-top: 1px solid #ECECEC;
   }
   .center-wrapper .account-content-wrapper .member-center .title-wrapper {
-    font-size: 2rem;
+    font-family: var(--primary-popfont);
+    height: 24px;
+    font-size: 16px;
+    line-height: 23.2px;
     color: #06C70C;
-    font-weight: 600;
-    padding-bottom: 2rem;
+    font-weight: 500;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .center-wrapper .account-content-wrapper .member-center .title-wrapper .icon-arrow_up {
+    width: 12px;
+    height: 12px;
+    flex: 0 0 12px;
+    font-size: 0;
+    color: transparent;
+    background: url(../image/account-center-mobile/section-chevron.svg) no-repeat center / 12px 12px;
+    transform: rotate(90deg);
+    transition: transform 0.2s ease;
+  }
+  .center-wrapper .account-content-wrapper .member-center.account-item-center-hide .title-wrapper .icon-arrow_up {
+    transform: rotate(0deg);
+  }
+  .center-wrapper .account-content-wrapper .member-center.account-item-center-hide .member-center-list {
+    display: none;
   }
   .center-wrapper .account-content-wrapper .member-center .member-center-list {
     display: flex;
-    align-items: center;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
     flex-wrap: wrap;
-    column-gap: 1rem;
-    row-gap: 2rem;
+    column-gap: 30px;
+    row-gap: 20px;
+    margin-top: 20px;
   }
   .center-wrapper .account-content-wrapper .member-center .member-center-li {
-    width: calc(50% - 0.5rem);
+    width: 140px;
     display: flex;
     align-items: center;
+    column-gap: 6px;
+    overflow: hidden;
   }
   .center-wrapper .account-content-wrapper .member-center .icon {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    display: block;
   }
   .center-wrapper .account-content-wrapper .member-center .name {
-    font-size: 1.75rem;
-    padding-left: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 20.3px;
+    padding-left: 0;
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #000;
   }
   .center-wrapper .account-content-wrapper .other-wrapper {
     display: none;
   }
   .center-wrapper .account-bottom-wrapper {
     width: 100%;
-    height: 8.5rem;
+    height: 58px;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
+    padding-top: 10px;
   }
   .center-wrapper .account-bottom-wrapper .close-icon {
     display: block;
-    width: 5rem;
-    height: 5rem;
+    width: 48px;
+    height: 48px;
     cursor: pointer;
   }
   .notice-items-wrapper {

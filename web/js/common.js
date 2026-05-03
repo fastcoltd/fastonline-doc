@@ -712,12 +712,78 @@ $(document).ready(function () {
     const $centerWrapper = $('.center-wrapper');
     const $headerAvatarTrigger = $('.header-avatar');
     let centerWrapperHideTimer = null;
+    const centerWrapperStoreIconMap = {
+        'shop center': 'image/account-center-mobile/store-shop-center.svg',
+        'shop orders': 'image/account-center-mobile/store-shop-orders.svg',
+        'shop messages': 'image/account-center-mobile/store-shop-messages.svg',
+        'product management': 'image/account-center-mobile/store-product-management.svg',
+        'inventory management': 'image/account-center-mobile/store-inventory-management.svg',
+        'product faq': 'image/account-center-mobile/store-product-faq.svg',
+        'withdrawal management': 'image/account-center-mobile/store-withdrawal-management.svg',
+        'order log': 'image/account-center-mobile/store-order-log.svg',
+        'fund records': 'image/account-center-mobile/store-fund-records.svg',
+        'shop staff': 'image/account-center-mobile/store-shop-staff.svg',
+        'shop kyc': 'image/account-center-mobile/store-shop-kyc.svg',
+        'shop log': 'image/account-center-mobile/store-shop-log.svg',
+        'shop information': 'image/account-center-mobile/store-shop-information.svg',
+        'wallet management': 'image/account-center-mobile/store-wallet-management.svg',
+        'blog settings': 'image/account-center-mobile/store-blog-settings.svg',
+        'article classification': 'image/account-center-mobile/store-article-classification.svg',
+        'article management': 'image/account-center-mobile/store-article-management.svg'
+    };
+    const centerWrapperMemberIconMap = {
+        'my order': 'image/account-center-mobile/member-my-order.svg',
+        'my demand': 'image/account-center-mobile/member-my-demand.svg',
+        'my message': 'image/account-center-mobile/member-my-message.svg',
+        'fund record': 'image/account-center-mobile/member-fund-record.svg',
+        'my favorites': 'image/account-center-mobile/member-my-favorites.svg',
+        'my subscription': 'image/account-center-mobile/member-my-subscription.svg',
+        'my comments': 'image/account-center-mobile/member-my-comments.svg',
+        'account log': 'image/account-center-mobile/member-account-log.svg',
+        'personal informati': 'image/account-center-mobile/member-personal-information.svg',
+        'account settings': 'image/account-center-mobile/member-account-settings.svg'
+    };
+
+    function normalizeCenterWrapperName(name) {
+        return (name || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function applyCenterWrapperIcons() {
+        if (!$centerWrapper.length) {
+            return;
+        }
+        $centerWrapper.find('.store-center .store-center-li').each(function () {
+            const $item = $(this);
+            const itemName = normalizeCenterWrapperName($item.find('.name').text());
+            const iconSrc = centerWrapperStoreIconMap[itemName];
+            if (iconSrc) {
+                $item.find('.icon').attr({
+                    src: iconSrc,
+                    alt: ''
+                });
+            }
+        });
+        $centerWrapper.find('.member-center .member-center-li').each(function () {
+            const $item = $(this);
+            const itemName = normalizeCenterWrapperName($item.find('.name').text());
+            const iconSrc = centerWrapperMemberIconMap[itemName];
+            if (iconSrc) {
+                $item.find('.icon').attr({
+                    src: iconSrc,
+                    alt: ''
+                });
+            }
+        });
+    }
+
+    applyCenterWrapperIcons();
 
     function showCenterWrapper() {
         if (centerWrapperHideTimer) {
             clearTimeout(centerWrapperHideTimer);
             centerWrapperHideTimer = null;
         }
+        applyCenterWrapperIcons();
         $centerWrapper.find('.account-item-center').removeClass('account-item-center-hide');
         $centerWrapper.find('.account-content-wrapper').scrollTop(0);
         $centerWrapper.find('.store-center .title').text('Store center');
@@ -790,7 +856,7 @@ $(document).ready(function () {
             closeCenterWrapper();
         }
     })
-    $('.icon-arrow_up').on('click', function () {
+    $('.center-wrapper .icon-arrow_up').on('click', function () {
         $(this).parents('.account-item-center').toggleClass('account-item-center-hide')
     })
     const $noticeItemsWrapper = $('.notice-items-wrapper');
