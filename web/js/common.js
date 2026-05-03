@@ -1,3 +1,78 @@
+function parseSessionUser() {
+    try {
+        const raw = sessionStorage.getItem('user');
+        if (!raw) {
+            return null;
+        }
+        const sessionUser = JSON.parse(raw);
+        if (!sessionUser || typeof sessionUser !== 'object') {
+            return null;
+        }
+        if (sessionUser.id || sessionUser.name || sessionUser.email) {
+            return sessionUser;
+        }
+    } catch (e) {
+        return null;
+    }
+    return null;
+}
+
+function getMockLoginUser() {
+    return {
+        name: 'Erinasa_he',
+        email: '80*******@yaho.com',
+        avatar: '',
+        badgeCount: 2
+    };
+}
+
+function getCurrentAuthUser() {
+    if (window.__forceLoggedOut) {
+        return null;
+    }
+    if (window.user && typeof window.user === 'object') {
+        return window.user;
+    }
+    const sessionUser = parseSessionUser();
+    if (sessionUser) {
+        return sessionUser;
+    }
+    if (location.href.indexOf('isLogin') > -1) {
+        return getMockLoginUser();
+    }
+    return null;
+}
+
+function getUserDisplayName(currentUser) {
+    if (!currentUser || typeof currentUser !== 'object') {
+        return 'Erinasa_he';
+    }
+    if (currentUser.name && typeof currentUser.name === 'string') {
+        const trimmedName = currentUser.name.trim();
+        if (trimmedName) {
+            return trimmedName;
+        }
+    }
+    return 'Erinasa_he';
+}
+
+function getUserDisplayEmail(currentUser) {
+    if (!currentUser || typeof currentUser !== 'object') {
+        return '80*******@yaho.com';
+    }
+    if (currentUser.email && typeof currentUser.email === 'string') {
+        const trimmedEmail = currentUser.email.trim();
+        if (trimmedEmail) {
+            return trimmedEmail;
+        }
+    }
+    return '80*******@yaho.com';
+}
+
+function getAvatarLabel(currentUser) {
+    const displayName = getUserDisplayName(currentUser);
+    return displayName.charAt(0).toUpperCase() || 'E';
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     function applyStarFill(node) {
@@ -81,7 +156,23 @@ document.addEventListener('DOMContentLoaded', function () {
         sellerTextNode.insertAdjacentElement('afterend', extraPostsTitleBox);
     }
 
-    function normalizeHomeMenuForMobile(homeMenuRoot) {
+    function ensureHomeMenuAvatarLetterNode(homeMenuUserEle) {
+        let avatarLetterNode = homeMenuUserEle.querySelector('.home-menu-user-avatar-letter');
+        if (avatarLetterNode) {
+            return avatarLetterNode;
+        }
+        avatarLetterNode = document.createElement('div');
+        avatarLetterNode.className = 'home-menu-user-avatar-letter';
+        const userInfoBox = homeMenuUserEle.querySelector('.home-menu-user-info-box');
+        if (userInfoBox) {
+            homeMenuUserEle.insertBefore(avatarLetterNode, userInfoBox);
+        } else {
+            homeMenuUserEle.appendChild(avatarLetterNode);
+        }
+        return avatarLetterNode;
+    }
+
+    function normalizeHomeMenuForMobile(homeMenuRoot, isAuthenticated) {
         if (window.innerWidth > 768) {
             return;
         }
@@ -91,8 +182,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const firstMenuTitleNode = homeMenuRoot.querySelector('.home-menu-item-title');
-        if (firstMenuTitleNode && firstMenuTitleNode.textContent.trim() === 'Browser Service') {
-            firstMenuTitleNode.textContent = 'Browse services';
+        if (firstMenuTitleNode && firstMenuTitleNode.textContent.trim() !== 'Browse categories' && firstMenuTitleNode.textContent.trim() !== 'Browse services') {
+            firstMenuTitleNode.textContent = isAuthenticated ? 'Browse categories' : 'Browse services';
+        } else if (firstMenuTitleNode) {
+            firstMenuTitleNode.textContent = isAuthenticated ? 'Browse categories' : 'Browse services';
         }
 
         ensureMobileMenuExtraPostsRow(homeMenuRoot);
@@ -115,6 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const homeMenuBack = homeMenuPage.querySelector('.home-menu-back');
     const homeMenuTitles = homeMenuPage.querySelectorAll('.home-menu-item-title-box');
     headerMenu.addEventListener('click', function () {
+        const currentUser = getCurrentAuthUser();
         homeMenuPage.style.display = 'flex';
         homeMenuPage.style.width = '100vw';
         body.classList.toggle('modal-open', true);
@@ -122,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const homeMenuRegistEle = homeMenuPage.querySelector('.home-menu-login-box');
         const homeMenuLgoinEle = homeMenuPage.querySelector('.home-menu-signin-text');
         const homeMenuUserLine = homeMenuPage.querySelector('.home-menu-seperate-line');
-        normalizeHomeMenuForMobile(homeMenuPage);
+        normalizeHomeMenuForMobile(homeMenuPage, !!currentUser);
         homeMenuLgoinEle.onclick = function (e) {
             showSigninFn();
         };
@@ -131,21 +225,31 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         const homeMenuLogoutEle = homeMenuUserEle.querySelector('.home-menu-user-logout');
         homeMenuLogoutEle.onclick = function (e) {
-            user = null;
+            window.user = null;
+            window.__forceLoggedOut = true;
+            try {
+                sessionStorage.removeItem('user');
+            } catch (error) {}
             dismissHomeMenuPage();
             refreshHeaderUserUI();
         };
-        if (user) {
+        if (currentUser) {
             homeMenuRegistEle.style.display = 'none';
             homeMenuLgoinEle.style.display = 'none';
             homeMenuUserEle.style.display = 'flex';
             homeMenuUserLine.style.display = '';
             const homeMenuUserIconEle = homeMenuUserEle.querySelector('.home-menu-user-icon');
-            homeMenuUserIconEle.src = user.avatar;
+            const homeMenuAvatarLetterEle = ensureHomeMenuAvatarLetterNode(homeMenuUserEle);
+            homeMenuAvatarLetterEle.textContent = getAvatarLabel(currentUser);
+            homeMenuAvatarLetterEle.style.display = 'flex';
+            if (homeMenuUserIconEle) {
+                homeMenuUserIconEle.style.display = 'none';
+                homeMenuUserIconEle.removeAttribute('src');
+            }
             const homeMenuUserNameEle = homeMenuUserEle.querySelector('.home-menu-user-name');
-            homeMenuUserNameEle.textContent = user.name;
+            homeMenuUserNameEle.textContent = getUserDisplayName(currentUser);
             const homeMenuUserEmailEle = homeMenuUserEle.querySelector('.home-menu-user-email');
-            homeMenuUserEmailEle.textContent = user.email;
+            homeMenuUserEmailEle.textContent = getUserDisplayEmail(currentUser);
         } else {
             homeMenuRegistEle.style.display = '';
             homeMenuLgoinEle.style.display = '';
@@ -327,31 +431,53 @@ function dismissHomeMenuPage() {
     homeMenuPage.style.display = 'none';
     body.classList.toggle('modal-open', false);
 }
+
+function syncHeaderAvatarBadge(headerUser, isAuthenticated, currentUser) {
+    const avatarItem = headerUser.querySelector('.item-avatar');
+    if (!avatarItem) {
+        return;
+    }
+    let avatarBadge = avatarItem.querySelector('.header-avatar-badge');
+    if (!avatarBadge) {
+        avatarBadge = document.createElement('span');
+        avatarBadge.className = 'header-avatar-badge';
+        avatarItem.appendChild(avatarBadge);
+    }
+    if (!isAuthenticated) {
+        avatarBadge.style.display = 'none';
+        return;
+    }
+    const badgeCount = currentUser && typeof currentUser === 'object' && Number.isFinite(Number(currentUser.badgeCount))
+        ? Number(currentUser.badgeCount)
+        : 2;
+    avatarBadge.textContent = `${badgeCount}`;
+    avatarBadge.style.display = '';
+}
+
 function refreshHeaderUserUI() {
-    // 上线后去掉  方便调试登录情况 isLogin
-    let user = window.user || location.href.indexOf('isLogin') > -1
+    const currentUser = getCurrentAuthUser();
+    const isAuthenticated = !!currentUser;
     const signinButtonEle = document.getElementById('header-signin');
     const headerJoinButton = document.getElementById('header-join');
     const headerUser = document.getElementById('header-user');
     if (!signinButtonEle || !headerJoinButton || !headerUser) {
         return;
     }
-    signinButtonEle.style.display = !user ? '' : 'none';
-    headerJoinButton.style.display = !user ? '' : 'none';
-    headerUser.style.display = !user ? 'none' : '';
+    document.body.classList.toggle('is-authenticated', isAuthenticated);
+    signinButtonEle.style.display = isAuthenticated ? 'none' : '';
+    headerJoinButton.style.display = isAuthenticated ? 'none' : '';
+    headerUser.style.display = isAuthenticated ? '' : 'none';
 
     const badgeEle = headerUser.querySelector('.badge');
     if (badgeEle) {
         badgeEle.textContent = '20';
     }
+    syncHeaderAvatarBadge(headerUser, isAuthenticated, currentUser);
 
-    if (user) {
+    if (isAuthenticated) {
         const avatarTextEle = headerUser.querySelector('.header-user-avatar-box');
         const avatarImageEle = headerUser.querySelector('.header-user-icon');
-        let avatarLabel = 'E';
-        if (typeof user === 'object' && user !== null && user.name) {
-            avatarLabel = user.name.trim().charAt(0).toUpperCase() || 'E';
-        }
+        const avatarLabel = getAvatarLabel(currentUser);
         if (avatarTextEle) {
             avatarTextEle.textContent = avatarLabel;
             avatarTextEle.style.display = 'flex';
@@ -359,6 +485,8 @@ function refreshHeaderUserUI() {
         if (avatarImageEle) {
             avatarImageEle.style.display = 'none';
         }
+    } else {
+        window.__forceLoggedOut = false;
     }
 }
 function setSearchData() {
