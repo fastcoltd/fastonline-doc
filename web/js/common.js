@@ -801,6 +801,7 @@ $(document).ready(function () {
             clearTimeout(centerWrapperHideTimer);
             centerWrapperHideTimer = null;
         }
+        hideNoticeItems();
         if ($centerWrapper.is(':visible')) {
             $centerWrapper.hide();
         }
@@ -852,7 +853,8 @@ $(document).ready(function () {
         const $target = $(e.target);
         const isInCenterWrapper = $target.closest('.center-wrapper').length > 0;
         const isOnAvatarTrigger = $target.closest('.header-avatar').length > 0;
-        if (!isInCenterWrapper && !isOnAvatarTrigger) {
+        const isInNoticeItemsWrapper = $target.closest('.notice-items-wrapper').length > 0;
+        if (!isInCenterWrapper && !isOnAvatarTrigger && !isInNoticeItemsWrapper) {
             closeCenterWrapper();
         }
     })
@@ -861,7 +863,52 @@ $(document).ready(function () {
     })
     const $noticeItemsWrapper = $('.notice-items-wrapper');
     const $headerNoticeTrigger = $('.header-user-box .item-notice');
+    const $centerNoticeTrigger = $('.center-wrapper .account-info-box .notice-box');
+    const centerNoticePopoverClass = 'notice-items-wrapper-mobile-center';
+    const centerNoticeIconList = [
+        'image/account-center-mobile/notice-popover-icon1.svg',
+        'image/account-center-mobile/notice-popover-icon2.svg',
+        'image/account-center-mobile/notice-popover-icon3.svg',
+        'image/account-center-mobile/notice-popover-icon4.svg',
+        'image/account-center-mobile/notice-popover-icon5.svg'
+    ];
+    const centerNoticeCountList = ['10', '12', '8', '2', '22'];
     let noticeHideTimer = null;
+
+    function applyCenterNoticeItems() {
+        $noticeItemsWrapper.find('.notice-item').each(function (index) {
+            const $item = $(this);
+            const iconSrc = centerNoticeIconList[index];
+            const countText = centerNoticeCountList[index];
+            if (iconSrc) {
+                $item.find('.notice-icon').attr({
+                    src: iconSrc,
+                    alt: ''
+                });
+            }
+            if (typeof countText === 'string') {
+                $item.find('span').text(countText);
+            }
+        });
+    }
+
+    function resetNoticeItemsWrapperMode() {
+        $noticeItemsWrapper.removeClass(centerNoticePopoverClass).css({
+            width: '',
+            left: '',
+            right: '',
+            top: ''
+        });
+    }
+
+    function hideNoticeItems() {
+        if (noticeHideTimer) {
+            clearTimeout(noticeHideTimer);
+            noticeHideTimer = null;
+        }
+        resetNoticeItemsWrapperMode();
+        $noticeItemsWrapper.hide();
+    }
 
     function positionNoticeItemsWrapper($trigger) {
         if (body.offsetWidth < 768 || !$noticeItemsWrapper.length || !$trigger || !$trigger.length) {
@@ -886,12 +933,36 @@ $(document).ready(function () {
         });
     }
 
+    function positionCenterNoticeItemsWrapperMobile() {
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth || body.offsetWidth;
+        const noticeWidth = Math.min(343, Math.max(300, viewportWidth - 32));
+        const noticeLeft = Math.round((viewportWidth - noticeWidth) / 2);
+        $noticeItemsWrapper.css({
+            width: `${noticeWidth}px`,
+            left: `${noticeLeft}px`,
+            right: 'auto',
+            top: '110px'
+        });
+    }
+
     function showNoticeItems($trigger) {
         if (noticeHideTimer) {
             clearTimeout(noticeHideTimer);
             noticeHideTimer = null;
         }
+        resetNoticeItemsWrapperMode();
         positionNoticeItemsWrapper($trigger);
+        $noticeItemsWrapper.show();
+    }
+
+    function showCenterNoticeItemsMobile() {
+        if (noticeHideTimer) {
+            clearTimeout(noticeHideTimer);
+            noticeHideTimer = null;
+        }
+        applyCenterNoticeItems();
+        $noticeItemsWrapper.addClass(centerNoticePopoverClass);
+        positionCenterNoticeItemsWrapperMobile();
         $noticeItemsWrapper.show();
     }
 
@@ -900,15 +971,27 @@ $(document).ready(function () {
             clearTimeout(noticeHideTimer);
         }
         noticeHideTimer = setTimeout(function () {
-            $noticeItemsWrapper.hide();
-            noticeHideTimer = null;
+            hideNoticeItems();
         }, delay);
     }
 
-    $headerNoticeTrigger.on('click', function () {
+    $headerNoticeTrigger.on('click', function (e) {
         if (body.offsetWidth < 768) {
+            e.stopPropagation();
+            resetNoticeItemsWrapperMode();
             positionNoticeItemsWrapper($(this));
             $noticeItemsWrapper.toggle();
+        }
+    });
+
+    $centerNoticeTrigger.on('click', function (e) {
+        if (body.offsetWidth < 768) {
+            e.stopPropagation();
+            if ($noticeItemsWrapper.is(':visible') && $noticeItemsWrapper.hasClass(centerNoticePopoverClass)) {
+                hideNoticeItems();
+            } else {
+                showCenterNoticeItemsMobile();
+            }
         }
     });
 
@@ -933,13 +1016,27 @@ $(document).ready(function () {
 
     $noticeItemsWrapper.on('mouseleave', function () {
         if (body.offsetWidth >= 768) {
-            $noticeItemsWrapper.hide();
+            hideNoticeItems();
+        }
+    });
+
+    $(document).on('click', function (e) {
+        if (body.offsetWidth >= 768 || !$noticeItemsWrapper.hasClass(centerNoticePopoverClass) || !$noticeItemsWrapper.is(':visible')) {
+            return;
+        }
+        const $target = $(e.target);
+        const isOnCenterNoticeTrigger = $target.closest('.center-wrapper .account-info-box .notice-box').length > 0;
+        const isInNoticeItemsWrapper = $target.closest('.notice-items-wrapper').length > 0;
+        if (!isOnCenterNoticeTrigger && !isInNoticeItemsWrapper) {
+            hideNoticeItems();
         }
     });
 
     $(window).on('resize', function () {
         if (body.offsetWidth >= 768 && $noticeItemsWrapper.is(':visible')) {
             positionNoticeItemsWrapper($headerNoticeTrigger.first());
+        } else if (body.offsetWidth < 768 && $noticeItemsWrapper.is(':visible') && $noticeItemsWrapper.hasClass(centerNoticePopoverClass)) {
+            positionCenterNoticeItemsWrapperMobile();
         }
     });
     $('body').on('click', '.item-buy-btn', function () {
