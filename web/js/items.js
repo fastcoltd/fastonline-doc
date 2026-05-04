@@ -31,12 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
     //   this.sort = new SortSelector();
     $('#load-more').on('click', function () {
         $('.loading').show()
+        $('.load-more-text').hide()
         setTimeout(() => {
             $('.item-all-items-pager').each(function () {
                 const htmlStr = $(this).html();
                 $(this).append(htmlStr);
             });
             $('.loading').hide()
+            $('.load-more-text').show()
         }, 2000)
     })
 });
