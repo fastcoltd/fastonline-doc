@@ -177,12 +177,32 @@
   padding: 0;
 }
 .filter-back-icon {
-  width: 1rem;
-  height: 1rem;
+  width: 2rem;
+  height: 2rem;
   display: block;
-  border-left: 0.1875rem solid #000;
-  border-bottom: 0.1875rem solid #000;
-  transform: rotate(45deg);
+  position: relative;
+  box-sizing: border-box;
+}
+.filter-back-icon::before {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  top: 50%;
+  width: 1.5rem;
+  height: 0.1875rem;
+  background: rgba(0, 0, 0, 0.85);
+  transform: translateY(-50%);
+}
+.filter-back-icon::after {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  top: 50%;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-left: 0.1875rem solid rgba(0, 0, 0, 0.85);
+  border-bottom: 0.1875rem solid rgba(0, 0, 0, 0.85);
+  transform: translateY(-50%) rotate(45deg);
   box-sizing: border-box;
 }
 .filter-title {
