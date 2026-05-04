@@ -933,15 +933,25 @@ $(document).ready(function () {
         });
     }
 
-    function positionCenterNoticeItemsWrapperMobile() {
+    function positionCenterNoticeItemsWrapperMobile($trigger) {
+        const $target = $trigger && $trigger.length ? $trigger : $centerNoticeTrigger.first();
+        if (!$target || !$target.length) {
+            return;
+        }
+        const centerWrapperRect = $centerWrapper.length ? $centerWrapper.get(0).getBoundingClientRect() : { left: 0, top: 0 };
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth || body.offsetWidth;
-        const noticeWidth = Math.min(343, Math.max(300, viewportWidth - 32));
-        const noticeLeft = Math.round((viewportWidth - noticeWidth) / 2);
+        const noticeWidth = 343;
+        const edgeGap = 4;
+        let noticeLeft = centerWrapperRect.left + 16;
+        const minLeft = edgeGap;
+        const maxLeft = Math.max(edgeGap, viewportWidth - noticeWidth - edgeGap);
+        noticeLeft = Math.min(Math.max(noticeLeft, minLeft), maxLeft);
+        const noticeTop = Math.max(0, centerWrapperRect.top + 110);
         $noticeItemsWrapper.css({
             width: `${noticeWidth}px`,
-            left: `${noticeLeft}px`,
+            left: `${Math.round(noticeLeft)}px`,
             right: 'auto',
-            top: '110px'
+            top: `${Math.round(noticeTop)}px`
         });
     }
 
@@ -962,7 +972,7 @@ $(document).ready(function () {
         }
         applyCenterNoticeItems();
         $noticeItemsWrapper.addClass(centerNoticePopoverClass);
-        positionCenterNoticeItemsWrapperMobile();
+        positionCenterNoticeItemsWrapperMobile($centerNoticeTrigger.first());
         $noticeItemsWrapper.show();
     }
 
@@ -1036,7 +1046,7 @@ $(document).ready(function () {
         if (body.offsetWidth >= 768 && $noticeItemsWrapper.is(':visible')) {
             positionNoticeItemsWrapper($headerNoticeTrigger.first());
         } else if (body.offsetWidth < 768 && $noticeItemsWrapper.is(':visible') && $noticeItemsWrapper.hasClass(centerNoticePopoverClass)) {
-            positionCenterNoticeItemsWrapperMobile();
+            positionCenterNoticeItemsWrapperMobile($centerNoticeTrigger.first());
         }
     });
     $('body').on('click', '.item-buy-btn', function () {
