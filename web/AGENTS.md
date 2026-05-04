@@ -15,3 +15,5 @@
 - HTML 修改必须遵循 `rules/source_build_rule.md`：只改 `src/pages`/`src/partials` 源码，根目录 `*.html` 通过 `node scripts/build-pages.js` 生成，不允许只改根目录产物
 - 对于跨模块重复的子结构（例如评分、标签、按钮块），必须优先抽到 `src/partials/components`，并在各业务 partial 中通过 include 复用；存在文案/数值差异时，优先使用 include 参数而不是复制结构
 - 在修改或者编写完成后，需要调用 chrome mcp 获取实际运行的内容，确认是否和 figma 设计一致
+## 注意
+- 项目的 pc 版本已经调试完成，后面我给你的所有需求，都是针对手机版本修改。请在你修改前，明确告诉我你会只对手机版进行修改，然后再执行你的修改操作
