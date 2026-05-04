@@ -691,6 +691,35 @@
             document.querySelectorAll('#items-grid > .best-items-item').forEach(function (item) {
                 item.classList.add('item-all-best-items-item');
             });
+
+            const brandText = document.querySelector('.filter-custom-select[data-type="brand"] .filter-custom-select-text');
+            const serviceText = document.querySelector('.filter-custom-select[data-type="service"] .filter-custom-select-text');
+            const attributeNameText = document.querySelector('.filter-custom-select[data-type="attribute-name"] .filter-custom-select-text');
+            const attributeValueText = document.querySelector('.filter-custom-select[data-type="attribute-value"] .filter-custom-select-text');
+            if (brandText) brandText.textContent = 'Select attribute';
+            if (serviceText) serviceText.textContent = 'Select attribute';
+            if (attributeNameText) attributeNameText.textContent = 'Select attribute';
+            if (attributeValueText) attributeValueText.textContent = 'Select value';
+
+            const attrsContainer = document.querySelector('.filter-attrs');
+            if (attrsContainer && attrsContainer.children.length === 0) {
+                const presetAttrs = [
+                    { value: 'color:red,orange', text: 'Color: Red,Orange' },
+                    { value: '7-day-return', text: '7-Day Return' },
+                    { value: 'cod', text: 'COD' },
+                    { value: 'airtable', text: 'Airtable' },
+                    { value: 'in-stock-1', text: 'In Stock' },
+                    { value: 'in-stock-2', text: 'In Stock' }
+                ];
+                attrsContainer.innerHTML = presetAttrs.map(function (attr) {
+                    return '<div class="filter-attr">' +
+                        '<span class="filter-attr-text" data-value="' + attr.value + '">' + attr.text + '</span>' +
+                        '<svg class="filter-attr-close" width="12" height="12" viewBox="0 0 12 12" fill="none">' +
+                        '<path d="M9 3L3 9M3 3L9 9" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+                        '</svg>' +
+                        '</div>';
+                }).join('');
+            }
         });
     </script>
     <!-- JavaScript -->
