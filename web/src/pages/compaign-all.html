@@ -614,6 +614,37 @@
                 if (resultContent) resultContent.textContent = 'Logo DesIgn';
                 const filterNum = document.querySelector('.page-top-sticky .page-filter-num');
                 if (filterNum) filterNum.textContent = '(2)';
+
+                const horizontalItems = document.querySelectorAll('.items-container-horizontal .figma-compaign-horizontal-item');
+                const tagsHtml = [
+                    '<a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self"><span class="item-tag-text">New Release</span></a>',
+                    '<a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self"><span class="item-tag-text">New</span></a>',
+                    '<a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self"><span class="item-tag-text">New Release</span></a>'
+                ].join('');
+
+                horizontalItems.forEach(function (item) {
+                    const cover = item.querySelector('.compaign-item-icon');
+                    if (cover) {
+                        cover.src = 'image/figma-search-campaign-cover.png';
+                        cover.alt = 'Campaign cover';
+                    }
+
+                    const adMark = item.querySelector('.compaign-item-ad-mark');
+                    if (adMark) adMark.textContent = 'AD';
+
+                    const title = item.querySelector('.item-title');
+                    if (title) title.textContent = 'Campaigns titleCampaigns title...';
+
+                    const likeBtn = item.querySelector('.icon-aixin');
+                    if (likeBtn) {
+                        likeBtn.setAttribute('src', 'image/Vector_nor.svg');
+                        likeBtn.setAttribute('data-like', '0');
+                        likeBtn.setAttribute('aria-pressed', 'false');
+                    }
+
+                    const tagBox = item.querySelector('.item-tag-box');
+                    if (tagBox) tagBox.innerHTML = tagsHtml;
+                });
             }
 
             const brandText = document.querySelector('.filter-custom-select[data-type="brand"] .filter-custom-select-text');
