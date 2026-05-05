@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="css/signin.css" />
     <link rel="stylesheet" href="css/page.css" />
     <link rel="stylesheet" href="css/compaign.css" />
+    <link rel="stylesheet" href="css/item-all.css">
 </head>
 
 <body style="background: white;">
@@ -2514,10 +2515,10 @@
         </div>
     </div>
     <div class="page-top-sticky" id="stickyHeader">
-        <div class="page-filter-layoutcontrol-box">
+        <div class="page-filter-layoutcontrol-box item-all-filter-layoutcontrol-box">
             <div class="page-filter-box">
                 <div class="page-filter-count">
-                    <img class="page-filter-icon" src="image/filter.png" />
+                    <img class="page-filter-icon" src="image/filter-tight.png" />
                     <p class="page-filter-num">(0)</p>
                 </div>
                 <!-- <button class="filter-clear-btn">Clear all</button> -->
@@ -2563,7 +2564,7 @@
             </div>
         </div>
     </div>
-    <div class="page-content">
+    <div class="page-content item-all-filter-design item-all-mobile-horizontal-page">
         <div class="filter-container page-fix-box">
             <div class="item-all-filter-container common-filter-panel ">
 <header class="filter-header" aria-label="Filter header">
@@ -4279,6 +4280,54 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
+            if (isMobile) {
+                const topSwitches = document.querySelectorAll('.page-top-sticky .layout-controls-box .layout-switch');
+                if (topSwitches[0]) topSwitches[0].textContent = 'Vertical display';
+                if (topSwitches[1]) topSwitches[1].textContent = 'Horizontal display';
+
+                const resultNum = document.querySelector('.page-top-sticky .page-filterresult-num');
+                const resultText = document.querySelector('.page-top-sticky .page-filterresult-text');
+                const resultContent = document.querySelector('.page-top-sticky .page-filterresult-content');
+                if (resultNum) resultNum.textContent = '12';
+                if (resultText) resultText.textContent = 'Pro freelancers for';
+                if (resultContent) resultContent.textContent = 'Logo DesIgn';
+                const filterNum = document.querySelector('.page-top-sticky .page-filter-num');
+                if (filterNum) filterNum.textContent = '(2)';
+            }
+
+            const brandText = document.querySelector('.filter-custom-select[data-type="brand"] .filter-custom-select-text');
+            const serviceText = document.querySelector('.filter-custom-select[data-type="service"] .filter-custom-select-text');
+            const attributeNameText = document.querySelector('.filter-custom-select[data-type="attribute-name"] .filter-custom-select-text');
+            const attributeValueText = document.querySelector('.filter-custom-select[data-type="attribute-value"] .filter-custom-select-text');
+            if (brandText) brandText.textContent = 'Select attribute';
+            if (serviceText) serviceText.textContent = 'Select attribute';
+            if (attributeNameText) attributeNameText.textContent = 'Select attribute';
+            if (attributeValueText) attributeValueText.textContent = 'Select value';
+
+            const attrsContainer = document.querySelector('.filter-attrs');
+            if (attrsContainer && attrsContainer.children.length === 0) {
+                const presetAttrs = [
+                    { value: 'color:red,orange', text: 'Color: Red,Orange' },
+                    { value: '7-day-return', text: '7-Day Return' },
+                    { value: 'cod', text: 'COD' },
+                    { value: 'airtable', text: 'Airtable' },
+                    { value: 'in-stock-1', text: 'In Stock' },
+                    { value: 'in-stock-2', text: 'In Stock' }
+                ];
+                attrsContainer.innerHTML = presetAttrs.map(function (attr) {
+                    return '<div class="filter-attr">' +
+                        '<span class="filter-attr-text" data-value="' + attr.value + '">' + attr.text + '</span>' +
+                        '<svg class="filter-attr-close" width="12" height="12" viewBox="0 0 12 12" fill="none">' +
+                        '<path d="M9 3L3 9M3 3L9 9" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+                        '</svg>' +
+                        '</div>';
+                }).join('');
+            }
+        });
+    </script>
     <!-- JavaScript -->
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/user.js"></script>
