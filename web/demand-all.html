@@ -3933,6 +3933,74 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
+            if (!isMobile) {
+                return;
+            }
+
+            const topLayoutBox = document.querySelector('.page-filter-layoutcontrol-box');
+            const pageContent = document.querySelector('.page-content');
+            if (topLayoutBox) {
+                topLayoutBox.classList.add('item-all-filter-layoutcontrol-box');
+            }
+            if (pageContent) {
+                pageContent.classList.add('item-all-filter-design');
+            }
+
+            const topFilterIcon = document.querySelector('.page-top-sticky .page-filter-icon');
+            if (topFilterIcon) {
+                topFilterIcon.src = 'image/filter-tight.png';
+            }
+
+            document.querySelectorAll('.page-filter-num').forEach(function (node) {
+                node.textContent = '(2)';
+            });
+
+            const topVerticalSwitch = document.querySelector('.page-top-sticky .layout-switch[data-layout=\"vertical\"]');
+            const topHorizontalSwitch = document.querySelector('.page-top-sticky .layout-switch[data-layout=\"horizontal\"]');
+            if (topVerticalSwitch) topVerticalSwitch.textContent = 'Vertical display';
+            if (topHorizontalSwitch) topHorizontalSwitch.textContent = 'Horizontal display';
+
+            const resultNum = document.querySelector('.page-top-sticky .page-filterresult-num');
+            const resultText = document.querySelector('.page-top-sticky .page-filterresult-text');
+            const resultContent = document.querySelector('.page-top-sticky .page-filterresult-content');
+            if (resultNum) resultNum.textContent = '12';
+            if (resultText) resultText.textContent = 'Pro freelancers for';
+            if (resultContent) resultContent.textContent = 'Logo DesIgn';
+
+            const brandText = document.querySelector('.filter-custom-select[data-type="brand"] .filter-custom-select-text');
+            const serviceText = document.querySelector('.filter-custom-select[data-type="service"] .filter-custom-select-text');
+            const attributeNameText = document.querySelector('.filter-custom-select[data-type="attribute-name"] .filter-custom-select-text');
+            const attributeValueText = document.querySelector('.filter-custom-select[data-type="attribute-value"] .filter-custom-select-text');
+
+            if (brandText) brandText.textContent = 'Select attribute';
+            if (serviceText) serviceText.textContent = 'Select attribute';
+            if (attributeNameText) attributeNameText.textContent = 'Select attribute';
+            if (attributeValueText) attributeValueText.textContent = 'Select value';
+
+            const attrsContainer = document.querySelector('.filter-attrs');
+            if (attrsContainer && attrsContainer.children.length === 0) {
+                const presetAttrs = [
+                    { value: 'color:red,orange', text: 'Color: Red,Orange' },
+                    { value: '7-day-return', text: '7-Day Return' },
+                    { value: 'cod', text: 'COD' },
+                    { value: 'airtable', text: 'Airtable' },
+                    { value: 'in-stock-1', text: 'In Stock' },
+                    { value: 'in-stock-2', text: 'In Stock' }
+                ];
+                attrsContainer.innerHTML = presetAttrs.map(function (attr) {
+                    return '<div class="filter-attr">' +
+                        '<span class="filter-attr-text" data-value="' + attr.value + '">' + attr.text + '</span>' +
+                        '<svg class="filter-attr-close" width="12" height="12" viewBox="0 0 12 12" fill="none">' +
+                        '<path d="M9 3L3 9M3 3L9 9" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+                        '</svg>' +
+                        '</div>';
+                }).join('');
+            }
+        });
+    </script>
     <!-- JavaScript -->
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/user.js"></script>
