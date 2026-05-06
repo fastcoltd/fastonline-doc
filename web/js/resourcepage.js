@@ -85,44 +85,55 @@ function renderItems(items) {
 function createItemElement(item) {
   const div = document.createElement('div');
   div.className = 'resource-item';
-
-  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
+  const itemStates = [
+    {
+      likeClass: 'resource-action-group resource-action-like',
+      unlikeClass: 'resource-action-group resource-action-unlike',
+      followIcon: 'image/follow-count.png'
+    },
+    {
+      likeClass: 'resource-action-group resource-action-like has-activate',
+      unlikeClass: 'resource-action-group resource-action-unlike',
+      followIcon: 'image/follow-active-count.png'
+    },
+    {
+      likeClass: 'resource-action-group resource-action-like',
+      unlikeClass: 'resource-action-group resource-action-unlike has-activate',
+      followIcon: 'image/follow-count.png'
+    },
+    {
+      likeClass: 'resource-action-group resource-action-like has-activate',
+      unlikeClass: 'resource-action-group resource-action-unlike has-activate',
+      followIcon: 'image/follow-active-count.png'
+    }
+  ];
+  const currentState = itemStates[(item.id - 1) % itemStates.length];
 
   div.innerHTML = `
            <div class="resource-header">
-                    <span class="resource-title">Resource Title,Resource Title,Resource Title,Resource Title,Resource
-                        Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource
-                        Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource
-                        Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource
-                        Title,Resource Title,Resource Title,Resource Title,Resource Title,Resource Title</span>
-                    <span class="resource-date">Update: 2023/05/16 12:13:14</span>
+                    <a href="resource-detail.html" class="resource-title">Laboriosam magni repudiandae quia a ut est soluta.Laboriosam magni repudiandae quia a ut est soluta.</a>
+                    <span class="resource-date">Updated: 2025/6/17 10:41:44</span>
                 </div>
                 <div class="resource-body">
-                    <span class="resource-content">Resource content,Resource content,Resource content,Resource
-                        content,Resource content,Resource content,Resource content,Resource content,Resource
-                        content,Resource content,Resource content,Resource content,Resource content,Resource
-                        content,Resource content,Resource content,Resource content,Resource content,Resource
-                        content,Resource content,Resource content,Resource content,Resource content,Resource
-                        content,Resource content,Resource content,Resource content,Resource content,Resource
-                        content,Resource content,Resource content,Resource content,Resource content,Resource
-                        content,Resource content,Resource content,Resource content,Resource content,Resource
-                        content,Resource content,Resource content,Resource content,</span>
+                    <span class="resource-content">Vero at sit corrupti. Autem omnis sed et repellat rerum possimus voluptas.Vero at sit corrupti. Autem omnis sed et repellat rerum possimus voluptas.Vero at sit corrupti. Autem omnis sed et repellat rerum possimus voluptas.</span>
                     <div class="resource-actions">
                         <div class="resource-action-group">
                             <img src="image/view-count.png" class="resource-action-icon" />
-                            <span class="resource-action-count">304</span>
+                            <span class="resource-action-count">486</span>
+                        </div>
+                        <div class="${currentState.likeClass}">
+                            <img src="image/like-count.png" class="resource-action-icon resource-action-icon-default resource-action-like-icon cursor-pointer" />
+                            <img src="image/like-active-count.png" class="resource-action-icon resource-action-icon-active resource-action-like-icon cursor-pointer" />
+                            <span class="resource-action-count">486</span>
+                        </div>
+                        <div class="${currentState.unlikeClass}">
+                            <img src="image/unlike-count.png" class="resource-action-icon resource-action-icon-default resource-action-unlike-icon cursor-pointer" />
+                            <img src="image/unlike-active-count.png" class="resource-action-icon resource-action-icon-active resource-action-unlike-icon cursor-pointer" />
+                            <span class="resource-action-count">10</span>
                         </div>
                         <div class="resource-action-group">
-                            <img src="image/like-count.png" class="resource-action-icon" />
-                            <span class="resource-action-count">203</span>
-                        </div>
-                        <div class="resource-action-group">
-                            <img src="image/unlike-count.png" class="resource-action-icon" />
-                            <span class="resource-action-count">102</span>
-                        </div>
-                        <div class="resource-action-group">
-                            <img src="image/follow-count.png" class="resource-action-icon" />
-                            <span class="resource-action-count">502</span>
+                            <img src="${currentState.followIcon}" class="resource-action-icon" />
+                            <span class="resource-action-count">20</span>
                         </div>
                     </div>
                 </div>

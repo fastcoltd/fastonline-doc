@@ -320,6 +320,16 @@ document.addEventListener('DOMContentLoaded', function () {
 class HeaderMenu {
     constructor(domId, imgId, labId, defaultValue) {
         this.menuButton = document.querySelector(domId);
+        if (!this.menuButton) {
+            this.menuArrow = null;
+            this.menuLabel = null;
+            this.menuContainer = null;
+            this.menuItems = [];
+            this.selectedValue = defaultValue;
+            this.selectedText = '';
+            this.headerMenuTimer = null;
+            return;
+        }
         this.menuArrow = this.menuButton.querySelector(imgId);
         if (labId && labId.length > 0) {
             this.menuLabel = this.menuButton.querySelector(labId);
