@@ -1,26 +1,44 @@
 // 博客文章详情页面交互功能
 document.addEventListener('DOMContentLoaded', function () {
-    const relateItems = new Carousel('best-items', 20);
-    const link = new LinkRef('toc-item', 'post-detail-section');
+    const carouselContainer = document.getElementById('best-items');
+    if (carouselContainer) {
+        new Carousel('best-items', 20);
+    }
+
+    const tocItem = document.querySelector('.toc-item');
+    if (tocItem) {
+        new LinkRef('toc-item', 'post-detail-section');
+    }
+
     const menu = document.querySelector('.detail-page-menu');
     const menuContainer = document.querySelector('.table-of-container');
-    menu.addEventListener('click', function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        const menuContainerStyle = window.getComputedStyle(menuContainer);
-        const close = menuContainer.querySelector('.table-of-container-close');
-        close.addEventListener('click', function (event) {
-            menuContainer.style.display = 'none';
-            body.classList.toggle('modal-open', false);
-        });
-        if (menuContainerStyle.display === 'none') {
-            menuContainer.style.display = 'block';
-            body.classList.toggle('modal-open', true);
-        } else {
-            menuContainer.style.display = 'none';
-            body.classList.toggle('modal-open', false);
+    const close = menuContainer ? menuContainer.querySelector('.table-of-container-close') : null;
+
+    function toggleMenu(visible) {
+        if (!menuContainer) {
+            return;
         }
-    });
+        menuContainer.style.display = visible ? 'block' : 'none';
+        document.body.classList.toggle('modal-open', visible);
+    }
+
+    if (menu && menuContainer) {
+        menu.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const isHidden = window.getComputedStyle(menuContainer).display === 'none';
+            toggleMenu(isHidden);
+        });
+    }
+
+    if (close) {
+        close.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleMenu(false);
+        });
+    }
+
     $('.helpful-section-wrapper .resource-action-like-icon, .helpful-section-wrapper .resource-action-like .resource-action-label').on('click', function () {
         const wrapper = $(this).closest('.helpful-section-wrapper')
         wrapper.find('.resource-action-like').addClass('has-activate')
