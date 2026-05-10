@@ -5003,6 +5003,16 @@
     <script>
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', () => {
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
+            if (isMobile) {
+                const breadcrumbCurrent = document.querySelector('.page-nav-box .home-nav-current');
+                if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'Tag';
+
+                const desc = document.querySelector('.tag-page-header-desc-content');
+                if (desc) {
+                    desc.textContent = 'Doloribus labore voluptatem culpa quia consequuntur qui dolores. Fugit iste vel omnis sit...';
+                }
+            }
             this.layout = new PageLayout();
             this.list = new PageList();
             this.sort = new SortSelector();
