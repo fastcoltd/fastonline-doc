@@ -12,6 +12,22 @@ const menuContainer = document.querySelector('.table-of-container');
 
 const close = menuContainer.querySelector('.table-of-container-close');
 
+function applyMobileBreadcrumbSpacing() {
+    const isMobileViewport = window.matchMedia('(max-width: 1024px)').matches;
+    const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    if (!isMobileViewport && !isTouchDevice) {
+        return;
+    }
+    const bread = document.querySelector('.page-top-bread');
+    if (bread) {
+        bread.style.width = '100%';
+        bread.style.marginLeft = '0';
+        bread.style.transform = 'none';
+        bread.style.padding = '0';
+        bread.style.boxSizing = 'border-box';
+    }
+}
+
 const sort = new SortSelector();
 function sortItems(value) {
     console.log('sort items', value);
@@ -218,6 +234,9 @@ function bindReviewItemEvents(element) {
 
 // 博客文章详情页面交互功能
 document.addEventListener('DOMContentLoaded', function () {
+    applyMobileBreadcrumbSpacing();
+    window.addEventListener('resize', applyMobileBreadcrumbSpacing);
+
     const relateItems = new Carousel('best-items', 20);
     const link = new LinkRef('toc-item', 'post-detail-section');
     const reviews = document.querySelectorAll('.post-detail-review-item');
