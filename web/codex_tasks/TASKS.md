@@ -16,6 +16,6 @@
 把 tag-all.html 页面的如图![alt text](image-1.png)的内容，参考图片![alt text](image.png)进行修改,要求内容的位置和布局，都进行修改
 
 ## Task 002:attribute-all.html页面和tag-all.html页面，点击排序按钮后，悬浮菜单被遮挡修改
-状态：未开始
+状态：已完成
 ### 任务内容
 上面两个页面，如图的![alt text](image-2.png)的按钮被点击后，应该出现的浮动菜单，，我不确定是被下面的列表遮挡住了还是压根没有出现，请确认问题，然后进行修改
