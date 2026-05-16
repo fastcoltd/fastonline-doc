@@ -500,7 +500,11 @@
         font-size: 1.875rem;
         font-weight: 400;
         line-height: 2.625rem;
-        transform: translateY(1.25rem);
+        order: 2;
+        transform: none;
+        grid-area: text;
+        min-width: 0;
+        padding-right: 0.75rem;
     }
 
     .tag-page-filterresult-box-mobile .page-filterresult-text,
@@ -512,11 +516,25 @@
         width: 100%;
         justify-content: space-between;
         align-items: center;
+        order: 1;
+        display: contents;
+    }
+
+    .page-header-function-box {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "layout layout"
+            "text sort";
+        column-gap: 0.75rem;
+        row-gap: 0.75rem;
+        align-items: center;
     }
 
     .page-header-function-box .page-filter-layoutcontrol-box {
         width: auto;
         flex: 0 0 auto;
+        grid-area: layout;
     }
 
     .page-header-function-box .page-filter-layoutcontrol-box .layout-controls-box {
@@ -541,6 +559,9 @@
 
     .page-header-function-box .page-sort-box {
         padding: 0;
+        grid-area: sort;
+        justify-self: end;
+        align-self: center;
     }
 
     .page-header-function-box .page-sort-icon {

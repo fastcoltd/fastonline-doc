@@ -11,7 +11,7 @@
 ---
 
 ## Task 001：tag-all.html页面，局部修改
-状态：未开始
+状态：已完成
 ### 任务内容
 把 tag-all.html 页面的如图![alt text](image-1.png)的内容，参考图片![alt text](image.png)进行修改,要求内容的位置和布局，都进行修改
 
