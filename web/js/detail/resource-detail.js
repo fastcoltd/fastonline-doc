@@ -6,8 +6,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const tocItem = document.querySelector('.toc-item');
+    let link = null;
     if (tocItem) {
-        new LinkRef('toc-item', 'post-detail-section');
+        link = new LinkRef('toc-item', 'post-detail-section');
     }
 
     const menu = document.querySelector('.detail-page-menu');
@@ -18,16 +19,20 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!menuContainer) {
             return;
         }
-        menuContainer.style.display = visible ? 'block' : 'none';
+        menuContainer.classList.toggle('is-open', visible);
         document.body.classList.toggle('modal-open', visible);
+        menuContainer.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        if (menu) {
+            menu.setAttribute('aria-expanded', visible ? 'true' : 'false');
+        }
     }
 
     if (menu && menuContainer) {
         menu.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            const isHidden = window.getComputedStyle(menuContainer).display === 'none';
-            toggleMenu(isHidden);
+            const isOpen = menuContainer.classList.contains('is-open');
+            toggleMenu(!isOpen);
         });
     }
 
@@ -37,6 +42,34 @@ document.addEventListener('DOMContentLoaded', function () {
             event.stopPropagation();
             toggleMenu(false);
         });
+    }
+
+    if (menuContainer) {
+        menuContainer.addEventListener('click', function (event) {
+            if (event.target === menuContainer) {
+                toggleMenu(false);
+            }
+        });
+
+        const tocItems = menuContainer.querySelectorAll('.toc-item');
+        tocItems.forEach(function (item) {
+            item.addEventListener('click', function () {
+                if (!window.matchMedia('(max-width: 768px)').matches || !link) {
+                    return;
+                }
+                const targetSectionId = item.id;
+                toggleMenu(false);
+                window.setTimeout(function () {
+                    link.scrollToSection(targetSectionId);
+                }, 0);
+            });
+        });
+    }
+
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        toggleMenu(false);
+    } else if (menuContainer) {
+        menuContainer.setAttribute('aria-hidden', 'false');
     }
 
     $('.helpful-section-wrapper .resource-action-like-icon, .helpful-section-wrapper .resource-action-like .resource-action-label').on('click', function () {
