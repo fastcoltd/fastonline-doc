@@ -95,7 +95,7 @@ Similar items 的部分，一页只需要展示 2 条数据，如图![alt text](
 Reviews 模块中，如图的部分![alt text](image-19.png)，其中的评分组件需要使用一颗星的评分组件（如图![alt text](image-20.png)），对应的设计稿为：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=852-28674&m=dev。请先确认项目中是否已经有该组件，如果有请直接使用，如果没有，请封装一个组件，然后应用到这里
 
 ## Task：post-detail.html的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 Reviews 模块中，如图的部分![alt text](image-21.png)，需要参考图片![alt text](image-22.png)进行修改。大小、间距、边框样式都需要修改，1：1 还原
 
