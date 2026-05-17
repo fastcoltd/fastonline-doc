@@ -245,11 +245,78 @@ function bindReviewItemEvents(element) {
     });
 }
 
+function optimizeRelatedItemsForMobile() {
+    const isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
+    const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    if (!isMobileViewport && !isTouchDevice) {
+        return;
+    }
+
+    const carouselContainer = document.getElementById('best-items');
+    if (!carouselContainer) {
+        return;
+    }
+
+    const track = carouselContainer.querySelector('.carousel-track');
+    const indicator = carouselContainer.querySelector('.carousel-indicators');
+    if (!track || !indicator) {
+        return;
+    }
+
+    const originSlides = Array.from(track.querySelectorAll('.carousel-slide'));
+    if (!originSlides.length) {
+        return;
+    }
+
+    const cards = [];
+    originSlides.forEach(slide => {
+        Array.from(slide.children).forEach(child => {
+            if (child.classList && child.classList.contains('best-items-item')) {
+                cards.push(child);
+            }
+        });
+    });
+
+    if (cards.length <= 2) {
+        return;
+    }
+
+    const perSlide = 2;
+    const expectedSlides = Math.ceil(cards.length / perSlide);
+    const alreadyGrouped = originSlides.length === expectedSlides && originSlides.every(slide => {
+        const cardCount = Array.from(slide.children).filter(child => child.classList && child.classList.contains('best-items-item')).length;
+        return cardCount <= perSlide;
+    });
+    if (alreadyGrouped) {
+        return;
+    }
+
+    const slideClassName = originSlides[0].className;
+    track.innerHTML = '';
+
+    for (let index = 0; index < cards.length; index += perSlide) {
+        const slide = document.createElement('div');
+        slide.className = slideClassName;
+        cards.slice(index, index + perSlide).forEach(card => {
+            slide.appendChild(card);
+        });
+        track.appendChild(slide);
+    }
+
+    indicator.innerHTML = '';
+    for (let dotIndex = 0; dotIndex < expectedSlides; dotIndex++) {
+        const dot = document.createElement('div');
+        dot.className = `carousel-indicator home-section-indicator${dotIndex === 0 ? ' active' : ''}`;
+        indicator.appendChild(dot);
+    }
+}
+
 // 博客文章详情页面交互功能
 document.addEventListener('DOMContentLoaded', function () {
     applyMobileBreadcrumbSpacing();
     window.addEventListener('resize', applyMobileBreadcrumbSpacing);
 
+    optimizeRelatedItemsForMobile();
     const relateItems = new Carousel('best-items', 20);
     const link = new LinkRef('toc-item', 'post-detail-section');
     const reviews = document.querySelectorAll('.post-detail-review-item');
