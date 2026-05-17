@@ -9,8 +9,21 @@ const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
 const listContainer = document.querySelector('.list-container')
 const menuContainer = document.querySelector('.table-of-container');
+const menuToggle = document.querySelector('.detail-page-menu');
 
-const close = menuContainer.querySelector('.table-of-container-close');
+const close = menuContainer ? menuContainer.querySelector('.table-of-container-close') : null;
+
+function toggleMobileToc(visible) {
+    if (!menuContainer) {
+        return;
+    }
+    menuContainer.classList.toggle('is-open', visible);
+    document.body.classList.toggle('modal-open', visible);
+    menuContainer.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    if (menuToggle) {
+        menuToggle.setAttribute('aria-expanded', visible ? 'true' : 'false');
+    }
+}
 
 function applyMobileBreadcrumbSpacing() {
     const isMobileViewport = window.matchMedia('(max-width: 1024px)').matches;
@@ -266,24 +279,50 @@ document.addEventListener('DOMContentLoaded', function () {
             bindReviewItemEvents(newReview);
         });
     }
-    const menu = document.querySelector('.detail-page-menu');
-    if (menu) {
-        menu.addEventListener('click', function (event) {
+    if (menuToggle && menuContainer) {
+        menuToggle.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            const menuContainerStyle = window.getComputedStyle(menuContainer);
-            close.addEventListener('click', function (event) {
-                menuContainer.style.display = 'none';
-                body.classList.toggle('modal-open', false);
-            });
-            if (menuContainerStyle.display === 'none') {
-                menuContainer.style.display = 'block';
-                body.classList.toggle('modal-open', true);
-            } else {
-                menuContainer.style.display = 'none';
-                body.classList.toggle('modal-open', false);
+            const visible = menuContainer.classList.contains('is-open');
+            toggleMobileToc(!visible);
+        });
+    }
+
+    if (close) {
+        close.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleMobileToc(false);
+        });
+    }
+
+    if (menuContainer) {
+        menuContainer.addEventListener('click', function (event) {
+            if (event.target === menuContainer) {
+                toggleMobileToc(false);
             }
         });
+
+        const tocItems = menuContainer.querySelectorAll('.toc-item');
+        tocItems.forEach(item => {
+            item.addEventListener('click', function () {
+                if (!window.matchMedia('(max-width: 768px)').matches) {
+                    return;
+                }
+                const targetSectionId = item.id;
+                // 先关闭抽屉再滚动，避免 modal-open 锁定影响滚动定位
+                toggleMobileToc(false);
+                window.setTimeout(function () {
+                    link.scrollToSection(targetSectionId);
+                }, 0);
+            });
+        });
+    }
+
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        toggleMobileToc(false);
+    } else if (menuContainer) {
+        menuContainer.setAttribute('aria-hidden', 'false');
     }
 });
 
@@ -313,25 +352,13 @@ function adjustFilterPosition() {
     const headIsSticky = stickyHeader.classList.contains('is-sticky');
     if (!pageFix) return;
     if (body.offsetWidth < 768) {
-        const pageFixVisble = pageFix.dataset.visible;
-        if (!pageFixVisble) {
-            return;
-        }
-        if (headIsSticky) {
-            Object.assign(pageFix.style, {
-                position: 'fixed',
-                left: 16 + 'px',
-                top: stickyHeaderHeight + 20 + 'px',
-                maxHeight: `calc(100vh - ${stickyHeaderHeight + 40}px)`
-            });
-            return;
-        }
-        Object.assign(pageFix.style, {
-            position: 'relative',
-            left: 0,
-            top: 20 + 'px',
-            maxHeight: `calc(100vh - ${stickyHeaderHeight + pageHeadHeight + 40}px)`
-        });
+        pageFix.classList.remove('is-sticky');
+        pageFix.style.position = '';
+        pageFix.style.left = '';
+        pageFix.style.right = '';
+        pageFix.style.top = '';
+        pageFix.style.maxHeight = '';
+        pageFix.style.transform = '';
         return;
     };
     // 清理移动端分支可能遗留的内联定位，避免桌面端横向偏移

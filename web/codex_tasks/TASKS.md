@@ -85,7 +85,7 @@ Similar items 的部分，一页只需要展示 2 条数据，如图![alt text](
 ![alt text](image-15.png)如图的部分（看成一个整体，这个整体不需要修改，修改的是整体上面和整体下面的间距），顶部到上面内容的间距改成 10px，底部到下面内容的间距改成 10px
 
 ## Task:post-detail.html的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 该页面的 pc 版本，右侧是有一个锚点模块的（如图![alt text](image-16.png)），但是切换成手机版以后这个部分就不见了。移动版也需要这个锚点组件的。移动端这样修改：在页面上有一个浮动按钮如图![alt text](image-17.png)，对应 figma 设计稿：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=852-28733&m=dev，点击按钮以后从右侧出现锚点组件如图![alt text](image-18.png)，对应 figma 设计稿：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=997-36993&m=dev，请使用 figma mcp 读取设计稿的内容后修改，修改完成后，请调用 chrome mcp 来确认修改效果，确认和 figma 设计比已经很还原了才算修改结束
 
