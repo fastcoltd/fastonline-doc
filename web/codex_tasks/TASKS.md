@@ -120,7 +120,7 @@ Related items 模块中，每一页只需要展示一行，每行展示两个，
 Other Pages 部分，每一页只需要展示 1 行数据，现在的效果如图![alt text](image-26.png)，应该修改成如图![alt text](image-27.png)的效果
 
 ## Task：service.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 如图的部分![alt text](image-28.png)的布局不对，左侧距离边框、距离底部内容的间距都不对，请参考item-all.html的手机版的相同位置进行布局修改
 

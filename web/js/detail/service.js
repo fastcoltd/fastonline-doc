@@ -66,7 +66,9 @@ function updateStickyHeader() {
     if (window.innerWidth >= 768) {
         const fullHeaderHeight = stickyHeaderHeight;
         headerHiddenOffset = Math.min(scrollTop, fullHeaderHeight);
-        const usesCenteredMainLayout = stickyHeader.classList.contains('page-top-sticky-main');
+        const usesCenteredMainLayout =
+            stickyHeader.classList.contains('page-top-sticky-main') ||
+            stickyHeader.classList.contains('page-head-main');
         stickyHeader.style.transform = usesCenteredMainLayout
             ? `translateY(-${headerHiddenOffset}px)`
             : `translate(-50%, -${headerHiddenOffset}px)`;
