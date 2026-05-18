@@ -10,8 +10,21 @@ const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
 let storeLeftScrollTimer = null;
 
+function isMobileLikeViewport() {
+    const narrowViewport = window.matchMedia('(max-width: 768px)').matches;
+    const touchPrimaryPointer = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    return narrowViewport || touchPrimaryPointer;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
-    const link = new LinkRef('page-link', 'item-detail-right-group');
+    const pageLinkBox = document.querySelector('.page-link-box');
+    const shouldEnablePageLink = pageLinkBox
+        && window.getComputedStyle(pageLinkBox).display !== 'none'
+        && !isMobileLikeViewport();
+    // 仅在 page-link 可见时启用锚点联动，避免隐藏态触发 scrollIntoView 抢占滚动位置
+    if (shouldEnablePageLink) {
+        const link = new LinkRef('page-link', 'item-detail-right-group');
+    }
     const faqs = document.querySelectorAll('.item-detail-faq-box');
     faqs.forEach(element => {
         const content = element.querySelector('.item-detail-faq-content');
@@ -332,9 +345,19 @@ function adjustFilterPosition() {
     const body = document.getElementsByTagName('body')[0];
     const headIsSticky = stickyHeader.classList.contains('is-sticky');
     if (!pageFix) return;
-    if (body.offsetWidth < 768) {
+    if (isMobileLikeViewport()) {
         const pageFixVisble = pageFix.dataset.visible;
         if (!pageFixVisble) {
+            // 移动端非抽屉型容器：清理可能残留的桌面端 fixed/absolute 内联样式，避免回弹与位置锁定
+            pageFix.classList.remove('is-sticky');
+            Object.assign(pageFix.style, {
+                position: '',
+                left: '',
+                top: '',
+                transform: '',
+                maxHeight: '',
+                height: ''
+            });
             return;
         }
         if (headIsSticky) {
