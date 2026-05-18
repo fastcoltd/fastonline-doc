@@ -1,4 +1,55 @@
 const list = new PageList();
+let selectedUploadFiles = [];
+
+function openUploadImagePreview(imageSrc) {
+  if (!imageSrc) {
+    return;
+  }
+
+  const previewMask = document.getElementById('uploadImagePreviewMask');
+  const previewImg = document.getElementById('uploadImagePreviewImg');
+  if (!previewMask || !previewImg) {
+    return;
+  }
+
+  previewImg.src = imageSrc;
+  previewMask.classList.add('is-visible');
+  previewMask.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+}
+
+function closeUploadImagePreview() {
+  const previewMask = document.getElementById('uploadImagePreviewMask');
+  const previewImg = document.getElementById('uploadImagePreviewImg');
+  if (!previewMask || !previewImg) {
+    return;
+  }
+
+  previewMask.classList.remove('is-visible');
+  previewMask.setAttribute('aria-hidden', 'true');
+  previewImg.removeAttribute('src');
+  document.body.classList.remove('modal-open');
+}
+
+function initializeUploadImagePreview() {
+  const previewMask = document.getElementById('uploadImagePreviewMask');
+  const previewClose = document.getElementById('uploadImagePreviewClose');
+
+  if (!previewMask || !previewClose) {
+    return;
+  }
+
+  previewClose.addEventListener('click', function (event) {
+    event.preventDefault();
+    closeUploadImagePreview();
+  });
+
+  previewMask.addEventListener('click', function (event) {
+    if (event.target === previewMask) {
+      closeUploadImagePreview();
+    }
+  });
+}
 
 // 加载商品数据
 async function loadItems() {
@@ -238,53 +289,66 @@ function initializeCharacterCount() {
 function initializeFileUpload() {
   const fileInput = document.getElementById('fileInput');
   const filePreview = document.getElementById('filePreview');
-  let uploadedFiles = [];
 
   fileInput.addEventListener('change', function (e) {
-    console.log(fileInput.files, '----')
     const files = Array.from(e.target.files);
-    console.log(files, '00000')
+    if (files.length === 0) {
+      return;
+    }
+
     document.getElementById('file-upload').classList.toggle('error', false)
+
     files.forEach(file => {
-      if (!uploadedFiles.find(f => f.name === file.name)) {
-        uploadedFiles.push(file);
+      if (!selectedUploadFiles.find(f => isSameFile(f, file))) {
+        selectedUploadFiles.push(file);
         addFileToPreview(file);
       }
     });
 
-    if (uploadedFiles.length > 0) {
-      filePreview.style.display = 'flex';
-    }
+    // 允许重复选择同一文件触发 change。
+    fileInput.value = '';
+    syncPreviewVisibility();
   });
+
+  function isSameFile(firstFile, secondFile) {
+    return firstFile.name === secondFile.name
+      && firstFile.size === secondFile.size
+      && firstFile.lastModified === secondFile.lastModified;
+  }
+
+  function syncPreviewVisibility() {
+    filePreview.style.display = selectedUploadFiles.length > 0 ? 'flex' : 'none';
+  }
 
   function addFileToPreview(file) {
     const fileItem = document.createElement('div');
     fileItem.className = 'file-item';
 
-
-    const viewImg = document.createElement('img')
-    let reader = new FileReader(); // 创建FileReader对象
+    const viewImg = document.createElement('img');
+    viewImg.className = 'file-thumb';
+    const reader = new FileReader();
     reader.onload = function (e) {
-      viewImg.src = e.target.result
+      viewImg.src = e.target.result;
     };
-    reader.readAsDataURL(file); // 读取文件内容作为DataURL
-
-
+    reader.readAsDataURL(file);
+    viewImg.addEventListener('click', function () {
+      openUploadImagePreview(viewImg.src);
+    });
 
     const fileName = document.createElement('span');
     fileName.className = 'file-name';
     fileName.textContent = file.name;
 
-    const removeBtn = document.createElement('span');
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
     removeBtn.className = 'file-remove';
-    removeBtn.innerHTML = '×';
-    removeBtn.onclick = function () {
-      uploadedFiles = uploadedFiles.filter(f => f.name !== file.name);
+    removeBtn.setAttribute('aria-label', 'Remove image');
+    removeBtn.textContent = '×';
+    removeBtn.onclick = function (event) {
+      event.stopPropagation();
+      selectedUploadFiles = selectedUploadFiles.filter(f => !isSameFile(f, file));
       fileItem.remove();
-
-      if (uploadedFiles.length === 0) {
-        filePreview.style.display = 'none';
-      }
+      syncPreviewVisibility();
     };
 
     fileItem.appendChild(viewImg);
@@ -322,7 +386,6 @@ function validateForm() {
   const biddingInstructions = document.getElementById('biddingInstructions').value.trim();
   const captchaInput = document.getElementById('captchaInput').value.trim();
   const captchaCode = document.getElementById('captchaCode').textContent;
-  const fileInput = document.getElementById('fileInput');
 
   // 验证必填字段
   if (!fieldInfo) {
@@ -340,7 +403,7 @@ function validateForm() {
     return false;
   }
   document.getElementById('biddingInstructions').classList.toggle('error', false)
-  if (fileInput.files.length === 0) {
+  if (selectedUploadFiles.length === 0) {
     document.getElementById('file-upload').classList.toggle('error', true)
     return false;
   }
@@ -370,7 +433,7 @@ function submitForm() {
     fieldInfo: document.getElementById('fieldInfo').value,
     samplesInfo: document.getElementById('samplesInfo').value,
     biddingInstructions: document.getElementById('biddingInstructions').value,
-    files: Array.from(document.getElementById('fileInput').files),
+    files: selectedUploadFiles,
     captcha: document.getElementById('captchaInput').value
   };
 
@@ -394,6 +457,7 @@ function submitForm() {
     document.getElementById('fileInput').value = '';
     document.getElementById('filePreview').innerHTML = '';
     document.getElementById('filePreview').style.display = 'none';
+    selectedUploadFiles = [];
 
     // 重置字符计数
     document.querySelectorAll('.word-count').forEach(counter => {
@@ -424,12 +488,17 @@ document.addEventListener('keydown', function (e) {
     e.preventDefault();
     refreshCaptcha();
   }
+
+  if (e.key === 'Escape') {
+    closeUploadImagePreview();
+  }
 });
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function () {
   initializeCharacterCount();
   initializeFileUpload();
+  initializeUploadImagePreview();
   refreshCaptcha();
   initDemandSummaryStickyLayer();
 });
