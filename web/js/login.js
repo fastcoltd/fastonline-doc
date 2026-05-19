@@ -10,6 +10,33 @@ const loginForm = document.getElementById('signin-login-form');
 const twofaForm = document.getElementById('signin-2fa-form');
 const loginAccoutErrTipEle = document.getElementById('signin-login-accout-tip');
 const twofaCodeErrTipEle = document.getElementById('signin-2fa-code-tip');
+
+function initPasswordToggle(rootElement) {
+    if (!rootElement) {
+        return;
+    }
+    const passwordFieldList = rootElement.querySelectorAll('.signin-password-field');
+    passwordFieldList.forEach(function (field) {
+        if (field.dataset.passwordToggleBound === '1') {
+            return;
+        }
+        const passwordInput = field.querySelector('input');
+        const passwordToggleButton = field.querySelector('.signin-password-toggle');
+        if (!passwordInput || !passwordToggleButton) {
+            return;
+        }
+        field.dataset.passwordToggleBound = '1';
+        passwordToggleButton.addEventListener('click', function () {
+            const isPasswordType = passwordInput.type === 'password';
+            passwordInput.type = isPasswordType ? 'text' : 'password';
+            field.classList.toggle('is-password-visible', isPasswordType);
+            passwordToggleButton.setAttribute('aria-label', isPasswordType ? 'Hide password' : 'Show password');
+        });
+    });
+}
+
+initPasswordToggle(signin);
+
 let countryList = [
     { value: 'china', text: 'China' },
     { value: 'english', text: 'English' }

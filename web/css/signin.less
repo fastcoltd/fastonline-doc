@@ -95,6 +95,50 @@
         padding: 1.75rem 2rem;
     }
 
+    .signin-password-field {
+        width: 100%;
+        position: relative;
+    }
+
+    .signin-password-field .signin-form-input {
+        padding-right: 5rem;
+    }
+
+    .signin-password-toggle {
+        display: none;
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 0;
+        padding: 0;
+        background-color: transparent;
+        background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.5 8C2.5 5.3 5 3.5 8 3.5C11 3.5 13.5 5.3 14.5 8C13.5 10.7 11 12.5 8 12.5C5 12.5 2.5 10.7 1.5 8Z' stroke='%234D4D4D' stroke-width='1.2'/%3E%3Ccircle cx='8' cy='8' r='2' fill='%234D4D4D'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 2rem 2rem;
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+    }
+
+    .signin-password-toggle::after {
+        content: '';
+        position: absolute;
+        top: 0.25rem;
+        left: 0.25rem;
+        width: 2rem;
+        height: 2rem;
+        border-top: 0.2rem solid #4d4d4d;
+        transform: rotate(-35deg) scaleX(0);
+        transform-origin: center;
+        transition: transform 0.2s ease;
+    }
+
+    .signin-password-field.is-password-visible .signin-password-toggle::after {
+        transform: rotate(-35deg) scaleX(1);
+    }
+
     .signin-form-error-tip {
         margin-top: 0;
         height: 2.5rem;
@@ -1398,6 +1442,14 @@
 
         .signin-form-title {
             margin-top: 2.5rem;
+        }
+
+        .signin-password-field .signin-form-input {
+            background-image: none;
+        }
+
+        .signin-password-toggle {
+            display: block;
         }
 
         .signin-login-form-tool-box {
