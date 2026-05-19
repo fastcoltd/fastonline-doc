@@ -1341,17 +1341,27 @@
     .signin-bg {
         background: #fff;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
+        height: 100vh;
+        height: 100dvh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
 
         .signin-container {
             width: 100vw;
             min-width: 100vw;
             padding-left: 4rem;
             padding-right: 4rem;
-            height: 100vh;
-            min-height: 100vh;
+            height: auto;
+            min-height: 100%;
             background: #fff;
             border-radius: 0;
+            overflow: visible;
+            touch-action: pan-y;
         }
 
         .signin-content-regist {
@@ -1427,7 +1437,14 @@
         .signin-container-login {
             padding-top: 10rem;
             padding-bottom: 10rem;
-            height: 100vh;
+            height: auto;
+            min-height: 100%;
+        }
+
+        .signin-container-regist,
+        .signin-container-2fa {
+            height: auto;
+            min-height: 100%;
         }
 
         .signin-container-login .signin-close,

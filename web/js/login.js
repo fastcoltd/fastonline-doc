@@ -67,8 +67,10 @@ function toggleSigninModalOpen(isOpen) {
         body.style.removeProperty('--scrollbar-width');
     }
     body.classList.toggle('modal-open', isOpen);
+    body.classList.toggle('signin-modal-open', isOpen);
     if (html) {
         html.classList.toggle('modal-open', isOpen);
+        html.classList.toggle('signin-modal-open', isOpen);
     }
 }
 
