@@ -200,6 +200,28 @@ const searchTabCardClassMap = {
     demands: 'search-card-fifth-item'
 };
 
+function bindSearchTagRandomJump() {
+    const container = document.querySelector('.search-list-container');
+    if (!container) {
+        return;
+    }
+
+    container.addEventListener('click', function (event) {
+        const clickedTag = event.target.closest('.item-tag');
+        if (!clickedTag || !container.contains(clickedTag)) {
+            return;
+        }
+
+        if (!window.matchMedia('(max-width: 768px)').matches) {
+            return;
+        }
+
+        event.preventDefault();
+        const targetPage = Math.random() < 0.5 ? 'attribute-all.html' : 'tag-all.html';
+        window.location.href = targetPage;
+    });
+}
+
 function filterSearchCardsByType(type) {
     const cards = document.querySelectorAll('.search-list-container .search-card');
     const targetClass = searchTabCardClassMap[type];
@@ -222,4 +244,5 @@ $(document).ready(function () {
 
     const defaultType = $('.page-link.active').attr('data-key') || 'all';
     filterSearchCardsByType(defaultType);
+    bindSearchTagRandomJump();
 });
