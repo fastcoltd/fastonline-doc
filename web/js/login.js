@@ -213,11 +213,28 @@ function updateSigninNavArray(name) {
 function showLogin() {
 
     const registButton = document.getElementById('signin-login-regist');
-    registButton.addEventListener('click', function () {
-        updateSigninNavArray('regist');
-        displaySigninPage();
-        displayBackButton();
-    });
+    if (registButton && registButton.dataset.boundLoginRegist !== '1') {
+        registButton.dataset.boundLoginRegist = '1';
+        registButton.addEventListener('click', function () {
+            updateSigninNavArray('regist');
+            displaySigninPage();
+            displayBackButton();
+        });
+    }
+
+    const resetpwdButton = document.querySelector('#signin-login .signin-login-form-resetpwd');
+    if (resetpwdButton && resetpwdButton.dataset.boundLoginResetpwd !== '1') {
+        resetpwdButton.dataset.boundLoginResetpwd = '1';
+        resetpwdButton.addEventListener('click', function () {
+            if (signin && signin.classList.contains('signin-bg-static-page')) {
+                window.location.href = 'signin-reset-password.html';
+                return;
+            }
+            updateSigninNavArray('resetpwd');
+            displaySigninPage();
+            displayBackButton();
+        });
+    }
 }
 
 function showRegist() {
