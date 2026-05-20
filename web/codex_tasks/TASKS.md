@@ -237,7 +237,7 @@ demand-all.html排序按钮太小，右侧需要有间距，compaign-all.html、
 多个页面的show more（或者是类似的 show more xxx）样式不对，全局的show more（show more xxx）都要改成相同的样式，请把item-detail.html页面的show more按钮封装成组件，然后应用到所有的show more(show more xxx)的位置
 
 ## Task:brand-all.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-49.png)，如图，顶部布局不对，需要完全复用item-all.html中的组件来修改，完全还原item-all.html中的样子
 
