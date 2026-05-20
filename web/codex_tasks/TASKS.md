@@ -222,7 +222,7 @@ demand-all.html排序按钮太小，右侧需要有间距，compaign-all.html、
 如图的部分![alt text](image-45.png)，点击收藏按钮的时候，不需要任何的效果，现在点击按钮的时候如图的整个部分都会有一个蓝色的点按效果（如图：![alt text](image-46.png)）（收藏和取消收藏功能不能受影响）
 
 ## Task：attribute-all.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 如图![alt text](image-47.png)，demands Vertical display 模式下的 item 布局不正确，需要参考 demand-all.html 中的 Vertical display 的 item 修改，请直接复用 demand-all.html 中的 Vertical display 的 item。要求修改完成后，展示的样子和 demand-all.html 中的 Vertical display 的 item一模一样
 
