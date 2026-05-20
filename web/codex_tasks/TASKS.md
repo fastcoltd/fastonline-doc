@@ -252,7 +252,7 @@ demand-all.html排序按钮太小，右侧需要有间距，compaign-all.html、
 如图![alt text](image-51.png)，Horizontal 模式下的 item，左右两边距离屏幕边缘的距离要减少一半
 
 ## Task:fastesp-service.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-52.png)，如图，顶部布局不对，需要完全复用item-all.html中的组件来修改，完全还原item-all.html中的样子
 
