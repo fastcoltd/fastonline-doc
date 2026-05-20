@@ -242,7 +242,7 @@ demand-all.html排序按钮太小，右侧需要有间距，compaign-all.html、
 ![alt text](image-49.png)，如图，顶部布局不对，需要完全复用item-all.html中的组件来修改，完全还原item-all.html中的样子
 
 ## Task:compaign-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-50.png)，如图，顶部布局不对，需要完全复用item-all.html中的组件来修改，完全还原item-all.html中的样子
 
