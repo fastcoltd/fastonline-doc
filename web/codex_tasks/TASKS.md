@@ -263,6 +263,6 @@ demand-all.html排序按钮太小，右侧需要有间距，compaign-all.html、
 该页面的 pc 版本，右侧是有一个锚点模块的![alt text](image-53.png)，但是切换成手机版以后这个部分就不见了。移动版也需要这个锚点组件的。移动端这样修改：在页面上有一个浮动按钮如图![alt text](image-17.png)，对应 figma 设计稿：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=852-28733&m=dev,需要使用设计稿中的图片，并且是只显示图片，完全切圆角，点击按钮以后从右侧出现锚点组件如图![alt text](image-18.png)，对应 figma 设计稿：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=997-36993&m=dev，锚点页面需要点击标题以后跳转到对应位置。请使用 figma mcp 读取设计稿的内容后修改，修改完成后，请调用 chrome mcp 来确认修改效果，确认和 figma 设计比已经很还原了才算修改结束，post-detail.html页面的手机版已经实现了，可以参考或者复用其中的组件和页面。
 
 ## Task:tag-all.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 post的 item，布局不对,如图![alt text](image-54.png)，需要替换成post-all.html中第二个item的组件，最终展示效果需要和post-all.html中第二个item的组件一样
