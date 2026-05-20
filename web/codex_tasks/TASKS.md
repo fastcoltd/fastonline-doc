@@ -232,7 +232,7 @@ demand-all.html排序按钮太小，右侧需要有间距，compaign-all.html、
 ![alt text](image-48.png)如图的内容布局不对，，参考item-all.html页面来修改，包括顶部的悬停效果，都要参考item-all.html来修改。包括面包屑的布局和位置也要参考item-all.html修改
 
 ## Task：多个页面的手机版的 show more 按钮需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 多个页面的show more（或者是类似的 show more xxx）样式不对，全局的show more（show more xxx）都要改成相同的样式，请把item-detail.html页面的show more按钮封装成组件，然后应用到所有的show more(show more xxx)的位置
 
