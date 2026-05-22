@@ -288,6 +288,6 @@ post的 item，布局不对,如图![alt text](image-54.png)，需要替换成pos
 Related Items 的部分，需要使用和这个页面的 items 相同的组件，即如图的组件：![alt text](image-57.png)
 
 ## Task: 多个页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 signin-2fa.html、signin-join.html、signin-login.html、signin-reset-2fa.html、signin-reset-password.html，这几个页面的如图的头部：![alt text](image-58.png)，如图，顶部布局不对，需要完全复用item-all.html中的组件来修改，完全还原item-all.html中的样子
