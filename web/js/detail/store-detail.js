@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeValidation();
     initializeOverviewTimeTabs();
     initializeStoreLeftScrollbar();
+    initializeItemsShowMore();
 
     $('.item-detail-review-tool-icon-yes').on('click', function() {
         console.log($(this).parent())
@@ -122,6 +123,24 @@ function initializeStoreLeftScrollbar() {
             pageFix.classList.remove('is-scrolling');
         }, 450);
     }, { passive: true });
+}
+
+function initializeItemsShowMore() {
+    const showMoreBtn = document.getElementById('load-more-items');
+    const extraItems = Array.from(document.querySelectorAll('#items-grid .store-detail-extra-item'));
+    if (!showMoreBtn || !extraItems.length) return;
+
+    if (!isMobileLikeViewport()) {
+        showMoreBtn.style.display = 'none';
+        return;
+    }
+
+    showMoreBtn.addEventListener('click', function () {
+        extraItems.forEach(item => {
+            item.classList.add('is-visible');
+        });
+        showMoreBtn.style.display = 'none';
+    });
 }
 
 function initializeOverviewTimeTabs() {
