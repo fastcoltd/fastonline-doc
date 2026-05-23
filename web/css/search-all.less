@@ -28,6 +28,10 @@
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #C5C5C5 transparent;
+    
+    .search-card.search-card-first-item-mobile {
+        display: none;
+    }
 
     .search-card {
         width: 100%;
@@ -883,7 +887,7 @@
         display: flex;
     }
 
-    .item-mark {
+    .search-list-container .search-card:not(.search-card-first-item-mobile) .item-mark {
         position: relative;
     }
 
@@ -892,6 +896,52 @@
         overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: #C5C5C5 transparent;
+
+        .search-card.search-card-first-item-desktop {
+            display: none !important;
+        }
+
+        .search-card.search-card-first-item-mobile {
+            display: block;
+            padding: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+
+            .item-all-horizontal-mobile-item {
+                display: block;
+            }
+
+            .item-all-horizontal-mobile-card {
+                width: 100%;
+                height: auto;
+                min-height: 13.875rem;
+            }
+
+            .item-all-horizontal-mobile-main {
+                width: calc(100% - 15.375rem);
+            }
+
+            .item-all-horizontal-mobile-title,
+            .item-all-horizontal-mobile-meta,
+            .item-all-horizontal-mobile-buy-btn {
+                width: 100%;
+            }
+
+            .item-all-horizontal-mobile-mark {
+                position: absolute;
+            }
+
+            .item-all-horizontal-mobile-like {
+                position: absolute;
+                top: 0.75rem;
+                right: 1.25rem;
+                width: 2.75rem;
+                height: 2.75rem;
+            }
+        }
 
         .search-card {
             width: 100%;
@@ -1045,6 +1095,16 @@
 
                 .buy-btn {
                     width: 100%;
+                }
+            }
+
+            &.search-card-first-item.search-card-first-item-mobile {
+                .icon-aixin {
+                    position: absolute;
+                    top: 0.75rem;
+                    right: 1.25rem;
+                    width: 2.75rem;
+                    height: 2.75rem;
                 }
             }
 
