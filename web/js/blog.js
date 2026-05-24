@@ -31,4 +31,79 @@ document.addEventListener('DOMContentLoaded', () => {
         $('.load-more-text').show()
       }, 2000)
     })
+
+    const sideMenuButton = document.querySelector('.detail-page-menu');
+    const sidePanel = document.getElementById('blog-side-panel');
+    const sidePanelContent = sidePanel ? sidePanel.querySelector('.other-info-wrapper') : null;
+    const sideClose = sidePanel ? sidePanel.querySelector('.table-of-container-close') : null;
+
+    const resetSidePanelScrollTop = () => {
+      if (sidePanel) {
+        sidePanel.scrollTop = 0;
+      }
+      if (sidePanelContent) {
+        sidePanelContent.scrollTop = 0;
+      }
+    };
+
+    const toggleSidePanel = (visible) => {
+      if (!sidePanel) {
+        return;
+      }
+      sidePanel.classList.toggle('is-open', visible);
+      document.body.classList.toggle('modal-open', visible);
+      sidePanel.setAttribute('aria-hidden', visible ? 'false' : 'true');
+      if (visible) {
+        resetSidePanelScrollTop();
+        window.requestAnimationFrame(resetSidePanelScrollTop);
+        window.setTimeout(resetSidePanelScrollTop, 80);
+      }
+      if (sideMenuButton) {
+        sideMenuButton.setAttribute('aria-expanded', visible ? 'true' : 'false');
+      }
+    };
+
+    const syncPanelByViewport = () => {
+      if (!sidePanel) {
+        return;
+      }
+      if (window.matchMedia('(max-width: 768px)').matches) {
+        toggleSidePanel(false);
+        return;
+      }
+      sidePanel.classList.remove('is-open');
+      sidePanel.setAttribute('aria-hidden', 'false');
+      document.body.classList.remove('modal-open');
+      if (sideMenuButton) {
+        sideMenuButton.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    if (sideMenuButton && sidePanel) {
+      sideMenuButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const visible = sidePanel.classList.contains('is-open');
+        toggleSidePanel(!visible);
+      });
+    }
+
+    if (sideClose) {
+      sideClose.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleSidePanel(false);
+      });
+    }
+
+    if (sidePanel) {
+      sidePanel.addEventListener('click', (event) => {
+        if (event.target === sidePanel) {
+          toggleSidePanel(false);
+        }
+      });
+    }
+
+    syncPanelByViewport();
+    window.addEventListener('resize', syncPanelByViewport);
   });
