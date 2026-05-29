@@ -121,6 +121,7 @@ function bindReviewItemEvents(element) {
     });
 }
 function renderStarsStatisticsChart() {
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
     let dom = document.getElementById('starsStatisticsEchart')
     var chartInstance = echarts.init(dom)
     var datas = [118, 50, 20, 10, 10]
@@ -139,10 +140,11 @@ function renderStarsStatisticsChart() {
             show: false
         },
         grid: {
-            left: 50,
-            right: 20,
+            left: isMobile ? 0 : 50,
+            right: isMobile ? 16 : 20,
             top: 20,
-            bottom: 0
+            bottom: 0,
+            containLabel: true
         },
         xAxis: {
             show: true,
@@ -150,20 +152,22 @@ function renderStarsStatisticsChart() {
             type: 'value',
             max: 'dataMax',
             axisLine: {
-                show: true, // 确保这一项设置为 true
+                show: true,
                 lineStyle: {
-                    color: '#eaeaea', // 轴线颜色
-                    width: 1, // 轴线宽度
+                    color: 'rgba(0, 0, 26, 0.3)',
+                    width: 1,
                 }
             },
             splitLine: {
                 show: true,
                 lineStyle: {
-                    type: 'dashed'
+                    type: 'dashed',
+                    color: 'rgba(0, 0, 26, 0.15)'
                 }
             },
             axisLabel: {
-                color: '#333'
+                color: 'rgba(0, 0, 0, 0.7)',
+                fontSize: 12
             }
 
         },
@@ -173,13 +177,15 @@ function renderStarsStatisticsChart() {
             axisLine: {
                 show: true,
                 lineStyle: {
-                    color: '#eaeaea'
+                    color: 'rgba(0, 0, 26, 0.3)',
+                    width: 1
                 }
             },
             splitLine: {
                 show: true,
                 lineStyle: {
-                    type: 'dashed'
+                    type: 'dashed',
+                    color: 'rgba(0, 0, 26, 0.15)'
                 }
             },
             axisTick: {
@@ -187,10 +193,10 @@ function renderStarsStatisticsChart() {
             },
             data: starNames,
             axisLabel: {
-                margin: 40,
-                fontSize: 17,
+                margin: isMobile ? 8 : 40,
+                fontSize: isMobile ? 12 : 17,
                 align: 'left',
-                color: '#333'
+                color: 'rgba(0, 0, 0, 0.7)'
             }
         }],
         series: [{
@@ -202,13 +208,14 @@ function renderStarsStatisticsChart() {
             data: datas,
             itemStyle: {
                 normal: {
-                    color: '#9E95FB'
+                    color: '#8979FF',
+                    opacity: 0.8
                 }
             },
             label: {
                 show: true,
                 position: 'right',
-                color: '#000',
+                color: 'rgba(0, 0, 0, 0.7)',
                 fontSize: 12
             }
         },
@@ -219,7 +226,7 @@ function renderStarsStatisticsChart() {
             barGap: '-100%',
             itemStyle: {
                 normal: {
-                    color: '#D6DBED66',
+                    color: 'rgba(214, 219, 237, 0.4)',
                 }
             },
             data: maxArr,

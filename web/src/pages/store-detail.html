@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="css/signin.css" />
   <link rel="stylesheet" href="css/second-page.css" />
   <link rel="stylesheet" href="css/page.css" />
-  <link rel="stylesheet" href="css/item-statistics.css">
+  <link rel="stylesheet" href="css/item-statistics.css?v=20260529-statistics-component-v3">
   <link rel="stylesheet" href="css/detail/store-detail.css?v=20260522-mobile-search-v2" />
 </head>
 
@@ -184,40 +184,7 @@
 
       <!-- 图表部分 -->
       <div class="frame-container">
-        <!-- Item's Statistics Section -->
-        <div class="statistics-frame">
-          <div class="section-title">
-            <div class="title-indicator"></div>
-            <h3>Response time</h3>
-          </div>
-          <div class="section-content">
-            <p>5 hours (21:28 local time)</p>
-          </div>
-          <!-- Rating Details Row -->
-          <div class="flex-row statistics-num-box">
-            <div class="flex-row statistics-num-item">
-              <span class="statistics-num-text">Rating:</span>
-              <span class="statistics-num">4.3</span>
-              <span class="statistics-num-count">(90)</span>
-            </div>
-            <div class="flex-row statistics-num-item">
-              <span class="statistics-num-text">Service:</span>
-              <span class="statistics-num">4.3</span>
-            </div>
-            <div class="flex-row statistics-num-item">
-              <span class="statistics-num-text">Logistics:</span>
-              <span class="statistics-num">4.3</span>
-            </div>
-            <div class="flex-row statistics-num-item">
-              <span class="statistics-num-text">Products:</span>
-              <span class="statistics-num">4.3</span>
-            </div>
-          </div>
-          <!-- Bar Chart -->
-          <div class="bar-chart-frame">
-            <div class="chart-content" id="starsStatisticsEchart"></div>
-          </div>
-        </div>
+        <!-- @include ../partials/components/statistics-bar-panel.html {"statistics_panel_class":"store-statistics-panel","section_title_style":"","section_title_text":"Response time","section_content_style":"","section_content_text":"5 hours (21:28 local time)","main_title_style":"display: none;","main_title_text":"","star_box_style":"display: none;","star_width":"0","star_score":"","star_recommend":"","rating_mobile_style":"display: none;","rating_mobile_score":"","rating_mobile_recommend":"","stat_1_label":"Rating:","stat_1_value":"4.3","stat_1_count":"(90)","stat_2_label":"Service:","stat_2_value":"4.3","stat_2_count":"","stat_3_label":"Logistics:","stat_3_value":"4.3","stat_3_count":"","stat_4_label":"Products:","stat_4_value":"4.3","stat_4_count":"","chart_id":"starsStatisticsEchart"} -->
 
         <!-- Overview Section -->
         <div class="overview-header">
@@ -997,6 +964,7 @@
     }
 
     function randerStarsStatisticschart() {
+      const isMobile = window.matchMedia('(max-width: 768px)').matches
       let dom = document.getElementById('starsStatisticsEchart')
       var chartInstance = echarts.init(dom)
       var datas = [80, 72, 60, 10, 2]
@@ -1011,8 +979,8 @@
           show: false
         },
         grid: {
-          left: 28,
-          right: 20,
+          left: isMobile ? 0 : 28,
+          right: isMobile ? 16 : 20,
           top: 20,
           bottom: 0,
           containLabel: true
@@ -1068,7 +1036,7 @@
           },
           data: starNames,
           axisLabel: {
-            margin: 12,
+            margin: isMobile ? 8 : 12,
             fontSize: 12,
             align: 'right',
             color: 'rgba(0, 0, 0, 0.7)'
