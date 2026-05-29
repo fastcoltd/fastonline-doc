@@ -16,7 +16,7 @@
 ---
 
 ## Task：post-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 如图![alt text](image-73.png)的部分，Hot 和 Limited time scale 标签，需要放在标题后面。不论标题多长，一行还是两行，都需要跟在标题后面，而不是另起一行
 
