@@ -51,7 +51,7 @@
 ![alt text](image-86.png)如图的部分，其中的内容的间距不对，纵向每个部分的间距都不对，请参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=722-21806&m=dev
 
 ## Task：index.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 如图![alt text](image-87.png)，是 Popular demands 部分的的 item，和设计稿不一样，我需要按照设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=263-1947&m=dev，我希望 1：1 还原，另外我希望改完以后，所有用到这个组件的地方，都是修改后的效果
 

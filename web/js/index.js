@@ -1,12 +1,16 @@
 
 
 window.addEventListener('DOMContentLoaded', function () {
+    const isMobile = window.innerWidth <= 768;
     const banner = new Carousel('banner', 5);
     const bestItems = new Carousel('best-items', 11);
     const bestStore = new Carousel('best-store', 23);
     const hotCompaign = new Carousel('hot-compaigns', 47);
-    const popuarDemands = new Carousel('popuar-demands', 97);
+    if (!isMobile) {
+        new Carousel('popuar-demands', 97);
+    }
     const hotPosts = new Carousel('hot-posts', 197);
+    const popularDemandsMobile = document.getElementById('popuar-demands-mobile');
     const brand = document.querySelector('.brand');
     const brandContent = brand.querySelector('.brand-content');
     const brandRightMore = brand.querySelector('.brand-right-box');
@@ -89,4 +93,33 @@ window.addEventListener('DOMContentLoaded', function () {
     brandContent.addEventListener('scroll', brandScroll, { passive: true });
     window.addEventListener('resize', brandScroll);
     brandScroll()
+
+    if (isMobile && popularDemandsMobile) {
+        let mouseDown = false;
+        let mouseStartX = 0;
+        let scrollStartX = 0;
+
+        popularDemandsMobile.addEventListener('mousedown', function (event) {
+            mouseDown = true;
+            mouseStartX = event.clientX;
+            scrollStartX = popularDemandsMobile.scrollLeft;
+            popularDemandsMobile.classList.add('is-dragging');
+            event.preventDefault();
+        });
+
+        popularDemandsMobile.addEventListener('mousemove', function (event) {
+            if (!mouseDown) return;
+            const deltaX = event.clientX - mouseStartX;
+            popularDemandsMobile.scrollLeft = scrollStartX - deltaX;
+            event.preventDefault();
+        });
+
+        function stopDrag() {
+            mouseDown = false;
+            popularDemandsMobile.classList.remove('is-dragging');
+        }
+
+        popularDemandsMobile.addEventListener('mouseleave', stopDrag);
+        popularDemandsMobile.addEventListener('mouseup', stopDrag);
+    }
 })
