@@ -41,7 +41,7 @@
 这个页面中，Items tab 的组件中的 buy now 按钮的样式，和Demands tab 的 item 的 buy now 按钮样式不一样，我希望改成一样的，请按照Items tab 的组件中的 buy now 按钮的样式修改。另外我希望项目中所有的 buy now 按钮的样式，都按照 Items tab 的组件中的 buy now 按钮的样式修改
 
 ## Task：item-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-85.png)如图的部分，发货这个部分，位置不对，实际应该靠右，请参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=722-21807&m=dev
 
