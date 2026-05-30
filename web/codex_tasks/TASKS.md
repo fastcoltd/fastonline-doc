@@ -46,7 +46,7 @@
 ![alt text](image-85.png)如图的部分，发货这个部分，位置不对，实际应该靠右，请参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=722-21807&m=dev
 
 ## Task：item-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-86.png)如图的部分，其中的内容的间距不对，纵向每个部分的间距都不对，请参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=722-21806&m=dev
 
