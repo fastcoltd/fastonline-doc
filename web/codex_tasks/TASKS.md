@@ -62,7 +62,7 @@
 这个页面中的不同模块的 item 中的标签的高度不一致，如图![alt text](image-88.png)、![alt text](image-89.png)、![alt text](image-90.png)，都是不同的大小，我希望这个页面中所有类型的 item，只要包含标签组件的，都按照 figma 设计稿修改https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=263-1968&m=dev，请按照设计稿封装标签组件，然后应用到各个类的的 item 中
 
 ## Task：search-all.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 这个页面中，几种 item 中的标签，都不是相同的样式，请复用项目中已有的标签组件，应用到该页面的所有类型的 item 中
 
