@@ -26,19 +26,24 @@ function toggleMobileToc(visible) {
 }
 
 function applyMobileBreadcrumbSpacing() {
-    const isMobileViewport = window.matchMedia('(max-width: 1024px)').matches;
-    const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-    if (!isMobileViewport && !isTouchDevice) {
+    const isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
+    const bread = document.querySelector('.page-top-bread');
+    if (!bread) {
         return;
     }
-    const bread = document.querySelector('.page-top-bread');
-    if (bread) {
-        bread.style.width = '100%';
-        bread.style.marginLeft = '0';
-        bread.style.transform = 'none';
-        bread.style.padding = '0';
-        bread.style.boxSizing = 'border-box';
+    if (!isMobileViewport) {
+        bread.style.removeProperty('width');
+        bread.style.removeProperty('margin-left');
+        bread.style.removeProperty('transform');
+        bread.style.removeProperty('padding');
+        bread.style.removeProperty('box-sizing');
+        return;
     }
+    bread.style.width = '100%';
+    bread.style.marginLeft = '0';
+    bread.style.transform = 'none';
+    bread.style.padding = '0';
+    bread.style.boxSizing = 'border-box';
 }
 
 const sort = new SortSelector();
@@ -315,6 +320,14 @@ function optimizeRelatedItemsForMobile() {
 document.addEventListener('DOMContentLoaded', function () {
     applyMobileBreadcrumbSpacing();
     window.addEventListener('resize', applyMobileBreadcrumbSpacing);
+    window.addEventListener('orientationchange', applyMobileBreadcrumbSpacing);
+    window.addEventListener('pageshow', applyMobileBreadcrumbSpacing);
+    const mobileBreadMql = window.matchMedia('(max-width: 768px)');
+    if (typeof mobileBreadMql.addEventListener === 'function') {
+        mobileBreadMql.addEventListener('change', applyMobileBreadcrumbSpacing);
+    } else if (typeof mobileBreadMql.addListener === 'function') {
+        mobileBreadMql.addListener(applyMobileBreadcrumbSpacing);
+    }
 
     optimizeRelatedItemsForMobile();
     const relateItems = new Carousel('best-items', 20);
