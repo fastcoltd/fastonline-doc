@@ -52,12 +52,22 @@ function adjustFilterPosition() {
         const footerElement = document.querySelector('footer.common-footer-wrapper') || footer;
         const headerHeightCurrent = headerElement ? headerElement.offsetHeight : 0;
         const topMenuHeightCurrent = topMenuElement ? topMenuElement.offsetHeight : 0;
-        const footerHeightCurrent = footerElement ? footerElement.offsetHeight : 0;
         const pageContentRect = pageContent ? pageContent.getBoundingClientRect() : null;
         const baseTop = headerHeightCurrent + topMenuHeightCurrent;
+        const isMobileViewport = body.offsetWidth < 768;
         const contentTop = pageContentRect ? pageContentRect.top : baseTop;
-        const fixedTop = Math.max(baseTop, contentTop);
-        const anchorHeight = Math.max(window.innerHeight - fixedTop - footerHeightCurrent, 0);
+        // PC 端使用固定基准，避免小窗口初始态被压缩；移动端保持原有行为
+        const fixedTop = isMobileViewport ? Math.max(baseTop, contentTop) : baseTop;
+        let anchorHeight = 0;
+        if (isMobileViewport) {
+            const footerHeightCurrent = footerElement ? footerElement.offsetHeight : 0;
+            anchorHeight = Math.max(window.innerHeight - fixedTop - footerHeightCurrent, 0);
+        } else {
+            const footerTopInViewport = footerElement ? footerElement.getBoundingClientRect().top : window.innerHeight;
+            const visibleBottom = Math.min(window.innerHeight, footerTopInViewport);
+            // PC 端只有在 footer 进入视口时才缩短高度，避免默认态纵向压缩
+            anchorHeight = Math.max(visibleBottom - fixedTop, 0);
+        }
         Object.assign(pageFix.style, {
             position: 'fixed',
             left: pageContentRect ? `${pageContentRect.left}px` : '',
