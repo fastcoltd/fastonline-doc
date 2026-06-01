@@ -88,6 +88,6 @@
 
 
 ## Task：index.html页面的手机版和 pc（电脑）版 都需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 电脑版中和手机版，Best stores 中的 item 中的标签，点击以后，需要随机跳转到tag-all.html页面或者attribute-all.html页面

@@ -94,6 +94,26 @@ window.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('resize', brandScroll);
     brandScroll()
 
+    function bindBestStoreTagRandomJump() {
+        const bestStoresWrapper = document.querySelector('.best-stores-wrapper');
+        if (!bestStoresWrapper) {
+            return;
+        }
+
+        bestStoresWrapper.addEventListener('click', function (event) {
+            const clickedTag = event.target.closest('.figma-best-store-item .item-tag');
+            if (!clickedTag || !bestStoresWrapper.contains(clickedTag)) {
+                return;
+            }
+
+            event.preventDefault();
+            const targetPage = Math.random() < 0.5 ? 'tag-all.html' : 'attribute-all.html';
+            window.location.href = targetPage;
+        });
+    }
+
+    bindBestStoreTagRandomJump();
+
     if (isMobile && popularDemandsMobile) {
         let mouseDown = false;
         let mouseStartX = 0;
