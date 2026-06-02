@@ -56,8 +56,7 @@ function adjustFilterPosition() {
         const baseTop = headerHeightCurrent + topMenuHeightCurrent;
         const isMobileViewport = body.offsetWidth < 768;
         const contentTop = pageContentRect ? pageContentRect.top : baseTop;
-        // PC 端使用固定基准，避免小窗口初始态被压缩；移动端保持原有行为
-        const fixedTop = isMobileViewport ? Math.max(baseTop, contentTop) : baseTop;
+        const fixedTop = Math.max(baseTop, contentTop);
         let anchorHeight = 0;
         if (isMobileViewport) {
             const footerHeightCurrent = footerElement ? footerElement.offsetHeight : 0;
@@ -75,7 +74,7 @@ function adjustFilterPosition() {
             top: `${fixedTop}px`,
             height: `${anchorHeight}px`,
             maxHeight: `${anchorHeight}px`,
-            overflowY: 'visible'
+            overflowY: isMobileViewport ? 'visible' : 'auto'
         });
         return;
     }
