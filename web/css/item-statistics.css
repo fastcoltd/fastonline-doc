@@ -530,25 +530,35 @@
   .statistics-bar-panel .statistics-rating-mobile {
     display: block;
   }
-  .statistics-bar-panel .statistics-num-box {
+  .statistics-frame.statistics-bar-panel {
+    container-type: inline-size;
+  }
+  .statistics-frame.statistics-bar-panel .statistics-num-box {
     width: 100%;
     justify-content: space-between;
     column-gap: 0.375rem;
     row-gap: 0;
     flex-wrap: nowrap;
   }
-  .statistics-bar-panel .statistics-num-item {
+  .statistics-frame.statistics-bar-panel .statistics-num-item {
     flex-wrap: nowrap;
     flex: 0 0 auto;
-    column-gap: 0.125rem;
+    column-gap: 0.0625rem;
     white-space: nowrap;
   }
-  .statistics-bar-panel .statistics-num-text,
-  .statistics-bar-panel .statistics-num,
-  .statistics-bar-panel .statistics-num-count {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
+  .statistics-frame.statistics-bar-panel .statistics-num-text,
+  .statistics-frame.statistics-bar-panel .statistics-num,
+  .statistics-frame.statistics-bar-panel .statistics-num-count {
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    line-height: 1.5;
     white-space: nowrap;
+  }
+  @supports (font-size: 1cqw) {
+    .statistics-frame.statistics-bar-panel .statistics-num-text,
+    .statistics-frame.statistics-bar-panel .statistics-num,
+    .statistics-frame.statistics-bar-panel .statistics-num-count {
+      font-size: clamp(1.25rem, 3.25cqw, 1.5rem);
+    }
   }
   .statistics-bar-panel .bar-chart-frame {
     width: 100%;
