@@ -1080,10 +1080,45 @@
       chartInstance.setOption(option)
     }
     randerStarsStatisticschart()
-    function randerOverviewStatisticschart() {
-      let dom = document.getElementById('overviewStatisticsEchart')
+    var overviewCurrentPeriod = '7D';
 
-      var chartInstance = echarts.init(dom)
+    function buildOverviewStatisticsLabels(days) {
+      return Array.from({ length: days }, (_, index) => `${days - index}d`);
+    }
+
+    function getOverviewStatisticsPeriodData(period) {
+      if (period === '14D') {
+        return {
+          labels: buildOverviewStatisticsLabels(14),
+          goodsRate: [18, 24, 28, 35, 44, 42, 50, 56, 62, 66, 71, 76, 82, 87],
+          responseRate: [16, 19, 23, 21, 30, 36, 34, 41, 47, 45, 50, 58, 61, 66],
+          sufficientRate: [8, 12, 16, 18, 22, 28, 31, 36, 41, 46, 53, 59, 65, 72]
+        };
+      }
+      if (period === '30D') {
+        return {
+          labels: buildOverviewStatisticsLabels(30),
+          goodsRate: [15, 18, 22, 20, 26, 31, 35, 38, 42, 46, 49, 53, 55, 59, 63, 61, 66, 70, 72, 75, 78, 76, 80, 83, 85, 88, 90, 92, 94, 96],
+          responseRate: [10, 12, 15, 18, 20, 19, 24, 27, 30, 33, 31, 35, 39, 42, 45, 48, 46, 50, 54, 57, 60, 58, 63, 66, 68, 71, 74, 76, 79, 82],
+          sufficientRate: [6, 8, 10, 13, 16, 18, 20, 23, 25, 29, 32, 35, 33, 38, 41, 44, 47, 49, 52, 56, 59, 62, 65, 68, 70, 73, 76, 80, 84, 88]
+        };
+      }
+      return {
+        labels: ['7d', '6d', '5d', '4d', '3d', '2d', '1d'],
+        goodsRate: [24, 40, 29, 55, 79, 70, 61],
+        responseRate: [19, 15, 14, 32, 25, 15, 17],
+        sufficientRate: [10, 10, 10, 10, 10, 30, 24]
+      };
+    }
+
+    function randerOverviewStatisticschart(period) {
+      let dom = document.getElementById('overviewStatisticsEchart')
+      if (!dom) return;
+
+      var overviewIsMobile = window.matchMedia('(max-width: 768px)').matches
+      var currentPeriod = (period || overviewCurrentPeriod || '7D').toUpperCase()
+      var periodData = getOverviewStatisticsPeriodData(currentPeriod)
+      var chartInstance = echarts.getInstanceByDom(dom) || echarts.init(dom)
       let option = {
         tooltip: {
           trigger: 'axis',
@@ -1098,12 +1133,15 @@
           left: 0,
           right: 0,
           top: 10,
-          bottom: 44
+          bottom: overviewIsMobile ? 72 : 64
         },
         legend: {
           itemWidth: 16,
           itemHeight: 2,
-          itemGap: 16,
+          itemGap: overviewIsMobile ? 8 : 16,
+          left: 0,
+          right: 0,
+          orient: 'horizontal',
           textStyle: createLegendTextStyle(),
           formatter: createLegendFormatter(['Goods rate', 'Response rate']),
           selected: {
@@ -1130,7 +1168,7 @@
               fontSize: 12,
               color: 'rgba(0, 0, 0, 0.7)'
             },
-            data: ['7d', '6d', '5d', '4d', '3d', '2d', '1d']
+            data: periodData.labels
           }
         ],
         yAxis: [
@@ -1180,7 +1218,7 @@
             emphasis: {
               focus: 'series'
             },
-            data: [24, 40, 29, 55, 79, 70, 61]
+            data: periodData.goodsRate
           },
           {
             name: 'Response rate',
@@ -1203,7 +1241,7 @@
             emphasis: {
               focus: 'series'
             },
-            data: [19, 15, 14, 32, 25, 15, 17]
+            data: periodData.responseRate
           },
           {
             name: 'Sufficient rate',
@@ -1226,11 +1264,12 @@
             emphasis: {
               focus: 'series'
             },
-            data: [10, 10, 10, 10, 10, 30, 24]
+            data: periodData.sufficientRate
           }
         ]
       }
-      chartInstance.setOption(option)
+      chartInstance.setOption(option, true)
+      overviewCurrentPeriod = currentPeriod
     }
     randerOverviewStatisticschart()
     function randerSalesCountStatisticschart() {

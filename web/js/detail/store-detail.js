@@ -153,14 +153,20 @@ function initializeOverviewTimeTabs() {
             tab.classList.toggle('active', isActive);
             tab.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
+        const period = targetTab.dataset.period;
+        if (period && typeof window.randerOverviewStatisticschart === 'function') {
+            window.randerOverviewStatisticschart(period);
+        }
     };
 
     tabItems.forEach(tab => {
+        const tabText = tab.querySelector('.tab-text');
         if (!tab.querySelector('.ink-bar')) {
             const inkBar = document.createElement('div');
             inkBar.className = 'ink-bar';
             tab.insertBefore(inkBar, tab.firstChild);
         }
+        tab.dataset.period = (tabText ? tabText.textContent : '').trim().toUpperCase();
         tab.setAttribute('role', 'button');
         tab.setAttribute('tabindex', '0');
         tab.setAttribute('aria-pressed', tab.classList.contains('active') ? 'true' : 'false');
