@@ -1,6 +1,5 @@
 
 const stickyHeader = document.getElementById('stickyHeader');
-const stickyHeaderHeight = stickyHeader.offsetHeight;
 const pageContent = document.querySelector('.page-content');
 const pageFix = document.querySelector('.page-fix-box');
 const pageHead = document.querySelector('.page-head');
@@ -10,6 +9,10 @@ const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
 const bodyElement = document.getElementsByTagName('body')[0];
 const sort = new SortSelector();
+function getStickyHeaderHeight() {
+    return stickyHeader ? stickyHeader.offsetHeight : 0;
+}
+
 function sortItems(value) {
     console.log('sort items', value);
 }
@@ -873,6 +876,7 @@ function adjustFilterPosition() {
             return;
         }
         if (headIsSticky) {
+            const stickyHeaderHeight = getStickyHeaderHeight();
             Object.assign(pageFix.style, {
                 position: 'fixed',
                 left: 16 + 'px',
@@ -891,7 +895,7 @@ function adjustFilterPosition() {
     };
     pageFix.classList.toggle('is-sticky', headIsSticky);
     // 计算页面头部所有固定元素的总高度
-    let totalHeight = stickyHeaderHeight;
+    let totalHeight = getStickyHeaderHeight();
     if (pageHead && !headIsSticky) {
         totalHeight += pageHeadHeight;
     }
