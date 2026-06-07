@@ -212,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
         homeMenuPage.style.display = 'flex';
         homeMenuPage.style.width = '100vw';
         body.classList.toggle('modal-open', true);
+        body.classList.toggle('home-menu-open', true);
         const homeMenuUserEle = homeMenuPage.querySelector('.home-menu-user-box');
         const homeMenuRegistEle = homeMenuPage.querySelector('.home-menu-login-box');
         const homeMenuLgoinEle = homeMenuPage.querySelector('.home-menu-signin-text');
@@ -440,6 +441,7 @@ function dismissHomeMenuPage() {
     homeMenuPage.style.width = '0';
     homeMenuPage.style.display = 'none';
     body.classList.toggle('modal-open', false);
+    body.classList.toggle('home-menu-open', false);
 }
 
 function syncHeaderAvatarBadge(headerUser, isAuthenticated, currentUser) {
