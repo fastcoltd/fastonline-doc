@@ -409,6 +409,16 @@
     height: 100dvh;
     padding: 1rem;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+  }
+  .table-of-contents::before,
+  .table-of-contents::after {
+    content: "";
+    flex: 1 1 0;
+    min-height: 0;
   }
   .table-of-container-close {
     display: block;
@@ -1190,10 +1200,22 @@
     border-radius: 0;
     padding: 1rem;
     gap: 1.25rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+  }
+  .privacy-policy-page .table-of-contents::before,
+  .privacy-policy-page .table-of-contents::after {
+    content: "";
+    flex: 1 1 0;
+    min-height: 0;
   }
   .privacy-policy-page .toc-group {
     width: 100%;
     gap: 0.75rem;
+    flex-shrink: 0;
   }
   .privacy-policy-page .toc-item {
     width: 100%;
