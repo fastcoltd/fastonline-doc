@@ -143,8 +143,8 @@ function renderStarsStatisticsChart() {
             show: false
         },
         grid: {
-            left: isMobile ? 0 : 50,
-            right: isMobile ? 16 : 20,
+            left: 0,
+            right: 16,
             top: 20,
             bottom: 0,
             containLabel: true
@@ -196,9 +196,9 @@ function renderStarsStatisticsChart() {
             },
             data: starNames,
             axisLabel: {
-                margin: isMobile ? 8 : 40,
+                margin: isMobile ? 8 : 12,
                 fontSize: isMobile ? 12 : 17,
-                align: 'left',
+                align: 'right',
                 color: 'rgba(0, 0, 0, 0.7)'
             }
         }],
