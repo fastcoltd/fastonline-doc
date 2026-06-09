@@ -77,7 +77,7 @@ Demands 这个 tab 的 item，如图![alt text](image-112.png)，其中的如图
 
 
 ## Task：index.html页面的 pc 版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 页面中的Hot campaigns 部分、Popular demands 部分，这两个部分的 item 中，有':'的地方，都需要改成':&nbsp'，Hot campaigns部分的 item 中的 'Sales:5633'，需要改成'Sales:&nbsp5633'，以此类推。或者修改样式，因为静态页面后续会替换掉其中 5633 的部分，我担心替换的时候把&nbsp5633都替换掉了，这样:和内容之间就没有空格了，请帮我找一个最佳的方案。另外这两个部分的 item，应该是独立组件，我希望修改后，项目中所有用到这两个部分组件的地方，都是修改后的样子
 
