@@ -250,6 +250,61 @@ function bindReviewItemEvents(element) {
     });
 }
 
+function initializeSelectableRatings() {
+    const ratingBoxes = document.querySelectorAll('.item-star-box[data-rating-selectable="true"]');
+    ratingBoxes.forEach(box => {
+        const starBg = box.querySelector('.star-bg');
+        const starsInner = box.querySelector('.stars-inner');
+        const scoreText = box.querySelector('.item-star-score');
+        if (!starBg || !starsInner || !scoreText) {
+            return;
+        }
+
+        const setRating = (rating) => {
+            const normalizedRating = Math.max(0, Math.min(5, rating));
+            const displayValue = normalizedRating % 1 === 0 ? String(normalizedRating) : normalizedRating.toFixed(1);
+            box.dataset.ratingValue = displayValue;
+            scoreText.textContent = displayValue;
+            starsInner.style.setProperty('--star-fill', `${normalizedRating / 5 * 100}%`);
+            starBg.setAttribute('aria-valuemin', '0');
+            starBg.setAttribute('aria-valuemax', '5');
+            starBg.setAttribute('aria-valuenow', displayValue);
+        };
+
+        const getRatingFromPointer = (event) => {
+            const rect = starBg.getBoundingClientRect();
+            if (!rect.width) {
+                return 0;
+            }
+            const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+            return Math.ceil(ratio * 10) / 2;
+        };
+
+        setRating(parseFloat(box.dataset.ratingValue || scoreText.textContent || '0') || 0);
+
+        starBg.addEventListener('click', function (event) {
+            setRating(getRatingFromPointer(event));
+        });
+
+        starBg.addEventListener('keydown', function (event) {
+            const currentRating = parseFloat(box.dataset.ratingValue || '0') || 0;
+            if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                setRating(currentRating + 0.5);
+            } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+                event.preventDefault();
+                setRating(currentRating - 0.5);
+            } else if (event.key === 'Home') {
+                event.preventDefault();
+                setRating(0);
+            } else if (event.key === 'End') {
+                event.preventDefault();
+                setRating(5);
+            }
+        });
+    });
+}
+
 function optimizeRelatedItemsForMobile() {
     const isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
     const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
@@ -336,6 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
     reviews.forEach(element => {
         bindReviewItemEvents(element);
     });
+    initializeSelectableRatings();
     const loadMore = document.getElementById('load-more');
     if (loadMore && document.body.clientWidth > 768) {
         loadMore.addEventListener('click', function (event) {
