@@ -83,7 +83,7 @@ Demands 这个 tab 的 item，如图![alt text](image-112.png)，其中的如图
 
 
 ## Task：store-detail.html页面的手机版和 pc 版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 手机版如图的部分![alt text](image-118.png)，pc 版如图的部分![alt text](image-119.png)，No 这个文本前面的按钮，为选中的状态，方向反了，应该是拇指朝下的按钮才对。请帮我修改。选中状态的样子是对的，不需要修改
 
