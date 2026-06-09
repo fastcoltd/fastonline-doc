@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeStoreLeftScrollbar();
     initializeItemsShowMore();
     initializeReviewsShowMore();
+    initializeAfterSalesRulesSeeMore();
 
     $('.item-detail-review-tool-icon-yes').on('click', function() {
         console.log($(this).parent())
@@ -154,6 +155,17 @@ function initializeReviewsShowMore() {
             review.classList.add('is-visible');
         });
         showMoreBtn.style.display = 'none';
+    });
+}
+
+function initializeAfterSalesRulesSeeMore() {
+    const rulesText = document.querySelector('.after-sales-rules-text');
+    const seeMoreBtn = document.querySelector('.after-sales-rules-more-btn');
+    if (!rulesText || !seeMoreBtn || window.matchMedia('(max-width: 768px)').matches) return;
+
+    seeMoreBtn.addEventListener('click', function () {
+        rulesText.classList.add('is-expanded');
+        seeMoreBtn.classList.add('is-hidden');
     });
 }
 
