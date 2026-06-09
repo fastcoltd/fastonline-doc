@@ -203,14 +203,201 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function clearHomeMenuTextSelection() {
+        const selection = window.getSelection && window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            selection.removeAllRanges();
+        }
+    }
+
+    function clearHomeMenuTextSelectionSoon() {
+        clearHomeMenuTextSelection();
+        setTimeout(clearHomeMenuTextSelection, 0);
+        setTimeout(clearHomeMenuTextSelection, 80);
+    }
+
+    function isSecondMenuTextTarget(target) {
+        return !!(target && target.closest && target.closest('.home-menu-second-page-group-title, .home-menu-second-page-group-item'));
+    }
+
+    let secondMenuPendingLink = null;
+    let secondMenuTouchPoint = null;
+    let secondMenuNavigating = false;
+
+    function getSecondMenuLink(target) {
+        return target && target.closest && target.closest('.home-menu-second-page-group-item[href]');
+    }
+
+    function rememberSecondMenuTouchTarget(e) {
+        const link = getSecondMenuLink(e.target);
+        secondMenuPendingLink = link || null;
+        const touch = e.changedTouches && e.changedTouches[0];
+        secondMenuTouchPoint = touch ? { x: touch.clientX, y: touch.clientY } : null;
+    }
+
+    function isSecondMenuTap(e) {
+        if (!secondMenuTouchPoint) {
+            return true;
+        }
+        const touch = e.changedTouches && e.changedTouches[0];
+        if (!touch) {
+            return true;
+        }
+        const moveX = Math.abs(touch.clientX - secondMenuTouchPoint.x);
+        const moveY = Math.abs(touch.clientY - secondMenuTouchPoint.y);
+        return moveX < 8 && moveY < 8;
+    }
+
+    function followSecondMenuLink(link) {
+        if (!link || secondMenuNavigating) {
+            return;
+        }
+        const href = link.getAttribute('href');
+        if (!href || href === '#') {
+            return;
+        }
+        secondMenuNavigating = true;
+        const target = link.getAttribute('target');
+        if (target && target !== '_self') {
+            window.open(link.href, target);
+            secondMenuNavigating = false;
+            return;
+        }
+        window.location.href = link.href;
+    }
+
+    function isSelectionInsideSecondMenu() {
+        const selection = window.getSelection && window.getSelection();
+        if (!selection || selection.rangeCount === 0) {
+            return false;
+        }
+        const anchorNode = selection.anchorNode;
+        const focusNode = selection.focusNode;
+        const anchorElement = anchorNode && (anchorNode.nodeType === 1 ? anchorNode : anchorNode.parentElement);
+        const focusElement = focusNode && (focusNode.nodeType === 1 ? focusNode : focusNode.parentElement);
+        return !!(
+            (anchorElement && anchorElement.closest && anchorElement.closest('.home-menu-second-page')) ||
+            (focusElement && focusElement.closest && focusElement.closest('.home-menu-second-page'))
+        );
+    }
+
+    function preventSecondMenuTitleSelection(e) {
+        if (window.innerWidth <= 768 && e.target.closest('.home-menu-second-page-group-title')) {
+            e.preventDefault();
+        }
+        if (window.innerWidth <= 768 && isSecondMenuTextTarget(e.target)) {
+            clearHomeMenuTextSelectionSoon();
+        }
+    }
+
+    function stopSecondMenuPressBubble(e) {
+        if (window.innerWidth > 768) {
+            return;
+        }
+        e.stopPropagation();
+        if (isSecondMenuTextTarget(e.target)) {
+            e.preventDefault();
+            rememberSecondMenuTouchTarget(e);
+        }
+        preventSecondMenuTitleSelection(e);
+    }
+
+    function stopSecondMenuBubbleAndClear(e) {
+        if (window.innerWidth > 768) {
+            return;
+        }
+        e.stopPropagation();
+        if (isSecondMenuTextTarget(e.target)) {
+            e.preventDefault();
+            clearHomeMenuTextSelectionSoon();
+        }
+    }
+
+    function handleSecondMenuTouchEnd(e) {
+        if (window.innerWidth > 768) {
+            return;
+        }
+        e.stopPropagation();
+        if (isSecondMenuTextTarget(e.target)) {
+            e.preventDefault();
+            clearHomeMenuTextSelectionSoon();
+        }
+        if (secondMenuPendingLink && isSecondMenuTap(e)) {
+            const link = secondMenuPendingLink;
+            secondMenuPendingLink = null;
+            secondMenuTouchPoint = null;
+            followSecondMenuLink(link);
+            return;
+        }
+        secondMenuPendingLink = null;
+        secondMenuTouchPoint = null;
+    }
+
+    function handleSecondMenuClick(e) {
+        if (window.innerWidth > 768) {
+            return;
+        }
+        e.stopPropagation();
+        if (isSecondMenuTextTarget(e.target)) {
+            e.preventDefault();
+            clearHomeMenuTextSelectionSoon();
+        }
+        const link = getSecondMenuLink(e.target);
+        if (link) {
+            followSecondMenuLink(link);
+        }
+    }
+
+    function bindMobileSecondMenuSelectionGuard(homeMenuRoot) {
+        if (!homeMenuRoot || homeMenuRoot.dataset.mobileSecondMenuSelectionGuard === '1') {
+            return;
+        }
+        homeMenuRoot.dataset.mobileSecondMenuSelectionGuard = '1';
+        document.addEventListener('selectionchange', function () {
+            if (window.innerWidth <= 768 && homeMenuRoot.classList.contains('home-menu-open') && isSelectionInsideSecondMenu()) {
+                clearHomeMenuTextSelectionSoon();
+            }
+        });
+        const secondPages = homeMenuRoot.querySelectorAll('.home-menu-second-page');
+        secondPages.forEach((secondPage) => {
+            secondPage.addEventListener('pointerdown', stopSecondMenuPressBubble, true);
+            secondPage.addEventListener('pointerup', stopSecondMenuBubbleAndClear, true);
+            secondPage.addEventListener('touchstart', stopSecondMenuPressBubble, { capture: true, passive: false });
+            secondPage.addEventListener('touchend', handleSecondMenuTouchEnd, { capture: true, passive: false });
+            secondPage.addEventListener('mousedown', stopSecondMenuPressBubble, true);
+            secondPage.addEventListener('click', handleSecondMenuClick, true);
+            secondPage.addEventListener('selectstart', function (e) {
+                if (window.innerWidth <= 768 && isSecondMenuTextTarget(e.target)) {
+                    e.preventDefault();
+                    clearHomeMenuTextSelectionSoon();
+                }
+            });
+            secondPage.addEventListener('pointerdown', preventSecondMenuTitleSelection);
+            secondPage.addEventListener('pointerup', function (e) {
+                if (window.innerWidth <= 768 && isSecondMenuTextTarget(e.target)) {
+                    clearHomeMenuTextSelectionSoon();
+                }
+            });
+            secondPage.addEventListener('touchstart', preventSecondMenuTitleSelection, { passive: false });
+            secondPage.addEventListener('touchend', function (e) {
+                if (window.innerWidth <= 768 && isSecondMenuTextTarget(e.target)) {
+                    clearHomeMenuTextSelectionSoon();
+                }
+            });
+            secondPage.addEventListener('mousedown', preventSecondMenuTitleSelection);
+        });
+    }
+
     const homeMenuPage = document.querySelector('.home-menu-page');
     const headerMenu = document.querySelector('.header-menu-box');
     const homeMenuBack = homeMenuPage.querySelector('.home-menu-back');
     const homeMenuTitles = homeMenuPage.querySelectorAll('.home-menu-item-title-box');
+    bindMobileSecondMenuSelectionGuard(homeMenuPage);
     headerMenu.addEventListener('click', function () {
         const currentUser = getCurrentAuthUser();
         homeMenuPage.style.display = 'flex';
         homeMenuPage.style.width = '100vw';
+        homeMenuPage.classList.toggle('home-menu-open', true);
         body.classList.toggle('modal-open', true);
         body.classList.toggle('home-menu-open', true);
         const homeMenuUserEle = homeMenuPage.querySelector('.home-menu-user-box');
@@ -440,6 +627,7 @@ function dismissHomeMenuPage() {
     const homeMenuPage = document.querySelector('.home-menu-page');
     homeMenuPage.style.width = '0';
     homeMenuPage.style.display = 'none';
+    homeMenuPage.classList.toggle('home-menu-open', false);
     body.classList.toggle('modal-open', false);
     body.classList.toggle('home-menu-open', false);
 }

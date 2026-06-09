@@ -1489,10 +1489,41 @@ button {
         overflow: hidden;
         cursor: pointer;
     }
+
 }
 
 @media screen and (max-width: 768px) {
     .home-menu-page {
+        .home-menu-second-page,
+        .home-menu-item-content-item,
+        .home-menu-second-page *,
+        .home-menu-second-page-title-box,
+        .home-menu-second-page-group-title,
+        .home-menu-second-page-group-item {
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        .home-menu-second-page-group-title,
+        .home-menu-second-page-group-item {
+            background: transparent !important;
+            outline: none !important;
+
+            &:active,
+            &:focus,
+            &:focus-visible {
+                background: transparent !important;
+                outline: none !important;
+            }
+
+            &::selection {
+                background: transparent !important;
+            }
+        }
+
         .home-menu-container {
             width: 38.875rem;
             max-width: calc(100vw - 5rem);
