@@ -102,6 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeOverviewTimeTabs();
     initializeStoreLeftScrollbar();
     initializeItemsShowMore();
+    initializeReviewsShowMore();
 
     $('.item-detail-review-tool-icon-yes').on('click', function() {
         console.log($(this).parent())
@@ -138,6 +139,19 @@ function initializeItemsShowMore() {
     showMoreBtn.addEventListener('click', function () {
         extraItems.forEach(item => {
             item.classList.add('is-visible');
+        });
+        showMoreBtn.style.display = 'none';
+    });
+}
+
+function initializeReviewsShowMore() {
+    const showMoreBtn = document.getElementById('load-more-reviews');
+    const extraReviews = Array.from(document.querySelectorAll('.item-detail-review-list .store-detail-extra-review'));
+    if (!showMoreBtn || !extraReviews.length) return;
+
+    showMoreBtn.addEventListener('click', function () {
+        extraReviews.forEach(review => {
+            review.classList.add('is-visible');
         });
         showMoreBtn.style.display = 'none';
     });

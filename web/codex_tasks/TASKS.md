@@ -89,7 +89,7 @@ Demands 这个 tab 的 item，如图![alt text](image-112.png)，其中的如图
 
 
 ## Task：store-detail.html页面的手机版和 pc 版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 pc 版：![alt text](image-120.png)，手机版：![alt text](image-121.png)，点击以后，需要增加一条内容，即手机版：增加一条如图![alt text](image-122.png)的内容，pc 版：增加一条如图：![alt text](image-123.png)的内容
 
