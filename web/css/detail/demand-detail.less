@@ -17,10 +17,7 @@
 .demand-summary-card.is-sticky {
     border-radius: 0;
     box-shadow: none;
-    border-left: none;
-    border-right: none;
-    border-top: none;
-    border-bottom: none;
+    border: 1px solid transparent;
     overflow: visible;
 }
 
@@ -43,6 +40,14 @@
     top: calc(100% + 1px);
     height: 1px;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+}
+
+.demand-summary-status-clip {
+    position: absolute;
+    inset: 0;
+    border-radius: 3.75rem;
+    overflow: hidden;
     pointer-events: none;
 }
 
@@ -223,6 +228,10 @@
     .demand-summary-card.is-sticky::before,
     .demand-summary-card.is-sticky::after {
         display: none;
+    }
+
+    .demand-summary-status-clip {
+        border-radius: 1.25rem;
     }
 
     .page-top-bread {
