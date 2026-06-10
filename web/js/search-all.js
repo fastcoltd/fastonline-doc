@@ -200,6 +200,16 @@ const searchTabCardClassMap = {
     demands: 'search-card-fifth-item'
 };
 
+const searchTabDesktopCardClassMap = {
+    items: 'search-card-first-item-desktop',
+    campaigns: 'search-card-second-item-desktop',
+    posts: 'search-card-third-item-desktop',
+    store: 'search-card-fourth-item-desktop',
+    demands: 'search-card-fifth-item-desktop'
+};
+
+const searchTabTypeOrder = ['items', 'campaigns', 'posts', 'store', 'demands'];
+
 function bindSearchTagRandomJump() {
     const container = document.querySelector('.search-list-container');
     if (!container) {
@@ -222,27 +232,80 @@ function bindSearchTagRandomJump() {
     });
 }
 
+function isSearchAllDesktop() {
+    return window.matchMedia('(min-width: 769px)').matches;
+}
+
+function updateSearchNoDataState(visibleCount) {
+    const noData = document.querySelector('.search-list-container .no-data-wrapper');
+    if (!noData) {
+        return;
+    }
+
+    noData.style.display = visibleCount > 0 ? 'none' : '';
+}
+
+function filterSearchDesktopCardsByType(type) {
+    const cards = document.querySelectorAll('.search-list-container .search-card');
+    const targetTypes = type === 'all' ? searchTabTypeOrder : [type];
+    const visibleCards = [];
+
+    cards.forEach((card) => {
+        card.style.display = 'none';
+    });
+
+    targetTypes.forEach((targetType) => {
+        const desktopClass = searchTabDesktopCardClassMap[targetType];
+        if (!desktopClass) {
+            return;
+        }
+
+        const card = document.querySelector(`.search-list-container .search-card.${desktopClass}`);
+        if (card) {
+            card.style.display = '';
+            visibleCards.push(card);
+        }
+    });
+
+    updateSearchNoDataState(visibleCards.length);
+}
+
 function filterSearchCardsByType(type) {
+    if (isSearchAllDesktop()) {
+        filterSearchDesktopCardsByType(type);
+        return;
+    }
+
     const cards = document.querySelectorAll('.search-list-container .search-card');
     const targetClass = searchTabCardClassMap[type];
+    let visibleCount = 0;
 
     cards.forEach((card) => {
         const shouldShow = type === 'all' || (targetClass && card.classList.contains(targetClass));
         card.style.display = shouldShow ? '' : 'none';
+        if (shouldShow) {
+            visibleCount += 1;
+        }
     });
+
+    updateSearchNoDataState(visibleCount);
 }
 
 $(document).ready(function () {
     const $pageLinks = $('.page-link');
+    let selectedType = $('.page-link.active').attr('data-key') || 'all';
 
     $pageLinks.on('click', function () {
-        const selectedType = $(this).attr('data-key');
+        selectedType = $(this).attr('data-key');
         $pageLinks.removeClass('active');
         $(this).addClass('active');
         filterSearchCardsByType(selectedType);
     });
 
-    const defaultType = $('.page-link.active').attr('data-key') || 'all';
-    filterSearchCardsByType(defaultType);
+    window.addEventListener('resize', function () {
+        filterSearchCardsByType(selectedType);
+    });
+
+    filterSearchCardsByType(selectedType);
     bindSearchTagRandomJump();
 });
