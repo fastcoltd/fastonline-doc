@@ -169,7 +169,7 @@ pc 版 figma 设计稿：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FAS
 
 
 ### Task：新增system-post-detail.html页面，需要支持pc版和手机版
-状态：未完成
+状态：待完善
 ### 任务内容
 绝大多数内容和 post-detail.html 是一样的。pc 端的区别有两个：1.顶部的部分，post-detail.html 页面如图![alt text](image-148.png)，而system-post-detail.html页面如图：![alt text](image-149.png) 2.post-detail.html 页面的锚点组件在右侧，而system-post-detail.html页面的锚点组件在左侧；手机端有 1 个区别：post-detail.html 的头部如图![alt text](image-150.png)，而system-post-detail.html页面的头部如图：![alt text](image-151.png)。请帮我实现。我希望复制一份post-detail.html的代码出来（为了完全不影响post-detail.html页面，无论手机版还是电脑版都不能影响）
 
