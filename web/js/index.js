@@ -114,6 +114,141 @@ window.addEventListener('DOMContentLoaded', function () {
 
     bindBestStoreTagRandomJump();
 
+    function bindIndexPurchaseFlow() {
+        const purchaseMask = document.getElementById('index-purchase-mask');
+        if (!purchaseMask) {
+            return;
+        }
+        const panels = Array.from(purchaseMask.querySelectorAll('.index-purchase-panel'));
+        const qtyInputs = Array.from(purchaseMask.querySelectorAll('.index-purchase-qty'));
+        const unitPrice = 156;
+        const maxCount = 77;
+
+        function getLoginState() {
+            let userInfo = {};
+            try {
+                userInfo = JSON.parse(sessionStorage.getItem('user') || '{}');
+            } catch (error) {
+                userInfo = {};
+            }
+            const params = new URLSearchParams(window.location.search);
+            return Boolean(userInfo.id || userInfo.uid || (window.user && window.user.uid) || params.get('isLogin') === 'true');
+        }
+
+        function setStep(step) {
+            panels.forEach(function (panel) {
+                panel.classList.toggle('is-active', panel.dataset.purchaseStep === step);
+            });
+            purchaseMask.dataset.purchaseStep = step;
+            if (window.innerWidth <= 768) {
+                window.scrollTo({ top: 0, behavior: 'auto' });
+            }
+        }
+
+        function syncQuantity(value) {
+            let count = parseInt(value, 10);
+            if (Number.isNaN(count)) {
+                count = 1;
+            }
+            count = Math.min(maxCount, Math.max(1, count));
+            qtyInputs.forEach(function (input) {
+                input.value = count;
+            });
+            purchaseMask.querySelectorAll('.index-purchase-total').forEach(function (item) {
+                item.textContent = `$${(unitPrice * count).toFixed(2)}`;
+            });
+            purchaseMask.querySelectorAll('.index-purchase-summary-qty').forEach(function (item) {
+                item.textContent = count;
+            });
+            purchaseMask.querySelectorAll('.index-purchase-qty-minus').forEach(function (button) {
+                button.classList.toggle('is-disabled', count <= 1);
+            });
+            purchaseMask.querySelectorAll('.index-purchase-qty-plus').forEach(function (button) {
+                button.classList.toggle('is-disabled', count >= maxCount);
+            });
+        }
+
+        function openPurchaseFlow() {
+            setStep(window.innerWidth <= 768 ? 'requirements' : 'product');
+            purchaseMask.style.display = 'flex';
+            purchaseMask.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('index-purchase-open');
+            syncQuantity(qtyInputs[0] ? qtyInputs[0].value : 1);
+        }
+
+        function closePurchaseFlow() {
+            purchaseMask.style.display = 'none';
+            purchaseMask.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('index-purchase-open');
+            setStep('product');
+        }
+
+        document.body.addEventListener('click', function (event) {
+            const buyButton = event.target.closest('.index-best-item-buy-btn');
+            if (!buyButton) {
+                return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            if (!getLoginState()) {
+                const signinButton = document.getElementById('header-signin');
+                if (signinButton) {
+                    signinButton.click();
+                }
+                return;
+            }
+            openPurchaseFlow();
+        });
+
+        purchaseMask.addEventListener('click', function (event) {
+            if (event.target === purchaseMask && window.innerWidth > 768) {
+                closePurchaseFlow();
+                return;
+            }
+            const closeButton = event.target.closest('.index-purchase-close');
+            if (closeButton) {
+                closePurchaseFlow();
+                return;
+            }
+            const nextButton = event.target.closest('[data-purchase-next]');
+            if (nextButton) {
+                const nextStep = nextButton.dataset.purchaseNext;
+                setStep(nextStep);
+                if (nextStep === 'success' && window.innerWidth <= 768) {
+                    window.setTimeout(closePurchaseFlow, 1200);
+                }
+                return;
+            }
+            const prevButton = event.target.closest('[data-purchase-prev]');
+            if (prevButton) {
+                setStep(prevButton.dataset.purchasePrev);
+                return;
+            }
+            const minusButton = event.target.closest('.index-purchase-qty-minus');
+            if (minusButton) {
+                syncQuantity((parseInt(qtyInputs[0].value, 10) || 1) - 1);
+                return;
+            }
+            const plusButton = event.target.closest('.index-purchase-qty-plus');
+            if (plusButton) {
+                syncQuantity((parseInt(qtyInputs[0].value, 10) || 1) + 1);
+                return;
+            }
+            if (event.target.closest('.index-purchase-link-btn')) {
+                closePurchaseFlow();
+            }
+        });
+
+        qtyInputs.forEach(function (input) {
+            input.addEventListener('input', function () {
+                syncQuantity(input.value);
+            });
+        });
+        syncQuantity(1);
+    }
+
+    bindIndexPurchaseFlow();
+
     if (isMobile && popularDemandsMobile) {
         let mouseDown = false;
         let mouseStartX = 0;

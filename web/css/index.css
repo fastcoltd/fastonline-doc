@@ -55,6 +55,346 @@
   column-gap: 2.625rem;
   margin-top: 10.875rem;
 }
+.index-purchase-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 520;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+  background: rgba(0, 0, 0, 0.2);
+}
+body.index-purchase-open {
+  overflow: hidden;
+}
+.index-purchase-dialog {
+  width: 87.5rem;
+  max-height: calc(100vh - 5rem);
+  border-radius: 1rem;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.16);
+}
+.index-purchase-panel {
+  display: none;
+  flex-direction: column;
+  max-height: calc(100vh - 5rem);
+  padding-bottom: 2.5rem;
+  background: #fff;
+}
+.index-purchase-panel.is-active {
+  display: flex;
+}
+.index-purchase-titlebar {
+  min-height: 7.5rem;
+  margin: 0 2.5rem;
+  padding: 1.25rem 0 1.25rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  background: #fdf7f3;
+  border: 0.125rem solid #f4f4f4;
+  border-top: 0;
+}
+.index-purchase-titlebar h2 {
+  margin: 0;
+  font-family: var(--primary-popfont);
+  font-size: 2.5rem;
+  line-height: 3.75rem;
+  font-weight: 400;
+  color: #000;
+}
+.index-purchase-close {
+  width: 5rem;
+  height: 5rem;
+  border: 0;
+  background: transparent;
+  position: relative;
+  cursor: pointer;
+}
+.index-purchase-close::before,
+.index-purchase-close::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2rem;
+  height: 0.25rem;
+  background: #898a8c;
+  border-radius: 1rem;
+}
+.index-purchase-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.index-purchase-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+.index-purchase-content,
+.index-purchase-form {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  overflow: auto;
+}
+.index-purchase-content {
+  max-height: min(62rem, calc(100vh - 22rem));
+}
+.index-purchase-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  font-family: var(--primary-popfont);
+  font-size: 1.75rem;
+  line-height: 2.625rem;
+  color: #6d6d6d;
+}
+.index-purchase-row strong {
+  max-width: 68%;
+  font-size: 2rem;
+  line-height: 3rem;
+  font-weight: 400;
+  color: #000;
+  text-align: right;
+}
+.index-purchase-row del {
+  color: #6d6d6d;
+}
+.index-purchase-row-top {
+  align-items: flex-start;
+}
+.index-purchase-green {
+  color: #00c27c !important;
+}
+.index-purchase-orange {
+  color: #ff4d10 !important;
+}
+.index-purchase-tags {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.index-purchase-tag {
+  min-height: 3rem;
+  padding: 0.5rem 1.125rem;
+  display: inline-flex;
+  align-items: center;
+  border: 0.125rem solid #d9d9d9;
+  border-radius: 2.5rem;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  color: #6d6d6d;
+}
+.index-purchase-stepper {
+  display: flex;
+  align-items: center;
+  border: 0.125rem solid #c5c5c5;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+.index-purchase-qty-btn,
+.index-purchase-qty {
+  width: 3rem;
+  height: 2.75rem;
+  border: 0;
+  background: #fff;
+  font-size: 1.75rem;
+  line-height: 2.75rem;
+  text-align: center;
+}
+.index-purchase-qty-btn {
+  cursor: pointer;
+}
+.index-purchase-qty-btn.is-disabled {
+  color: #c5c5c5;
+  cursor: not-allowed;
+}
+.index-purchase-qty {
+  border-left: 0.125rem solid #c5c5c5;
+  border-right: 0.125rem solid #c5c5c5;
+  color: #000;
+}
+.index-purchase-actions {
+  padding: 0 2.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+.index-purchase-actions-single {
+  margin-top: auto;
+}
+.index-purchase-primary,
+.index-purchase-secondary {
+  min-width: 14.25rem;
+  height: 5rem;
+  padding: 0 1.875rem;
+  border-radius: 1rem;
+  font-family: var(--primary-robotofont);
+  font-size: 2rem;
+  line-height: 3rem;
+  cursor: pointer;
+}
+.index-purchase-primary {
+  border: 0.125rem solid #ff1b20;
+  background: #ff1b20;
+  color: #fff;
+}
+.index-purchase-secondary {
+  border: 0.125rem solid #d9d9d9;
+  background: #fff;
+  color: #000;
+}
+.index-purchase-rules {
+  padding: 2.5rem 2.5rem 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-family: var(--primary-popfont);
+  font-size: 1.75rem;
+  line-height: 2.625rem;
+  color: #000;
+}
+.index-purchase-rules input {
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0.25rem;
+  accent-color: #ff1b20;
+}
+.index-purchase-rules a {
+  color: #ff1b20;
+}
+.index-purchase-form {
+  max-height: min(90rem, calc(100vh - 22rem));
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 2.5rem;
+}
+.index-purchase-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-family: var(--primary-popfont);
+  font-size: 2rem;
+  line-height: 2.875rem;
+  color: #000;
+}
+.index-purchase-field input[type="text"],
+.index-purchase-field select,
+.index-purchase-field textarea {
+  width: 100%;
+  border: 0.125rem solid #c5c5c5;
+  border-radius: 0.5rem;
+  background: #fff;
+  box-sizing: border-box;
+  font-family: var(--primary-popfont);
+  font-size: 1.875rem;
+  line-height: 2.625rem;
+  color: #000;
+}
+.index-purchase-field input[type="text"],
+.index-purchase-field select {
+  height: 4.625rem;
+  padding: 0 1.5rem;
+}
+.index-purchase-field textarea {
+  min-height: 12.625rem;
+  padding: 0.75rem 1.5rem;
+  resize: vertical;
+}
+.index-purchase-field-full {
+  grid-column: 1 / -1;
+}
+.index-purchase-check-field {
+  min-height: 6.125rem;
+}
+.index-purchase-choice,
+.index-purchase-radio-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  font-size: 1.75rem;
+  line-height: 2.5rem;
+}
+.index-purchase-upload {
+  width: 13rem;
+  height: 13rem;
+  border: 0.125rem dashed #d9d9d9;
+  border-radius: 1rem;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #898a8c;
+  font-size: 3rem;
+}
+.index-purchase-form-amount {
+  justify-content: flex-start;
+}
+.index-purchase-summary,
+.index-purchase-requirement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.index-purchase-requirement-list h3 {
+  margin: 0;
+  font-family: var(--primary-popfont);
+  font-size: 2rem;
+  line-height: 2.875rem;
+  font-weight: 400;
+  color: #000;
+}
+.index-purchase-cover {
+  width: 13rem;
+  height: 13rem;
+  border: 0.125rem solid #d9d9d9;
+  border-radius: 0.625rem;
+  overflow: hidden;
+}
+.index-purchase-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.index-purchase-alert {
+  height: 5rem;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  border: 0.125rem solid #b7eb8f;
+  border-radius: 0.25rem;
+  background: #f6ffed;
+  font-family: var(--primary-robotofont);
+  font-size: 2rem;
+  line-height: 3rem;
+  font-weight: 500;
+  color: #000;
+}
+.index-purchase-success-actions {
+  justify-content: flex-end;
+}
+.index-purchase-link-btn {
+  min-width: 9.125rem;
+  height: 3rem;
+  padding: 0 1.25rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  font-family: var(--primary-popfont);
+  font-size: 1.75rem;
+  line-height: 2.75rem;
+  color: #40a9ff;
+  cursor: pointer;
+}
+.index-purchase-download {
+  color: #00c907;
+}
 .item-content-box .btns-wrapper .bid-now-btn {
   width: 25.2965rem;
   height: 6.125rem;
@@ -1755,5 +2095,128 @@
     line-height: 1.5rem;
     color: #6d6d6d;
     white-space: nowrap;
+  }
+  .index-purchase-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+    background: #fff;
+  }
+  .index-purchase-dialog {
+    width: 100%;
+    max-height: 100vh;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .index-purchase-panel {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    max-height: 100vh;
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+    border-radius: 0;
+    overflow: hidden;
+  }
+  .index-purchase-titlebar {
+    min-height: 9rem;
+    margin: 0;
+    padding: 1rem 2rem;
+  }
+  .index-purchase-titlebar h2 {
+    max-width: calc(100% - 4rem);
+    font-size: 2rem;
+    line-height: 3rem;
+  }
+  .index-purchase-close {
+    width: 3rem;
+    height: 3rem;
+    background: #fff;
+    flex: 0 0 auto;
+  }
+  .index-purchase-content,
+  .index-purchase-form {
+    padding: 2rem;
+    gap: 2rem;
+    max-height: none;
+    flex: 1;
+    min-height: 0;
+    padding-bottom: 8.8rem;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .index-purchase-form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .index-purchase-row {
+    font-size: 1.4rem;
+    line-height: 2.1rem;
+  }
+  .index-purchase-row strong {
+    font-size: 1.6rem;
+    line-height: 2.4rem;
+  }
+  .index-purchase-tag {
+    min-height: 2.8rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 1.3rem;
+    line-height: 1.8rem;
+  }
+  .index-purchase-field {
+    font-size: 1.6rem;
+    line-height: 2.3rem;
+  }
+  .index-purchase-field input[type="text"],
+  .index-purchase-field select,
+  .index-purchase-field textarea {
+    font-size: 1.5rem;
+    line-height: 2.1rem;
+  }
+  .index-purchase-field input[type="text"],
+  .index-purchase-field select {
+    height: 3.7rem;
+  }
+  .index-purchase-field textarea {
+    min-height: 10.1rem;
+  }
+  .index-purchase-upload,
+  .index-purchase-cover {
+    width: 10.4rem;
+    height: 10.4rem;
+  }
+  .index-purchase-actions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 610;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1.2rem 2rem max(1.2rem, env(safe-area-inset-bottom));
+    background: #fff;
+    border-top: 0.1rem solid #f4f4f4;
+  }
+  .index-purchase-primary,
+  .index-purchase-secondary {
+    min-width: 11.4rem;
+    height: 4rem;
+    border-radius: 0.8rem;
+    font-size: 1.6rem;
+    line-height: 2.4rem;
+  }
+  .index-purchase-rules {
+    padding: 2rem 2rem 0;
+    font-size: 1.2rem;
+    line-height: 1.8rem;
+  }
+  .index-purchase-alert {
+    height: 4rem;
+    font-size: 1.4rem;
+    line-height: 2.2rem;
   }
 }
