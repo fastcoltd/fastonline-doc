@@ -180,6 +180,6 @@ pc 版 figma 设计稿：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FAS
 https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78110&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78196&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78196&m=dev
 
 ### Task：检查 search-all 中的 item。标题和内容的间距
-状态：未完成
+状态：已完成
 ### 任务内容
 提醒用户，检查 search-all 中的 item。标题和内容的间距，无需修改任何代码
