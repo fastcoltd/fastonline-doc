@@ -9,6 +9,26 @@ const footer = document.getElementsByTagName('footer')[0];
 const footerHeight = footer.offsetHeight;
 const bodyElement = document.getElementsByTagName('body')[0];
 const sort = new SortSelector();
+let stickyHeaderStartTop = stickyHeader ? stickyHeader.offsetTop : 0;
+let stickyHeaderNormalHeight = stickyHeader ? stickyHeader.offsetHeight : 0;
+
+function isMobileViewport() {
+    return bodyElement.offsetWidth < 768;
+}
+
+function updateStickyHeaderStartTop() {
+    if (!stickyHeader) return;
+    const wasSticky = stickyHeader.classList.contains('is-sticky');
+    if (wasSticky) {
+        stickyHeader.classList.remove('is-sticky');
+    }
+    stickyHeaderStartTop = stickyHeader.offsetTop;
+    stickyHeaderNormalHeight = stickyHeader.offsetHeight;
+    if (wasSticky && window.scrollY >= stickyHeaderStartTop) {
+        stickyHeader.classList.add('is-sticky');
+    }
+}
+
 function getStickyHeaderHeight() {
     return stickyHeader ? stickyHeader.offsetHeight : 0;
 }
@@ -849,18 +869,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 window.addEventListener('scroll', updateStickyHeader, { passive: true });
+window.addEventListener('resize', function () {
+    updateStickyHeaderStartTop();
+    updateStickyHeader();
+});
 
 // 页面加载时调整位置
-document.addEventListener('DOMContentLoaded', adjustFilterPosition);
+document.addEventListener('DOMContentLoaded', function () {
+    updateStickyHeaderStartTop();
+    updateStickyHeader();
+    adjustFilterPosition();
+});
 
 // 更新sticky header状态
 function updateStickyHeader() {
     if (!stickyHeader) return;
-    const stickyTop = stickyHeader.getBoundingClientRect().top;
-    if (stickyTop <= 0) {
+    const shouldSticky = window.scrollY >= stickyHeaderStartTop;
+    if (shouldSticky) {
         stickyHeader.classList.add('is-sticky');
     } else {
         stickyHeader.classList.remove('is-sticky');
+    }
+    if (isMobileViewport() && pageContent) {
+        pageContent.style.marginTop = shouldSticky ? `${stickyHeaderNormalHeight}px` : '';
+    } else if (pageContent) {
+        pageContent.style.marginTop = '';
     }
     adjustFilterPosition();
 }

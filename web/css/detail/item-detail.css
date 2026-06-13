@@ -290,6 +290,22 @@
   height: 29.5rem;
 }
 @media screen and (max-width: 768px) {
+  .page-top-sticky {
+    position: relative;
+    margin-left: 0;
+    transform: none;
+    top: auto;
+    padding-left: 0;
+    padding-right: 0;
+    box-sizing: border-box;
+  }
+  .page-top-sticky.is-sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 49;
+  }
   .page-top-bread {
     width: 100%;
     margin-left: 0;
@@ -299,6 +315,8 @@
   }
   .page-top-sticky .item-detail-purchase-container {
     margin-top: 2rem;
+    margin-left: 0;
+    width: calc(100% - 4rem);
   }
   /* 购买组件样式 */
   .item-detail-purchase-container {
@@ -319,6 +337,14 @@
   /* 产品图片区域 */
   .item-detail-purchase-image {
     display: none;
+  }
+  .page-top-sticky:not(.is-sticky) .item-detail-purchase-image {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 27.5rem;
+    border-radius: 1.25rem;
+    object-fit: cover;
   }
   /* 主要内容区域 */
   .item-detail-purchase-content {
