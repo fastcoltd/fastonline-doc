@@ -54,7 +54,7 @@ search-all.html show more 点了以后，增加一页数据。举个例子：选
 
 
 ## Task：blog.html 页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-157.png)如图中的 Follow 按钮，需要修改位置，请放在与 Hot 标签水平居中的最右侧
 
