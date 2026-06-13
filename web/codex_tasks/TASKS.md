@@ -18,7 +18,7 @@
 
 
 ## Task：reset password 密码弹框和 signin-reset-password.html页面的手机版和 pc 版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-154.png)如图，重置密码弹框和重置密码页面中，如图中红框的部分，需要先展示发送验证码按钮，点击以后才展示倒计时。手机版和 pc 版都需要修改
 

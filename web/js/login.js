@@ -37,6 +37,72 @@ function initPasswordToggle(rootElement) {
 
 initPasswordToggle(signin);
 
+function initVerificationCodeSend(rootElement) {
+    if (!rootElement) {
+        return;
+    }
+    const codeFieldList = rootElement.querySelectorAll('.signin-from-2fa-item');
+    codeFieldList.forEach(function (field) {
+        if (field.dataset.codeSendBound === '1') {
+            return;
+        }
+        const sendButton = field.querySelector('.signin-form-code-send');
+        const timeText = field.querySelector('.signin-form-time');
+        if (!sendButton || !timeText) {
+            return;
+        }
+        field.dataset.codeSendBound = '1';
+        field.dataset.codeCountdownTimer = '';
+        field.classList.remove('is-counting');
+        sendButton.addEventListener('click', function () {
+            let remainingSeconds = parseInt(field.dataset.countdownSeconds || '30', 10);
+            if (!Number.isFinite(remainingSeconds) || remainingSeconds <= 0) {
+                remainingSeconds = 30;
+            }
+            field.classList.add('is-counting');
+            sendButton.disabled = true;
+            timeText.textContent = `${remainingSeconds}s`;
+            const timer = window.setInterval(function () {
+                remainingSeconds -= 1;
+                if (remainingSeconds <= 0) {
+                    window.clearInterval(timer);
+                    field.classList.remove('is-counting');
+                    sendButton.disabled = false;
+                    timeText.textContent = '30s';
+                    return;
+                }
+                timeText.textContent = `${remainingSeconds}s`;
+            }, 1000);
+            field.dataset.codeCountdownTimer = String(timer);
+        });
+    });
+}
+
+initVerificationCodeSend(signin);
+
+function resetVerificationCodeSend(rootElement) {
+    if (!rootElement) {
+        return;
+    }
+    const codeFieldList = rootElement.querySelectorAll('.signin-from-2fa-item');
+    codeFieldList.forEach(function (field) {
+        const sendButton = field.querySelector('.signin-form-code-send');
+        const timeText = field.querySelector('.signin-form-time');
+        const timer = parseInt(field.dataset.codeCountdownTimer || '', 10);
+        if (Number.isFinite(timer)) {
+            window.clearInterval(timer);
+        }
+        field.dataset.codeCountdownTimer = '';
+        field.classList.remove('is-counting');
+        if (sendButton) {
+            sendButton.disabled = false;
+        }
+        if (timeText) {
+            timeText.textContent = '30s';
+        }
+    });
+}
+
 let countryList = [
     { value: 'china', text: 'China' },
     { value: 'english', text: 'English' }
@@ -342,6 +408,8 @@ function syncReset2faContent() {
 }
 
 function showResetpwd() {
+    const resetpwd = document.getElementById('signin-resetpwd');
+    resetVerificationCodeSend(resetpwd);
 }
 
 function show2fa() {
