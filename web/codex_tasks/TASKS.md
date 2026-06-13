@@ -66,7 +66,7 @@ search-all.html show more 点了以后，增加一页数据。举个例子：选
 
 
 ## Task：所有列表页面的手机版和 pc 版都需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 所有列表页面，都加一个没有数据的展示组件，展示在列表最后一项即可。都做成 figma 设计稿的样式：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1922-78313&m=dev
 

@@ -318,7 +318,7 @@ function updateSearchNoDataState(visibleCount) {
         return;
     }
 
-    noData.style.display = visibleCount > 0 ? 'none' : '';
+    noData.style.display = '';
 }
 
 function filterSearchDesktopCardsByType(type) {

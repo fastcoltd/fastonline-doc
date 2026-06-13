@@ -25,7 +25,9 @@ async function loadItems() {
 function reloadItems() {
   console.log('reload items');
   const container = document.getElementById('items-grid');
-  container.innerHTML = '';
+  container.querySelectorAll(':scope > :not(.no-data-wrapper)').forEach(function (child) {
+    child.remove();
+  });
   loadItems();
 }
 
@@ -74,7 +76,12 @@ function renderItems(items) {
 
   items.forEach(item => {
     const itemElement = createItemElement(item);
-    container.appendChild(itemElement);
+    const emptyState = container.querySelector(':scope > .no-data-wrapper');
+    if (emptyState) {
+      container.insertBefore(itemElement, emptyState);
+    } else {
+      container.appendChild(itemElement);
+    }
   });
 }
 

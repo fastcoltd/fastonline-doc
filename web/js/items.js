@@ -34,8 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
         $('.load-more-text').hide()
         setTimeout(() => {
             $('.item-all-items-pager').each(function () {
-                const htmlStr = $(this).html();
-                $(this).append(htmlStr);
+                const htmlStr = $(this).children(':not(.no-data-wrapper)').map(function () {
+                    return this.outerHTML;
+                }).get().join('');
+                const $emptyState = $(this).children('.no-data-wrapper').first();
+                if ($emptyState.length) {
+                    $emptyState.before(htmlStr);
+                } else {
+                    $(this).append(htmlStr);
+                }
             });
             $('.loading').hide()
             $('.load-more-text').show()

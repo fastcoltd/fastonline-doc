@@ -22,11 +22,20 @@ document.addEventListener('DOMContentLoaded', () => {
   this.layout = new PageLayout();
   //   this.sort = new SortSelector();
   $('.load-more').on('click', function () {
-    let htmlStr = $('.items-pager').html()
     $('.loading').show()
     $('.load-more-text').hide()
     setTimeout(() => {
-      $('.items-pager').append(htmlStr)
+      $('.items-pager').each(function () {
+        const htmlStr = $(this).children(':not(.no-data-wrapper)').map(function () {
+          return this.outerHTML;
+        }).get().join('');
+        const $emptyState = $(this).children('.no-data-wrapper').first();
+        if ($emptyState.length) {
+          $emptyState.before(htmlStr);
+        } else {
+          $(this).append(htmlStr);
+        }
+      })
       $('.loading').hide()
       $('.load-more-text').show()
     }, 2000)

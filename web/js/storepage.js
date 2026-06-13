@@ -24,7 +24,9 @@ async function loadItems() {
 function reloadItems() {
   console.log('reload items');
   const container = document.getElementById('items-grid');
-  container.innerHTML = '';
+  container.querySelectorAll(':scope > :not(.no-data-wrapper)').forEach(function (child) {
+    child.remove();
+  });
   loadItems();
 }
 
@@ -73,7 +75,12 @@ function renderItems(items) {
 
   items.forEach(item => {
     const itemElement = createItemElement(item);
-    container.appendChild(itemElement);
+    const emptyState = container.querySelector(':scope > .no-data-wrapper');
+    if (emptyState) {
+      container.insertBefore(itemElement, emptyState);
+    } else {
+      container.appendChild(itemElement);
+    }
   });
 }
 
@@ -177,10 +184,17 @@ document.addEventListener('DOMContentLoaded', () => {
   $('.load-more').on('click', function () {
       const $activePager = $('.items-container[data-layout].is-active .store-all-items-pager');
       const $targetPager = $activePager.length ? $activePager : $('.store-all-items-pager').first();
-      let htmlStr = $targetPager.html()
+      const htmlStr = $targetPager.children(':not(.no-data-wrapper)').map(function () {
+          return this.outerHTML;
+      }).get().join('');
       $('.loading').show()
       setTimeout(() => {
-          $targetPager.append(htmlStr)
+          const $emptyState = $targetPager.children('.no-data-wrapper').first();
+          if ($emptyState.length) {
+              $emptyState.before(htmlStr);
+          } else {
+              $targetPager.append(htmlStr)
+          }
           $('.loading').hide()
       }, 2000)
   })
