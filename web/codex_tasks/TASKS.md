@@ -96,7 +96,7 @@ Vertical 模式和 Horizontal 模式的 item，其中的文字，字体都需要
 
 
 ## Task：item-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 description 部分，其中的内容距离卡片的间距太大了![alt text](image-160.png)，如图，文本距离卡片边缘的间距，应该改成与 Screenshots 部分，图片距离卡片的间距一样，如图![alt text](image-161.png)
 
