@@ -84,7 +84,7 @@ Vertical 模式和 Horizontal 模式的 item，其中的文字，字体都需要
 
 
 ## Task：index.html页面的手机版和 pc 版都需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 其中 Hot campaigns 和 Popular demands 中的 item，带有冒号':'的文本后面有空白占位符，我希望改成使用 css 样式来控制':'后面的空白占位符，而不是写死在 html 中
 
