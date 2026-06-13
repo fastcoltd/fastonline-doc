@@ -4,17 +4,7 @@ const list = new PageList();
 async function loadItems() {
     console.log('load items');
     try {
-        // 模拟API调用
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const items = generateMockItems();
-        renderItems(items);
-
-        // 模拟没有更多数据的情况
-        if (Math.random() > 0.8) {
-            list.showNoMore();
-        }
-
+        appendSearchResultsPage(selectedSearchType);
     } catch (error) {
         console.error('加载商品失败:', error);
     } finally {
@@ -209,6 +199,92 @@ const searchTabDesktopCardClassMap = {
 };
 
 const searchTabTypeOrder = ['items', 'campaigns', 'posts', 'store', 'demands'];
+const searchTabMobileCardClassMap = {
+    items: 'search-card-first-item-mobile',
+    campaigns: 'search-card-second-item-mobile',
+    posts: 'search-card-third-item-mobile',
+    store: 'search-card-fourth-item-mobile',
+    demands: 'search-card-fifth-item-mobile'
+};
+const searchInitialCardTemplates = {
+    desktop: {},
+    mobile: {}
+};
+let selectedSearchType = 'all';
+let lastSearchLoadMoreTime = 0;
+
+function getSearchCardType(card) {
+    return searchTabTypeOrder.find((type) => card.classList.contains(searchTabCardClassMap[type]));
+}
+
+function getSearchCardViewport(card, type) {
+    if (card.classList.contains(searchTabDesktopCardClassMap[type])) {
+        return 'desktop';
+    }
+
+    if (card.classList.contains(searchTabMobileCardClassMap[type])) {
+        return 'mobile';
+    }
+
+    return '';
+}
+
+function collectSearchInitialCardTemplates() {
+    const cards = document.querySelectorAll('.search-list-container .search-card');
+
+    cards.forEach((card) => {
+        const type = getSearchCardType(card);
+        if (!type) {
+            return;
+        }
+
+        const viewport = getSearchCardViewport(card, type);
+        if (!viewport || searchInitialCardTemplates[viewport][type]) {
+            return;
+        }
+
+        searchInitialCardTemplates[viewport][type] = card.cloneNode(true);
+    });
+}
+
+function createSearchResultCard(type) {
+    const viewport = isSearchAllDesktop() ? 'desktop' : 'mobile';
+    const template = searchInitialCardTemplates[viewport][type];
+
+    if (!template) {
+        return null;
+    }
+
+    const card = template.cloneNode(true);
+    card.style.display = '';
+    return card;
+}
+
+function appendSearchResultsPage(type) {
+    const container = document.querySelector('.search-list-container');
+    if (!container) {
+        return;
+    }
+
+    const targetTypes = type === 'all' ? searchTabTypeOrder : [type];
+    const fragment = document.createDocumentFragment();
+
+    targetTypes.forEach((targetType) => {
+        const card = createSearchResultCard(targetType);
+        if (card) {
+            fragment.appendChild(card);
+        }
+    });
+
+    if (!fragment.childNodes.length) {
+        return;
+    }
+
+    const noData = container.querySelector('.no-data-wrapper');
+    container.insertBefore(fragment, noData || null);
+    lastSearchLoadMoreTime = Date.now();
+    filterSearchCardsByType(type);
+}
 
 function bindSearchTagRandomJump() {
     const container = document.querySelector('.search-list-container');
@@ -248,26 +324,20 @@ function updateSearchNoDataState(visibleCount) {
 function filterSearchDesktopCardsByType(type) {
     const cards = document.querySelectorAll('.search-list-container .search-card');
     const targetTypes = type === 'all' ? searchTabTypeOrder : [type];
-    const visibleCards = [];
+    let visibleCount = 0;
 
     cards.forEach((card) => {
-        card.style.display = 'none';
-    });
-
-    targetTypes.forEach((targetType) => {
-        const desktopClass = searchTabDesktopCardClassMap[targetType];
-        if (!desktopClass) {
-            return;
-        }
-
-        const card = document.querySelector(`.search-list-container .search-card.${desktopClass}`);
-        if (card) {
-            card.style.display = '';
-            visibleCards.push(card);
+        const shouldShow = targetTypes.some((targetType) => {
+            const desktopClass = searchTabDesktopCardClassMap[targetType];
+            return desktopClass && card.classList.contains(desktopClass);
+        });
+        card.style.display = shouldShow ? '' : 'none';
+        if (shouldShow) {
+            visibleCount += 1;
         }
     });
 
-    updateSearchNoDataState(visibleCards.length);
+    updateSearchNoDataState(visibleCount);
 }
 
 function filterSearchCardsByType(type) {
@@ -293,19 +363,28 @@ function filterSearchCardsByType(type) {
 
 $(document).ready(function () {
     const $pageLinks = $('.page-link');
-    let selectedType = $('.page-link.active').attr('data-key') || 'all';
+    collectSearchInitialCardTemplates();
+    selectedSearchType = $('.page-link.active').attr('data-key') || 'all';
 
     $pageLinks.on('click', function () {
-        selectedType = $(this).attr('data-key');
+        selectedSearchType = $(this).attr('data-key');
         $pageLinks.removeClass('active');
         $(this).addClass('active');
-        filterSearchCardsByType(selectedType);
+        filterSearchCardsByType(selectedSearchType);
+    });
+
+    $('#load-more').on('click.searchAll', function () {
+        if (Date.now() - lastSearchLoadMoreTime < 100) {
+            return;
+        }
+
+        loadItems();
     });
 
     window.addEventListener('resize', function () {
-        filterSearchCardsByType(selectedType);
+        filterSearchCardsByType(selectedSearchType);
     });
 
-    filterSearchCardsByType(selectedType);
+    filterSearchCardsByType(selectedSearchType);
     bindSearchTagRandomJump();
 });
