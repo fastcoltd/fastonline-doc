@@ -72,7 +72,7 @@ search-all.html show more 点了以后，增加一页数据。举个例子：选
 
 
 ## Task：item-all.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容 
 Horizontal 模式下的 item，buy now 按钮，需要撑满剩余宽度，即如图![alt text](image-159.png)，buy now 按钮的右侧需要与收藏按钮的右侧在垂直方向对齐
 
