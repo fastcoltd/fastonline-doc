@@ -60,7 +60,7 @@ search-all.html show more 点了以后，增加一页数据。举个例子：选
 
 
 ## Task：attribute-all.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-158.png)如图中的标签，现在是换行显示的，需要改成一行显示，展示不下的部分可以滚动展示
 
