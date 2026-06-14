@@ -102,7 +102,7 @@ description 部分，其中的内容距离卡片的间距太大了![alt text](im
 
 
 ## Task：item-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 需要增加一个悬浮按钮，悬浮按钮的样式和post-detail.html手机版的悬浮按钮一模一样，可以直接复用过来，只是点击后出现的页面不一样。item-detail.html页面点击悬浮按钮后，出现的界面如图https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=555-5668&m=dev，也就是 pc 端右侧的卡片里的内容
 

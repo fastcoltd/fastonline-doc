@@ -736,19 +736,21 @@
     }
 
     .item-detail-right-box {
-        z-index: 100;
+        z-index: 320;
         background-color: #fff;
         position: fixed;
         top: 0;
         height: 100vh;
+        height: 100dvh;
         left: 0;
         width: 100vw;
-        padding: 0 2rem;
+        padding: 0 1.6rem;
         box-sizing: border-box;
         display: none;
         margin-left: 0;
         display: none;
         flex-direction: column;
+        overflow: hidden;
 
         /* 基础安全区域内边距 - 确保在所有设备上生效 */
         padding-top: var(--safe-area-inset-top) !important;
@@ -758,8 +760,74 @@
         padding-bottom: env(safe-area-inset-bottom, 2.5rem) !important;
     }
 
+    .item-detail-right-box.is-open {
+        display: flex;
+    }
+
     .item-detail-right-header {
         display: flex;
+        min-height: 5rem;
+        padding: 0;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .item-detail-right-title {
+        margin: 0;
+        font-family: var(--primary-popfont);
+        font-size: 2rem;
+        font-weight: 500;
+        line-height: 2.2rem;
+        color: #000;
+    }
+
+    .item-detail-right-close {
+        right: 1rem;
+        width: 2.1rem;
+        height: 2.1rem;
+    }
+
+    .item-detail-right-box .frame-container {
+        border-radius: 1rem;
+        padding: 2rem;
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .item-detail-right-box .line-chart-container {
+        height: 38rem;
+        min-height: 38rem;
+    }
+
+    .detail-page-menu {
+        z-index: 319;
+        padding: 0;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #FF1B20;
+        border: none;
+        box-shadow: none;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 0;
+        overflow: hidden;
+    }
+
+    .detail-page-menu[aria-expanded='true'] {
+        display: none !important;
+    }
+
+    .detail-page-menu img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-radius: 50%;
     }
 }
 

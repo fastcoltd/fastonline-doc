@@ -848,23 +848,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const menu = document.querySelector('.detail-page-menu');
     const statistics = document.querySelector('.item-detail-right-box');
-    menu.addEventListener('click', function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        const statisticsStyle = window.getComputedStyle(statistics);
-        const close = statistics.querySelector('.item-detail-right-close');
-        close.addEventListener('click', function (event) {
-            statistics.style.display = 'none';
-        });
-        if (statisticsStyle.display === 'none') {
-            statistics.style.display = 'flex';
-        } else {
-            statistics.style.display = 'none';
+    const close = statistics ? statistics.querySelector('.item-detail-right-close') : null;
+    const closeStatisticsPanel = function () {
+        if (!statistics) return;
+        statistics.classList.remove('is-open');
+        statistics.style.display = '';
+        statistics.setAttribute('aria-hidden', 'true');
+        if (menu) {
+            menu.setAttribute('aria-expanded', 'false');
+        }
+    };
+    const openStatisticsPanel = function () {
+        if (!statistics) return;
+        statistics.classList.add('is-open');
+        statistics.style.display = '';
+        statistics.setAttribute('aria-hidden', 'false');
+        if (menu) {
+            menu.setAttribute('aria-expanded', 'true');
         }
         renderStarsStatisticsChart()
         randerSalesCountStatisticschart()
         randerOverviewStatisticschart()
-    });
+    };
+    if (close) {
+        close.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeStatisticsPanel();
+        });
+    }
+    if (menu && statistics) {
+        menu.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (statistics.classList.contains('is-open')) {
+            closeStatisticsPanel();
+        } else {
+            openStatisticsPanel();
+        }
+        });
+    }
 });
 
 
