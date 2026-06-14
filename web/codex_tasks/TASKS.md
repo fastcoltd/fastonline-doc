@@ -116,7 +116,7 @@ description 部分，其中的内容距离卡片的间距太大了![alt text](im
 
 
 ## Task：compaign-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-165.png)如图的部分布局不对， Limited time sale标签应该在文字之后，文字最多展示 2 行，展示不下的部分显示...，优先展示标签
 

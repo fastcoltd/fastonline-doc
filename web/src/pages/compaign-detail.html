@@ -48,9 +48,11 @@
         <section class="compaign-detail-summary" aria-label="Campaign summary">
             <div class="compaign-detail-summary-head">
                 <div class="compaign-detail-summary-title-group">
-                    <h1 class="compaign-detail-summary-title">Handcrafted Plastic Hat</h1>
-                    <span class="item-mark item-mark1">HOT</span>
-                    <span class="item-mark item-mark2">Limited time sale</span>
+                    <h1 class="compaign-detail-summary-title" data-full-title="Handcrafted Plastic Hat">
+                        <span class="compaign-detail-summary-title-text">Handcrafted Plastic Hat</span>
+                        <span class="item-mark item-mark1">HOT</span>
+                        <span class="item-mark item-mark2">Limited time sale</span>
+                    </h1>
                 </div>
                 <button class="compaign-detail-like-btn" type="button" aria-label="收藏">
                     <!-- @include ../partials/components/item-like-button.html {"like_class":"icon-aixin","like":"1","like_icon":"image/Vector_sel.png","like_alt":"收藏按钮","aria_label":"收藏","aria_pressed":"true"} -->
@@ -382,9 +384,57 @@
             updateActiveByScroll();
         }
 
+        function initCompaignDetailMobileTitle() {
+            const title = document.querySelector('.compaign-detail-summary-title');
+            const titleText = title ? title.querySelector('.compaign-detail-summary-title-text') : null;
+
+            if (!title || !titleText) {
+                return;
+            }
+
+            const fullTitle = title.getAttribute('data-full-title') || titleText.textContent.trim();
+
+            const syncTitle = function () {
+                titleText.textContent = fullTitle;
+
+                if (window.innerWidth > 768) {
+                    return;
+                }
+
+                const maxHeight = parseFloat(window.getComputedStyle(title).lineHeight) * 2;
+
+                if (title.scrollHeight <= maxHeight + 1) {
+                    return;
+                }
+
+                let start = 0;
+                let end = fullTitle.length;
+                let best = '';
+
+                while (start <= end) {
+                    const middle = Math.floor((start + end) / 2);
+                    const nextText = fullTitle.slice(0, middle).trimEnd() + '...';
+                    titleText.textContent = nextText;
+
+                    if (title.scrollHeight <= maxHeight + 1) {
+                        best = nextText;
+                        start = middle + 1;
+                    } else {
+                        end = middle - 1;
+                    }
+                }
+
+                titleText.textContent = best || '...';
+            };
+
+            window.addEventListener('resize', syncTitle);
+            syncTitle();
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             initCompaignDetailStickySummary();
             initCompaignDetailAnchors();
+            initCompaignDetailMobileTitle();
         });
     </script>
     <script src="js/jquery-3.7.1.min.js"></script>
