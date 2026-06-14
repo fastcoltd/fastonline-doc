@@ -225,15 +225,75 @@ function initDemandSummaryStickyLayer() {
     return;
   }
 
+  const stickyPlaceholder = document.createElement('div');
+  stickyPlaceholder.className = 'demand-summary-sticky-placeholder';
+  summaryCard.insertAdjacentElement('afterend', stickyPlaceholder);
+  let summaryOffsetTop = 0;
+
+  const isMobileSummarySticky = function () {
+    return window.innerWidth <= 768;
+  };
+
+  const measureSummaryOffset = function () {
+    const wasSticky = summaryCard.classList.contains('is-sticky');
+    if (wasSticky) {
+      summaryCard.classList.remove('is-sticky');
+      stickyPlaceholder.classList.remove('is-active');
+      stickyPlaceholder.style.height = '';
+    }
+
+    summaryOffsetTop = summaryCard.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+
+    if (wasSticky) {
+      summaryCard.classList.add('is-sticky');
+      stickyPlaceholder.classList.add('is-active');
+    }
+  };
+
+  const preserveScrollTop = function (scrollTop) {
+    if (typeof scrollTop === 'number' && Math.abs((window.pageYOffset || document.documentElement.scrollTop) - scrollTop) > 0.5) {
+      window.scrollTo(0, scrollTop);
+    }
+  };
+
+  const setStickyState = function (isSticky, scrollTop) {
+    const wasSticky = summaryCard.classList.contains('is-sticky');
+    if (wasSticky === isSticky) {
+      return;
+    }
+
+    if (isSticky && isMobileSummarySticky()) {
+      summaryCard.classList.add('is-sticky');
+      stickyPlaceholder.style.height = summaryCard.offsetHeight + 'px';
+      stickyPlaceholder.classList.add('is-active');
+      preserveScrollTop(scrollTop);
+      return;
+    }
+
+    summaryCard.classList.toggle('is-sticky', isSticky);
+    if (!isSticky) {
+      stickyPlaceholder.classList.remove('is-active');
+      stickyPlaceholder.style.height = '';
+      preserveScrollTop(scrollTop);
+    }
+  };
+
   const syncStickyState = function () {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const summaryRect = summaryCard.getBoundingClientRect();
-    const isSticky = scrollTop > 0 && summaryRect.top <= 0.5;
-    summaryCard.classList.toggle('is-sticky', isSticky);
+    const isSticky = isMobileSummarySticky()
+      ? scrollTop >= summaryOffsetTop
+      : scrollTop > 0 && summaryRect.top <= 0.5;
+    setStickyState(isSticky, scrollTop);
   };
 
+  measureSummaryOffset();
   window.addEventListener('scroll', syncStickyState, { passive: true });
-  window.addEventListener('resize', syncStickyState);
+  window.addEventListener('resize', function () {
+    setStickyState(false, window.pageYOffset || document.documentElement.scrollTop);
+    measureSummaryOffset();
+    syncStickyState();
+  });
   syncStickyState();
 }
 

@@ -136,7 +136,7 @@ description 部分，其中的内容距离卡片的间距太大了![alt text](im
 
 
 ## Task：demand-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 悬停时，顶部悬停的部分如图：![alt text](image-168.png)，我希望进行修改，我希望修改后，悬停时，只展示如图的部分![alt text](image-169.png)，其余的部分隐藏掉
 

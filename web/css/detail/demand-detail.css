@@ -193,10 +193,33 @@
   white-space: nowrap;
 }
 @media screen and (max-width: 768px) {
+  .demand-summary-card {
+    position: relative;
+    top: auto;
+  }
   .demand-summary-card.is-sticky {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    width: 100%;
+    max-width: var(--container-width);
+    transform: translateX(-50%);
     border: 1px solid #F0F0F3;
     border-radius: 1.25rem;
     overflow: hidden;
+    z-index: 46;
+  }
+  .demand-summary-sticky-placeholder {
+    display: none;
+    width: 100%;
+    flex: 0 0 auto;
+  }
+  .demand-summary-sticky-placeholder.is-active {
+    display: block;
+  }
+  .demand-summary-card.is-sticky .brand-service-section + .brand-service-section,
+  .demand-summary-card.is-sticky .other-info {
+    display: none;
   }
   .demand-summary-card.is-sticky::before,
   .demand-summary-card.is-sticky::after {
