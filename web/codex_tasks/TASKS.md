@@ -142,7 +142,7 @@ description 部分，其中的内容距离卡片的间距太大了![alt text](im
 
 
 ## Task：brand-all.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 其中的每个 item，现在如图![alt text](image-170.png)只占了屏幕宽度的一小部分，都需要撑满屏幕宽度
 
