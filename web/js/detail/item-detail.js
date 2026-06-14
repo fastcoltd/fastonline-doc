@@ -269,6 +269,7 @@ function renderStarsStatisticsChart() {
     chartInstance.setOption(option)
 }
 let overviewCurrentPeriod = '7D';
+let salesCountCurrentPeriod = '7D';
 
 function buildOverviewLabels(days) {
     return Array.from({ length: days }, (_, index) => `D${index + 1}`);
@@ -391,42 +392,98 @@ function randerOverviewStatisticschart(period = overviewCurrentPeriod) {
     overviewCurrentPeriod = period;
 }
 
-function initOverviewPeriodTabs() {
-    const tabs = document.querySelectorAll('.overview-header .tab-item');
-    if (!tabs.length) {
+function initStatisticsPeriodTabs() {
+    const tabGroups = document.querySelectorAll('.tabs-container[data-chart]');
+    if (!tabGroups.length) {
         return;
     }
 
-    tabs.forEach((tab) => {
-        const tabTextNode = tab.querySelector('.tab-text');
-        const period = (tabTextNode ? tabTextNode.textContent : '').trim().toUpperCase();
-        tab.dataset.period = period;
-        tab.addEventListener('click', function () {
-            if (!this.dataset.period) {
-                return;
-            }
-            tabs.forEach(item => item.classList.remove('active'));
-            this.classList.add('active');
+    tabGroups.forEach((group) => {
+        const tabs = group.querySelectorAll('.tab-item');
+        const chartType = group.dataset.chart;
 
-            const overviewChartDom = document.getElementById('overviewStatisticsEchart');
-            if (overviewChartDom && overviewChartDom.offsetParent !== null) {
-                randerOverviewStatisticschart(this.dataset.period);
-                return;
-            }
-            overviewCurrentPeriod = this.dataset.period;
+        tabs.forEach((tab) => {
+            const tabTextNode = tab.querySelector('.tab-text');
+            const period = tab.dataset.period || (tabTextNode ? tabTextNode.textContent : '').trim().toUpperCase();
+            tab.dataset.period = period;
+            tab.addEventListener('click', function () {
+                if (!this.dataset.period) {
+                    return;
+                }
+                tabs.forEach(item => {
+                    const isActive = item === this;
+                    item.classList.toggle('active', isActive);
+                    item.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+
+                if (chartType === 'overview') {
+                    const overviewChartDom = document.getElementById('overviewStatisticsEchart');
+                    if (overviewChartDom && overviewChartDom.offsetParent !== null) {
+                        randerOverviewStatisticschart(this.dataset.period);
+                        return;
+                    }
+                    overviewCurrentPeriod = this.dataset.period;
+                }
+                if (chartType === 'sales') {
+                    const salesChartDom = document.getElementById('salesCountStatisticsEchart');
+                    if (salesChartDom && salesChartDom.offsetParent !== null) {
+                        randerSalesCountStatisticschart(this.dataset.period);
+                        return;
+                    }
+                    salesCountCurrentPeriod = this.dataset.period;
+                }
+            });
         });
-    });
 
-    const activeTab = document.querySelector('.overview-header .tab-item.active') || tabs[0];
-    const activePeriod = activeTab && activeTab.dataset ? activeTab.dataset.period : '7D';
-    overviewCurrentPeriod = activePeriod;
-    tabs.forEach(item => item.classList.toggle('active', item.dataset.period === activePeriod));
+        const activeTab = group.querySelector('.tab-item.active') || tabs[0];
+        const activePeriod = activeTab && activeTab.dataset ? activeTab.dataset.period : '7D';
+        tabs.forEach(item => {
+            const isActive = item.dataset.period === activePeriod;
+            item.classList.toggle('active', isActive);
+            item.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+        if (chartType === 'overview') {
+            overviewCurrentPeriod = activePeriod;
+        }
+        if (chartType === 'sales') {
+            salesCountCurrentPeriod = activePeriod;
+        }
+    });
 }
 
-function randerSalesCountStatisticschart() {
-    let dom = document.getElementById('salesCountStatisticsEchart')
+function getSalesCountPeriodData(period) {
+    if (period === '14D') {
+        return {
+            labels: buildOverviewLabels(14),
+            salesVolume: buildOverviewSeries(14, 180, 8, 24, 28, 18),
+            afterSalesVolume: buildOverviewSeries(14, 96, 6, 38, 18, 26),
+            newVolume: buildOverviewSeries(14, 160, 5, 18, 20, 14)
+        };
+    }
+    if (period === '30D') {
+        return {
+            labels: buildOverviewLabels(30),
+            salesVolume: buildOverviewSeries(30, 210, 5, 22, 32, 20),
+            afterSalesVolume: buildOverviewSeries(30, 120, 4, 42, 20, 30),
+            newVolume: buildOverviewSeries(30, 190, 4, 20, 24, 18)
+        };
+    }
+    return {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        salesVolume: [120, 132, 101, 134, 90, 230, 210],
+        afterSalesVolume: [220, 182, 191, 234, 290, 330, 310],
+        newVolume: [150, 232, 201, 154, 190, 330, 410]
+    };
+}
 
-    var chartInstance = echarts.init(dom)
+function randerSalesCountStatisticschart(period = salesCountCurrentPeriod) {
+    let dom = document.getElementById('salesCountStatisticsEchart')
+    if (!dom) {
+        return;
+    }
+
+    const periodData = getSalesCountPeriodData(period);
+    var chartInstance = echarts.getInstanceByDom(dom) || echarts.init(dom)
     let option = {
         tooltip: {
             trigger: 'axis',
@@ -452,7 +509,7 @@ function randerSalesCountStatisticschart() {
             {
                 type: 'category',
                 boundaryGap: false,
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                data: periodData.labels
             }
         ],
         yAxis: [
@@ -471,7 +528,7 @@ function randerSalesCountStatisticschart() {
                 emphasis: {
                     focus: 'series'
                 },
-                data: [120, 132, 101, 134, 90, 230, 210]
+                data: periodData.salesVolume
             },
             {
                 name: 'After-sales volume',
@@ -483,7 +540,7 @@ function randerSalesCountStatisticschart() {
                 emphasis: {
                     focus: 'series'
                 },
-                data: [220, 182, 191, 234, 290, 330, 310]
+                data: periodData.afterSalesVolume
             },
             {
                 name: 'New volume',
@@ -495,11 +552,12 @@ function randerSalesCountStatisticschart() {
                 emphasis: {
                     focus: 'series'
                 },
-                data: [150, 232, 201, 154, 190, 330, 410]
+                data: periodData.newVolume
             }
         ]
     }
-    chartInstance.setOption(option)
+    chartInstance.setOption(option, true)
+    salesCountCurrentPeriod = period;
 }
 if (bodyElement.offsetWidth >= 768) {
     renderStarsStatisticsChart()
@@ -597,7 +655,7 @@ function createItemElement(item) {
 document.addEventListener("DOMContentLoaded", function () {
     const similar = new Carousel('best-items', 20);
     const link = new LinkRef('page-link', 'item-detail-left-group');
-    initOverviewPeriodTabs();
+    initStatisticsPeriodTabs();
     const screenshot = document.querySelector('.item-detail-screenshot');
     const screenshotContent = screenshot.querySelector('.item-detail-screenshot-content');
     const screenshotRightMore = screenshot.querySelector('.item-detail-screenshot-right-box');

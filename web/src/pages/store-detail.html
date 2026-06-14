@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="css/signin.css" />
   <link rel="stylesheet" href="css/second-page.css" />
   <link rel="stylesheet" href="css/page.css" />
-  <link rel="stylesheet" href="css/item-statistics.css?v=20260529-statistics-component-v3">
+  <link rel="stylesheet" href="css/item-statistics.css?v=20260614-stat-period-align">
   <link rel="stylesheet" href="css/detail/store-detail.css?v=20260522-mobile-search-v2" />
 </head>
 
@@ -187,36 +187,14 @@
         <!-- @include ../partials/components/statistics-rating-chart-panel.html {"statistics_panel_class":"store-statistics-panel","section_title_style":"","section_title_text":"Response time","section_content_style":"","section_content_text":"5 hours (21:28 local time)","main_title_style":"display: none;","main_title_text":"","star_box_style":"display: none;","star_width":"0","star_score":"","star_recommend":"","rating_mobile_style":"display: none;","rating_mobile_score":"","rating_mobile_recommend":"","stat_1_label":"Rating:","stat_1_value":"4.3","stat_1_count":"(90)","stat_2_label":"Service:","stat_2_value":"4.3","stat_2_count":"","stat_3_label":"Logistics:","stat_3_value":"4.3","stat_3_count":"","stat_4_label":"Products:","stat_4_value":"4.3","stat_4_count":"","chart_id":"starsStatisticsEchart"} -->
 
         <!-- Overview Section -->
-        <div class="overview-header">
-          <div class="title-section">
-            <div class="red-indicator"></div>
-            <span class="section-title">Overview</span>
-          </div>
-          <div class="tabs-container">
-            <div class="tab-item active">
-              <div class="ink-bar"></div>
-              <span class="tab-text">7D</span>
-            </div>
-            <div class="tab-item">
-              <span class="tab-text">14D</span>
-            </div>
-            <div class="tab-item">
-              <span class="tab-text">30D</span>
-            </div>
-          </div>
-        </div>
+        <!-- @include ../partials/components/statistics-period-header.html {"header_class":"overview-header","title_text":"Overview","chart_type":"overview"} -->
 
         <!-- Line Chart Container -->
         <div class="line-chart-container" id="overviewStatisticsEchart">
         </div>
 
         <!-- Sales Count Section -->
-        <div class="sales-header">
-          <div class="title-section">
-            <div class="red-indicator"></div>
-            <span class="section-title">Sales Count</span>
-          </div>
-        </div>
+        <!-- @include ../partials/components/statistics-period-header.html {"header_class":"sales-header","title_text":"Sales Count","chart_type":"sales"} -->
         <!-- Sales Line Chart -->
         <div class="line-chart-container" id="salesCountStatisticsEchart">
 
@@ -907,7 +885,7 @@
   <script src="js/filter.js"></script>
   <script src="js/pagelist.js"></script>
   <script src="js/pagination.js"></script>
-  <script src="js/detail/store-detail.js?v=20260518-compat2"></script>
+  <script src="js/detail/store-detail.js?v=20260614-stat-period-tabs"></script>
   <script>
 
     // 页面加载完成后初始化
@@ -1082,6 +1060,7 @@
     }
     randerStarsStatisticschart()
     var overviewCurrentPeriod = '7D';
+    var salesCountCurrentPeriod = '7D';
 
     function buildOverviewStatisticsLabels(days) {
       return Array.from({ length: days }, (_, index) => `${days - index}d`);
@@ -1273,10 +1252,38 @@
       overviewCurrentPeriod = currentPeriod
     }
     randerOverviewStatisticschart()
-    function randerSalesCountStatisticschart() {
-      let dom = document.getElementById('salesCountStatisticsEchart')
+    function getSalesCountStatisticsPeriodData(period) {
+      if (period === '14D') {
+        return {
+          labels: buildOverviewStatisticsLabels(14),
+          salesVolume: [88, 92, 96, 100, 84, 79, 83, 90, 94, 101, 98, 106, 110, 104],
+          afterSalesVolume: [72, 70, 66, 58, 40, 34, 31, 27, 25, 21, 48, 60, 56, 51],
+          newVolume: [96, 97, 98, 100, 89, 90, 92, 94, 98, 100, 100, 100, 100, 100]
+        };
+      }
+      if (period === '30D') {
+        return {
+          labels: buildOverviewStatisticsLabels(30),
+          salesVolume: [74, 78, 82, 88, 91, 96, 100, 93, 86, 80, 77, 82, 88, 94, 99, 105, 102, 96, 90, 84, 78, 76, 82, 90, 98, 106, 112, 108, 102, 96],
+          afterSalesVolume: [80, 78, 74, 70, 66, 62, 58, 50, 44, 38, 34, 31, 28, 25, 23, 21, 20, 24, 30, 44, 58, 64, 60, 56, 53, 49, 46, 44, 42, 40],
+          newVolume: [91, 92, 94, 96, 97, 99, 100, 98, 95, 91, 89, 90, 92, 94, 96, 99, 100, 100, 98, 96, 95, 97, 99, 100, 100, 100, 100, 100, 100, 100]
+        };
+      }
+      return {
+        labels: ['7d', '6d', '5d', '4d', '3d', '2d', '1d'],
+        salesVolume: [100, 74, 77, 65, 56, 86, 75],
+        afterSalesVolume: [100, 100, 49, 37, 29, 59, 52],
+        newVolume: [99, 100, 88, 92, 100, 100, 100]
+      };
+    }
 
-      var chartInstance = echarts.init(dom)
+    function randerSalesCountStatisticschart(period) {
+      let dom = document.getElementById('salesCountStatisticsEchart')
+      if (!dom) return;
+
+      var currentPeriod = (period || salesCountCurrentPeriod || '7D').toUpperCase()
+      var periodData = getSalesCountStatisticsPeriodData(currentPeriod)
+      var chartInstance = echarts.getInstanceByDom(dom) || echarts.init(dom)
       let option = {
         tooltip: {
           trigger: 'axis',
@@ -1323,7 +1330,7 @@
               fontSize: 12,
               color: 'rgba(0, 0, 0, 0.7)'
             },
-            data: ['7d', '6d', '5d', '4d', '3d', '2d', '1d']
+            data: periodData.labels
           }
         ],
         yAxis: [
@@ -1373,7 +1380,7 @@
             emphasis: {
               focus: 'series'
             },
-            data: [100, 74, 77, 65, 56, 86, 75]
+            data: periodData.salesVolume
           },
           {
             name: 'After-sales volume',
@@ -1396,7 +1403,7 @@
             emphasis: {
               focus: 'series'
             },
-            data: [100, 100, 49, 37, 29, 59, 52]
+            data: periodData.afterSalesVolume
           },
           {
             name: 'New volume',
@@ -1419,11 +1426,12 @@
             emphasis: {
               focus: 'series'
             },
-            data: [99, 100, 88, 92, 100, 100, 100]
+            data: periodData.newVolume
           }
         ]
       }
-      chartInstance.setOption(option)
+      chartInstance.setOption(option, true)
+      salesCountCurrentPeriod = currentPeriod
     }
     randerSalesCountStatisticschart()
   </script>

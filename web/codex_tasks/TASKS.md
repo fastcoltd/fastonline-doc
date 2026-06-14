@@ -109,7 +109,7 @@ description 部分，其中的内容距离卡片的间距太大了![alt text](im
 
 
 ## Task：store-detail.html页面的pc版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-162.png)如图的部分，右上角需要加上![alt text](image-163.png)切换按钮，参考 Overview 部分实现。修改完成后，请抽取成独立的组件并替换到此处，然后检查全局的展示![alt text](image-164.png)的地方，都替换成组件。
 
