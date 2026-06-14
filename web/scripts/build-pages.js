@@ -94,9 +94,44 @@ function parseIncludeDirective(rawRef, filePath) {
   return { includeRef, vars };
 }
 
+function formatStarFill(value) {
+  const numericValue = Number.parseFloat(String(value).replace(/[^\d.-]/g, ""));
+  if (!Number.isFinite(numericValue)) {
+    return "";
+  }
+  const fill = Math.max(0, Math.min(100, (numericValue / 5) * 100));
+  return `${Number.parseFloat(fill.toFixed(2))}%`;
+}
+
+function withDerivedTemplateVars(vars) {
+  const nextVars = { ...vars };
+
+  Object.entries(vars).forEach(([key, value]) => {
+    const fillKey = `${key}_fill`;
+    if (nextVars[fillKey] !== undefined) {
+      return;
+    }
+    const placeholderMatch = String(value).match(/^{{\s*([A-Za-z0-9_.-]+)\s*}}$/);
+    if (placeholderMatch) {
+      nextVars[fillKey] = `{{${placeholderMatch[1]}_fill}}`;
+      return;
+    }
+    const fillValue = formatStarFill(value);
+    if (fillValue) {
+      nextVars[fillKey] = fillValue;
+    }
+  });
+
+  return nextVars;
+}
+
 function applyTemplateVars(content, vars) {
+  const nextVars = withDerivedTemplateVars(vars);
   return content.replace(/{{\s*([A-Za-z0-9_.-]+)\s*}}/g, (_, key) => {
-    const value = vars[key];
+    const value = nextVars[key];
+    if ((value === undefined || value === null || value === "") && key.endsWith("_fill")) {
+      return "0%";
+    }
     return value === undefined || value === null ? "" : String(value);
   });
 }

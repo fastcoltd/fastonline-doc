@@ -152,7 +152,7 @@ function createItemElement(item) {
                   <div class="item-star-box">
                     <div class="star-bg">
                         <div class="stars-outer">
-                            <div class="stars-inner" style="width: 83%;"></div>
+                            <div class="stars-inner" style="--star-fill: 86%;"></div>
                         </div>
                     </div>
                     <p class="item-star-score">4.3</p>

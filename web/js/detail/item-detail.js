@@ -597,7 +597,7 @@ function createItemElement(item) {
                                 <div class="item-star-box">
                                     <div class="star-bg">
                                         <div class="stars-outer">
-                                            <div class="stars-inner" style="width: 100%;"></div>
+                                            <div class="stars-inner" style="--star-fill: 100%;"></div>
                                         </div>
                                     </div>
                                     <p class="item-star-score">5.0</p>
