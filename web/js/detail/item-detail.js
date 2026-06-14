@@ -33,6 +33,15 @@ function getStickyHeaderHeight() {
     return stickyHeader ? stickyHeader.offsetHeight : 0;
 }
 
+function syncMobileStickyPlaceholder(shouldSticky) {
+    if (!pageContent) return;
+    if (!isMobileViewport() || !shouldSticky) {
+        pageContent.style.marginTop = '';
+        return;
+    }
+    pageContent.style.marginTop = `${getStickyHeaderHeight()}px`;
+}
+
 function sortItems(value) {
     console.log('sort items', value);
 }
@@ -913,11 +922,7 @@ function updateStickyHeader() {
     } else {
         stickyHeader.classList.remove('is-sticky');
     }
-    if (isMobileViewport() && pageContent) {
-        pageContent.style.marginTop = shouldSticky ? `${stickyHeaderNormalHeight}px` : '';
-    } else if (pageContent) {
-        pageContent.style.marginTop = '';
-    }
+    syncMobileStickyPlaceholder(shouldSticky);
     adjustFilterPosition();
 }
 updateStickyHeader();
