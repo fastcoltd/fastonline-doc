@@ -1102,13 +1102,14 @@
     .blog-sidebar-container {
         display: none;
         position: fixed;
-        top: 50%;
+        top: 0;
         right: 0;
-        transform: translateY(-50%);
+        transform: none;
         z-index: 320;
         background-color: #fff;
         width: calc(100vw - 8rem);
-        height: auto;
+        height: 100vh;
+        height: 100dvh;
         max-height: 100vh;
         max-height: 100dvh;
         border-radius: 0;
@@ -1126,8 +1127,9 @@
 
     .blog-sidebar-container .other-info-wrapper {
         width: 100%;
-        max-height: calc(100vh - 8rem);
-        max-height: calc(100dvh - 8rem);
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
         margin: 0;
         height: auto;
         padding: 1rem;
@@ -1176,11 +1178,11 @@
 
     @keyframes mobile-anchor-panel-slide-in {
         from {
-            transform: translate(100%, -50%);
+            transform: translateX(100%);
         }
 
         to {
-            transform: translate(0, -50%);
+            transform: translateX(0);
         }
     }
 }
