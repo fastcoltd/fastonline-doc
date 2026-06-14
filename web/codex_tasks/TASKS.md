@@ -123,7 +123,7 @@ description 部分，其中的内容距离卡片的间距太大了![alt text](im
 
 
 ## Task：compaign-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-166.png)如图中的 item 中，需要增加购买按钮，请参考item-all.html页面的手机版的 Horizontal 模式下的 item 的购买按钮来实现
 
