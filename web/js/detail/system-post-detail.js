@@ -18,7 +18,6 @@ function toggleMobileToc(visible) {
         return;
     }
     menuContainer.classList.toggle('is-open', visible);
-    document.body.classList.toggle('modal-open', visible);
     menuContainer.setAttribute('aria-hidden', visible ? 'false' : 'true');
     if (menuToggle) {
         menuToggle.setAttribute('aria-expanded', visible ? 'true' : 'false');
@@ -446,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 const targetSectionId = item.id;
-                // 先关闭抽屉再滚动，避免 modal-open 锁定影响滚动定位
+                // 先关闭抽屉再滚动，避免面板遮挡目标章节
                 toggleMobileToc(false);
                 window.setTimeout(function () {
                     link.scrollToSection(targetSectionId);

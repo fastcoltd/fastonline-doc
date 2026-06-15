@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         menuContainer.classList.toggle('is-open', visible);
-        document.body.classList.toggle('modal-open', visible);
         menuContainer.setAttribute('aria-hidden', visible ? 'false' : 'true');
         if (menu) {
             menu.setAttribute('aria-expanded', visible ? 'true' : 'false');

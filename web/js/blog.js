@@ -60,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       sidePanel.classList.toggle('is-open', visible);
-      document.body.classList.toggle('modal-open', visible);
       sidePanel.setAttribute('aria-hidden', visible ? 'false' : 'true');
       if (visible) {
         resetSidePanelScrollTop();
@@ -82,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       sidePanel.classList.remove('is-open');
       sidePanel.setAttribute('aria-hidden', 'false');
-      document.body.classList.remove('modal-open');
       if (sideMenuButton) {
         sideMenuButton.setAttribute('aria-expanded', 'false');
       }
