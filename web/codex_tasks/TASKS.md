@@ -18,7 +18,7 @@
 
 
 ## Task：多个页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 多个页面的手机版的 show more 按钮需要修改，以item-detail.html为例，如图![alt text](image-174.png)，现在项目中，所有的手机版的 show more 按钮都是如图的样子，需要全部统一修改（应该使用的是同一个组件，修改组件即可），请参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=813-25755&m=dev，需要撑满屏幕宽度（左右边距还是要的）
 
