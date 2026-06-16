@@ -17,151 +17,104 @@
 
 
 
-## Task：reset password 密码弹框和 signin-reset-password.html页面的手机版和 pc 版需要修改
-状态：已完成
+## Task：多个页面的手机版需要修改
+状态：未完成
 ### 任务内容
-![alt text](image-154.png)如图，重置密码弹框和重置密码页面中，如图中红框的部分，需要先展示发送验证码按钮，点击以后才展示倒计时。手机版和 pc 版都需要修改
+多个页面的手机版的 show more 按钮需要修改，以item-detail.html为例，如图![alt text](image-174.png)，现在项目中，所有的手机版的 show more 按钮都是如图的样子，需要全部统一修改（应该使用的是同一个组件，修改组件即可），请参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=813-25755&m=dev，需要撑满屏幕宽度（左右边距还是要的）
 
 
 ## Task：brand.html页面的手机版需要修改
-状态：已完成
+状态：未完成
 ### 任务内容
-这个页面的手机版，所有的 item，收藏按钮的收藏状态都要改成红色，现在不知道为什么变成了白色。修改完成后，请检查全局的收藏按钮的收藏状态颜色，都需要是红色
+Adobe-Hot Demands 部分的 item，如图![alt text](image-175.png)，BID NOW 按钮距离上面的 tag 的距离太远了。我希望修改成：最多展示 2 行 tag（tag 部分，固定能够展示两行的高度即可），BID NOW 顶部紧贴 tag 部分的底部即可（间距 10px）
 
 
-## Task：多个页面的手机版需要修改
-状态：已完成
+## Task：brand.html页面的手机版需要修改
+状态：未完成
 ### 任务内容
-esource-detail.html、fastesp-service.html、service.html，三个页面的手机版，都需要进行相同的修改：文章的正文部分，左侧需要和顶部面包屑的左侧对齐，右侧距离边框的距离需要与左侧相同
+Adobe - Hot Posts 部分的第一个 item，![alt text](image-176.png)，点击右侧的![alt text](image-177.png)，关闭后又会自动打开，我希望打开和关闭状态，可以固定住，而不是跳动。第二个和第三个 item 如图![alt text](image-178.png)，点击箭头点开和关闭，内容没有变化，我希望展开状态如图 ![alt text](image-176.png)，关闭状态如图![alt text](image-178.png)
 
 
-## Task：footer 组件的手机版和 pc 版需要修改
-状态：已完成
+## Task：brand.html页面的手机版需要修改
+状态：未完成
 ### 任务内容
-footer 中的文字（可以点击的），点击后需要跳转到对应的页面。请在项目中查找合适的页面进行跳转。尽可能每个文字都有对应的页面可以跳转（如果有，没有则保持原样即可）
+Social Accounts Hot items 部分的 item（这个 item 是全局的 item 组件，我希望修改后，全局使用这个组件的地方都修改了），需要进行修改，请参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=722-20389&m=dev
 
-
-## Task：search-all.html页面的手机版和 pc 版需要修改
-状态：已完成
-### 任务内容
-search-all.html show more 点了以后，增加一页数据。举个例子：选中 all tab，原本展示的数据是每种类型都有一条，则show more 点击以后，还是这些数据，增加一页。选择其他 tab 也是一样，比如选中 items，原本只展示 1 条数据，那么点击 show more 以后，则增加一条数据，其他 tab 以此类推
-
-
-## Task：blog.html 页面的手机版需要修改
-状态：已完成
-### 任务内容
-![alt text](image-155.png)如图，该页面的头部的部分，即如图![alt text](image-156.png)的部分，左右两侧需要和红线对齐，也就是左侧和面包屑左侧对齐，右侧距离屏幕边缘的距离要和左侧距离屏幕边缘的距离相同
-
-
-## Task：blog.html 页面的手机版需要修改
-状态：已完成
-### 任务内容
-![alt text](image-157.png)如图中的 Follow 按钮，需要修改位置，请放在与 Hot 标签水平居中的最右侧
-
-
-## Task：attribute-all.html页面的手机版需要修改
-状态：已完成
-### 任务内容
-![alt text](image-158.png)如图中的标签，现在是换行显示的，需要改成一行显示，展示不下的部分可以滚动展示
-
-
-## Task：所有列表页面的手机版和 pc 版都需要修改
-状态：已完成
-### 任务内容
-所有列表页面，都加一个没有数据的展示组件，展示在列表最后一项即可。都做成 figma 设计稿的样式：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1922-78313&m=dev
-
-
-## Task：item-all.html页面的手机版需要修改
-状态：已完成
-### 任务内容 
-Horizontal 模式下的 item，buy now 按钮，需要撑满剩余宽度，即如图![alt text](image-159.png)，buy now 按钮的右侧需要与收藏按钮的右侧在垂直方向对齐
-
-
-## Task：store-all.html页面的手机版需要修改
-状态：已完成
-### 任务内容
-Vertical 模式和 Horizontal 模式的 item，其中的文字，字体都需要参考 figma 修改，设计稿：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=622-8753&m=dev
-
-
-## Task：index.html页面的手机版和 pc 版都需要修改
-状态：已完成
-### 任务内容
-其中 Hot campaigns 和 Popular demands 中的 item，带有冒号':'的文本后面有空白占位符，我希望改成使用 css 样式来控制':'后面的空白占位符，而不是写死在 html 中
-
-
-## Task：item-detail.html页面的手机版需要修改
-状态：已完成
-### 任务内容
-顶部的图片不见了，我希望的是没有滚动时，顶部能够展示图片（如图），只有滚动到悬停时，悬停的部分不展示图片
-
-
-## Task：item-detail.html页面的手机版需要修改
-状态：已完成
-### 任务内容
-description 部分，其中的内容距离卡片的间距太大了![alt text](image-160.png)，如图，文本距离卡片边缘的间距，应该改成与 Screenshots 部分，图片距离卡片的间距一样，如图![alt text](image-161.png)
-
-
-## Task：item-detail.html页面的手机版需要修改
-状态：已完成
-### 任务内容
-需要增加一个悬浮按钮，悬浮按钮的样式和post-detail.html手机版的悬浮按钮一模一样，可以直接复用过来，只是点击后出现的页面不一样。item-detail.html页面点击悬浮按钮后，出现的界面如图https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=555-5668&m=dev，也就是 pc 端右侧的卡片里的内容
-
-
-
-## Task：store-detail.html页面的pc版需要修改
-状态：已完成
-### 任务内容
-![alt text](image-162.png)如图的部分，右上角需要加上![alt text](image-163.png)切换按钮，参考 Overview 部分实现。修改完成后，请抽取成独立的组件并替换到此处，然后检查全局的展示![alt text](image-164.png)的地方，都替换成组件。
-
-
-
-## Task：compaign-detail.html页面的手机版需要修改
-状态：已完成
-### 任务内容
-![alt text](image-165.png)如图的部分布局不对， Limited time sale标签应该在文字之后，文字最多展示 2 行，展示不下的部分显示...，优先展示标签
-
-
-
-## Task：compaign-detail.html页面的手机版需要修改
-状态：已完成
-### 任务内容
-![alt text](image-166.png)如图中的 item 中，需要增加购买按钮，请参考item-all.html页面的手机版的 Horizontal 模式下的 item 的购买按钮来实现
-
-
-
-## Task：全局的评分组件，传值确认和修改
-状态：已完成
-### 任务内容
-需要确认全局的评分组件，即例如post-detail.html中的![alt text](image-167.png)，要展示评分的时候，传的是分数吗，还是百分比。如果传递的是百分比，请改成传递分数，满分 5 分，传递分数后展示对应的分数和星星
-
-
-## Task：demand-detail.html页面的手机版需要修改
-状态：已完成
-### 任务内容
-悬停时，顶部悬停的部分如图：![alt text](image-168.png)，我希望进行修改，我希望修改后，悬停时，只展示如图的部分![alt text](image-169.png)，其余的部分隐藏掉
 
 
 ## Task：brand-all.html页面的手机版需要修改
-状态：已完成
+状态：未完成
 ### 任务内容
-其中的每个 item，现在如图![alt text](image-170.png)只占了屏幕宽度的一小部分，都需要撑满屏幕宽度
+面包屑部分需要进行微调：底部的 padding 需要增加 20px
 
 
-
-## Task：页面的pc版需要修改
-状态：已完成
+## Task：brand-all.html页面的手机版需要修改
+状态：未完成
 ### 任务内容
-Best items 中的每一个 item，其中的标题部分，即如图的部分![alt text](image-171.png)，需要进行修改。1.高度进行修改，只需要展示 1 行；2.标签 + 标题进行修改，只展示 1 行，优先展示标签，标题展示不下的部分，展示...
+左侧的字母锚点部分，需要稍微调整下位置，左侧需要和面包屑的左侧对齐
 
 
-
-## Task：多个页面的手机版需要修改
-状态：已完成
+## Task：store-all.html页面的手机版需要修改
+状态：未完成
 ### 任务内容
-多个页面的手机版本中，有悬浮按钮，举个例子，post-detail.html页面中的悬浮按钮如图![alt text](image-172.png)，悬浮按钮需要增加右边距。悬浮按钮的右边距离屏幕边缘的宽度，请调整成顶部面包屑左侧距离屏幕边缘的宽度相同。其他的有悬浮按钮的页面，也需要进行相同的修改，为悬浮按钮增加右边距。所有手机版的悬浮按钮样式是一模一样的，按照这个来查找即可，再次强调所有页面的悬浮按钮都需要修改
+Horizontal 模式下的 item，其中的 tag，现在如图![alt text](image-179.png)，需要增加到 12 个，最多展示 1 行，超出的部分展示...即可
 
 
-## Task：多个页面的手机版需要修改
-状态：已完成
+## Task：compaign-all.html页面的手机版需要修改
+状态：未完成
 ### 任务内容
-多个页面的手机版本中，有悬浮按钮，post-detail.html页面中的悬浮按钮如图![alt text](image-172.png)，悬浮按钮点击后，如果出现的是锚点页面，类似图片这种![alt text](image-173.png)，则锚点页面需要进行修改：现在的样式是其中的内容居中展示，整个锚点页面撑满了屏幕高度，我希望改成这样：不要有半透明黑色背景了，然后锚点页面出现方式还是从右边往屏幕里出现，锚点页面的高度，适配其中内容的高度（包括其中的锚点标题、关闭按钮），也就是不再撑满整个屏幕高度了，而是跟随其中要展示的内容的高度来自适应锚点页面的高度。当锚点页面的高度超过屏幕高度时，则锚点页面高度和屏幕高度相同，关闭按钮展示在最底部，其余部分内容可以滚动（目前没修过前就是这样，这种情况下请保持）。所有的点击悬浮按钮出现的锚点页面都需要进行相同的修改。请告诉我你对我需求的理解，我同意以后再开始执行
+Vertical 模式下的 item 需要改用其他组件，请使用 index.html 中的Hot campaigns 部分的组件（即如图的组件：![alt text](image-181.png)）
+
+
+## Task：index.html页面的手机版需要修改
+状态：未完成
+### 任务内容
+Popular demands 部分的 item，需要进行调整，需要在右上角增加一个收藏组件，收藏组件请复用 Best items 部分的组件中的收藏组件
+
+## Task：index.html页面的手机版需要修改
+状态：未完成
+### 任务内容
+Popular demands 部分的 item![alt text](image-182.png)如图，其中的 tag 部分，第二行的 tag，下半部分像是被裁切掉了，没有展示出来。我希望 tag 部分能够完整展示
+
+
+## Task：index.html页面的手机版需要修改
+状态：未完成
+### 任务内容
+Host posts 部分的 item组件，需要使用其他的组件，请使用 post-all.html 页面的组件。我希望替换后，index.html 页面的Host posts 部分的 item组件能够和post-all.html 页面展示得一模一样
+
+
+## Task：item-detail.html页面的手机版需要修改
+状态：未完成
+### 任务内容
+![alt text](image-184.png)如图的部分，需要参考 figma 设计稿来修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=722-21849&m=dev，主要是修改按钮高度、按钮文字的样式大小、Total price 部分的字体大小和字体样式
+
+
+## Task：item-detail.html页面的手机版需要修改
+状态：未完成
+### 任务内容
+![alt text](image-185.png)如图的部分，需要参考 figma 设计稿来修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=722-21842&m=dev，主要是修改高度和字体、图标大小
+
+
+
+## Task：compaign-detail.html页面的手机版需要修改
+状态：未完成
+### 任务内容
+这个页面中的 item 组件，右侧为什么会有滚动条？如图![alt text](image-186.png)，我希望去掉滚动条
+
+
+## Task：search-all.html页面的pc版需要修改
+状态：未完成
+### 任务内容
+两个地方需要修改，1：![alt text](image-188.png) 2.![alt text](image-189.png)，其中的标题前面的标签，需要和标题放在标题前面，和标题纵向居中对齐
+
+
+## Task：blog.html页面的手机版需要修改
+状态：未完成
+### 任务内容
+点击右侧锚点按钮后出现的页面如图：![alt text](image-190.png)，现在这个页面无法关闭，我希望在底部增加一个关闭按钮，点击以后关闭如图的页面。关闭按钮的位置和样式，请参考post-detail.html 页面的锚点页面（如图![alt text](image-191.png)）中的关闭按钮来实现
+
+### Task：index.html页面的pc版和手机版都需要进行修改
+状态：未完成
+### 任务内容
+需要完善购买流程：在已登录的情况下，点击 Best Items 的 buy now 按钮，需要进入购买流程（目前无论登录没登录，点击以后都展示登录弹框，需要修改）。购买流程如下：pc 端：![alt text](image-152.png)，手机端：![alt text](image-153.png)，pc 端是以弹框的形式呈现，手机端是以新页面的形式呈现（手机端流程走完，需要回到 index.html 页面），一下是 figmg 设计稿，请按照设计稿 1：1 还原，pc 端：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78158&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=4151-81393&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=4151-83592&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=4151-83819&m=dev；手机端：
+https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78110&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78196&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78196&m=dev。目前的情况是，已经实现了购买流程，pc 端和手机端都实现了，但是样式跟 figma 设计稿差别太大了，我希望你能够按照 figma 设计稿，来修改 pc 端和手机端的购物流程中的所有 ui
