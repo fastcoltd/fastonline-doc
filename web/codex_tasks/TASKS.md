@@ -24,7 +24,7 @@
 
 
 ## Task：brand.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 Adobe-Hot Demands 部分的 item，如图![alt text](image-175.png)，BID NOW 按钮距离上面的 tag 的距离太远了。我希望修改成：最多展示 2 行 tag（tag 部分，固定能够展示两行的高度即可），BID NOW 顶部紧贴 tag 部分的底部即可（间距 10px）
 
