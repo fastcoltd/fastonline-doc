@@ -102,7 +102,7 @@ Host posts 部分的 item组件，需要使用其他的组件，请使用 post-a
 
 
 ## Task：search-all.html页面的pc版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 两个地方需要修改，1：![alt text](image-188.png) 2.![alt text](image-189.png)，其中的标题前面的标签，需要和标题放在标题前面，和标题纵向居中对齐
 
