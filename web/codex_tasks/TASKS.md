@@ -123,6 +123,9 @@ https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78
 
 ### Task：全局组件确认
 状态：未完成
+### 范围说明
+本任务 PC 端和手机端都需要修改，目的是全局统一组件。
+
 ### 任务内容
 我现在有一个需求：全局的同类型的 item，需要使用同一个组件，总共有 5 种组件：商品，campaign ， 店铺，posts，demands 五种类型。商品就是 index.html 中 Best items 对应的 item，还有item-all.html 页面的 Horizontal 模式的 item；店铺就是 index.html 中 Best stores 中的 item，还有store-all.html 中 Horizontal 模式的 item；campaign 就是 index.html 中 Hot campaigns 中的 item，还有compaign-all.html 页面中 Horizontal 模式下的 item；posts 就是 index.html 中 Host posts 的 item（只有一种）；demands 就是 index.html 中 Popular demands 中的 item，还有demand-all.html 中 Horizontal 模式的 item。清楚分类后，我再举个例子帮你理解我的需求，index.html 的 Best items 中的 item，需要复用到item-all.html 页面中的 Vertical 模式中（最终展示效果需要一模一样），而 Horizontal 模式需要是另一种组件。而 Horizontal 模式的组件，项目中也有很多地方使用到了，比如compaign-detail.html中，嵌入的商品（item），也需要使用item-all.html 页面中 Horizontal 模式的组件。以此类推。我希望项目中，同一个类型的组件，全局只有一份，所有地方，只要是同类型的样式，都复用同一份组件。
 
