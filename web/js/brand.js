@@ -46,12 +46,16 @@ $(document).ready(function () {
         }
     }
     $('.faq-header-title').on('click', function () {
-        $(this).parents('.faq-itme').find('.faq-header-arrow-icon').toggleClass('open')
-        $(this).parents('.faq-item').find('.faq-content').toggle(100)
+        var $item = $(this).parents('.faq-item');
+        $item.find('.faq-header-arrow-icon').toggleClass('open');
+        $item.find('.faq-content').toggle(100);
+        $item.toggleClass('brand-faq-item-expanded');
     })
     $('.faq-header-arrow-icon').on('click', e => {
-        $(e.target).toggleClass('open')
-        $(e.target).parents('.faq-item').find('.faq-content').toggle(100)
+        var $item = $(e.target).parents('.faq-item');
+        $(e.target).toggleClass('open');
+        $item.find('.faq-content').toggle(100);
+        $item.toggleClass('brand-faq-item-expanded');
     })
     $('.resource-action-like-icon, .icon-is-dianzan').on('click', function () {
         $(this).parent('.resource-action-group').toggleClass('has-activate')
