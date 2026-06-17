@@ -117,3 +117,13 @@ Host posts 部分的 item组件，需要使用其他的组件，请使用 post-a
 ### 任务内容
 需要完善购买流程：在已登录的情况下，点击 Best Items 的 buy now 按钮，需要进入购买流程（目前无论登录没登录，点击以后都展示登录弹框，需要修改）。购买流程如下：pc 端：![alt text](image-152.png)，手机端：![alt text](image-153.png)，pc 端是以弹框的形式呈现，手机端是以新页面的形式呈现（手机端流程走完，需要回到 index.html 页面），一下是 figmg 设计稿，请按照设计稿 1：1 还原，pc 端：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78158&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=4151-81393&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=4151-83592&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=4151-83819&m=dev；手机端：
 https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78110&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78196&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78242&m=dev。目前的情况是，已经实现了购买流程，pc 端和手机端都实现了，但是样式跟 figma 设计稿差别太大了，我希望你能够按照 figma 设计稿，来修改 pc 端和手机端的购物流程中的所有 ui
+
+
+
+
+### Task：全局组件确认
+状态：未完成
+### 任务内容
+我现在有一个需求：全局的同类型的 item，需要使用同一个组件，总共有 5 种组件：商品，campaign ， 店铺，posts，demands 五种类型。商品就是 index.html 中 Best items 对应的 item，还有item-all.html 页面的 Horizontal 模式的 item；店铺就是 index.html 中 Best stores 中的 item，还有store-all.html 中 Horizontal 模式的 item；campaign 就是 index.html 中 Hot campaigns 中的 item，还有compaign-all.html 页面中 Horizontal 模式下的 item；posts 就是 index.html 中 Host posts 的 item（只有一种）；demands 就是 index.html 中 Popular demands 中的 item，还有demand-all.html 中 Horizontal 模式的 item。清楚分类后，我再举个例子帮你理解我的需求，index.html 的 Best items 中的 item，需要复用到item-all.html 页面中的 Vertical 模式中（最终展示效果需要一模一样），而 Horizontal 模式需要是另一种组件。而 Horizontal 模式的组件，项目中也有很多地方使用到了，比如compaign-detail.html中，嵌入的商品（item），也需要使用item-all.html 页面中 Horizontal 模式的组件。以此类推。我希望项目中，同一个类型的组件，全局只有一份，所有地方，只要是同类型的样式，都复用同一份组件。
+
+接下来我希望你帮我分析目前项目中各个页面中各个类型组件的使用情况，是否已经使用了相同的组件，如果不是，哪些地方不是，需要列举出来。如果要改成相同的组件，有多少地方要修改，给出详细的修改计划和影响范围
