@@ -61,7 +61,7 @@ Horizontal 模式下的 item，其中的 tag，现在如图![alt text](image-179
 
 
 ## Task：compaign-all.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 Vertical 模式下的 item 需要改用其他组件，请使用 index.html 中的Hot campaigns 部分的组件（即如图的组件：![alt text](image-181.png)）
 
