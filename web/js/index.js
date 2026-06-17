@@ -214,9 +214,6 @@ window.addEventListener('DOMContentLoaded', function () {
             if (nextButton) {
                 const nextStep = nextButton.dataset.purchaseNext;
                 setStep(nextStep);
-                if (nextStep === 'success' && window.innerWidth <= 768) {
-                    window.setTimeout(closePurchaseFlow, 1200);
-                }
                 return;
             }
             const prevButton = event.target.closest('[data-purchase-prev]');
