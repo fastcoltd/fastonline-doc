@@ -96,7 +96,7 @@ Host posts 部分的 item组件，需要使用其他的组件，请使用 post-a
 
 
 ## Task：compaign-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 这个页面中的 item 组件，右侧为什么会有滚动条？如图![alt text](image-186.png)，我希望去掉滚动条
 
