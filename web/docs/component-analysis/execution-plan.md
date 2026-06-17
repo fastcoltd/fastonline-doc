@@ -288,7 +288,85 @@ Demands Horizontal (demand-all): src/partials/components/demand-all-figma-item.h
 
 ### E 类：参数化硬编码数据（SEO 必须）
 
-见表 E（另附）。
+> 备注：A2/A5 替换后 `tag-all-mobile-horizontal-item.html` 不再被引用，其参数化（E-4）可跳过。
+
+#### E-1：item-card-vertical.html — 价格和库存参数化
+
+**文件：** `src/partials/components/item-card-vertical.html`
+**改什么：** `$325.00` → `{{item_price}}`，`52` → `{{item_stock}}`
+**影响页面：** item-all.html、tag-all.html、index.html（通过 index-best-items-section.html）、brand.html（通过 brand-hot-item-card.html）、item-detail.html、store-detail.html、post-detail.html、system-post-detail.html、brand-service.html、attribute-all.html
+**风险：** 低（纯值替换，DOM/CSS 不变）
+
+#### E-2：item-all-horizontal-item.html — 价格和库存参数化
+
+**文件：** `src/partials/components/item-all-horizontal-item.html`
+**改什么：** `$325.00` → `{{item_price}}`，`52` → `{{item_stock}}`
+**影响文件：** item-all-horizontal-item-responsive.html（需传递新参数）
+
+#### E-3：item-all-horizontal-mobile-item.html — 价格和库存参数化
+
+**文件：** `src/partials/components/item-all-horizontal-mobile-item.html`
+**改什么：** `$325.00` → `{{item_price}}`，`52` → `{{item_stock}}`
+**影响文件：** item-all-horizontal-item-responsive.html（需传递新参数）
+
+#### E-4：tag-all-mobile-horizontal-item.html — 价格和库存（如保留则参数化）
+
+**文件：** `src/partials/components/tag-all-mobile-horizontal-item.html`
+**说明：** A2/A5 替换后此文件不再被引用，可跳过参数化，直接等待删除。
+
+#### E-5：store-all-horizontal-item.html — 完全参数化
+
+**文件：** `src/partials/components/store-all-horizontal-item.html`
+**改什么（10项）：**
+
+| 当前硬编码 | 替换为 |
+|-----------|--------|
+| `image/figma-best-store-avatar.png` | `{{store_avatar}}` |
+| `Store name` | `{{store_name}}` |
+| `Connecting Ideas...` | `{{store_subtitle}}` |
+| 评分 `5.0/(62)` | 通过 rating-with-count 参数传递 |
+| 描述文本 | `{{store_description}}` |
+| `Quora` | `{{brand_name}}` |
+| `Cloud Service` | `{{service_name}}` |
+| 7个硬编码标签 | `{{item_tags}}` |
+| `store-detail.html?name=store-name` | `{{store_link}}` |
+
+**影响文件：** store-all-horizontal-item-responsive.html、store-all.html、tag-all.html
+
+#### E-6：best-store-item.html — 完全参数化
+
+**文件：** `src/partials/components/best-store-item.html`
+**改什么：** 同 E-5 模式，额外包括 `brand_color` 参数
+**影响文件：** index-best-store-item.html、index-best-store-item-liked.html、store-all-vertical-item-responsive.html、index.html
+
+#### E-7：store-all-horizontal-mobile-item.html — 完全参数化
+
+**文件：** `src/partials/components/store-all-horizontal-mobile-item.html`
+**改什么：** 13项替换，包括 avatar、AD标记、店名、描述、评分、品牌、服务、12个标签
+**影响文件：** store-all-horizontal-item-responsive.html
+
+#### E-8：store-all-vertical-mobile-item.html — 完全参数化
+
+**文件：** `src/partials/components/store-all-vertical-mobile-item.html`
+**改什么：** 同 E-6 模式
+**影响文件：** store-all-vertical-item-responsive.html
+
+#### E-9/E-10：demand mobile 组件标签参数化
+
+**文件：** `demand-all-horizontal-mobile-item.html`、`demand-all-vertical-mobile-item.html`
+**改什么：** 硬编码标签 → `{{tags_html}}`，硬编码 bidder → `{{bidders_html}}`
+
+#### E-11：Campaign 参数名统一 item_tags_block → item_tags
+
+**文件：** `src/partials/components/hot-compaign-item.html`
+**改什么：** `{{item_tags_block}}` → `<div class="item-tag-box">{{item_tags}}</div>`
+**影响文件：** index-hot-compaign-item.html、compaign-all-vertical-item.html、index.html、compaign-all.html
+**风险：** 中高（DOM 结构微调，需确认 CSS 兼容）
+
+#### E-12：Cover 图片参数化
+
+**文件：** `item-card-vertical.html`、`item-all-horizontal-item.html`、`item-all-horizontal-mobile-item.html`
+**改什么：** 硬编码封面图 `src="image/best-item-cover.png"` → `{{cover_image}}`
 
 ---
 
@@ -300,9 +378,12 @@ Demands Horizontal (demand-all): src/partials/components/demand-all-figma-item.h
 第 3 步：A1（index 店铺 Vertical → responsive）— 12 处替换，影响面最大
 第 4 步：A2（tag-all 商品 Horizontal → responsive）— 需配合 B1 组件改造
 第 5 步：A5（attribute-all 商品 Horizontal → responsive）
-第 6 步：C1（blog Posts 统一）— 需决策
-第 7 步：D 类（死代码清理）
-第 8 步：E 类（参数化硬编码）
+第 6 步：E-5~E-8（店铺组件参数化）— A1/A3/A4 替换后执行
+第 7 步：E-1~E-3（商品组件参数化）— 价格/库存参数化
+第 8 步：E-11（Campaign 参数名统一）
+第 9 步：C1（blog Posts 统一）— 需决策
+第 10 步：D 类（死代码清理）— 删除不再被引用的文件
+第 11 步：E-12（Cover 图片参数化）
 ```
 
 ---
