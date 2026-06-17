@@ -90,10 +90,9 @@ Host posts 部分的 item组件，需要使用其他的组件，请使用 post-a
 
 
 ## Task：item-detail.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-185.png)如图的部分，需要参考 figma 设计稿来修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=722-21842&m=dev，主要是修改高度和字体、图标大小
-
 
 
 ## Task：compaign-detail.html页面的手机版需要修改
