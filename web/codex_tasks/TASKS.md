@@ -25,7 +25,7 @@
 
 
 ## Task：index.html页面中，购物流程的 pc 版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-192.png)如图是实际运行的效果，其中![alt text](image-193.png)的颜色，需要参考设计稿修改：figma：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78183&m=dev
 
