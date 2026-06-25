@@ -94,3 +94,46 @@
 ### 任务内容
 ![alt text](image-210.png)如图的部分，![alt text](image-211.png)和![alt text](image-212.png)需要调换位置，即修改后，模式切换组件和筛选按钮在同一行纵向居中对齐。修改完成后，需要修改模式切换组件的宽度，需要撑满剩余宽度
 
+
+
+## Task：resource-detail.html的手机版需要修改
+状态：未完成
+### 任务内容
+![alt text](image-213.png)如图的部分，不能换行，需要在同一行显示
+
+
+
+## Task：resource-detail.html的手机版和 pc 版需要修改
+状态：未完成
+### 任务内容
+![alt text](image-214.png)如图的部分，pc 和手机版都需要修改，，点击以后需要有选中和取消选中效果，参考 item-detail.html 页面的 Reviews 部分的![alt text](image-215.png)来做，直接拷贝过来就行
+
+
+## Task：brand-all.html的 pc 版需要修改
+状态：未完成
+### 任务内容
+左侧的锚点组件部分，如图![alt text](image-216.png)，在页面滚动到最底部时，因为 footer 的出现，锚点组件被挤压，如图![alt text](image-217.png)，我希望footer 的出现不要挤压锚点组件，而是让锚点组件顺势往上滚动，即使顶部滚动到看不见也没关系
+
+
+## Task：brand-all.html的手机版需要修改
+状态：未完成
+### 任务内容
+![alt text](image-218.png)，锚点组件，需要铺满整个可用高度，即等比例占满整个高度
+
+
+## Task：header 组件的登录后的样式， pc 版需要修改
+状态：未完成
+### 任务内容
+登录成功后，右上角会有这么个图标![alt text](image-219.png)，我希望把这个图标去掉，其他内容的布局不要发生改变，仅仅是去掉这个图标。因为 header 是通用组件，我希望修改后，整个项目中的 header 都是修改后的效果
+
+
+## Task：header 组件的登录后的样式， pc 版需要修改
+状态：未完成
+### 任务内容
+登录成功后，点击最右上角的![alt text](image-221.png)会出现如图![alt text](image-220.png)的浮窗，这个浮窗顶部需要修改：需要在![alt text](image-223.png)之下，增加如图的内容![alt text](image-222.png)，字体和图标需要和邮箱字体一致。其中所需要的图片，可以从手机版本登录后点击头像跳转的页面中获取
+
+
+
+
+
+
