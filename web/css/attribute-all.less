@@ -316,19 +316,53 @@
     }
 
     .attribute-header-function-box {
-        display: flex;
-        flex-direction: column;
-        margin: 0.667rem 0 -2rem;
+        display: grid;
+        grid-template-columns: 1fr auto;
         gap: 0.625rem;
+        margin: 0.667rem 0 -2rem;
+    }
+
+    .attribute-header-function-box .page-header-function-control-box {
+        display: contents;
     }
 
     .attribute-header-function-box .page-filter-layoutcontrol-box {
+        grid-column: 1 / -1;
         padding-top: 0;
         gap: 0;
+        width: auto;
     }
 
     .attribute-header-function-box .page-sort-box {
+        grid-column: 2;
+        grid-row: 2;
         padding: 0;
+    }
+
+    .attribute-header-function-box>.layout-controls-box {
+        display: flex;
+        height: 5rem;
+        border: 0.125rem solid #c5c5c5;
+        border-radius: 2.5rem;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .attribute-header-function-box>.layout-controls-box .layout-switch {
+        flex: 1;
+        height: 5rem;
+        padding: 1.25rem 1rem 1rem;
+        font-family: 'Inter', var(--primary-popfont);
+        font-size: 1.875rem;
+        line-height: 2.625rem;
+        font-weight: 500;
+        color: #000;
+        text-align: center;
+    }
+
+    .attribute-header-function-box>.layout-controls-box .layout-switch:first-child,
+    .attribute-header-function-box>.layout-controls-box .layout-switch:last-child {
+        width: auto;
     }
 
     #best-items-item .layout-horizontal .items-pager {
