@@ -206,52 +206,67 @@
   .page-content.item-all-filter-design #demand-item .items-container[data-layout=vertical] .demand-all-figma-item {
     width: 50%;
   }
-  .attribute-header-function-box .page-header-function-control-box {
-    order: 1;
-    display: flex;
+  .attribute-header-function-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: 1rem;
+    column-gap: 1rem;
+  }
+  .attribute-header-function-box .page-header-function-control-box {
+    display: contents;
   }
   .attribute-header-function-box .page-header-function-control-box .page-filter-layoutcontrol-box {
-    flex: 1;
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    align-self: center;
   }
   .attribute-header-function-box .page-filter-layoutcontrol-box {
     width: auto;
   }
   .attribute-header-function-box > .layout-controls-box {
-    order: 2;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
     display: flex;
-    flex: 1;
-    height: 5rem;
+    flex: 0 0 40.25rem;
+    width: 40.25rem;
+    height: 4.75rem;
     border: 0.125rem solid #c5c5c5;
-    border-radius: 2.5rem;
+    border-radius: 2.375rem;
     overflow: hidden;
     background: #fff;
   }
   .attribute-header-function-box > .layout-controls-box .layout-switch {
-    flex: 1;
-    height: 5rem;
-    padding: 1.25rem 1rem 1rem;
+    flex: 0 0 auto;
+    height: 4.75rem;
+    padding: 0 2rem;
     font-family: 'Inter', var(--primary-popfont);
-    font-size: 1.875rem;
-    line-height: 2.625rem;
-    font-weight: 500;
+    font-size: 1.75rem;
+    line-height: 2.5rem;
+    font-weight: 600;
     color: #000;
     text-align: center;
   }
-  .attribute-header-function-box > .layout-controls-box .layout-switch:first-child,
+  .attribute-header-function-box > .layout-controls-box .layout-switch:first-child {
+    width: 17.5rem;
+  }
   .attribute-header-function-box > .layout-controls-box .layout-switch:last-child {
-    width: auto;
+    width: 22.75rem;
   }
   .attribute-header-function-box > .layout-controls-box .layout-switch.active {
-    border-radius: 2.5rem;
+    border-radius: 2.375rem;
     color: #fff;
   }
   .attribute-header-function-box .page-filterresult-box {
     white-space: nowrap;
   }
   .attribute-header-function-box .page-sort-box {
-    padding-left: 0;
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+    height: 4.75rem;
+    padding: 0;
   }
 }
 @media screen and (max-width: 768px) {
