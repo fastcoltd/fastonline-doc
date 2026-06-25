@@ -48,7 +48,7 @@
 
 
 ## Task：index.html页面中，购物流程的 手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-198.png)如图是实际运行的效果，其中的view 按钮和 download 按钮的样式，需要参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78262&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78263&m=dev
 
