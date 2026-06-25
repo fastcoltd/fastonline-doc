@@ -309,6 +309,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
         function bindImagePreview() {
             purchaseMask.addEventListener('click', function (event) {
+                if (event.target.closest('.index-purchase-upload-remove')) return;
                 var previewEl = event.target.closest('.index-purchase-upload-preview');
                 if (!previewEl) return;
                 if (previewEl.classList.contains('index-purchase-upload-file-preview')) return;
