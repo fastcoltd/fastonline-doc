@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="title" content="FastResp">
+    </meta>
+    <meta name="description" content="快速响应，合作共赢">
+    </meta>
+    <meta name="keywords" content="快速 响应">
+    </meta>
+    <title>FAQ List</title>
+    <link rel="icon" href="image/logo.jpg" type="image/x-icon" />
+    <link rel="stylesheet" href="css/iconfont.css">
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/page.css" />
+    <link rel="stylesheet" href="css/notch-support.css" />
+    <link rel="stylesheet" href="css/filter.css" />
+    <link rel="stylesheet" href="css/signin.css" />
+    <link rel="stylesheet" href="css/faq.css" />
+</head>
+
+<body class="faq-list-page">
+    <div class="page-top-sticky page-top-sticky-main">
+        <!-- header -->
+        <!-- @include ../partials/components/site-header.html -->
+        <!-- header search for mobile -->
+        <!-- @include ../partials/components/header-search-mobile.html -->
+        <!-- menu -->
+        <!-- @include ../partials/components/top-menu.html -->
+    </div>
+    <main class="faq-detail-main">
+        <div class="faq-detail-article">
+            <div class="layout-horizontal items-container">
+                <div class="items-pager items-pager-flex-start" id="faq-list-grid">
+                    <!-- @include ../partials/components/brand-faq-item.html {"faq_item_class":"brand-faq-item-expanded","faq_content_style":"display: block;","faq_icon_src":"image/brand-adobe-icon.png","faq_brand_style":"color: #1E9FDB; border: #1E9FDB solid 0.125rem;","faq_brand":"Payment Problems","faq_title":"How do I reset my password?","faq_content":"We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their produc and see more， We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their produc","faq_detail_link":"faq-detail.html?id=123","like_active_class":"has-activate","unlike_active_class":"has-activate","like_count":"20","unlike_count":"10","follow_icon_src":"image/follow-active-count.png","follow_count":"saved"} -->
+                    <!-- @include ../partials/components/brand-faq-item.html {"faq_item_class":"","faq_content_style":"display: none;","faq_icon_src":"image/brand-adobe-icon.png","faq_brand_style":"color: #1E9FDB; border: #1E9FDB solid 0.125rem;","faq_brand":"Payment Problems","faq_title":"How do I reset my password?","faq_content":"We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their produc and see more， We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their produc","faq_detail_link":"faq-detail.html?id=123","like_active_class":"has-activate","unlike_active_class":"has-activate","like_count":"20","unlike_count":"10","follow_icon_src":"image/follow-active-count.png","follow_count":"saved"} -->
+                    <!-- @include ../partials/components/brand-faq-item.html {"faq_item_class":"","faq_content_style":"display: none;","faq_icon_src":"image/brand-adobe-icon.png","faq_brand_style":"color: #1E9FDB; border: #1E9FDB solid 0.125rem;","faq_brand":"Payment Problems","faq_title":"How do I reset my password?","faq_content":"We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their produc and see more， We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their produc","faq_detail_link":"faq-detail.html?id=123","like_active_class":"has-activate","unlike_active_class":"has-activate","like_count":"20","unlike_count":"10","follow_icon_src":"image/follow-active-count.png","follow_count":"saved"} -->
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- footer -->
+    <!-- @include ../partials/components/site-footer.html -->
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/user.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/homemenu.js"></script>
+    <script>
+        $(function () {
+            $('.resource-action-like-icon').on('click', function () {
+                $(this).parent('.resource-action-group').toggleClass('has-activate');
+                $(this).closest('.faq-actions').find('.resource-action-unlike').removeClass('has-activate');
+            });
+            $('.resource-action-unlike-icon').on('click', function () {
+                $(this).parent('.resource-action-group').toggleClass('has-activate');
+                $(this).closest('.faq-actions').find('.resource-action-like').removeClass('has-activate');
+            });
+            $('#faq-list-grid').on('click', '.faq-header', function () {
+                var $item = $(this).closest('.faq-item');
+                var $content = $item.find('.faq-content');
+                var $arrow = $item.find('.faq-header-arrow-icon');
+                $content.slideToggle(200);
+                $arrow.toggleClass('open');
+            });
+        });
+    </script>
+</body>
+
+</html>
