@@ -73,15 +73,8 @@ document.addEventListener('DOMContentLoaded', function () {
         menuContainer.setAttribute('aria-hidden', 'false');
     }
 
-    $('.helpful-section-wrapper .resource-action-like-icon, .helpful-section-wrapper .resource-action-like .resource-action-label').on('click', function () {
-        const wrapper = $(this).closest('.helpful-section-wrapper')
-        wrapper.find('.resource-action-like').addClass('has-activate')
-        wrapper.find('.resource-action-unlike').removeClass('has-activate')
-    })
-    $('.helpful-section-wrapper .resource-action-unlike-icon, .helpful-section-wrapper .resource-action-unlike .resource-action-label').on('click', function () {
-        const wrapper = $(this).closest('.helpful-section-wrapper')
-        wrapper.find('.resource-action-unlike').addClass('has-activate')
-        wrapper.find('.resource-action-like').removeClass('has-activate')
+    $('.helpful-section-wrapper .resource-action-group').on('click', function () {
+        $(this).toggleClass('has-activate')
     })
 });
 

@@ -104,7 +104,7 @@
 
 
 ## Task：resource-detail.html的手机版和 pc 版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-214.png)如图的部分，pc 和手机版都需要修改，，点击以后需要有选中和取消选中效果，参考 item-detail.html 页面的 Reviews 部分的![alt text](image-215.png)来做，直接拷贝过来就行
 
