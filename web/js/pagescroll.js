@@ -47,6 +47,19 @@ function adjustFilterPosition() {
     const headIsSticky = stickyHeader.classList.contains('is-sticky');
     if (!pageFix) return;
     if (isBrandPageIndexBox) {
+        const isMobileViewport = body.offsetWidth < 768;
+        if (!isMobileViewport) {
+            Object.assign(pageFix.style, {
+                position: '',
+                left: '',
+                transform: '',
+                top: '',
+                height: '',
+                maxHeight: '',
+                overflowY: ''
+            });
+            return;
+        }
         const headerElement = document.querySelector('.page-head header');
         const topMenuElement = document.querySelector('.page-head .top-menu-container');
         const footerElement = document.querySelector('footer.common-footer-wrapper') || footer;
@@ -54,19 +67,11 @@ function adjustFilterPosition() {
         const topMenuHeightCurrent = topMenuElement ? topMenuElement.offsetHeight : 0;
         const pageContentRect = pageContent ? pageContent.getBoundingClientRect() : null;
         const baseTop = headerHeightCurrent + topMenuHeightCurrent;
-        const isMobileViewport = body.offsetWidth < 768;
         const contentTop = pageContentRect ? pageContentRect.top : baseTop;
         const fixedTop = Math.max(baseTop, contentTop);
         let anchorHeight = 0;
-        if (isMobileViewport) {
-            const footerHeightCurrent = footerElement ? footerElement.offsetHeight : 0;
-            anchorHeight = Math.max(window.innerHeight - fixedTop - footerHeightCurrent, 0);
-        } else {
-            const footerTopInViewport = footerElement ? footerElement.getBoundingClientRect().top : window.innerHeight;
-            const visibleBottom = Math.min(window.innerHeight, footerTopInViewport);
-            // PC 端只有在 footer 进入视口时才缩短高度，避免默认态纵向压缩
-            anchorHeight = Math.max(visibleBottom - fixedTop, 0);
-        }
+        const footerHeightCurrent = footerElement ? footerElement.offsetHeight : 0;
+        anchorHeight = Math.max(window.innerHeight - fixedTop - footerHeightCurrent, 0);
         Object.assign(pageFix.style, {
             position: 'fixed',
             left: pageContentRect ? `${pageContentRect.left}px` : '',

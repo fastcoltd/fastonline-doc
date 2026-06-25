@@ -92,7 +92,10 @@ LinkRef.prototype.updateNavigation = function (activeSectionId) {
     this.pageIndexs.forEach(function (item) {
         if (item.id === activeSectionId) {
             item.classList.add('active');
-            item.scrollIntoView({behavior: "smooth", block: "nearest"});
+            const isDesktopBrandIndex = item.closest('.brand-page-index-box') && window.innerWidth >= 769;
+            if (!isDesktopBrandIndex) {
+                item.scrollIntoView({behavior: "smooth", block: "nearest"});
+            }
         } else {
             item.classList.remove('active');
         }
