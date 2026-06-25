@@ -72,7 +72,7 @@
 
 
 ## Task：compaign-detail.html的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 其中的如图的部分![alt text](image-203.png)和![alt text](image-204.png)，两个 item组件，其中的 BUY NOW 按钮，右侧需要和收藏组件的右侧对齐
 
