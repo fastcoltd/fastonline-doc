@@ -169,7 +169,7 @@ window.addEventListener('DOMContentLoaded', function () {
         }
 
         function openPurchaseFlow() {
-            setStep(window.innerWidth <= 768 ? 'requirements' : 'product');
+            setStep('product');
             purchaseMask.style.display = 'flex';
             purchaseMask.setAttribute('aria-hidden', 'false');
             document.body.classList.add('index-purchase-open');
