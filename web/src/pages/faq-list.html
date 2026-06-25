@@ -76,13 +76,15 @@
 
             $('#load-more').on('click', function () {
                 var $btn = $(this);
-                if ($btn.hasClass('loading')) return;
-                $btn.addClass('loading');
-                $.get('/api/faq-list', function (data) {
-                    $btn.removeClass('loading');
-                }).fail(function () {
-                    $btn.removeClass('loading');
-                });
+                var $loading = $btn.find('.loading');
+                var $text = $btn.find('.load-more-text');
+                if ($loading.is(':visible')) return;
+                $loading.show();
+                $text.hide();
+                setTimeout(function () {
+                    $loading.hide();
+                    $text.show();
+                }, 1500);
             });
         });
     </script>
