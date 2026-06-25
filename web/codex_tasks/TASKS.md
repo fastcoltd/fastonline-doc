@@ -140,7 +140,7 @@ Best items 中第三个 item 的 Buy Now 按钮，需要展示成可以点击的
 
 
 ## Task：faq-detail.html 的pc版需要修改 
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-226.png)，如图，header 部分，位置不对，从页面的最左侧开始展示了，应该和其他页面一样，参考 index.html 页面的 header 修改。另外我想问下，这难道用的不是全局的 header 组件吗？按理说需要和 index.html 中用的是相同的 header 组件，位置、内容所有细节，应该和 index.html 中是完全一样的
 
