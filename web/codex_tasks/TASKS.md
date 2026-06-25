@@ -30,13 +30,13 @@
 
 
 ## Task：index.html页面中，购物流程的 pc 版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-192.png)如图是实际运行的效果，其中Accept & Buy按钮的宽度，需要根据 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78195&m=dev
 
 
 ## Task：index.html页面中，购物流程的 pc 版需要修改
-状态：已完成
+状态：未完成
 ### 任务内容
 ![alt text](image-195.png)如图是实际运行的效果，其中![alt text](image-196.png)需要参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=4151-81329&m=dev
 
