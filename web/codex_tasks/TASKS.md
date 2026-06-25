@@ -78,7 +78,7 @@
 
 
 ## Task：demand-all.html的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 这个页面，Vertical 模式和 Horizontal 模式的 item，即如图![alt text](image-205.png)和![alt text](image-206.png)，其中的字体都需要放大，参考index.html 中 Popular demands 的 item 的字体进行修改
 
