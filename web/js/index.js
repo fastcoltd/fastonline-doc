@@ -241,6 +241,103 @@ window.addEventListener('DOMContentLoaded', function () {
                 syncQuantity(input.value);
             });
         });
+        var fileDataMap = {};
+
+        function bindUpload() {
+            var uploadInputs = purchaseMask.querySelectorAll('.index-purchase-upload-input');
+            uploadInputs.forEach(function (input) {
+                input.addEventListener('change', function (event) {
+                    var files = Array.from(event.target.files || []);
+                    var container = input.closest('.index-purchase-upload');
+                    var previewsEl = container.querySelector('.index-purchase-upload-previews');
+                    files.forEach(function (file) {
+                        var id = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                        fileDataMap[id] = file;
+                        var previewEl = document.createElement('div');
+                        previewEl.className = 'index-purchase-upload-preview';
+                        previewEl.dataset.fileId = id;
+                        var removeBtn = document.createElement('button');
+                        removeBtn.className = 'index-purchase-upload-remove';
+                        removeBtn.type = 'button';
+                        removeBtn.textContent = '×';
+                        previewEl.appendChild(removeBtn);
+                        if (file.type.startsWith('image/')) {
+                            var reader = new FileReader();
+                            reader.onload = function (e) {
+                                var img = document.createElement('img');
+                                img.src = e.target.result;
+                                img.alt = file.name;
+                                previewEl.appendChild(img);
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            previewEl.classList.add('index-purchase-upload-file-preview');
+                            var icon = document.createElement('span');
+                            icon.className = 'index-purchase-upload-file-icon';
+                            icon.textContent = '📄';
+                            var name = document.createElement('span');
+                            name.className = 'index-purchase-upload-file-name';
+                            name.textContent = file.name;
+                            previewEl.appendChild(icon);
+                            previewEl.appendChild(name);
+                        }
+                        previewsEl.appendChild(previewEl);
+                    });
+                    if (previewsEl.children.length > 0) {
+                        container.classList.add('has-files');
+                    }
+                    input.value = '';
+                });
+            });
+        }
+
+        function bindUploadRemove() {
+            purchaseMask.addEventListener('click', function (event) {
+                var removeBtn = event.target.closest('.index-purchase-upload-remove');
+                if (!removeBtn) return;
+                event.stopPropagation();
+                var previewEl = removeBtn.closest('.index-purchase-upload-preview');
+                var container = previewEl.closest('.index-purchase-upload');
+                var previewsEl = container.querySelector('.index-purchase-upload-previews');
+                delete fileDataMap[previewEl.dataset.fileId];
+                previewEl.remove();
+                if (previewsEl.children.length === 0) {
+                    container.classList.remove('has-files');
+                }
+            });
+        }
+
+        function bindImagePreview() {
+            purchaseMask.addEventListener('click', function (event) {
+                var previewEl = event.target.closest('.index-purchase-upload-preview');
+                if (!previewEl) return;
+                if (previewEl.classList.contains('index-purchase-upload-file-preview')) return;
+                event.preventDefault();
+                event.stopPropagation();
+                var img = previewEl.querySelector('img');
+                if (!img) return;
+                var modal = document.getElementById('index-purchase-image-modal');
+                if (modal) {
+                    modal.querySelector('.index-purchase-image-modal-img').src = img.src;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+            });
+            var imageModal = document.getElementById('index-purchase-image-modal');
+            if (imageModal) {
+                imageModal.addEventListener('click', function (event) {
+                    if (event.target === imageModal || event.target.closest('.index-purchase-image-modal-close')) {
+                        imageModal.classList.remove('is-open');
+                        imageModal.setAttribute('aria-hidden', 'true');
+                        imageModal.querySelector('.index-purchase-image-modal-img').src = '';
+                    }
+                });
+            }
+        }
+
+        bindUpload();
+        bindUploadRemove();
+        bindImagePreview();
         syncQuantity(1);
     }
 
