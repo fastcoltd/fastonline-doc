@@ -97,7 +97,7 @@
 
 
 ## Task：resource-detail.html的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-213.png)如图的部分，不能换行，需要在同一行显示
 
