@@ -62,10 +62,12 @@
                 <h2 class="faq-detail-helpful-title" id="faq-detail-helpful-title">Was this page helpful?</h2>
                 <div class="faq-actions faq-detail-helpful-actions">
                     <div class="resource-action-group resource-action-like">
+                        <i class="iconfont icon-dianzan"></i>
                         <img src="image/like-count.png" class="resource-action-icon resource-action-like-icon cursor-pointer" alt="Helpful" />
                         <span class="resource-action-count">108</span>
                     </div>
                     <div class="resource-action-group resource-action-unlike">
+                        <i class="iconfont icon-dianzan icon-not-dianzan"></i>
                         <img src="image/unlike-count.png" class="resource-action-icon resource-action-unlike-icon cursor-pointer" alt="Not helpful" />
                         <span class="resource-action-count">41</span>
                     </div>
@@ -216,6 +218,18 @@
     <script src="js/login.js"></script>
     <script src="js/common.js"></script>
     <script src="js/homemenu.js"></script>
+    <script>
+        $(function () {
+            $('.resource-action-like-icon').on('click', function () {
+                $(this).parent('.resource-action-group').toggleClass('has-activate');
+                $(this).closest('.faq-actions').find('.resource-action-unlike').removeClass('has-activate');
+            });
+            $('.resource-action-unlike-icon').on('click', function () {
+                $(this).parent('.resource-action-group').toggleClass('has-activate');
+                $(this).closest('.faq-actions').find('.resource-action-like').removeClass('has-activate');
+            });
+        });
+    </script>
 </body>
 
 </html>
