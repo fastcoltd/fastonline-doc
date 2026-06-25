@@ -261,28 +261,38 @@
     z-index: 48;
   }
   .attribute-header-function-box {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
     gap: 0.625rem;
     margin: 0.667rem 0 -2rem;
   }
   .attribute-header-function-box .page-header-function-control-box {
-    display: contents;
+    order: 1;
+    display: flex;
+    align-items: center;
   }
   .attribute-header-function-box .page-filter-layoutcontrol-box {
-    grid-column: 1 / -1;
+    flex: 1;
     padding-top: 0;
     gap: 0;
     width: auto;
   }
   .attribute-header-function-box .page-sort-box {
-    grid-column: 2;
-    grid-row: 2;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 5rem;
+    display: flex;
+    align-items: center;
     padding: 0;
+    z-index: 1;
   }
   .attribute-header-function-box > .layout-controls-box {
+    order: 2;
     display: flex;
     height: 5rem;
+    margin-right: 5rem;
     border: 0.125rem solid #c5c5c5;
     border-radius: 2.5rem;
     overflow: hidden;
