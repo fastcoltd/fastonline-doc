@@ -20,13 +20,13 @@
     </meta>
     <title>FAQ List</title>
     <link rel="icon" href="image/logo.jpg" type="image/x-icon" />
-    <link rel="stylesheet" href="css/iconfont.css?v=20260626122545">
-    <link rel="stylesheet" href="css/common.css?v=20260626122545" />
-    <link rel="stylesheet" href="css/page.css?v=20260626122545" />
-    <link rel="stylesheet" href="css/notch-support.css?v=20260626122545" />
-    <link rel="stylesheet" href="css/filter.css?v=20260626122545" />
-    <link rel="stylesheet" href="css/signin.css?v=20260626122545" />
-    <link rel="stylesheet" href="css/faq.css?v=20260626122545" />
+    <link rel="stylesheet" href="css/iconfont.css?v=20260626125240">
+    <link rel="stylesheet" href="css/common.css?v=20260626125240" />
+    <link rel="stylesheet" href="css/page.css?v=20260626125240" />
+    <link rel="stylesheet" href="css/notch-support.css?v=20260626125240" />
+    <link rel="stylesheet" href="css/filter.css?v=20260626125240" />
+    <link rel="stylesheet" href="css/signin.css?v=20260626125240" />
+    <link rel="stylesheet" href="css/faq.css?v=20260626125240" />
 </head>
 
 <body class="faq-list-page">
@@ -2502,6 +2502,74 @@
             </div>
         </div>
     </div>
+    <!-- Sticky Header -->
+    <div class="page-top-sticky faq-list-filter-sticky" id="stickyHeader">
+        <div class="page-header-content faq-list-page-header-content">
+            <div class="page-dropdown-section">
+                <span class="page-dropdown-label">Category:</span>
+                <div class="page-dropdown-select" id="categorySelect">
+                    <span class="page-dropdown-select-text" id="selectedCategory"
+                        data-value="support-forums">Support Forums</span>
+                    <img class="page-dropdown-icon" src="image/more-arrow.png" />
+                    <div class="page-dropdown" id="categoryDropdown">
+                        <div class="page-dropdown-selector">
+                            <div class="page-dropdown-list">
+                                <div class="page-dropdown-item" data-value="">
+                                    <p class="title">All</p>
+                                </div>
+                                <div class="page-dropdown-item" data-value="support-forums">
+                                    <p class="title">Support Forums</p>
+                                </div>
+                                <div class="page-dropdown-item" data-value="tutorials">
+                                    <p class="title">Tutorials</p>
+                                </div>
+                                <div class="page-dropdown-item" data-value="documentation">
+                                    <p class="title">Documentation</p>
+                                </div>
+                                <div class="page-dropdown-item" data-value="best-practices">
+                                    <p class="title">Best Practices</p>
+                                </div>
+                                <div class="page-dropdown-item" data-value="case-studies">
+                                    <p class="title">Case Studies</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="page-section-empty"></div>
+            <div class="page-search-section">
+                <input type="text" class="page-search-input" placeholder="Search by title..." id="searchInput">
+                <img src="image/page-search-icon.svg" class="page-search-icon">
+            </div>
+            <div class="page-sort-box" id="page-sort-section">
+    <img class="page-sort-icon" data-value="" src="image/resource-all-sort-filter.png" />
+    <div class="sort-container" id="sortDropdown">
+        <div class="sort-triangle"></div>
+        <div class="sort-selector">
+            <div class="sort-list">
+                <div class="sort-item sort-item-all" data-value="">
+                    <div class="title">all</div>
+                </div>
+                <div class="sort-item" data-value="price">
+                    <div class="title">sort by price</div>
+                </div>
+                <div class="sort-item" data-value="rating">
+                    <div class="title">sort by rating</div>
+                </div>
+                <div class="sort-item" data-value="stock">
+                    <div class="title">sort by stock</div>
+                </div>
+                <div class="sort-item" data-value="sales">
+                    <div class="title">sort by sales</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
     <main class="faq-detail-main">
         <div class="faq-detail-article">
             <div class="layout-horizontal items-container">
@@ -2703,13 +2771,46 @@
     </div>
 </footer>
 
-    <script src="js/jquery-3.7.1.min.js?v=20260626122545"></script>
-    <script src="js/user.js?v=20260626122545"></script>
-    <script src="js/login.js?v=20260626122545"></script>
-    <script src="js/common.js?v=20260626122545"></script>
-    <script src="js/homemenu.js?v=20260626122545"></script>
+    <script src="js/jquery-3.7.1.min.js?v=20260626125240"></script>
+    <script src="js/user.js?v=20260626125240"></script>
+    <script src="js/login.js?v=20260626125240"></script>
+    <script src="js/common.js?v=20260626125240"></script>
+    <script src="js/homemenu.js?v=20260626125240"></script>
     <script>
         $(function () {
+            function searchData() {
+                var params = {
+                    category: $('#selectedCategory').attr('data-value'),
+                    name: $('#searchInput').val(),
+                    sortBy: $('.page-sort-icon').attr('data-value')
+                };
+                console.log(params);
+            }
+
+            $('.page-dropdown-select').on('click', function () {
+                $(this).toggleClass('active');
+            });
+            $('.page-dropdown-item').on('click', function (event) {
+                event.stopPropagation();
+                var value = $(this).attr('data-value');
+                var text = $(this).find('.title').text();
+                $('#selectedCategory').attr('data-value', value).text(text);
+                $('.page-dropdown-select').removeClass('active');
+                searchData();
+            });
+            $('#page-sort-section').on('click', function () {
+                $('#sortDropdown').toggle();
+            });
+            $('.sort-item').on('click', function (event) {
+                event.stopPropagation();
+                $('.page-sort-icon').attr('data-value', $(this).attr('data-value'));
+                $('#sortDropdown').hide();
+                searchData();
+            });
+            $('.page-search-icon').on('click', function () {
+                searchData();
+            });
+
             $('#faq-list-grid').on('click', '.resource-action-like-icon', function () {
                 $(this).parent('.resource-action-group').toggleClass('has-activate');
                 $(this).closest('.faq-actions').find('.resource-action-unlike').removeClass('has-activate');
