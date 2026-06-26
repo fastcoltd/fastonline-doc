@@ -20,13 +20,13 @@
     </meta>
     <title>FAQ List</title>
     <link rel="icon" href="image/logo.jpg" type="image/x-icon" />
-    <link rel="stylesheet" href="css/iconfont.css?v=20260626001309">
-    <link rel="stylesheet" href="css/common.css?v=20260626001309" />
-    <link rel="stylesheet" href="css/page.css?v=20260626001309" />
-    <link rel="stylesheet" href="css/notch-support.css?v=20260626001309" />
-    <link rel="stylesheet" href="css/filter.css?v=20260626001309" />
-    <link rel="stylesheet" href="css/signin.css?v=20260626001309" />
-    <link rel="stylesheet" href="css/faq.css?v=20260626001309" />
+    <link rel="stylesheet" href="css/iconfont.css?v=20260626122545">
+    <link rel="stylesheet" href="css/common.css?v=20260626122545" />
+    <link rel="stylesheet" href="css/page.css?v=20260626122545" />
+    <link rel="stylesheet" href="css/notch-support.css?v=20260626122545" />
+    <link rel="stylesheet" href="css/filter.css?v=20260626122545" />
+    <link rel="stylesheet" href="css/signin.css?v=20260626122545" />
+    <link rel="stylesheet" href="css/faq.css?v=20260626122545" />
 </head>
 
 <body class="faq-list-page">
@@ -2703,18 +2703,18 @@
     </div>
 </footer>
 
-    <script src="js/jquery-3.7.1.min.js?v=20260626001309"></script>
-    <script src="js/user.js?v=20260626001309"></script>
-    <script src="js/login.js?v=20260626001309"></script>
-    <script src="js/common.js?v=20260626001309"></script>
-    <script src="js/homemenu.js?v=20260626001309"></script>
+    <script src="js/jquery-3.7.1.min.js?v=20260626122545"></script>
+    <script src="js/user.js?v=20260626122545"></script>
+    <script src="js/login.js?v=20260626122545"></script>
+    <script src="js/common.js?v=20260626122545"></script>
+    <script src="js/homemenu.js?v=20260626122545"></script>
     <script>
         $(function () {
-            $('.resource-action-like-icon').on('click', function () {
+            $('#faq-list-grid').on('click', '.resource-action-like-icon', function () {
                 $(this).parent('.resource-action-group').toggleClass('has-activate');
                 $(this).closest('.faq-actions').find('.resource-action-unlike').removeClass('has-activate');
             });
-            $('.resource-action-unlike-icon').on('click', function () {
+            $('#faq-list-grid').on('click', '.resource-action-unlike-icon', function () {
                 $(this).parent('.resource-action-group').toggleClass('has-activate');
                 $(this).closest('.faq-actions').find('.resource-action-like').removeClass('has-activate');
             });
@@ -2734,6 +2734,28 @@
                 $loading.show();
                 $text.hide();
                 setTimeout(function () {
+                    var $faqList = $('#faq-list-grid');
+                    var $items = $faqList.children('.faq-item');
+                    var $emptyState = $faqList.children('.no-data-wrapper').first();
+                    var nextIndex = $items.length + 1;
+                    var $newItems = $items.clone(false, false);
+
+                    $newItems.each(function (index) {
+                        var itemIndex = nextIndex + index;
+                        var $item = $(this);
+                        $item.removeClass('brand-faq-item-expanded');
+                        $item.find('.faq-content').hide();
+                        $item.find('.faq-header-arrow-icon').removeClass('open');
+                        $item.find('.faq-header-title').text('How do I reset my password? ' + itemIndex);
+                        $item.find('.view-more-btn').attr('href', 'faq-detail.html?id=' + (123 + itemIndex));
+                    });
+
+                    if ($emptyState.length) {
+                        $emptyState.before($newItems);
+                    } else {
+                        $faqList.append($newItems);
+                    }
+
                     $loading.hide();
                     $text.show();
                 }, 1500);

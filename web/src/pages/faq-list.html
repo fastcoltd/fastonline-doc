@@ -58,11 +58,11 @@
     <script src="js/homemenu.js"></script>
     <script>
         $(function () {
-            $('.resource-action-like-icon').on('click', function () {
+            $('#faq-list-grid').on('click', '.resource-action-like-icon', function () {
                 $(this).parent('.resource-action-group').toggleClass('has-activate');
                 $(this).closest('.faq-actions').find('.resource-action-unlike').removeClass('has-activate');
             });
-            $('.resource-action-unlike-icon').on('click', function () {
+            $('#faq-list-grid').on('click', '.resource-action-unlike-icon', function () {
                 $(this).parent('.resource-action-group').toggleClass('has-activate');
                 $(this).closest('.faq-actions').find('.resource-action-like').removeClass('has-activate');
             });
@@ -82,6 +82,28 @@
                 $loading.show();
                 $text.hide();
                 setTimeout(function () {
+                    var $faqList = $('#faq-list-grid');
+                    var $items = $faqList.children('.faq-item');
+                    var $emptyState = $faqList.children('.no-data-wrapper').first();
+                    var nextIndex = $items.length + 1;
+                    var $newItems = $items.clone(false, false);
+
+                    $newItems.each(function (index) {
+                        var itemIndex = nextIndex + index;
+                        var $item = $(this);
+                        $item.removeClass('brand-faq-item-expanded');
+                        $item.find('.faq-content').hide();
+                        $item.find('.faq-header-arrow-icon').removeClass('open');
+                        $item.find('.faq-header-title').text('How do I reset my password? ' + itemIndex);
+                        $item.find('.view-more-btn').attr('href', 'faq-detail.html?id=' + (123 + itemIndex));
+                    });
+
+                    if ($emptyState.length) {
+                        $emptyState.before($newItems);
+                    } else {
+                        $faqList.append($newItems);
+                    }
+
                     $loading.hide();
                     $text.show();
                 }, 1500);
