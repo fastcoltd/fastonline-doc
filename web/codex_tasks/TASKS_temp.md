@@ -852,3 +852,139 @@ https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78
 我现在有一个需求：全局的同类型的 item，需要使用同一个组件，总共有 5 种组件：商品，campaign ， 店铺，posts，demands 五种类型。商品就是 index.html 中 Best items 对应的 item，还有item-all.html 页面的 Horizontal 模式的 item；店铺就是 index.html 中 Best stores 中的 item，还有store-all.html 中 Horizontal 模式的 item；campaign 就是 index.html 中 Hot campaigns 中的 item，还有compaign-all.html 页面中 Horizontal 模式下的 item；posts 就是 index.html 中 Host posts 的 item（只有一种）；demands 就是 index.html 中 Popular demands 中的 item，还有demand-all.html 中 Horizontal 模式的 item。清楚分类后，我再举个例子帮你理解我的需求，index.html 的 Best items 中的 item，需要复用到item-all.html 页面中的 Vertical 模式中（最终展示效果需要一模一样），而 Horizontal 模式需要是另一种组件。而 Horizontal 模式的组件，项目中也有很多地方使用到了，比如compaign-detail.html中，嵌入的商品（item），也需要使用item-all.html 页面中 Horizontal 模式的组件。以此类推。我希望项目中，同一个类型的组件，全局只有一份，所有地方，只要是同类型的样式，都复用同一份组件。
 
 接下来我希望你帮我分析目前项目中各个页面中各个类型组件的使用情况，是否已经使用了相同的组件，如果不是，哪些地方不是，需要列举出来。如果要改成相同的组件，有多少地方要修改，给出详细的修改计划和影响范围。因为后续这个静态页面项目是需要给后端组装替换数据后用于 seo 的，所以尽可能是同一类型的组件是相同的内容，相同的 css，去适应所有的需要展示的地方，请把这点考虑进去。
+
+
+
+
+## Task：index.html页面中，购物流程的 pc 版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-192.png)如图是实际运行的效果，其中![alt text](image-193.png)的颜色，需要参考设计稿修改：figma：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78183&m=dev
+
+
+## Task：index.html页面中，购物流程的 pc 版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-192.png)如图是实际运行的效果，其中![alt text](image-194.png)的样式，需要参考设计稿修改：figma：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78186&m=dev
+
+
+## Task：index.html页面中，购物流程的 pc 版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-192.png)如图是实际运行的效果，其中Accept & Buy按钮的宽度，需要根据 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78195&m=dev
+
+
+## Task：index.html页面中，购物流程的 pc 版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-195.png)如图是实际运行的效果，其中![alt text](image-196.png)需要参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=4151-81329&m=dev
+
+
+## Task：index.html页面中，购物流程的 pc 版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-197.png)如图是实际运行的效果，其中view 按钮和 download 按钮的样式，需要参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=4151-83795&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=4151-83796&m=dev
+
+
+## Task：index.html页面中，购物流程的 手机版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-198.png)如图是实际运行的效果，其中的view 按钮和 download 按钮的样式，需要参考 figma 设计稿修改：https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78262&m=dev、https://www.figma.com/design/tSDKDZHIeanGhze3wX8rwx/FASTRESP-NEW?node-id=1902-78263&m=dev
+
+
+## Task：index.html页面中，购物流程的手机版需要修改
+状态：已完成
+### 任务内容
+现在的手机版购物流程，相较于 pc 端，是缺少了一步的，我希望和 pc 端对齐。缺少的那一步，没有对应的 ui 设计稿，请根据现有的手机版购物流程的风格，来实现缺少的那一步
+
+
+## Task：index.html页面中，购物流程的手机版和 pc 版需要修改
+状态：已完成
+### 任务内容
+购物流程中，有上传图片和文件的部分，就是类似图片：![alt text](image-199.png)的地方，需要支持图片和文件的上传，图片上传以后，点击图片需要可以放大查看。文件则不需要，只需要展示文件名称。
+
+
+## Task：store-detail.html的手机版和 pc 版需要修改
+状态：待完善
+### 任务内容
+![alt text](image-201.png)这是 pc 版本的样式的截图，其中有红线，这个部分，其中图表的部分，右侧需要对齐 Products:4.3 的右侧，即对齐图中的红线。![alt text](image-202.png)这是手机版的样式的截图，其中有红线，这个部分，其中图表的部分，右侧需要对齐 Products:4.3 的右侧，即对齐图中的红线
+
+
+## Task：compaign-detail.html的手机版需要修改
+状态：已完成
+### 任务内容
+其中的如图的部分![alt text](image-203.png)和![alt text](image-204.png)，两个 item组件，其中的 BUY NOW 按钮，右侧需要和收藏组件的右侧对齐
+
+
+## Task：demand-all.html的手机版需要修改
+状态：已完成
+### 任务内容
+这个页面，Vertical 模式和 Horizontal 模式的 item，即如图![alt text](image-205.png)和![alt text](image-206.png)，其中的字体都需要放大，参考index.html 中 Popular demands 的 item 的字体进行修改
+
+
+## Task：attribute-all.html的手机版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-207.png)如图的部分，![alt text](image-208.png)和![alt text](image-209.png)需要调换位置，即修改后，模式切换组件和筛选按钮在同一行纵向居中对齐。修改完成后，需要修改模式切换组件的宽度，需要撑满剩余宽度
+
+
+## Task：tag-all.html的手机版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-210.png)如图的部分，![alt text](image-211.png)和![alt text](image-212.png)需要调换位置，即修改后，模式切换组件和筛选按钮在同一行纵向居中对齐。修改完成后，需要修改模式切换组件的宽度，需要撑满剩余宽度
+
+
+
+## Task：resource-detail.html的手机版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-213.png)如图的部分，不能换行，需要在同一行显示
+
+
+
+## Task：resource-detail.html的手机版和 pc 版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-214.png)如图的部分，pc 和手机版都需要修改，，点击以后需要有选中和取消选中效果，参考 item-detail.html 页面的 Reviews 部分的![alt text](image-215.png)来做，直接拷贝过来就行
+
+
+## Task：brand-all.html的 pc 版需要修改
+状态：已完成
+### 任务内容
+左侧的锚点组件部分，如图![alt text](image-216.png)，在页面滚动到最底部时，因为 footer 的出现，锚点组件被挤压，如图![alt text](image-217.png)，我希望footer 的出现不要挤压锚点组件，而是让锚点组件顺势往上滚动，即使顶部滚动到看不见也没关系
+
+
+## Task：brand-all.html的手机版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-218.png)，锚点组件，需要铺满整个可用高度，即等比例占满整个高度
+
+
+## Task：header 组件的登录后的样式， pc 版需要修改
+状态：已完成
+### 任务内容
+登录成功后，右上角会有这么个图标![alt text](image-219.png)，我希望把这个图标去掉，其他内容的布局不要发生改变，仅仅是去掉这个图标。因为 header 是通用组件，我希望修改后，整个项目中的 header 都是修改后的效果
+
+
+## Task：header 组件的登录后的样式， pc 版需要修改
+状态：已完成
+### 任务内容
+登录成功后，点击最右上角的![alt text](image-221.png)会出现如图![alt text](image-220.png)的浮窗，这个浮窗顶部需要修改：需要在![alt text](image-223.png)之下，增加如图的内容![alt text](image-222.png)，字体和图标需要和邮箱字体一致。其中所需要的图片，可以从手机版本登录后点击头像跳转的页面中获取
+
+
+## Task：index.html 的手机版需要修改 
+状态：已完成
+### 任务内容
+Best items 中第三个 item 的 Buy Now 按钮，需要展示成可以点击的样式，因为现在点击后是会触发登录弹框或者触发购买流程，但是样式上看起来像是不可以点击的，请看看有没有可以点击的样式，如果没有，请做成红框白色背景红字，类似![alt text](image-225.png)的样子，请注意仅仅需要修改样式，大小布局等等所有都不需要修改也不允许修改
+
+
+## Task：faq-detail.html 的pc版需要修改 
+状态：已完成
+### 任务内容
+![alt text](image-226.png)，如图，header 部分，位置不对，从页面的最左侧开始展示了，应该和其他页面一样，参考 index.html 页面的 header 修改。另外我想问下，这难道用的不是全局的 header 组件吗？按理说需要和 index.html 中用的是相同的 header 组件，位置、内容所有细节，应该和 index.html 中是完全一样的
+
+
+## Task：需要新增一个 faq-list页面 
+状态：已完成
+### 任务内容
+请新增一个 faq-list 页面，header、top-menu、footer 都和 index.html 是一样的，可以直接复用组件，并且样式需要一模一样。然后其中的内容部分，则是一个列表，列表的 item 如图：![alt text](image-227.png)，这个图片是项目运行的截图，也就是说，项目中已经有这个代码了，我需要你找到代码然后复用，我不确定之前有没有封装成组件，如果有责直接复用组件，如果没有则封装成组件然后复用。该页面需要适配手机版和 pc 版本
