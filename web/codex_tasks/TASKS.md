@@ -39,7 +39,7 @@
 
 
 ## Task：brand-service.html页面的手机版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 Horizontal 模式下的 item 如图：![alt text](image-232.png)，需要修改其中的 Buy now 按钮的布局，右侧需要对齐收藏按钮的右侧，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
 
