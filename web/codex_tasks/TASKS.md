@@ -20,7 +20,7 @@
 
 
 ## Task：attribute-all.html页面的pc版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 ![alt text](image-228.png)，如图，在选择 Demands，并且选择 Vertical 模式的情况下，每行只能显示一个 item，我需要每行能显示 2 个 item，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
 
