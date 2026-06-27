@@ -42,10 +42,6 @@ function syncMobileStickyPlaceholder(shouldSticky) {
     pageContent.style.marginTop = `${getStickyHeaderHeight()}px`;
 }
 
-function sortItems(value) {
-    console.log('sort items', value);
-}
-
 const REVIEW_INCREMENT_COUNT = 1;
 const list = new PageList();
 list.itemsPerPage = REVIEW_INCREMENT_COUNT;
@@ -848,10 +844,11 @@ document.addEventListener("DOMContentLoaded", function () {
         $(this).parent().toggleClass('has-activate')
     })
     const loadMore = document.getElementById('load-more');
-    if (loadMore && bodyElement.offsetWidth > 768) {
+    if (loadMore && window.innerWidth > 768) {
         loadMore.addEventListener('click', function(event) {
             event.preventDefault();
             event.stopPropagation();
+            list.currentPage++;
             renderItems(generateMockItems());
         })
     }

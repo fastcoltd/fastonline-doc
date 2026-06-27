@@ -52,7 +52,7 @@ after sales rules 这个部分，如图![alt text](image-234.png)，文字需要
 
 
 ## Task：item-detail.html页面的pc版需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 Reviews 的部分，点击 show more reviews 后，没有反应，我希望改成点击后增加一条完整 Review，即一条：![alt text](image-235.png)，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
 
