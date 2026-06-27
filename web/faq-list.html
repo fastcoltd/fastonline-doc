@@ -20,13 +20,13 @@
     </meta>
     <title>FAQ List</title>
     <link rel="icon" href="image/logo.jpg" type="image/x-icon" />
-    <link rel="stylesheet" href="css/iconfont.css?v=20260626131618">
-    <link rel="stylesheet" href="css/common.css?v=20260626131618" />
-    <link rel="stylesheet" href="css/page.css?v=20260626131618" />
-    <link rel="stylesheet" href="css/notch-support.css?v=20260626131618" />
-    <link rel="stylesheet" href="css/filter.css?v=20260626131618" />
-    <link rel="stylesheet" href="css/signin.css?v=20260626131618" />
-    <link rel="stylesheet" href="css/faq.css?v=20260626131618" />
+    <link rel="stylesheet" href="css/iconfont.css?v=20260626160623">
+    <link rel="stylesheet" href="css/common.css?v=20260626160623" />
+    <link rel="stylesheet" href="css/page.css?v=20260626160623" />
+    <link rel="stylesheet" href="css/notch-support.css?v=20260626160623" />
+    <link rel="stylesheet" href="css/filter.css?v=20260626160623" />
+    <link rel="stylesheet" href="css/signin.css?v=20260626160623" />
+    <link rel="stylesheet" href="css/faq.css?v=20260626160623" />
 </head>
 
 <body class="faq-list-page">
@@ -2569,6 +2569,13 @@
 </div>
 
         </div>
+        <div class="faq-list-result-row">
+            <div class="page-filterresult-box">
+                <span class="page-filterresult-num">12</span>
+                <span class="page-filterresult-text">Pro freelancers for</span>
+                <span class="page-filterresult-content">Logo DesIgn</span>
+            </div>
+        </div>
     </div>
     <main class="faq-detail-main">
         <div class="faq-detail-article">
@@ -2771,13 +2778,18 @@
     </div>
 </footer>
 
-    <script src="js/jquery-3.7.1.min.js?v=20260626131618"></script>
-    <script src="js/user.js?v=20260626131618"></script>
-    <script src="js/login.js?v=20260626131618"></script>
-    <script src="js/common.js?v=20260626131618"></script>
-    <script src="js/homemenu.js?v=20260626131618"></script>
+    <script src="js/jquery-3.7.1.min.js?v=20260626160623"></script>
+    <script src="js/user.js?v=20260626160623"></script>
+    <script src="js/login.js?v=20260626160623"></script>
+    <script src="js/common.js?v=20260626160623"></script>
+    <script src="js/homemenu.js?v=20260626160623"></script>
     <script>
         $(function () {
+            function updateFaqListStickyTop() {
+                var headerHeight = $('.page-top-sticky-main').outerHeight() || 0;
+                document.documentElement.style.setProperty('--faq-list-sticky-top', headerHeight + 'px');
+            }
+
             function searchData() {
                 var params = {
                     category: $('#selectedCategory').attr('data-value'),
@@ -2786,6 +2798,10 @@
                 };
                 console.log(params);
             }
+
+            updateFaqListStickyTop();
+            $(window).on('resize', updateFaqListStickyTop);
+            setTimeout(updateFaqListStickyTop, 0);
 
             $('.page-dropdown-select').on('click', function () {
                 $(this).toggleClass('active');

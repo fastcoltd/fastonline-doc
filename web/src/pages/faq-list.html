@@ -76,6 +76,13 @@
             </div>
             <!-- @include ../partials/components/page-sort-dropdown.html {"sort_box_attrs":"id=\"page-sort-section\"","sort_icon_attrs":"data-value=\"\"","sort_icon_src":"image/resource-all-sort-filter.png","sort_container_attrs":"id=\"sortDropdown\""} -->
         </div>
+        <div class="faq-list-result-row">
+            <div class="page-filterresult-box">
+                <span class="page-filterresult-num">12</span>
+                <span class="page-filterresult-text">Pro freelancers for</span>
+                <span class="page-filterresult-content">Logo DesIgn</span>
+            </div>
+        </div>
     </div>
     <main class="faq-detail-main">
         <div class="faq-detail-article">
@@ -101,6 +108,11 @@
     <script src="js/homemenu.js"></script>
     <script>
         $(function () {
+            function updateFaqListStickyTop() {
+                var headerHeight = $('.page-top-sticky-main').outerHeight() || 0;
+                document.documentElement.style.setProperty('--faq-list-sticky-top', headerHeight + 'px');
+            }
+
             function searchData() {
                 var params = {
                     category: $('#selectedCategory').attr('data-value'),
@@ -109,6 +121,10 @@
                 };
                 console.log(params);
             }
+
+            updateFaqListStickyTop();
+            $(window).on('resize', updateFaqListStickyTop);
+            setTimeout(updateFaqListStickyTop, 0);
 
             $('.page-dropdown-select').on('click', function () {
                 $(this).toggleClass('active');
