@@ -161,7 +161,7 @@ function initializeReviewsShowMore() {
 function initializeAfterSalesRulesSeeMore() {
     const rulesText = document.querySelector('.after-sales-rules-text');
     const seeMoreBtn = document.querySelector('.after-sales-rules-more-btn');
-    if (!rulesText || !seeMoreBtn || window.matchMedia('(max-width: 768px)').matches) return;
+    if (!rulesText || !seeMoreBtn) return;
 
     seeMoreBtn.addEventListener('click', function () {
         rulesText.classList.add('is-expanded');
