@@ -95,3 +95,15 @@ If a behavior looks wrong, run the same test against baseline before changing it
 - Do not leave temporary worktrees behind.
 - Do not keep browser viewport overrides after verification.
 - Summarize exact checks performed in the final response.
+
+## Whole-Page Stage Gate
+
+For whole-page refactors, each stage must finish with:
+
+- build completed
+- static checks completed
+- visual and behavior regression completed for that stage
+- stage commit created
+- stage commit pushed
+
+Do not begin the next stage until all items above are complete. If commit or push is blocked, stop and report the exact blocker.

@@ -76,6 +76,37 @@ Use this only when the parent scope uniquely owns the internal structure.
 8. Validate syntax and diffs.
 9. Run regression checks from `references/regression-checklist.md`.
 
+## Whole-Page Requests
+
+When the user asks to apply this skill to an entire page, do not refactor the whole page in one large edit.
+
+Split the page into small stages by module or visual section, for example:
+
+1. banner / hero
+2. brand strip
+3. carousel sections
+4. comments or list sections
+5. menus / account panels
+6. notices / modals / selectors
+
+For each stage:
+
+1. Define the exact module boundary before editing.
+2. Refactor only that stage.
+3. Build with `node scripts/build-pages.js`.
+4. Run static checks and the regression checklist for that stage.
+5. Commit the completed stage.
+6. Push the commit.
+7. Start the next stage only after the commit and push succeed.
+
+Keep stage commits small and named by page plus module, for example:
+
+```bash
+git commit -m "Simplify index banner selectors"
+```
+
+If a stage cannot be safely completed or pushed, stop and report the blocker instead of continuing into the next stage.
+
 ## Header Search Example
 
 Before:
