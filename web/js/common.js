@@ -524,7 +524,7 @@ class HeaderMenu {
         }
 
         this.menuContainer = this.menuButton.querySelector('.header-menu-container');
-        this.menuItems = this.menuButton.querySelectorAll('.header-menu-item');
+        this.menuItems = this.menuContainer ? this.menuContainer.querySelectorAll('[data-value]') : [];
         this.init();
         this.setDefaultSelection(defaultValue);
         this.headerMenuTimer = null;
@@ -545,7 +545,8 @@ class HeaderMenu {
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const value = item.dataset.value;
-                const text = item.querySelector('.title').textContent;
+                const title = item.querySelector('.title') || item.querySelector('h2') || item;
+                const text = title.textContent.trim();
                 this.selectOption(value, text);
             });
         });
