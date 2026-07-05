@@ -15,7 +15,7 @@ Carousel.prototype.setup = function (domId, duration) {
   this.track = this.carousel.getElementsByClassName('carousel-track')[0];
   const slideList = this.track.querySelectorAll('.carousel-slide');
   this.indicator = this.carousel.getElementsByClassName('carousel-indicators')[0];
-  this.dotList = this.indicator.querySelectorAll('.carousel-indicator');
+  this.dotList = this.indicator ? Array.from(this.indicator.children) : [];
   this.slideCount = slideList.length;
   this.index = this.slideCount > 1 ? 1 : 0; // 初始指向第一个实际 slide
   if (this.slideCount > 1) {
