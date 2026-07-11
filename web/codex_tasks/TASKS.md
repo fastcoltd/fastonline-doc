@@ -19,7 +19,7 @@
 
 
 ## Task：attribute-all.html 页面的源码需要修改
-状态：未完成
+状态：已完成
 ### 任务内容
 使用 html-selector-simplification 这个 skill，对 attribute-all.html 源码进行修改，直到整个页面完成修改
 
@@ -167,4 +167,3 @@
 状态：未完成
 ### 任务内容
 使用 html-selector-simplification 这个 skill，对 tag-all.html 源码进行修改，直到整个页面完成修改
-

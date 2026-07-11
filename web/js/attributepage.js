@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let pageType = "best-items-item";
   let pageList = null;
   let attributeValue = null;
-  const attributes = document.querySelectorAll(".tag-page-header-desc-tag-item");
+  const attributes = document.querySelectorAll(".tag-page-header-desc-box [data-attribute-value]");
   const brandPageIndexs = document.querySelectorAll(".page-link");
 
   function syncItemAllBestItemsClass() {
