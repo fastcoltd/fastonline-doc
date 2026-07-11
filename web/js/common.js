@@ -119,10 +119,10 @@ document.addEventListener('DOMContentLoaded', function () {
     starObserver.observe(document.body, { childList: true, subtree: true });
 
     const body = document.getElementsByTagName('body')[0];
-    this.headerSearchMenu = new HeaderMenu('.header-search-box-label', '.header-search-box-label-icon', '.header-search-box-label-text', 'items');
+    this.headerSearchMenu = new HeaderMenu('.header-search-box-label', '', '', 'items');
     this.headerResourceMenu = new HeaderMenu('.header-items-label-resource', '.header-items-label-icon', '', '');
     this.headerPostMenu = new HeaderMenu('.header-items-label-post', '.header-items-label-icon', '', 'Blog');
-    this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', '.header-search-mobile-box-label-icon', '.header-search-mobile-box-label-text', 'items')
+    this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', '', '', 'items')
     refreshHeaderUserUI();
 
     function setHomeMenuSectionDisplay(sectionBox, shouldOpen) {
@@ -518,9 +518,11 @@ class HeaderMenu {
             this.headerMenuTimer = null;
             return;
         }
-        this.menuArrow = this.menuButton.querySelector(imgId);
+        this.menuArrow = imgId ? this.menuButton.querySelector(imgId) : Array.from(this.menuButton.children).find(item => item.tagName === 'IMG');
         if (labId && labId.length > 0) {
             this.menuLabel = this.menuButton.querySelector(labId);
+        } else {
+            this.menuLabel = Array.from(this.menuButton.children).find(item => item.tagName === 'LABEL');
         }
 
         this.menuContainer = this.menuButton.querySelector('.header-menu-container');
@@ -696,19 +698,19 @@ function setSearchData() {
     }
     let params = Qs.parse(location.href.split('?')[1])
     console.log(params, '999')
-    $('.header-search-box-label-text, .header-search-mobile-box-label-text').text(params.type)
+    $('.header-search-box-label > label, .header-search-mobile-box-label > label').text(params.type)
     $('.header-search-mobile-box-input-box-input, .header-search-box-input-box-input').val(params.q)
 }
 function handleEnterFn(e) {
     if (e.key == 'Enter') {
         let input = e.target
-        let type = $('.header-search-box-label-text').text()
+        let type = $('.header-search-box-label > label').text()
         window.open(`search-all.html?q=${input.value.trim()}&type=${type}`, '_self')
     }
 }
 function handleSearchFn(e) {
     let input = e.target.previousElementSibling
-    let type = $('.header-search-box-label-text').text()
+    let type = $('.header-search-box-label > label').text()
     window.open(`search-all.html?q=${input.value.trim()}&type=${type}`, '_self')
 }
 function searchAction(params) {
