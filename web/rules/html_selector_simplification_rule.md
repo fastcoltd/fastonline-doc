@@ -1,5 +1,8 @@
 # HTML 选择器精简规则（必须遵守）
 
+## 修改目标，优先级最高！！
+所有的修改完成后，必须回归，保证不改变页面任何 ui、样式、js 行为，这些都需要和修改前一模一样！
+
 ## 1. 适用场景
 
 当页面或组件存在明确父级容器时，内部节点如果只是为了样式而添加 class，必须优先移除内部 class，改用父级作用域选择器。
@@ -80,9 +83,9 @@ const text = Array.from(box.children).find(item => item.tagName === 'LABEL');
 const icon = Array.from(box.children).find(item => item.tagName === 'IMG');
 ```
 
-## 4. 不允许精简的 class
+## 4. 需要慎重精简的 class
 
-以下 class 不允许直接删除，除非同步完成所有样式、JS、状态和回归检查：
+以下 class 不允许直接删除，需要先同步完成所有样式、JS、状态和回归检查：
 
 - 状态 class：`active`、`selected`、`disabled`、`is-active`、`is-open`、`loading` 等。
 - JS 行为钩子：事件绑定、DOM 查找、数据读取、状态切换使用的 class。
