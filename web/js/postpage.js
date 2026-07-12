@@ -93,15 +93,15 @@ function createItemElement(item) {
   const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
   div.innerHTML = `
-           <img class="post-item-icon" src="{{item.image}}" />
+           <img src="{{item.image}}" />
             <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
             <div class="post-item-content">
               <a href="post-detail.html?name=post-name" class="item-title-box">
                 <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>
               </a>
               <div class="post-item-user-box">
-                <img class="post-item-user-avatar" src="用户头像" />
-                <p class="post-item-user-name">xxxxxx</p>
+                <img src="用户头像" />
+                <p>xxxxxx</p>
               </div>
               <div class="item-brand-box">
                 <p class="item-brand-text">品牌: </p>
@@ -109,7 +109,7 @@ function createItemElement(item) {
                 <p class="item-brand" style="color: #06C70C;">{{Google}}</p>
               </div>
               <div class="post-item-kind-box">
-                <p class="post-item-kind-text">{{价格}}</p>
+                <p>{{价格}}</p>
                 <a class="item-tag" href="items.html" target="_self">
                   <p class="item-tag-text">{{新品发布}}</p>
                 </a>

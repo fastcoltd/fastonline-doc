@@ -101,7 +101,7 @@ function createItemElement(item) {
                     Store name,Store name,Store name,Store name,Store name</p>
                 </a>
                 <div class="item-desc-box">
-                  <p class="item-desc">Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
+                  <p>Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
                     desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
                     desc,Store desc,Store desc,Store desc,Store desc</p>
                 </div>

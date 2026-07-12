@@ -86,7 +86,7 @@ function createItemElement(item) {
   const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
   div.innerHTML = `
-           <img class="compaign-item-icon" src="{{item.image}}" />
+           <img src="{{item.image}}" />
             <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
             <div class="compaign-item-content">
               <a href="compaign-detail.html?name=compaign-name" target="_self" class="item-title-box">

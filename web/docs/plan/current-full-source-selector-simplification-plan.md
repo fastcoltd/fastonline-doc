@@ -421,3 +421,12 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - CSS/LESS：同步 common、demand、demand-detail-item、demand-detail 全部基础及响应式覆盖。
 - 明确保留：共享卡 bidder 文本及其 include 参数、通用 item/other/tag/service 类、头像组和 meta 等必要父级、状态与 like class。
 - 回归：构建 31 页、`git diff --check`、全部非 minified JS 语法检查、17 组旧 class 及重复父级 scope 检查均通过。
+
+### D5 Campaign、Post、Blog 卡片组件族（2026-07-12）
+
+- 组件：hot campaign、campaign horizontal、post shared、blog-post-v2；同步顶层参数包装、`compaignpage.js`、`postpage.js`、`storepage.js`、`tagpage.js` 和 campaign-all 内联查询。
+- Campaign/Post 已删除并结构化：封面、广告标记、统计行、用户头像/名称、Kind 文本。
+- `item-desc`：当前全部 Store/Post/Brand 消费者均为 `.item-desc-box > p`，已跨组件和动态模板统一删除。
+- Blog v2 已删除并结构化：封面、标题 link/title、品牌入口、stars/score、属性 label/value/bold；全部使用 article/content/meta/rate/attr 稳定父级。
+- 明确保留：Campaign brand/products 类（同时被标签参数和多个结构复用）、布局根、通用 title/brand/tag、like 状态与行为类。
+- 回归：构建 31 页、`git diff --check`、全部非 minified JS 语法检查、17 组旧 class 及 Campaign/Post/Blog 重复父级 scope 检查均通过。
