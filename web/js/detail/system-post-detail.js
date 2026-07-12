@@ -365,7 +365,7 @@ function optimizeRelatedItemsForMobile() {
     indicator.innerHTML = '';
     for (let dotIndex = 0; dotIndex < expectedSlides; dotIndex++) {
         const dot = document.createElement('div');
-        dot.className = `carousel-indicator${dotIndex === 0 ? ' active' : ''}`;
+        dot.className = `carousel-indicator home-section-indicator${dotIndex === 0 ? ' active' : ''}`;
         indicator.appendChild(dot);
     }
 }

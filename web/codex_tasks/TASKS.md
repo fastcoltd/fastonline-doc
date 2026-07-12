@@ -18,152 +18,66 @@
 
 
 
-## Task：attribute-all.html 页面的源码需要修改
+
+## Task：attribute-all.html页面的pc版需要修改
 状态：已完成
 ### 任务内容
-使用 html-selector-simplification 这个 skill，对 attribute-all.html 源码进行修改，直到整个页面完成修改
+![alt text](image-228.png)，如图，在选择 Demands，并且选择 Vertical 模式的情况下，每行只能显示一个 item，我需要每行能显示 2 个 item，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
 
-## Task：become-seller.html 页面的源码需要修改
+
+## Task：brand-service.html页面的手机版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-230.png)，如图有两条竖线，我希望![alt text](image-231.png)这个部分的左右两侧能够和竖线对齐，也就是左侧对齐面包屑左侧，右侧对齐搜索框右侧，，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
+
+
+## Task：brand-service.html页面的手机版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-229.png)，如图的部分，需要做成一行显示，显示不下的部分支持滚动查看，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
+
+
+
+## Task：brand-service.html页面的手机版需要修改
+状态：已完成
+### 任务内容
+Horizontal 模式下的 item 如图：![alt text](image-232.png)，需要修改其中的 Buy now 按钮的布局，右侧需要对齐收藏按钮的右侧，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
+
+
+## Task：store-detail.html页面的手机版需要修改
+状态：已完成
+### 任务内容
+after sales rules 这个部分，如图![alt text](image-234.png)，文字需要改成 4（或者更多） 行，但是点击 see more 之前，最多只能展示 2 行，超出的部分显示...，点击 see more 后，see more 按钮消失，文字全部展示。pc 版本已经是这个逻辑了，手机版也需要改成这个样子。告诉我你对我需求的理解，并给出详细方案，我同意后再开始
+
+
+
+## Task：item-detail.html页面的pc版需要修改
+状态：已完成
+### 任务内容
+Reviews 的部分，点击 show more reviews 后，没有反应，我希望改成点击后增加一条完整 Review，即一条：![alt text](image-235.png)，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
+
+
+## Task：brand.html页面的手机版需要修改
+状态：已完成
+### 任务内容
+Adobe - Hot Posts 的部分，pc 版本的 item 中，是有一个 more 按钮的，点击后会调整新页面，但是手机版本没有了这个 more 按钮，手机版本也需要加上，并且点击后也是跳转相同页面。告诉我你对我需求的理解，并给出详细方案，我同意后再开始
+
+
+## Task：brand-all.html页面的手机版需要修改
+状态：已完成
+### 任务内容
+![alt text](image-236.png)，左侧的锚点组件，布局需要修改，我需要按照屏幕可显示的高度来完整展示 a 到z 所有内容，现在的内容如图，只展示到了 y，这个页面只需要微调即可，不要大改，满足我需求即可，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
+
+
+
+## Task：手机版的同意 cookie 协议 ui 需要修改
+状态：已完成
+### 任务内容
+![alt text](image-237.png)，如图，是点击Customize展开后的样子，其中如图![alt text](image-238.png)的部分，需要增加左右边距，左右对齐![alt text](image-239.png)这个部分，现在是从最左侧开始布局了，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
+
+
+
+## Task：所有的页面的 pc 版本，需要检查并按需修改
 状态：未完成
 ### 任务内容
-使用 html-selector-simplification 这个 skill，对 become-seller.html 源码进行修改，直到整个页面完成修改
-
-## Task：blog.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 blog.html 源码进行修改，直到整个页面完成修改
-
-## Task：brand-all.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 brand-all.html 源码进行修改，直到整个页面完成修改
-
-## Task：brand-service.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 brand-service.html 源码进行修改，直到整个页面完成修改
-
-## Task：brand.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 brand.html 源码进行修改，直到整个页面完成修改
-
-## Task：compaign-all.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 compaign-all.html 源码进行修改，直到整个页面完成修改
-
-## Task：compaign-detail.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 compaign-detail.html 源码进行修改，直到整个页面完成修改
-
-## Task：demand-all.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 demand-all.html 源码进行修改，直到整个页面完成修改
-
-## Task：demand-detail.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 demand-detail.html 源码进行修改，直到整个页面完成修改
-
-## Task：faq-detail.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 faq-detail.html 源码进行修改，直到整个页面完成修改
-
-## Task：faq-list.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 faq-list.html 源码进行修改，直到整个页面完成修改
-
-## Task：fastesp-service.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 fastesp-service.html 源码进行修改，直到整个页面完成修改
-
-## Task：item-all.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 item-all.html 源码进行修改，直到整个页面完成修改
-
-## Task：item-detail.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 item-detail.html 源码进行修改，直到整个页面完成修改
-
-## Task：post-all.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 post-all.html 源码进行修改，直到整个页面完成修改
-
-## Task：post-detail.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 post-detail.html 源码进行修改，直到整个页面完成修改
-
-## Task：resource-all.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 resource-all.html 源码进行修改，直到整个页面完成修改
-
-## Task：resource-detail.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 resource-detail.html 源码进行修改，直到整个页面完成修改
-
-## Task：search-all.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 search-all.html 源码进行修改，直到整个页面完成修改
-
-## Task：service.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 service.html 源码进行修改，直到整个页面完成修改
-
-## Task：signin-2fa.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 signin-2fa.html 源码进行修改，直到整个页面完成修改
-
-## Task：signin-join.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 signin-join.html 源码进行修改，直到整个页面完成修改
-
-## Task：signin-login.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 signin-login.html 源码进行修改，直到整个页面完成修改
-
-## Task：signin-reset-2fa.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 signin-reset-2fa.html 源码进行修改，直到整个页面完成修改
-
-## Task：signin-reset-password.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 signin-reset-password.html 源码进行修改，直到整个页面完成修改
-
-## Task：store-all.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 store-all.html 源码进行修改，直到整个页面完成修改
-
-## Task：store-detail.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 store-detail.html 源码进行修改，直到整个页面完成修改
-
-## Task：system-post-detail.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 system-post-detail.html 源码进行修改，直到整个页面完成修改
-
-## Task：tag-all.html 页面的源码需要修改
-状态：未完成
-### 任务内容
-使用 html-selector-simplification 这个 skill，对 tag-all.html 源码进行修改，直到整个页面完成修改
+所有的页面的 pc 版本，只有要列表的地方，都需要进行修改：所有的 item，在鼠标滑过或者停留时，需要增加一个背景色，注意，仅仅是增加背景色，不需要做其他任何修改。背景色的颜色，参考post-all.html页面第一个 item 的背景色，如图：![alt text](image-233.png)，告诉我你对我需求的理解，并给出详细方案，我同意后再开始
