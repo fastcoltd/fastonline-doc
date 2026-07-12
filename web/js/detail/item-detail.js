@@ -596,7 +596,7 @@ function createItemElement(item) {
                                             <div class="stars-inner" style="--star-fill: 100%;"></div>
                                         </div>
                                     </div>
-                                    <p class="item-star-score">5.0</p>
+                                    <p>5.0</p>
                                 </div>
                                 <div class="flex-row item-detail-review-info-box">
                                     <div class="flex-column item-detail-review-info-item">

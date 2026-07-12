@@ -86,7 +86,7 @@ function createItemElement(item) {
   const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
   div.innerHTML = `
-           <img class="best-items-item-icon" src="{{item.image}}" />
+           <img src="{{item.image}}" />
            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
            <div class="best-items-item-content">
             <div class="item-title-box">
@@ -99,8 +99,8 @@ function createItemElement(item) {
                   <div class="stars-inner" style="--star-fill: 86%;"></div>
                 </div>
               </div>
-              <p class="item-star-score">4.3</p>
-              <p class="item-star-recommend">(200)</p>
+              <p>4.3</p>
+              <p>(200)</p>
             </div>
             <div class="best-items-item-middle-box">
               <div class="item-brand-box">

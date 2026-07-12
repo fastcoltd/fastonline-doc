@@ -21,7 +21,7 @@ function initPasswordToggle(rootElement) {
             return;
         }
         const passwordInput = field.querySelector('input');
-        const passwordToggleButton = field.querySelector('.signin-password-toggle');
+        const passwordToggleButton = field.querySelector(':scope > button');
         if (!passwordInput || !passwordToggleButton) {
             return;
         }
@@ -46,8 +46,8 @@ function initVerificationCodeSend(rootElement) {
         if (field.dataset.codeSendBound === '1') {
             return;
         }
-        const sendButton = field.querySelector('.signin-form-code-send');
-        const timeText = field.querySelector('.signin-form-time');
+        const sendButton = field.querySelector(':scope > button');
+        const timeText = field.querySelector(':scope > p');
         if (!sendButton || !timeText) {
             return;
         }
@@ -86,8 +86,8 @@ function resetVerificationCodeSend(rootElement) {
     }
     const codeFieldList = rootElement.querySelectorAll('.signin-from-2fa-item');
     codeFieldList.forEach(function (field) {
-        const sendButton = field.querySelector('.signin-form-code-send');
-        const timeText = field.querySelector('.signin-form-time');
+        const sendButton = field.querySelector(':scope > button');
+        const timeText = field.querySelector(':scope > p');
         const timer = parseInt(field.dataset.codeCountdownTimer || '', 10);
         if (Number.isFinite(timer)) {
             window.clearInterval(timer);
@@ -315,7 +315,7 @@ function showLogin() {
         });
     }
 
-    const resetpwdButton = document.querySelector('#signin-login .signin-login-form-resetpwd');
+    const resetpwdButton = document.querySelector('#signin-login .signin-login-form-tool-box > p');
     if (resetpwdButton && resetpwdButton.dataset.boundLoginResetpwd !== '1') {
         resetpwdButton.dataset.boundLoginResetpwd = '1';
         resetpwdButton.addEventListener('click', function () {
@@ -364,11 +364,11 @@ function syncRegistContent() {
     if (countryPlaceholder) {
         countryPlaceholder.textContent = 'Select Country';
     }
-    const splitText = regist.querySelector('.signin-line-text');
+    const splitText = regist.querySelector('.signin-line-box > p');
     if (splitText) {
         splitText.textContent = 'or';
     }
-    const otherwayText = regist.querySelector('#signin-regist-login .signin-otherway-text');
+    const otherwayText = regist.querySelector('#signin-regist-login > p:first-child');
     if (otherwayText) {
         otherwayText.textContent = 'Already registered to Fastresp?';
     }
@@ -386,22 +386,22 @@ function syncReset2faContent() {
     const reset2fa = document.getElementById('signin-reset-2fa');
     if (!reset2fa) return;
 
-    const tip = reset2fa.querySelector('.signin-form-tip');
+    const tip = reset2fa.querySelector('#signin-reset-2fa-form > p:first-child');
     if (tip) {
         tip.textContent = 'We have sent a 2FA reset email to jean***********@yahoo.com';
     }
 
-    const timeText = reset2fa.querySelector('.signin-form-time');
+    const timeText = reset2fa.querySelector('.signin-from-2fa-item > p');
     if (timeText) {
         timeText.textContent = 'Send 30s';
     }
 
-    const submitButton = reset2fa.querySelector('.signin-form-button');
+    const submitButton = reset2fa.querySelector('form > button[type="submit"]');
     if (submitButton) {
         submitButton.textContent = 'Verify';
     }
 
-    const splitText = reset2fa.querySelector('.signin-line-text');
+    const splitText = reset2fa.querySelector('.signin-line-box > p');
     if (splitText) {
         splitText.textContent = 'or';
     }

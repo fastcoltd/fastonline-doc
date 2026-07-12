@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //   this.sort = new SortSelector();
     $('#load-more').on('click', function () {
         $('.loading').show()
-        $('.load-more-text').hide()
+        $('.show-more-btn > span').hide()
         setTimeout(() => {
             $('.item-all-items-pager').each(function () {
                 const htmlStr = $(this).children(':not(.no-data-wrapper)').map(function () {
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             $('.loading').hide()
-            $('.load-more-text').show()
+            $('.show-more-btn > span').show()
         }, 2000)
     })
 });

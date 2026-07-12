@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         let fill = '';
-        const scoreNode = node.closest('.item-star-box')?.querySelector('.item-star-score');
+        const scoreNode = node.closest('.item-star-box')?.querySelector(':scope > p:first-of-type');
         const score = parseFloat((scoreNode?.textContent || '').trim());
         if (!Number.isNaN(score)) {
             fill = `${Math.max(0, Math.min(5, score)) / 5 * 100}%`;
@@ -119,14 +119,14 @@ document.addEventListener('DOMContentLoaded', function () {
     starObserver.observe(document.body, { childList: true, subtree: true });
 
     const body = document.getElementsByTagName('body')[0];
-    this.headerSearchMenu = new HeaderMenu('.header-search-box-label', '.header-search-box-label-icon', '.header-search-box-label-text', 'items');
-    this.headerResourceMenu = new HeaderMenu('.header-items-label-resource', '.header-items-label-icon', '', '');
-    this.headerPostMenu = new HeaderMenu('.header-items-label-post', '.header-items-label-icon', '', 'Blog');
-    this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', '.header-search-mobile-box-label-icon', '.header-search-mobile-box-label-text', 'items')
+    this.headerSearchMenu = new HeaderMenu('.header-search-box-label', ':scope > img', ':scope > label', 'items');
+    this.headerResourceMenu = new HeaderMenu('.header-items-label-resource', ':scope > img', '', '');
+    this.headerPostMenu = new HeaderMenu('.header-items-label-post', ':scope > img', '', 'Blog');
+    this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', ':scope > img', ':scope > label', 'items')
     refreshHeaderUserUI();
 
     function setHomeMenuSectionDisplay(sectionBox, shouldOpen) {
-        const titleArrow = sectionBox.querySelector('.home-menu-item-title-arrow');
+        const titleArrow = sectionBox.querySelector('.home-menu-item-title-content > img');
         const titleContent = sectionBox.querySelector('.home-menu-item-content');
         if (!titleContent) {
             return;
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (homeMenuRoot.querySelector('.home-menu-item-title-box-mobile-extra-posts')) {
             return;
         }
-        const sellerTextNode = homeMenuRoot.querySelector('.home-menu-seller-text');
+        const sellerTextNode = homeMenuRoot.querySelector('.home-menu-first-page > a');
         if (!sellerTextNode) {
             return;
         }
@@ -149,8 +149,8 @@ document.addEventListener('DOMContentLoaded', function () {
         extraPostsTitleBox.className = 'home-menu-item-title-box home-menu-item-title-box-mobile-extra-posts';
         extraPostsTitleBox.innerHTML = `
             <div class="home-menu-item-title-content">
-                <p class="home-menu-item-title">Posts</p>
-                <img class="home-menu-item-title-arrow" src="image/more-arrow.png" />
+                <p>Posts</p>
+                <img src="image/more-arrow.png" />
             </div>
         `;
         sellerTextNode.insertAdjacentElement('afterend', extraPostsTitleBox);
@@ -176,12 +176,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (window.innerWidth > 768) {
             return;
         }
-        const joinTextNode = homeMenuRoot.querySelector('.home-menu-login-text');
+        const joinTextNode = homeMenuRoot.querySelector('.home-menu-login-box > span');
         if (joinTextNode) {
             joinTextNode.textContent = 'Join Fastresp';
         }
 
-        const firstMenuTitleNode = homeMenuRoot.querySelector('.home-menu-item-title');
+        const firstMenuTitleNode = homeMenuRoot.querySelector('.home-menu-item-title-content > p');
         if (firstMenuTitleNode && firstMenuTitleNode.textContent.trim() !== 'Browse categories' && firstMenuTitleNode.textContent.trim() !== 'Browse services') {
             firstMenuTitleNode.textContent = isAuthenticated ? 'Browse categories' : 'Browse services';
         } else if (firstMenuTitleNode) {
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const homeMenuTitleBoxes = homeMenuRoot.querySelectorAll('.home-menu-item-title-box');
         for (let i = 0; i < homeMenuTitleBoxes.length; i++) {
             const titleBox = homeMenuTitleBoxes[i];
-            const titleArrow = titleBox.querySelector('.home-menu-item-title-arrow');
+            const titleArrow = titleBox.querySelector('.home-menu-item-title-content > img');
             const titleContent = titleBox.querySelector('.home-menu-item-content');
             if (titleContent) {
                 titleContent.style.display = 'none';
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function isSecondMenuTextTarget(target) {
-        return !!(target && target.closest && target.closest('.home-menu-second-page-group-title, .home-menu-second-page-group-item'));
+        return !!(target && target.closest && target.closest('.home-menu-second-page-group > p, .home-menu-second-page-group > a'));
     }
 
     let secondMenuPendingLink = null;
@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let secondMenuNavigating = false;
 
     function getSecondMenuLink(target) {
-        return target && target.closest && target.closest('.home-menu-second-page-group-item[href]');
+        return target && target.closest && target.closest('.home-menu-second-page-group > a[href]');
     }
 
     function rememberSecondMenuTouchTarget(e) {
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function preventSecondMenuTitleSelection(e) {
-        if (window.innerWidth <= 768 && e.target.closest('.home-menu-second-page-group-title')) {
+        if (window.innerWidth <= 768 && e.target.closest('.home-menu-second-page-group > p')) {
             e.preventDefault();
         }
         if (window.innerWidth <= 768 && isSecondMenuTextTarget(e.target)) {
@@ -402,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function () {
         body.classList.toggle('home-menu-open', true);
         const homeMenuUserEle = homeMenuPage.querySelector('.home-menu-user-box');
         const homeMenuRegistEle = homeMenuPage.querySelector('.home-menu-login-box');
-        const homeMenuLgoinEle = homeMenuPage.querySelector('.home-menu-signin-text');
+        const homeMenuLgoinEle = homeMenuPage.querySelector('.home-menu-first-page > span');
         const homeMenuUserLine = homeMenuPage.querySelector('.home-menu-seperate-line');
         normalizeHomeMenuForMobile(homeMenuPage, !!currentUser);
         homeMenuLgoinEle.onclick = function (e) {
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function () {
         homeMenuRegistEle.onclick = function (e) {
             showJoinFn();
         };
-        const homeMenuLogoutEle = homeMenuUserEle.querySelector('.home-menu-user-logout');
+        const homeMenuLogoutEle = homeMenuUserEle.querySelector(':scope > img:last-of-type');
         homeMenuLogoutEle.onclick = function (e) {
             window.user = null;
             window.__forceLoggedOut = true;
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
             homeMenuLgoinEle.style.display = 'none';
             homeMenuUserEle.style.display = 'flex';
             homeMenuUserLine.style.display = '';
-            const homeMenuUserIconEle = homeMenuUserEle.querySelector('.home-menu-user-icon');
+            const homeMenuUserIconEle = homeMenuUserEle.querySelector(':scope > img:first-of-type');
             const homeMenuAvatarLetterEle = ensureHomeMenuAvatarLetterNode(homeMenuUserEle);
             homeMenuAvatarLetterEle.textContent = getAvatarLabel(currentUser);
             homeMenuAvatarLetterEle.style.display = 'flex';
@@ -434,9 +434,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 homeMenuUserIconEle.style.display = 'none';
                 homeMenuUserIconEle.removeAttribute('src');
             }
-            const homeMenuUserNameEle = homeMenuUserEle.querySelector('.home-menu-user-name');
+            const homeMenuUserNameEle = homeMenuUserEle.querySelector('.home-menu-user-info-box > p:first-child');
             homeMenuUserNameEle.textContent = getUserDisplayName(currentUser);
-            const homeMenuUserEmailEle = homeMenuUserEle.querySelector('.home-menu-user-email');
+            const homeMenuUserEmailEle = homeMenuUserEle.querySelector('.home-menu-user-info-box > p:last-child');
             homeMenuUserEmailEle.textContent = getUserDisplayEmail(currentUser);
         } else {
             homeMenuRegistEle.style.display = '';
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const footerItems = footerContent.querySelectorAll('.footer-item-content');
         footerItems.forEach(item => {
             const itemTitleBox = item.querySelector('.footer-item-title-box');
-            const itemTitleIcon = itemTitleBox.querySelector('.footer-item-title-icon');
+            const itemTitleIcon = itemTitleBox.querySelector(':scope > span');
             const itemTitleIconStyle = window.getComputedStyle(itemTitleIcon);
             if (itemTitleIconStyle.display === 'none') {
                 return;
@@ -637,10 +637,9 @@ function syncHeaderAvatarBadge(headerUser, isAuthenticated, currentUser) {
     if (!avatarItem) {
         return;
     }
-    let avatarBadge = avatarItem.querySelector('.header-avatar-badge');
+    let avatarBadge = avatarItem.querySelector(':scope > span');
     if (!avatarBadge) {
         avatarBadge = document.createElement('span');
-        avatarBadge.className = 'header-avatar-badge';
         avatarItem.appendChild(avatarBadge);
     }
     if (!isAuthenticated) {
@@ -668,7 +667,7 @@ function refreshHeaderUserUI() {
     headerJoinButton.style.display = isAuthenticated ? 'none' : '';
     headerUser.style.display = isAuthenticated ? '' : 'none';
 
-    const badgeEle = headerUser.querySelector('.badge');
+    const badgeEle = headerUser.querySelector('.item-notice > span');
     if (badgeEle) {
         badgeEle.textContent = '20';
     }
@@ -676,7 +675,7 @@ function refreshHeaderUserUI() {
 
     if (isAuthenticated) {
         const avatarTextEle = headerUser.querySelector('.header-user-avatar-box');
-        const avatarImageEle = headerUser.querySelector('.header-user-icon');
+        const avatarImageEle = headerUser.querySelector('.item-avatar > img');
         const avatarLabel = getAvatarLabel(currentUser);
         if (avatarTextEle) {
             avatarTextEle.textContent = avatarLabel;
@@ -695,19 +694,19 @@ function setSearchData() {
     }
     let params = Qs.parse(location.href.split('?')[1])
     console.log(params, '999')
-    $('.header-search-box-label-text, .header-search-mobile-box-label-text').text(params.type)
-    $('.header-search-mobile-box-input-box-input, .header-search-box-input-box-input').val(params.q)
+    $('.header-search-box-label > label, .header-search-mobile-box-label > label').text(params.type)
+    $('.header-search-mobile-box-input-box > input, .header-search-box-input-box > input').val(params.q)
 }
 function handleEnterFn(e) {
     if (e.key == 'Enter') {
         let input = e.target
-        let type = $('.header-search-box-label-text').text()
+        let type = $('.header-search-box-label > label').text()
         window.open(`search-all.html?q=${input.value.trim()}&type=${type}`, '_self')
     }
 }
 function handleSearchFn(e) {
     let input = e.target.previousElementSibling
-    let type = $('.header-search-box-label-text').text()
+    let type = $('.header-search-box-label > label').text()
     window.open(`search-all.html?q=${input.value.trim()}&type=${type}`, '_self')
 }
 function searchAction(params) {
@@ -884,10 +883,10 @@ $(document).ready(function () {
     }
 
     setSearchData()
-    $('.scroll-to-top').on('click', function () {
+    $('.slide-btns-wrapper > img:last-child').on('click', function () {
         scrollToTop()
     })
-    $('.kefu-icon').on('click', function () {
+    $('.slide-btns-wrapper > img:first-child').on('click', function () {
         alert('你好，客服为您服务')
     })
     const AIXIN_NORMAL_SRC = 'image/Vector_nor.svg'
@@ -989,8 +988,8 @@ $(document).ready(function () {
         $centerWrapper.find('.store-center .title').text('Store center');
         $centerWrapper.find('.member-center .other-wrapper').each(function () {
             const $otherWrapper = $(this);
-            if ($otherWrapper.find('.home-menu-other-text.logout-text').length === 0) {
-                $otherWrapper.append('<p class="home-menu-other-text logout-text">logout</p>');
+            if ($otherWrapper.children('p.logout-text').length === 0) {
+                $otherWrapper.append('<p class="logout-text">logout</p>');
             }
         });
         $centerWrapper.show();
@@ -1273,7 +1272,7 @@ $(document).ready(function () {
         $('.cookies-feature-wrapper').show()
         $(this).hide()
     })
-    $('.feature-accept-btn').on('click', function() {
+    $('.cookies-feature-save-btn > div').on('click', function() {
         let $cookiesFeature1 = $('#cookiesFeature1')
         let $cookiesFeature2 = $('#cookiesFeature2')
         let $cookiesFeature3 = $('#cookiesFeature3')
@@ -1295,39 +1294,39 @@ $(document).ready(function () {
         }
         alert('bid it')
     })
-    $('.purchase-qty-btn-left').on('click', function () {
-        let count = Number($('.purchase-qty-display').val()) - 1
-        $('.purchase-qty-display').val(count)
+    $('.item-buy-mask .purchase-controls > button:first-of-type').on('click', function () {
+        let count = Number($('.item-buy-mask .purchase-controls > input').val()) - 1
+        $('.item-buy-mask .purchase-controls > input').val(count)
         changeBuyCount()
     })
-    $('.purchase-qty-btn-right').on('click', function () {
-        let count = Number($('.purchase-qty-display').val()) + 1
-        $('.purchase-qty-display').val(count)
+    $('.item-buy-mask .purchase-controls > button:last-of-type').on('click', function () {
+        let count = Number($('.item-buy-mask .purchase-controls > input').val()) + 1
+        $('.item-buy-mask .purchase-controls > input').val(count)
         changeBuyCount()
     })
-    $('.purchase-buy-btn').on('click', function () {
-        let count = Number($('.purchase-qty-display').val())
+    $('.item-buy-mask .item-list > button').on('click', function () {
+        let count = Number($('.item-buy-mask .purchase-controls > input').val())
         console.log(count, '数量')
     })
-    $('.close-buy-modal-btn').on('click', function () {
+    $('.item-buy-mask .close-btn-wrapper > img').on('click', function () {
         $('.item-buy-mask').hide()
     })
     function changeBuyCount() {
         let totalCount = Number($('.goods-count').text())
-        let count = Number($('.purchase-qty-display').val())
+        let count = Number($('.item-buy-mask .purchase-controls > input').val())
         if (count < 2) {
-            $('.purchase-qty-display').val(1)
-            $('.purchase-qty-btn-left').addClass('disabled')
+            $('.item-buy-mask .purchase-controls > input').val(1)
+            $('.item-buy-mask .purchase-controls > button:first-of-type').addClass('disabled')
         } else {
-            $('.purchase-qty-btn-left').removeClass('disabled')
+            $('.item-buy-mask .purchase-controls > button:first-of-type').removeClass('disabled')
         }
         if (count >= totalCount) {
-            $('.purchase-qty-display').val(totalCount)
-            $('.purchase-qty-btn-right').addClass('disabled')
+            $('.item-buy-mask .purchase-controls > input').val(totalCount)
+            $('.item-buy-mask .purchase-controls > button:last-of-type').addClass('disabled')
         } else {
-            $('.purchase-qty-btn-right').removeClass('disabled')
+            $('.item-buy-mask .purchase-controls > button:last-of-type').removeClass('disabled')
         }
-        let totalPrice = Number($('.item-buy-wrapper .item-price').attr('data-value')) * Number($('.purchase-qty-display').val())
+        let totalPrice = Number($('.item-buy-wrapper .item-price').attr('data-value')) * Number($('.item-buy-mask .purchase-controls > input').val())
 
         $('.total-price').text(`$${totalPrice}`)
     }

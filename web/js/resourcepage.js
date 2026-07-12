@@ -176,7 +176,7 @@ $(document).ready(function () {
     searchData()
   })
   $('.sort-item').on('click', function () {
-    $('.page-sort-icon').attr('data-value', $(this).attr('data-value'))
+    $('.page-sort-box > img').attr('data-value', $(this).attr('data-value'))
     searchData()
   })
   $('.page-search-icon').on('click', function() {
@@ -187,7 +187,7 @@ function searchData () {
   let params = {
     category: $('#selectedCategory').attr('data-value'),
     name: $('#searchInput').val(),
-    sortBy: $('.page-sort-icon').attr('data-value')
+    sortBy: $('.page-sort-box > img').attr('data-value')
   }
   console.log(params, 'dddd')
 }

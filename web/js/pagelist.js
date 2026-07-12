@@ -52,7 +52,7 @@ class PageList {
         if (!loadMore) return;
         this.isLoading = show;
         const loading = loadMore.querySelector('.loading');
-        const loadText = loadMore.querySelector('.load-more-text');
+        const loadText = loadMore.querySelector(':scope > span');
         if (!loading || !loadText) return;
         if (show) {
             loading.style.display = 'inline-block';

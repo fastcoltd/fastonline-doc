@@ -117,7 +117,7 @@
                 var params = {
                     category: $('#selectedCategory').attr('data-value'),
                     name: $('#searchInput').val(),
-                    sortBy: $('.page-sort-icon').attr('data-value')
+                    sortBy: $('.page-sort-box > img').attr('data-value')
                 };
                 console.log(params);
             }
@@ -142,7 +142,7 @@
             });
             $('.sort-item').on('click', function (event) {
                 event.stopPropagation();
-                $('.page-sort-icon').attr('data-value', $(this).attr('data-value'));
+                $('.page-sort-box > img').attr('data-value', $(this).attr('data-value'));
                 $('#sortDropdown').hide();
                 searchData();
             });
@@ -172,7 +172,7 @@
             $('#load-more').on('click', function () {
                 var $btn = $(this);
                 var $loading = $btn.find('.loading');
-                var $text = $btn.find('.load-more-text');
+                var $text = $btn.children('span');
                 if ($loading.is(':visible')) return;
                 $loading.show();
                 $text.hide();

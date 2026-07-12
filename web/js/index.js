@@ -120,7 +120,7 @@ window.addEventListener('DOMContentLoaded', function () {
             return;
         }
         const panels = Array.from(purchaseMask.querySelectorAll('.index-purchase-panel'));
-        const qtyInputs = Array.from(purchaseMask.querySelectorAll('.index-purchase-qty'));
+        const qtyInputs = Array.from(purchaseMask.querySelectorAll('.index-purchase-stepper > input'));
         const unitPrice = 156;
         const maxCount = 77;
 
@@ -160,10 +160,10 @@ window.addEventListener('DOMContentLoaded', function () {
             purchaseMask.querySelectorAll('.index-purchase-summary-qty').forEach(function (item) {
                 item.textContent = count;
             });
-            purchaseMask.querySelectorAll('.index-purchase-qty-minus').forEach(function (button) {
+            purchaseMask.querySelectorAll('.index-purchase-stepper > button:first-of-type').forEach(function (button) {
                 button.classList.toggle('is-disabled', count <= 1);
             });
-            purchaseMask.querySelectorAll('.index-purchase-qty-plus').forEach(function (button) {
+            purchaseMask.querySelectorAll('.index-purchase-stepper > button:last-of-type').forEach(function (button) {
                 button.classList.toggle('is-disabled', count >= maxCount);
             });
         }
@@ -205,7 +205,7 @@ window.addEventListener('DOMContentLoaded', function () {
                 closePurchaseFlow();
                 return;
             }
-            const closeButton = event.target.closest('.index-purchase-close');
+            const closeButton = event.target.closest('.index-purchase-titlebar > button');
             if (closeButton) {
                 closePurchaseFlow();
                 return;
@@ -221,17 +221,17 @@ window.addEventListener('DOMContentLoaded', function () {
                 setStep(prevButton.dataset.purchasePrev);
                 return;
             }
-            const minusButton = event.target.closest('.index-purchase-qty-minus');
+            const minusButton = event.target.closest('.index-purchase-stepper > button:first-of-type');
             if (minusButton) {
                 syncQuantity((parseInt(qtyInputs[0].value, 10) || 1) - 1);
                 return;
             }
-            const plusButton = event.target.closest('.index-purchase-qty-plus');
+            const plusButton = event.target.closest('.index-purchase-stepper > button:last-of-type');
             if (plusButton) {
                 syncQuantity((parseInt(qtyInputs[0].value, 10) || 1) + 1);
                 return;
             }
-            if (event.target.closest('.index-purchase-link-btn')) {
+            if (event.target.closest('.index-purchase-success-actions > button')) {
                 closePurchaseFlow();
             }
         });
@@ -319,7 +319,7 @@ window.addEventListener('DOMContentLoaded', function () {
                 if (!img) return;
                 var modal = document.getElementById('index-purchase-image-modal');
                 if (modal) {
-                    modal.querySelector('.index-purchase-image-modal-img').src = img.src;
+                    modal.querySelector(':scope > img').src = img.src;
                     modal.classList.add('is-open');
                     modal.setAttribute('aria-hidden', 'false');
                 }
@@ -327,10 +327,10 @@ window.addEventListener('DOMContentLoaded', function () {
             var imageModal = document.getElementById('index-purchase-image-modal');
             if (imageModal) {
                 imageModal.addEventListener('click', function (event) {
-                    if (event.target === imageModal || event.target.closest('.index-purchase-image-modal-close')) {
+                    if (event.target === imageModal || event.target.closest('.index-purchase-image-modal > button')) {
                         imageModal.classList.remove('is-open');
                         imageModal.setAttribute('aria-hidden', 'true');
-                        imageModal.querySelector('.index-purchase-image-modal-img').src = '';
+                        imageModal.querySelector(':scope > img').src = '';
                     }
                 });
             }

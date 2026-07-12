@@ -141,10 +141,10 @@ function createItemElement(item) {
     <div class="card-content">
           <!-- 第一行：用户信息 -->
           <div class="user-section">
-            <img class="demand-detail-item-user-avatar" src="image" />
+            <img src="image" />
             <div class="demand-detail-item-user-info">
               <div class="user-header">
-                <h2 class="demand-detail-item-user-name">Sergio Tremblay</h2>
+                <h2>Sergio Tremblay</h2>
                 <div class="user-icon-box">
                   <div class="item-mark item-mark1">Hot</div>
                   <div class="item-mark item-mark2">LV1</div>
@@ -155,8 +155,8 @@ function createItemElement(item) {
                             <div class="stars-inner" style="--star-fill: 86%;"></div>
                         </div>
                     </div>
-                    <p class="item-star-score">4.3</p>
-                    <p class="item-star-recommend">(200)</p>
+                    <p>4.3</p>
+                    <p>(200)</p>
                   </div>
                 </div>
               </div>
@@ -195,7 +195,7 @@ function createItemElement(item) {
                 Nesciunt quibusdam quae nihil debitis eveniet quidem perspiciatis numquam. Voluptatem necessitatibus occaecati voluptatem qui blanditiis eligendi. Quod rerum itaque tempora dolorem tenetur molestias aut deleniti incidunt. Sit alias sed ea dolorem unde culpa incidunt neque.
             </span></p>
           </div>
-          <span class="bidding-text">Bidding pictures</span>
+          <span>Bidding pictures</span>
           <div class="bidding-box">
             <img src="image" class="bidding-item" />
             <img src="image" class="bidding-item" />
@@ -208,7 +208,7 @@ function createItemElement(item) {
             <img src="image" class="bidding-item" />
             <img src="image" class="bidding-item" />
           </div>
-          <span class="item-service demand-desc">Fuga nisi id dicta fugi Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.t.</span>
+          <span class="item-service">Fuga nisi id dicta fugi Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.t.</span>
         </div>
         <div class="demand-edit-box demand-edit-box1">Edit</div>
         <!-- 状态标签 -->

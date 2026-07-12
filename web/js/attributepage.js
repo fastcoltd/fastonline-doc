@@ -110,14 +110,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const htmlStr = $targetPager.html();
     $('.loading').show()
-    $('.load-more-text').hide()
+    $('.show-more-btn > span').hide()
     setTimeout(() => {
       $targetPager.append(htmlStr);
       if (type != 'demand') {
         syncItemAllBestItemsClass();
       }
       $('.loading').hide()
-      $('.load-more-text').show()
+      $('.show-more-btn > span').show()
     }, 2000)
   })
 });

@@ -156,7 +156,7 @@ function createBestItemElement(item) {
   const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
 
   div.innerHTML = `
-           <img class="best-items-item-icon" src="{{item.image}}" />
+           <img src="{{item.image}}" />
            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
            <div class="best-items-item-content">
             <div class="item-title-box">
@@ -169,8 +169,8 @@ function createBestItemElement(item) {
                   <div class="stars-inner" style="--star-fill: 86%;"></div>
                 </div>
               </div>
-              <p class="item-star-score">4.3</p>
-              <p class="item-star-recommend">(200)</p>
+              <p>4.3</p>
+              <p>(200)</p>
             </div>
             <div class="best-items-item-middle-box">
               <div class="item-brand-box">
@@ -222,7 +222,7 @@ function createStoreItemElement(item) {
   div.innerHTML = `
            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
             <div class="store-item-user-box">
-              <img class="store-item-icon" src="{{item.image}}" />
+              <img src="{{item.image}}" />
               <div class="store-item-name-box">
                 <a href="store-detail.html?name=store-name" target="_self" class="item-title-box">
                   <p class="item-title">Store name,Store name,Store name,Store name,Store name,Store name,Store name,
@@ -242,11 +242,11 @@ function createStoreItemElement(item) {
                     <div class="stars-inner" style="--star-fill: 86%;"></div>
                   </div>
                 </div>
-                <p class="item-star-score">4.3</p>
-                <p class="item-star-recommend">(200)</p>
+                <p>4.3</p>
+                <p>(200)</p>
               </div>
               <div class="store-item-detail-box">
-                <p class="store-item-detail">Store detail,Store detail,Store detail,Store detail,Store detail,Store
+                <p>Store detail,Store detail,Store detail,Store detail,Store detail,Store
                   detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
                   detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
                   detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store

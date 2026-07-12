@@ -175,12 +175,12 @@ $(document).ready(function () {
     $('.filter-apply-btn').on('click', function () {
         startFitterData()
     })
-    $('.page-sort-icon').on('click', function (e) {
+    $('.page-sort-box > img').on('click', function (e) {
         e.stopPropagation()
         $('.sort-container').toggle()
     })
     $('.sort-item').on('click', function () {
-        $('.page-sort-icon').attr('data-value', $(this).data('value'))
+        $('.page-sort-box > img').attr('data-value', $(this).data('value'))
         $('.sort-container').hide()
         startFitterData()
     })
@@ -204,7 +204,7 @@ $(document).ready(function () {
         $('.filter-custom-select[data-type="attribute-value"]').find('.filter-tags').html('')
         selectedTags.clear();
         selectedAttrs.clear();
-        $('.page-sort-icon').attr('data-value', '')
+        $('.page-sort-box > img').attr('data-value', '')
         filterCount()
         updateAllSpinnerStates()
         startFitterData()
@@ -232,7 +232,7 @@ $(document).ready(function () {
                 min: $numberInputMin.val() || '',
                 max: $numberInputMax.val() || ''
             },
-            sortBy: $('.page-sort-icon').attr('data-value') || ''
+            sortBy: $('.page-sort-box > img').attr('data-value') || ''
         };
     }
     // Filter group expand/collapse functionality
