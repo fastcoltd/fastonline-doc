@@ -479,3 +479,13 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - CSS/LESS：同步 `resource`、`detail/resource`、`detail/resource-detail` 三组样式；Other Pages 卡片原先来自 common 的标题样式按相同属性迁移到卡片结构选择器，桌面与移动端最终样式保持一致。
 - JS：`resourcepage.js` 的静态绑定与动态模板改用 `data-action`，`resource-detail.js` 的 Helpful 绑定同步迁移；动态轮播仍通过必要的 `resource-page-item` 根识别卡片。
 - 回归：目标旧叶子类在 E4 源码、CSS/LESS、JS 中无残留；构建 31 页、`git diff --check`、全部非 minified JS 语法检查通过。
+
+### F1 全消费页筛选结果行（2026-07-13）
+
+- 页面与当前行：`attribute-all.html:83-87`、`brand-service.html:80-84`、`compaign-all.html:60-64`、`demand-all.html:59-63`、`faq-list.html:80-84`、`item-all.html:60-64`、`post-all.html:55-59`、`store-all.html:60-64`、`tag-all.html:68-77`。
+- 旧选择器：`page-filterresult-num`、`page-filterresult-text`、`page-filterresult-content`，以及 Attribute 已有的 `data-result-num/text/content`。
+- 新结构：在保留的 `.page-filterresult-box` 布局根下，三个直接子元素统一使用 `data-result-role="count|label|query"`；业务身份不用 `nth-child` 表达。
+- CSS/LESS：`common` 的灰色 label 规则、`attribute-all` 的结果文字规则、`tag-all` 的移动端 label/query 规则同步到统一 data role；声明值和媒体查询位置不变。
+- JS：`compaign-all.html`、`demand-all.html` 内联脚本按 `data-result-role` 查询并更新三段文字。
+- 特异性：Common 从单叶子 class 改为布局根 + data role，限定范围更窄；Attribute、Tag 的页面作用域与原选择器层级保持，不引入跨模块命中。
+- 回归：旧 `page-filterresult-num/text/content` class 和旧 `data-result-num/text/content` 在 `src/css/js` 中无残留；构建 31 页、`git diff --check`、全部非 minified JS 及全部页面内联脚本语法检查通过。
