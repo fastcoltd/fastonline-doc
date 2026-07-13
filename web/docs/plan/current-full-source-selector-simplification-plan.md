@@ -288,16 +288,16 @@
 
 - [x] A1 home-menu 全消费页（第一轮全量扫描候选已完成，见下方执行记录）
 - [x] A2 购买弹窗全消费页（公共弹窗 + index 独立流程已完成）
-- [ ] B1 header + mobile search
-- [ ] B2 footer/cookies/slide buttons
-- [ ] B3 auth
-- [ ] C 公共页面结构
-- [ ] D1 rating/like
-- [ ] D2 item 卡片族
-- [ ] D3 store 卡片族
-- [ ] D4 demand 卡片族
-- [ ] D5 campaign/post/blog 卡片族
-- [ ] D6 search 卡片族
+- [x] B1 header + mobile search
+- [x] B2 footer/cookies/slide buttons
+- [x] B3 auth
+- [x] C 公共页面结构
+- [x] D1 rating/like
+- [x] D2 item 卡片族
+- [x] D3 store 卡片族
+- [x] D4 demand 卡片族
+- [x] D5 campaign/post/blog 卡片族
+- [x] D6 search 卡片族
 - [ ] E1 brand/FAQ
 - [ ] E2 review
 - [ ] E3 statistics
@@ -430,3 +430,13 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - Blog v2 已删除并结构化：封面、标题 link/title、品牌入口、stars/score、属性 label/value/bold；全部使用 article/content/meta/rate/attr 稳定父级。
 - 明确保留：Campaign brand/products 类（同时被标签参数和多个结构复用）、布局根、通用 title/brand/tag、like 状态与行为类。
 - 回归：构建 31 页、`git diff --check`、全部非 minified JS 语法检查、17 组旧 class 及 Campaign/Post/Blog 重复父级 scope 检查均通过。
+
+### D6 Search 卡片组件族（2026-07-13）
+
+- 组件：Search 的 featured、campaign、post、store、demand 五类桌面卡片；同步 search 页面 `bidders_html` include 参数。
+- 已删除并结构化：Post 标题高亮和摘要、Store 摘要、Demand 日期图标及竞标人 label/avatar/more、Campaign 产品行及产品值、Featured/Campaign 浏览统计 item/icon/count。
+- 目标结构：标题直接 span、各卡片 `.card-content > p`、日期容器直接 img、竞标人容器首 span/直接 img/末 span、浏览统计容器直接 span 及其 img/末 span。
+- CSS/LESS：全部改为卡片类型或保留父级下的直接子结构选择器；Post 摘要原公共样式完整迁入专属结构规则，避免宽泛段落选择器误命中 Campaign/Store。
+- 明确保留：搜索卡根及桌面/移动类型、title/meta/row/group/view/bidder 等布局作用域、通用 title/brand/service/stock/tag/rating、状态 badge 和 like 行为类。
+- JS：本批删除项均未被脚本查询或写入，无需改动 JS。
+- 回归：构建 31 页、`git diff --check`、全部非 minified JS 语法检查、15 组旧 class 及重复结构作用域检查均通过。
