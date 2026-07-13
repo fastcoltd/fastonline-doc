@@ -87,23 +87,23 @@ function createItemElement(item) {
   div.className = 'resource-item';
   const itemStates = [
     {
-      likeClass: 'resource-action-group resource-action-like',
-      unlikeClass: 'resource-action-group resource-action-unlike',
+      likeClass: 'resource-action-group',
+      unlikeClass: 'resource-action-group',
       followIcon: 'image/follow-count.png'
     },
     {
-      likeClass: 'resource-action-group resource-action-like has-activate',
-      unlikeClass: 'resource-action-group resource-action-unlike',
+      likeClass: 'resource-action-group has-activate',
+      unlikeClass: 'resource-action-group',
       followIcon: 'image/follow-active-count.png'
     },
     {
-      likeClass: 'resource-action-group resource-action-like',
-      unlikeClass: 'resource-action-group resource-action-unlike has-activate',
+      likeClass: 'resource-action-group',
+      unlikeClass: 'resource-action-group has-activate',
       followIcon: 'image/follow-count.png'
     },
     {
-      likeClass: 'resource-action-group resource-action-like has-activate',
-      unlikeClass: 'resource-action-group resource-action-unlike has-activate',
+      likeClass: 'resource-action-group has-activate',
+      unlikeClass: 'resource-action-group has-activate',
       followIcon: 'image/follow-active-count.png'
     }
   ];
@@ -111,29 +111,29 @@ function createItemElement(item) {
 
   div.innerHTML = `
            <div class="resource-header">
-                    <a href="resource-detail.html" class="resource-title">Laboriosam magni repudiandae quia a ut est soluta.Laboriosam magni repudiandae quia a ut est soluta.</a>
-                    <span class="resource-date">Updated: 2025/6/17 10:41:44</span>
+                    <a href="resource-detail.html">Laboriosam magni repudiandae quia a ut est soluta.Laboriosam magni repudiandae quia a ut est soluta.</a>
+                    <span>Updated: 2025/6/17 10:41:44</span>
                 </div>
                 <div class="resource-body">
-                    <span class="resource-content">Vero at sit corrupti. Autem omnis sed et repellat rerum possimus voluptas.Vero at sit corrupti. Autem omnis sed et repellat rerum possimus voluptas.Vero at sit corrupti. Autem omnis sed et repellat rerum possimus voluptas.</span>
+                    <span>Vero at sit corrupti. Autem omnis sed et repellat rerum possimus voluptas.Vero at sit corrupti. Autem omnis sed et repellat rerum possimus voluptas.Vero at sit corrupti. Autem omnis sed et repellat rerum possimus voluptas.</span>
                     <div class="resource-actions">
-                        <div class="resource-action-group">
-                            <img src="image/view-count.png" class="resource-action-icon" />
-                            <span class="resource-action-count">486</span>
+                        <div class="resource-action-group" data-action="view">
+                            <img src="image/view-count.png" />
+                            <span>486</span>
                         </div>
-                        <div class="${currentState.likeClass}">
-                            <img src="image/like-count.png" class="resource-action-icon resource-action-icon-default resource-action-like-icon cursor-pointer" />
-                            <img src="image/like-active-count.png" class="resource-action-icon resource-action-icon-active resource-action-like-icon cursor-pointer" />
-                            <span class="resource-action-count">486</span>
+                        <div class="${currentState.likeClass}" data-action="like">
+                            <img src="image/like-count.png" />
+                            <img src="image/like-active-count.png" />
+                            <span>486</span>
                         </div>
-                        <div class="${currentState.unlikeClass}">
-                            <img src="image/unlike-count.png" class="resource-action-icon resource-action-icon-default resource-action-unlike-icon cursor-pointer" />
-                            <img src="image/unlike-active-count.png" class="resource-action-icon resource-action-icon-active resource-action-unlike-icon cursor-pointer" />
-                            <span class="resource-action-count">10</span>
+                        <div class="${currentState.unlikeClass}" data-action="unlike">
+                            <img src="image/unlike-count.png" />
+                            <img src="image/unlike-active-count.png" />
+                            <span>10</span>
                         </div>
-                        <div class="resource-action-group">
-                            <img src="${currentState.followIcon}" class="resource-action-icon" />
-                            <span class="resource-action-count">20</span>
+                        <div class="resource-action-group" data-action="follow">
+                            <img src="${currentState.followIcon}" />
+                            <span>20</span>
                         </div>
                     </div>
                 </div>
@@ -192,10 +192,10 @@ function searchData () {
   console.log(params, 'dddd')
 }
 $(document).ready(function () {
-  $('.resource-action-like-icon, .icon-is-dianzan').on('click', function() {
+  $('.resource-actions [data-action="like"] > img').on('click', function() {
     $(this).parent('.resource-action-group').toggleClass('has-activate')
   })
-  $('.resource-action-unlike-icon, .icon-not-dianzan').on('click', function() {
+  $('.resource-actions [data-action="unlike"] > img').on('click', function() {
     $(this).parent('.resource-action-group').toggleClass('has-activate')
   })
 })

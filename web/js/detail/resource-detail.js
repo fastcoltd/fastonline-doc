@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
         menuContainer.setAttribute('aria-hidden', 'false');
     }
 
-    $('.helpful-section-wrapper .resource-action-group').on('click', function () {
+    $('.helpful-section-wrapper [data-action]').on('click', function () {
         $(this).toggleClass('has-activate')
     })
 });

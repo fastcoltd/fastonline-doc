@@ -12,19 +12,19 @@
     overflow: hidden;
 }
 
-.resource-image {
+.resource-page-item > img {
     width: 100%;
     height: 26.25rem;
     border-radius: 3.75rem;
     object-fit: cover;
 }
 
-.summary-section {
+.resource-page-item > .resource-header + div {
     width: 100%;
     height: 8.75rem;
 }
 
-.fixed-text {
+.resource-page-item > .resource-header + div > p {
     font-family: var(--primary-popfont);
     font-weight: 400;
     font-size: 1.75rem;
@@ -39,20 +39,47 @@
     text-overflow: ellipsis;
 }
 
+.resource-page-item > .resource-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    gap: 1.25rem;
+}
+
+.resource-page-item > .resource-header > span {
+    flex-shrink: 1;
+    min-width: 0;
+    font-family: var(--primary-popfont);
+    font-weight: 600;
+    color: black;
+    font-size: 3.5rem;
+    line-height: 5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 @media screen and (max-width: 768px) {
     .resource-page-item {
         padding: 0;
         border-radius: 1.25rem;
     }
 
-    .resource-page-item .item-title-box {
+    .resource-page-item > .resource-header {
         padding: 0 1.25rem;
+        gap: 0.75rem;
     }
 
-    .resource-page-item .item-title {
+    .resource-page-item > .resource-header > span {
         max-height: 2rem;
         height: 2rem;
+        font-size: 1.5rem;
+        line-height: 2rem;
         white-space: nowrap;
+        word-wrap: break-word;
+        word-break: break-word;
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -62,19 +89,19 @@
         top: 1.25rem;
     }
 
-    .resource-image {
+    .resource-page-item > img {
         height: 11.25rem;
         border-radius: 1.25rem;
     }
 
-    .summary-section {
+    .resource-page-item > .resource-header + div {
         height: 11.25rem;
         padding: 0 1.25rem;
     }
 
     /* 独立的12.5rem高度文本组件 */
 
-    .fixed-text {
+    .resource-page-item > .resource-header + div > p {
         font-size: 1.5rem;
         line-height: 2.25rem;
     }

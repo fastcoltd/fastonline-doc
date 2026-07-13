@@ -301,7 +301,7 @@
 - [x] E1 brand/FAQ
 - [x] E2 review
 - [x] E3 statistics
-- [ ] E4 resource
+- [x] E4 resource
 - [ ] F 页面独有结构，按页面逐个完成
 - [ ] 124 个源文件覆盖表复核，无遗漏文件
 
@@ -469,3 +469,13 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - CSS/LESS：同步 `item-statistics` 的基础与响应式规则，以及 Store Detail 对统计数字的页面级覆盖，所有属性值保持不变。
 - JS：Item/Store Detail 的周期初始化改为查询 tab 直接 `span/div`；动态补充激活条时不再写入展示类，原有 data-period、键盘与图表切换行为保持不变。
 - 回归：旧叶子类在 `src/css/js` 中无残留；构建 31 页、`git diff --check`、全部非 minified JS 语法检查通过。
+
+### E4 Resource article 组件族（2026-07-13）
+
+- 源码：`resource-all-item.html`、`resource-detail-article-content.html`；同步 Resource All 的 6 处 include 参数、动态列表模板及 Resource Detail 交互。
+- Resource All：删除动作图标、默认/激活图标、计数和 like/unlike 行为叶子类；动作身份迁移到 `data-action="view|like|unlike|follow"`，默认/激活图片由动作组下的图片顺序与 `has-activate` 状态表达。
+- Resource Detail：删除文章章节标题、正文包装与文章图片叶子类、Helpful 文案/标签/图标/like-unlike 类、Share 标签/容器/平台图标类，以及 Other Pages 标题、卡片图片/标题/摘要叶子类，全部改由模块根下的直接子结构表达。
+- 保留项：`resource-item`、`resource-actions`、`resource-action-group`、`content-section`、`share-section`、`resource-page-item`、轮播布局类等组件或布局根继续保留；`has-activate`、`active`、iconfont 类及 `resource-page-item` JS 卡片身份不可删除。
+- CSS/LESS：同步 `resource`、`detail/resource`、`detail/resource-detail` 三组样式；Other Pages 卡片原先来自 common 的标题样式按相同属性迁移到卡片结构选择器，桌面与移动端最终样式保持一致。
+- JS：`resourcepage.js` 的静态绑定与动态模板改用 `data-action`，`resource-detail.js` 的 Helpful 绑定同步迁移；动态轮播仍通过必要的 `resource-page-item` 根识别卡片。
+- 回归：目标旧叶子类在 E4 源码、CSS/LESS、JS 中无残留；构建 31 页、`git diff --check`、全部非 minified JS 语法检查通过。
