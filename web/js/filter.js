@@ -138,7 +138,7 @@ $(document).ready(function () {
             count += 1
         }
 
-        $('.page-filter-num').text(`(${count})`)
+        $('[data-filter-role="count"]').text(`(${count})`)
     }
     if (filterBox) {
         filterBox.addEventListener('click', function () {
@@ -736,7 +736,7 @@ $(document).ready(function () {
                 selectedCount++;
             }
         }
-        const filterCount = document.querySelector('.page-filter-num');
+        const filterCount = document.querySelector('[data-filter-role="count"]');
         filterCount.textContent = '(' + selectedCount + ')';
         return filters
     }

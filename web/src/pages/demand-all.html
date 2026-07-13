@@ -45,8 +45,8 @@
         <div class="page-filter-layoutcontrol-box item-all-filter-layoutcontrol-box">
             <div class="page-filter-box">
                 <div class="page-filter-count">
-                    <img class="page-filter-icon" src="image/filter.png" />
-                    <p class="page-filter-num">(0)</p>
+                    <img data-filter-role="icon" src="image/filter.png" />
+                    <p data-filter-role="count">(0)</p>
                 </div>
                 <!-- <button class="filter-clear-btn">Clear all</button> -->
             </div>
@@ -594,12 +594,12 @@
                 pageContent.classList.add('item-all-filter-design');
             }
 
-            const topFilterIcon = document.querySelector('.page-top-sticky .page-filter-icon');
+            const topFilterIcon = document.querySelector('.page-top-sticky [data-filter-role="icon"]');
             if (topFilterIcon) {
                 topFilterIcon.src = 'image/filter-tight.png';
             }
 
-            document.querySelectorAll('.page-filter-num').forEach(function (node) {
+            document.querySelectorAll('[data-filter-role="count"]').forEach(function (node) {
                 node.textContent = '(2)';
             });
 

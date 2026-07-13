@@ -489,3 +489,13 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - JS：`compaign-all.html`、`demand-all.html` 内联脚本按 `data-result-role` 查询并更新三段文字。
 - 特异性：Common 从单叶子 class 改为布局根 + data role，限定范围更窄；Attribute、Tag 的页面作用域与原选择器层级保持，不引入跨模块命中。
 - 回归：旧 `page-filterresult-num/text/content` class 和旧 `data-result-num/text/content` 在 `src/css/js` 中无残留；构建 31 页、`git diff --check`、全部非 minified JS 及全部页面内联脚本语法检查通过。
+
+### F2 筛选入口图标与数量（2026-07-13）
+
+- 页面与当前行：`brand-service.html:68-71`、`compaign-all.html:48-51`、`demand-all.html:47-50`、`item-all.html:48-51`、`post-all.html:48-51`、`store-all.html:48-51`；共享移动源码 `item-all-filter-panel.html:12-15`。
+- 旧选择器：`page-filter-icon`、`page-filter-num`。
+- 新结构：保留 `.page-filter-count`、`.item-all-filter-mobile-count` 布局根；直接 `img/p` 使用 `data-filter-role="icon|count"`，供跨桌面/移动结构的样式与行为统一识别。
+- CSS/LESS：同步 `filter` 基础及响应式规则、`page` 通用覆盖、Campaign 桌面覆盖、Post All 页面覆盖，所有声明值与媒体查询位置保持不变。
+- JS：`filter.js` 的数量更新与查询迁移到 `data-filter-role="count"`；Campaign/Demand 内联脚本同步查询 count，Demand 的图标切换同步查询 icon。
+- 保留项：筛选容器、布局切换、active/is-active、data-layout 及过滤器业务组件 class 均不在本批删除。
+- 回归：旧 `page-filter-icon/page-filter-num` 在 `src/css/js` 中无残留；7 个源码消费者和构建页面均生成 icon/count data role；构建 31 页、`git diff --check`、全部非 minified JS 及全部页面内联脚本语法检查通过。
