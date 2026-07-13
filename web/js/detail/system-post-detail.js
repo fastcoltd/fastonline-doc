@@ -141,18 +141,17 @@ function createItemElement(item) {
            <div class="page-section">
                             <div class="flex-column post-detail-review-box">
                                 <div class="flex-row post-detail-review-user-box">
-                                    <img class="post-detail-review-user-avatar" src="image/detailpage/review-main-avatar.png" />
+                                    <img src="image/detailpage/review-main-avatar.png" />
                                     <div class="flex-column post-detail-review-user-name-box">
-                                        <span class="post-detail-review-user-name">Han Solo</span>
-                                        <span class="post-detail-review-user-time">1 day ago</span>
+                                        <span>Han Solo</span>
+                                        <span>1 day ago</span>
                                     </div>
                                     <div class="flex-row post-detail-review-user-status-box">
-                                        <img class="post-detail-review-user-status-icon"
-                                            src="image/detailpage/repeat-client.png" />
-                                        <span class="post-detail-review-user-status-text">Repeat client</span>
+                                        <img src="image/detailpage/repeat-client.png" />
+                                        <span>Repeat client</span>
                                     </div>
                                 </div>
-                                <span class="post-detail-review-content">We supply a series of design principles,
+                                <span>We supply a series of design principles,
                                     practical
                                     patterns and high quality design resources (Sketch and Axure), to help people create
                                     their
@@ -171,29 +170,29 @@ function createItemElement(item) {
                                 </div>
                                 <div class="flex-row post-detail-review-info-box">
                                     <div class="flex-column post-detail-review-info-item">
-                                        <span class="post-detail-review-info-title">$666.6</span>
-                                        <span class="post-detail-review-info-desc">Price</span>
+                                        <span>$666.6</span>
+                                        <span>Price</span>
                                     </div>
                                     <div class="post-detail-review-info-line"></div>
                                     <div class="flex-column post-detail-review-info-item">
-                                        <span class="post-detail-review-info-title">333</span>
-                                        <span class="post-detail-review-info-desc">Quantity</span>
+                                        <span>333</span>
+                                        <span>Quantity</span>
                                     </div>
                                     <div class="post-detail-review-info-line"></div>
                                     <div class="flex-column post-detail-review-info-item icon">
-                                        <img class="post-detail-review-info-icon" src="review图片" />
+                                        <img src="review图片" />
                                     </div>
                                 </div>
                             </div>
                             <div class="post-detail-review-line"></div>
                             <div class="flex-column post-detail-reiviewer-box">
                                 <div class="flex-row post-detail-reviewer-user-box">
-                                    <img class="post-detail-reviewer-user-icon" src="image/detailpage/review-reply-avatar.png" />
-                                    <span class="post-detail-reviewer-user-name">Erinasa</span>
-                                    <div class="post-detail-reviewer-user-empty"></div>
-                                    <img class="post-detail-reviewer-arrow" src="image/detailpage/arrow-down.png" />
+                                    <img src="image/detailpage/review-reply-avatar.png" />
+                                    <span>Erinasa</span>
+                                    <div></div>
+                                    <img src="image/detailpage/arrow-down.png" />
                                 </div>
-                                <span class="post-detail-reviewer-content" style="display: none;">Incidunt velit eveniet
+                                <span style="display: none;">Incidunt velit eveniet
                                     sint.
                                     Tempore est et quaerat
                                     quia. Nam consequatur tenetur quia ut sed esse molestias. Nulla enim vel et porro
@@ -203,14 +202,14 @@ function createItemElement(item) {
                             </div>
                         </div>
                         <div class="flex-row post-detail-review-tool-box">
-                            <span class="post-detail-review-tool-text">Helpful?</span>
-                            <div class="flex-row post-detail-review-tool-item" id="review-like">
-                                <img class="post-detail-review-tool-icon" src="image/like-count.png" />
-                                <span class="post-detail-review-tool-text">Yes</span>
+                            <span>Helpful?</span>
+                            <div class="flex-row post-detail-review-tool-item" data-action="yes">
+                                <img src="image/like-count.png" />
+                                <span>Yes</span>
                             </div>
-                            <div class="flex-row post-detail-review-tool-item" id="review-unlike">
-                                <img class="post-detail-review-tool-icon" src="image/unlike-count.png" />
-                                <span class="post-detail-review-tool-text">No</span>
+                            <div class="flex-row post-detail-review-tool-item" data-action="no">
+                                <img src="image/unlike-count.png" />
+                                <span>No</span>
                             </div>
                         </div>
          `;
@@ -227,8 +226,8 @@ function bindReviewItemEvents(element) {
         return;
     }
     const user = reviewer.querySelector('.post-detail-reviewer-user-box');
-    const arrow = user ? user.querySelector('.post-detail-reviewer-arrow') : null;
-    const content = reviewer.querySelector('.post-detail-reviewer-content');
+    const arrow = user ? user.querySelector(':scope > img:last-of-type') : null;
+    const content = reviewer.querySelector(':scope > span');
     if (!user || !arrow || !content) {
         return;
     }
@@ -402,8 +401,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
             const newReview = reviewTemplate.cloneNode(true);
-            const replyContent = newReview.querySelector('.post-detail-reviewer-content');
-            const replyArrow = newReview.querySelector('.post-detail-reviewer-arrow');
+            const replyContent = newReview.querySelector('.post-detail-reiviewer-box > span');
+            const replyArrow = newReview.querySelector('.post-detail-reviewer-user-box > img:last-of-type');
             if (replyContent) {
                 replyContent.style.display = 'none';
             }
@@ -542,10 +541,10 @@ $(document).ready(function () {
     $('.reading-mode-btn').on('click', function () {
         $(this).parent().toggleClass('is-reading-mode')
     })
-    $(document).on('click', '.post-detail-review-tool-icon-like, .icon-is-dianzan', function () {
+    $(document).on('click', '.post-detail-review-tool-item[data-action="yes"] > img, .post-detail-review-tool-item[data-action="yes"] > i', function () {
         $(this).parent('.post-detail-review-tool-item').toggleClass('has-activate')
     })
-    $(document).on('click', '.post-detail-review-tool-icon-unlike, .icon-not-dianzan', function () {
+    $(document).on('click', '.post-detail-review-tool-item[data-action="no"] > img, .post-detail-review-tool-item[data-action="no"] > i', function () {
         $(this).parent('.post-detail-review-tool-item').toggleClass('has-activate')
     })
     document.querySelectorAll('.star-list').forEach(function(starList, index) {

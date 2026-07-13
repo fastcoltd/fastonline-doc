@@ -127,8 +127,8 @@ function bindReviewItemEvents(element) {
         return;
     }
     const user = reviewer.querySelector('.item-detail-reviewer-user-box');
-    const arrow = user ? user.querySelector('.item-detail-reviewer-arrow') : null;
-    const content = reviewer.querySelector('.item-detail-reviewer-content');
+    const arrow = user ? user.querySelector(':scope > img:last-of-type') : null;
+    const content = reviewer.querySelector(':scope > span');
     if (!user || !arrow || !content) {
         return;
     }
@@ -571,18 +571,17 @@ function createItemElement(item) {
            <div class="page-section item-detail-review-card">
                             <div class="flex-column item-detail-review-box">
                                 <div class="flex-row item-detail-review-user-box">
-                                    <img class="item-detail-review-user-avatar" src="image/detailpage/review-main-avatar.png" />
+                                    <img src="image/detailpage/review-main-avatar.png" />
                                     <div class="flex-column item-detail-review-user-name-box">
-                                        <span class="item-detail-review-user-name">Han Solo</span>
-                                        <span class="item-detail-review-user-time">1 day ago</span>
+                                        <span>Han Solo</span>
+                                        <span>1 day ago</span>
                                     </div>
                                     <div class="flex-row item-detail-review-user-status-box">
-                                        <img class="item-detail-review-user-status-icon"
-                                            src="image/detailpage/repeat-client.png" />
-                                        <span class="item-detail-review-user-status-text">Repeat Client</span>
+                                        <img src="image/detailpage/repeat-client.png" />
+                                        <span>Repeat Client</span>
                                     </div>
                                 </div>
-                                <span class="item-detail-review-content">We supply a series of design principles,
+                                <span>We supply a series of design principles,
                                     practical
                                     patterns and high quality design resources (Sketch and Axure), to help people create
                                     their
@@ -600,29 +599,29 @@ function createItemElement(item) {
                                 </div>
                                 <div class="flex-row item-detail-review-info-box">
                                     <div class="flex-column item-detail-review-info-item">
-                                        <span class="item-detail-review-info-title">$325.00</span>
-                                        <span class="item-detail-review-info-desc">Price</span>
+                                        <span>$325.00</span>
+                                        <span>Price</span>
                                     </div>
                                     <div class="item-detail-review-info-line"></div>
                                     <div class="flex-column item-detail-review-info-item">
-                                        <span class="item-detail-review-info-title">213</span>
-                                        <span class="item-detail-review-info-desc">Quantity</span>
+                                        <span>213</span>
+                                        <span>Quantity</span>
                                     </div>
                                     <div class="item-detail-review-info-line"></div>
                                     <div class="flex-column item-detail-review-info-item icon">
-                                        <img class="item-detail-review-info-icon" src="image/detailpage/review-info-thumb.png" />
+                                        <img src="image/detailpage/review-info-thumb.png" />
                                     </div>
                                 </div>
                             </div>
                             <div class="item-detail-review-line"></div>
                             <div class="flex-column item-detail-reiviewer-box">
                                 <div class="flex-row item-detail-reviewer-user-box">
-                                    <img class="item-detail-reviewer-user-icon" src="image/detailpage/review-reply-avatar.png" />
-                                    <span class="item-detail-reviewer-user-name">Erinasa</span>
-                                    <div class="item-detail-reviewer-user-empty"></div>
-                                    <img class="item-detail-reviewer-arrow" src="image/detailpage/arrow-down.png" style="transform: rotate(180deg);" />
+                                    <img src="image/detailpage/review-reply-avatar.png" />
+                                    <span>Erinasa</span>
+                                    <div></div>
+                                    <img src="image/detailpage/arrow-down.png" style="transform: rotate(180deg);" />
                                 </div>
-                                <span class="item-detail-reviewer-content">Incidunt velit eveniet
+                                <span>Incidunt velit eveniet
                                     sint.
                                     Tempore est et quaerat
                                     quia. Nam consequatur tenetur quia ut sed esse molestias. Nulla enim vel et porro
@@ -632,16 +631,16 @@ function createItemElement(item) {
                             </div>
                         </div>
                         <div class="flex-row item-detail-review-tool-box">
-                            <span class="item-detail-review-tool-text">Helpful?</span>
-                            <div class="flex-row item-detail-review-tool-item" id="review-like">
-                                <img class="item-detail-review-tool-icon item-detail-review-tool-icon-yes" src="image/detailpage/review-helpful-yes.svg" />
-                                <i class="iconfont icon-dianzan item-detail-review-tool-icon-yes"></i>
-                                <span class="item-detail-review-tool-text">Yes</span>
+                            <span>Helpful?</span>
+                            <div class="flex-row item-detail-review-tool-item" data-action="yes">
+                                <img src="image/detailpage/review-helpful-yes.svg" />
+                                <i class="iconfont icon-dianzan"></i>
+                                <span>Yes</span>
                             </div>
-                            <div class="flex-row item-detail-review-tool-item" id="review-unlike">
-                                <img class="item-detail-review-tool-icon item-detail-review-tool-icon-no" src="image/detailpage/review-helpful-no.svg" />
-                                <i class="iconfont icon-dianzan icon-not-dianzan item-detail-review-tool-icon-no"></i>
-                                <span class="item-detail-review-tool-text">No</span>
+                            <div class="flex-row item-detail-review-tool-item" data-action="no">
+                                <img src="image/detailpage/review-helpful-no.svg" />
+                                <i class="iconfont icon-dianzan icon-not-dianzan"></i>
+                                <span>No</span>
                             </div>
                         </div>
          `;
@@ -837,11 +836,11 @@ document.addEventListener("DOMContentLoaded", function () {
     $('#buy-now-btn').on('click', () => {
         console.log('Buy~')
     })
-    $(document).on('click', '.item-detail-review-tool-icon-yes', function() {
-        $(this).parent().toggleClass('has-activate')
+    $(document).on('click', '.item-detail-review-tool-item[data-action="yes"] > img, .item-detail-review-tool-item[data-action="yes"] > i', function() {
+        $(this).closest('.item-detail-review-tool-item').toggleClass('has-activate')
     })
-    $(document).on('click', '.item-detail-review-tool-icon-no', function() {
-        $(this).parent().toggleClass('has-activate')
+    $(document).on('click', '.item-detail-review-tool-item[data-action="no"] > img, .item-detail-review-tool-item[data-action="no"] > i', function() {
+        $(this).closest('.item-detail-review-tool-item').toggleClass('has-activate')
     })
     const loadMore = document.getElementById('load-more');
     if (loadMore && window.innerWidth > 768) {

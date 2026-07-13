@@ -299,7 +299,7 @@
 - [x] D5 campaign/post/blog 卡片族
 - [x] D6 search 卡片族
 - [x] E1 brand/FAQ
-- [ ] E2 review
+- [x] E2 review
 - [ ] E3 statistics
 - [ ] E4 resource
 - [ ] F 页面独有结构，按页面逐个完成
@@ -450,3 +450,13 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - CSS/LESS：同步 `brand`、`second-page`、`faq`、`detail/brand` 的基础、响应式及 Brand 详情覆盖；Resource 和 FAQ 详情仍使用的公共动作类保持不变。
 - JS：`brand.js` 与 FAQ List 内联逻辑改为 FAQ header/content/action 父级下的直接子结构查询，动态克隆后的标题、箭头和详情链接更新行为保持一致。
 - 回归：构建 31 页、`git diff --check`、全部非 minified JS 语法检查通过。
+
+### E2 Review 组件族（2026-07-13）
+
+- 源码：Store Review 共享 partial、Item Detail 内联 Review、Post/System Post 两套内联 Review；同步 Item/Post/System Post 动态 Review 模板。
+- 已删除并结构化：主用户头像/名称/时间/状态、正文、信息字段 title/desc/icon、回复用户头像/名称/占位/箭头/正文、Helpful 工具文字与图标，以及 Post yes/no 专用 item 类。
+- 目标结构：user/name/status/info/reviewer/tool 等布局父级下的直接 `img/span/div`；回复箭头使用 user box 的末 `img`，回复正文使用 reviewer box 的直接 `span`。
+- 状态与行为：移除重复的 `review-like/review-unlike` id，工具项新增 `data-action="yes|no"`；`has-activate`、工具项布局类和 iconfont 状态类保留。
+- CSS/LESS：同步 item、store、post、system-post、service、resource-detail 六组详情样式及响应式规则，样式值保持不变。
+- JS：同步 `item-detail.js`、`store-detail.js`、`post-detail.js`、`system-post-detail.js` 的回复展开、动态克隆和 Helpful 点击选择器。
+- 回归：构建 31 页、`git diff --check`、全部非 minified JS 语法检查、旧叶子类/重复 id/危险空选择器检查均通过。

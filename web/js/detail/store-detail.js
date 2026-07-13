@@ -49,8 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
     reviews.forEach(element => {
         const reviewer = element.querySelector('.item-detail-reiviewer-box');
         const user = reviewer.querySelector('.item-detail-reviewer-user-box')
-        const arrow = user.querySelector('.item-detail-reviewer-arrow');
-        const content = reviewer.querySelector('.item-detail-reviewer-content');
+        const arrow = user.querySelector(':scope > img:last-of-type');
+        const content = reviewer.querySelector(':scope > span');
         user.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -105,12 +105,12 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeReviewsShowMore();
     initializeAfterSalesRulesSeeMore();
 
-    $('.item-detail-review-tool-icon-yes').on('click', function() {
+    $('.item-detail-review-tool-item[data-action="yes"] > img, .item-detail-review-tool-item[data-action="yes"] > i').on('click', function() {
         console.log($(this).parent())
-        $(this).parent().toggleClass('has-activate')
+        $(this).closest('.item-detail-review-tool-item').toggleClass('has-activate')
     })
-    $('.item-detail-review-tool-icon-no').on('click', function() {
-        $(this).parent().toggleClass('has-activate')
+    $('.item-detail-review-tool-item[data-action="no"] > img, .item-detail-review-tool-item[data-action="no"] > i').on('click', function() {
+        $(this).closest('.item-detail-review-tool-item').toggleClass('has-activate')
     })
 })
 
