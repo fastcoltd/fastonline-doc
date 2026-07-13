@@ -298,7 +298,7 @@
 - [x] D4 demand 卡片族
 - [x] D5 campaign/post/blog 卡片族
 - [x] D6 search 卡片族
-- [ ] E1 brand/FAQ
+- [x] E1 brand/FAQ
 - [ ] E2 review
 - [ ] E3 statistics
 - [ ] E4 resource
@@ -440,3 +440,13 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - 明确保留：搜索卡根及桌面/移动类型、title/meta/row/group/view/bidder 等布局作用域、通用 title/brand/service/stock/tag/rating、状态 badge 和 like 行为类。
 - JS：本批删除项均未被脚本查询或写入，无需改动 JS。
 - 回归：构建 31 页、`git diff --check`、全部非 minified JS 语法检查、15 组旧 class 及重复结构作用域检查均通过。
+
+### E1 Brand 与 FAQ 组件族（2026-07-13）
+
+- 组件：Brand 列表项、Hot Items/Demands/Posts/FAQ 四类区块、FAQ 卡片；核对 Brand 顶层参数包装和全部页面消费者。
+- Brand 已删除并结构化：列表标签分隔线、底部统计项、区块标题、区块 view-more 链接；分别使用 middle/bottom/title wrapper 的直接子节点。
+- FAQ 已删除并结构化：header 图标、品牌标签、标题、展开箭头、详情 view-more 容器/链接，以及 like/unlike/save 的展示图标和计数类。
+- 状态：default/active 图标改由动作父级下首/次 `img` 与 `has-activate` 组合控制；`open`、`has-activate`、like/unlike/save 行为父类和 iconfont 类保留。
+- CSS/LESS：同步 `brand`、`second-page`、`faq`、`detail/brand` 的基础、响应式及 Brand 详情覆盖；Resource 和 FAQ 详情仍使用的公共动作类保持不变。
+- JS：`brand.js` 与 FAQ List 内联逻辑改为 FAQ header/content/action 父级下的直接子结构查询，动态克隆后的标题、箭头和详情链接更新行为保持一致。
+- 回归：构建 31 页、`git diff --check`、全部非 minified JS 语法检查通过。

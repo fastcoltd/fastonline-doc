@@ -45,22 +45,22 @@ $(document).ready(function () {
             }
         }
     }
-    $('.faq-header-title').on('click', function () {
+    $('.faq-header-middle-box > div').on('click', function () {
         var $item = $(this).parents('.faq-item');
-        $item.find('.faq-header-arrow-icon').toggleClass('open');
+        $item.find('.faq-header > img').toggleClass('open');
         $item.find('.faq-content').toggle(100);
         $item.toggleClass('brand-faq-item-expanded');
     })
-    $('.faq-header-arrow-icon').on('click', e => {
+    $('.faq-header > img').on('click', e => {
         var $item = $(e.target).parents('.faq-item');
         $(e.target).toggleClass('open');
         $item.find('.faq-content').toggle(100);
         $item.toggleClass('brand-faq-item-expanded');
     })
-    $('.resource-action-like-icon, .icon-is-dianzan').on('click', function () {
+    $('.faq-item .resource-action-like > img, .icon-is-dianzan').on('click', function () {
         $(this).parent('.resource-action-group').toggleClass('has-activate')
     })
-    $('.resource-action-unlike-icon, .icon-not-dianzan').on('click', function () {
+    $('.faq-item .resource-action-unlike > img, .icon-not-dianzan').on('click', function () {
         $(this).parent('.resource-action-group').toggleClass('has-activate')
     })
 })

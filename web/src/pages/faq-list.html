@@ -150,11 +150,11 @@
                 searchData();
             });
 
-            $('#faq-list-grid').on('click', '.resource-action-like-icon', function () {
+            $('#faq-list-grid').on('click', '.resource-action-like > img', function () {
                 $(this).parent('.resource-action-group').toggleClass('has-activate');
                 $(this).closest('.faq-actions').find('.resource-action-unlike').removeClass('has-activate');
             });
-            $('#faq-list-grid').on('click', '.resource-action-unlike-icon', function () {
+            $('#faq-list-grid').on('click', '.resource-action-unlike > img', function () {
                 $(this).parent('.resource-action-group').toggleClass('has-activate');
                 $(this).closest('.faq-actions').find('.resource-action-like').removeClass('has-activate');
             });
@@ -164,7 +164,7 @@
             $('#faq-list-grid').on('click', '.faq-header', function () {
                 var $item = $(this).closest('.faq-item');
                 var $content = $item.find('.faq-content');
-                var $arrow = $item.find('.faq-header-arrow-icon');
+                var $arrow = $item.find('.faq-header > img');
                 $content.slideToggle(200);
                 $arrow.toggleClass('open');
             });
@@ -188,9 +188,9 @@
                         var $item = $(this);
                         $item.removeClass('brand-faq-item-expanded');
                         $item.find('.faq-content').hide();
-                        $item.find('.faq-header-arrow-icon').removeClass('open');
-                        $item.find('.faq-header-title').text('How do I reset my password? ' + itemIndex);
-                        $item.find('.view-more-btn').attr('href', 'faq-detail.html?id=' + (123 + itemIndex));
+                        $item.find('.faq-header > img').removeClass('open');
+                        $item.find('.faq-header-middle-box > div').text('How do I reset my password? ' + itemIndex);
+                        $item.find('.faq-content > div:last-child > a').attr('href', 'faq-detail.html?id=' + (123 + itemIndex));
                     });
 
                     if ($emptyState.length) {
