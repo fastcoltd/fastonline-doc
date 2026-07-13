@@ -16,7 +16,7 @@
   gap: 1.25rem;
   width: 100%;
 }
-.main-title {
+.statistics-frame > h2 {
   font-family: Inter;
   font-weight: 500;
   font-size: 2.5rem;
@@ -45,24 +45,24 @@
   align-items: center;
   column-gap: 0.25rem;
 }
-.statistics-bar-panel .statistics-num-count:empty {
+.statistics-bar-panel [data-stat-role="count"]:empty {
   display: none;
 }
-.statistics-num-text {
+[data-stat-role="label"] {
   font-family: var(--primary-popfont);
   font-size: 1.5rem;
   line-height: 2.75rem;
   font-weight: 500;
   color: #000000;
 }
-.statistics-num {
+[data-stat-role="value"] {
   font-family: var(--primary-popfont);
   font-size: 1.75rem;
   line-height: 2.75rem;
   font-weight: 500;
   color: #FD8E2D;
 }
-.statistics-num-count {
+[data-stat-role="count"] {
   font-family: var(--primary-popfont);
   font-size: 1.75rem;
   line-height: 2.75rem;
@@ -261,7 +261,7 @@
   align-items: center;
   gap: 0.75rem;
 }
-.red-indicator {
+.title-section > div {
   width: 0.5rem;
   height: 2rem;
   background: #FF1B20;
@@ -285,7 +285,7 @@
   align-items: center;
   cursor: pointer;
 }
-.tab-item.active .ink-bar {
+.tab-item.active > div {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -293,14 +293,14 @@
   height: 0.25rem;
   background: #FF1B20;
 }
-.tab-text {
+.tab-item > span {
   font-family: Roboto;
   font-weight: 400;
   font-size: 1.75rem;
   line-height: 1.5714em;
   color: #000000;
 }
-.tab-item.active .tab-text {
+.tab-item.active > span {
   color: #FF1B20;
 }
 /* Line Chart Container */
@@ -558,17 +558,17 @@
     column-gap: 0.0625rem;
     white-space: nowrap;
   }
-  .statistics-frame.statistics-bar-panel .statistics-num-text,
-  .statistics-frame.statistics-bar-panel .statistics-num,
-  .statistics-frame.statistics-bar-panel .statistics-num-count {
+  .statistics-frame.statistics-bar-panel [data-stat-role="label"],
+  .statistics-frame.statistics-bar-panel [data-stat-role="value"],
+  .statistics-frame.statistics-bar-panel [data-stat-role="count"] {
     font-size: clamp(1.25rem, 3vw, 1.5rem);
     line-height: 1.5;
     white-space: nowrap;
   }
   @supports (font-size: 1cqw) {
-    .statistics-frame.statistics-bar-panel .statistics-num-text,
-    .statistics-frame.statistics-bar-panel .statistics-num,
-    .statistics-frame.statistics-bar-panel .statistics-num-count {
+    .statistics-frame.statistics-bar-panel [data-stat-role="label"],
+    .statistics-frame.statistics-bar-panel [data-stat-role="value"],
+    .statistics-frame.statistics-bar-panel [data-stat-role="count"] {
       font-size: clamp(1.25rem, 3.25cqw, 1.5rem);
     }
   }

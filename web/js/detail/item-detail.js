@@ -399,7 +399,7 @@ function initStatisticsPeriodTabs() {
         const chartType = group.dataset.chart;
 
         tabs.forEach((tab) => {
-            const tabTextNode = tab.querySelector('.tab-text');
+            const tabTextNode = tab.querySelector(':scope > span');
             const period = tab.dataset.period || (tabTextNode ? tabTextNode.textContent : '').trim().toUpperCase();
             tab.dataset.period = period;
             tab.addEventListener('click', function () {

@@ -300,7 +300,7 @@
 - [x] D6 search 卡片族
 - [x] E1 brand/FAQ
 - [x] E2 review
-- [ ] E3 statistics
+- [x] E3 statistics
 - [ ] E4 resource
 - [ ] F 页面独有结构，按页面逐个完成
 - [ ] 124 个源文件覆盖表复核，无遗漏文件
@@ -460,3 +460,12 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - CSS/LESS：同步 item、store、post、system-post、service、resource-detail 六组详情样式及响应式规则，样式值保持不变。
 - JS：同步 `item-detail.js`、`store-detail.js`、`post-detail.js`、`system-post-detail.js` 的回复展开、动态克隆和 Helpful 点击选择器。
 - 回归：构建 31 页、`git diff --check`、全部非 minified JS 语法检查、旧叶子类/重复 id/危险空选择器检查均通过。
+
+### E3 Statistics 组件族（2026-07-13）
+
+- 源码：`statistics-bar-panel.html`、`statistics-rating-chart-panel.html`、`statistics-period-header.html`，覆盖 Item Detail 与 Store Detail 两个消费页。
+- 已删除并结构化：`main-title` 改为统计框架的直接 `h2`；统计标签、数值、计数改为 `data-stat-role="label|value|count"`；周期标题的红色指示条、tab 文本和激活下划线改为父级直接子元素。
+- 保留项：`statistics-frame`、面板类型、数字布局、tabs/tab-item、active、data-period/data-chart 等布局、类型、状态与行为标识继续保留；`section-title`、`title-indicator` 仍被 Store Detail 的其他标题结构复用，不在本批删除。
+- CSS/LESS：同步 `item-statistics` 的基础与响应式规则，以及 Store Detail 对统计数字的页面级覆盖，所有属性值保持不变。
+- JS：Item/Store Detail 的周期初始化改为查询 tab 直接 `span/div`；动态补充激活条时不再写入展示类，原有 data-period、键盘与图表切换行为保持不变。
+- 回归：旧叶子类在 `src/css/js` 中无残留；构建 31 页、`git diff --check`、全部非 minified JS 语法检查通过。

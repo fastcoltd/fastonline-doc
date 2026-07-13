@@ -196,10 +196,9 @@ function initializeStatisticsPeriodTabs() {
         };
 
         tabItems.forEach(tab => {
-            const tabText = tab.querySelector('.tab-text');
-            if (!tab.querySelector('.ink-bar')) {
+            const tabText = tab.querySelector(':scope > span');
+            if (!tab.querySelector(':scope > div')) {
                 const inkBar = document.createElement('div');
-                inkBar.className = 'ink-bar';
                 tab.insertBefore(inkBar, tab.firstChild);
             }
             tab.dataset.period = tab.dataset.period || (tabText ? tabText.textContent : '').trim().toUpperCase();
