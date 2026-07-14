@@ -66,7 +66,7 @@ $(document).ready(function () {
             $(that).find('.filter-custom-select-text').text(text)
             $(that).toggleClass('active')
             if (dataType == 'contactInformation') {
-                $('.contact-information-input').show().val('').attr('placeholder', `请输入${text}`)
+                $('[name="contactValue"]').show().val('').attr('placeholder', `请输入${text}`)
             }
         })
         $(that).on('click', function () {
@@ -96,58 +96,58 @@ $(document).ready(function () {
     // $(document).on('click', function () {
     //     console.log(quillRule.root.innerHTML)
     // })
-    $('.avatar-img, .upload-avatar-img').on('click', function () {
+    $('[data-upload-role="avatar"] > img, [data-upload-role="avatar"] > div').on('click', function () {
         $('#avatarInput').trigger('click')
     })
     $('#avatarInput').on('change', function (e) {
         var file = this.files[0]; // 获取选中的文件
         if (file) {
-            $('.avatar-img').show()
-            $('.upload-avatar-img').hide()
+            $('[data-upload-role="avatar"] > img').show()
+            $('[data-upload-role="avatar"] > div').hide()
             var reader = new FileReader(); // 创建FileReader对象
             reader.onload = function (e) {
-                $('.avatar-img').attr('src', e.target.result)
-                console.log($('.avatar-img'))
+                $('[data-upload-role="avatar"] > img').attr('src', e.target.result)
+                console.log($('[data-upload-role="avatar"] > img'))
             };
             reader.readAsDataURL(file); // 读取文件内容作为DataURL
         } else {
-            $('.avatar-img').hide()
-            $('.upload-avatar-img').show()
+            $('[data-upload-role="avatar"] > img').hide()
+            $('[data-upload-role="avatar"] > div').show()
         }
     });
-    $('.logo-img, .upload-logo-img').on('click', function () {
+    $('[data-upload-role="logo"] > img, [data-upload-role="logo"] > div').on('click', function () {
         $('#logoInput').trigger('click')
     })
     $('#logoInput').on('change', function (e) {
         var file = this.files[0]; // 获取选中的文件
         if (file) {
-            $('.logo-img').show()
-            $('.upload-logo-img').hide()
+            $('[data-upload-role="logo"] > img').show()
+            $('[data-upload-role="logo"] > div').hide()
             var reader = new FileReader(); // 创建FileReader对象
             reader.onload = function (e) {
-                $('.logo-img').attr('src', e.target.result)
+                $('[data-upload-role="logo"] > img').attr('src', e.target.result)
             };
             reader.readAsDataURL(file); // 读取文件内容作为DataURL
         } else {
-            $('.logo-img').show()
-            $('.upload-logo-img').hide()
+            $('[data-upload-role="logo"] > img').show()
+            $('[data-upload-role="logo"] > div').hide()
         }
     });
     $('.submit-btn-wrapper').on('click', function () {
         let formData = new FormData(); // 创建FormData对象
-        $avatarInput = $('#avatarInput')[0]
-        $logoInput = $('#logoInput')[0]
+        $avatarInput = $('[name="avatar"]')[0]
+        $logoInput = $('[name="logo"]')[0]
         $country = $('.filter-custom-select[data-type="country"]')
         $timeZone = $('.filter-custom-select[data-type="timeZone"]')
         $language = $('.filter-custom-select[data-type="language"]')
-        $storeName = $('.name-input')
-        $time = $('.time-input')
-        $slogan = $('.slogan-input')
-        $introduction = $('.introduction-textarea')
-        $team = $('.team-textarea')
+        $storeName = $('[name="storeName"]')
+        $time = $('[name="time"]')
+        $slogan = $('[name="slogan"]')
+        $introduction = $('[name="introduction"]')
+        $team = $('[name="team"]')
         $contactType = $('.filter-custom-select[data-type="contactInformation"]')
-        $contactValue = $('.contact-information-input')
-        $agreement = $('#agreement')
+        $contactValue = $('[name="contactValue"]')
+        $agreement = $('[name="agreement"]')
         if ($avatarInput.files.length > 0) {
             formData.append('avatar', $avatarInput.files[0])
         } else {

@@ -510,3 +510,15 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - JS：`common.js` 的库存读取、单价读取和总价写入均限定在 `.item-buy-mask` 下查询 data role；数量按钮/输入与 disabled 状态逻辑保持原结构。
 - Attribute 结论：第 9 节表格所列 update-time、价格、购买数量与按钮均已由 A2 + 本批覆盖；页面头部 Attribute 信息与切换项此前已使用 data 属性，布局/状态根继续保留。
 - 回归：10 个消费页均生成四种 purchase role；弹窗旧 `goods-count/item-price-wrapper/item-price/item-price-original/total-price` HTML class 在目标集合中无残留；构建 31 页、`git diff --check`、全部非 minified JS 及全部页面内联脚本语法检查通过。
+
+### F4 Become Seller 表单（2026-07-14）
+
+- 页面范围：`become-seller.html:43-219`；样式 `css/become-seller.css/less`；行为 `js/become-seller.js`。
+- 上传结构：删除 `upload-avatar-img/upload-logo-img`、`avatar-img/logo-img`、`file-avatar/file-logo`；保留上传组布局根并增加 `data-upload-role="avatar|logo"`，内部占位、预览、file input 使用直接子结构。
+- 表单字段：删除 `name-input/time-input/slogan-input/contact-information-input` 与 `introduction-textarea/team-textarea`；为控件增加 `name="storeName|time|slogan|contactValue|introduction|team"`，CSS/JS 使用 name/type 与父级作用域。
+- 其它叶子：字段 `label` class 改 `.item-wrapper > span`；`agreement-name-wrapper` 改协议根直接 `label`；`editor-rule/editor-des` 删除并继续使用既有 id。
+- 保留项：页面/卡片/字段/分组布局根、联系信息 modifier、上传组根、提交按钮行为根、筛选组件 class、Quill 生成类、active 状态和 iconfont class。
+- 特异性：所有新选择器保持 `.seller-apply-page` 页面作用域；上传尺寸由 data-upload-role 区分，字段样式由 `.item-content` 下直接控件限定，不命中筛选组件内部 input。
+- JS：头像/Logo 点击与预览切换改为上传组直接子结构；联系信息显示与提交数据读取改用控件 name，Quill id、下拉 data-type 和提交入口行为保持不变。
+- 页面结论：第 9 节 Become Seller 所列头像/Logo、input、textarea、agreement 文本候选已完成；字段/上传根和第三方组件类均有明确保留原因。
+- 回归：目标 16 组旧叶子 class 在页面、CSS/LESS、JS 中无残留；构建 31 页、`git diff --check`、全部非 minified JS 及全部页面内联脚本语法检查通过。
