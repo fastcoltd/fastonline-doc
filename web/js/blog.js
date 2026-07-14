@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sideMenuButton = document.querySelector('.detail-page-menu');
     const sidePanel = document.getElementById('blog-side-panel');
     const sidePanelContent = sidePanel ? sidePanel.querySelector('.other-info-wrapper') : null;
-    const sideClose = sidePanel ? sidePanel.querySelector('.table-of-container-close') : null;
+    const sideClose = sidePanel ? sidePanel.querySelector(':scope > img') : null;
 
     const resetSidePanelScrollTop = () => {
       if (sidePanel) {

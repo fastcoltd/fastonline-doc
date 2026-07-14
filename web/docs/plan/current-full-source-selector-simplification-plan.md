@@ -522,3 +522,15 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - JS：头像/Logo 点击与预览切换改为上传组直接子结构；联系信息显示与提交数据读取改用控件 name，Quill id、下拉 data-type 和提交入口行为保持不变。
 - 页面结论：第 9 节 Become Seller 所列头像/Logo、input、textarea、agreement 文本候选已完成；字段/上传根和第三方组件类均有明确保留原因。
 - 回归：目标 16 组旧叶子 class 在页面、CSS/LESS、JS 中无残留；构建 31 页、`git diff --check`、全部非 minified JS 及全部页面内联脚本语法检查通过。
+
+### F5 Blog 页面内联结构（2026-07-14）
+
+- 页面范围：`blog.html:48-257`；样式 `css/detail/blog.css/less`；行为 `js/blog.js:44-47`。
+- 头像：`blog.html:52` 的 `.avatar`、`:114` 的 `.avatar-icon` 分别迁移为 Blog header 与 store info 的 `.avatar-wrapper > img`。
+- 列表：`blog.html:168-176` 的 `.post-item` 改为 `.post-list > div`；`:233-253` 的评论 `.item` 改为 `.latest-comments-wrapper .content > div`。
+- 分类子列表：`blog.html:183-205` 的 `.dl-list` 改为 `.categories-wrapper .ul-list > dl`，其 `:last-of-type` 和直接 `li` 规则同步保持。
+- 评论叶子：`blog.html:235/242/249` 的 `.comment-user` 改为评论文本的首个直接 `span`；`:238/245/252` 的 `.time` 改为评论项的末个直接 `p`。Introduction 中承担独立排版的 `.time` 保留。
+- 目录关闭：`blog.html:257` 的 `.table-of-container-close` 改为 `.blog-sidebar-container > img`；`js/blog.js` 同步使用 `:scope > img` 查询。
+- 保留项：页面/侧栏/列表/分类/评论布局根、复用的 `title/des/text/time/tag-item` 排版类、状态与行为类、卡片 partial class 均不在本页内联批次删除。
+- 命中集合：两个头像选择器各命中 1 个节点；热门文章 7 项、分类子列表 4 项、评论项/用户/时间各 3 项、侧栏直接关闭图片 1 个，与迁移前精确一致。新规则均保留 Blog 页面及具体模块父级作用域；加载顺序和属性声明不变，不产生跨模块命中。
+- 回归：目标旧叶子 class 在页面、Blog CSS/LESS 与 `blog.js` 中无意外残留（Introduction 的 `.time` 为明确保留项）；构建 31 页、`git diff --check`、`js/blog.js` 与全部非 minified JS 语法检查、全部页面内联脚本解析均通过。
