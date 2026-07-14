@@ -499,3 +499,14 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - JS：`filter.js` 的数量更新与查询迁移到 `data-filter-role="count"`；Campaign/Demand 内联脚本同步查询 count，Demand 的图标切换同步查询 icon。
 - 保留项：筛选容器、布局切换、active/is-active、data-layout 及过滤器业务组件 class 均不在本批删除。
 - 回归：旧 `page-filter-icon/page-filter-num` 在 `src/css/js` 中无残留；7 个源码消费者和构建页面均生成 icon/count data role；构建 31 页、`git diff --check`、全部非 minified JS 及全部页面内联脚本语法检查通过。
+
+### F3 Attribute 计划项与公共购买弹窗价格/库存补齐（2026-07-13）
+
+- 当前审计：Attribute 计划中的 `update-time`、数量减/加/显示和购买按钮 class 已由 A2 完成；A2 原范围包含但尚残留的 `item-price-*`、库存数量和总价行为类需按当前全部 10 个消费页统一补齐。
+- 消费页：`attribute-all.html:636-666`、`brand-service.html:622-652`、`brand.html:600-630`、`item-all.html:602-632`、`post-detail.html:945-975`、`resource-detail.html:611-641`、`search-all.html:570-600`、`store-detail.html:826-856`、`system-post-detail.html:910-940`、`tag-all.html:670-700`。
+- 旧选择器：弹窗内的 `goods-count`、`item-price-wrapper`、`item-price`、`item-price-original`、`total-price`；页面卡片和 Item Detail 自身仍使用的同名价格 class 不属于本批删除集合。
+- 新结构：公共 `.item-buy-mask` 内使用 `data-purchase-role="stock-count|unit-price-group|unit-price|total-price"`；原价由 unit-price 的相邻 `span` 表达，不使用展示 class。
+- CSS/LESS：仅同步 `common` 中公共购买弹窗作用域规则；通用卡片价格规则继续保留，确保非弹窗消费者不变。
+- JS：`common.js` 的库存读取、单价读取和总价写入均限定在 `.item-buy-mask` 下查询 data role；数量按钮/输入与 disabled 状态逻辑保持原结构。
+- Attribute 结论：第 9 节表格所列 update-time、价格、购买数量与按钮均已由 A2 + 本批覆盖；页面头部 Attribute 信息与切换项此前已使用 data 属性，布局/状态根继续保留。
+- 回归：10 个消费页均生成四种 purchase role；弹窗旧 `goods-count/item-price-wrapper/item-price/item-price-original/total-price` HTML class 在目标集合中无残留；构建 31 页、`git diff --check`、全部非 minified JS 及全部页面内联脚本语法检查通过。

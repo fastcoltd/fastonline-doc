@@ -1312,7 +1312,7 @@ $(document).ready(function () {
         $('.item-buy-mask').hide()
     })
     function changeBuyCount() {
-        let totalCount = Number($('.goods-count').text())
+        let totalCount = Number($('.item-buy-mask [data-purchase-role="stock-count"]').text())
         let count = Number($('.item-buy-mask .purchase-controls > input').val())
         if (count < 2) {
             $('.item-buy-mask .purchase-controls > input').val(1)
@@ -1326,9 +1326,9 @@ $(document).ready(function () {
         } else {
             $('.item-buy-mask .purchase-controls > button:last-of-type').removeClass('disabled')
         }
-        let totalPrice = Number($('.item-buy-wrapper .item-price').attr('data-value')) * Number($('.item-buy-mask .purchase-controls > input').val())
+        let totalPrice = Number($('.item-buy-mask [data-purchase-role="unit-price"]').attr('data-value')) * Number($('.item-buy-mask .purchase-controls > input').val())
 
-        $('.total-price').text(`$${totalPrice}`)
+        $('.item-buy-mask [data-purchase-role="total-price"]').text(`$${totalPrice}`)
     }
     changeBuyCount()
     $(document).on('scroll', computedSideIconPosition)
