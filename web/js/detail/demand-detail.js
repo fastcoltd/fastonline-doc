@@ -191,7 +191,7 @@ function createItemElement(item) {
             <div class="item-tag"><p class="item-tag-text">Lighting:Incandescent</p></div>
           </div>
           <div class="other-info">
-            <p class="other-label">Provide samples: <span class="other-text">
+            <p>Provide samples: <span>
                 Nesciunt quibusdam quae nihil debitis eveniet quidem perspiciatis numquam. Voluptatem necessitatibus occaecati voluptatem qui blanditiis eligendi. Quod rerum itaque tempora dolorem tenetur molestias aut deleniti incidunt. Sit alias sed ea dolorem unde culpa incidunt neque.
             </span></p>
           </div>
@@ -500,10 +500,11 @@ function submitForm() {
   console.log('提交的表单数据:', formData);
 
   // 模拟提交
-  const submitButton = document.querySelector('.submit-button');
-  const originalText = submitButton.querySelector('.submit-text').textContent;
+  const submitButton = document.querySelector('[data-action="submit-bid"]');
+  const submitText = submitButton.querySelector(':scope > span');
+  const originalText = submitText.textContent;
 
-  submitButton.querySelector('.submit-text').textContent = '提交中...';
+  submitText.textContent = '提交中...';
   submitButton.style.pointerEvents = 'none';
   submitButton.style.opacity = '0.7';
 
@@ -520,7 +521,7 @@ function submitForm() {
     selectedUploadFiles = [];
 
     // 重置字符计数
-    document.querySelectorAll('.word-count').forEach(counter => {
+    document.querySelectorAll('.textarea-container > span').forEach(counter => {
       counter.textContent = '0 / 100';
       counter.style.color = 'rgba(0, 0, 0, 0.25)';
     });
@@ -529,7 +530,7 @@ function submitForm() {
     refreshCaptcha();
 
     // 恢复按钮
-    submitButton.querySelector('.submit-text').textContent = originalText;
+    submitText.textContent = originalText;
     submitButton.style.pointerEvents = 'auto';
     submitButton.style.opacity = '1';
   }, 2000);

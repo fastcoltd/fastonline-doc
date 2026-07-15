@@ -2,8 +2,8 @@ $(document).ready(function () {
     const link = new LinkRef('page-link', 'brand-section');
     const headDetailBox = document.querySelector('.page-header-desc-right-detail-box');
     if (headDetailBox) {
-        const text = headDetailBox.querySelector('.page-header-desc-right-detail-text');
-        const button = headDetailBox.querySelector('.page-header-desc-right-detail-toggle-btn');
+        const text = headDetailBox.querySelector('[data-brand-detail-role="text"]');
+        const button = headDetailBox.querySelector('[data-brand-detail-role="toggle"]');
         if (text && button) {
             const syncToggleVisibility = () => {
                 const isExpanded = text.classList.contains('is-toggle');

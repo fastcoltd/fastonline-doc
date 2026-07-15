@@ -33,12 +33,12 @@
 
 ## 3. 执行前基线
 
-- [ ] 记录 `git status --short`，不得覆盖用户已有修改。
-- [ ] 执行 `node scripts/build-pages.js`，确保当前源文件可以构建。
-- [ ] 执行 `git diff --check`。
-- [ ] 对全部 JS 执行 `find js -name '*.js' -not -name '*.min.js' -print0 | xargs -0 -n1 node --check`。
-- [ ] 为每一批生成 class 命中清单：HTML 文件、CSS/LESS 规则、JS 字符串/模板、include 消费页。
-- [ ] 对每个目标选择器比较改前/改后命中数量、标签类型、父级路径和特异性。
+- [x] 记录 `git status --short`，不得覆盖用户已有修改。
+- [x] 执行 `node scripts/build-pages.js`，确保当前源文件可以构建。
+- [x] 执行 `git diff --check`。
+- [x] 对全部 JS 执行 `find js -name '*.js' -not -name '*.min.js' -print0 | xargs -0 -n1 node --check`。
+- [x] 为每一批生成 class 命中清单：HTML 文件、CSS/LESS 规则、JS 字符串/模板、include 消费页。
+- [x] 对每个目标选择器比较改前/改后命中数量、标签类型、父级路径和特异性。
 
 ## 4. 批次 A：全站重复内联结构
 
@@ -302,8 +302,8 @@
 - [x] E2 review
 - [x] E3 statistics
 - [x] E4 resource
-- [ ] F 页面独有结构，按页面逐个完成
-- [ ] 124 个源文件覆盖表复核，无遗漏文件
+- [x] F 页面独有结构，按页面逐个完成
+- [x] 124 个源文件覆盖表复核，无遗漏文件
 
 每批至少执行：
 
@@ -544,3 +544,80 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - Partial 边界：A–G section partial 的 `id` 是滚动目标且必须保留；本批只修改 `src/pages/brand-all.html` 内联索引，不修改 partial。
 - 命中与特异性：源码和构建页均按 A–Z 顺序生成 26 个 `data-letter`，基础/active 规则仍分别为 0-2-0/0-3-0；构建页不再存在 A–G 重复 id。`LinkRef` 已验证旧 class 名和新显式 selector 两种入参、旧 id 与新 data-letter 两种目标值均能正确解析。
 - 回归：旧 `.brand-page-index-box-item` 在目标页面、两组 CSS/LESS 和相关 JS 中无残留；构建 31 页、`git diff --check`、全部非 minified JS、全部页面内联脚本语法及 data-letter/重复 id 检查均通过。
+
+### F7 Brand 与列表/搜索页面（2026-07-15）
+
+- `brand-service.html:45-58`：两个 brand mark 的基础/变体 class 迁移为 `data-brand-mark="hot|sale"`；同步 `brand-service.css/less` 基础、变体及移动端规则。Hero、summary、row 均为必要布局根，保留。
+- `brand.html:43-78`：自有 breadcrumb 的 home/separator/current class 迁移 `data-breadcrumb-role`；Category/Company 交替字段迁移 `data-brand-field-role="label|value"`；详情正文/切换行为迁移 `data-brand-detail-role="text|toggle"`。同步 `page.css/less`、`second-page.css/less`、`detail/brand.css/less` 和 `brand.js`。
+- `faq-list.html:40-75`、`resource-all.html:56-91`：共享 dropdown 的 label/value/icon/option 与搜索 input/submit class 统一迁移 `data-dropdown-role`、`data-search-role`；option 已有 `data-value` 继续保留。同步 `page`、`faq`、`resource` CSS/LESS、`dropdown.js`、`search.js`、`resourcepage.js` 和 FAQ 内联脚本。
+- `resource-all.html:42-52`：资源 breadcrumb 的 divider/sub class 改为 `.resource-page-breadcrumb > p` 下第三、第四个直接 `span`；同步 `resource.css/less`。
+- `search-all.html:43-91`：`search-list-container` 同时是全部搜索卡 CSS 布局根和 JS 结果根，并非“仅用于 JS”，按计划条件明确保留；page-link 是 tab 行为/布局根，其余页面结构来自 D6 卡片 partial，本页无新增删除项。
+- 命中集合：brand mark 2 个、breadcrumb 5 项、Brand 字段 4 项/详情节点 2 项；FAQ 与 Resource 各 9 个 dropdown 节点、2 个 search 节点，均与旧 class 集合一致。data 属性继续保持原父级作用域，基础与页面覆盖规则声明不变。
+- 回归：目标旧 HTML class 在 4 个修改页中无残留；5 页闭环完成。构建 31 页、`git diff --check`、全部非 minified JS、全部页面内联脚本语法及 role 数量检查通过。
+
+### F8 Service、FAQ Detail、Resource Detail（2026-07-15）
+
+- `fastesp-service.html`、`service.html`：同构文章首区的 `.article-title/.article-subtitle` 改为首个 `.content-section` 的直接 `span/p`；正文 `.section-title/.sub-title` 改为 article 下 `section.content-section` 的直接 `span/h4`。`section-content` 与 `post-detail-section` 分别承担正文布局和锚点行为，保留。
+- 两个 Service 页目录关闭 `.table-of-container-close` 改为目录面板直接 `img`；同步 `detail/service.css/less` 和 `detail/service.js`。目录项/子项及 active、锚点 id 保留。
+- `faq-detail.html`：info item 改 `.faq-detail-info-row > *`；Helpful 动作身份迁移 `data-action="like|unlike"`，图标/计数用动作根直接子结构；Share label/icons/icon 改 `.faq-detail-share` 直接 `span/div/img`。同步 FAQ CSS/LESS 与内联事件。
+- `resource-detail.html`：product title 改 title-mark 父级直接 `span`；三组 info label/value 迁移 `data-info-role`；目录 divider/close 改稳定直接子结构。同步 Resource Detail CSS/LESS 与 JS。
+- Breadcrumb 完整消费集合：F7 将共享 `page.css/less` 迁移到 `data-breadcrumb-role` 后，当前其余 6 个旧消费者 `demand/item/post/resource/store/system-post-detail.html` 同批迁移，避免中间状态的样式回归。
+- 命中集合：Fastresp Rules 的 1 个 article heading、63 个 h4，Privacy Policy 的 1 个 article heading、16 个 section heading 均由稳定文章层级命中；FAQ 两个动作/三个分享图标、Resource 6 个 info role/1 个目录关闭图，以及 6 页各 5 个 breadcrumb role 均与旧集合一致。
+- 回归：本批目标旧 class 在对应页面中无残留；构建 31 页、`git diff --check`、全部非 minified JS、全部页面内联脚本语法、结构数量和 breadcrumb 完整消费集合检查通过。
+
+### F9 Campaign Detail、Demand Detail（2026-07-15）
+
+- `compaign-detail.html`：Campaign 标题文字、五组统计 label/value、收藏按钮行为和七个正文标题改用稳定父级结构或 `data-role/data-action`；锚点 section、侧栏导航、推荐区、布局与状态 class 保留。
+- Campaign 的移动标题截断脚本改查标题下 `data-role="title"`；收藏根改为 `data-action="favorite"`，内部 `icon-aixin` 仍是共享收藏组件行为/状态钩子；正文标题由每个正文 section 的首个直接 heading 精确命中。
+- `demand-detail.html`：用户头像/名称和 Others 文案改为模块父级直接子结构；表单属性 label/value、输入控件、上传入口/文件/预览/提示、验证码与提交动作改用 `data-*`、`name`、`type` 和既有 id。
+- Demand 的 `textarea-large`、`error`、上传预览弹层、表单区块及状态 class 保留；同步动态竞标模板、校验/提交 JS，移除已不存在的 `submit-text/word-count` 查询。
+- CSS/LESS：同步 `detail/compaign-detail`、`detail/demand-detail` 的桌面与响应式选择器，声明值及媒体查询位置保持不变。
+- 回归：修改后执行目标旧 class 残留检查、构建 31 页、`git diff --check`、全部非 minified JS 和全部页面内联脚本语法检查。
+
+执行结果：上述迁移已完成；Campaign 的 10 个统计角色、7 个正文标题及标题/收藏动作命中集合保持一致，Demand 的 5 个属性角色、3 个输入区、4 个上传角色及验证码/提交动作完整生成。构建 31 页、diff、全部 JS 与页面内联脚本语法检查通过。
+
+### F10 Index 与顶层独立 partial（2026-07-15）
+
+- `index.html` 与 `index-best-items-section.html`：Banner 标题改为内容盒直接 `h3`；Bid/View More 展示 class 改为 `data-action`，`demand-button` 作为全站投标行为钩子保留。
+- 六组 pager 的标题、副标题、弹性占位与更多入口改由 `.pager-wrapper/.pager-subtitle-box` 下的直接语义子元素定位；carousel、slide、indicator、各业务 wrapper 和布局 class 保留。
+- `brand-all-section-a`～`g`：字母 section 根被 `brandpage.js` 用于滚动定位，line/list-box 均为独立布局容器，保留；标题已经是根下直接 `p`，无新增删除项。
+- 三个 `index-comment-item-*`：用户、时间和正文已通过 user/desc 布局父级直接标签定位，rating 已在 D1 迁移，tag 为共享组件；本批只验证，无新增删除项。
+- CSS/LESS：同步 `index` 全部基础、移动端和各业务 pager 覆盖选择器；JS 不查询本批删除的展示 class。
+
+### F11 Item Detail（2026-07-15）
+
+- 顶部购买区：Share/More 改 `data-action`；总价、数量控件与图标使用 `data-purchase-role`、控件 `name/type` 和既有 id；通用 `item-buy-btn`、收藏、价格/服务共享 class、布局与状态 class 保留。
+- 内容区：统一 section 标题迁移 `data-section-role/data-title-kind`；截图图片/箭头和 Description 正文改稳定父级直接元素；轮播容器、方向容器和显示状态保留。
+- Rules/FAQ：标题、正文、展开入口和 FAQ 文案/更多入口迁移到 `data-rules-role/data-faq-role/data-action`；FAQ title/content 根继续承担折叠布局和 `toggle` 状态。
+- Store：头像与信息 icon 改父级直接图片，文字/价格/销量用稳定父级或 `data-store-role/data-stat-role`；online、item-mark、rating 与 store 布局根保留。
+- Complaint：关闭/提交改 `data-action`，textarea 使用 `name`，信息行 label/value 使用 `data-complaint-role`；筛选组件根、overlay、selected/disabled 等公共行为和状态 class 保留。
+- 同步 `detail/item-detail.css/less` 与 `detail/item-detail.js`；E2 Review、E3 Statistics 已完成内容只做回归，不重复改写。
+
+### F12 Post Detail、System Post Detail（2026-07-15）
+
+- 两页共同文章：产品标题、目录关闭、10 个 section 标题、正文图片与 Share 内部叶子改为产品/文章父级直接结构或 `data-*`；`content-section/section-content/post-detail-section`、TOC 和 Share 根保留。
+- Post 产品 meta 的 Blog/Store label/avatar/name 与 Reads/Paid label/value 迁移 `data-info-role/data-meta-role`；Paywall 的预览、遮罩、提示与解锁动作迁移 `data-paywall-role/data-action`，布局和付费状态 class 保留。
+- System Post：Share/More 按钮迁移 `data-action`，共同按钮样式由 actions 直接 button 承载；Author/Reads/Date 使用 `data-meta-role`，日期绘制节点保留为属性角色。
+- 评论表单：用户头像/名称和 rating label 改父级直接子结构；textarea/captcha 使用 `name/type/data-form-role`，字符计数与提交使用 `data-form-role/data-action`；同步两份提交 JS。
+- Review 动态项继续沿用 E2 结果；公共购买弹窗继续沿用 F3 结果，不重复修改。
+
+### F13 Store Detail（2026-07-15）
+
+- Store 基础/section：详情文字改 detail item 直接 span；四个标题 indicator 改 section-title 直接 div；Services 改列表直接 span。
+- After-sales：正文、额外副本和 see-more 行为迁移 `data-rules-role/data-action`；`is-expanded/is-hidden` 状态保留并同步 JS。
+- Items 筛选：Brand/Tag/Search 输入使用 `name/type` 与既有 id；label、dropdown trigger/item、搜索 icon 用父级直接结构或 `data-dropdown-role`；dropdown list 与 show 状态保留并同步过滤/校验 JS。
+- FAQ：header/content 布局根和 toggle 状态保留；内部 title/arrow/content 改 `data-faq-role`，同步展开脚本。
+- Review 与 Statistics 已在 E2/E3 完成，卡片与 Show More 状态根保留；同步 `detail/store-detail.css/less` 和 JS 后执行最终全量审计。
+
+### F14 最终覆盖审计补齐（2026-07-15）
+
+- 全量文件名反查确认 7 个 Brand section 均已覆盖：`brand-all-section-a.html`、`brand-all-section-b.html`、`brand-all-section-c.html`、`brand-all-section-d.html`、`brand-all-section-e.html`、`brand-all-section-f.html`、`brand-all-section-g.html`；同时补审此前未显式记录的 `top-menu.html` 与 `top-menu-store-detail.html`。
+- Top Menu 的 item 标题、分组标题和左右滚动图标均可由必要布局/行为父级直接命中；删除三个叶子 class，同步 `common.css/less`。item/list/more-box 根、方向 modifier、active 和 JS 行为 class 保留。
+- 反向残留发现 Demand 竞标共享 partial 与 Search 动态模板仍输出 F9 已结构化的 `other-label/other-text`，同步删除；发现 Item Share 弹窗内部 close/platform/avatar 叶子未纳入首轮 F11，迁移到 `data-action/data-share-role` 并同步 CSS/LESS/JS。
+- 展示叶子反查继续补齐：Cookie 设置标题、Campaign 主标题、Item/Store 统计与评论标题、Index 购买汇总钩子、动态筛选 tag/attribute 的文字及关闭图标、列表空状态图片、Pagination total、Demand 上传预览和 Blog 页面剩余标题/统计/关注/搜索叶子；均迁移为稳定父级结构、控件属性或 `data-*`。
+- CSS 基础语法扫描发现 `store-detail.css` 的 `.team-member:hover` 后存在一个与 Less 源码不一致的多余右括号；移除该编译产物语法错误，未改变任何声明。
+- 本批完成后重新执行 124 文件覆盖、删除项残留、异常选择器、构建、全部 JS/内联脚本、CSS/LESS 括号与最终 diff 检查。
+
+执行结果：计划逐名覆盖 `src/pages` 31 个文件与 `src/partials` 93 个文件，共 124/124；页面、partial、JS 动态模板和 CSS/LESS 的目标旧叶子 class 已完成反向复核。剩余 class 均属于状态/修饰、组件或布局根、第三方图标、跨结构真实复用、动态参数注入或无法由稳定父级等价替代的业务身份，不再存在可安全删除而尚未处理的 HTML 展示叶子 class。
+
+最终回归：`node scripts/build-pages.js` 成功生成 31 页；`git diff --check` 通过；全部非 minified JS `node --check` 通过；31 个构建页的内联脚本均可解析且无未展开 include；84 个 CSS/LESS 文件通过引号、注释和括号结构检查；未调用 Playwright，符合本项目本轮验收约定。

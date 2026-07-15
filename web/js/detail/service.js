@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const link = new LinkRef('toc-item', 'post-detail-section');
     const menu = document.querySelector('.detail-page-menu');
     const menuContainer = document.querySelector('.table-of-container');
-    const close = menuContainer ? menuContainer.querySelector('.table-of-container-close') : null;
+    const close = menuContainer ? menuContainer.querySelector(':scope > img') : null;
 
     function toggleMenu(visible) {
         if (!menuContainer) {
@@ -154,7 +154,7 @@ function adjustFilterPosition() {
     };
     if (!pageContent || !articleContent) return;
 
-    const articleTitle = document.querySelector('.article-title');
+    const articleTitle = document.querySelector('.article-content > .content-section:first-child > span');
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const pageContentTop = pageContent.getBoundingClientRect().top + scrollTop;
     const articleStartTop = (articleTitle ? articleTitle.getBoundingClientRect().top : articleContent.getBoundingClientRect().top) + scrollTop;

@@ -660,7 +660,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // screenshotContent.addEventListener('touchmove', { passive: window.innerWidth <= 750 });
     let screenshotScrollOffsetX = 0
     const screenshotGap = parseFloat(window.getComputedStyle(screenshotContent).gap) || 0;
-    const screenshotItem = screenshotContent.querySelector('.item-detail-screenshot-item-icon');
+    const screenshotItem = screenshotContent.querySelector(':scope > img');
     const screenshotStep = (screenshotItem ? screenshotItem.clientWidth : 0) + screenshotGap;
     const screenshotContentScroll = screenshotContent.scrollWidth > screenshotContent.clientWidth;
     screenshotLeftMore.style.display = (screenshotContentScroll && !isMobile) ? 'flex' : 'none';
@@ -713,49 +713,49 @@ document.addEventListener("DOMContentLoaded", function () {
             item.find('.filter-dropdown-content').html(htmlStr)
         }
     }
-    $('.item-detail-share').on('click', function() {
+    $('.item-detail-purchase-title-actions > [data-action="share"]').on('click', function() {
         $('.item-share-mask').css({
             display: 'flex'
         })
     })
-    $('.item-share-close-btn').on('click', function() {
+    $('.item-share-mask [data-action="close-share"]').on('click', function() {
         $('.item-share-mask').css({
             display: 'none'
         })
     })
-    $('.item-detail-more').on('click', function () {
+    $('.item-detail-purchase-title-actions > [data-action="open-complaint"]').on('click', function () {
         $('.item-complaint-mask').css({
             display: 'flex'
         })
     })
-    $('.item-complaint-close-btn').on('click', function() {
+    $('.item-complaint-mask [data-action="close-complaint"]').on('click', function() {
         $('.item-complaint-mask').css({
             display: 'none'
         })
         $('.item-complaint-mask .filter-custom-select[data-type="switchComplaintType"]').removeClass('active')
     })
-    $('.item-complaint-mask .submit-btn').on('click', function() {
+    $('.item-complaint-mask [data-action="submit-complaint"]').on('click', function() {
         let data = {
             complaintType: $('.item-complaint-mask .filter-custom-select[data-type="switchComplaintType"]').attr('data-value'),
-            des: $('.item-complaint-mask .complaint-textarea').val()
+            des: $('.item-complaint-mask [name="complaint"]').val()
         }
         console.log(data, '----')
         if (!data.des) {
-            $('.complaint-textarea').css({
+            $('.item-complaint-mask [name="complaint"]').css({
                 border: '0.125rem solid #FF1b20'
             })
             return
         } else {
-            $('.complaint-textarea').css({
+            $('.item-complaint-mask [name="complaint"]').css({
                 border: '0.125rem solid #C5C5C5'
             })
         }
-        $('.item-complaint-close-btn').trigger('click')
+        $('.item-complaint-mask [data-action="close-complaint"]').trigger('click')
     })
     const $quantityDisplay = $('#quantity-display')
     const $increaseQtyButton = $('#increase-qty')
     const $decreaseQtyButton = $('#decrease-qty')
-    const $totalPrice = $('.item-detail-purchase-total-price')
+    const $totalPrice = $('.item-detail-purchase-total-section > [data-purchase-role="total"]')
 
     function parsePriceText(text) {
         const safeText = (text || '').trim()
@@ -870,8 +870,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const rules = document.querySelectorAll('.item-detail-rules-box');
     rules.forEach(element => {
-        const content = element.querySelector('.item-detail-rules-content');
-        const moreButton = element.querySelector('.item-detail-rules-more-button');
+        const content = element.querySelector('[data-rules-role="content"]');
+        const moreButton = element.querySelector('[data-action="toggle-rules"]');
         if (!content || !moreButton) {
             return;
         }
@@ -911,7 +911,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const menu = document.querySelector('.detail-page-menu');
     const statistics = document.querySelector('.item-detail-right-box');
-    const close = statistics ? statistics.querySelector('.item-detail-right-close') : null;
+    const close = statistics ? statistics.querySelector('[data-action="close-statistics"]') : null;
     const closeStatisticsPanel = function () {
         if (!statistics) return;
         statistics.classList.remove('is-open');

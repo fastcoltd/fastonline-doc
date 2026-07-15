@@ -40,11 +40,11 @@
   </div>
   <div class="page-top-bread">
     <div class="page-nav-box">
-      <img class="page-nav-home-icon" src="image/home.png" />
-      <p class="page-nav-seperator">/</p>
-      <p class="page-nav-current">Demand</p>
-      <p class="page-nav-seperator">/</p>
-      <p class="page-nav-current">Detail</p>
+      <img data-breadcrumb-role="home" src="image/home.png" />
+      <p data-breadcrumb-role="separator">/</p>
+      <p data-breadcrumb-role="current">Demand</p>
+      <p data-breadcrumb-role="separator">/</p>
+      <p data-breadcrumb-role="current">Detail</p>
     </div>
   </div>
   <div class="page-content" style="flex-direction: column;">
@@ -52,10 +52,10 @@
       <div class="card-content">
         <!-- 第一行：用户信息 -->
         <div class="user-section">
-          <img class="user-avatar" src="image/figma-comment-avatar-alt.png" alt="User avatar" />
+          <img src="image/figma-comment-avatar-alt.png" alt="User avatar" />
           <div class="user-info">
             <div class="user-header">
-              <h2 class="user-name">Sergio Tremblay</h2>
+              <h2>Sergio Tremblay</h2>
               <div class="user-icon-box">
                 <div class="item-mark" style="background: linear-gradient(to right, #0567C4, #0BB4E0);">Hot</div>
                 <div class="item-mark" style="background: linear-gradient(to right, #ff4d10, #ff7a02);">LV1</div>
@@ -139,7 +139,7 @@
         </div>
         <!-- 第四行：其他信息 -->
         <div class="other-info">
-          <p class="other-label">Others: <span class="other-text">
+          <p>Others: <span>
               Nesciunt quibusdam quae nihil debitis eveniet quidem perspiciatis numquam. Voluptatem necessitatibus
               occaecati voluptatem qui blanditiis eligendi. Quod rerum itaque tempora dolorem tenetur molestias aut
               deleniti incidunt. Sit alias sed ea dolorem unde culpa incidunt neque.
@@ -167,18 +167,18 @@
       <div class="form-content">
         <!-- 商店名称 -->
         <div class="attribute-row">
-          <span class="attribute-label">Store name:</span>
-          <span class="attribute-value">Krajcik - Quitzon</span>
+          <span data-attribute-role="label">Store name:</span>
+          <span data-attribute-role="value">Krajcik - Quitzon</span>
         </div>
 
         <!-- 字段信息 -->
         <div class="form-section form-section-field-info">
           <div class="attribute-row">
-            <span class="attribute-label">Field Information:</span>
+            <span data-attribute-role="label">Field Information:</span>
           </div>
           <div class="textarea-container">
-            <input type="text" class="textarea-field" placeholder="email----password----gender----followers----extra..."
-              id="fieldInfo" maxlength="100" />
+            <input type="text" name="fieldInfo" data-field-role="input"
+              placeholder="email----password----gender----followers----extra..." id="fieldInfo" maxlength="100" />
             <span id="fieldInfoCount">0 / 100</span>
           </div>
         </div>
@@ -186,11 +186,11 @@
         <!-- 可用样本 -->
         <div class="form-section form-section-samples">
           <div class="attribute-row">
-            <span class="attribute-label">Samples Available:</span>
+            <span data-attribute-role="label">Samples Available:</span>
           </div>
           <div class="textarea-container">
-            <input type="text" class="textarea-field" placeholder="comment-content..." id="samplesInfo"
-              maxlength="100" />
+            <input type="text" name="samplesInfo" data-field-role="input" placeholder="comment-content..."
+              id="samplesInfo" maxlength="100" />
             <span id="samplesInfoCount">0 / 100</span>
           </div>
         </div>
@@ -198,49 +198,51 @@
         <!-- 文件上传 -->
         <div class="upload-section">
           <div class="upload-label">
-            <span class="upload-required">*</span>
-            <span class="upload-title">Upload</span>
-            <span class="upload-title">:</span>
+            <span data-upload-label-role="required">*</span>
+            <span data-upload-label-role="text">Upload</span>
+            <span data-upload-label-role="text">:</span>
           </div>
           <div class="upload-content">
-            <div class="upload-button" id="file-upload" onclick="document.getElementById('fileInput').click()">
-              <svg class="upload-icon" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <button type="button" data-upload-role="trigger" id="file-upload"
+              onclick="document.getElementById('fileInput').click()">
+              <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7 1.16666V9.91666M7 1.16666L10.5 4.66666M7 1.16666L3.5 4.66666M1.16666 12.8333H12.8333"
                   stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
               <span>Click to Upload</span>
-            </div>
-            <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
-            <div class="file-preview" id="filePreview"></div>
-            <div class="upload-hint">Recommanded resolution is 640*640 with file size</div>
+            </button>
+            <input type="file" name="attachments" id="fileInput" data-upload-role="input" multiple accept="image/*">
+            <div data-upload-role="preview" id="filePreview"></div>
+            <div data-upload-role="hint">Recommanded resolution is 640*640 with file size</div>
           </div>
         </div>
 
         <!-- 投标说明 -->
         <div class="form-section form-section-bidding">
           <div class="attribute-row">
-            <span class="attribute-label">Bidding instructions:</span>
+            <span data-attribute-role="label">Bidding instructions:</span>
           </div>
           <div class="textarea-container">
-            <textarea class="textarea-field textarea-large" placeholder="comment-content..." id="biddingInstructions"
-              maxlength="100"></textarea>
+            <textarea class="textarea-large" name="biddingInstructions" data-field-role="input"
+              placeholder="comment-content..." id="biddingInstructions" maxlength="100"></textarea>
             <span id="biddingInstructionsCount">0 / 100</span>
           </div>
         </div>
 
         <!-- 验证码 -->
         <div class="captcha-section">
-          <input type="text" class="captcha-input" placeholder="Captcha" id="captchaInput" maxlength="6">
-          <div class="captcha-image" onclick="refreshCaptcha()">
+          <input type="text" name="captcha" data-form-role="captcha" placeholder="Captcha" id="captchaInput"
+            maxlength="6">
+          <button type="button" data-action="refresh-captcha" onclick="refreshCaptcha()">
             <span id="captchaCode">YII5</span>
-          </div>
+          </button>
           <!-- <img src="https://dummyimage.com/122x36" class="verification-code-img" alt=""> -->
         </div>
 
         <!-- 提交按钮 -->
-        <div class="submit-button" onclick="submitForm()">
+        <button type="button" data-action="submit-bid" onclick="submitForm()">
           <span>Submit</span>
-        </div>
+        </button>
       </div>
     </div>
   </div>
@@ -740,8 +742,8 @@
   </div>
   <div class="upload-image-preview-mask" id="uploadImagePreviewMask" aria-hidden="true">
     <div class="upload-image-preview-dialog">
-      <button type="button" class="upload-image-preview-close" id="uploadImagePreviewClose" aria-label="Close preview">X</button>
-      <img class="upload-image-preview-img" id="uploadImagePreviewImg" alt="Upload preview image" />
+      <button type="button" id="uploadImagePreviewClose" aria-label="Close preview">X</button>
+      <img id="uploadImagePreviewImg" alt="Upload preview image" />
     </div>
   </div>
   <!-- JavaScript -->

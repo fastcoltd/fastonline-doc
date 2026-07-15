@@ -44,15 +44,15 @@
                     </div>
                 </div>
                 <div class="faq-detail-info-row" aria-label="FAQ information">
-                    <span class="faq-detail-info-item">Favorites: 1078</span>
-                    <span class="faq-detail-info-item">Technical Support</span>
-                    <span class="faq-detail-info-item">Brand: Adobe</span>
-                    <div class="faq-detail-author faq-detail-info-item">
+                    <span>Favorites: 1078</span>
+                    <span>Technical Support</span>
+                    <span>Brand: Adobe</span>
+                    <div class="faq-detail-author">
                         <img src="image/figma-comment-avatar.jpg" alt="Ms. Dora Kerluke" />
                         <span>Ms. Dora Kerluke</span>
                     </div>
-                    <span class="faq-detail-info-item">Reads: 517</span>
-                    <span class="faq-detail-info-item">Published on: 2025/12/10 14:21:06</span>
+                    <span>Reads: 517</span>
+                    <span>Published on: 2025/12/10 14:21:06</span>
                 </div>
             </header>
             <section class="faq-detail-content">
@@ -61,24 +61,24 @@
             <section class="faq-detail-helpful" aria-labelledby="faq-detail-helpful-title">
                 <h2 id="faq-detail-helpful-title">Was this page helpful?</h2>
                 <div class="faq-actions faq-detail-helpful-actions">
-                    <div class="resource-action-group resource-action-like">
+                    <div class="resource-action-group" data-action="like">
                         <i class="iconfont icon-dianzan"></i>
-                        <img src="image/like-count.png" class="resource-action-icon resource-action-like-icon cursor-pointer" alt="Helpful" />
-                        <span class="resource-action-count">108</span>
+                        <img src="image/like-count.png" alt="Helpful" />
+                        <span>108</span>
                     </div>
-                    <div class="resource-action-group resource-action-unlike">
+                    <div class="resource-action-group" data-action="unlike">
                         <i class="iconfont icon-dianzan icon-not-dianzan"></i>
-                        <img src="image/unlike-count.png" class="resource-action-icon resource-action-unlike-icon cursor-pointer" alt="Not helpful" />
-                        <span class="resource-action-count">41</span>
+                        <img src="image/unlike-count.png" alt="Not helpful" />
+                        <span>41</span>
                     </div>
                 </div>
             </section>
             <section class="share-section faq-detail-share" aria-label="Share">
-                <span class="share-label">Share</span>
-                <div class="share-icons">
-                    <img class="share-icon facebook" src="image/detailpage/twitter.png" alt="Share to Facebook" />
-                    <img class="share-icon twitter" src="image/detailpage/icon-x.png" alt="Share to X" />
-                    <img class="share-icon link" src="image/detailpage/icon-in.png" alt="Share to LinkedIn" />
+                <span>Share</span>
+                <div>
+                    <img src="image/detailpage/twitter.png" alt="Share to Facebook" />
+                    <img src="image/detailpage/icon-x.png" alt="Share to X" />
+                    <img src="image/detailpage/icon-in.png" alt="Share to LinkedIn" />
                 </div>
             </section>
         </article>
@@ -220,11 +220,11 @@
     <script src="js/homemenu.js"></script>
     <script>
         $(function () {
-            $('.resource-action-like-icon').on('click', function () {
+            $('.faq-detail-helpful-actions [data-action="like"] > img').on('click', function () {
                 $(this).parent('.resource-action-group').toggleClass('has-activate');
                 $(this).closest('.faq-actions').find('.resource-action-unlike').removeClass('has-activate');
             });
-            $('.resource-action-unlike-icon').on('click', function () {
+            $('.faq-detail-helpful-actions [data-action="unlike"] > img').on('click', function () {
                 $(this).parent('.resource-action-group').toggleClass('has-activate');
                 $(this).closest('.faq-actions').find('.resource-action-like').removeClass('has-activate');
             });

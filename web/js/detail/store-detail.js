@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     const faqs = document.querySelectorAll('.item-detail-faq-box');
     faqs.forEach(element => {
-        const content = element.querySelector('.item-detail-faq-content');
+        const content = element.querySelector('[data-faq-role="content"]');
         const title = element.querySelector('.item-detail-faq-title-box');
-        const arrow = title.querySelector('.item-detail-faq-title-arrow');
+        const arrow = title.querySelector('[data-faq-role="arrow"]');
         title.addEventListener('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -159,8 +159,8 @@ function initializeReviewsShowMore() {
 }
 
 function initializeAfterSalesRulesSeeMore() {
-    const rulesText = document.querySelector('.after-sales-rules-text');
-    const seeMoreBtn = document.querySelector('.after-sales-rules-more-btn');
+    const rulesText = document.querySelector('[data-rules-role="content"]');
+    const seeMoreBtn = document.querySelector('[data-action="expand-rules"]');
     if (!rulesText || !seeMoreBtn) return;
 
     seeMoreBtn.addEventListener('click', function () {
@@ -298,7 +298,7 @@ function initializeDropdowns() {
         });
 
         // 选择下拉项
-        const items = dropdown.list.querySelectorAll('.dropdown-item');
+        const items = dropdown.list.querySelectorAll(':scope > [data-value]');
         items.forEach(item => {
             item.addEventListener('click', function() {
                 dropdown.input.value = this.textContent;
@@ -314,7 +314,7 @@ function initializeDropdowns() {
         // 输入时过滤选项
         dropdown.input.addEventListener('input', function() {
             const filter = this.value.toLowerCase();
-            const items = dropdown.list.querySelectorAll('.dropdown-item');
+            const items = dropdown.list.querySelectorAll(':scope > [data-value]');
             
             items.forEach(item => {
                 const text = item.textContent.toLowerCase();
@@ -339,7 +339,7 @@ function initializeDropdowns() {
 
 // 输入框验证
 function initializeValidation() {
-    const inputs = document.querySelectorAll('.input-field, .search-input');
+    const inputs = document.querySelectorAll('.search-container input[type="text"]');
     
     inputs.forEach(input => {
         input.addEventListener('blur', function() {

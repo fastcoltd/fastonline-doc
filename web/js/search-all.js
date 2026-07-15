@@ -130,7 +130,7 @@ function createItemElement(item) {
             <div class="item-tag"><p class="item-tag-text">Lighting:Incandescent</p></div>
           </div>
           <div class="other-info">
-            <p class="other-label">Provide samples: <span class="other-text">
+            <p>Provide samples: <span>
                 Nesciunt quibusdam quae nihil debitis eveniet quidem perspiciatis numquam. Voluptatem necessitatibus occaecati voluptatem qui blanditiis eligendi. Quod rerum itaque tempora dolorem tenetur molestias aut deleniti incidunt. Sit alias sed ea dolorem unde culpa incidunt neque.
             </span></p>
           </div>

@@ -1,8 +1,8 @@
 class Search {
     constructor() {
         this.container = document.querySelector('.page-search-section');
-        this.input = this.container.querySelector('.page-search-input');
-        this.button = this.container.querySelector('.page-search-icon');
+        this.input = this.container.querySelector('[data-search-role="input"]');
+        this.button = this.container.querySelector('[data-search-role="submit"]');
         this.init();
     }
 

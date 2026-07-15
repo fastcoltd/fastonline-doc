@@ -154,10 +154,10 @@ window.addEventListener('DOMContentLoaded', function () {
             qtyInputs.forEach(function (input) {
                 input.value = count;
             });
-            purchaseMask.querySelectorAll('.index-purchase-total').forEach(function (item) {
+            purchaseMask.querySelectorAll('[data-purchase-role="total"]').forEach(function (item) {
                 item.textContent = `$${(unitPrice * count).toFixed(2)}`;
             });
-            purchaseMask.querySelectorAll('.index-purchase-summary-qty').forEach(function (item) {
+            purchaseMask.querySelectorAll('[data-purchase-role="summary-quantity"]').forEach(function (item) {
                 item.textContent = count;
             });
             purchaseMask.querySelectorAll('.index-purchase-stepper > button:first-of-type').forEach(function (button) {

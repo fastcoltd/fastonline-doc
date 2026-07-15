@@ -11,7 +11,7 @@ const listContainer = document.querySelector('.list-container')
 const menuContainer = document.querySelector('.table-of-container');
 const menuToggle = document.querySelector('.detail-page-menu');
 
-const close = menuContainer ? menuContainer.querySelector('.table-of-container-close') : null;
+const close = menuContainer ? menuContainer.querySelector(':scope > img') : null;
 
 function toggleMobileToc(visible) {
     if (!menuContainer) {
@@ -531,14 +531,14 @@ $(document).ready(function () {
     const $articleContent = $('.article-content');
     $articleContent.addClass('is-unpaid').removeClass('is-paid');
 
-    $('.submit-btn').on('click', function () {
+    $('.comment-form [data-action="submit-comment"]').on('click', function () {
         let params = {
-            content: $('.comment-textarea').val(),
-            captcha: $('.captcha-input').val()
+            content: $('.comment-form [name="comment"]').val(),
+            captcha: $('.comment-form [name="captcha"]').val()
         }
         console.log(params, '000')
     })
-    $('.article-unlock-btn').on('click', function (event) {
+    $('.article-paywall-overlay > [data-action="unlock-article"]').on('click', function (event) {
         event.preventDefault();
         $articleContent.removeClass('is-unpaid').addClass('is-paid');
         updateStickyHeader();

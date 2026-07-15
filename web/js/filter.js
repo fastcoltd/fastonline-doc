@@ -6,7 +6,7 @@ $(document).ready(function () {
     const backBtn = document.querySelector('.filter-back-btn');
     // const clearBtn = document.querySelector('.filter-clear-btn');
     const filterGroups = document.querySelectorAll('.filter-group');
-    const tagCloseButtons = document.querySelectorAll('.filter-tag-close');
+    const tagCloseButtons = document.querySelectorAll('.filter-tag > svg');
     const filterInputs = document.querySelectorAll('.filter-input');
     const customSelects = document.querySelectorAll('.filter-content .filter-custom-select');
     const filterBox = document.querySelector('.page-filter-box');
@@ -503,13 +503,13 @@ $(document).ready(function () {
         const newAttr = document.createElement('div');
         newAttr.className = 'filter-attr';
         newAttr.innerHTML = `
-            <span class="filter-attr-text" data-value="${option.value}">${option.text}</span>
-            <svg class="filter-attr-close" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <span data-value="${option.value}">${option.text}</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M9 3L3 9M3 3L9 9" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         `;
 
-        const closeBtn = newAttr.querySelector('.filter-attr-close');
+        const closeBtn = newAttr.querySelector(':scope > svg');
         closeBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             removeAttr(this);
@@ -528,13 +528,13 @@ $(document).ready(function () {
         const newTag = document.createElement('div');
         newTag.className = 'filter-tag';
         newTag.innerHTML = `
-            <span class="filter-tag-text" data-value="${option.value}">${option.text}</span>
-            <svg class="filter-tag-close" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <span data-value="${option.value}">${option.text}</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M9 3L3 9M3 3L9 9" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         `;
 
-        const closeBtn = newTag.querySelector('.filter-tag-close');
+        const closeBtn = newTag.querySelector(':scope > svg');
         closeBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             removeTag(this);
@@ -587,7 +587,7 @@ $(document).ready(function () {
     function removeAttr(closeBtn) {
         const attr = closeBtn.closest('.filter-attr');
         if (attr) {
-            const attrText = $(attr).find('.filter-attr-text').attr('data-value');
+            const attrText = attr.querySelector(':scope > span').dataset.value;
             // 从选中集合中移除
             selectedAttrs.forEach(item => {
                 if (item == attrText) {
@@ -611,7 +611,7 @@ $(document).ready(function () {
     function removeTag(closeBtn) {
         const tag = closeBtn.closest('.filter-tag');
         if (tag) {
-            const tagText = tag.querySelector('.filter-tag-text').textContent;
+            const tagText = tag.querySelector(':scope > span').textContent;
 
             // 从选中集合中移除
             for (let [key, value] of Object.entries(selectOptions.tag)) {

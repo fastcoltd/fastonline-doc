@@ -169,9 +169,9 @@ $(document).ready(function () {
   $('.page-dropdown-select').on('click', function() {
     $(this).toggleClass('active')
   })
-  $('.page-dropdown-item').on('click', function() {
+  $('[data-dropdown-role="option"]').on('click', function() {
     let value = $(this).attr('data-value')
-    let text = $(this).find('.title').text()
+    let text = $(this).children('p').text()
     $('#selectedCategory').attr('data-value', value).text(text)
     searchData()
   })
@@ -179,7 +179,7 @@ $(document).ready(function () {
     $('.page-sort-box > img').attr('data-value', $(this).attr('data-value'))
     searchData()
   })
-  $('.page-search-icon').on('click', function() {
+  $('[data-search-role="submit"]').on('click', function() {
     searchData()
   })
 })

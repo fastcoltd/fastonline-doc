@@ -353,7 +353,7 @@
     width: 100%;
     gap: 2rem;
   }
-  .item-detail-right-title {
+  .item-detail-right-group > [data-section-role=title] {
     margin-bottom: 1.25rem;
     font-family: 'Inter', var(--primary-popfont), var(--primary-robotofont);
     font-size: 1.75rem;
@@ -364,7 +364,7 @@
     margin-top: 0;
     margin-bottom: 1.25rem;
   }
-  .item-detail-right-subtitle {
+  .item-detail-right-subtitle-box > span {
     font-size: 1.5rem;
     line-height: 2.75rem;
   }
@@ -376,7 +376,7 @@
   margin-left: 0;
   width: 100%;
 }
-.item-detail-right-title {
+.item-detail-right-group > [data-section-role=title] {
   display: block;
   width: 100%;
   margin-bottom: 2.5rem;
@@ -403,7 +403,7 @@
   width: 100%;
   justify-content: space-between;
 }
-.item-detail-right-subtitle {
+.item-detail-right-subtitle-box > span {
   width: 100%;
   font-family: 'Inter', var(--primary-robotofont), var(--primary-popfont);
   font-size: 1.75rem;
@@ -414,7 +414,7 @@
   overflow: hidden;
   white-space: nowrap;
 }
-#Reviews .item-detail-right-title {
+#Reviews > [data-section-role=title] {
   margin-bottom: 0;
 }
 .item-detail-faq-section {
@@ -447,7 +447,7 @@
   border-bottom-right-radius: 0;
   border-bottom: #f0f0f3 0.125rem solid;
 }
-.item-detail-faq-title {
+[data-faq-role="title"] {
   width: calc(100% - 2.5rem);
   font-family: var(--primary-robotofont), var(--primary-popfont);
   font-size: 1.75rem;
@@ -458,15 +458,15 @@
   overflow: hidden;
   white-space: nowrap;
 }
-.item-detail-faq-title-box:not(.toggle) .item-detail-faq-title {
+.item-detail-faq-title-box:not(.toggle) [data-faq-role="title"] {
   font-family: 'Inter', var(--primary-robotofont), var(--primary-popfont);
 }
-.item-detail-faq-title-arrow {
+[data-faq-role="arrow"] {
   width: 1.5rem;
   height: 1.446rem;
   transition: transform 0.2s ease-in-out;
 }
-.item-detail-faq-content {
+[data-faq-role="content"] {
   width: 100%;
   padding: 2rem 2rem;
   font-family: 'Inter', var(--primary-robotofont), var(--primary-popfont);
@@ -499,12 +499,12 @@
   .item-detail-faq-title-box {
     padding: 0.75rem 1.25rem;
   }
-  .item-detail-faq-title {
+  [data-faq-role="title"] {
     font-size: 1.5rem;
     line-height: 2.25rem;
     font-family: var(--primary-robotofont);
   }
-  .item-detail-faq-content {
+  [data-faq-role="content"] {
     padding: 0.75rem 1.25rem;
     font-size: 1.5rem;
     line-height: 2.25rem;
@@ -530,23 +530,6 @@
     border-radius: 1.25rem;
     gap: 1.25rem;
   }
-}
-.item-detail-left-subtitle-box {
-  margin-top: -2.5rem;
-  margin-bottom: 0;
-  width: 100%;
-  justify-content: space-between;
-}
-.item-detail-left-subtitle {
-  width: 100%;
-  font-family: var(--primary-popfont);
-  font-size: 1.75rem;
-  line-height: 2.75rem;
-  font-weight: 400;
-  color: var(--gray-color);
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
 }
 .item-detail-review-box {
   width: 100%;
@@ -755,14 +738,6 @@
   transform-origin: center;
 }
 @media screen and (max-width: 768px) {
-  .item-detail-left-subtitle-box {
-    margin-top: -2rem;
-    margin-bottom: 0;
-  }
-  .item-detail-left-subtitle {
-    font-size: 1.5rem;
-    line-height: 2.25rem;
-  }
   .item-detail-review-box {
     gap: 1.25rem;
   }
@@ -992,7 +967,7 @@
   align-items: center;
   justify-content: center;
 }
-.detail-text {
+.detail-item > span {
   font-family: var(--primary-popfont), var(--primary-robotofont);
   font-weight: 400;
   font-size: 1.75rem;
@@ -1032,7 +1007,7 @@
   align-items: center;
   gap: 0.75rem;
 }
-.title-indicator {
+.store-section > .section-title > div:first-child {
   width: 0.5rem;
   height: 2.0203rem;
   background: var(--primary-color);
@@ -1060,7 +1035,7 @@
   margin: 0;
 }
 /* 查看更多按钮 */
-.see-more-btn {
+[data-action="expand-rules"] {
   padding: 0.5rem 1rem;
   background: #FFFFFF;
   border: 0.125rem solid #D9D9D9;
@@ -1074,23 +1049,23 @@
   align-self: flex-start;
   box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.02);
 }
-.see-more-btn:hover {
+[data-action="expand-rules"]:hover {
   background: #F5F5F5;
 }
 /* after-sales rules see more - 通用样式 */
-.after-sales-rules-text {
+[data-rules-role="content"] {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.after-sales-rules-text.is-expanded {
+[data-rules-role="content"].is-expanded {
   display: block;
   overflow: visible;
   text-overflow: clip;
 }
-.after-sales-rules-more-btn.is-hidden {
+[data-action="expand-rules"].is-hidden {
   display: none;
 }
 /* 团队成员 */
@@ -1112,7 +1087,6 @@
 }
 .team-member:hover {
   background-color: #FDF5F2;
-}
 }
 .member-avatar {
   position: relative;
@@ -1164,7 +1138,7 @@
   gap: 1.25rem;
   flex-wrap: wrap;
 }
-.service-item {
+.services-list > span {
   font-family: 'Inter', sans-serif;
   font-weight: 400;
   font-size: 1.75rem;
@@ -1257,7 +1231,7 @@
     width: 1.5rem;
     height: 1.5rem;
   }
-  .detail-text {
+  .detail-item > span {
     font-size: 1.5rem;
     line-height: 3rem;
   }
@@ -1294,7 +1268,7 @@
   height: 4.625rem;
   flex: 0 0 auto;
 }
-.input-label {
+.input-group > span {
   font-family: 'Inter', sans-serif;
   font-weight: 500;
   font-size: 2rem;
@@ -1302,7 +1276,7 @@
   color: #000000;
   white-space: nowrap;
 }
-.input-field {
+.input-with-dropdown > input {
   width: 100%;
   height: 100%;
   background: #FFFFFF;
@@ -1317,10 +1291,10 @@
   outline: none;
   transition: border-color 0.3s ease;
 }
-.input-field::placeholder {
+.input-with-dropdown > input::placeholder {
   color: #6D6D6D;
 }
-.input-field:focus {
+.input-with-dropdown > input:focus {
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
@@ -1342,7 +1316,7 @@
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
-.search-input {
+.search-box > input {
   width: 100%;
   height: 100%;
   border: none;
@@ -1354,7 +1328,7 @@
   line-height: 1.45;
   color: #000000;
 }
-.search-input::placeholder {
+.search-box > input::placeholder {
   color: #6D6D6D;
 }
 .search-icon-container {
@@ -1371,21 +1345,21 @@
   background-color: rgba(0, 123, 255, 0.1);
   border-radius: 0 9px 9px 0;
 }
-.search-icon {
+.search-icon-container > svg {
   width: 14px;
   height: 14px;
   opacity: 0.85;
 }
 /* 下拉箭头图标 */
-.dropdown-icon {
+[data-dropdown-role="trigger"] {
   width: 1.48rem;
   height: 1.5rem;
   position: relative;
   cursor: pointer;
   margin-left: -2.95rem;
 }
-.dropdown-icon::before,
-.dropdown-icon::after {
+[data-dropdown-role="trigger"]::before,
+[data-dropdown-role="trigger"]::after {
   content: '';
   position: absolute;
   width: 6px;
@@ -1394,11 +1368,11 @@
   top: 50%;
   transform-origin: center;
 }
-.dropdown-icon::before {
+[data-dropdown-role="trigger"]::before {
   left: 2px;
   transform: translateY(-50%) rotate(45deg);
 }
-.dropdown-icon::after {
+[data-dropdown-role="trigger"]::after {
   right: 2px;
   transform: translateY(-50%) rotate(-45deg);
 }
@@ -1427,17 +1401,17 @@
 .dropdown-list.show {
   display: block;
 }
-.dropdown-item {
+.dropdown-list > [data-value] {
   padding: 1.25rem 1.5rem;
   cursor: pointer;
   font-size: 1.75rem;
   color: #000000;
   transition: background-color 0.2s ease;
 }
-.dropdown-item:hover {
+.dropdown-list > [data-value]:hover {
   background-color: #f5f5f5;
 }
-.dropdown-item:last-child {
+.dropdown-list > [data-value]:last-child {
   border-radius: 0 0 1.25rem 1.25rem;
 }
 .load-more {
@@ -1486,7 +1460,7 @@
     height: 37px;
     gap: 6px;
   }
-  .input-label {
+  .input-group > span {
     font-size: 14px;
     line-height: 1.45;
   }
@@ -1498,7 +1472,7 @@
     display: flex;
     align-items: center;
   }
-  .input-field {
+  .input-with-dropdown > input {
     height: 30px;
     border-radius: 10px;
     padding: 0 12px;
@@ -1509,29 +1483,29 @@
     -webkit-appearance: none;
     -webkit-text-size-adjust: 100%;
   }
-  .input-field::placeholder {
+  .input-with-dropdown > input::placeholder {
     color: #6D6D6D;
     font-size: 15px;
     line-height: 1.4;
   }
-  .input-field:focus {
+  .input-with-dropdown > input:focus {
     border-color: #C5C5C5;
     box-shadow: none;
   }
-  .dropdown-icon {
+  [data-dropdown-role="trigger"] {
     width: 12px;
     height: 11.568px;
     margin-left: -24px;
     transform: rotate(-90deg);
   }
-  .search-input {
+  .search-box > input {
     font-size: 14px;
     line-height: 1.45;
     appearance: none;
     -webkit-appearance: none;
     -webkit-text-size-adjust: 100%;
   }
-  .search-input::placeholder {
+  .search-box > input::placeholder {
     font-size: 14px;
     line-height: 1.45;
     color: #6D6D6D;

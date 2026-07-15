@@ -45,11 +45,11 @@
     </div>
     <div class="page-top-bread">
         <div class="page-nav-box">
-            <img class="page-nav-home-icon" src="image/home.png" />
-            <p class="page-nav-seperator">/</p>
-            <p class="page-nav-current">Item</p>
-            <p class="page-nav-seperator">/</p>
-            <p class="page-nav-current">Detail</p>
+            <img data-breadcrumb-role="home" src="image/home.png" />
+            <p data-breadcrumb-role="separator">/</p>
+            <p data-breadcrumb-role="current">Item</p>
+            <p data-breadcrumb-role="separator">/</p>
+            <p data-breadcrumb-role="current">Detail</p>
         </div>
     </div>
     <!-- Sticky Header -->
@@ -76,8 +76,8 @@
                     <!-- 操作按钮区域 -->
                     <div class="item-detail-purchase-title-actions">
                         <!-- @include ../partials/components/item-like-button.html {"like_class":"icon-aixin item-detail-like-button","like":"1","like_icon":"image/Vector_sel.png","like_alt":"收藏按钮","aria_label":"收藏","aria_pressed":"true"} -->
-                        <img class="item-detail-share" src="image/detailpage/share.png" />
-                        <img class="item-detail-more" src="image/detailpage/detail.png" />
+                        <img data-action="share" src="image/detailpage/share.png" alt="Share item" />
+                        <img data-action="open-complaint" src="image/detailpage/detail.png" alt="More actions" />
                     </div>
                 </div>
 
@@ -118,25 +118,24 @@
                         <!-- 总价显示 -->
                         <div class="item-detail-purchase-total-section">
                             <span>Total price:</span>
-                            <span class="item-detail-purchase-total-price">$325.00</span>
+                            <span data-purchase-role="total">$325.00</span>
                         </div>
                         <!-- 数量选择器和购买按钮 -->
                         <div class="item-detail-purchase-buy-box">
                             <div class="item-detail-purchase-controls">
-                                <button class="item-detail-purchase-qty-btn item-detail-purchase-qty-btn-left disabled"
+                                <button type="button" class="disabled" data-purchase-role="decrease"
                                     id="decrease-qty">
-                                    <img class="item-detail-purchase-qty-icon"
+                                    <img
                                         src="image/detailpage/item-detail-qty-minus.svg" alt="decrease quantity" />
                                 </button>
-                                <input type="text" value="1" class="item-detail-purchase-qty-display"
+                                <input type="text" name="quantity" value="1" data-purchase-role="quantity"
                                     id="quantity-display">
-                                <button class="item-detail-purchase-qty-btn item-detail-purchase-qty-btn-right"
-                                    id="increase-qty">
-                                    <img class="item-detail-purchase-qty-icon"
+                                <button type="button" data-purchase-role="increase" id="increase-qty">
+                                    <img
                                         src="image/detailpage/item-detail-qty-plus.svg" alt="increase quantity" />
                                 </button>
                             </div>
-                            <button class="item-detail-purchase-buy-btn item-buy-btn" id="buy-now-btn">
+                            <button type="button" class="item-buy-btn" id="buy-now-btn">
                                 BUY NOW
                             </button>
                         </div>
@@ -158,7 +157,7 @@
         <div class="flex-column item-detail-left-box">
             <div class="item-detail-left-group" id="Infomation">
                 <div>
-                    <span class="item-detail-left-title item-detail-info-title">Information</span>
+                    <span data-section-role="title" data-title-kind="information">Information</span>
                     <div class="flex-column page-section item-detail-info-section" style="gap: 1.25rem;">
                         <div class="item-tag-box">
                             <span>Tags:</span>
@@ -220,10 +219,10 @@
                     </div>
                 </div>
                 <div>
-                    <span class="item-detail-left-title">Screenshots</span>
+                    <span data-section-role="title">Screenshots</span>
                     <div class="item-detail-screenshot page-section">
                         <div class="flex-row item-detail-screenshot-left-box" style="display: none;" aria-label="previous screenshot">
-                            <svg class="item-detail-screenshot-arrow-icon" viewBox="0 0 31.5 31.5" fill="none"
+                            <svg viewBox="0 0 31.5 31.5" fill="none"
                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path
                                     d="M15.75 0C7.05234 0 0 7.05234 0 15.75C0 24.4477 7.05234 31.5 15.75 31.5C24.4477 31.5 31.5 24.4477 31.5 15.75C31.5 7.05234 24.4477 0 15.75 0ZM19.4062 11.141C19.4062 11.4996 19.234 11.8406 18.9422 12.0516L13.8305 15.75L18.9422 19.4484C19.234 19.6594 19.4062 19.9969 19.4062 20.359V22.0078C19.4062 22.2363 19.1461 22.3699 18.9598 22.2363L10.3113 15.9785C10.2754 15.9526 10.2461 15.9186 10.2259 15.8791C10.2058 15.8397 10.1952 15.796 10.1952 15.7518C10.1952 15.7075 10.2058 15.6638 10.2259 15.6244C10.2461 15.585 10.2754 15.5509 10.3113 15.525L18.9598 9.26719C19.0018 9.23667 19.0515 9.21839 19.1032 9.21437C19.155 9.21035 19.2069 9.22075 19.2531 9.24442C19.2994 9.26808 19.3382 9.30409 19.3652 9.34844C19.3922 9.39279 19.4064 9.44376 19.4062 9.4957V11.141V11.141Z"
@@ -231,23 +230,23 @@
                             </svg>
                         </div>
                         <div class="item-detail-screenshot-content">
-                            <img class="item-detail-screenshot-item-icon" src="image/detailpage/item-detail-main-cover.png"
+                            <img src="image/detailpage/item-detail-main-cover.png"
                                 alt="item screenshot" />
-                            <img class="item-detail-screenshot-item-icon" src="image/detailpage/item-detail-main-cover.png"
+                            <img src="image/detailpage/item-detail-main-cover.png"
                                 alt="item screenshot" />
-                            <img class="item-detail-screenshot-item-icon" src="image/detailpage/item-detail-main-cover.png"
+                            <img src="image/detailpage/item-detail-main-cover.png"
                                 alt="item screenshot" />
-                            <img class="item-detail-screenshot-item-icon" src="image/detailpage/item-detail-main-cover.png"
+                            <img src="image/detailpage/item-detail-main-cover.png"
                                 alt="item screenshot" />
-                            <img class="item-detail-screenshot-item-icon" src="image/detailpage/item-detail-main-cover.png"
+                            <img src="image/detailpage/item-detail-main-cover.png"
                                 alt="item screenshot" />
-                            <img class="item-detail-screenshot-item-icon" src="image/detailpage/item-detail-main-cover.png"
+                            <img src="image/detailpage/item-detail-main-cover.png"
                                 alt="item screenshot" />
-                            <img class="item-detail-screenshot-item-icon" src="image/detailpage/item-detail-main-cover.png"
+                            <img src="image/detailpage/item-detail-main-cover.png"
                                 alt="item screenshot" />
                         </div>
                         <div class="flex-row item-detail-screenshot-right-box" style="display: none;" aria-label="next screenshot">
-                            <svg class="item-detail-screenshot-arrow-icon item-detail-screenshot-arrow-icon-right"
+                            <svg
                                 viewBox="0 0 31.5 31.5" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path
                                     d="M15.75 0C7.05234 0 0 7.05234 0 15.75C0 24.4477 7.05234 31.5 15.75 31.5C24.4477 31.5 31.5 24.4477 31.5 15.75C31.5 7.05234 24.4477 0 15.75 0ZM19.4062 11.141C19.4062 11.4996 19.234 11.8406 18.9422 12.0516L13.8305 15.75L18.9422 19.4484C19.234 19.6594 19.4062 19.9969 19.4062 20.359V22.0078C19.4062 22.2363 19.1461 22.3699 18.9598 22.2363L10.3113 15.9785C10.2754 15.9526 10.2461 15.9186 10.2259 15.8791C10.2058 15.8397 10.1952 15.796 10.1952 15.7518C10.1952 15.7075 10.2058 15.6638 10.2259 15.6244C10.2461 15.585 10.2754 15.5509 10.3113 15.525L18.9598 9.26719C19.0018 9.23667 19.0515 9.21839 19.1032 9.21437C19.155 9.21035 19.2069 9.22075 19.2531 9.24442C19.2994 9.26808 19.3382 9.30409 19.3652 9.34844C19.3922 9.39279 19.4064 9.44376 19.4062 9.4957V11.141V11.141Z"
@@ -257,9 +256,9 @@
                     </div>
                 </div>
                 <div>
-                    <span class="item-detail-left-title item-detail-description-title">Description</span>
+                    <span data-section-role="title" data-title-kind="description">Description</span>
                     <div class="item-detail-description-box">
-                        <p class="item-detail-description">
+                        <p>
                             Quo quis itaque ipsa ut voluptas non illo saepe eius. Omnis quam dolore est deserunt a rerum
                             enim
                             nemo.
@@ -397,25 +396,25 @@
                     </div>
                 </div>
                 <div>
-                    <span class="item-detail-left-title item-detail-rules-title-text">Rules</span>
+                    <span data-section-role="title" data-title-kind="rules">Rules</span>
                     <div class="page-section item-detail-rules-section item-detail-rules-section-last">
                         <div class="flex-column item-detail-rules-box">
-                            <span class="item-detail-rules-title">After-sales time: 399小时</span>
-                            <span class="item-detail-rules-content"
+                            <span data-rules-role="title">After-sales time: 399小时</span>
+                            <span data-rules-role="content"
                                 data-expanded-text="Commodi laudantium repellat dolor error.Commodi laudantium repellat dolor error.Commodi laudantium repellat dolor error.Commodi laudantium repellat dolor error.Commodi laudantium repellat dolor error.Commodi laudantium repellat dolor error.">Commodi
                                 laudantium repellat dolor error.</span>
-                            <div class="item-detail-rules-more-button">see more</div>
+                            <button type="button" data-action="toggle-rules">see more</button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="item-detail-left-group" id="FAQs">
-                <span class="item-detail-left-title item-detail-faq-title-text">FAQs</span>
+                <span data-section-role="title" data-title-kind="faq">FAQs</span>
                 <div class="page-section item-detail-faq-section">
                     <div class="flex-column item-detail-faq-box">
                         <div class="flex-row item-detail-faq-title-box">
-                            <span class="item-detail-faq-title">This is panel header 1</span>
-                            <svg class="item-detail-faq-title-arrow" viewBox="0 0 12 11.786" fill="none"
+                            <span data-faq-role="title">This is panel header 1</span>
+                            <svg viewBox="0 0 12 11.786" fill="none"
                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path
                                     d="M2.67785 6.01544C2.65408 5.62545 2.83074 5.17603 3.18664 4.82013L7.27648 0.730287C7.84116 0.165669 8.64204 0.0509392 9.06554 0.474428C9.48899 0.897932 9.37431 1.69884 8.80968 2.26349L5.0714 6.00177L8.81164 9.74103C9.37617 10.3055 9.4906 11.1065 9.06749 11.5301C8.64398 11.9536 7.84214 11.8399 7.27746 11.2752L3.18761 7.18536C2.83966 6.83737 2.66329 6.39928 2.67785 6.01544Z"
@@ -423,16 +422,16 @@
                             </svg>
                         </div>
                         <div class="item-detail-faq-content" style="display: none;">
-                                        <div class="item-detail-faq-text">label</div>
-                                        <div class="view-more-wrapper"><a class="view-more-btn" href="faq-detail.html?id=123">more</a></div>
+                                        <div data-faq-role="text">label</div>
+                                        <div data-faq-role="actions"><a data-faq-role="more" href="faq-detail.html?id=123">more</a></div>
                                     </div>
                     </div>
                 </div>
                 <div class="page-section item-detail-faq-section">
                     <div class="flex-column item-detail-faq-box">
                         <div class="flex-row item-detail-faq-title-box">
-                            <span class="item-detail-faq-title">This is panel header 1</span>
-                            <svg class="item-detail-faq-title-arrow" viewBox="0 0 12 11.786" fill="none"
+                            <span data-faq-role="title">This is panel header 1</span>
+                            <svg viewBox="0 0 12 11.786" fill="none"
                                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path
                                     d="M2.67785 6.01544C2.65408 5.62545 2.83074 5.17603 3.18664 4.82013L7.27648 0.730287C7.84116 0.165669 8.64204 0.0509392 9.06554 0.474428C9.48899 0.897932 9.37431 1.69884 8.80968 2.26349L5.0714 6.00177L8.81164 9.74103C9.37617 10.3055 9.4906 11.1065 9.06749 11.5301C8.64398 11.9536 7.84214 11.8399 7.27746 11.2752L3.18761 7.18536C2.83966 6.83737 2.66329 6.39928 2.67785 6.01544Z"
@@ -440,46 +439,46 @@
                             </svg>
                         </div>
                         <div class="item-detail-faq-content" style="display: none;">
-                                        <div class="item-detail-faq-text">label</div>
-                                        <div class="view-more-wrapper"><a class="view-more-btn" href="faq-detail.html?id=123">more</a></div>
+                                        <div data-faq-role="text">label</div>
+                                        <div data-faq-role="actions"><a data-faq-role="more" href="faq-detail.html?id=123">more</a></div>
                                     </div>
                     </div>
                 </div>
             </div>
             <div class="item-detail-left-group" id="Store">
-                <span class="item-detail-left-title">Store</span>
+                <span data-section-role="title">Store</span>
                 <div class="page-section">
                     <div class="flex-row item-detail-store-box">
                         <div class="item-detail-store-image-box">
-                            <img class="item-detail-store-icon" src="image/detailpage/store-main-avatar.png" />
+                            <img src="image/detailpage/store-main-avatar.png" />
                             <div class="item-detail-store-online active"></div>
                         </div>
                         <div class="flex-column item-detail-store-right-box">
                             <div class="item-title-box item-detail-store-title-row">
                                 <span class="item-title">Store name</span>
                                 <div class="item-detail-store-title-badges">
-                                    <div class="item-mark item-mark4 item-detail-store-badge-hot">HOT</div>
-                                    <div class="item-mark item-mark2 item-detail-store-badge-top">Top 1</div>
+                                    <div class="item-mark item-mark4" data-store-role="hot-mark">HOT</div>
+                                    <div class="item-mark item-mark2" data-store-role="top-mark">Top 1</div>
                                 </div>
                             </div>
                             <div class="flex-row item-detail-store-right-middle-box">
                                 <div class="flex-row item-detail-store-right-middle-item">
-                                    <img class="item-detail-store-right-middle-icon"
+                                    <img
                                         src="image/detailpage/certified.png" />
-                                    <span class="item-detail-store-right-middle-text">Certified</span>
+                                    <span>Certified</span>
                                 </div>
                                 <div class="flex-row item-detail-store-right-middle-item">
-                                    <img class="item-detail-store-right-middle-icon"
+                                    <img
                                         src="image/detailpage/deposit.png" />
-                                    <span class="item-detail-store-right-middle-text">Deposit: </span>
-                                    <span class="item-detail-store-right-middle-text price">$548</span>
+                                    <span>Deposit: </span>
+                                    <span data-store-role="price">$548</span>
                                 </div>
                             </div>
                             <div class="flex-row item-detail-store-right-bottom-box">
                                 <!-- @include ../partials/components/rating-with-count.html {"score":"5.0","recommend":"(62)"} -->
                                 <div class="flex-row">
-                                    <span class="item-detail-store-right-bottom-sale-text">Sales volume: </span>
-                                    <span class="item-detail-store-right-bottom-sale-text number">954</span>
+                                    <span data-stat-role="label">Sales volume: </span>
+                                    <span data-stat-role="value">954</span>
                                 </div>
                             </div>
                         </div>
@@ -487,9 +486,9 @@
                 </div>
             </div>
             <div class="item-detail-left-group" id="Reviews">
-                <span class="item-detail-left-title">Reviews</span>
+                <span data-section-role="title">Reviews</span>
                 <div class="flex-row item-detail-left-subtitle-box">
-                    <span class="item-detail-left-subtitle">1-5 out of 433 Reviews</span>
+                    <span>1-5 out of 433 Reviews</span>
                     <!-- 排序按钮-->
                     <!-- @include ../partials/components/page-sort-dropdown.html {"sort_box_attrs":"","sort_icon_attrs":"data-value=\"\"","sort_icon_src":"image/sort.png","sort_container_attrs":""} -->
                 </div>
@@ -572,8 +571,8 @@
         </div>
         <div class="item-detail-right-box page-fix-box" id="item-detail-statistics-panel" aria-hidden="true">
             <div class="flex-row item-detail-right-header">
-                <h2 class="item-detail-right-title">Item's Statistics</h2>
-                <img class="item-detail-right-close" src="image/close.png" />
+                <h2>Item's Statistics</h2>
+                <img data-action="close-statistics" src="image/close.png" alt="Close statistics" />
             </div>
             <div class="frame-container">
                 <!-- @include ../partials/components/statistics-rating-chart-panel.html {"statistics_panel_class":"item-statistics-panel","section_title_style":"display: none;","section_title_text":"","section_content_style":"display: none;","section_content_text":"","main_title_style":"","main_title_text":"Item's Statistics","star_box_style":"","star_score":"4.3","star_recommend":"(200)","rating_mobile_style":"","rating_mobile_score":"4.3","rating_mobile_recommend":"(200)","stat_1_label":"Rating:","stat_1_value":"4.3","stat_1_count":"(90)","stat_2_label":"Service:","stat_2_value":"4.3","stat_2_count":"","stat_3_label":"Logistics:","stat_3_value":"4.3","stat_3_count":"","stat_4_label":"Products:","stat_4_value":"4.3","stat_4_count":"","chart_id":"starsStatisticsEchart"} -->
@@ -597,7 +596,7 @@
     <div class="page-content">
         <div class="flex-column item-detail-item-list">
             <div class="item-detail-left-group" id="Similar Items">
-                <span class="item-detail-left-title">Similar items</span>
+                <span data-section-role="title">Similar items</span>
                 <!-- Best Items -->
                 <div class="item-detail-pager">
                     <div class="carousel-container" id="best-items">
@@ -1131,36 +1130,36 @@
     <!-- 分享弹框 -->
     <div class="item-share-mask">
         <div class="item-share-content">
-            <div class="item-share-close-wrappper"><img src="image/close.png" class="item-share-close-btn" alt=""></div>
-            <div class="share-icons">
-                <img class="share-icon facebook" src="image/detailpage/twitter.png" />
-                <img class="share-icon twitter" src="image/detailpage/icon-x.png" />
-                <img class="share-icon link" src="image/detailpage/icon-in.png" />
+            <div class="item-share-close-wrappper"><img src="image/close.png" data-action="close-share" alt="Close share"></div>
+            <div data-share-role="platforms">
+                <img src="image/detailpage/twitter.png" alt="Twitter" />
+                <img src="image/detailpage/icon-x.png" alt="X" />
+                <img src="image/detailpage/icon-in.png" alt="LinkedIn" />
             </div>
-            <div class="avatar-list">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
-                <img src="https://dummyimage.com/32x32" class="avatar-icon" alt="">
+            <div data-share-role="avatars">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
+                <img src="https://dummyimage.com/32x32" alt="">
             </div>
         </div>
     </div>
     <div class="item-complaint-mask">
         <div class="item-complaint-content">
-            <div class="item-complaint-close-wrappper"><img src="image/close.png" class="item-complaint-close-btn"
-                    alt=""></div>
+            <div class="item-complaint-close-wrappper"><img src="image/close.png" data-action="close-complaint"
+                    alt="Close complaint"></div>
             <div class="filter-custom-select" data-value="" data-type="switchComplaintType">
                 <div class="filter-custom-select-trigger">
                     <span class="filter-custom-select-text placeholder">选择投诉类型</span>
@@ -1175,18 +1174,18 @@
                 </div>
             </div>
             <div class="complaint-textarea-wrapper">
-                <textarea class="complaint-textarea" placeholder="投诉内容" rows="5"></textarea>
+                <textarea name="complaint" placeholder="投诉内容" rows="5"></textarea>
             </div>
-            <h3 class="complaint-info-title">Complaint Infomation</h3>
-            <div class="item">
-                <span class="label">items: </span>
-                <span class="text">Sleek Concrete Keyboard</span>
+            <h3>Complaint Infomation</h3>
+            <div data-complaint-role="info-row">
+                <span data-complaint-role="label">items: </span>
+                <span data-complaint-role="value">Sleek Concrete Keyboard</span>
             </div>
-            <div class="item">
-                <span class="label">Store: </span>
-                <span class="text">Koch and Son</span>
+            <div data-complaint-role="info-row">
+                <span data-complaint-role="label">Store: </span>
+                <span data-complaint-role="value">Koch and Son</span>
             </div>
-            <div class="submit-btn">提交</div>
+            <button type="button" data-action="submit-complaint">提交</button>
         </div>
     </div>
     <!-- 投诉弹框 -->

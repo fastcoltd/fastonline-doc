@@ -70,7 +70,7 @@
     align-items: center;
 }
 
-.user-avatar {
+.user-section > img {
     width: 10rem;
     height: 10rem;
     border-radius: 50%;
@@ -94,7 +94,7 @@
     gap: 2.5rem;
 }
 
-.user-name {
+.user-header > h2 {
     font-weight: 600;
     font-size: 3.5rem;
     line-height: 3.75rem;
@@ -167,13 +167,13 @@
     align-items: flex-start;
 }
 
-.other-label {
+.other-info > p {
     font-size: 1.75rem;
     line-height: 2.5rem;
     color: #6d6d6d;
 }
 
-.other-text {
+.other-info > p > span {
     flex: 1;
     width: 100%;
     font-size: 1.75rem;
@@ -295,7 +295,7 @@
         align-items: flex-start;
     }
 
-    .user-avatar {
+    .user-section > img {
         width: 7.5rem;
         height: 7.5rem;
     }
@@ -311,7 +311,7 @@
         flex-direction: column;
     }
 
-    .user-name {
+    .user-header > h2 {
         width: 100%;
         font-size: 2.5rem;
         line-height: 2.75rem;
@@ -350,12 +350,12 @@
         gap: 1rem;
     }
 
-    .other-label {
+    .other-info > p {
         font-size: 1.5rem;
         line-height: 2.25rem;
     }
 
-    .other-text {
+    .other-info > p > span {
         font-size: 1.5rem;
         line-height: 2.25rem;
     }
@@ -490,7 +490,7 @@
     gap: 1.25rem;
 }
 
-.attribute-label {
+.attribute-row > [data-attribute-role="label"] {
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
     font-size: 1.75rem;
@@ -499,7 +499,7 @@
     white-space: nowrap;
 }
 
-.attribute-value {
+.attribute-row > [data-attribute-role="value"] {
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
     font-size: 1.75rem;
@@ -523,7 +523,7 @@
 }
 
 /* 文本区域样式 */
-.textarea-field {
+.textarea-container > [data-field-role="input"] {
     width: 100%;
     background: #FFFFFF;
     border: 1px solid #D9D9D9;
@@ -540,15 +540,15 @@
     transition: border-color 0.3s ease;
 }
 
-.textarea-field.large {
+.textarea-container > [data-field-role="input"].large {
     height: 4.5rem;
 }
 
-.textarea-field::placeholder {
+.textarea-container > [data-field-role="input"]::placeholder {
     color: rgba(0, 0, 0, 0.25);
 }
 
-.textarea-field.error {
+.textarea-container > [data-field-role="input"].error {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
@@ -615,14 +615,14 @@
     gap: 0.5rem;
 }
 
-.upload-required {
+.upload-label > [data-upload-label-role="required"] {
     color: var(--primary-color);
     font-family: 'SimSong', serif;
     font-size: 1.75rem;
     line-height: 2.5rem;
 }
 
-.upload-title {
+.upload-label > [data-upload-label-role="text"] {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
     font-size: 1.75rem;
@@ -637,7 +637,7 @@
     gap: 1rem;
 }
 
-.upload-button {
+.upload-content > [data-upload-role="trigger"] {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -651,16 +651,16 @@
     box-shadow: 0px 0.25rem 0px 0px rgba(0, 0, 0, 0.02);
 }
 
-.upload-button.error {
+.upload-content > [data-upload-role="trigger"].error {
     border-color: var(--primary-color);
 }
 
-.upload-icon {
+.upload-content > [data-upload-role="trigger"] > svg {
     width: 1.75rem;
     height: 1.75rem;
 }
 
-.upload-button span {
+.upload-content > [data-upload-role="trigger"] > span {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
     font-size: 1.75rem;
@@ -668,7 +668,7 @@
     color: rgba(0, 0, 0, 0.85);
 }
 
-.upload-hint {
+.upload-content > [data-upload-role="hint"] {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
     font-size: 1.75rem;
@@ -677,7 +677,7 @@
 }
 
 /* 隐藏的文件输入 */
-.file-input {
+.upload-content > [data-upload-role="input"] {
     display: none;
 }
 
@@ -693,7 +693,7 @@
     }
 }
 
-.captcha-input {
+.captcha-section > [data-form-role="captcha"] {
     width: 25rem;
     height: 4.5rem;
     background: #FFFFFF;
@@ -709,15 +709,15 @@
     transition: border-color 0.3s ease;
 }
 
-.captcha-input::placeholder {
+.captcha-section > [data-form-role="captcha"]::placeholder {
     color: #6D6D6D;
 }
 
-.captcha-input.error {
+.captcha-section > [data-form-role="captcha"].error {
     border: var(--primary-color) solid 0.125rem;
 }
 
-.captcha-image {
+.captcha-section > [data-action="refresh-captcha"] {
     width: 15.25rem;
     height: 4.625rem;
     background: linear-gradient(135deg, #E6F7FF 0%, #F0F9FF 100%);
@@ -729,9 +729,10 @@
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    padding: 0;
 }
 
-.captcha-image span {
+.captcha-section > [data-action="refresh-captcha"] > span {
     font-family: 'Roboto', sans-serif;
     font-size: 2rem;
     color: var(--primary-color);
@@ -740,7 +741,7 @@
 }
 
 /* 提交按钮 */
-.submit-button {
+.form-content > [data-action="submit-bid"] {
     width: 37.1875rem;
     height: 6.25rem;
     background: #fff;
@@ -752,19 +753,20 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
+    padding: 0;
 }
 
-.submit-button:hover {
+.form-content > [data-action="submit-bid"]:hover {
     background: #FF1B20;
     transform: translateY(-1px);
     box-shadow: 0px 0.5rem 1rem rgba(255, 27, 32, 0.3);
 }
 
-.submit-button:hover span {
+.form-content > [data-action="submit-bid"]:hover > span {
     color: #FFFFFF;
 }
 
-.submit-button span {
+.form-content > [data-action="submit-bid"] > span {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
     font-size: 1.75rem;
@@ -791,25 +793,25 @@
         gap: 0.75rem;
     }
     
-    .attribute-label {
+    .attribute-row > [data-attribute-role="label"] {
         font-size: 1.5rem;
         line-height: 2.25rem;
     }
     
-    .attribute-value {
+    .attribute-row > [data-attribute-role="value"] {
         font-size: 1.5rem;
         line-height: 2.25rem;
     }
     
     /* 文本区域样式 */
-    .textarea-field {
+    .textarea-container > [data-field-role="input"] {
         height: 3.75rem;
         padding: 0.5rem 1rem;
         font-size: 1.5rem;
         line-height: 2.25rem;
     }
     
-    .textarea-field.large {
+    .textarea-container > [data-field-role="input"].large {
         height: 6.25rem;
     }
 
@@ -849,11 +851,11 @@
         margin-top: 0.75rem;
     }
     
-    .upload-required {
+    .upload-label > [data-upload-label-role="required"] {
         font-size: 1.5rem;
     }
     
-    .upload-title {
+    .upload-label > [data-upload-label-role="text"] {
         font-size: 1.5rem;
         line-height: 2rem;
     }
@@ -863,7 +865,7 @@
         gap: 0.5rem;
     }
     
-    .upload-button {
+    .upload-content > [data-upload-role="trigger"] {
         width: auto;
         margin-top: 0;
         gap: 0.5rem;
@@ -871,17 +873,17 @@
         min-height: 3.75rem;
     }
     
-    .upload-icon {
+    .upload-content > [data-upload-role="trigger"] > svg {
         width: 1.75rem;
         height: 1.75rem;
     }
     
-    .upload-button span {
+    .upload-content > [data-upload-role="trigger"] > span {
         font-size: 1.5rem;
         line-height: 2.25rem;
     }
     
-    .upload-hint {
+    .upload-content > [data-upload-role="hint"] {
         width: 100%;
         font-size: 1.25rem;
         line-height: 2rem;
@@ -894,7 +896,7 @@
         gap: 1.25rem;
     }
     
-    .captcha-input {
+    .captcha-section > [data-form-role="captcha"] {
         width: 25rem;
         height: 3.75rem;
         padding: 0 0.75rem;
@@ -902,29 +904,29 @@
         line-height: 2.25rem;
     }
     
-    .captcha-image {
+    .captcha-section > [data-action="refresh-captcha"] {
         width: 12.75rem;
         height: 3.875rem;
     }
     
-    .captcha-image span {
+    .captcha-section > [data-action="refresh-captcha"] > span {
         font-size: 1.5rem;
     }
     
     /* 提交按钮 */
-    .submit-button {
+    .form-content > [data-action="submit-bid"] {
         order: 6;
         width: 100%;
         height: 3.75rem;
         border-radius: 0.5rem;
     }
     
-    .submit-button span {
+    .form-content > [data-action="submit-bid"] > span {
         font-size: 1.5rem;
         line-height: 2.75rem;
     }
 
-    .file-preview {
+    .upload-content > [data-upload-role="preview"] {
         width: 100%;
         flex-direction: row;
         flex-wrap: wrap;
@@ -981,7 +983,7 @@
 }
 
 /* 文件预览样式 */
-.file-preview {
+.upload-content > [data-upload-role="preview"] {
     display: none;
     width: 100%;
     flex-direction: row;
@@ -1063,7 +1065,7 @@
     max-width: 48rem;
 }
 
-.upload-image-preview-img {
+#uploadImagePreviewImg {
     width: 100%;
     max-height: 78vh;
     display: block;
@@ -1072,7 +1074,7 @@
     background: #000;
 }
 
-.upload-image-preview-close {
+#uploadImagePreviewClose {
     position: absolute;
     top: -1rem;
     right: -1rem;
@@ -1089,7 +1091,7 @@
 }
 
 @media (max-width: 768px) {
-    .file-preview {
+    .upload-content > [data-upload-role="preview"] {
         width: 100%;
         flex-direction: row;
         flex-wrap: wrap;

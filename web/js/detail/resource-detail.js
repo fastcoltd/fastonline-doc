@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const menu = document.querySelector('.detail-page-menu');
     const menuContainer = document.querySelector('.table-of-container');
-    const close = menuContainer ? menuContainer.querySelector('.table-of-container-close') : null;
+    const close = menuContainer ? menuContainer.querySelector(':scope > img') : null;
 
     function toggleMenu(visible) {
         if (!menuContainer) {

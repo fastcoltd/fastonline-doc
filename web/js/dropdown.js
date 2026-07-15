@@ -1,10 +1,10 @@
 class DropdownMenu {
     constructor(defaultValue) {
         this.menuButton = document.querySelector('.page-dropdown-select');
-        this.menuArrow = this.menuButton.querySelector('.page-dropdown-icon');
-        this.menuLabel = this.menuButton.querySelector('.page-dropdown-select-text');
+        this.menuArrow = this.menuButton.querySelector('[data-dropdown-role="icon"]');
+        this.menuLabel = this.menuButton.querySelector('[data-dropdown-role="value"]');
         this.menuContainer = this.menuButton.querySelector('.page-dropdown');
-        this.menuItems = this.menuButton.querySelectorAll('.page-dropdown-item');
+        this.menuItems = this.menuButton.querySelectorAll('[data-dropdown-role="option"]');
         this.init();
         this.setDefaultSelection(defaultValue);
         this.dropdownTimer = null;
@@ -25,7 +25,7 @@ class DropdownMenu {
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const value = item.dataset.value;
-                const text = item.querySelector('.title').textContent;
+                const text = item.querySelector(':scope > p').textContent;
                 this.selectOption(value, text);
             });
         });
