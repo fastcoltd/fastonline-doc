@@ -1,8 +1,14 @@
 function LinkRef(linkId, sectionId) {
-    this.pageIndexs = document.querySelectorAll('.' + linkId);
+    const usesSelector = ['.', '#', '['].includes(linkId.charAt(0));
+    const linkSelector = usesSelector ? linkId : '.' + linkId;
+    this.pageIndexs = document.querySelectorAll(linkSelector);
     this.sections = document.querySelectorAll('.' + sectionId);
     this.stickyHeader = document.getElementById('stickyHeader');
     this.setup();
+}
+
+LinkRef.prototype.getLinkValue = function (item) {
+    return item.dataset.letter || item.id;
 }
 
 // 统一使用文档绝对坐标，避免 section 在不同父容器时 offsetTop 失真
@@ -28,7 +34,7 @@ LinkRef.prototype.setup = function () {
     this.pageIndexs.forEach((item) => {
         item.addEventListener("click", (e) => {
             e.stopPropagation();
-            const value = e.currentTarget.id;
+            const value = this.getLinkValue(e.currentTarget);
             this.scrollToSection(value);
         });
     });
@@ -89,8 +95,9 @@ LinkRef.prototype.updateActiveLink = function () {
 
 // 更新导航高亮
 LinkRef.prototype.updateNavigation = function (activeSectionId) {
+    const linkRef = this;
     this.pageIndexs.forEach(function (item) {
-        if (item.id === activeSectionId) {
+        if (linkRef.getLinkValue(item) === activeSectionId) {
             item.classList.add('active');
             const isDesktopBrandIndex = item.closest('.brand-page-index-box') && window.innerWidth >= 769;
             if (!isDesktopBrandIndex) {

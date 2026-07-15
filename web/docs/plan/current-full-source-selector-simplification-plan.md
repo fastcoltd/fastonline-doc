@@ -534,3 +534,13 @@ rg 'REMOVED_CLASS' src/pages src/partials css js
 - 保留项：页面/侧栏/列表/分类/评论布局根、复用的 `title/des/text/time/tag-item` 排版类、状态与行为类、卡片 partial class 均不在本页内联批次删除。
 - 命中集合：两个头像选择器各命中 1 个节点；热门文章 7 项、分类子列表 4 项、评论项/用户/时间各 3 项、侧栏直接关闭图片 1 个，与迁移前精确一致。新规则均保留 Blog 页面及具体模块父级作用域；加载顺序和属性声明不变，不产生跨模块命中。
 - 回归：目标旧叶子 class 在页面、Blog CSS/LESS 与 `blog.js` 中无意外残留（Introduction 的 `.time` 为明确保留项）；构建 31 页、`git diff --check`、`js/blog.js` 与全部非 minified JS 语法检查、全部页面内联脚本解析均通过。
+
+### F6 Brand All 字母索引（2026-07-14）
+
+- 页面范围：`brand-all.html:46-72`；样式 `css/brand.css/less:28-48,289-301`、`css/second-page.css/less:10-25`；行为 `js/brandpage.js:6-14,22-63`、`js/link.js:1-32,90-110`。
+- 旧结构：26 个索引 `span` 使用 `.brand-page-index-box-item` 作为样式和行为钩子，并以 `id="A"…"Z"` 保存目标字母；A–G 与构建进来的 `.brand-page-list` section 形成重复 id。
+- 新结构：索引项删除专用 class 和 id，统一使用 `data-letter="A"…"Z"`；`active` 状态 class 保留。CSS/LESS 迁移为 `.brand-page-index-box > [data-letter]` 及其 `.active` 状态，特异性与旧选择器一致。
+- JS：`brandpage.js` 的桌面与移动端索引查询、字母比较改读 `data-letter`；`LinkRef` 向后兼容原 class 名参数，同时允许显式 CSS selector，并以 `data-letter` 优先、id 兜底解析链接目标，确保其它 7 个消费者行为不变。
+- Partial 边界：A–G section partial 的 `id` 是滚动目标且必须保留；本批只修改 `src/pages/brand-all.html` 内联索引，不修改 partial。
+- 命中与特异性：源码和构建页均按 A–Z 顺序生成 26 个 `data-letter`，基础/active 规则仍分别为 0-2-0/0-3-0；构建页不再存在 A–G 重复 id。`LinkRef` 已验证旧 class 名和新显式 selector 两种入参、旧 id 与新 data-letter 两种目标值均能正确解析。
+- 回归：旧 `.brand-page-index-box-item` 在目标页面、两组 CSS/LESS 和相关 JS 中无残留；构建 31 页、`git diff --check`、全部非 minified JS、全部页面内联脚本语法及 data-letter/重复 id 检查均通过。

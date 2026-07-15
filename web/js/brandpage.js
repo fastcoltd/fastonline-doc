@@ -4,13 +4,13 @@ window.addEventListener('DOMContentLoaded', function () {
     };
 
     if (!isMobileBrandPage()) {
-        new LinkRef('brand-page-index-box-item', 'brand-page-list');
+        new LinkRef('.brand-page-index-box > [data-letter]', 'brand-page-list');
         return;
     }
 
     const indexBox = document.querySelector('.brand-page-index-box');
     const listContainer = document.querySelector('.brand-page-list-container');
-    const indexItems = Array.from(document.querySelectorAll('.brand-page-index-box-item'));
+    const indexItems = Array.from(document.querySelectorAll('.brand-page-index-box > [data-letter]'));
     const sections = Array.from(document.querySelectorAll('.brand-page-list'));
     let scrollTimer = null;
     let isClickScrolling = false;
@@ -21,7 +21,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
     const updateActiveIndex = function (sectionId) {
         indexItems.forEach(function (item) {
-            const isActive = item.id === sectionId;
+            const isActive = item.dataset.letter === sectionId;
             item.classList.toggle('active', isActive);
             if (isActive) {
                 item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
@@ -52,14 +52,14 @@ window.addEventListener('DOMContentLoaded', function () {
     indexItems.forEach(function (item) {
         item.addEventListener('click', function () {
             const targetSection = sections.find(function (section) {
-                return section.id === item.id;
+                return section.id === item.dataset.letter;
             });
             if (!targetSection) {
                 return;
             }
 
             isClickScrolling = true;
-            updateActiveIndex(item.id);
+            updateActiveIndex(item.dataset.letter);
             listContainer.scrollTo({
                 top: getSectionTopInContainer(targetSection),
                 behavior: 'smooth'
