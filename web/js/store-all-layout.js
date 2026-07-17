@@ -30,6 +30,8 @@ class StoreAllLayout {
         } else {
             this.mobileMedia.addListener(handleViewportChange);
         }
+
+        window.addEventListener('resize', () => this.scheduleTagOverflowSync());
     }
 
     observeItems() {
@@ -66,6 +68,26 @@ class StoreAllLayout {
         document.querySelectorAll('#items-grid > .store-all-card').forEach(card => {
             card.classList.remove(...this.stateClasses);
             card.classList.add(stateClass);
+        });
+        this.scheduleTagOverflowSync();
+    }
+
+    scheduleTagOverflowSync() {
+        cancelAnimationFrame(this.tagOverflowFrame);
+        this.tagOverflowFrame = requestAnimationFrame(() => this.syncTagOverflow());
+    }
+
+    syncTagOverflow() {
+        document.querySelectorAll('#items-grid > .store-all-card').forEach(card => {
+            const tagList = card.querySelector(':scope > nav');
+            if (!tagList) return;
+
+            tagList.removeAttribute('data-overflow');
+            const isHorizontal = card.classList.contains('store-all-card--desktop-horizontal')
+                || card.classList.contains('store-all-card--mobile-horizontal');
+            if (!isHorizontal) return;
+
+            tagList.toggleAttribute('data-overflow', tagList.scrollWidth > tagList.clientWidth + 1);
         });
     }
 }
