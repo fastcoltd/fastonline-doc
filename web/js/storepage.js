@@ -84,77 +84,45 @@ function renderItems(items) {
   });
 }
 
-// 创建商品元素 - 完全按照Figma设计
+let storeCardPrototype = null;
+
+// 创建 Store 元素：克隆统一 partial 生成的 DOM，不在 JavaScript 中维护第二份 HTML
 function createItemElement(item) {
-  const div = document.createElement('div');
-  div.className = 'store-item';
+  const sourceCard = storeCardPrototype || document.querySelector('#items-grid > .store-all-card');
+  if (!sourceCard) return document.createElement('article');
 
-  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
+  const card = sourceCard.cloneNode(true);
+  const rating = Number.parseFloat(item.rating);
+  const ratingText = Number.isFinite(rating) ? rating.toFixed(1) : '4.3';
+  const reviewText = `(${item.reviews || 200})`;
+  const ratingPercent = Number.isFinite(rating) ? `${Math.max(0, Math.min(100, rating / 5 * 100))}%` : '86%';
 
-  div.innerHTML = `
-            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
-            <div class="store-item-user-box">
-              <img src="{{item.image}}" />
-              <div class="store-item-name-box">
-                <a href="store-detail.html?name=store-name" target="_self" class="item-title-box">
-                  <p class="item-title">Store name,Store name,Store name,Store name,Store name,Store name,Store name,
-                    Store name,Store name,Store name,Store name,Store name</p>
-                </a>
-                <div class="item-desc-box">
-                  <p>Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
-                    desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
-                    desc,Store desc,Store desc,Store desc,Store desc</p>
-                </div>
-              </div>
-            </div>
-            <div class="store-item-content">
-              <div class="item-star-box">
-                <div class="star-bg">
-                  <div class="stars-outer">
-                    <div class="stars-inner" style="--star-fill: 86%;"></div>
-                  </div>
-                </div>
-                <p>4.3</p>
-                <p>(200)</p>
-              </div>
-              <div class="store-item-detail-box">
-                <p>Store detail,Store detail,Store detail,Store detail,Store detail,Store
-                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
-                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
-                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
-                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
-                  detail,Store detail,Store detail</p>
-              </div>
-              <div class="store-item-brand-service-box">
-                <div class="item-brand-box">
-                  <p class="item-brand-text">品牌: </p>
-                  <img class="item-brand-icon" src="image/brand.png" />
-                  <p class="item-brand" style="color: #06C70C;">{{Google}}</p>
-                </div>
-                <div class="item-service-box">
-                  <p class="item-service-text">服务: </p>
-                  <img class="item-service-icon" src="image/service.png" />
-                  <p class="item-service">{{SEO & SA}}</p>
-                </div>
-              </div>
-            </div>
-            <div class="item-tag-box">
-              <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
-                <p class="item-tag-text">{{新品发布}}</p>
-              </a>
-              <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
-                <p class="item-tag-text">{{运动户外}}</p>
-              </a>
-              <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
-                <p class="item-tag-text">{{配送时间: 24H+}}</p>
-              </a>
-              <div class="item-tag-more-box" style="display: inline-block;">
-                <p class="item-tag-more">+3</p>
-              </div>
-            </div>
-         `;
+  const avatar = card.querySelector(':scope > figure > img');
+  const title = card.querySelector(':scope > header h2 > a');
+  const mark = card.querySelector(':scope > header [data-role="mark"]');
+  const ratingFill = card.querySelector('[data-role="rating"] .stars-inner');
+  const ratingScores = card.querySelectorAll('[data-role="rating"] p:first-of-type');
+  const ratingReviews = card.querySelectorAll('[data-role="rating"] p:nth-of-type(2)');
+  const brand = card.querySelector('[data-field="brand"] > dd');
+  const service = card.querySelector('[data-field="service"] > dd');
+  const likeButton = card.querySelector(':scope > .icon-aixin');
 
-  return div;
+  if (avatar && item.image) avatar.src = item.image;
+  if (title && item.title) title.textContent = item.title;
+  if (mark && item.mark) mark.textContent = item.mark;
+  if (ratingFill) ratingFill.style.setProperty('--star-fill', ratingPercent);
+  ratingScores.forEach(node => { node.textContent = ratingText; });
+  ratingReviews.forEach(node => { node.textContent = reviewText; });
+  if (brand && item.brand) brand.textContent = item.brand;
+  if (service && item.service) service.textContent = item.service;
+  if (likeButton) {
+    const isLiked = Boolean(item.isLiked);
+    likeButton.dataset.like = isLiked ? '1' : '0';
+    likeButton.setAttribute('aria-pressed', String(isLiked));
+    likeButton.src = isLiked ? 'image/Vector_sel.png' : 'image/Vector_nor.svg';
+  }
+
+  return card;
 }
 
 
@@ -179,21 +147,20 @@ pagination.onPageSizeChange = (page, pageSize) => {
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
-  this.layout = new PageLayout();
+  const firstStoreCard = document.querySelector('#items-grid > .store-all-card');
+  storeCardPrototype = firstStoreCard ? firstStoreCard.cloneNode(true) : null;
+  window.storeAllLayout = new StoreAllLayout();
   // this.sort = new SortSelector();
   $('.load-more').on('click', function () {
-      const $activePager = $('.items-container[data-layout].is-active .store-all-items-pager');
-      const $targetPager = $activePager.length ? $activePager : $('.store-all-items-pager').first();
-      const htmlStr = $targetPager.children(':not(.no-data-wrapper)').map(function () {
-          return this.outerHTML;
-      }).get().join('');
+      const $targetPager = $('.store-all-unified-items-pager').first();
+      const clonedCards = $targetPager.children('.store-all-card').clone().get();
       $('.loading').show()
       setTimeout(() => {
           const $emptyState = $targetPager.children('.no-data-wrapper').first();
           if ($emptyState.length) {
-              $emptyState.before(htmlStr);
+              clonedCards.forEach(card => $emptyState.before(card));
           } else {
-              $targetPager.append(htmlStr)
+              clonedCards.forEach(card => $targetPager.append(card));
           }
           $('.loading').hide()
       }, 2000)
