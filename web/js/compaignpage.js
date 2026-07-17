@@ -78,67 +78,11 @@ function renderItems(items) {
   });
 }
 
-// 创建商品元素 - 完全按照Figma设计
-function createItemElement(item) {
-  const div = document.createElement('div');
-  div.className = 'compaign-item';
-
-  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
-
-  div.innerHTML = `
-           <img src="{{item.image}}" />
-            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
-            <div class="compaign-item-content">
-              <a href="compaign-detail.html?name=compaign-name" target="_self" class="item-title-box">
-                <div class="item-mark item-mark1">compaign.mark</div>
-                <p class="item-title">item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题
-                  item 标题 item 标题 item 标题</p>
-              </a>
-              <div class="compaign-item-middle-box">
-                <div class="compaign-item-box">
-                  <div class="compaign-item-brand-box">
-                    <p class="compaign-item-brand-text">Items</p>
-                    <p class="compaign-item-brand">14</p>
-                  </div>
-                  <div class="compaign-item-brand-box">
-                    <p class="compaign-item-brand-text">Sales</p>
-                    <p class="compaign-item-brand">3000</p>
-                  </div>
-                </div>
-                <div class="compaign-item-box">
-                  <div class="compaign-item-brand-box">
-                    <p class="compaign-item-brand-text">Orders</p>
-                    <p class="compaign-item-brand">144</p>
-                  </div>
-                  <div class="compaign-item-brand-box">
-                    <p class="compaign-item-brand-text">Favorites</p>
-                    <p class="compaign-item-brand">200</p>
-                  </div>
-                </div>
-              </div>
-              <div class="compaign-item-products-box">
-                <p class="compaign-item-products-text">Products</p>
-                <p class="compaign-item-products">Product A, Product B, Product C, Product D, Product E, Product F,
-                  Product G, Product H, Product I, Product J, Product K, Product L, Product M, Product N</p>
-              </div>
-              <div class="item-tag-box">
-                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
-                  <p class="item-tag-text">{{新品发布}}</p>
-                </a>
-                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
-                  <p class="item-tag-text">{{运动户外}}</p>
-                </a>
-                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
-                  <p class="item-tag-text">{{配送时间: 24H+}}</p>
-                </a>
-                <div class="item-tag-more-box">
-                  <p class="item-tag-more">+3</p>
-                </div>
-              </div>
-            </div>
-         `;
-
-  return div;
+// 动态卡片复用统一组件原型，不在 JavaScript 中重复维护组件 HTML
+function createItemElement() {
+  const card = window.compaignAllLayout?.createCard();
+  if (!card) throw new Error('Campaign card prototype is unavailable');
+  return card;
 }
 
 // 初始化分页组件
