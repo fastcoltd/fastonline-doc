@@ -19,14 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
   pagination.onPageSizeChange = (page, pageSize) => {
     console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
   };
-  this.layout = new PageLayout();
+  window.demandAllLayout = new DemandAllLayout();
   //   this.sort = new SortSelector();
   $('.load-more').on('click', function () {
     $('.loading').show()
     $('.show-more-btn > span').hide()
     setTimeout(() => {
-      $('.items-pager').each(function () {
-        const htmlStr = $(this).children(':not(.no-data-wrapper)').map(function () {
+      $('#items-grid').each(function () {
+        const htmlStr = $(this).children('.demand-all-card').map(function () {
           return this.outerHTML;
         }).get().join('');
         const $emptyState = $(this).children('.no-data-wrapper').first();
