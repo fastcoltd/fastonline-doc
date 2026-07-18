@@ -2,6 +2,7 @@
 
 window.addEventListener('DOMContentLoaded', function () {
     const isMobile = window.innerWidth <= 768;
+    const hotPostsLayout = new PostAllLayout(document.getElementById('hot-posts'));
     const banner = new Carousel('banner', 5);
     const bestItems = new Carousel('best-items', 11);
     const bestStore = new Carousel('best-store', 23);

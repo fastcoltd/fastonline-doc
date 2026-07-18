@@ -1,11 +1,11 @@
 class PostAllLayout {
-    constructor() {
+    constructor(itemsGrid = document.getElementById('items-grid')) {
         this.mobileMedia = window.matchMedia('(max-width: 768px)');
         this.stateClasses = [
             'post-all-card--desktop',
             'post-all-card--mobile'
         ];
-        this.itemsGrid = document.getElementById('items-grid');
+        this.itemsGrid = itemsGrid;
         this.init();
     }
 
@@ -36,7 +36,7 @@ class PostAllLayout {
                 });
             });
         });
-        this.itemsObserver.observe(this.itemsGrid, { childList: true });
+        this.itemsObserver.observe(this.itemsGrid, { childList: true, subtree: true });
     }
 
     getStateClass() {
@@ -47,7 +47,7 @@ class PostAllLayout {
 
     syncCards() {
         if (!this.itemsGrid) return;
-        this.itemsGrid.querySelectorAll(':scope > .post-all-card').forEach(card => this.syncCard(card));
+        this.itemsGrid.querySelectorAll('.post-all-card').forEach(card => this.syncCard(card));
     }
 
     syncCard(card) {
