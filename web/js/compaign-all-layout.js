@@ -1,6 +1,7 @@
 class CompaignAllLayout {
-    constructor() {
+    constructor(itemsGrid = document.getElementById('items-grid'), layoutSwitchRoot = document) {
         this.currentLayout = 'vertical';
+        this.layoutSwitchRoot = layoutSwitchRoot;
         this.mobileMedia = window.matchMedia('(max-width: 768px)');
         this.stateClasses = [
             'compaign-all-card--desktop-vertical',
@@ -8,9 +9,9 @@ class CompaignAllLayout {
             'compaign-all-card--mobile-vertical',
             'compaign-all-card--mobile-horizontal'
         ];
-        this.itemsGrid = document.getElementById('items-grid');
+        this.itemsGrid = itemsGrid;
         this.cardPrototype = this.itemsGrid
-            ?.querySelector(':scope > .compaign-all-card')
+            ?.querySelector('.compaign-all-card')
             ?.cloneNode(true) || null;
         this.init();
     }
@@ -21,8 +22,14 @@ class CompaignAllLayout {
         this.syncLayout();
     }
 
+    getLayoutButtons() {
+        return this.layoutSwitchRoot
+            ? this.layoutSwitchRoot.querySelectorAll('.layout-switch')
+            : [];
+    }
+
     bindEvents() {
-        document.querySelectorAll('.layout-switch').forEach(button => {
+        this.getLayoutButtons().forEach(button => {
             button.addEventListener('click', event => {
                 this.switchLayout(event.currentTarget.dataset.layout);
             });
@@ -48,7 +55,7 @@ class CompaignAllLayout {
                 });
             });
         });
-        this.itemsObserver.observe(this.itemsGrid, { childList: true });
+        this.itemsObserver.observe(this.itemsGrid, { childList: true, subtree: true });
     }
 
     switchLayout(layout) {
@@ -63,7 +70,7 @@ class CompaignAllLayout {
     }
 
     syncLayout() {
-        document.querySelectorAll('.layout-switch').forEach(button => {
+        this.getLayoutButtons().forEach(button => {
             button.classList.toggle('active', button.dataset.layout === this.currentLayout);
         });
         this.syncCards();
@@ -71,7 +78,7 @@ class CompaignAllLayout {
 
     syncCards() {
         if (!this.itemsGrid) return;
-        this.itemsGrid.querySelectorAll(':scope > .compaign-all-card').forEach(card => this.syncCard(card));
+        this.itemsGrid.querySelectorAll('.compaign-all-card').forEach(card => this.syncCard(card));
     }
 
     syncCard(card) {
