@@ -1,6 +1,8 @@
 class StoreAllLayout {
-    constructor() {
+    constructor(itemsRoot = document, layoutSwitchRoot = document) {
         this.currentLayout = 'vertical';
+        this.itemsRoot = itemsRoot || document;
+        this.layoutSwitchRoot = layoutSwitchRoot;
         this.mobileMedia = window.matchMedia('(max-width: 768px)');
         this.stateClasses = [
             'store-all-card--desktop-vertical',
@@ -17,8 +19,14 @@ class StoreAllLayout {
         this.syncLayout();
     }
 
+    getLayoutButtons() {
+        return this.layoutSwitchRoot
+            ? this.layoutSwitchRoot.querySelectorAll('.layout-switch')
+            : [];
+    }
+
     bindEvents() {
-        document.querySelectorAll('.layout-switch').forEach(button => {
+        this.getLayoutButtons().forEach(button => {
             button.addEventListener('click', event => {
                 this.switchLayout(event.currentTarget.dataset.layout);
             });
@@ -35,14 +43,16 @@ class StoreAllLayout {
     }
 
     observeItems() {
-        const itemsGrid = document.getElementById('items-grid');
+        const itemsGrid = this.itemsRoot === document
+            ? document.getElementById('items-grid')
+            : this.itemsRoot;
         if (!itemsGrid) return;
 
         this.itemsObserver = new MutationObserver(mutations => {
             const hasNewItems = mutations.some(mutation => mutation.addedNodes.length > 0);
             if (hasNewItems) this.syncCards();
         });
-        this.itemsObserver.observe(itemsGrid, { childList: true });
+        this.itemsObserver.observe(itemsGrid, { childList: true, subtree: true });
     }
 
     switchLayout(layout) {
@@ -57,7 +67,7 @@ class StoreAllLayout {
     }
 
     syncLayout() {
-        document.querySelectorAll('.layout-switch').forEach(button => {
+        this.getLayoutButtons().forEach(button => {
             button.classList.toggle('active', button.dataset.layout === this.currentLayout);
         });
         this.syncCards();
@@ -65,7 +75,7 @@ class StoreAllLayout {
 
     syncCards() {
         const stateClass = this.getStateClass();
-        document.querySelectorAll('#items-grid > .store-all-card').forEach(card => {
+        this.itemsRoot.querySelectorAll('.store-all-card').forEach(card => {
             card.classList.remove(...this.stateClasses);
             card.classList.add(stateClass);
         });
@@ -78,7 +88,7 @@ class StoreAllLayout {
     }
 
     syncTagOverflow() {
-        document.querySelectorAll('#items-grid > .store-all-card').forEach(card => {
+        this.itemsRoot.querySelectorAll('.store-all-card').forEach(card => {
             const tagList = card.querySelector(':scope > nav');
             if (!tagList) return;
 

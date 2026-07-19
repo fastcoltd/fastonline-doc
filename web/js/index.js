@@ -3,6 +3,7 @@
 window.addEventListener('DOMContentLoaded', function () {
     const isMobile = window.innerWidth <= 768;
     const bestItemsLayout = new PageLayout(document.getElementById('best-items'), null);
+    const bestStoresLayout = new StoreAllLayout(document.getElementById('best-store'), null);
     const hotPostsLayout = new PostAllLayout(document.getElementById('hot-posts'));
     const banner = new Carousel('banner', 5);
     const bestItems = new Carousel('best-items', 11);
@@ -103,7 +104,7 @@ window.addEventListener('DOMContentLoaded', function () {
         }
 
         bestStoresWrapper.addEventListener('click', function (event) {
-            const clickedTag = event.target.closest('.figma-best-store-item .item-tag');
+            const clickedTag = event.target.closest('.store-all-card > nav > a');
             if (!clickedTag || !bestStoresWrapper.contains(clickedTag)) {
                 return;
             }
