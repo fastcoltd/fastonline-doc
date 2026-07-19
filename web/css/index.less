@@ -1022,6 +1022,11 @@ body.index-purchase-open {
     display: flex;
     flex-wrap: wrap;
     gap: 3.75rem;
+
+    > .demand-all-card--desktop-vertical {
+        width: calc((100% - 3.75rem) / 2);
+        margin: 0;
+    }
 }
 
 .hot-posts-pager {
@@ -1042,24 +1047,6 @@ body.index-purchase-open {
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-}
-
-.demand-item {
-    .item-title {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        white-space: normal;
-        /* 限制文本为2行 */
-        overflow: hidden;
-        height: 10rem;
-    }
-}
-.layout-vertical .demand-item .item-tag-box {
-    max-height: 12rem;
-    height: 12rem;
-    padding: 2rem 0;
-    align-items: flex-start;
 }
 
 @media screen and (max-width: 980px) {
@@ -1106,28 +1093,9 @@ body.index-purchase-open {
     }
 }
 
-@media screen and (min-width: 1441px) {
-    .popular-demands-pager .demand-item {
-        width: calc((100% - 3.75rem) / 2);
-    }
-}
-
-@media screen and (max-width: 1440px) {
-    .popular-demands-pager .demand-item {
-        width: calc((100% - 3.75rem) / 2);
-    }
-}
-
 @media screen and (max-width: 980px) {
-    .popular-demands-pager .demand-item {
+    .popular-demands-pager > .demand-all-card--desktop-vertical {
         width: 100%;
-    }
-}
-
-@media screen and (max-width: 768px) {
-
-    .popular-demands-pager .demand-item {
-        width: calc((100% - 1rem) / 2);
     }
 }
 
@@ -1576,155 +1544,6 @@ body.index-purchase-open {
     }
 }
 
-/* Popular demands first item (Figma 129:3674) */
-#popuar-demands {
-    .figma-popular-demand-item {
-        border: 0.125rem solid #f0f0f3;
-        border-radius: 5rem;
-        box-shadow: none;
-        padding: 3.75rem;
-        height: calc(65.125rem + 8px);
-        gap: 0;
-        position: relative;
-    }
-
-    .figma-popular-demand-item .icon-aixin {
-        width: 3rem;
-        height: 3rem;
-        right: 3.75rem;
-        top: 3.75rem;
-        font-size: 0;
-    }
-
-    .figma-popular-demand-item .item-title-box {
-        align-items: flex-start;
-        padding-right: 7.5rem;
-    }
-
-    .figma-popular-demand-item .item-title {
-        width: 73.25rem;
-        max-width: 100%;
-        height: auto;
-        max-height: 12.5rem;
-        font-size: 4.25rem;
-        line-height: 6.25rem;
-        font-weight: 600;
-        color: #000;
-        white-space: normal;
-        text-overflow: unset;
-    }
-
-    .figma-popular-demand-item .demand-item-content {
-        margin-top: 3.75rem;
-        gap: 3.75rem;
-        padding-bottom: 11.25rem;
-    }
-
-    .figma-popular-demand-item .demand-item-middle-box {
-        gap: 0.625rem;
-    }
-
-    .figma-popular-demand-item .demand-item-row-box {
-        align-items: flex-start;
-    }
-
-    .figma-popular-demand-item .demand-item-row-box>.demand-item-coloumn-box:first-child {
-        width: 41.654%;
-    }
-
-    .figma-popular-demand-item .demand-item-row-box>.demand-item-coloumn-box:last-child {
-        width: 58.346%;
-    }
-
-    .figma-popular-demand-item .item-brand-box,
-    .figma-popular-demand-item .item-service-box {
-        gap: 0;
-        min-height: 2.75rem;
-    }
-
-    .figma-popular-demand-item .demand-item-bidder-box {
-        margin-top: 0;
-        gap: 0;
-    }
-
-    .figma-popular-demand-item .demand-item-bidder-text {
-        margin-right: 0.5rem;
-        padding-right: 0.125rem;
-        line-height: 3rem;
-    }
-
-    .figma-popular-demand-item .demand-item-bidder-avatar,
-    .figma-popular-demand-item .demand-item-bidder-avatar-more {
-        margin-inline-start: -0.625rem;
-    }
-
-    .figma-popular-demand-item .demand-item-bidder-avatar:first-of-type {
-        margin-inline-start: 0;
-    }
-
-    .figma-popular-demand-item .item-tag-box {
-        margin-top: 0;
-        max-height: none;
-        height: auto;
-        padding: 0;
-        gap: 0.75rem;
-        overflow: visible;
-        align-content: flex-start;
-    }
-
-    .figma-popular-demand-item .item-tag {
-        height: auto;
-        min-height: 4rem;
-        padding: 0.625rem 1.125rem;
-        border-radius: 2.5rem;
-        border: 0.125rem solid #d9d9d9;
-        box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.0156862745);
-    }
-
-    .figma-popular-demand-item .item-tag-text {
-        font-size: 1.75rem;
-        line-height: 2.75rem;
-        color: #6d6d6d;
-    }
-
-    .figma-popular-demand-item .item-button-box {
-        margin-top: 0;
-        position: absolute;
-        left: 3.75rem;
-        right: 3.75rem;
-        bottom: calc(3.75rem - 1px);
-        width: auto;
-        height: 7.5rem;
-        border-radius: 6.25rem;
-        border: 0.125rem solid #f4f4f4;
-        box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.0156862745);
-        font-size: 2rem;
-        line-height: 2.75rem;
-        font-family: var(--primary-robotofont);
-    }
-
-    .figma-popular-demand-item .item-button-box.disabled,
-    .figma-popular-demand-item .item-button-box.disabled:hover {
-        background: #f4f4f4;
-        color: rgba(0, 0, 0, 0.85);
-    }
-
-    .figma-popular-demand-item-alt .item-title-box {
-        min-height: 10rem;
-    }
-
-    .figma-popular-demand-item-alt .item-title {
-        width: 58.6rem;
-        max-height: 6.25rem;
-        white-space: nowrap;
-    }
-
-    .figma-popular-demand-item-alt .item-tag-box {
-        height: 8.75rem;
-        max-height: 8.75rem;
-    }
-}
-
 @media screen and (max-width: 768px) {
     .best-items-wrapper {
         padding-top: 2.5rem;
@@ -1770,236 +1589,17 @@ body.index-purchase-open {
         display: none;
     }
 
-    #popuar-demands-mobile {
-
-        .figma-popular-demand-item {
-            width: 18rem;
-            min-width: 18rem;
-            flex: 0 0 18rem;
-            height: 31.2rem;
-            min-height: 31.2rem;
-            padding: 1rem;
-            border-width: 0.1rem;
-            border-radius: 1rem;
-            position: relative;
-            box-shadow: 0 0.2rem 0.3rem rgba(0, 0, 0, 0.06);
-            gap: 1rem;
-        }
-
-        .figma-popular-demand-item .icon-aixin {
-            display: none;
-        }
-
-        .figma-popular-demand-item .item-title-box {
-            width: 100%;
-            min-height: 4rem;
-            padding-right: 0;
-            align-items: flex-start;
-        }
-
-        .figma-popular-demand-item .item-title {
-            width: 9.2rem;
-            max-width: 100%;
-            height: 4rem;
-            max-height: 4rem;
-            font-size: 1.4rem;
-            line-height: 2rem;
-            font-weight: 600;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            white-space: normal;
-            overflow: hidden;
-            text-overflow: clip;
-        }
-
-        .figma-popular-demand-item .demand-item-content {
-            width: 100%;
-            margin-top: 0.75rem;
-            gap: 0;
-            padding-bottom: 0;
-        }
-
-        .figma-popular-demand-item .demand-item-middle-box {
-            width: 100%;
-            gap: 0;
-        }
-
-        .figma-popular-demand-item .demand-item-row-box {
-            display: contents;
-        }
-
-        .figma-popular-demand-item .demand-item-row-box>.demand-item-coloumn-box:first-child,
-        .figma-popular-demand-item .demand-item-row-box>.demand-item-coloumn-box:last-child {
-            width: 100%;
-        }
-
-        .figma-popular-demand-item .demand-item-row-box:nth-child(3)>.demand-item-coloumn-box:first-child {
-            order: 1;
-        }
-
-        .figma-popular-demand-item .demand-item-row-box:nth-child(2)>.demand-item-coloumn-box:first-child {
-            order: 2;
-        }
-
-        .figma-popular-demand-item .demand-item-row-box:nth-child(1)>.demand-item-coloumn-box:first-child {
-            order: 3;
-        }
-
-        .figma-popular-demand-item .demand-item-row-box:nth-child(2)>.demand-item-coloumn-box:last-child {
-            order: 4;
-        }
-
-        .figma-popular-demand-item .demand-item-row-box:nth-child(3)>.demand-item-coloumn-box:last-child {
-            order: 5;
-        }
-
-        .figma-popular-demand-item .demand-item-row-box:nth-child(1)>.demand-item-coloumn-box:last-child {
-            display: none;
-        }
-
-        .figma-popular-demand-item .demand-item-row-box:nth-child(3)>.demand-item-coloumn-box:last-child .item-service-text {
-            display: none;
-        }
-
-        .figma-popular-demand-item .item-brand-box,
-        .figma-popular-demand-item .item-service-box {
-            gap: 0;
-            min-height: 2rem;
-        }
-
-        .figma-popular-demand-item .item-brand-text,
-        .figma-popular-demand-item .item-service-text,
-        .figma-popular-demand-item .item-brand,
-        .figma-popular-demand-item .item-service {
-            font-size: 1.4rem;
-            line-height: 2rem;
-            text-overflow: clip;
-        }
-
-        .figma-popular-demand-item .item-brand-text,
-        .figma-popular-demand-item .item-service-text {
-            color: #6d6d6d;
-            flex-shrink: 0;
-        }
-
-        .figma-popular-demand-item .item-brand,
-        .figma-popular-demand-item .item-service {
-            min-width: 0;
-        }
-
-        .figma-popular-demand-item .item-brand-box .item-brand,
-        .figma-popular-demand-item .item-service-box .item-service {
-            margin-left: 0.2rem;
-        }
-
-        .figma-popular-demand-item .demand-item-bidder-box {
-            margin-top: 0;
-            gap: 0;
-            align-items: center;
-            position: relative;
-            min-height: 3.2rem;
-        }
-
-        .figma-popular-demand-item .demand-item-bidder-box::before {
-            content: '';
-            width: 2rem;
-            min-width: 2rem;
-            height: 2rem;
-            border-radius: 50%;
-            background: #bfbfbf;
-            margin-right: 0.2rem;
-            flex-shrink: 0;
-        }
-
-        .figma-popular-demand-item .demand-item-bidder-box::after {
-            content: '';
-            position: absolute;
-            left: 0.55rem;
-            top: 0.75rem;
-            width: 0.9rem;
-            height: 0.45rem;
-            border-radius: 0.45rem 0.45rem 0 0;
-            background: #fff;
-            box-shadow: 0 -0.55rem 0 0 #fff;
-            pointer-events: none;
-        }
-
-        .figma-popular-demand-item .demand-item-bidder-text {
-            display: none;
-        }
-
-        .figma-popular-demand-item .demand-item-bidder-avatar,
-        .figma-popular-demand-item .demand-item-bidder-avatar-more {
-            width: 2rem;
-            min-width: 2rem;
-            height: 2rem;
-            margin-inline-start: -0.5rem;
-            border-width: 0.1rem;
-        }
-
-        .figma-popular-demand-item .demand-item-bidder-avatar:first-of-type {
-            margin-inline-start: 0;
-        }
-
-        .figma-popular-demand-item .demand-item-bidder-avatar-more {
-            font-size: 1rem;
-            line-height: 2rem;
-        }
-
-        .figma-popular-demand-item .item-tag-box {
-            margin-top: 0;
-            max-height: 5.2rem;
-            height: auto;
-            padding: 0;
-            gap: 0.4rem;
-            display: flex;
-            flex-wrap: wrap;
-            overflow: hidden;
-        }
-
-        .figma-popular-demand-item .item-tag {
-            min-height: 1.8rem;
-            padding: 0.3rem 0.5rem;
-            border-radius: 2rem;
-            border: 0.1rem solid #d9d9d9;
-            box-shadow: 0 0.2rem 0 rgba(0, 0, 0, 0.02);
-            display: inline-flex;
-        }
-
-        .figma-popular-demand-item .item-tag-text {
-            font-size: 1rem;
-            line-height: 1.2rem;
-            color: #6d6d6d;
-            white-space: nowrap;
-        }
-
-        .figma-popular-demand-item .item-button-box {
-            margin-top: 1rem;
-            position: relative;
-            left: auto;
-            right: auto;
-            bottom: auto;
-            width: 100%;
-            height: 3rem;
-            border-radius: 0.4rem;
-            border: 0;
-            box-shadow: 0 0.2rem 0 rgba(0, 0, 0, 0.02);
-            font-size: 1.2rem;
-            line-height: 2.2rem;
-        }
-
-        .figma-popular-demand-item-alt .item-title {
-            white-space: normal;
-        }
+    #popuar-demands-mobile > .demand-all-card--mobile-vertical {
+        width: 18rem;
+        min-width: 18rem;
+        flex: 0 0 18rem;
+        margin: 0;
     }
 
-    #popuar-demands-mobile .figma-popular-demand-item .item-tag,
     .comments-pager .figma-comment-item .item-tag {
         .index-mobile-tag-chip();
     }
 
-    #popuar-demands-mobile .figma-popular-demand-item .item-tag-text,
     .comments-pager .figma-comment-item .item-tag-text {
         .index-mobile-tag-chip-text();
     }

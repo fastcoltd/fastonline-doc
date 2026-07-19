@@ -5,6 +5,7 @@ window.addEventListener('DOMContentLoaded', function () {
     const bestItemsLayout = new PageLayout(document.getElementById('best-items'), null);
     const bestStoresLayout = new StoreAllLayout(document.getElementById('best-store'), null);
     const hotCampaignsLayout = new CompaignAllLayout(document.getElementById('hot-compaigns'), null);
+    const popularDemandsLayout = new DemandAllLayout(document.querySelector('.popular-demands-wrapper'), null);
     const hotPostsLayout = new PostAllLayout(document.getElementById('hot-posts'));
     const banner = new Carousel('banner', 5);
     const bestItems = new Carousel('best-items', 11);

@@ -1,6 +1,7 @@
 class DemandAllLayout {
-    constructor() {
+    constructor(itemsGrid = document.getElementById('items-grid'), layoutSwitchRoot = document) {
         this.currentLayout = 'vertical';
+        this.layoutSwitchRoot = layoutSwitchRoot;
         this.mobileMedia = window.matchMedia('(max-width: 768px)');
         this.stateClasses = [
             'demand-all-card--desktop-vertical',
@@ -8,7 +9,7 @@ class DemandAllLayout {
             'demand-all-card--mobile-vertical',
             'demand-all-card--mobile-horizontal'
         ];
-        this.itemsGrid = document.getElementById('items-grid');
+        this.itemsGrid = itemsGrid;
         this.init();
     }
 
@@ -18,8 +19,14 @@ class DemandAllLayout {
         this.syncLayout();
     }
 
+    getLayoutButtons() {
+        return this.layoutSwitchRoot
+            ? this.layoutSwitchRoot.querySelectorAll('.layout-switch')
+            : [];
+    }
+
     bindEvents() {
-        document.querySelectorAll('.layout-switch').forEach(button => {
+        this.getLayoutButtons().forEach(button => {
             button.addEventListener('click', event => {
                 this.switchLayout(event.currentTarget.dataset.layout);
             });
@@ -45,7 +52,7 @@ class DemandAllLayout {
                 });
             });
         });
-        this.itemsObserver.observe(this.itemsGrid, { childList: true });
+        this.itemsObserver.observe(this.itemsGrid, { childList: true, subtree: true });
     }
 
     switchLayout(layout) {
@@ -60,7 +67,7 @@ class DemandAllLayout {
     }
 
     syncLayout() {
-        document.querySelectorAll('.layout-switch').forEach(button => {
+        this.getLayoutButtons().forEach(button => {
             button.classList.toggle('active', button.dataset.layout === this.currentLayout);
         });
         this.syncCards();
@@ -68,7 +75,7 @@ class DemandAllLayout {
 
     syncCards() {
         if (!this.itemsGrid) return;
-        this.itemsGrid.querySelectorAll(':scope > .demand-all-card').forEach(card => this.syncCard(card));
+        this.itemsGrid.querySelectorAll('.demand-all-card').forEach(card => this.syncCard(card));
     }
 
     syncCard(card) {
