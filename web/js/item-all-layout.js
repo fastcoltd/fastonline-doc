@@ -1,6 +1,8 @@
 class PageLayout {
-    constructor() {
+    constructor(itemsRoot = document, layoutSwitchRoot = document) {
         this.currentLayout = 'vertical';
+        this.itemsRoot = itemsRoot || document;
+        this.layoutSwitchRoot = layoutSwitchRoot;
         this.mobileMedia = window.matchMedia('(max-width: 768px)');
         this.stateClasses = [
             'item-all-card--desktop-vertical',
@@ -17,8 +19,14 @@ class PageLayout {
         this.syncLayout();
     }
 
+    getLayoutButtons() {
+        return this.layoutSwitchRoot
+            ? this.layoutSwitchRoot.querySelectorAll('.layout-switch')
+            : [];
+    }
+
     bindEvents() {
-        document.querySelectorAll('.layout-switch').forEach(button => {
+        this.getLayoutButtons().forEach(button => {
             button.addEventListener('click', event => {
                 this.switchLayout(event.currentTarget.dataset.layout);
             });
@@ -33,14 +41,16 @@ class PageLayout {
     }
 
     observeItems() {
-        const itemsGrid = document.getElementById('items-grid');
+        const itemsGrid = this.itemsRoot === document
+            ? document.getElementById('items-grid')
+            : this.itemsRoot;
         if (!itemsGrid) return;
 
         this.itemsObserver = new MutationObserver(mutations => {
             const hasNewItems = mutations.some(mutation => mutation.addedNodes.length > 0);
             if (hasNewItems) this.syncCards();
         });
-        this.itemsObserver.observe(itemsGrid, { childList: true });
+        this.itemsObserver.observe(itemsGrid, { childList: true, subtree: true });
     }
 
     switchLayout(layout) {
@@ -55,7 +65,7 @@ class PageLayout {
     }
 
     syncLayout() {
-        document.querySelectorAll('.layout-switch').forEach(button => {
+        this.getLayoutButtons().forEach(button => {
             button.classList.toggle('active', button.dataset.layout === this.currentLayout);
         });
         this.syncCards();
@@ -63,7 +73,7 @@ class PageLayout {
 
     syncCards() {
         const stateClass = this.getStateClass();
-        document.querySelectorAll('.item-all-card').forEach(card => {
+        this.itemsRoot.querySelectorAll('.item-all-card').forEach(card => {
             card.classList.remove(...this.stateClasses);
             card.classList.add(stateClass);
         });
