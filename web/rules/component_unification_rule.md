@@ -6,9 +6,9 @@
 
 - 一份语义化 HTML 组件；
 - 一个稳定的组件基础 class；
-- 一个可替换的根状态 class；
+- 一个设置在使用场景公共外层上的可替换状态 class；
 - 若干份按展示状态拆分的 CSS，并同步维护对应 LESS；
-- 只负责替换根状态 class 的切换逻辑。
+- 只负责替换公共外层状态 class 的切换逻辑。
 
 统一后的模式切换只能改变样式和布局，不能替换组件 DOM、组件数据或业务行为。
 
@@ -22,7 +22,7 @@
 - 各版本包含相同或可兼容的业务字段；
 - 差异主要是方向、尺寸、间距、排列、内容显隐或响应式布局；
 - 收藏、购买、跳转、禁用等交互语义一致；
-- 可以通过根状态 class 和 CSS 等价实现现有 UI。
+- 可以通过公共外层状态 class 和 CSS 等价实现现有 UI。
 
 ### 2.2 不允许强行统一的情况
 
@@ -104,7 +104,8 @@ docs/plan/<component-name>-unified-component-plan.md
 推荐结构示例：
 
 ```html
-<article class="product-card product-card--desktop-vertical">
+<div class="product-card--desktop-vertical">
+<article class="product-card">
     <figure>
         <img src="image/product.png" alt="Product cover" />
     </figure>
@@ -118,17 +119,21 @@ docs/plan/<component-name>-unified-component-plan.md
         <footer>...</footer>
     </section>
 </article>
+</div>
 ```
 
-### 5.2 根节点 class
+### 5.2 组件根节点与外层状态容器
 
-根节点允许保留：
+组件根节点允许保留：
 
 1. 一个稳定基础 class，例如 `product-card`；
-2. 一个互斥状态 class，例如 `product-card--desktop-vertical`；
-3. 确有页面上下文或 JS 行为用途的根级扩展 class。
+2. 确有业务语义或 JS 行为用途的根级扩展 class。
 
-页面上下文 class 不能代替状态 class，也不能在切换布局时被删除。
+PC / Mobile、Vertical / Horizontal 等互斥状态 class 必须设置在组件列表、轮播或页面区域的公共外层容器上，不能设置在组件根节点上。每个公共外层同时只能保留一个该组件的互斥状态 class。
+
+外层容器可以是 `div`、`section`、列表、网格或轮播容器。状态 CSS 只能依赖状态 class 和组件基础 class，不能依赖外层标签名称。状态容器和组件之间允许存在分页、轮播等包装层。
+
+页面上下文 class 和 `post-all-card--featured` 这类业务扩展 class 不能代替互斥状态 class，也不能在切换布局时被删除。
 
 ### 5.3 内部选择器精简
 
@@ -152,10 +157,9 @@ docs/plan/<component-name>-unified-component-plan.md
 
 文案、链接、图片、评分、标签、按钮状态等差异必须通过 include 参数传入，不能复制组件文件。
 
-参数名称应表达数据或状态，不能把大段样式 class 当作普通数据。确需根级扩展 class 时，应使用单独且语义明确的参数，例如：
+参数名称应表达数据或状态，不能把大段样式 class 当作普通数据。确需组件根级业务扩展 class 时，应使用单独且语义明确的参数，例如：
 
 ```text
-component_state_class
 component_context_class
 button_state_class
 ```
@@ -189,15 +193,18 @@ component-card-mobile-horizontal.less
 
 组件内部布局与列表排布必须尽量解耦。不能把只适用于某个页面的三列宽度、`nth-child` 外边距等写成所有消费者都必须承受的组件默认值；确需保留旧 UI 时，使用明确的页面作用域或根级上下文 class。
 
-### 6.3 状态入口
+### 6.3 外层状态入口
 
-每份状态文件只能以对应根状态 class 为入口，例如：
+每份状态文件只能以对应外层状态 class 为入口，并在其后明确限定固定组件根，例如：
 
 ```css
-.product-card--mobile-horizontal > figure {}
-.product-card--mobile-horizontal > section {}
-.product-card--mobile-horizontal [data-field="brand"] {}
+.product-card--mobile-horizontal .product-card {}
+.product-card--mobile-horizontal .product-card > figure {}
+.product-card--mobile-horizontal .product-card > section {}
+.product-card--mobile-horizontal .product-card [data-field="brand"] {}
 ```
+
+禁止把状态容器与组件根之间写成直接子元素关系；页面可能在二者之间插入分页或轮播包装层。组件根内部仍应优先使用稳定的直接子元素和结构选择器。
 
 状态 CSS 不能依靠媒体查询决定当前模式。设备或方向变化由 JavaScript 替换状态 class；媒体查询只允许处理组件之外的页面上下文，或经计划明确说明的兼容需求。
 
@@ -231,8 +238,8 @@ component-card-mobile-horizontal.less
 每次同步状态时只能：
 
 1. 计算目标状态；
-2. 移除该组件完整的状态 class 集合；
-3. 添加唯一目标状态 class；
+2. 从目标公共外层容器移除该组件完整的状态 class 集合；
+3. 向该公共外层容器添加唯一目标状态 class；
 4. 更新布局按钮自身的状态。
 
 禁止在切换过程中：
@@ -250,7 +257,7 @@ component-card-mobile-horizontal.less
 - 切换逻辑必须限定在目标组件或目标容器作用域，不能误改页面上的 Store、Demand、Post 等其它组件；
 - 页面存在多个独立列表时，每个列表必须有明确布局配置，不能依赖一个不受控的全局 `currentLayout`；
 - 没有布局按钮的固定 Vertical / Horizontal 组件，也必须在 PC / Mobile 变化时替换对应设备状态 class；
-- 动态新增卡片时，可使用限定目标容器的 `MutationObserver` 自动同步状态。
+- 动态新增卡片插入公共状态容器后必须自动继承当前样式，不得为了状态同步逐张修改卡片 class；只有组件自身的其它动态行为确实需要时才保留 `MutationObserver`。
 
 ### 7.4 动态内容
 
@@ -259,7 +266,7 @@ component-card-mobile-horizontal.less
 - 优先克隆由统一 partial 生成的现有组件原型，再通过结构或 `data-*` 属性更新数据；
 - 或使用由统一 partial 生成的 `<template>`；
 - 禁止在 JavaScript 模板字符串中重新维护一整份组件结构；
-- 动态卡片必须继承当前根状态 class、行为属性和可访问性属性。
+- 动态卡片必须插入正确的公共状态容器，并保留行为属性和可访问性属性；组件根不得复制外层互斥状态 class。
 
 ## 8. 数据一致性
 
@@ -299,7 +306,7 @@ component-card-mobile-horizontal.less
 - 未纳入用户批准范围的消费者必须保持不变；
 - 旧 partial 仍有消费者时不得删除；
 - 最后一个消费者迁移完成后，使用 `rg` 确认零引用，才能删除旧 partial 和只为旧结构服务的 CSS / JS；
-- 为兼容页面行为而暂时保留的根 class 必须在计划和最终报告中说明。
+- 为兼容页面行为而暂时保留的组件根扩展 class 必须在计划和最终报告中说明。
 
 ### 9.3 最小修改
 
@@ -392,7 +399,7 @@ rg "class=\"[^\"]+\"" src/partials/components/<component>.html
 必须确认：
 
 - 目标范围内不再输出重复 DOM；
-- 每个组件只有一个互斥状态 class；
+- 每个公共状态容器只有一个互斥状态 class，组件根没有设备/方向状态 class；
 - CSS / LESS 文件成对存在且规则等价；
 - 被删除的旧组件确实零引用；
 - 有意保留的行为或兼容 class 已记录；
@@ -436,14 +443,14 @@ rg "class=\"[^\"]+\"" src/partials/components/<component>.html
 ## 新组件
 - [ ] 定义语义 HTML
 - [ ] 定义 include 参数
-- [ ] 分类根 class、状态 class、行为 class
+- [ ] 分类组件根 class、外层状态 class、行为 class
 - [ ] 定义结构和 data-* 选择器
 
 ## 样式与状态
 - [ ] 基础 CSS/LESS
 - [ ] 各状态 CSS/LESS
 - [ ] 页面上下文覆盖
-- [ ] 根状态切换逻辑
+- [ ] 外层状态切换逻辑
 - [ ] 动态新增同步
 
 ## 分批迁移

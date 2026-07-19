@@ -1,7 +1,7 @@
 class StoreAllLayout {
-    constructor(itemsRoot = document, layoutSwitchRoot = document) {
+    constructor(stateRoot = document.getElementById('items-grid'), layoutSwitchRoot = document) {
         this.currentLayout = 'vertical';
-        this.itemsRoot = itemsRoot || document;
+        this.stateRoot = stateRoot || document.getElementById('items-grid');
         this.layoutSwitchRoot = layoutSwitchRoot;
         this.mobileMedia = window.matchMedia('(max-width: 768px)');
         this.stateClasses = [
@@ -43,16 +43,13 @@ class StoreAllLayout {
     }
 
     observeItems() {
-        const itemsGrid = this.itemsRoot === document
-            ? document.getElementById('items-grid')
-            : this.itemsRoot;
-        if (!itemsGrid) return;
+        if (!this.stateRoot) return;
 
         this.itemsObserver = new MutationObserver(mutations => {
             const hasNewItems = mutations.some(mutation => mutation.addedNodes.length > 0);
-            if (hasNewItems) this.syncCards();
+            if (hasNewItems) this.scheduleTagOverflowSync();
         });
-        this.itemsObserver.observe(itemsGrid, { childList: true, subtree: true });
+        this.itemsObserver.observe(this.stateRoot, { childList: true, subtree: true });
     }
 
     switchLayout(layout) {
@@ -70,16 +67,14 @@ class StoreAllLayout {
         this.getLayoutButtons().forEach(button => {
             button.classList.toggle('active', button.dataset.layout === this.currentLayout);
         });
-        this.syncCards();
+        this.syncState();
+        this.scheduleTagOverflowSync();
     }
 
-    syncCards() {
-        const stateClass = this.getStateClass();
-        this.itemsRoot.querySelectorAll('.store-all-card').forEach(card => {
-            card.classList.remove(...this.stateClasses);
-            card.classList.add(stateClass);
-        });
-        this.scheduleTagOverflowSync();
+    syncState() {
+        if (!this.stateRoot) return;
+        this.stateRoot.classList.remove(...this.stateClasses);
+        this.stateRoot.classList.add(this.getStateClass());
     }
 
     scheduleTagOverflowSync() {
@@ -88,13 +83,15 @@ class StoreAllLayout {
     }
 
     syncTagOverflow() {
-        this.itemsRoot.querySelectorAll('.store-all-card').forEach(card => {
+        if (!this.stateRoot) return;
+        const isHorizontal = this.stateRoot.classList.contains('store-all-card--desktop-horizontal')
+            || this.stateRoot.classList.contains('store-all-card--mobile-horizontal');
+
+        this.stateRoot.querySelectorAll('.store-all-card').forEach(card => {
             const tagList = card.querySelector(':scope > nav');
             if (!tagList) return;
 
             tagList.removeAttribute('data-overflow');
-            const isHorizontal = card.classList.contains('store-all-card--desktop-horizontal')
-                || card.classList.contains('store-all-card--mobile-horizontal');
             if (!isHorizontal) return;
 
             tagList.toggleAttribute('data-overflow', tagList.scrollWidth > tagList.clientWidth + 1);

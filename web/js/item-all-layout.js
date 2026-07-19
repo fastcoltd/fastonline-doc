@@ -1,7 +1,7 @@
 class PageLayout {
-    constructor(itemsRoot = document, layoutSwitchRoot = document) {
+    constructor(stateRoot = document.getElementById('items-grid'), layoutSwitchRoot = document) {
         this.currentLayout = 'vertical';
-        this.itemsRoot = itemsRoot || document;
+        this.stateRoot = stateRoot || document.getElementById('items-grid');
         this.layoutSwitchRoot = layoutSwitchRoot;
         this.mobileMedia = window.matchMedia('(max-width: 768px)');
         this.stateClasses = [
@@ -15,7 +15,6 @@ class PageLayout {
 
     init() {
         this.bindEvents();
-        this.observeItems();
         this.syncLayout();
     }
 
@@ -40,19 +39,6 @@ class PageLayout {
         }
     }
 
-    observeItems() {
-        const itemsGrid = this.itemsRoot === document
-            ? document.getElementById('items-grid')
-            : this.itemsRoot;
-        if (!itemsGrid) return;
-
-        this.itemsObserver = new MutationObserver(mutations => {
-            const hasNewItems = mutations.some(mutation => mutation.addedNodes.length > 0);
-            if (hasNewItems) this.syncCards();
-        });
-        this.itemsObserver.observe(itemsGrid, { childList: true, subtree: true });
-    }
-
     switchLayout(layout) {
         if (layout !== 'vertical' && layout !== 'horizontal') return;
         this.currentLayout = layout;
@@ -68,14 +54,12 @@ class PageLayout {
         this.getLayoutButtons().forEach(button => {
             button.classList.toggle('active', button.dataset.layout === this.currentLayout);
         });
-        this.syncCards();
+        this.syncState();
     }
 
-    syncCards() {
-        const stateClass = this.getStateClass();
-        this.itemsRoot.querySelectorAll('.item-all-card').forEach(card => {
-            card.classList.remove(...this.stateClasses);
-            card.classList.add(stateClass);
-        });
+    syncState() {
+        if (!this.stateRoot) return;
+        this.stateRoot.classList.remove(...this.stateClasses);
+        this.stateRoot.classList.add(this.getStateClass());
     }
 }

@@ -1,5 +1,5 @@
 class CompaignAllLayout {
-    constructor(itemsGrid = document.getElementById('items-grid'), layoutSwitchRoot = document) {
+    constructor(stateRoot = document.getElementById('items-grid'), layoutSwitchRoot = document) {
         this.currentLayout = 'vertical';
         this.layoutSwitchRoot = layoutSwitchRoot;
         this.mobileMedia = window.matchMedia('(max-width: 768px)');
@@ -9,8 +9,8 @@ class CompaignAllLayout {
             'compaign-all-card--mobile-vertical',
             'compaign-all-card--mobile-horizontal'
         ];
-        this.itemsGrid = itemsGrid;
-        this.cardPrototype = this.itemsGrid
+        this.stateRoot = stateRoot;
+        this.cardPrototype = this.stateRoot
             ?.querySelector('.compaign-all-card')
             ?.cloneNode(true) || null;
         this.init();
@@ -18,7 +18,6 @@ class CompaignAllLayout {
 
     init() {
         this.bindEvents();
-        this.observeItems();
         this.syncLayout();
     }
 
@@ -43,21 +42,6 @@ class CompaignAllLayout {
         }
     }
 
-    observeItems() {
-        if (!this.itemsGrid) return;
-
-        this.itemsObserver = new MutationObserver(mutations => {
-            mutations.forEach(mutation => {
-                mutation.addedNodes.forEach(node => {
-                    if (!(node instanceof Element)) return;
-                    if (node.matches('.compaign-all-card')) this.syncCard(node);
-                    node.querySelectorAll('.compaign-all-card').forEach(card => this.syncCard(card));
-                });
-            });
-        });
-        this.itemsObserver.observe(this.itemsGrid, { childList: true, subtree: true });
-    }
-
     switchLayout(layout) {
         if (layout !== 'vertical' && layout !== 'horizontal') return;
         this.currentLayout = layout;
@@ -73,23 +57,17 @@ class CompaignAllLayout {
         this.getLayoutButtons().forEach(button => {
             button.classList.toggle('active', button.dataset.layout === this.currentLayout);
         });
-        this.syncCards();
+        this.syncState();
     }
 
-    syncCards() {
-        if (!this.itemsGrid) return;
-        this.itemsGrid.querySelectorAll('.compaign-all-card').forEach(card => this.syncCard(card));
-    }
-
-    syncCard(card) {
-        card.classList.remove(...this.stateClasses);
-        card.classList.add(this.getStateClass());
+    syncState() {
+        if (!this.stateRoot) return;
+        this.stateRoot.classList.remove(...this.stateClasses);
+        this.stateRoot.classList.add(this.getStateClass());
     }
 
     createCard() {
         if (!this.cardPrototype) return null;
-        const card = this.cardPrototype.cloneNode(true);
-        this.syncCard(card);
-        return card;
+        return this.cardPrototype.cloneNode(true);
     }
 }

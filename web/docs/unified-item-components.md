@@ -16,7 +16,7 @@
 4. 后续需要调整某类 Item 时，应统一修改该组件及其现有状态 CSS，使所有使用页面一起生效。
 5. 不得为了 Index、Brand、Tag、Search 等具体页面复制新的组件 HTML，也不得新增页面专用的组件状态 class 或组件内部样式。
 
-同一种业务 Item 只维护一份 HTML。PC / Mobile、Vertical / Horizontal 的布局差异，只通过替换组件最外层已有的状态 class 匹配对应 CSS 实现。切换状态时不得替换组件内部 DOM、组件数据或业务行为。
+同一种业务 Item 只维护一份 HTML。组件 `<article>` 只保留固定基础 class；PC / Mobile、Vertical / Horizontal 的布局差异，只通过替换使用场景公共外层容器已有的状态 class 匹配对应 CSS 实现。切换状态时不得替换组件根 class、内部 DOM、组件数据或业务行为。
 
 ## 组件总览
 
@@ -49,7 +49,7 @@
 
 状态 class 与样式文件：
 
-| 状态 | 根状态 class | CSS / LESS |
+| 状态 | 外层状态 class | CSS / LESS |
 | --- | --- | --- |
 | PC Vertical | `item-all-card--desktop-vertical` | `css/item-all-card-desktop-vertical.css` / `.less` |
 | PC Horizontal | `item-all-card--desktop-horizontal` | `css/item-all-card-desktop-horizontal.css` / `.less` |
@@ -69,7 +69,7 @@
 
 状态 class 与样式文件：
 
-| 状态 | 根状态 class | CSS / LESS |
+| 状态 | 外层状态 class | CSS / LESS |
 | --- | --- | --- |
 | PC Vertical | `store-all-card--desktop-vertical` | `css/store-all-card-desktop-vertical.css` / `.less` |
 | PC Horizontal | `store-all-card--desktop-horizontal` | `css/store-all-card-desktop-horizontal.css` / `.less` |
@@ -89,7 +89,7 @@
 
 状态 class 与样式文件：
 
-| 状态 | 根状态 class | CSS / LESS |
+| 状态 | 外层状态 class | CSS / LESS |
 | --- | --- | --- |
 | PC Vertical | `compaign-all-card--desktop-vertical` | `css/compaign-all-card-desktop-vertical.css` / `.less` |
 | PC Horizontal | `compaign-all-card--desktop-horizontal` | `css/compaign-all-card-desktop-horizontal.css` / `.less` |
@@ -109,7 +109,7 @@
 
 状态 class 与样式文件：
 
-| 状态 | 根状态 class | CSS / LESS |
+| 状态 | 外层状态 class | CSS / LESS |
 | --- | --- | --- |
 | PC Vertical | `demand-all-card--desktop-vertical` | `css/demand-all-card-desktop-vertical.css` / `.less` |
 | PC Horizontal | `demand-all-card--desktop-horizontal` | `css/demand-all-card-desktop-horizontal.css` / `.less` |
@@ -129,14 +129,14 @@
 
 Post 当前没有 Vertical / Horizontal 模式，只有两种设备状态：
 
-| 状态 | 根状态 class | CSS / LESS |
+| 状态 | 外层状态 class | CSS / LESS |
 | --- | --- | --- |
 | PC | `post-all-card--desktop` | `css/post-all-card-desktop.css` / `.less` |
 | Mobile | `post-all-card--mobile` | `css/post-all-card-mobile.css` / `.less` |
 
 状态切换脚本：`js/post-all-layout.js`
 
-Post 第一张特色卡片还可以保留根级扩展 class：`post-all-card--featured`。这个 class 是视觉扩展，不是互斥设备状态，切换 PC / Mobile 时不能删除。
+Post 第一张特色卡片还可以在组件根保留扩展 class：`post-all-card--featured`。这个 class 是视觉扩展，不是互斥设备状态，切换 PC / Mobile 时不能删除。
 
 ## 统一结构与页面数据的边界
 
@@ -167,11 +167,14 @@ Post 第一张特色卡片还可以保留根级扩展 class：`post-all-card--fe
 
 ## 状态 class 切换规则
 
-1. 每张组件的最外层同时只能保留一个互斥状态 class。
-2. PC / Mobile、Vertical / Horizontal 切换时，只移除该组件完整的互斥状态 class 集合，再添加目标状态 class。
-3. 切换状态不得重建 DOM、替换内容或改变业务数据。
-4. `post-all-card--featured` 这类已存在的非互斥扩展 class 可以保留，不能在设备状态切换时误删。
-5. 如果目标页面存在独立列表、不同容器 ID 或多组布局按钮，只调整现有状态切换逻辑的作用域，避免影响其他业务列表；不得因此创建新的组件状态。
+1. 组件根只保留固定基础 class；设备/方向状态必须放在该组件区域的公共外层容器上。
+2. 每个公共外层状态容器同时只能保留一个该组件的互斥状态 class。
+3. PC / Mobile、Vertical / Horizontal 切换时，只从公共外层移除该组件完整的互斥状态 class 集合，再添加目标状态 class。
+4. 外层可以是 `div`、`section`、列表、网格或轮播容器；CSS 不得依赖其标签名称，并允许外层与组件之间存在包装层。
+5. 同一组件区域不能嵌套两个互相冲突的同类型状态容器；独立区域需要独立切换时，应分别设置状态容器。
+6. 切换状态不得重建 DOM、替换内容或改变业务数据。
+7. `post-all-card--featured` 这类已存在的非互斥扩展 class 可以保留在组件根，不能在设备状态切换时误删。
+8. 如果目标页面存在独立列表、不同容器 ID 或多组布局按钮，只调整现有状态切换逻辑的作用域，避免影响其他业务列表；不得因此创建新的组件状态。
 
 ## JavaScript 动态生成 Item 的规则
 
@@ -181,7 +184,7 @@ JavaScript 动态新增的 Item 也必须来自统一组件，不能继续在 JS
 
 1. 在源码中通过统一 partial 生成隐藏的 `<template>` 或标准组件原型。
 2. JavaScript 使用 `template.content.cloneNode(true)` 或 `cloneNode(true)` 克隆组件。
-3. 根据需要写入当前 Item 的数据，并同步当前根状态 class。
+3. 根据需要写入当前 Item 的数据，并插入对应公共状态容器；新 Item 自动继承外层状态，不在组件根同步状态 class。
 4. 轮播为了展示而克隆现有统一组件是允许的，但克隆后的 DOM 仍须来自统一组件。
 
 如果旧 JavaScript 中存在完整 Item 模板字符串，迁移时必须一并移除，避免形成第二份 HTML 实现。
@@ -194,7 +197,7 @@ JavaScript 动态新增的 Item 也必须来自统一组件，不能继续在 JS
 4. 将目标页面原有业务数据映射到统一组件 include 参数。
 5. 接入统一组件现有的基础 CSS 和状态 CSS，不新增页面专用组件 class、组件 partial 或组件内部 CSS。
 6. 保留页面自己的列表、网格或轮播等外部布局；卡片内部直接采用统一组件当前标准样式。
-7. 设备或布局变化时，只切换组件最外层已有状态 class。
+7. 设备或布局变化时，只切换组件区域公共外层已有状态 class，组件 `<article>` 的基础 class 保持不变。
 8. 将 JavaScript 动态 Item 改为克隆统一 partial 生成的模板或组件原型。
 9. 执行 `node scripts/build-pages.js` 生成根目录 HTML，并完成语法、引用和差异检查。
 10. 反向搜索旧 partial、旧 CSS 和旧动态模板的全部消费者；只有确认零消费者后才允许删除。
@@ -212,10 +215,10 @@ Codex 应默认理解为：
 - 直接采用统一组件当前已有的 PC / Mobile / Vertical / Horizontal 状态样式。
 - 不以像素级还原目标页面旧 Item 为迁移目标，不为旧页面差异新增专用样式。
 - 页面继续负责列表、网格或轮播等外部布局。
-- 同一组件实例只通过最外层已有状态 class 切换样式和布局。
+- 同一组件区域只通过公共外层已有状态 class 切换样式和布局，区域内所有组件根 class 保持固定。
 - 动态生成的 Item 同样迁移到统一组件来源。
 
-以“使用 Post Item 替换 `index.html` 的 Host posts”为例：保留首页每篇 Post 的标题、图片、链接、作者、标签和收藏状态；HTML 改由 `post-all-card.html` 统一输出；PC 与 Mobile 分别使用 `post-all-card--desktop` 和 `post-all-card--mobile`；不再为首页旧卡片内部布局新增样式。
+以“使用 Post Item 替换 `index.html` 的 Host posts”为例：保留首页每篇 Post 的标题、图片、链接、作者、标签和收藏状态；HTML 改由 `post-all-card.html` 统一输出；`#hot-posts` 公共外层在 PC 与 Mobile 分别使用 `post-all-card--desktop` 和 `post-all-card--mobile`，内部 `<article class="post-all-card">` 不变；不再为首页旧卡片内部布局新增样式。
 
 ## 禁止事项
 
@@ -230,7 +233,7 @@ Codex 应默认理解为：
 ## 迁移后的检查项
 
 1. 目标页面中的同类 Item 均来自唯一组件 partial。
-2. PC / Mobile 以及存在的 Vertical / Horizontal 状态使用正确的已有根 class。
+2. PC / Mobile 以及存在的 Vertical / Horizontal 状态使用正确的已有公共外层 class，组件根不携带这些状态 class。
 3. 状态切换前后组件内部 DOM 和数据不变。
 4. 目标页面原有数据、链接、收藏状态和交互行为仍然有效。
 5. 页面外部列表、网格或轮播布局正常。

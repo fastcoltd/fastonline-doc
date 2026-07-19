@@ -63,9 +63,6 @@ function createItemElement() {
   }
 
   const itemElement = template.content.firstElementChild.cloneNode(true);
-  if (window.postAllLayout) {
-    window.postAllLayout.syncCard(itemElement);
-  }
   return itemElement;
 }
 

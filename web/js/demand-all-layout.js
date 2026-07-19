@@ -1,5 +1,5 @@
 class DemandAllLayout {
-    constructor(itemsGrid = document.getElementById('items-grid'), layoutSwitchRoot = document) {
+    constructor(stateRoot = document.getElementById('items-grid'), layoutSwitchRoot = document) {
         this.currentLayout = 'vertical';
         this.layoutSwitchRoot = layoutSwitchRoot;
         this.mobileMedia = window.matchMedia('(max-width: 768px)');
@@ -9,13 +9,12 @@ class DemandAllLayout {
             'demand-all-card--mobile-vertical',
             'demand-all-card--mobile-horizontal'
         ];
-        this.itemsGrid = itemsGrid;
+        this.stateRoot = stateRoot;
         this.init();
     }
 
     init() {
         this.bindEvents();
-        this.observeItems();
         this.syncLayout();
     }
 
@@ -40,21 +39,6 @@ class DemandAllLayout {
         }
     }
 
-    observeItems() {
-        if (!this.itemsGrid) return;
-
-        this.itemsObserver = new MutationObserver(mutations => {
-            mutations.forEach(mutation => {
-                mutation.addedNodes.forEach(node => {
-                    if (!(node instanceof Element)) return;
-                    if (node.matches('.demand-all-card')) this.syncCard(node);
-                    node.querySelectorAll('.demand-all-card').forEach(card => this.syncCard(card));
-                });
-            });
-        });
-        this.itemsObserver.observe(this.itemsGrid, { childList: true, subtree: true });
-    }
-
     switchLayout(layout) {
         if (layout !== 'vertical' && layout !== 'horizontal') return;
         this.currentLayout = layout;
@@ -70,16 +54,12 @@ class DemandAllLayout {
         this.getLayoutButtons().forEach(button => {
             button.classList.toggle('active', button.dataset.layout === this.currentLayout);
         });
-        this.syncCards();
+        this.syncState();
     }
 
-    syncCards() {
-        if (!this.itemsGrid) return;
-        this.itemsGrid.querySelectorAll('.demand-all-card').forEach(card => this.syncCard(card));
-    }
-
-    syncCard(card) {
-        card.classList.remove(...this.stateClasses);
-        card.classList.add(this.getStateClass());
+    syncState() {
+        if (!this.stateRoot) return;
+        this.stateRoot.classList.remove(...this.stateClasses);
+        this.stateRoot.classList.add(this.getStateClass());
     }
 }
