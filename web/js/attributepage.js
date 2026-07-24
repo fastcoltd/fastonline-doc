@@ -7,30 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const attributes = document.querySelectorAll(".tag-page-header-desc-tag-item");
   const brandPageIndexs = document.querySelectorAll(".page-link");
 
-  function syncItemAllBestItemsClass() {
-    document.querySelectorAll('#best-items-item #items-grid > .best-items-item').forEach(item => {
-      item.classList.add('item-all-best-items-item');
-    });
-  }
-
   function getActiveItemPager() {
-    const $activePager = $('#best-items-item .items-container[data-layout].is-active .item-all-items-pager');
-    if ($activePager.length > 0) {
-      return $activePager.first();
-    }
-    const $defaultPager = $('#best-items-item .item-all-items-pager');
-    if ($defaultPager.length > 0) {
-      return $defaultPager.first();
-    }
-    return $('#best-items-item .items-pager').first();
+    return $('#items-grid');
   }
 
   function getActiveDemandPager() {
-    const $activePager = $('#demand-item .items-container[data-layout].is-active .items-pager');
-    if ($activePager.length > 0) {
-      return $activePager.first();
-    }
-    return $('#demand-item .items-pager').first();
+    return $('#demand-items-grid');
   }
 
   // 初始化 - 设置第一个链接为激活状态
@@ -39,8 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     pageType = brandPageIndexs[0].id;
     changePageType(pageType);
   }
-  syncItemAllBestItemsClass();
-
   if (attributes.length > 0) {
     attributes[0].classList.add('active');
     attributeValue = attributes[0].textContent;
@@ -76,9 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
         pageList = item;
       }
     });
-    if (type === 'best-items-item') {
-      syncItemAllBestItemsClass();
-    }
   }
   // 初始化分页组件
   const pagination = new Pagination({
@@ -98,23 +75,29 @@ document.addEventListener('DOMContentLoaded', () => {
   pagination.onPageSizeChange = (page, pageSize) => {
     console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
   };
-  this.layout = new PageLayout();
+  const layoutSwitchRoot = document.querySelector('.attribute-header-function-box');
+  this.itemLayout = new PageLayout(document.getElementById('items-grid'), layoutSwitchRoot);
+  this.demandLayout = new DemandAllLayout(document.getElementById('demand-items-grid'), layoutSwitchRoot);
   //   this.sort = new SortSelector();
   $('.load-more').on('click', function () {
-    let type = $('.page-link.active').attr('data-type');
-    let $targetPager = $();
-    if (type == 'demand') {
+    const type = $('.page-link.active').attr('data-type');
+    let $targetPager;
+    if (type === 'demand') {
       $targetPager = getActiveDemandPager();
     } else {
       $targetPager = getActiveItemPager();
     }
-    const htmlStr = $targetPager.html();
+    const cardSelector = type === 'demand' ? '.demand-all-card' : '.item-all-card';
+    const $cards = $targetPager.children(cardSelector);
     $('.loading').show()
     $('.show-more-btn > span').hide()
     setTimeout(() => {
-      $targetPager.append(htmlStr);
-      if (type != 'demand') {
-        syncItemAllBestItemsClass();
+      const $clones = $cards.clone();
+      const $emptyState = $targetPager.children('.list-empty-state').first();
+      if ($emptyState.length > 0) {
+        $clones.insertBefore($emptyState);
+      } else {
+        $targetPager.append($clones);
       }
       $('.loading').hide()
       $('.show-more-btn > span').show()
