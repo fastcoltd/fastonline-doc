@@ -84,17 +84,60 @@ class StoreAllLayout {
 
     syncTagOverflow() {
         if (!this.stateRoot) return;
-        const isHorizontal = this.stateRoot.classList.contains('store-all-card--desktop-horizontal')
-            || this.stateRoot.classList.contains('store-all-card--mobile-horizontal');
+        const isDesktopHorizontal = this.stateRoot.classList.contains('store-all-card--desktop-horizontal');
+        const isMobileHorizontal = this.stateRoot.classList.contains('store-all-card--mobile-horizontal');
 
         this.stateRoot.querySelectorAll('.store-all-card').forEach(card => {
             const tagList = card.querySelector(':scope > nav');
             if (!tagList) return;
 
-            tagList.removeAttribute('data-overflow');
-            if (!isHorizontal) return;
+            this.clearTagOverflow(tagList);
 
-            tagList.toggleAttribute('data-overflow', tagList.scrollWidth > tagList.clientWidth + 1);
+            if (isDesktopHorizontal) {
+                this.syncDesktopHorizontalOverflow(tagList);
+            } else if (isMobileHorizontal) {
+                this.syncMobileHorizontalOverflow(tagList);
+            }
         });
+    }
+
+    clearTagOverflow(tagList) {
+        tagList.removeAttribute('data-overflow');
+        const ellipsis = tagList.querySelector(':scope > .store-tag-ellipsis');
+        if (ellipsis) ellipsis.remove();
+        tagList.querySelectorAll(':scope > a').forEach(tag => {
+            if (tag.style.display === 'none') tag.style.display = '';
+        });
+    }
+
+    syncDesktopHorizontalOverflow(tagList) {
+        if (tagList.scrollHeight <= tagList.clientHeight + 1) return;
+        tagList.setAttribute('data-overflow', 'true');
+        this.fitTagEllipsis(tagList);
+    }
+
+    syncMobileHorizontalOverflow(tagList) {
+        tagList.toggleAttribute('data-overflow', tagList.scrollWidth > tagList.clientWidth + 1);
+    }
+
+    fitTagEllipsis(tagList) {
+        const tags = Array.from(tagList.querySelectorAll(':scope > a'));
+        if (tags.length === 0) return;
+
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'store-tag-ellipsis';
+        ellipsis.textContent = '...';
+        tagList.appendChild(ellipsis);
+
+        const maxHeight = tagList.clientHeight;
+        let lastVisible = tags.length - 1;
+        while (lastVisible >= 0 && tagList.scrollHeight > maxHeight + 1) {
+            tags[lastVisible].style.display = 'none';
+            lastVisible--;
+        }
+
+        if (lastVisible < 0) {
+            tags[0].style.display = '';
+        }
     }
 }
