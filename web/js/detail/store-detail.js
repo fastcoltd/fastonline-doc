@@ -6,7 +6,7 @@ const pageContent = document.querySelector('.page-content');
 const pageFix = document.querySelector('.page-fix-box');
 const pageHead = document.querySelector('.page-head');
 const pageHeadHeight = pageHead.offsetHeight;
-const footer = document.getElementsByTagName('footer')[0];
+const footer = document.querySelector('.common-footer-wrapper');
 const footerHeight = footer.offsetHeight;
 let storeLeftScrollTimer = null;
 
@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeValidation();
     initializeStatisticsPeriodTabs();
     initializeStoreLeftScrollbar();
+    initializeItemsLayout();
     initializeItemsShowMore();
     initializeReviewsShowMore();
     initializeAfterSalesRulesSeeMore();
@@ -127,20 +128,23 @@ function initializeStoreLeftScrollbar() {
     }, { passive: true });
 }
 
+function initializeItemsLayout() {
+    const itemsGrid = document.getElementById('items-grid');
+    if (!itemsGrid) return;
+
+    window.storeDetailItemsLayout = new PageLayout(itemsGrid, null);
+}
+
 function initializeItemsShowMore() {
     const showMoreBtn = document.getElementById('load-more-items');
-    const extraItems = Array.from(document.querySelectorAll('#items-grid .store-detail-extra-item'));
-    if (!showMoreBtn || !extraItems.length) return;
-
-    if (!isMobileLikeViewport()) {
-        showMoreBtn.style.display = 'none';
-        return;
-    }
+    const itemsGrid = document.getElementById('items-grid');
+    const items = itemsGrid
+        ? Array.from(itemsGrid.children).filter(item => item.classList.contains('item-all-card'))
+        : [];
+    if (!showMoreBtn || !itemsGrid || items.length <= 4) return;
 
     showMoreBtn.addEventListener('click', function () {
-        extraItems.forEach(item => {
-            item.classList.add('is-visible');
-        });
+        itemsGrid.classList.add('is-expanded');
         showMoreBtn.style.display = 'none';
     });
 }
