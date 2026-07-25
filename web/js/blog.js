@@ -19,23 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
     pagination.onPageSizeChange = (page, pageSize) => {
       console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
     };
-    this.layout = new PageLayout();
+    new PostAllLayout(document.getElementById('items-grid'));
     //   this.sort = new SortSelector();
     $('.load-more').on('click', function () {
       $('.loading').show()
       $('.show-more-btn > span').hide()
       setTimeout(() => {
-        $('.items-pager').each(function () {
-          const htmlStr = $(this).children(':not(.no-data-wrapper)').map(function () {
-            return this.outerHTML;
-          }).get().join('');
-          const $emptyState = $(this).children('.no-data-wrapper').first();
-          if ($emptyState.length) {
-            $emptyState.before(htmlStr);
-          } else {
-            $(this).append(htmlStr);
-          }
-        })
+        const $postsPager = $('#items-grid');
+        const $postCards = $postsPager.children('.post-all-card');
+        const $emptyState = $postsPager.children('.no-data-wrapper').first();
+        const $clonedCards = $postCards.clone();
+        if ($emptyState.length) {
+          $emptyState.before($clonedCards);
+        } else {
+          $postsPager.append($clonedCards);
+        }
         $('.loading').hide()
         $('.show-more-btn > span').show()
       }, 2000)
