@@ -1,4 +1,18 @@
 $(document).ready(function () {
+    document.querySelectorAll('.brand-hot-items-pager').forEach(function (pager) {
+        new PageLayout(pager, pager);
+    });
+
+    const demandsPager = document.getElementById('popuar-demands');
+    if (demandsPager) {
+        new DemandAllLayout(demandsPager, demandsPager);
+    }
+
+    const postsPager = document.getElementById('hot-posts');
+    if (postsPager) {
+        new PostAllLayout(postsPager);
+    }
+
     const link = new LinkRef('page-link', 'brand-section');
     const headDetailBox = document.querySelector('.page-header-desc-right-detail-box');
     if (headDetailBox) {
