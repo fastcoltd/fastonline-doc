@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     const faqs = document.querySelectorAll('.item-detail-faq-box');
     faqs.forEach(element => {
-        const content = element.querySelector('[data-faq-role="content"]');
+        const content = element.querySelector('.item-detail-faq-content');
         const title = element.querySelector('.item-detail-faq-title-box');
         const arrow = title.querySelector('[data-faq-role="arrow"]');
         title.addEventListener('click', function (event) {
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
             event.stopPropagation();
             if (content.style.display === 'none') {
                 title.classList.toggle('toggle', true);
-                content.style.display = 'inline-block';
+                content.style.display = 'block';
                 arrow.style.transform = 'rotate(180deg)';
             } else {
                 title.classList.toggle('toggle', false);
