@@ -1,256 +1,44 @@
 const list = new PageList();
-
-// 加载商品数据
-async function loadItems() {
-    console.log('load items');
-    try {
-        appendSearchResultsPage(selectedSearchType);
-    } catch (error) {
-        console.error('加载商品失败:', error);
-    } finally {
-        /// 加载结束
-        list.showLoading(false);
-    }
-}
-
-function reloadItems() {
-    console.log('reload items');
-    const container = document.querySelector('.item-detail-review-list');
-    container.innerHTML = '';
-    loadItems();
-}
-
-function sortItems(value) {
-    console.log('sort items', value);
-}
-
-// 生成模拟商品数据
-function generateMockItems() {
-    const brands = ['Google', 'Apple', 'Microsoft', 'Amazon', 'Meta', 'Netflix'];
-    const services = ['云服务', 'SEO服务', '社交媒体', '内容创作', '交易平台', '游戏服务'];
-    const categories = ['科技产品', '服装鞋履', '家居用品', '数码配件', '美妆护肤', '运动户外'];
-    const marks = ['Hot', 'New', '推荐', '热销', '限时', '特价'];
-    const markClasses = ['best-items-item-mark1', 'best-items-item-mark2', 'best-items-item-mark3', 'best-items-item-mark4', 'best-items-item-mark5', 'best-items-item-mark6'];
-
-    const items = [];
-    for (let i = 0; i < list.itemsPerPage; i++) {
-        const price = (Math.random() * 1000 + 50).toFixed(2);
-        const stock = Math.floor(Math.random() * 100) + 1;
-        const rating = (Math.random() * 2 + 3).toFixed(1);
-        const reviews = Math.floor(Math.random() * 500) + 10;
-        const isLiked = Math.random() > 0.5;
-
-        items.push({
-            id: (list.currentPage - 1) * list.itemsPerPage + i + 1,
-            title: `商品名称 ${(list.currentPage - 1) * list.itemsPerPage + i + 1}`,
-            price: `$${price}`,
-            stock: stock,
-            rating: rating,
-            reviews: reviews,
-            brand: brands[Math.floor(Math.random() * brands.length)],
-            service: services[Math.floor(Math.random() * services.length)],
-            category: categories[Math.floor(Math.random() * categories.length)],
-            mark: marks[Math.floor(Math.random() * marks.length)],
-            markClass: markClasses[Math.floor(Math.random() * markClasses.length)],
-            isLiked: isLiked,
-            image: 'https://via.placeholder.com/300x200'
-        });
-    }
-    return items;
-}
-
-// 渲染商品
-function renderItems(items) {
-    const container = document.querySelector('.list-container');
-
-    items.forEach(item => {
-        const itemElement = createItemElement(item);
-        container.appendChild(itemElement);
-    });
-}
-
-// 创建商品元素 - 完全按照Figma设计
-function createItemElement(item) {
-    const div = document.createElement('div');
-    div.className = 'demand-card';
-
-    const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
-
-    div.innerHTML = `
-    <div class="card-content">
-          <!-- 第一行：用户信息 -->
-          <div class="user-section">
-            <img src="image" />
-            <div class="demand-detail-item-user-info">
-              <div class="user-header">
-                <h2>Sergio Tremblay</h2>
-                <div class="user-icon-box">
-                  <div class="item-mark item-mark1">Hot</div>
-                  <div class="item-mark item-mark2">LV1</div>
-                  <div class="level-badge level-badge1"></div>
-                  <div class="item-star-box">
-                    <div class="star-bg">
-                        <div class="stars-outer">
-                            <div class="stars-inner" style="--star-fill: 86%;"></div>
-                        </div>
-                    </div>
-                    <p>4.3</p>
-                    <p>(200)</p>
-                  </div>
-                </div>
-              </div>
-              <div class="demand-detail-item-user-stats">
-                <div class="item-service-box">
-                  <img class="item-service-icon" src="image" />
-                  <span class="item-service-text">Order volumn:</span>
-                  <span class="item-service">40</span>
-                </div>
-                <div class="item-service-box">
-                  <img class="item-service-icon" src="image" />
-                  <span class="item-service-text">Bidding/Winning:</span>
-                  <span class="item-service">33</span>
-                </div>
-                <div class="item-service-box">
-                  <img class="item-service-icon" src="image" />
-                  <span class="item-service-text">Winning rate:</span>
-                  <span class="item-service">70.2%</span>
-                </div>
-                <div class="item-service-box">
-                  <img class="item-service-icon" src="image" />
-                  <span class="item-service-text">Bidding time:</span>
-                  <span class="item-service">2025/07/31 ~ 2025/09/30</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="brand-tag-box">
-            <div class="item-tag"><p class="item-tag-text">Screen Size: 17-20in</p></div>
-            <div class="item-tag"><p class="item-tag-text">Waterproof: IPX7</p></div>
-            <div class="item-tag"><p class="item-tag-text">Cleaning: Pro Clean</p></div>
-            <div class="item-tag"><p class="item-tag-text">Lighting:Incandescent</p></div>
-          </div>
-          <div class="other-info">
-            <p>Provide samples: <span>
-                Nesciunt quibusdam quae nihil debitis eveniet quidem perspiciatis numquam. Voluptatem necessitatibus occaecati voluptatem qui blanditiis eligendi. Quod rerum itaque tempora dolorem tenetur molestias aut deleniti incidunt. Sit alias sed ea dolorem unde culpa incidunt neque.
-            </span></p>
-          </div>
-          <span>Bidding pictures</span>
-          <div class="bidding-box">
-            <img src="image" class="bidding-item" />
-            <img src="image" class="bidding-item" />
-            <img src="image" class="bidding-item" />
-            <img src="image" class="bidding-item" />
-            <img src="image" class="bidding-item" />
-            <img src="image" class="bidding-item" />
-            <img src="image" class="bidding-item" />
-            <img src="image" class="bidding-item" />
-            <img src="image" class="bidding-item" />
-            <img src="image" class="bidding-item" />
-          </div>
-          <span class="item-service">Fuga nisi id dicta fugi Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.Fuga nisi id dicta fugit.t.</span>
-        </div>
-        <div class="demand-edit-box demand-edit-box1">Edit</div>
-        <!-- 状态标签 -->
-        <div class="status-badge status-badge1">
-          <p>Delivered</p>
-        </div>
-         `;
-
-    return div;
-}
-document.addEventListener("DOMContentLoaded", function () {
-    
-});
-
-// 初始化分页组件
-const pagination = new Pagination({
-    current: 1,
-    pageSize: 20,
-    total: 285,
-    showSizeChanger: true,
-    showQuickJumper: true
-  });
-  
-  // 页面变化回调
-  pagination.onPageChange = (page, pageSize) => {
-    console.log(`页面变化: 第${page}页, 每页${pageSize}条`);
-    loadItems();
-  };
-  
-  // 页面大小变化回调
-  pagination.onPageSizeChange = (page, pageSize) => {
-    console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
-    reloadItems();
-  };
 const searchTabCardClassMap = {
-    items: 'search-card-first-item',
-    campaigns: 'search-card-second-item',
-    posts: 'search-card-third-item',
-    store: 'search-card-fourth-item',
-    demands: 'search-card-fifth-item'
+    items: 'item-all-card',
+    campaigns: 'compaign-all-card',
+    posts: 'post-all-card',
+    store: 'store-all-card',
+    demands: 'demand-all-card'
 };
-
-const searchTabDesktopCardClassMap = {
-    items: 'search-card-first-item-desktop',
-    campaigns: 'search-card-second-item-desktop',
-    posts: 'search-card-third-item-desktop',
-    store: 'search-card-fourth-item-desktop',
-    demands: 'search-card-fifth-item-desktop'
-};
-
 const searchTabTypeOrder = ['items', 'campaigns', 'posts', 'store', 'demands'];
-const searchTabMobileCardClassMap = {
-    items: 'search-card-first-item-mobile',
-    campaigns: 'search-card-second-item-mobile',
-    posts: 'search-card-third-item-mobile',
-    store: 'search-card-fourth-item-mobile',
-    demands: 'search-card-fifth-item-mobile'
-};
-const searchInitialCardTemplates = {
-    desktop: {},
-    mobile: {}
-};
+const searchInitialCardTemplates = {};
 let selectedSearchType = 'all';
 let lastSearchLoadMoreTime = 0;
+
+function getSearchContainer() {
+    return document.querySelector('.search-list-container');
+}
+
+function getSearchResultCards() {
+    const container = getSearchContainer();
+    if (!container) {
+        return [];
+    }
+
+    return Array.from(container.children).filter((child) => getSearchCardType(child));
+}
 
 function getSearchCardType(card) {
     return searchTabTypeOrder.find((type) => card.classList.contains(searchTabCardClassMap[type]));
 }
 
-function getSearchCardViewport(card, type) {
-    if (card.classList.contains(searchTabDesktopCardClassMap[type])) {
-        return 'desktop';
-    }
-
-    if (card.classList.contains(searchTabMobileCardClassMap[type])) {
-        return 'mobile';
-    }
-
-    return '';
-}
-
 function collectSearchInitialCardTemplates() {
-    const cards = document.querySelectorAll('.search-list-container .search-card');
-
-    cards.forEach((card) => {
+    getSearchResultCards().forEach((card) => {
         const type = getSearchCardType(card);
-        if (!type) {
-            return;
+        if (type && !searchInitialCardTemplates[type]) {
+            searchInitialCardTemplates[type] = card.cloneNode(true);
         }
-
-        const viewport = getSearchCardViewport(card, type);
-        if (!viewport || searchInitialCardTemplates[viewport][type]) {
-            return;
-        }
-
-        searchInitialCardTemplates[viewport][type] = card.cloneNode(true);
     });
 }
 
 function createSearchResultCard(type) {
-    const viewport = isSearchAllDesktop() ? 'desktop' : 'mobile';
-    const template = searchInitialCardTemplates[viewport][type];
-
+    const template = searchInitialCardTemplates[type];
     if (!template) {
         return null;
     }
@@ -261,7 +49,7 @@ function createSearchResultCard(type) {
 }
 
 function appendSearchResultsPage(type) {
-    const container = document.querySelector('.search-list-container');
+    const container = getSearchContainer();
     if (!container) {
         return;
     }
@@ -286,14 +74,77 @@ function appendSearchResultsPage(type) {
     filterSearchCardsByType(type);
 }
 
+function resetSearchResults() {
+    const container = getSearchContainer();
+    if (!container) {
+        return;
+    }
+
+    getSearchResultCards().forEach((card) => card.remove());
+
+    const fragment = document.createDocumentFragment();
+    searchTabTypeOrder.forEach((type) => {
+        const card = createSearchResultCard(type);
+        if (card) {
+            fragment.appendChild(card);
+        }
+    });
+
+    const noData = container.querySelector('.no-data-wrapper');
+    container.insertBefore(fragment, noData || null);
+    filterSearchCardsByType(selectedSearchType);
+}
+
+// 加载搜索结果
+async function loadItems() {
+    console.log('load items');
+    try {
+        appendSearchResultsPage(selectedSearchType);
+    } catch (error) {
+        console.error('加载商品失败:', error);
+    } finally {
+        list.showLoading(false);
+    }
+}
+
+function reloadItems() {
+    console.log('reload items');
+    resetSearchResults();
+    list.showLoading(false);
+}
+
+function sortItems(value) {
+    console.log('sort items', value);
+}
+
+function updateSearchNoDataState() {
+    const noData = document.querySelector('.search-list-container .no-data-wrapper');
+    if (noData) {
+        noData.style.display = '';
+    }
+}
+
+function filterSearchCardsByType(type) {
+    const targetClass = searchTabCardClassMap[type];
+
+    getSearchResultCards().forEach((card) => {
+        const shouldShow = type === 'all' || (targetClass && card.classList.contains(targetClass));
+        card.style.display = shouldShow ? '' : 'none';
+    });
+
+    updateSearchNoDataState();
+}
+
 function bindSearchTagRandomJump() {
-    const container = document.querySelector('.search-list-container');
+    const container = getSearchContainer();
     if (!container) {
         return;
     }
 
     container.addEventListener('click', function (event) {
-        const clickedTag = event.target.closest('.item-tag');
+        const clickedTag = event.target.closest(
+            '.item-all-card nav a, .compaign-all-card nav a, .post-all-card nav a, .store-all-card nav a, .demand-all-card nav a'
+        );
         if (!clickedTag || !container.contains(clickedTag)) {
             return;
         }
@@ -308,61 +159,50 @@ function bindSearchTagRandomJump() {
     });
 }
 
-function isSearchAllDesktop() {
-    return window.matchMedia('(min-width: 769px)').matches;
-}
-
-function updateSearchNoDataState(visibleCount) {
-    const noData = document.querySelector('.search-list-container .no-data-wrapper');
-    if (!noData) {
+function initializeSearchLayouts() {
+    const container = getSearchContainer();
+    if (!container) {
         return;
     }
 
-    noData.style.display = '';
+    window.searchItemLayout = new PageLayout(container, null);
+    window.searchItemLayout.switchLayout('horizontal');
+
+    window.searchCompaignLayout = new CompaignAllLayout(container, null);
+    window.searchCompaignLayout.switchLayout('horizontal');
+
+    window.searchPostLayout = new PostAllLayout(container);
+
+    window.searchStoreLayout = new StoreAllLayout(container, null);
+    window.searchStoreLayout.switchLayout('horizontal');
+
+    window.searchDemandLayout = new DemandAllLayout(container, null);
+    window.searchDemandLayout.switchLayout('horizontal');
 }
 
-function filterSearchDesktopCardsByType(type) {
-    const cards = document.querySelectorAll('.search-list-container .search-card');
-    const targetTypes = type === 'all' ? searchTabTypeOrder : [type];
-    let visibleCount = 0;
+// 初始化分页组件
+const pagination = new Pagination({
+    current: 1,
+    pageSize: 20,
+    total: 285,
+    showSizeChanger: true,
+    showQuickJumper: true
+});
 
-    cards.forEach((card) => {
-        const shouldShow = targetTypes.some((targetType) => {
-            const desktopClass = searchTabDesktopCardClassMap[targetType];
-            return desktopClass && card.classList.contains(desktopClass);
-        });
-        card.style.display = shouldShow ? '' : 'none';
-        if (shouldShow) {
-            visibleCount += 1;
-        }
-    });
+pagination.onPageChange = (page, pageSize) => {
+    console.log(`页面变化: 第${page}页, 每页${pageSize}条`);
+    loadItems();
+};
 
-    updateSearchNoDataState(visibleCount);
-}
-
-function filterSearchCardsByType(type) {
-    if (isSearchAllDesktop()) {
-        filterSearchDesktopCardsByType(type);
-        return;
-    }
-
-    const cards = document.querySelectorAll('.search-list-container .search-card');
-    const targetClass = searchTabCardClassMap[type];
-    let visibleCount = 0;
-
-    cards.forEach((card) => {
-        const shouldShow = type === 'all' || (targetClass && card.classList.contains(targetClass));
-        card.style.display = shouldShow ? '' : 'none';
-        if (shouldShow) {
-            visibleCount += 1;
-        }
-    });
-
-    updateSearchNoDataState(visibleCount);
-}
+pagination.onPageSizeChange = (page, pageSize) => {
+    console.log(`页面大小变化: 第${page}页, 每页${pageSize}条`);
+    reloadItems();
+};
 
 $(document).ready(function () {
     const $pageLinks = $('.page-link');
+
+    initializeSearchLayouts();
     collectSearchInitialCardTemplates();
     selectedSearchType = $('.page-link.active').attr('data-key') || 'all';
 
@@ -379,10 +219,6 @@ $(document).ready(function () {
         }
 
         loadItems();
-    });
-
-    window.addEventListener('resize', function () {
-        filterSearchCardsByType(selectedSearchType);
     });
 
     filterSearchCardsByType(selectedSearchType);
