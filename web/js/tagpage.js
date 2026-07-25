@@ -3,6 +3,10 @@
 let pageType = "best-items-item";
 let pageList = null;
 const brandPageIndexs = document.querySelectorAll(".page-link");
+// Items Tab 统一商品卡片原型：动态新增卡片通过克隆统一组件原型生成，
+// 不在 JS 中维护第二份 item HTML（遵循 docs/unified-item-components.md）。
+const itemAllCardRoot = document.querySelector('#best-items-item .items-pager');
+const itemAllCardPrototype = itemAllCardRoot ? itemAllCardRoot.querySelector(':scope > .item-all-card') : null;
 
 // 初始化 - 设置第一个链接为激活状态
 if (brandPageIndexs.length > 0) {
@@ -150,67 +154,9 @@ function renderItems(items) {
 }
 
 function createBestItemElement(item) {
-  const div = document.createElement('div');
-  div.className = 'best-items-item';
-
-  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
-
-  div.innerHTML = `
-           <img src="{{item.image}}" />
-           <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
-           <div class="best-items-item-content">
-            <div class="item-title-box">
-              <div class="item-mark item-mark1">{{item.mark}}</div>
-              <a href="item-detail.html?item_id=123" target="_self" class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</a>
-            </div>
-            <div class="item-star-box">
-              <div class="star-bg">
-                <div class="stars-outer">
-                  <div class="stars-inner" style="--star-fill: 86%;"></div>
-                </div>
-              </div>
-              <p>4.3</p>
-              <p>(200)</p>
-            </div>
-            <div class="best-items-item-middle-box">
-              <div class="item-brand-box">
-                <p class="item-brand-text">品牌: </p>
-                <img class="item-brand-icon" src="image/brand.png" />
-                <p class="item-brand" style="color: #06C70C;">{{Google}}</p>
-              </div>
-              <div class="item-service-box">
-                <p class="item-service-text">服务: </p>
-                <img class="item-service-icon" src="image/service.png" />
-                <p class="item-service">{{SEO & SA}}</p>
-              </div>
-              <div class="best-items-item-price-stock-box">
-                <div class="item-price-box">
-                  <p class="item-price-text">{{价格}}</p>
-                  <p class="item-price">{{$10.0}}</p>
-                </div>
-                <div class="item-stock-box">
-                  <p class="item-stock-text">{{库存}}</p>
-                  <img class="item-stock-icon" src="image/stock.png" />
-                  <p class="item-stock">{{80}}</p>
-                </div>
-              </div>
-            </div>
-            <div class="item-tag-box">
-              <a href="tag-all.html?type=items&name=item-name" target="_self" class="item-tag">
-                <p class="item-tag-text">{{新品发布}}</p>
-              </a>
-              <a href="tag-all.html?type=items&name=item-name" target="_self" class="item-tag">
-                <p class="item-tag-text">{{运动户外}}</p>
-              </a>
-              <a href="tag-all.html?type=items&name=item-name" target="_self" class="item-tag">
-                <p class="item-tag-text">{{配送时间: 24H+}}</p>
-              </a>
-            </div>
-            <div class="item-button-box ${Math.random() > 0.5 ? 'active' : ''}">立即购买</div>
-        </div>
-         `;
-
-  return div;
+  // 克隆统一商品组件原型，不在 JS 中维护第二份 item HTML（遵循 docs/unified-item-components.md）
+  if (!itemAllCardPrototype) return document.createElement('div');
+  return itemAllCardPrototype.cloneNode(true);
 }
 
 function createStoreItemElement(item) {
