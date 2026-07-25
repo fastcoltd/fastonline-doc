@@ -648,6 +648,7 @@ function createItemElement(item) {
     return div;
 }
 document.addEventListener("DOMContentLoaded", function () {
+    const similarLayout = new PageLayout(document.getElementById('best-items'), null);
     const similar = new Carousel('best-items', 20);
     const link = new LinkRef('page-link', 'item-detail-left-group');
     initStatisticsPeriodTabs();
