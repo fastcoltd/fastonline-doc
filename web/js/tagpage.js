@@ -7,6 +7,18 @@ const brandPageIndexs = document.querySelectorAll(".page-link");
 // 不在 JS 中维护第二份 item HTML（遵循 docs/unified-item-components.md）。
 const itemAllCardRoot = document.querySelector('#best-items-item .items-pager');
 const itemAllCardPrototype = itemAllCardRoot ? itemAllCardRoot.querySelector(':scope > .item-all-card') : null;
+// Stories Tab 统一店铺卡片原型：动态新增卡片通过克隆统一组件原型生成，
+// 不在 JS 中维护第二份 store HTML（遵循 docs/unified-item-components.md）。
+const storeAllCardRoot = document.querySelector('#store-item .items-pager');
+const storeAllCardPrototype = storeAllCardRoot ? storeAllCardRoot.querySelector(':scope > .store-all-card') : null;
+// Compaigns Tab 统一活动卡片原型：动态新增卡片通过克隆统一组件原型生成，
+// 不在 JS 中维护第二份 compaign HTML（遵循 docs/unified-item-components.md）。
+const compaignAllCardRoot = document.querySelector('#compaign-item .items-pager');
+const compaignAllCardPrototype = compaignAllCardRoot ? compaignAllCardRoot.querySelector(':scope > .compaign-all-card') : null;
+// Posts Tab 统一文章卡片原型：动态新增卡片通过克隆统一组件原型生成，
+// 不在 JS 中维护第二份 post HTML（遵循 docs/unified-item-components.md）。
+const postAllCardRoot = document.querySelector('#post-item .items-pager');
+const postAllCardPrototype = postAllCardRoot ? postAllCardRoot.querySelector(':scope > .post-all-card') : null;
 
 // 初始化 - 设置第一个链接为激活状态
 if (brandPageIndexs.length > 0) {
@@ -160,182 +172,19 @@ function createBestItemElement(item) {
 }
 
 function createStoreItemElement(item) {
-  const div = document.createElement('div');
-  div.className = 'store-item';
-
-  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
-
-  div.innerHTML = `
-           <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
-            <div class="store-item-user-box">
-              <img src="{{item.image}}" />
-              <div class="store-item-name-box">
-                <a href="store-detail.html?name=store-name" target="_self" class="item-title-box">
-                  <p class="item-title">Store name,Store name,Store name,Store name,Store name,Store name,Store name,
-                    Store name,Store name,Store name,Store name,Store name</p>
-                </a>
-                <div class="item-desc-box">
-                  <p>Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
-                    desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store desc,Store
-                    desc,Store desc,Store desc,Store desc,Store desc</p>
-                </div>
-              </div>
-            </div>
-            <div class="store-item-content">
-              <div class="item-star-box">
-                <div class="star-bg">
-                  <div class="stars-outer">
-                    <div class="stars-inner" style="--star-fill: 86%;"></div>
-                  </div>
-                </div>
-                <p>4.3</p>
-                <p>(200)</p>
-              </div>
-              <div class="store-item-detail-box">
-                <p>Store detail,Store detail,Store detail,Store detail,Store detail,Store
-                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
-                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
-                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
-                  detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store detail,Store
-                  detail,Store detail,Store detail</p>
-              </div>
-              <div class="store-item-brand-service-box">
-                <div class="item-brand-box">
-                  <p class="item-brand-text">品牌: </p>
-                  <img class="item-brand-icon" src="image/brand.png" />
-                  <p class="item-brand" style="color: #06C70C;">{{Google}}</p>
-                </div>
-                <div class="item-service-box">
-                  <p class="item-service-text">服务: </p>
-                  <img class="item-service-icon" src="image/service.png" />
-                  <p class="item-service">{{SEO & SA}}</p>
-                </div>
-              </div>
-            </div>
-            <div class="item-tag-box">
-              <a class="item-tag" href="tag-all.html?type=store&name=store-name" target="_self">
-                <p class="item-tag-text">{{新品发布}}</p>
-              </a>
-              <a class="item-tag" href="tag-all.html?type=store&name=store-name" target="_self">
-                <p class="item-tag-text">{{运动户外}}</p>
-              </a>
-              <a class="item-tag" href="tag-all.html?type=store&name=store-name" target="_self">
-                <p class="item-tag-text">{{配送时间: 24H+}}</p>
-              </a>
-              <div class="item-tag-more-box" style="display: inline-block;">
-                <p class="item-tag-more">+3</p>
-              </div>
-            </div>
-         `;
-
-  return div;
+  // 克隆统一店铺组件原型，不在 JS 中维护第二份 store HTML（遵循 docs/unified-item-components.md）
+  if (!storeAllCardPrototype) return document.createElement('div');
+  return storeAllCardPrototype.cloneNode(true);
 }
 
 function createCompaignItemElement(item) {
-  const div = document.createElement('div');
-  div.className = 'compaign-item';
-
-  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
-
-  div.innerHTML = `
-           <img src="{{item.image}}" />
-            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
-            <div class="compaign-item-content">
-              <a href="compaign-detail.html?name=compaign-name" target="_self" class="item-title-box">
-                <div class="item-mark item-mark1">compaign.mark</div>
-                <p class="item-title">item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题 item 标题
-                  item 标题 item 标题 item 标题</p>
-              </a>
-              <div class="compaign-item-middle-box">
-                <div class="compaign-item-box">
-                  <div class="compaign-item-brand-box">
-                    <p class="compaign-item-brand-text">Items</p>
-                    <p class="compaign-item-brand">14</p>
-                  </div>
-                  <div class="compaign-item-brand-box">
-                    <p class="compaign-item-brand-text">Sales</p>
-                    <p class="compaign-item-brand">3000</p>
-                  </div>
-                </div>
-                <div class="compaign-item-box">
-                  <div class="compaign-item-brand-box">
-                    <p class="compaign-item-brand-text">Orders</p>
-                    <p class="compaign-item-brand">144</p>
-                  </div>
-                  <div class="compaign-item-brand-box">
-                    <p class="compaign-item-brand-text">Favorites</p>
-                    <p class="compaign-item-brand">200</p>
-                  </div>
-                </div>
-              </div>
-              <div class="compaign-item-products-box">
-                <p class="compaign-item-products-text">Products</p>
-                <p class="compaign-item-products">Product A, Product B, Product C, Product D, Product E, Product F,
-                  Product G, Product H, Product I, Product J, Product K, Product L, Product M, Product N</p>
-              </div>
-              <div class="item-tag-box">
-                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
-                  <p class="item-tag-text">{{新品发布}}</p>
-                </a>
-                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
-                  <p class="item-tag-text">{{运动户外}}</p>
-                </a>
-                <a class="item-tag" href="tag-all.html?type=compaign&name=compaign-name" target="_self">
-                  <p class="item-tag-text">{{配送时间: 24H+}}</p>
-                </a>
-                <div class="item-tag-more-box">
-                  <p class="item-tag-more">+3</p>
-                </div>
-              </div>
-            </div>
-         `;
-
-  return div;
+  // 克隆统一活动组件原型，不在 JS 中维护第二份 compaign HTML（遵循 docs/unified-item-components.md）
+  if (!compaignAllCardPrototype) return document.createElement('div');
+  return compaignAllCardPrototype.cloneNode(true);
 }
 
 function createPostItemElement(item) {
-  const div = document.createElement('div');
-  div.className = 'post-item';
-
-  const ratingPercent = (parseFloat(item.rating) / 5 * 100).toFixed(0);
-
-  div.innerHTML = `
-           <img src="{{item.image}}" />
-            <i class="iconfont icon-aixin" data-like="1" style="color: var(--primary-color)"></i>
-            <div class="post-item-content">
-              <a href="post-detail.html?name=post-name" class="item-title-box">
-                <p class="item-title">{{item 标题 item 标题 item 标题 item 标题 item 标题 item 标题}}</p>
-              </a>
-              <div class="post-item-user-box">
-                <img src="用户头像" />
-                <p>xxxxxx</p>
-              </div>
-              <div class="item-brand-box">
-                <p class="item-brand-text">品牌: </p>
-                <img class="item-brand-icon" src="image/brand.png" />
-                <p class="item-brand" style="color: #06C70C;">{{Google}}</p>
-              </div>
-              <div class="item-desc-box">
-                <p>Post Desc, Post Desc, Post Desc, Post Desc, Post Desc, Post Desc, Post Desc, Post
-                  Desc, Post Desc, Post Desc, Post Desc, Post Desc</p>
-              </div>
-              <div class="post-item-kind-box">
-                <p>{{价格}}</p>
-                <a class="item-tag" href="items.html" target="_self">
-                  <p class="item-tag-text">{{新品发布}}</p>
-                </a>
-                <a class="item-tag" href="items.html" target="_self">
-                  <p class="item-tag-text">{{运动户外}}</p>
-                </a>
-                <a class="item-tag" href="items.html" target="_self">
-                  <p class="item-tag-text">{{配送时间: 24H+}}</p>
-                </a>
-                <div class="item-tag-more-box">
-                  <p class="item-tag-more">+3</p>
-                </div>
-              </div>
-            </div>
-         `;
-
-  return div;
+  // 克隆统一文章组件原型，不在 JS 中维护第二份 post HTML（遵循 docs/unified-item-components.md）
+  if (!postAllCardPrototype) return document.createElement('div');
+  return postAllCardPrototype.cloneNode(true);
 }
