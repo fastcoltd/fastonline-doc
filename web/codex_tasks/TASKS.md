@@ -16,7 +16,7 @@
 
 
 ## Task：替换brand-service.html页面的item
-状态：未完成
+状态：已完成
 ### 任务内容
 使用 docs/unified-item-components.md 这个规则，替换下列 item：
 1.使用商品 Item，替换该页面中的 item
