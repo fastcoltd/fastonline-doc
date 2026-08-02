@@ -166,10 +166,14 @@ window.addEventListener('DOMContentLoaded', function () {
                 item.textContent = count;
             });
             purchaseMask.querySelectorAll('.index-purchase-stepper > button:first-of-type').forEach(function (button) {
-                button.classList.toggle('is-disabled', count <= 1);
+                const isDisabled = count <= 1;
+                button.classList.toggle('is-disabled', isDisabled);
+                button.disabled = isDisabled;
             });
             purchaseMask.querySelectorAll('.index-purchase-stepper > button:last-of-type').forEach(function (button) {
-                button.classList.toggle('is-disabled', count >= maxCount);
+                const isDisabled = count >= maxCount;
+                button.classList.toggle('is-disabled', isDisabled);
+                button.disabled = isDisabled;
             });
         }
 
