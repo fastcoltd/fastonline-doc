@@ -84,20 +84,13 @@ class StoreAllLayout {
 
     syncTagOverflow() {
         if (!this.stateRoot) return;
-        const isDesktopHorizontal = this.stateRoot.classList.contains('store-all-card--desktop-horizontal');
-        const isMobileHorizontal = this.stateRoot.classList.contains('store-all-card--mobile-horizontal');
 
         this.stateRoot.querySelectorAll('.store-all-card').forEach(card => {
             const tagList = card.querySelector(':scope > nav');
             if (!tagList) return;
 
             this.clearTagOverflow(tagList);
-
-            if (isDesktopHorizontal) {
-                this.syncDesktopHorizontalOverflow(tagList);
-            } else if (isMobileHorizontal) {
-                this.syncMobileHorizontalOverflow(tagList);
-            }
+            this.fitTagOverflow(tagList);
         });
     }
 
@@ -105,39 +98,54 @@ class StoreAllLayout {
         tagList.removeAttribute('data-overflow');
         const ellipsis = tagList.querySelector(':scope > .store-tag-ellipsis');
         if (ellipsis) ellipsis.remove();
+        const more = tagList.querySelector(':scope > [data-role="more"]');
+        if (more) more.hidden = true;
         tagList.querySelectorAll(':scope > a').forEach(tag => {
-            if (tag.style.display === 'none') tag.style.display = '';
+            tag.classList.remove('store-all-tag-overflow-hidden');
+            if (tag.style.display === 'none') tag.style.removeProperty('display');
         });
     }
 
-    syncDesktopHorizontalOverflow(tagList) {
-        if (tagList.scrollHeight <= tagList.clientHeight + 1) return;
-        tagList.setAttribute('data-overflow', 'true');
-        this.fitTagEllipsis(tagList);
-    }
-
-    syncMobileHorizontalOverflow(tagList) {
-        tagList.toggleAttribute('data-overflow', tagList.scrollWidth > tagList.clientWidth + 1);
-    }
-
-    fitTagEllipsis(tagList) {
+    fitTagOverflow(tagList) {
         const tags = Array.from(tagList.querySelectorAll(':scope > a'));
         if (tags.length === 0) return;
 
-        const ellipsis = document.createElement('span');
-        ellipsis.className = 'store-tag-ellipsis';
-        ellipsis.textContent = '...';
-        tagList.appendChild(ellipsis);
-
-        const maxHeight = tagList.clientHeight;
-        let lastVisible = tags.length - 1;
-        while (lastVisible >= 0 && tagList.scrollHeight > maxHeight + 1) {
-            tags[lastVisible].style.display = 'none';
-            lastVisible--;
+        let more = tagList.querySelector(':scope > [data-role="more"]');
+        if (!more) {
+            more = document.createElement('span');
+            more.dataset.role = 'more';
+            more.hidden = true;
+            tagList.appendChild(more);
         }
 
-        if (lastVisible < 0) {
-            tags[0].style.display = '';
+        if (this.getTagRowCount(tags) <= 2) return;
+
+        let hiddenCount = 0;
+        more.hidden = false;
+        more.textContent = '+0';
+
+        while (this.getTagRowCount([
+            ...tags.filter(tag => !tag.classList.contains('store-all-tag-overflow-hidden')),
+            more
+        ]) > 2) {
+            const lastVisibleTag = tags.slice().reverse()
+                .find(tag => !tag.classList.contains('store-all-tag-overflow-hidden'));
+            if (!lastVisibleTag) break;
+            lastVisibleTag.classList.add('store-all-tag-overflow-hidden');
+            hiddenCount += 1;
+            more.textContent = `+${hiddenCount}`;
         }
+    }
+
+    getTagRowCount(elements) {
+        const rowTops = [];
+        elements.forEach(element => {
+            if (element.hidden || element.classList.contains('store-all-tag-overflow-hidden')) return;
+            const top = element.offsetTop;
+            if (!rowTops.some(rowTop => Math.abs(rowTop - top) < 2)) {
+                rowTops.push(top);
+            }
+        });
+        return rowTops.length;
     }
 }
