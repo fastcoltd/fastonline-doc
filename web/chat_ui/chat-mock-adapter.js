@@ -62,12 +62,24 @@
   MockChatAdapter.prototype.loadConversations = function (params) {
     var tab = params && params.tab;
     var query = String(params && params.query || '').toLowerCase();
-    var list = (this.data.conversations || []).filter(function (conversation) {
+    var source = this.data.conversationCatalog || this.data.conversations || [];
+    var list = source.filter(function (conversation) {
       var matchesTab = !tab || conversation.type === tab;
       var haystack = (conversation.title + ' ' + conversation.preview).toLowerCase();
       return matchesTab && (!query || haystack.indexOf(query) >= 0);
     });
-    return wait(this.delay, clone(list));
+    if (!tab) return wait(this.delay, clone(list));
+    var limit = Math.max(1, Number(params && params.limit) || 12);
+    var cursor = String(params && params.before || '');
+    var cursorOffset = Number(cursor.split(':').pop());
+    var start = Number.isFinite(cursorOffset) && cursorOffset > 0 ? cursorOffset : 0;
+    var end = Math.min(start + limit, list.length);
+    return wait(this.delay, {
+      conversations: clone(list.slice(start, end)),
+      olderCursor: end < list.length ? tab + ':' + end : null,
+      hasMore: end < list.length,
+      tabCounts: clone(this.data.tabCounts || {})
+    });
   };
 
   MockChatAdapter.prototype.loadMessages = function (params) {

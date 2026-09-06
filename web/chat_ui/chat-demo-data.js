@@ -12,7 +12,7 @@
       { id: 'service', name: 'Customer service', role: 'service', avatarUrl: assetBase + 'avatar-service.jpg', presence: 'online' },
       { id: 'shop-owner', name: 'Shop owner', role: 'store', avatarUrl: assetBase + 'avatar-customer.jpg', presence: 'online' }
     ];
-    var ticketConversations = Array.from({ length: 12 }).map(function (_, index) {
+    var ticketConversations = Array.from({ length: 30 }).map(function (_, index) {
       var id = 'ticket-' + (index + 1);
       return {
         id: id,
@@ -33,18 +33,19 @@
         }
       };
     });
-    var directConversations = [
-      {
-        id: 'chat-1',
+    var directConversations = Array.from({ length: 24 }).map(function (_, index) {
+      var number = index + 1;
+      return {
+        id: 'chat-' + number,
         type: 'chat',
-        title: 'Sophie',
-        preview: 'Temporibus iste quod magnam.',
-        participants: [people[0], { id: 'sophie', name: 'Sophie', role: 'customer', avatarUrl: assetBase + 'avatar-customer.jpg', presence: 'online' }],
-        unread: 2,
+        title: index % 2 ? 'Customer ' + number : 'Sophie',
+        preview: index % 2 ? 'Can you help me with this order?' : 'Temporibus iste quod magnam.',
+        participants: [people[0], { id: 'customer-' + number, name: index % 2 ? 'Customer ' + number : 'Sophie', role: 'customer', avatarUrl: assetBase + 'avatar-customer.jpg', presence: 'online' }],
+        unread: index < 4 ? 2 : 0,
         order: null
-      }
-    ];
-    var systemConversations = Array.from({ length: 10 }).map(function (_, index) {
+      };
+    });
+    var systemConversations = Array.from({ length: 24 }).map(function (_, index) {
       return {
         id: 'system-' + (index + 1),
         type: 'system',
@@ -60,7 +61,7 @@
 
   function buildSystemNotices(assetBase) {
     var paragraph = 'Quibusdam quo qui sapiente consequatur dolores maiores dolores. Incidunt quia et in dolorem aliquid quibusdam. Voluptas quaerat voluptas sunt quis voluptate nobis aut accusamus rem. Qui molestiae quam itaque repellendus nulla eos ut exercitationem aut. Ipsa nihil est molestiae aut neque eveniet consectetur cumque enim. Porro magnam unde aut non sed. Qui explicabo illo. Aliquam debitis sint non. Amet animi officia quia ex voluptatem quia velit. Quo dolores deleniti eligendi aspernatur nobis et quasi accusamus ratione. Sunt odit quos rerum ut in. Esse autem autem possimus similique alias dolores ipsa at. Magnam placeat rerum.';
-    return Array.from({ length: 10 }).reduce(function (notices, _, index) {
+    return Array.from({ length: 24 }).reduce(function (notices, _, index) {
       var id = 'system-' + (index + 1);
       notices[id] = {
         id: id,
@@ -232,12 +233,19 @@
   function createDemoData(options) {
     var settings = options || {};
     var assetBase = settings.assetBase || 'chat_ui/assets/';
+    var conversationCatalog = buildConversations(assetBase);
+    var initialConversations = ['chat', 'ticket', 'system'].reduce(function (items, tab) {
+      return items.concat(conversationCatalog.filter(function (conversation) {
+        return conversation.type === tab;
+      }).slice(0, 12));
+    }, []);
     var data = {
       activeTab: 'ticket',
       selectedConversationId: 'ticket-2',
       connectionStatus: 'idle',
       tabCounts: { chat: 611, ticket: 417, system: 21 },
-      conversations: buildConversations(assetBase),
+      conversations: initialConversations,
+      conversationCatalog: conversationCatalog,
       messages: buildMessages(assetBase),
       systemNotices: buildSystemNotices(assetBase),
       hasOlderMessages: true,

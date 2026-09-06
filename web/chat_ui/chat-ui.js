@@ -105,6 +105,30 @@
     };
   }
 
+  function normalizeConversationPageResult(result) {
+    if (Array.isArray(result)) {
+      return {
+        conversations: result,
+        olderCursor: null,
+        hasMore: false,
+        tabCounts: null
+      };
+    }
+    var olderCursor = result && (
+      result.olderCursor !== undefined ? result.olderCursor :
+        (result.nextCursor !== undefined ? result.nextCursor : result.cursor)
+    );
+    var hasMore = result && result.hasMoreOlder !== undefined
+      ? result.hasMoreOlder
+      : (result && result.hasMore !== undefined ? result.hasMore : olderCursor !== null && olderCursor !== undefined);
+    return {
+      conversations: result && Array.isArray(result.conversations) ? result.conversations : [],
+      olderCursor: olderCursor === undefined ? null : olderCursor,
+      hasMore: Boolean(hasMore),
+      tabCounts: result && result.tabCounts || null
+    };
+  }
+
   function ChatUI(root, options) {
     if (!root || root.nodeType !== 1) throw new Error('FastRespChat.mount requires a root element.');
     this.root = root;
@@ -112,6 +136,9 @@
       assetBase: 'chat_ui/assets/',
       currentUserId: 'me',
       mobileInitialView: 'list',
+      conversationPageSize: 12,
+      conversationLoadThreshold: 60,
+      searchDebounce: 250,
       disconnectOnDestroy: true,
       callbacks: {}
     }, options || {});
@@ -124,9 +151,19 @@
     this.forceScrollToBottom = true;
     this.mobileView = this.options.mobileInitialView === 'detail' ? 'detail' : 'list';
     this.mediaQuery = global.matchMedia ? global.matchMedia('(max-width: 768px)') : null;
+    this.conversationScrollPositions = { chat: 0, ticket: 0, system: 0 };
+    this.selectedConversationByTab = { chat: null, ticket: null, system: null };
+    this.conversationRequestVersions = { chat: 0, ticket: 0, system: 0 };
+    this.restoringConversationScroll = false;
+    this.searchTimer = null;
+    var initialConversation = this.store.getState().conversations.find(function (conversation) {
+      return conversation.id === this.store.getState().selectedConversationId;
+    }.bind(this));
+    if (initialConversation) this.selectedConversationByTab[initialConversation.type] = initialConversation.id;
 
     this.handleRootClickBound = this.handleRootClick.bind(this);
     this.handleSearchBound = this.handleSearch.bind(this);
+    this.handleConversationScrollBound = this.handleConversationScroll.bind(this);
     this.handleComposerSubmitBound = this.handleComposerSubmit.bind(this);
     this.handleComposerKeydownBound = this.handleComposerKeydown.bind(this);
     this.handleFileChangeBound = this.handleFileChange.bind(this);
@@ -324,6 +361,7 @@
   ChatUI.prototype.bindEvents = function () {
     this.root.addEventListener('click', this.handleRootClickBound);
     this.searchInput.addEventListener('input', this.handleSearchBound);
+    this.conversationList.addEventListener('scroll', this.handleConversationScrollBound, { passive: true });
     this.composer.addEventListener('submit', this.handleComposerSubmitBound);
     this.messageInput.addEventListener('keydown', this.handleComposerKeydownBound);
     this.imageInput.addEventListener('change', this.handleFileChangeBound);
@@ -356,23 +394,90 @@
   };
 
   ChatUI.prototype.refreshConversations = function () {
+    var state = this.store.getState();
+    return this.loadConversationPage(state.activeTab, { replace: true, query: state.searchQuery });
+  };
+
+  ChatUI.prototype.loadConversationPage = function (tab, options) {
     var self = this;
-    if (!this.adapter || typeof this.adapter.loadConversations !== 'function') return Promise.resolve([]);
-    this.store.setLoading('loadingConversations', true);
-    return this.adapter.loadConversations({}).then(function (result) {
-      var conversations = Array.isArray(result) ? result : result && result.conversations || [];
-      self.store.setConversations(conversations);
-      if (result && result.tabCounts) {
-        self.store.update(function (state) {
-          return Object.assign({}, state, { tabCounts: result.tabCounts });
+    var settings = options || {};
+    var state = this.store.getState();
+    var pageState = state.conversationPagination[tab] || {};
+    var append = !settings.replace;
+    var query = settings.query === undefined ? (state.searchQueries[tab] || '') : settings.query;
+    if (!this.adapter || typeof this.adapter.loadConversations !== 'function') {
+      this.store.setConversationPageState(tab, {
+        loading: false,
+        initialized: true,
+        hasMore: false,
+        error: null,
+        query: query
+      });
+      return Promise.resolve([]);
+    }
+    if (pageState.loading || (append && (!pageState.initialized || pageState.hasMore === false))) {
+      return Promise.resolve([]);
+    }
+
+    var requestVersion = ++this.conversationRequestVersions[tab];
+    this.store.setConversationPageState(tab, { loading: true, error: null, query: query });
+    return this.adapter.loadConversations({
+      tab: tab,
+      query: query,
+      direction: append ? 'older' : 'latest',
+      before: append ? pageState.olderCursor : null,
+      limit: this.options.conversationPageSize
+    }).then(function (result) {
+      if (requestVersion !== self.conversationRequestVersions[tab]) return [];
+      var normalized = normalizeConversationPageResult(result);
+      var hasMore = normalized.hasMore;
+      if (!normalized.conversations.length || normalized.olderCursor === null || normalized.olderCursor === undefined) {
+        hasMore = false;
+      } else if (append && String(normalized.olderCursor) === String(pageState.olderCursor)) {
+        hasMore = false;
+      }
+      self.store.setConversationPage(tab, normalized.conversations, {
+        append: append,
+        olderCursor: normalized.olderCursor,
+        hasMore: hasMore,
+        query: query
+      });
+      if (normalized.tabCounts) {
+        self.store.update(function (current) {
+          return Object.assign({}, current, { tabCounts: normalized.tabCounts });
         });
       }
-      return conversations;
+      if (!append) {
+        self.conversationScrollPositions[tab] = 0;
+        var currentState = self.store.getState();
+        if (currentState.activeTab === tab) {
+          var available = self.getVisibleConversations(currentState);
+          var rememberedId = self.selectedConversationByTab[tab];
+          var remembered = available.find(function (conversation) { return conversation.id === rememberedId; });
+          var target = remembered || available[0];
+          if (target && target.id !== currentState.selectedConversationId) self.selectConversation(target.id);
+        }
+      }
+      return normalized.conversations;
     }).catch(function (error) {
-      self.store.setLoading('loadingConversations', false);
+      if (requestVersion !== self.conversationRequestVersions[tab]) return [];
+      self.store.setConversationPageState(tab, {
+        loading: false,
+        error: error && error.message || 'Unable to load conversations.'
+      });
       self.reportError(error);
       throw error;
     });
+  };
+
+  ChatUI.prototype.handleConversationScroll = function () {
+    var state = this.store.getState();
+    var tab = state.activeTab;
+    this.conversationScrollPositions[tab] = this.conversationList.scrollTop;
+    if (this.restoringConversationScroll) return;
+    var remaining = this.conversationList.scrollHeight - this.conversationList.clientHeight - this.conversationList.scrollTop;
+    if (remaining > this.options.conversationLoadThreshold) return;
+    this.loadConversationPage(tab, { query: state.searchQuery }).catch(function () {});
   };
 
   ChatUI.prototype.handleMediaChange = function () {
@@ -409,7 +514,19 @@
     } else if (event.type === 'order.closed') {
       this.store.setOrderClosed(conversationId || this.store.getState().selectedConversationId, payload.closed !== false);
     } else if (event.type === 'conversation.list') {
-      this.store.setConversations(payload.conversations || payload);
+      if (event.requestId) return;
+      var page = normalizeConversationPageResult(payload);
+      var pageTab = payload.tab || page.conversations[0] && page.conversations[0].type;
+      if (pageTab) {
+        this.store.setConversationPage(pageTab, page.conversations, {
+          append: Boolean(payload.append || payload.before),
+          olderCursor: page.olderCursor,
+          hasMore: page.hasMore,
+          query: payload.query || ''
+        });
+      } else {
+        this.store.setConversations(page.conversations);
+      }
     } else if (event.type === 'system.notification.new' || event.type === 'system.notification.update') {
       var notice = payload.notice || payload;
       this.store.upsertSystemNotice(notice, payload.conversation);
@@ -471,9 +588,12 @@
 
   ChatUI.prototype.renderConversationList = function (state) {
     var visible = this.getVisibleConversations(state);
+    var tab = state.activeTab;
+    var pageState = state.conversationPagination[tab] || {};
+    var savedScrollTop = this.conversationScrollPositions[tab] || 0;
     this.conversationList.textContent = '';
     if (!visible.length) {
-      var empty = createElement('li', 'fr-chat-empty', state.loadingConversations ? 'Loading…' : 'No conversations found.');
+      var empty = createElement('li', 'fr-chat-empty', pageState.loading ? 'Loading…' : 'No conversations found.');
       this.conversationList.appendChild(empty);
     }
 
@@ -511,11 +631,37 @@
     }.bind(this));
 
     this.sidebarFooter.textContent = '';
-    var loading = createElement('span', 'fr-chat-loading', state.loadingConversations ? 'loading' : 'loading');
-    var dots = createElement('span', 'fr-chat-loading-dots');
-    dots.setAttribute('aria-hidden', 'true');
-    this.sidebarFooter.appendChild(dots);
-    this.sidebarFooter.appendChild(loading);
+    if (pageState.loading) {
+      var loading = createElement('span', 'fr-chat-loading', 'loading');
+      var dots = createElement('span', 'fr-chat-loading-dots');
+      dots.setAttribute('aria-hidden', 'true');
+      appendChildren(this.sidebarFooter, [dots, loading]);
+    } else if (pageState.error) {
+      var retry = createElement('button', 'fr-chat-loading-retry', 'Load failed. Retry');
+      retry.type = 'button';
+      retry.dataset.chatAction = 'retry-conversations';
+      this.sidebarFooter.appendChild(retry);
+    } else if (pageState.initialized && pageState.hasMore === false) {
+      this.sidebarFooter.appendChild(createElement(
+        'span',
+        'fr-chat-loading-end',
+        tab === 'system' ? 'No more notifications' : 'No more conversations'
+      ));
+    } else {
+      this.sidebarFooter.setAttribute('aria-hidden', 'true');
+    }
+    if (pageState.loading || pageState.error || pageState.hasMore === false) {
+      this.sidebarFooter.removeAttribute('aria-hidden');
+    }
+
+    global.requestAnimationFrame(function () {
+      if (this.destroyed || this.store.getState().activeTab !== tab) return;
+      this.restoringConversationScroll = true;
+      this.conversationList.scrollTop = savedScrollTop;
+      global.requestAnimationFrame(function () {
+        this.restoringConversationScroll = false;
+      }.bind(this));
+    }.bind(this));
   };
 
   ChatUI.prototype.getSelectedConversation = function (state) {
@@ -923,7 +1069,15 @@
   };
 
   ChatUI.prototype.handleSearch = function () {
-    this.store.setSearchQuery(this.searchInput.value);
+    var tab = this.store.getState().activeTab;
+    var query = this.searchInput.value;
+    this.store.setSearchQuery(query);
+    this.conversationRequestVersions[tab] += 1;
+    this.store.setConversationPageState(tab, { loading: false, error: null });
+    global.clearTimeout(this.searchTimer);
+    this.searchTimer = global.setTimeout(function () {
+      this.loadConversationPage(tab, { replace: true, query: query }).catch(function () {});
+    }.bind(this), this.options.searchDebounce);
   };
 
   ChatUI.prototype.handleComposerKeydown = function (event) {
@@ -1077,14 +1231,38 @@
     else if (action === 'confirm-dialog') this.confirmDialogAction();
     else if (action === 'retry-message') this.retryMessage(target.dataset.messageId);
     else if (action === 'load-older') this.loadOlderMessages();
+    else if (action === 'retry-conversations') {
+      var state = this.store.getState();
+      var pageState = state.conversationPagination[state.activeTab] || {};
+      this.loadConversationPage(state.activeTab, {
+        replace: !pageState.initialized,
+        query: state.searchQuery
+      }).catch(function () {});
+    }
   };
 
   ChatUI.prototype.selectTab = function (tab) {
     if (!TAB_LABELS[tab]) return;
+    var currentState = this.store.getState();
+    this.conversationScrollPositions[currentState.activeTab] = this.conversationList.scrollTop;
+    global.clearTimeout(this.searchTimer);
     this.store.setActiveTab(tab);
     var state = this.store.getState();
-    var first = this.getVisibleConversations(state)[0];
-    if (first) this.selectConversation(first.id);
+    var pageState = state.conversationPagination[tab] || {};
+    if (!pageState.initialized || pageState.query !== state.searchQuery) {
+      var initialVisible = this.getVisibleConversations(state);
+      var initialRememberedId = this.selectedConversationByTab[tab];
+      var initialSelected = initialVisible.find(function (conversation) { return conversation.id === initialRememberedId; });
+      var initialTarget = initialSelected || initialVisible[0];
+      if (initialTarget) this.selectConversation(initialTarget.id);
+      this.loadConversationPage(tab, { replace: true, query: state.searchQuery }).catch(function () {});
+      return;
+    }
+    var visible = this.getVisibleConversations(state);
+    var rememberedId = this.selectedConversationByTab[tab];
+    var selected = visible.find(function (conversation) { return conversation.id === rememberedId; });
+    var target = selected || visible[0];
+    if (target) this.selectConversation(target.id);
   };
 
   ChatUI.prototype.selectConversation = function (conversationId) {
@@ -1092,6 +1270,7 @@
     var conversation = this.store.getState().conversations.find(function (item) {
       return item.id === conversationId;
     });
+    if (conversation) this.selectedConversationByTab[conversation.type] = conversationId;
     this.store.selectConversation(conversationId);
     this.setMobileView('detail');
     this.emitHost('conversationchange', { conversationId: conversationId });
@@ -1360,8 +1539,10 @@
   ChatUI.prototype.destroy = function () {
     if (this.destroyed) return;
     this.destroyed = true;
+    global.clearTimeout(this.searchTimer);
     this.root.removeEventListener('click', this.handleRootClickBound);
     this.searchInput.removeEventListener('input', this.handleSearchBound);
+    this.conversationList.removeEventListener('scroll', this.handleConversationScrollBound);
     this.composer.removeEventListener('submit', this.handleComposerSubmitBound);
     this.messageInput.removeEventListener('keydown', this.handleComposerKeydownBound);
     this.imageInput.removeEventListener('change', this.handleFileChangeBound);

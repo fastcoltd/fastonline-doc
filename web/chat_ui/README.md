@@ -78,6 +78,9 @@ chat_ui/
 | `assetBase` | String | 否 | 组件素材目录，默认 `chat_ui/assets/` |
 | `currentUserId` | String | 是 | 当前登录用户 ID，用于确定自己发送的消息 |
 | `mobileInitialView` | `list` / `detail` | 否 | 手机端首次展示会话列表还是聊天详情，默认 `list` |
+| `conversationPageSize` | Number | 否 | 会话列表每页数量，默认 `12` |
+| `conversationLoadThreshold` | Number | 否 | 距离列表底部多少像素时加载旧数据，默认 `60` |
+| `searchDebounce` | Number | 否 | 会话搜索请求防抖时间，默认 `250ms` |
 | `disconnectOnDestroy` | Boolean | 否 | 销毁组件时是否断开 Adapter，默认 `true` |
 | `callbacks` | Object | 否 | 组件事件回调 |
 | `store` | ChatStore | 否 | 需要共享外部 Store 时传入；通常不需要 |
@@ -104,6 +107,11 @@ const initialData = {
     chat: 611,
     ticket: 417,
     system: 21
+  },
+  searchQueries: {
+    chat: '',
+    ticket: '',
+    system: ''
   },
   conversations: [],
   messages: {
@@ -146,6 +154,37 @@ const initialData = {
   }
 }
 ```
+
+### 会话列表分页
+
+Chat、Ticket、System 三个列表均采用“上新、下旧”的顺序。首次只请求最近一页并停留在顶部；滚动到列表底部时，用当前最旧会话的游标请求更早数据，并把结果追加到列表底部。
+
+```js
+adapter.loadConversations({
+  tab: 'ticket',
+  query: '',
+  direction: 'latest', // 首次为 latest，后续为 older
+  before: null,        // 后续传上一页返回的 olderCursor
+  limit: 12
+});
+```
+
+推荐返回结构：
+
+```js
+{
+  conversations: [],  // 时间倒序：最新在前、最旧在后
+  olderCursor: 'ticket:12',
+  hasMore: true,
+  tabCounts: {
+    chat: 611,
+    ticket: 417,
+    system: 21
+  }
+}
+```
+
+组件为三个分类分别保存游标、加载状态、搜索条件和滚动位置。分页结果按 `conversation.id` 去重。旧 Adapter 若直接返回数组仍然可以使用，但会被视为一次性完整结果，不再继续请求下一页。
 
 ### 消息公共结构
 
@@ -354,8 +393,12 @@ class MyChatAdapter {
 
   disconnect() {}
 
-  loadConversations({ tab, query }) {
-    return Promise.resolve([]);
+  loadConversations({ tab, query, direction, before, limit }) {
+    return Promise.resolve({
+      conversations: [],
+      olderCursor: null,
+      hasMore: false
+    });
   }
 
   loadMessages({ conversationId, before }) {
@@ -472,7 +515,7 @@ const adapter = new FastRespChat.SocketChatAdapter({
 | 事件 | payload |
 | --- | --- |
 | `connection.changed` | `{ status }` |
-| `conversation.list` | `{ conversations }` |
+| `conversation.list` | `{ tab, conversations, olderCursor, hasMore }`；服务端主动推送时可附带 `append` |
 | `message.created` | 完整领域消息 |
 | `message.ack` | `{ id, clientMessageId, status, sentAt }` |
 | `message.status` | `{ messageId, status }` |
@@ -492,6 +535,7 @@ const adapter = new FastRespChat.SocketChatAdapter({
 1. Socket URL、Cookie/Token/票据的传递方式。
 2. 心跳请求和服务端心跳响应格式。
 3. 会话列表与历史消息的分页字段。
+   会话列表必须保证返回顺序为最新到最旧，并提供稳定的 `olderCursor`。
 4. 服务端消息的单调序号或去重 ID。
 5. 客户端 `clientMessageId` 的 ACK 回传规则。
 6. sent、delivered、read 状态的事件格式。

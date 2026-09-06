@@ -11,10 +11,26 @@
 
   function createInitialState(initialState) {
     var source = initialState || {};
+    var activeTab = source.activeTab || 'ticket';
+    var searchQueries = clone(source.searchQueries || { chat: '', ticket: '', system: '' });
+    var paginationSource = source.conversationPagination || {};
+    var conversationPagination = {};
+    ['chat', 'ticket', 'system'].forEach(function (tab) {
+      conversationPagination[tab] = Object.assign({
+        olderCursor: null,
+        hasMore: true,
+        loading: false,
+        initialized: false,
+        error: null,
+        query: searchQueries[tab] || ''
+      }, clone(paginationSource[tab] || {}));
+    });
     return {
-      activeTab: source.activeTab || 'ticket',
+      activeTab: activeTab,
       tabCounts: clone(source.tabCounts || { chat: 0, ticket: 0, system: 0 }),
-      searchQuery: source.searchQuery || '',
+      searchQuery: source.searchQuery || searchQueries[activeTab] || '',
+      searchQueries: searchQueries,
+      conversationPagination: conversationPagination,
       selectedConversationId: source.selectedConversationId || null,
       conversations: clone(source.conversations || []),
       messages: clone(source.messages || {}),
@@ -64,13 +80,76 @@
 
   ChatStore.prototype.setActiveTab = function (tab) {
     this.update(function (state) {
-      return Object.assign({}, state, { activeTab: tab, searchQuery: '' });
+      return Object.assign({}, state, {
+        activeTab: tab,
+        searchQuery: state.searchQueries[tab] || ''
+      });
     });
   };
 
   ChatStore.prototype.setSearchQuery = function (query) {
     this.update(function (state) {
-      return Object.assign({}, state, { searchQuery: query || '' });
+      var value = query || '';
+      var searchQueries = Object.assign({}, state.searchQueries);
+      searchQueries[state.activeTab] = value;
+      return Object.assign({}, state, {
+        searchQuery: value,
+        searchQueries: searchQueries
+      });
+    });
+  };
+
+  ChatStore.prototype.setConversationPageState = function (tab, patch) {
+    if (!tab) return;
+    this.update(function (state) {
+      var pagination = Object.assign({}, state.conversationPagination);
+      pagination[tab] = Object.assign({}, pagination[tab] || {}, clone(patch || {}));
+      return Object.assign({}, state, {
+        conversationPagination: pagination,
+        loadingConversations: tab === state.activeTab
+          ? Boolean(pagination[tab].loading)
+          : state.loadingConversations
+      });
+    });
+  };
+
+  ChatStore.prototype.setConversationPage = function (tab, conversations, options) {
+    if (!tab) return;
+    var settings = options || {};
+    this.update(function (state) {
+      var incoming = clone(conversations || []);
+      var current = settings.append
+        ? state.conversations.filter(function (conversation) { return conversation.type === tab; })
+        : [];
+      var merged = [];
+      var indexes = new Map();
+      current.concat(incoming).forEach(function (conversation) {
+        if (!conversation || !conversation.id) return;
+        if (indexes.has(conversation.id)) {
+          var index = indexes.get(conversation.id);
+          merged[index] = Object.assign({}, merged[index], conversation);
+          return;
+        }
+        indexes.set(conversation.id, merged.length);
+        merged.push(conversation);
+      });
+      var otherTabs = state.conversations.filter(function (conversation) {
+        return conversation.type !== tab;
+      });
+      var pagination = Object.assign({}, state.conversationPagination);
+      pagination[tab] = Object.assign({}, pagination[tab] || {}, {
+        olderCursor: settings.olderCursor || null,
+        hasMore: settings.hasMore !== false,
+        loading: false,
+        initialized: true,
+        error: null,
+        query: settings.query || ''
+      });
+      return Object.assign({}, state, {
+        conversations: otherTabs.concat(merged),
+        conversationPagination: pagination,
+        loadingConversations: tab === state.activeTab ? false : state.loadingConversations
+      });
     });
   };
 
