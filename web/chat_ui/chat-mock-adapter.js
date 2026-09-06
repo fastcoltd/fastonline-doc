@@ -76,6 +76,11 @@
     return wait(this.delay, { messages: list, hasOlder: true });
   };
 
+  MockChatAdapter.prototype.loadSystemNotice = function (params) {
+    var notice = clone((this.data.systemNotices || {})[params.noticeId] || null);
+    return wait(this.delay, notice);
+  };
+
   MockChatAdapter.prototype.sendMessage = function (message) {
     var self = this;
     return wait(this.delay).then(function () {
@@ -134,6 +139,15 @@
 
   MockChatAdapter.prototype.markRead = function () {
     return wait(this.delay, { status: 'read' });
+  };
+
+  MockChatAdapter.prototype.markSystemNoticeRead = function (noticeId) {
+    var notice = this.data.systemNotices && this.data.systemNotices[noticeId];
+    if (notice) notice.read = true;
+    (this.data.conversations || []).forEach(function (conversation) {
+      if (conversation.id === noticeId) conversation.unread = 0;
+    });
+    return wait(this.delay, { noticeId: noticeId, status: 'read' });
   };
 
   MockChatAdapter.prototype.uploadAttachment = function (file, onProgress) {

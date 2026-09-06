@@ -18,6 +18,7 @@
       selectedConversationId: source.selectedConversationId || null,
       conversations: clone(source.conversations || []),
       messages: clone(source.messages || {}),
+      systemNotices: clone(source.systemNotices || {}),
       connectionStatus: source.connectionStatus || 'idle',
       loadingConversations: false,
       loadingMessages: false,
@@ -108,11 +109,76 @@
         if (conversation.id !== conversationId) return conversation;
         return Object.assign({}, conversation, { unread: 0 });
       });
+      var nextSystemNotices = Object.assign({}, state.systemNotices);
+      if (nextSystemNotices[conversationId]) {
+        nextSystemNotices[conversationId] = Object.assign({}, nextSystemNotices[conversationId], { read: true });
+      }
       return Object.assign({}, state, {
         conversations: conversations,
+        systemNotices: nextSystemNotices,
         selectedConversationId: conversationId,
         loadingMessages: true,
         error: null
+      });
+    });
+  };
+
+  ChatStore.prototype.setSystemNotice = function (noticeId, notice) {
+    if (!noticeId || !notice) return;
+    this.update(function (state) {
+      var nextSystemNotices = Object.assign({}, state.systemNotices);
+      var previousNotice = nextSystemNotices[noticeId];
+      nextSystemNotices[noticeId] = Object.assign({}, clone(notice), {
+        id: notice.id || noticeId,
+        read: Boolean(notice.read || previousNotice && previousNotice.read)
+      });
+      return Object.assign({}, state, {
+        systemNotices: nextSystemNotices,
+        loadingMessages: false
+      });
+    });
+  };
+
+  ChatStore.prototype.upsertSystemNotice = function (notice, conversation) {
+    if (!notice || !notice.id) return;
+    this.update(function (state) {
+      var nextSystemNotices = Object.assign({}, state.systemNotices);
+      nextSystemNotices[notice.id] = clone(notice);
+      var summary = conversation || {
+        id: notice.id,
+        type: 'system',
+        title: notice.title || 'System notification',
+        preview: notice.publishedAtLabel || notice.publishedAt || '',
+        unread: notice.read ? 0 : 1,
+        participants: [],
+        order: null
+      };
+      var conversations = state.conversations.slice();
+      var index = conversations.findIndex(function (item) { return item.id === summary.id; });
+      if (index >= 0) conversations[index] = Object.assign({}, conversations[index], clone(summary));
+      else conversations.unshift(clone(summary));
+      return Object.assign({}, state, {
+        systemNotices: nextSystemNotices,
+        conversations: conversations
+      });
+    });
+  };
+
+  ChatStore.prototype.markSystemNoticeRead = function (noticeId) {
+    if (!noticeId) return;
+    this.update(function (state) {
+      var nextSystemNotices = Object.assign({}, state.systemNotices);
+      if (nextSystemNotices[noticeId]) {
+        nextSystemNotices[noticeId] = Object.assign({}, nextSystemNotices[noticeId], { read: true });
+      }
+      var conversations = state.conversations.map(function (conversation) {
+        return conversation.id === noticeId
+          ? Object.assign({}, conversation, { unread: 0 })
+          : conversation;
+      });
+      return Object.assign({}, state, {
+        systemNotices: nextSystemNotices,
+        conversations: conversations
       });
     });
   };

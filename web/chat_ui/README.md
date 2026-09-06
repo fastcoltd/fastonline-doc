@@ -109,6 +109,9 @@ const initialData = {
   messages: {
     'ticket-2': []
   },
+  systemNotices: {
+    'system-1': {}
+  },
   hasOlderMessages: true,
   orderClosed: false
 };
@@ -212,7 +215,7 @@ const initialData = {
 }
 ```
 
-### 系统消息
+### 会话内系统提示
 
 ```js
 {
@@ -224,6 +227,64 @@ const initialData = {
   }
 }
 ```
+
+此类型只用于 Chat/Ticket 消息流中的居中状态提示，不等同于 System 分类中的只读通知。
+
+### System 只读通知
+
+System 分类不会渲染聊天消息、订单栏、输入框或业务操作按钮。左侧仍使用 `type: 'system'` 的会话摘要，右侧内容来自 `systemNotices`：
+
+```js
+{
+  id: 'system-1',
+  title: 'Ullam ut laudantium animi voluptas.',
+  publisher: 'FASTRESP Team',
+  publishedAt: '2026/09/06 14:30',
+  publishedAtLabel: 'just now',
+  read: false,
+  blocks: [
+    {
+      type: 'paragraph',
+      text: 'Notification body. See https://www.fastresp.com for details.'
+    },
+    {
+      type: 'image',
+      url: 'https://cdn.example.com/notice.jpg',
+      previewUrl: 'https://cdn.example.com/notice-large.jpg',
+      alt: 'Notification image'
+    },
+    {
+      type: 'link',
+      label: 'View details',
+      url: 'https://www.fastresp.com'
+    },
+    {
+      type: 'file',
+      name: 'notice.pdf',
+      url: 'https://cdn.example.com/notice.pdf',
+      size: 23819
+    }
+  ]
+}
+```
+
+支持的只读内容块为 `paragraph`、`image`、`link` 和 `file`。段落内的 HTTP、HTTPS、mailto 地址会自动转为链接；图片可预览，附件可下载。不要向 `blocks` 传入 HTML 字符串。
+
+System 列表摘要建议使用：
+
+```js
+{
+  id: 'system-1',
+  type: 'system',
+  title: 'Notification list title',
+  preview: 'just now',
+  unread: 1,
+  participants: [],
+  order: null
+}
+```
+
+选择通知后组件会立即清除本地未读红点，并调用 Adapter 的 `markSystemNoticeRead()`。`tabCounts.system` 由业务端维护，可表示总数或未读数，组件不会自行推断其含义。
 
 ### 退款、换货与关闭申请
 
@@ -304,6 +365,10 @@ class MyChatAdapter {
     });
   }
 
+  loadSystemNotice({ noticeId }) {
+    return Promise.resolve(systemNotices[noticeId]);
+  }
+
   sendMessage(message) {
     return Promise.resolve({
       id: 'server-id',
@@ -324,6 +389,10 @@ class MyChatAdapter {
 
   markRead(conversationId, messageId) {
     return Promise.resolve();
+  }
+
+  markSystemNoticeRead(noticeId) {
+    return Promise.resolve({ noticeId, status: 'read' });
   }
 
   uploadAttachment(file, onProgress) {
@@ -409,6 +478,9 @@ const adapter = new FastRespChat.SocketChatAdapter({
 | `message.status` | `{ messageId, status }` |
 | `workflow.updated` | `{ messageId, workflow }` |
 | `order.closed` | `{ closed: true }` |
+| `system.notification.new` | `{ notice, conversation }`，新增通知和左侧摘要 |
+| `system.notification.update` | `{ notice, conversation? }`，更新通知内容 |
+| `system.notification.read` | `{ noticeId }`，同步已读状态 |
 | `adapter.error` | Adapter Error |
 
 连接状态可用值：`idle`、`connecting`、`online`、`reconnecting`、`offline`。
@@ -427,6 +499,7 @@ const adapter = new FastRespChat.SocketChatAdapter({
 8. 断线期间发送消息的服务端处理规则。
 9. 图片/文件上传接口、大小限制、MIME 白名单和 URL 有效期。
 10. 关闭订单后服务端是否拒绝新消息和业务操作。
+11. 系统通知详情、未读状态和 `system.notification.*` 事件的字段映射。
 
 ## 9. 组件事件
 
@@ -499,7 +572,7 @@ FastRespChat.mount(root, {
 }
 ```
 
-`768px` 以下自动进入手机模式：首次显示会话列表，选择会话后显示详情，并通过返回按钮回到列表。PC 与 Mobile 使用同一套消息 DOM 和数据。
+`768px` 以下自动进入手机模式：首次显示会话列表，选择会话后显示详情，并通过返回按钮回到列表。PC 与 Mobile 使用同一套消息 DOM 和数据。System 详情保持只读，不会在移动端恢复输入框或业务按钮。
 
 ## 11. 多实例
 

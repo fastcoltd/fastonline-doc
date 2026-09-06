@@ -190,6 +190,9 @@
     this.messageList = createElement('ol', 'fr-chat-message-list');
     this.messageList.setAttribute('aria-label', 'Messages');
     this.messageViewport.appendChild(this.messageList);
+    this.systemNoticeViewport = createElement('section', 'fr-chat-system-notice-viewport');
+    this.systemNoticeViewport.setAttribute('aria-label', 'System notification detail');
+    this.systemNoticeViewport.hidden = true;
 
     this.attachmentTray = createElement('section', 'fr-chat-attachment-tray');
     this.attachmentTray.setAttribute('aria-label', 'Selected attachments');
@@ -199,6 +202,7 @@
       this.orderHeader,
       this.connectionBanner,
       this.messageViewport,
+      this.systemNoticeViewport,
       this.attachmentTray,
       this.composerToolbar,
       this.composer
@@ -406,6 +410,11 @@
       this.store.setOrderClosed(conversationId || this.store.getState().selectedConversationId, payload.closed !== false);
     } else if (event.type === 'conversation.list') {
       this.store.setConversations(payload.conversations || payload);
+    } else if (event.type === 'system.notification.new' || event.type === 'system.notification.update') {
+      var notice = payload.notice || payload;
+      this.store.upsertSystemNotice(notice, payload.conversation);
+    } else if (event.type === 'system.notification.read') {
+      this.store.markSystemNoticeRead(payload.noticeId || conversationId);
     } else if (event.type === 'adapter.error') {
       this.reportError(event.error || new Error('Chat adapter error.'));
     }
@@ -414,12 +423,22 @@
   ChatUI.prototype.render = function () {
     if (this.destroyed) return;
     var state = this.store.getState();
+    var systemMode = state.activeTab === 'system';
+    this.root.classList.toggle('is-system-view', systemMode);
+    this.messageViewport.hidden = systemMode;
+    this.systemNoticeViewport.hidden = !systemMode;
+    this.attachmentTray.hidden = systemMode;
+    this.composerToolbar.hidden = systemMode;
+    this.composer.hidden = systemMode;
     this.renderTabs(state);
     this.renderConversationList(state);
     this.renderOrderHeader(state);
     this.renderConnection(state);
-    this.renderMessages(state);
-    this.renderAttachments();
+    if (systemMode) this.renderSystemNotice(state);
+    else {
+      this.renderMessages(state);
+      this.renderAttachments();
+    }
     this.renderComposerState(state);
   };
 
@@ -441,7 +460,12 @@
       if (conversation.type !== state.activeTab) return false;
       if (!query) return true;
       var participants = (conversation.participants || []).map(function (person) { return person.name; }).join(' ');
-      return (conversation.title + ' ' + conversation.preview + ' ' + participants).toLowerCase().indexOf(query) >= 0;
+      var notice = state.systemNotices[conversation.id] || {};
+      var noticeText = (notice.blocks || []).map(function (block) {
+        return block && (block.text || block.label || block.name || block.url) || '';
+      }).join(' ');
+      return (conversation.title + ' ' + conversation.preview + ' ' + participants + ' ' + noticeText)
+        .toLowerCase().indexOf(query) >= 0;
     });
   };
 
@@ -461,20 +485,25 @@
       button.dataset.chatAction = 'select-conversation';
       button.dataset.conversationId = conversation.id;
       button.classList.toggle('is-active', selected);
+      button.classList.toggle('is-system-notice', conversation.type === 'system');
       button.setAttribute('aria-current', selected ? 'true' : 'false');
       var title = createElement('strong', null, conversation.title);
       var preview = createElement('span', 'fr-chat-conversation-preview', conversation.preview);
-      var meta = createElement('span', 'fr-chat-conversation-meta');
-      (conversation.participants || []).forEach(function (person, index) {
-        if (index) meta.appendChild(document.createTextNode(', '));
-        var name = createElement('span', null, person.name);
-        name.dataset.role = person.role || 'customer';
-        meta.appendChild(name);
-      });
-      appendChildren(button, [title, preview, meta]);
+      appendChildren(button, [title, preview]);
+      if (conversation.type !== 'system') {
+        var meta = createElement('span', 'fr-chat-conversation-meta');
+        (conversation.participants || []).forEach(function (person, index) {
+          if (index) meta.appendChild(document.createTextNode(', '));
+          var name = createElement('span', null, person.name);
+          name.dataset.role = person.role || 'customer';
+          meta.appendChild(name);
+        });
+        button.appendChild(meta);
+      }
       if (conversation.unread) {
-        var unread = createElement('span', 'fr-chat-unread', conversation.unread > 99 ? '99+' : conversation.unread);
-        unread.setAttribute('aria-label', conversation.unread + ' unread messages');
+        var unread = createElement('span', 'fr-chat-unread', conversation.type === 'system' ? '' : (conversation.unread > 99 ? '99+' : conversation.unread));
+        unread.classList.toggle('is-dot', conversation.type === 'system');
+        unread.setAttribute('aria-label', conversation.type === 'system' ? 'Unread notification' : conversation.unread + ' unread messages');
         button.appendChild(unread);
       }
       item.appendChild(button);
@@ -498,7 +527,9 @@
   ChatUI.prototype.renderOrderHeader = function (state) {
     var conversation = this.getSelectedConversation(state);
     var order = conversation && conversation.order;
+    var systemMode = state.activeTab === 'system';
     this.orderHeader.textContent = '';
+    this.orderHeader.classList.toggle('is-system-notice-header', systemMode);
 
     var back = createElement('button', 'fr-chat-mobile-back', '‹');
     back.type = 'button';
@@ -507,10 +538,14 @@
     this.orderHeader.appendChild(back);
 
     var details = createElement('div', 'fr-chat-order-details');
-    var heading = createElement('h1', null, order ? '工单 - 订单 #' + order.id : (conversation ? conversation.title : 'Select a conversation'));
+    var notice = conversation && state.systemNotices[conversation.id];
+    var headingText = systemMode
+      ? (notice && notice.title || conversation && conversation.title || 'Select a system notification')
+      : (order ? '工单 - 订单 #' + order.id : (conversation ? conversation.title : 'Select a conversation'));
+    var heading = createElement('h1', null, headingText);
     details.appendChild(heading);
 
-    if (order) {
+    if (order && !systemMode) {
       var meta = createElement('div', 'fr-chat-order-meta');
       var product = createElement('strong', 'fr-chat-order-product');
       var productIcon = createElement('span', null, '▰');
@@ -538,7 +573,7 @@
   ChatUI.prototype.renderConnection = function (state) {
     var status = state.connectionStatus;
     this.connectionBanner.dataset.status = status;
-    if (status === 'online' || status === 'idle') {
+    if (state.activeTab === 'system' || status === 'online' || status === 'idle') {
       this.connectionBanner.textContent = '';
       this.connectionBanner.hidden = true;
       return;
@@ -627,6 +662,73 @@
     var time = createElement('time', null, message.sentAt || '');
     appendChildren(item, [text, time]);
     return item;
+  };
+
+  ChatUI.prototype.renderSystemNotice = function (state) {
+    var conversation = this.getSelectedConversation(state);
+    var notice = conversation && state.systemNotices[conversation.id];
+    this.systemNoticeViewport.textContent = '';
+
+    if (!conversation || conversation.type !== 'system') {
+      this.systemNoticeViewport.appendChild(createElement('p', 'fr-chat-system-notice-empty', 'Select a system notification to view.'));
+      return;
+    }
+    if (!notice) {
+      this.systemNoticeViewport.appendChild(createElement('p', 'fr-chat-system-notice-empty', state.loadingMessages ? 'Loading notification…' : 'Notification content is unavailable.'));
+      return;
+    }
+
+    var article = createElement('article', 'fr-chat-system-notice-detail');
+    var body = createElement('div', 'fr-chat-system-notice-body');
+    (notice.blocks || []).forEach(function (block) {
+      if (!block || !block.type) return;
+      if (block.type === 'paragraph') {
+        var paragraph = createElement('p');
+        appendLinkedText(paragraph, block.text || '');
+        body.appendChild(paragraph);
+      } else if (block.type === 'image') {
+        var imageUrl = safeUrl(block.url, { allowImageData: true });
+        if (!imageUrl) return;
+        var preview = createElement('button', 'fr-chat-system-notice-image');
+        preview.type = 'button';
+        preview.dataset.chatAction = 'preview-image';
+        preview.dataset.imageUrl = safeUrl(block.previewUrl || block.url, { allowImageData: true });
+        preview.setAttribute('aria-label', 'Preview ' + (block.alt || 'notification image'));
+        var image = createElement('img');
+        image.src = imageUrl;
+        image.alt = block.alt || 'System notification image';
+        image.loading = 'lazy';
+        preview.appendChild(image);
+        body.appendChild(preview);
+      } else if (block.type === 'link') {
+        var linkUrl = safeUrl(block.url);
+        if (!linkUrl) return;
+        var link = createElement('a', 'fr-chat-system-notice-link', block.label || block.url);
+        link.href = linkUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        body.appendChild(link);
+      } else if (block.type === 'file') {
+        var fileUrl = safeUrl(block.url);
+        if (!fileUrl) return;
+        var file = createElement('a', 'fr-chat-system-notice-file');
+        file.href = fileUrl;
+        file.target = '_blank';
+        file.rel = 'noopener noreferrer';
+        file.download = block.download === false ? '' : (block.name || '');
+        appendChildren(file, [
+          createElement('strong', null, block.name || 'Download attachment'),
+          createElement('span', null, formatBytes(block.size))
+        ]);
+        body.appendChild(file);
+      }
+    });
+
+    var footer = createElement('footer', 'fr-chat-system-notice-footer');
+    footer.appendChild(createElement('strong', null, notice.publisher || 'FASTRESP Team'));
+    footer.appendChild(createElement('time', null, notice.publishedAtLabel || notice.publishedAt || ''));
+    appendChildren(article, [body, footer]);
+    this.systemNoticeViewport.appendChild(article);
   };
 
   ChatUI.prototype.renderParticipant = function (person) {
@@ -806,17 +908,18 @@
   ChatUI.prototype.renderComposerState = function (state) {
     var conversation = this.getSelectedConversation(state);
     var closed = Boolean(conversation && conversation.order && conversation.order.closed);
-    this.messageInput.disabled = closed || !conversation;
-    this.sendButton.disabled = closed || !conversation;
-    this.imageInput.disabled = closed || !conversation;
-    this.fileInput.disabled = closed || !conversation;
+    var readOnly = state.activeTab === 'system';
+    this.messageInput.disabled = readOnly || closed || !conversation;
+    this.sendButton.disabled = readOnly || closed || !conversation;
+    this.imageInput.disabled = readOnly || closed || !conversation;
+    this.fileInput.disabled = readOnly || closed || !conversation;
     Array.from(this.composerToolbar.querySelectorAll('.fr-chat-composer-modes button')).forEach(function (button) {
-      button.disabled = closed || !conversation;
+      button.disabled = readOnly || closed || !conversation;
     });
     Array.from(this.composerToolbar.querySelectorAll('.fr-chat-quick-actions button')).forEach(function (button) {
-      button.disabled = closed || !conversation || !conversation.order;
+      button.disabled = readOnly || closed || !conversation || !conversation.order;
     });
-    this.messageInput.placeholder = closed ? 'This order is closed.' : 'Write a message...';
+    this.messageInput.placeholder = readOnly ? 'System notifications are read-only.' : (closed ? 'This order is closed.' : 'Write a message...');
   };
 
   ChatUI.prototype.handleSearch = function () {
@@ -846,7 +949,7 @@
     if (event && typeof event.preventDefault === 'function') event.preventDefault();
     var state = this.store.getState();
     var conversation = this.getSelectedConversation(state);
-    if (!conversation || (conversation.order && conversation.order.closed)) return;
+    if (state.activeTab === 'system' || !conversation || (conversation.order && conversation.order.closed)) return;
     var text = this.messageInput.value.trim();
     var attachments = this.attachments.slice();
     if (!text && !attachments.length) {
@@ -986,9 +1089,30 @@
 
   ChatUI.prototype.selectConversation = function (conversationId) {
     var self = this;
+    var conversation = this.store.getState().conversations.find(function (item) {
+      return item.id === conversationId;
+    });
     this.store.selectConversation(conversationId);
     this.setMobileView('detail');
     this.emitHost('conversationchange', { conversationId: conversationId });
+    if (conversation && conversation.type === 'system') {
+      var loadNotice = this.adapter && typeof this.adapter.loadSystemNotice === 'function'
+        ? this.adapter.loadSystemNotice({ noticeId: conversationId })
+        : Promise.resolve(this.store.getState().systemNotices[conversationId]);
+      loadNotice.then(function (notice) {
+        if (notice) self.store.setSystemNotice(conversationId, notice.notice || notice);
+        else self.store.setLoading('loadingMessages', false);
+      }).catch(function (error) {
+        self.store.setLoading('loadingMessages', false);
+        self.reportError(error);
+      });
+      if (this.adapter && typeof this.adapter.markSystemNoticeRead === 'function') {
+        this.adapter.markSystemNoticeRead(conversationId).catch(function (error) {
+          self.reportError(error);
+        });
+      }
+      return;
+    }
     if (this.adapter && typeof this.adapter.loadMessages === 'function') {
       this.adapter.loadMessages({ conversationId: conversationId }).then(function (result) {
         var normalized = normalizeLoadMessagesResult(result);
@@ -1254,7 +1378,7 @@
     this.objectUrls.forEach(function (url) { URL.revokeObjectURL(url); });
     this.objectUrls.clear();
     this.root.textContent = '';
-    this.root.classList.remove('fr-chat', 'is-conversation-list', 'is-chat-detail');
+    this.root.classList.remove('fr-chat', 'is-conversation-list', 'is-chat-detail', 'is-system-view');
   };
 
   namespace.mount = function (root, options) {

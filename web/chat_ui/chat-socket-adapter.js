@@ -197,6 +197,13 @@
     });
   };
 
+  SocketChatAdapter.prototype.loadSystemNotice = function (params) {
+    return this.sendFrame({
+      type: 'system.notification.get',
+      payload: { noticeId: params.noticeId }
+    });
+  };
+
   SocketChatAdapter.prototype.sendMessage = function (message) {
     return this.sendFrame({
       type: 'message.send',
@@ -218,6 +225,13 @@
       type: 'message.read',
       conversationId: conversationId,
       payload: { messageId: messageId }
+    }, false);
+  };
+
+  SocketChatAdapter.prototype.markSystemNoticeRead = function (noticeId) {
+    return this.sendFrame({
+      type: 'system.notification.read',
+      payload: { noticeId: noticeId }
     }, false);
   };
 

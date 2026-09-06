@@ -12,7 +12,7 @@
       { id: 'service', name: 'Customer service', role: 'service', avatarUrl: assetBase + 'avatar-service.jpg', presence: 'online' },
       { id: 'shop-owner', name: 'Shop owner', role: 'store', avatarUrl: assetBase + 'avatar-customer.jpg', presence: 'online' }
     ];
-    return Array.from({ length: 12 }).map(function (_, index) {
+    var ticketConversations = Array.from({ length: 12 }).map(function (_, index) {
       var id = 'ticket-' + (index + 1);
       return {
         id: id,
@@ -32,7 +32,8 @@
           closed: false
         }
       };
-    }).concat([
+    });
+    var directConversations = [
       {
         id: 'chat-1',
         type: 'chat',
@@ -41,17 +42,45 @@
         participants: [people[0], { id: 'sophie', name: 'Sophie', role: 'customer', avatarUrl: assetBase + 'avatar-customer.jpg', presence: 'online' }],
         unread: 2,
         order: null
-      },
-      {
-        id: 'system-1',
-        type: 'system',
-        title: 'System notification',
-        preview: 'Your order status has changed.',
-        participants: [],
-        unread: 1,
-        order: null
       }
-    ]);
+    ];
+    var systemConversations = Array.from({ length: 10 }).map(function (_, index) {
+      return {
+        id: 'system-' + (index + 1),
+        type: 'system',
+        title: 'Quibusdam quo qui sapiente conse quatur',
+        preview: 'just now',
+        participants: [],
+        unread: index === 0 ? 0 : 1,
+        order: null
+      };
+    });
+    return ticketConversations.concat(directConversations, systemConversations);
+  }
+
+  function buildSystemNotices(assetBase) {
+    var paragraph = 'Quibusdam quo qui sapiente consequatur dolores maiores dolores. Incidunt quia et in dolorem aliquid quibusdam. Voluptas quaerat voluptas sunt quis voluptate nobis aut accusamus rem. Qui molestiae quam itaque repellendus nulla eos ut exercitationem aut. Ipsa nihil est molestiae aut neque eveniet consectetur cumque enim. Porro magnam unde aut non sed. Qui explicabo illo. Aliquam debitis sint non. Amet animi officia quia ex voluptatem quia velit. Quo dolores deleniti eligendi aspernatur nobis et quasi accusamus ratione. Sunt odit quos rerum ut in. Esse autem autem possimus similique alias dolores ipsa at. Magnam placeat rerum.';
+    return Array.from({ length: 10 }).reduce(function (notices, _, index) {
+      var id = 'system-' + (index + 1);
+      notices[id] = {
+        id: id,
+        title: 'Ullam ut laudantium animi voluptas.',
+        publisher: 'FASTRESP Team',
+        publishedAt: '2026/09/06 14:30',
+        publishedAtLabel: 'just now',
+        read: index === 0,
+        blocks: [
+          { type: 'paragraph', text: paragraph },
+          {
+            type: 'image',
+            url: assetBase + 'chat-image-sample.jpg',
+            previewUrl: assetBase + 'chat-image-sample.jpg',
+            alt: 'Fashion landing page preview'
+          }
+        ]
+      };
+      return notices;
+    }, {});
   }
 
   function sender(id, name, role, avatarUrl, presence) {
@@ -210,6 +239,7 @@
       tabCounts: { chat: 611, ticket: 417, system: 21 },
       conversations: buildConversations(assetBase),
       messages: buildMessages(assetBase),
+      systemNotices: buildSystemNotices(assetBase),
       hasOlderMessages: true,
       orderClosed: false
     };
