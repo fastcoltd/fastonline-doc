@@ -21,7 +21,11 @@ function isLocalCssOrJsAsset(url) {
     return false;
   }
   const normalized = pathPart.replace(/^\.\//, "");
-  if (!(normalized.startsWith("css/") || normalized.startsWith("js/"))) {
+  if (!(
+    normalized.startsWith("css/") ||
+    normalized.startsWith("js/") ||
+    normalized.startsWith("chat_ui/")
+  )) {
     return false;
   }
   return normalized.endsWith(".css") || normalized.endsWith(".js");

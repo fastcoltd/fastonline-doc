@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="title" content="FastResp Chat" />
+    <meta name="description" content="FastResp portable ecommerce chat UI" />
+    <title>FastResp Chat</title>
+    <link rel="icon" href="image/logo.jpg" type="image/x-icon" />
+    <link rel="stylesheet" href="chat_ui/chat-ui.css?v=20260906063324" />
+</head>
+
+<body class="fr-chat-page">
+    <section class="fr-chat" data-chat-root aria-label="Order conversations">
+    <p data-chat-fallback>Loading chat…</p>
+    <noscript>JavaScript is required to use the chat.</noscript>
+</section>
+
+
+    <script src="chat_ui/chat-store.js?v=20260906063324"></script>
+    <script src="chat_ui/chat-protocol-bridge.js?v=20260906063324"></script>
+    <script src="chat_ui/chat-socket-adapter.js?v=20260906063324"></script>
+    <script src="chat_ui/chat-mock-adapter.js?v=20260906063324"></script>
+    <script src="chat_ui/chat-demo-data.js?v=20260906063324"></script>
+    <script src="chat_ui/chat-ui.js?v=20260906063324"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var data = window.FastRespChatDemoData.create({ assetBase: 'chat_ui/assets/' });
+            var adapter = new window.FastRespChat.MockChatAdapter(data);
+            window.fastRespChatDemo = window.FastRespChat.mount(
+                document.querySelector('[data-chat-root]'),
+                {
+                    adapter: adapter,
+                    initialData: data,
+                    assetBase: 'chat_ui/assets/',
+                    currentUserId: 'me'
+                }
+            );
+        });
+    </script>
+</body>
+
+</html>
