@@ -59,16 +59,34 @@ class HomeMenu {
         this.menuContainer.style.display = 'flex';
         this.menuContainer.style.top = rect.height + 2 + 'px';
         this.menuButton.classList.toggle('active', true);
-        $(this.menuButton).find('.top-menu-more-box-left').css({
-            left: this.menuButton.offsetLeft - this.menuContent.scrollLeft > 0 ?`${this.menuButton.offsetLeft - this.menuContent.scrollLeft}px` : '0px'
-        })
-        $(this.menuButton).find('.top-menu-more-box-center').css({
-            left: '50%',
-            transform: 'translateX(-50%)'
-        })
-        $(this.menuButton).find('.top-menu-more-box-right').css({
-            right: rect.width - this.menuButton.offsetLeft - $(this.menuButton).width()/2 > 0 ? `${rect.width - this.menuButton.offsetLeft - $(this.menuButton).width()/2}px` : '0px'
-        })
+        this.positionMenuContainer();
+    }
+
+    // 浮窗展开方向按当前分类在屏幕上的实时位置算（service 条可横向滚动，不能在模板里写死方向）：
+    // 分类中心落在视口左 1/3 → 从它左缘往右展开；中间 1/3 → 以它为中心；右 1/3 → 右缘对齐、往左展开。
+    // 最后统一夹在视口内（两边各留 16px），配合 CSS 的 max-width 保证不顶出屏幕。
+    positionMenuContainer() {
+        if (!this.menuContainer) { return }
+        const vw = document.documentElement.clientWidth
+        const btnRect = this.menuButton.getBoundingClientRect()
+        const boxWidth = Math.min(this.menuContainer.offsetWidth, vw - 32)
+        const btnCenter = btnRect.left + btnRect.width / 2
+        const offsetParent = this.menuContainer.offsetParent || this.menuButton.offsetParent
+        const parentLeft = offsetParent ? offsetParent.getBoundingClientRect().left : 0
+
+        let desiredLeft
+        if (btnCenter < vw / 3) {
+            desiredLeft = btnRect.left
+        } else if (btnCenter > vw * 2 / 3) {
+            desiredLeft = btnRect.right - boxWidth
+        } else {
+            desiredLeft = btnCenter - boxWidth / 2
+        }
+        desiredLeft = Math.max(16, Math.min(desiredLeft, vw - boxWidth - 16))
+
+        this.menuContainer.style.right = 'auto'
+        this.menuContainer.style.transform = 'none'
+        this.menuContainer.style.left = (desiredLeft - parentLeft) + 'px'
     }
 
     hideSiblingMenusImmediately() {
