@@ -34,8 +34,14 @@ LinkRef.prototype.setup = function () {
     this.pageIndexs.forEach((item) => {
         item.addEventListener("click", (e) => {
             e.stopPropagation();
+            // 拦掉 <a href="#xxx"> 的原生锚点跳转，否则它会先跳到 section 顶部（不扣 sticky 头高度），
+            // 把下面 scrollToSection 算好的带偏移滚动冲掉，section 被卡在 sticky 头后面看不见。
+            e.preventDefault();
             const value = this.getLinkValue(e.currentTarget);
             this.scrollToSection(value);
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, '', '#' + value);
+            }
         });
     });
     // 修正滚动事件监听器的绑定问题
@@ -50,6 +56,19 @@ LinkRef.prototype.setup = function () {
             this.updateActiveLink();
         }
     });
+
+    // 深链接（#xxx 直接打开/刷新）：原生跳转不扣 sticky 头高度，section 会被顶部 sticky 头挡住。
+    // 原生 hash 滚动可能在 load 之后才发生，这里在 load 之后再用带偏移的滚动纠正一次。
+    if (window.location.hash && window.location.hash.length > 1) {
+        const hashValue = decodeURIComponent(window.location.hash.slice(1));
+        const hasSection = Array.prototype.some.call(this.sections, (s) => s.id === hashValue);
+        if (hasSection) {
+            const correct = () => this.scrollToSection(hashValue);
+            // 原生 hash 滚动时机不定，多打几拍，最后一拍压在浏览器那次之后。
+            [80, 250, 600].forEach((d) => setTimeout(correct, d));
+            window.addEventListener('load', () => setTimeout(correct, 80), { once: true });
+        }
+    }
 }
 
 // 更新激活的导航链接
