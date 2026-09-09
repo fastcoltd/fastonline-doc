@@ -49,6 +49,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         } else if (action === 'tip-error') {
             feedback.tip.error('操作失败，请稍后重试。');
+        } else if (action === 'tip-custom-width') {
+            feedback.tip.info({
+                title: '自定义宽度提示',
+                description: '该示例宽度为 720px；当内容较长或屏幕较窄时，文案会在可用区域内自动换行。',
+                width: 720
+            });
         }
     }
 

@@ -27,6 +27,25 @@
         return Object.assign({ type: fallbackType }, value || {});
     }
 
+    function normalizeTipWidth(value) {
+        if (value === undefined || value === null || value === '') {
+            return '500px';
+        }
+        if (typeof value === 'number') {
+            return Number.isFinite(value) && value > 0 ? value + 'px' : '500px';
+        }
+        var width = String(value).trim();
+        if (!width || width === 'auto') {
+            return '500px';
+        }
+        if (global.CSS && typeof global.CSS.supports === 'function') {
+            return global.CSS.supports('width', width) ? width : '500px';
+        }
+        return /^(?:\d+(?:\.\d+)?)(?:px|rem|em|vw|vh|vmin|vmax|%)$/.test(width)
+            ? width
+            : '500px';
+    }
+
     function resolveElement(value, optionName) {
         if (!value) {
             return null;
@@ -129,6 +148,7 @@
         tip.className = 'fr-tip fr-tip--' + type
             + (description ? ' fr-tip--detailed' : '')
             + (options.actionText ? ' fr-tip--with-action' : '');
+        tip.style.setProperty('--fr-tip-width', normalizeTipWidth(options.width));
         tip.dataset.feedbackId = id;
         tip.setAttribute('role', type === 'error' || type === 'warning' ? 'alert' : 'status');
         tip.setAttribute('aria-atomic', 'true');

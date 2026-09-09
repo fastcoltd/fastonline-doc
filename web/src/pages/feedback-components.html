@@ -35,6 +35,7 @@
                     <button type="button" data-demo-action="tip-info" data-demo-type="info">Info Tip</button>
                     <button type="button" data-demo-action="tip-warning" data-demo-type="warning">Warning Tip</button>
                     <button type="button" data-demo-action="tip-error" data-demo-type="error">Error Tip</button>
+                    <button type="button" data-demo-action="tip-custom-width" data-demo-type="info">720px Tip</button>
                 </div>
 
                 <section data-demo-role="preview" aria-labelledby="tip-preview-title">
@@ -52,6 +53,7 @@ FastFeedback.tip.warning({
     description: '部分字段尚未填写完整。',
     actionText: '查看',
     duration: 4000,
+    width: 500,
     onAction: function (tip) {
         tip.close();
     }
@@ -86,6 +88,7 @@ FastFeedback.tip.warning({
 &lt;script src&#61;&quot;js/feedback-components.js&quot;&gt;&lt;/script&gt;</code></pre>
                 <ul data-demo-role="notes">
                     <li>Tip 类型：success、info、warning、error。</li>
+                    <li>Tip 默认宽度为 500px；width 支持像素数字或合法的 CSS 宽度字符串。</li>
                     <li>duration 默认 4000；设置为 0 时不会自动消失。</li>
                     <li>Alert 的 onConfirm 可以返回 Promise；处理期间按钮会自动进入禁用状态。</li>
                     <li>onConfirm 返回 false 或 Promise 解析为 false 时，弹框保持显示。</li>

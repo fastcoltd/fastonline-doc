@@ -20,6 +20,7 @@ FastFeedback.tip.warning({
     description: '部分字段尚未填写完整。',
     actionText: '查看',
     duration: 4000,
+    width: 500,
     closable: true,
     closeOnAction: false,
     onAction: function (tip) {
@@ -41,7 +42,7 @@ FastFeedback.tip.warning({
 - `FastFeedback.tip.close(id)`
 - `FastFeedback.tip.clear([container])`
 
-`duration` 默认为 `4000` 毫秒；设为 `0` 时不会自动关闭。传入 `container` 元素或选择器后，可将 Tip 以内嵌形式挂载到指定容器，适合组件预览和文档页面。
+`duration` 默认为 `4000` 毫秒；设为 `0` 时不会自动关闭。`width` 默认为 `500px`，传入数字时按像素处理，也可以传入 `32rem`、`80vw`、`100%` 等合法 CSS 宽度字符串。实际宽度不会超过当前容器或移动端可视区域，标题和描述会自动换行。传入 `container` 元素或选择器后，可将 Tip 以内嵌形式挂载到指定容器，适合组件预览和文档页面。
 
 ## Alert
 
