@@ -1159,14 +1159,16 @@ button {
     background: #fff;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 12.5rem;
+    /* 12.5rem 太宽，8 组字母全有时会超过 1440 主体区，收到 6.25rem。 */
+    gap: 6.25rem;
     cursor: pointer;
     border-bottom-left-radius: 5rem;
     border-bottom-right-radius: 5rem;
     border: var(--gray-color) solid 0.5px;
     border-top: none;
-    /* 品牌很多时浮窗不能顶出屏幕：限死不超过视口（两侧各留 2rem），超出的靠 overflow-x 内部横向滚动。 */
-    max-width: calc(100vw - 4rem);
+    /* 浮窗永远不超出 1440 主体区（--container-width），也不超出视口；组数/品牌再多超出的靠 overflow-x
+       内部横向滚动。展开方向 + 最终 left 由 js/homemenu.js positionMenuContainer 现算。 */
+    max-width: min(calc(100vw - 4rem), var(--container-width));
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;

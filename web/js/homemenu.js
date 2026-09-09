@@ -62,31 +62,40 @@ class HomeMenu {
         this.positionMenuContainer();
     }
 
-    // 浮窗展开方向按当前分类在屏幕上的实时位置算（service 条可横向滚动，不能在模板里写死方向）：
-    // 分类中心落在视口左 1/3 → 从它左缘往右展开；中间 1/3 → 以它为中心；右 1/3 → 右缘对齐、往左展开。
-    // 最后统一夹在视口内（两边各留 16px），配合 CSS 的 max-width 保证不顶出屏幕。
+    // 浮窗展开方向 + 最终位置，按当前分类在「1440 主体区」里的实时位置算（service 条可横向滚动，
+    // 不能在模板里写死方向）。参照系是 .top-menu 这层（max-width: var(--container-width)、水平居中，
+    // 也是浮窗的 offsetParent），不是整个视口——用户明确要求"凡是超出中间主体区域都要处理"：
+    //   · 分类中心在主体区左 1/3   → 从它左缘往右展开
+    //   · 分类中心在主体区中间 1/3 → 以它为中心
+    //   · 分类中心在主体区右 1/3   → 右缘对齐、往左展开
+    // 最后把浮窗夹在主体区内（[containerLeft, containerRight - boxWidth]），配合 CSS 的
+    // max-width: min(100vw - 4rem, --container-width) 保证 8 组字母这种超宽情况也不顶出主体区。
     positionMenuContainer() {
         if (!this.menuContainer) { return }
-        const vw = document.documentElement.clientWidth
+        const container = this.menuButton.closest('.top-menu')
+            || this.menuContainer.offsetParent
+            || this.menuButton.offsetParent
+        if (!container) { return }
+        const cRect = container.getBoundingClientRect()
         const btnRect = this.menuButton.getBoundingClientRect()
-        const boxWidth = Math.min(this.menuContainer.offsetWidth, vw - 32)
+        const boxWidth = Math.min(this.menuContainer.offsetWidth, cRect.width)
         const btnCenter = btnRect.left + btnRect.width / 2
-        const offsetParent = this.menuContainer.offsetParent || this.menuButton.offsetParent
-        const parentLeft = offsetParent ? offsetParent.getBoundingClientRect().left : 0
 
         let desiredLeft
-        if (btnCenter < vw / 3) {
+        if (btnCenter < cRect.left + cRect.width / 3) {
             desiredLeft = btnRect.left
-        } else if (btnCenter > vw * 2 / 3) {
+        } else if (btnCenter > cRect.left + cRect.width * 2 / 3) {
             desiredLeft = btnRect.right - boxWidth
         } else {
             desiredLeft = btnCenter - boxWidth / 2
         }
-        desiredLeft = Math.max(16, Math.min(desiredLeft, vw - boxWidth - 16))
+        // 夹在主体区内
+        desiredLeft = Math.max(cRect.left, Math.min(desiredLeft, cRect.right - boxWidth))
 
         this.menuContainer.style.right = 'auto'
         this.menuContainer.style.transform = 'none'
-        this.menuContainer.style.left = (desiredLeft - parentLeft) + 'px'
+        // style.left 相对 offsetParent（= .top-menu）的 padding 盒左缘，border 为 0 时即等于其视口左缘。
+        this.menuContainer.style.left = (desiredLeft - cRect.left) + 'px'
     }
 
     hideSiblingMenusImmediately() {

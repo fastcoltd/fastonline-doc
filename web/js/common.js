@@ -137,25 +137,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function ensureMobileMenuExtraPostsRow(homeMenuRoot) {
-        if (homeMenuRoot.querySelector('.home-menu-item-title-box-mobile-extra-posts')) {
-            return;
-        }
-        const sellerTextNode = homeMenuRoot.querySelector('.home-menu-first-page > a');
-        if (!sellerTextNode) {
-            return;
-        }
-        const extraPostsTitleBox = document.createElement('div');
-        extraPostsTitleBox.className = 'home-menu-item-title-box home-menu-item-title-box-mobile-extra-posts';
-        extraPostsTitleBox.innerHTML = `
-            <div class="home-menu-item-title-content">
-                <p>Posts</p>
-                <img src="image/more-arrow.png" />
-            </div>
-        `;
-        sellerTextNode.insertAdjacentElement('afterend', extraPostsTitleBox);
-    }
-
     function ensureHomeMenuAvatarLetterNode(homeMenuUserEle) {
         let avatarLetterNode = homeMenuUserEle.querySelector('.home-menu-user-avatar-letter');
         if (avatarLetterNode) {
@@ -188,7 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
             firstMenuTitleNode.textContent = isAuthenticated ? 'Browse categories' : 'Browse services';
         }
 
-        ensureMobileMenuExtraPostsRow(homeMenuRoot);
         const homeMenuTitleBoxes = homeMenuRoot.querySelectorAll('.home-menu-item-title-box');
         for (let i = 0; i < homeMenuTitleBoxes.length; i++) {
             const titleBox = homeMenuTitleBoxes[i];
@@ -697,17 +677,36 @@ function setSearchData() {
     $('.header-search-box-label > label, .header-search-mobile-box-label > label').text(params.type)
     $('.header-search-mobile-box-input-box > input, .header-search-box-input-box > input').val(params.q)
 }
+// 全站顶部搜索框跳转目标。static-source 原稿是纯前端原型，硬编码跳一个不存在的相对路径
+// "search-all.html?q=...&type=..."——从任何非首页页面点这个搜索框都是导航到一个 404（或者干脆
+// 拼出一个奇怪的相对路径），"网站搜索在二级页面上没有"这个反馈的根因就是这个（不是显示问题，是点了
+// 就走错路由）。SSR 这边 items/stores/demands/posts 四个真实列表路由（SiteItemController#searchItem
+// 等）都已经支持免费文本参数 k，这里改成按下拉框选中的 data-value（items/stories/demands/posts，见
+// fragments/header.html 的 .header-menu-item[data-value]）映射到对应的真实路由，带上当前语言前缀
+// （从当前 URL 第一段读，不是首页也一样能拼对）。
+var SEARCH_TYPE_ROUTE_MAP = {
+    items: 'items',
+    stories: 'stores',
+    demands: 'demands',
+    posts: 'posts'
+};
+function buildSearchUrl(keyword) {
+    var selected = document.querySelector('.header-search-box-label .header-menu-item.selected')
+        || document.querySelector('.header-search-mobile-box-label .header-menu-item.selected');
+    var type = selected ? selected.dataset.value : 'items';
+    var route = SEARCH_TYPE_ROUTE_MAP[type] || 'items';
+    var lang = (location.pathname.split('/')[1] || 'en');
+    return `/${lang}/${route}?k=${encodeURIComponent((keyword || '').trim())}`;
+}
 function handleEnterFn(e) {
     if (e.key == 'Enter') {
         let input = e.target
-        let type = $('.header-search-box-label > label').text()
-        window.open(`search-all.html?q=${input.value.trim()}&type=${type}`, '_self')
+        window.open(buildSearchUrl(input.value), '_self')
     }
 }
 function handleSearchFn(e) {
     let input = e.target.previousElementSibling
-    let type = $('.header-search-box-label > label').text()
-    window.open(`search-all.html?q=${input.value.trim()}&type=${type}`, '_self')
+    window.open(buildSearchUrl(input.value), '_self')
 }
 function searchAction(params) {
     console.log(params, 'sdf')
@@ -758,117 +757,198 @@ $(document).ready(function () {
         console.log(postData, '00000')
     })
     let optionsMap = {
-        switchLanguage: [
-            { value: 'china', text: 'China' },
-            { value: 'english', text: 'English' }
-        ],
-        switchGmt: [
-            {
-                value: 'GMT+1',
-                text: 'GMT+1'
-            },
-            {
-                value: 'GMT+2',
-                text: 'GMT+2'
-            },
-            {
-                value: 'GMT+3',
-                text: 'GMT+3'
-            },
-            {
-                value: 'GMT+4',
-                text: 'GMT+4'
-            },
-            {
-                value: 'GMT+5',
-                text: 'GMT+5'
-            },
-            {
-                value: 'GMT+6',
-                text: 'GMT+6'
-            },
-            {
-                value: 'GMT+7',
-                text: 'GMT+7'
-            },
-            {
-                value: 'GMT+8',
-                text: 'GMT+8'
-            },
-            ,
-            {
-                value: 'GMT+9',
-                text: 'GMT+9'
-            }
-        ],
-        switchCurrency: [
-            {
-                value: 'BMD',
-                text: 'BMD'
-            },
-            {
-                value: 'RMB',
-                text: 'RMB'
-            }
-        ]
+        // 三个下拉的选项都不写死：loadLocales() 拉 fast-api 的 /basic/locales 后由 renderLocaleOptions()
+        // 统一填充真实数据（用户要求语言也跟时区/货币一样以 /basic/locales 为唯一数据源）。
+        switchLanguage: [],
+        switchGmt: [],
+        switchCurrency: []
     }
-    $('.language-gmt-country-content .filter-custom-select').each(function () {
-        // 生成下拉内容
-        generateDropdownHtml($(this));
-        let that = this
-        $(that).on('click', '.filter-dropdown-item', function (e) {
-            e.stopPropagation();
-            let value = $(e.target).data('value')
-            let text = $(e.target).text()
-            let switchType = $(that).attr('data-type')
-            $(that).attr('data-value', value)
-            $(that).find('.filter-custom-select-text').text(text)
-            $(that).toggleClass('active')
-            if (switchType == 'switchLanguage') {
-                $('.language-btn').text(text)
-                console.log('语言已经切换成：', value)
-            } else if (switchType == 'switchGmt') {
-                $('.gmt-btn').text(text)
-                console.log('时区已经切换成：', value)
-            } else if (switchType == 'switchCurrency') {
-                $('.currency-btn').text(text)
-                console.log('币种已经切换成：', value)
+
+    // locale-modal 的语言/时区/货币真实数据。/basic/locales 是 fast-api 的公开只读接口（全局 CorsFilter
+    // 已放开跨域，见 fast-api WebApplicationConfig），返回全球 locale 列表（语言/国家/时区/货币）。
+    // - 语言：按 languageCode 去重，label 优先用母语自称（window.SITE_LANGUAGE_NAMES，由
+    //   fragments/locale-modal.html 从 GlobalSiteModelAdvice.LANGUAGE_NAMES 注入），没有的回退到接口的
+    //   languageFullName；选中后把 URL 第一段语言前缀换成选中的 languageCode 整页跳转（LocaleFilter
+    //   认第一段语言码，见 fast-site CLAUDE.md §7.1）。
+    // - 时区：defaultTimezoneGMT；货币：currencyCode/currencySymbol。
+    let localeList = []
+
+    function loadLocales() {
+        if (!window.FastLocale) {
+            console.warn('js/locale-data.js not loaded, language/GMT/currency switcher stays empty')
+            return
+        }
+        window.FastLocale.load(function (list) {
+            if (list && list.length) {
+                localeList = list
+                renderLocaleOptions()
             }
-            $('.language-gmt-country-close-btn').trigger('click')
         })
-        $(that).on('click', function () {
-            $(this).toggleClass('active')
+    }
+
+    function currentLangCode() {
+        return (document.documentElement.getAttribute('lang') || 'en').toLowerCase().split('-')[0]
+    }
+
+    function gmtOptionText(locale) {
+        return locale.defaultTimezoneGMT + ' (' + (locale.countryFullName || locale.defaultTimezone || '') + ')'
+    }
+
+    function currencyOptionText(locale) {
+        return locale.currencyCode + (locale.currencySymbol ? ' ' + locale.currencySymbol : '')
+    }
+
+    function renderLocaleOptions() {
+        let nativeNames = window.SITE_LANGUAGE_NAMES || {}
+        let langSeen = {}
+        let langOptions = []
+        let gmtSeen = {}
+        let gmtOptions = []
+        let currencySeen = {}
+        let currencyOptions = []
+        localeList.forEach(function (locale) {
+            if (locale.languageCode && !langSeen[locale.languageCode]) {
+                langSeen[locale.languageCode] = true
+                langOptions.push({
+                    value: locale.languageCode,
+                    text: nativeNames[locale.languageCode] || locale.languageFullName || locale.languageCode
+                })
+            }
+            if (locale.defaultTimezoneGMT && !gmtSeen[locale.defaultTimezoneGMT]) {
+                gmtSeen[locale.defaultTimezoneGMT] = true
+                gmtOptions.push({ value: locale.defaultTimezoneGMT, text: gmtOptionText(locale) })
+            }
+            if (locale.currencyCode && !currencySeen[locale.currencyCode]) {
+                currencySeen[locale.currencyCode] = true
+                currencyOptions.push({ value: locale.currencyCode, text: currencyOptionText(locale) })
+            }
         })
+        langOptions.sort(function (a, b) { return a.text.localeCompare(b.text) })
+        optionsMap.switchLanguage = langOptions
+        optionsMap.switchGmt = gmtOptions
+        optionsMap.switchCurrency = currencyOptions
+        $('.language-gmt-country-content .filter-custom-select[data-type="switchLanguage"]').each(function () {
+            generateDropdownHtml($(this))
+            // 把当前语言显示进这个下拉的输入框 + 底部 .language-btn
+            let cur = currentLangCode()
+            let match = langOptions.find(function (o) { return o.value === cur })
+            if (match) {
+                $('.language-btn').text(match.text)
+                $(this).attr('data-value', cur).attr('data-selected-text', match.text)
+                    .find('.filter-custom-select-text').val(match.text)
+            }
+        })
+        $('.language-gmt-country-content .filter-custom-select[data-type="switchGmt"]').each(function () {
+            generateDropdownHtml($(this))
+        })
+        $('.language-gmt-country-content .filter-custom-select[data-type="switchCurrency"]').each(function () {
+            generateDropdownHtml($(this))
+        })
+    }
+
+    // 语言切换：把当前 URL 第一段（语言前缀，SSR 保证一定带）换成选中的 languageCode 整页跳转。
+    function switchSiteLanguage(langCode) {
+        if (!langCode) return
+        let segs = window.location.pathname.split('/')
+        if (segs.length > 1) {
+            segs[1] = langCode
+        } else {
+            segs = ['', langCode]
+        }
+        window.location.href = segs.join('/') + window.location.search + window.location.hash
+    }
+
+    // 联动：选 GMT 就找第一个该时区的 locale 帮忙定货币，反过来选货币就找第一个该货币的 locale 帮忙定时区——
+    // 同一货币/时区常常对应好几个 locale（比如 USD 对应好几个国家），这里简单取列表里第一个匹配的，
+    // 联动结果之后用户还能再手动改。
+    function applyLocaleCurrency(locale) {
+        if (!locale || !locale.currencyCode) return
+        let text = currencyOptionText(locale)
+        $('.currency-btn').text(text)
+        $('.language-gmt-country-content .filter-custom-select[data-type="switchCurrency"]')
+            .attr('data-value', locale.currencyCode)
+            .attr('data-selected-text', text)
+            .find('.filter-custom-select-text').val(text)
+    }
+
+    function applyLocaleGmt(locale) {
+        if (!locale || !locale.defaultTimezoneGMT) return
+        let text = gmtOptionText(locale)
+        $('.gmt-btn').text(text)
+        $('.language-gmt-country-content .filter-custom-select[data-type="switchGmt"]')
+            .attr('data-value', locale.defaultTimezoneGMT)
+            .attr('data-selected-text', text)
+            .find('.filter-custom-select-text').val(text)
+    }
+
+    function findLocaleByGmt(gmt) {
+        return localeList.find(function (l) { return l.defaultTimezoneGMT === gmt })
+    }
+
+    function findLocaleByCurrency(currencyCode) {
+        return localeList.find(function (l) { return l.currencyCode === currencyCode })
+    }
+    // 展开/收起、输入过滤、点选项写回显示值 都是全站通用逻辑，见 js/filter-select-search.js；这里只管
+    // 生成下拉数据 + 监听选中后的 filterselect:change 事件做语言/时区/货币各自的联动副作用。
+    $('.language-gmt-country-content .filter-custom-select').each(function () {
+        generateDropdownHtml($(this));
     })
+    $('.language-gmt-country-content .filter-custom-select').on('filterselect:change', function (e, detail) {
+        let switchType = detail.type
+        let value = detail.value
+        let text = detail.text
+        if (switchType == 'switchLanguage') {
+            $('.language-btn').text(text)
+            switchSiteLanguage(value)
+        } else if (switchType == 'switchGmt') {
+            $('.gmt-btn').text(text)
+            applyLocaleCurrency(findLocaleByGmt(value))
+        } else if (switchType == 'switchCurrency') {
+            $('.currency-btn').text(text)
+            applyLocaleGmt(findLocaleByCurrency(value))
+        }
+        $('.language-gmt-country-close-btn').trigger('click')
+    })
+    // ⚠️ 这几个选择器必须限定在 .language-gmt-country-content 里，不能写裸的 $('.filter-custom-select')——
+    // 后者会连 sign in 弹窗注册表单里的国家选择（.signin-regist-form .filter-custom-select[data-type="countryList"]，
+    // login.js 管）一起 hide() 掉，而且没有对应的地方会再把它 show() 回来，导致「先点底部语言/时区/货币，
+    // 再打开 sign in 选国家，国家下拉整个消失」的 bug。
+    // 收起用 window.FilterSelect.close（js/filter-select-search.js）而不是裸的 .removeClass('active')，
+    // 否则切标签页时上一个下拉输入框里没提交的搜索文字不会被清掉，下次切回来还带着脏数据。
     $('.language-btn').on('click', function () {
         $('.language-gmt-country-mask').css({
             display: 'flex'
         })
-        $('.filter-custom-select').hide()
-        $('.filter-custom-select[data-type="switchLanguage"]').show()
-        $('.language-gmt-country-content .filter-custom-select').removeClass('active')
+        $('.language-gmt-country-content .filter-custom-select').hide().each(function () {
+            window.FilterSelect.close($(this))
+        })
+        $('.language-gmt-country-content .filter-custom-select[data-type="switchLanguage"]').show()
     })
     $('.gmt-btn').on('click', function () {
         $('.language-gmt-country-mask').css({
             display: 'flex'
         })
-        $('.filter-custom-select').hide()
-        $('.filter-custom-select[data-type="switchGmt"]').show()
-        $('.language-gmt-country-content .filter-custom-select').removeClass('active')
+        $('.language-gmt-country-content .filter-custom-select').hide().each(function () {
+            window.FilterSelect.close($(this))
+        })
+        $('.language-gmt-country-content .filter-custom-select[data-type="switchGmt"]').show()
     })
     $('.currency-btn').on('click', function () {
         $('.language-gmt-country-mask').css({
             display: 'flex'
         })
-        $('.filter-custom-select').hide()
-        $('.filter-custom-select[data-type="switchCurrency"]').show()
-        $('.language-gmt-country-content .filter-custom-select').removeClass('active')
+        $('.language-gmt-country-content .filter-custom-select').hide().each(function () {
+            window.FilterSelect.close($(this))
+        })
+        $('.language-gmt-country-content .filter-custom-select[data-type="switchCurrency"]').show()
     })
     $('.language-gmt-country-close-btn').on('click', function () {
         $('.language-gmt-country-mask').css({
             display: 'none'
         })
-        $('.filter-custom-select').hide()
+        $('.language-gmt-country-content .filter-custom-select').hide().each(function () {
+            window.FilterSelect.close($(this))
+        })
     })
     function generateDropdownHtml(item) {
         let options = optionsMap[item.attr('data-type')]
@@ -882,15 +962,24 @@ $(document).ready(function () {
         }
     }
 
+    loadLocales()
     setSearchData()
     $('.slide-btns-wrapper > img:last-child').on('click', function () {
         scrollToTop()
     })
     $('.slide-btns-wrapper > img:first-child').on('click', function () {
-        alert('你好，客服为您服务')
+        // 客服入口：优先打开 ConfigKey.site_identity_info 里配的 customerServiceUrl（fragments/head.html
+        // 的 <meta name="site-customer-service-url">），没配就退回原来的占位提示。
+        var csMeta = document.querySelector('meta[name="site-customer-service-url"]')
+        var csUrl = csMeta ? (csMeta.getAttribute('content') || '').trim() : ''
+        if (csUrl) {
+            window.open(csUrl, '_blank', 'noopener')
+        } else {
+            alert('你好，客服为您服务')
+        }
     })
-    const AIXIN_NORMAL_SRC = 'image/Vector_nor.svg'
-    const AIXIN_SELECTED_SRC = 'image/Vector_sel.png'
+    const AIXIN_NORMAL_SRC = '/image/Vector_nor.svg'
+    const AIXIN_SELECTED_SRC = '/image/Vector_sel.png'
 
     function syncAixinState($icon) {
         const like = Number($icon.data('like')) === 1
