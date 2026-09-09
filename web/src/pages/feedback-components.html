@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="title" content="FastResp Tip 与 Alert 组件">
+    <meta name="description" content="FastResp 通用 Tip 与 Alert 组件演示及使用说明">
+    <title>Tip 与 Alert 组件演示</title>
+    <link rel="icon" href="image/logo.jpg" type="image/x-icon" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/feedback-components.css" />
+    <link rel="stylesheet" href="css/feedback-demo.css" />
+</head>
+
+<body>
+    <div class="feedback-demo-page">
+        <header>
+            <div>
+                <div>
+                    <h1>Tip 与 Alert 通用组件</h1>
+                    <p>原生 HTML、CSS、JavaScript 实现，不依赖 UI 库。</p>
+                </div>
+                <a href="index.html">返回首页</a>
+            </div>
+        </header>
+
+        <main>
+            <article aria-labelledby="tip-demo-title">
+                <h2 id="tip-demo-title">Tip 顶部提示</h2>
+                <p>默认固定在页面顶部并在 4 秒后消失，也支持关闭按钮、描述文案和操作按钮。</p>
+                <div data-demo-role="actions" aria-label="Tip 交互示例">
+                    <button type="button" data-demo-action="tip-success" data-demo-type="success">Success Tip</button>
+                    <button type="button" data-demo-action="tip-info" data-demo-type="info">Info Tip</button>
+                    <button type="button" data-demo-action="tip-warning" data-demo-type="warning">Warning Tip</button>
+                    <button type="button" data-demo-action="tip-error" data-demo-type="error">Error Tip</button>
+                </div>
+
+                <section data-demo-role="preview" aria-labelledby="tip-preview-title">
+                    <div>
+                        <h3 id="tip-preview-title">四种状态与内容组合</h3>
+                        <button type="button" data-demo-action="reset-preview">重置预览</button>
+                    </div>
+                    <div id="feedback-tip-preview-host"></div>
+                </section>
+
+                <pre><code>FastFeedback.tip.success('操作成功');
+
+FastFeedback.tip.warning({
+    title: '请检查填写内容',
+    description: '部分字段尚未填写完整。',
+    actionText: '查看',
+    duration: 4000,
+    onAction: function (tip) {
+        tip.close();
+    }
+});</code></pre>
+            </article>
+
+            <article aria-labelledby="alert-demo-title">
+                <h2 id="alert-demo-title">Alert 确认框</h2>
+                <p>弹框居中显示并锁定背景页面；点击遮罩和按 Esc 均不会关闭，只能使用弹框按钮。</p>
+                <div data-demo-role="actions" aria-label="Alert 交互示例">
+                    <button type="button" data-demo-action="alert-warning" data-demo-type="warning">删除确认</button>
+                    <button type="button" data-demo-action="alert-info" data-demo-type="info">提交确认</button>
+                    <button type="button" data-demo-action="alert-async" data-demo-type="success">异步确认</button>
+                    <button type="button" data-demo-action="alert-error" data-demo-type="error">危险操作</button>
+                </div>
+
+                <pre><code>FastFeedback.alert.confirm({
+    type: 'warning',
+    title: '确认删除？',
+    message: '删除后无法恢复，请确认是否继续。',
+    cancelText: '取消',
+    confirmText: '确认删除',
+    onCancel: function () {},
+    onConfirm: function () {}
+});</code></pre>
+            </article>
+
+            <article aria-labelledby="usage-title">
+                <h2 id="usage-title">跨项目使用</h2>
+                <p>复制组件的 CSS 和 JavaScript 文件，再按下面顺序引入即可。组件会在首次调用时自动创建 DOM。</p>
+                <pre><code>&lt;link rel=&quot;stylesheet&quot; href&#61;&quot;css/feedback-components.css&quot; /&gt;
+&lt;script src&#61;&quot;js/feedback-components.js&quot;&gt;&lt;/script&gt;</code></pre>
+                <ul data-demo-role="notes">
+                    <li>Tip 类型：success、info、warning、error。</li>
+                    <li>duration 默认 4000；设置为 0 时不会自动消失。</li>
+                    <li>Alert 的 onConfirm 可以返回 Promise；处理期间按钮会自动进入禁用状态。</li>
+                    <li>onConfirm 返回 false 或 Promise 解析为 false 时，弹框保持显示。</li>
+                    <li>所有文案均通过 textContent 写入，不执行传入的 HTML。</li>
+                </ul>
+            </article>
+        </main>
+    </div>
+
+    <script src="js/feedback-components.js"></script>
+    <script src="js/feedback-demo.js"></script>
+</body>
+
+</html>
