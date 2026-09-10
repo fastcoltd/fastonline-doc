@@ -1472,7 +1472,15 @@ $(document).ready(function () {
         }
 
     })
+    // Cookie 同意后写 cookie（1 年），并给 <html> 加类让 common.css 隐藏提示条；
+    // 下次进站 cookies-tips 顶部的内联脚本读到这个 cookie 就不会再弹。
+    function saveCookieConsent(value) {
+        let maxAge = 60 * 60 * 24 * 365
+        document.cookie = 'cookieConsent=' + encodeURIComponent(value) + ';path=/;max-age=' + maxAge + ';SameSite=Lax'
+        document.documentElement.classList.add('has-cookie-consent')
+    }
     $('.cookies-accept-btn').on('click', function () {
+        saveCookieConsent('all')
         $(this).closest('.cookies-tips-wrapper').hide()
     })
     $('.cookies-customize-btn').on('click', function () {
@@ -1480,20 +1488,15 @@ $(document).ready(function () {
         $(this).hide()
     })
     $('.cookies-feature-save-btn > div').on('click', function() {
-        let $cookiesFeature1 = $('#cookiesFeature1')
-        let $cookiesFeature2 = $('#cookiesFeature2')
-        let $cookiesFeature3 = $('#cookiesFeature3')
-        let postData = []
-        if($cookiesFeature1.prop('checked')) {
-            postData.push('custom1')
+        let postData = ['essential']
+        if($('#cookiesFeature2').prop('checked')) {
+            postData.push('analytics')
         }
-        if($cookiesFeature2.prop('checked')) {
-            postData.push('custom2')
+        if($('#cookiesFeature3').prop('checked')) {
+            postData.push('marketing')
         }
-        if($cookiesFeature3.prop('checked')) {
-            postData.push('custom3')
-        }
-        alert(`Save Preferences:${postData.join(',')}`)
+        saveCookieConsent(postData.join(','))
+        $(this).closest('.cookies-tips-wrapper').hide()
     })
     $('body').on('click', '.demand-button', function () {
         if ($(this).hasClass('disabled')) {

@@ -344,13 +344,24 @@
     font-weight: 600;
     line-height: 2.75rem;
     color: #000000;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
+    // 标题现在是 rules_lang.title（短标题），完整显示、允许换行——不再是以前的 "indexNumber + content"
+    // 那种长文本，不需要 nowrap + ellipsis 硬截断。
+    white-space: normal;
+    word-break: break-word;
     margin-bottom: 1.25rem;
 }
 .article-content > section.content-section > h4 {
     font-size: 2rem;
+}
+// 一级 / 二级标题下方的正文（content 显示在每条标题之后）。这两个 <p> 是 section 的直接子节点，
+// 不在 .section-content 里，所以单独给样式。
+.article-content > section.content-section > p {
+    font-family: var(--primary-popfont);
+    font-size: 1.75rem;
+    font-weight: 400;
+    line-height: 2;
+    color: #666;
+    margin-bottom: 1.25rem;
 }
 
 .section-content {
@@ -368,6 +379,12 @@
         padding-bottom: 1rem;
         color: #666;
         line-height: 2;
+    }
+    // 三级条款：title 作为小标题行（在 content 之前），加粗、深色，锚点挂在这个 <p> 上。
+    .rule-item-title {
+        font-weight: 600;
+        color: #000000;
+        padding-bottom: 0.25rem;
     }
 }
 

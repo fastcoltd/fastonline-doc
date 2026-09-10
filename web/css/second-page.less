@@ -283,50 +283,74 @@
     }
 }
 
-.page-header-desc-right-detail-box {
+/* ==== 详情页描述「一行 + Show More / Show Less」通用样式（品牌 / 标签 / 属性详情共用）====
+   交互见 js/desc-toggle.js。按钮永远紧挨正文后面，不是「描述 | 按钮」左右两栏、也不贴到最右边：
+   - 收起态：容器 flex 一行，正文 flex:0 1 auto 可收缩 + 省略号，按钮 flex:0 0 auto 紧跟省略号后。
+   - 展开态（容器 .desc-expanded）：容器回 block，正文 display:inline + white-space:normal 铺满多行，
+     按钮 display:inline 跟文本后 → 落在最后一行末尾。
+   - 只有正文放不下一行时 js 给容器加 .desc-has-toggle，按钮才显示。PC / 移动端同一套，不用 -webkit-line-clamp。 */
+.page-header-desc-right-detail-box,
+.tag-page-desc-row {
     width: 100%;
+    max-width: 100%;
+    /* 自己是外层 .tag-page-header-desc-box 的 flex item：不给 min-width:0，收起态 white-space:nowrap
+       的长正文会把 min-content 撑到一两千 px，冲破窄屏父容器（移动端「描述冲出屏幕、按钮跑到屏幕外、
+       看着只剩半行」就是这个）。 */
+    min-width: 0;
     display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: flex-start;
-    flex-wrap: nowrap;
-    row-gap: 0;
-    column-gap: 0;
+    align-items: baseline;
+    overflow: hidden;
 }
-
-.page-header-desc-right-detail-box > [data-brand-detail-role="text"] {
-    width: 100%;
+.page-header-desc-right-detail-box > [data-brand-detail-role="text"],
+.tag-page-desc-row > [data-desc-toggle-text] {
+    flex: 0 1 auto;
+    min-width: 0;
+    width: auto;
+    margin: 0;
     color: var(--gray-color);
     font-family: var(--primary-popfont);
     font-size: 1.75rem;
     line-height: 2.75rem;
     font-weight: 400;
+    max-height: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex-shrink: 1;
 }
-
-.page-header-desc-right-detail-box > [data-brand-detail-role="text"].is-toggle {
-    white-space: normal;
-    overflow: visible;
-    word-break: break-word;
-    word-wrap: break-word;
-}
-
-.page-header-desc-right-detail-box > [data-brand-detail-role="toggle"] {
-    display: inline-block;
-    margin-left: 0;
+.page-header-desc-right-detail-box > [data-brand-detail-role="toggle"],
+.tag-page-desc-row > [data-desc-toggle-btn] {
+    display: none;
+    flex: 0 0 auto;
+    margin-left: 0.5rem;
     text-decoration: underline;
     color: var(--primary-color);
     font-family: var(--primary-popfont);
     font-size: 1.75rem;
     line-height: 2.75rem;
     font-weight: 400;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    vertical-align: baseline;
     white-space: nowrap;
+    cursor: pointer;
+}
+.page-header-desc-right-detail-box.desc-has-toggle > [data-brand-detail-role="toggle"],
+.tag-page-desc-row.desc-has-toggle > [data-desc-toggle-btn] {
+    display: inline-block;
+}
+.page-header-desc-right-detail-box.desc-expanded,
+.tag-page-desc-row.desc-expanded {
+    display: block;
+    overflow: visible;
+}
+.page-header-desc-right-detail-box.desc-expanded > [data-brand-detail-role="text"],
+.tag-page-desc-row.desc-expanded > [data-desc-toggle-text] {
+    display: inline;
+    white-space: normal;
+    overflow: visible;
+    word-break: break-word;
+    word-wrap: break-word;
+}
+.page-header-desc-right-detail-box.desc-has-toggle.desc-expanded > [data-brand-detail-role="toggle"],
+.tag-page-desc-row.desc-has-toggle.desc-expanded > [data-desc-toggle-btn] {
+    display: inline;
 }
 
 .tag-page-header-desc-box {
@@ -393,16 +417,7 @@
         line-height: 2.5rem;
     }
 
-    [data-tag-desc] {
-        max-height: 5.25rem;
-        display: -webkit-box;
-        --webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        white-space: normal;
-        text-overflow: ellipsis;
-        word-break: break-word;
-        word-wrap: break-word;
-    }
+    /* [data-tag-desc] 移动端原来是 2 行 -webkit-box clamp，现在统一走「一行 + Show More/Less」flex 布局，去掉。 */
 }
 
 .tag-page-header-desc-tag-box {
