@@ -86,9 +86,9 @@
             };
             window.addEventListener('scroll', onScroll, { passive: true });
         } else if (tocPanel) {
-            // 正文没标题、也没有「Other Pages」区块 → 没目录可导航：藏掉目录面板 + 移动端目录按钮，
-            // 并让正文收回整宽（detail/resource-detail.css 给 .article-content 默认留了 margin-left:
-            // 53.75rem 的目录位）。
+            // 正文没标题、也没有「Other Pages」区块 → 没目录可导航：藏掉目录面板 + 移动端目录按钮。
+            // 布局是 flex 两列（.resource-detail-body），面板 display:none 后 .article-content（flex:1）
+            // 自动占满整宽，不用再手动改 margin / width。
             tocPanel.style.display = 'none';
             var menuBtn0 = document.querySelector('.detail-page-menu');
             if (menuBtn0) {
@@ -96,8 +96,6 @@
             }
             if (article) {
                 article.classList.add('article-content-full');
-                article.style.marginLeft = '0';
-                article.style.width = '100%';
             }
         }
 

@@ -260,9 +260,36 @@
     }
 }
 
+/* 正文 + 右侧目录 = flex 两列，目录 position: sticky（浏览器合成层处理不抖，见 CLAUDE.md §13）：
+   跟页面滚 → 吸顶头贴住后停在下方（top = --sticky-content-top，js/sticky-offset.js 一次性算）→
+   滚到 .rules-detail-body（= 正文）底部目录跟着一起滚走。 */
+.rules-detail-body {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2.75rem;
+}
+.rules-detail-body.page-content > .article-content,
+.privacy-policy-page .rules-detail-body > .article-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-right: 0;
+    margin-left: 0;
+    width: auto;
+    padding: 0;
+    gap: 2.75rem;
+}
+.rules-detail-body > .table-of-container {
+    position: sticky;
+    top: var(--sticky-content-top, 2.5rem);
+    align-self: flex-start;
+    flex: 0 0 41.25rem;
+    max-height: calc(100vh - var(--sticky-content-top, 2.5rem) - 2rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
 .article-content {
-    margin-right: 55rem;
-    width: calc(100% - 55rem);
     padding: 0 0;
     gap: 2.75rem;
 }
@@ -418,6 +445,18 @@
 
 
 @media screen and (max-width: 768px) {
+    /* 移动端：解除桌面两列 + sticky，正文整宽，目录回到 position:fixed 抽屉。 */
+    .rules-detail-body {
+        display: block;
+
+        > .table-of-container {
+            position: fixed;
+            top: 50%;
+            flex: none;
+            max-height: none;
+            overflow: hidden;
+        }
+    }
     .detail-page-menu {
         z-index: 319;
         padding: 0;
