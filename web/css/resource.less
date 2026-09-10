@@ -223,7 +223,12 @@
     }
 
     .resource-all-page .page-top-sticky {
-        padding: 0 2rem;
+        /* 收回 base 的 100vw + translateX(-50%) 满宽（有滚动条时会右移半个滚动条宽、跟卡片列表右边
+           对不齐）+ 去横向内边距，筛选栏左右边缘跟卡片列表对齐。 */
+        width: 100%;
+        margin-left: 0;
+        transform: none;
+        padding: 0;
         padding-top: 0;
         margin-top: 2rem;
     }
@@ -304,7 +309,10 @@
         padding: 0 1.5rem 0 1.125rem;
     }
 
-    .resource-all-page #page-sort-section {
+    /* 直接命中 .page-sort-box（原型里它带 id=page-sort-section，SSR fragment 没这个 id）——
+       .page-sort-box 是超集，两仓都能命中。去掉内边距锁死 3rem，排序图标正好落进 .page-header-content
+       网格给的 3rem 列、跟内容右边缘对齐。 */
+    .resource-all-page .page-sort-box {
         padding: 0;
         width: 3rem;
         height: 3rem;
@@ -313,12 +321,12 @@
         justify-content: center;
     }
 
-    .resource-all-page #page-sort-section .page-sort-box > img {
+    .resource-all-page .page-sort-box > img {
         width: 3rem;
         height: 3rem;
     }
 
-    .resource-all-page #sortDropdown {
+    .resource-all-page .sort-container {
         top: 4rem;
     }
 

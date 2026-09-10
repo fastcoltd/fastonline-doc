@@ -13,7 +13,7 @@ html {
     src: url('../fonts/Poppins-Regular.ttf') format('truetype');
     font-style: normal;
     font-weight: 400;
-    font-display: swap;
+    font-display: block;
 }
 
 @font-face {
@@ -21,7 +21,7 @@ html {
     src: url('../fonts/Poppins-Medium.ttf') format('truetype');
     font-style: normal;
     font-weight: 500;
-    font-display: swap;
+    font-display: block;
 }
 
 @font-face {
@@ -29,7 +29,7 @@ html {
     src: url('../fonts/Poppins-SemiBold.ttf') format('truetype');
     font-style: normal;
     font-weight: 600;
-    font-display: swap;
+    font-display: block;
 }
 
 @font-face {
@@ -37,7 +37,7 @@ html {
     src: url('../fonts/Poppins-Bold.ttf') format('truetype');
     font-style: normal;
     font-weight: 700;
-    font-display: swap;
+    font-display: block;
 }
 
 @font-face {
@@ -45,7 +45,7 @@ html {
     src: url('../fonts/Inter-Variable.ttf') format('truetype');
     font-style: normal;
     font-weight: 100 900;
-    font-display: swap;
+    font-display: block;
 }
 
 @font-face {
@@ -53,7 +53,7 @@ html {
     src: url('../fonts/Roboto-Variable.ttf') format('truetype');
     font-style: normal;
     font-weight: 100 900;
-    font-display: swap;
+    font-display: block;
 }
 
 :root {
@@ -1435,6 +1435,9 @@ button {
         gap: 3.75rem;
         padding: 3.25rem;
         overflow-y: auto;
+        /* iOS 惯性滚动 + overscroll 收敛，二级页列表滚动丝滑。 */
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
         transition: width 0.3s ease-in-out;
         scrollbar-width: thin;
         scrollbar-color: #C5C5C5 transparent;

@@ -357,8 +357,8 @@
             if (confirmButton) {
                 confirmButton.disabled = loading;
                 confirmButton.textContent = loading
-                    ? String(options.loadingText || '处理中...')
-                    : String(options.confirmText || '确认');
+                    ? String(options.loadingText || 'Processing...')
+                    : String(options.confirmText || 'Confirm');
             }
             if (cancelButton) {
                 cancelButton.disabled = loading;
@@ -503,12 +503,12 @@
         };
 
         if (options.showCancel !== false) {
-            cancelButton = createButton('cancel', String(options.cancelText || '取消'));
+            cancelButton = createButton('cancel', String(options.cancelText || 'Cancel'));
             cancelButton.addEventListener('click', handleCancel);
             actions.appendChild(cancelButton);
         }
 
-        confirmButton = createButton('confirm', String(options.confirmText || '确认'));
+        confirmButton = createButton('confirm', String(options.confirmText || 'Confirm'));
         confirmButton.addEventListener('click', handleConfirm);
         actions.appendChild(confirmButton);
         dialog.appendChild(actions);

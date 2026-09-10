@@ -239,6 +239,14 @@
   }
   
   @media screen and (max-width: 768px) {
+    /* .page-top-bread 桌面端靠 100vw + translateX(-50%) + padding:calc((100vw - 1440px)/2) 居中，
+       移动端这个 padding 会算成负值 / 让面包屑不贴左边。全站统一收回整宽、去左内边距，面包屑左对齐。 */
+    .page-top-bread {
+      width: 100%;
+      margin-left: 0;
+      transform: none;
+      padding: 0;
+    }
     .page-nav-box {
       padding: 2rem 0 0 0;
       font-family: 'Inter', var(--primary-popfont);
@@ -321,7 +329,20 @@
     color: #000000;
     margin-left: 0.5rem;
   }
-  
+
+  /* 三级面包屑中间那一级 <a>：跟随文字色、无下划线，hover 才加。 */
+  .page-home-breadcrumb > p a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .page-home-breadcrumb > p a:hover {
+    text-decoration: underline;
+  }
+  .page-home-breadcrumb > p > span:nth-child(even):not(:last-child) {
+    color: #6D6D6D;
+    margin-right: 0.5rem;
+  }
+
   .page-dropdown-section {
     display: flex;
     align-items: center;

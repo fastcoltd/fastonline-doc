@@ -383,7 +383,12 @@
 @media screen and (max-width: 768px) {
     .faq-list-page {
         .faq-list-filter-sticky {
-            padding: 0 2rem;
+            /* 收回 base .page-top-sticky 的 100vw + translateX(-50%) 满宽，移动端改正常流
+               width:100% + padding:0 2rem，跟卡片列表右边缘对齐。 */
+            width: 100%;
+            margin-left: 0;
+            transform: none;
+            padding: 0;
             padding-top: 0;
             margin-top: 2rem;
         }
@@ -464,7 +469,9 @@
             padding: 0 1.5rem 0 1.125rem;
         }
 
-        #page-sort-section {
+        /* 直接命中 .page-sort-box（原型里带 id=page-sort-section，SSR fragment 没这个 id，.page-sort-box
+           是超集两仓都命中）：去内边距锁 3rem，排序图标落进网格列、跟内容右边缘对齐。 */
+        .page-sort-box {
             padding: 0;
             width: 3rem;
             height: 3rem;
@@ -473,12 +480,12 @@
             justify-content: center;
         }
 
-        #page-sort-section .page-sort-box > img {
+        .page-sort-box > img {
             width: 3rem;
             height: 3rem;
         }
 
-        #sortDropdown {
+        .sort-container {
             top: 4rem;
         }
 

@@ -298,6 +298,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         e.stopPropagation();
+        // 返回箭头 / 二级页标题栏：收起二级页回到服务列表（touch 端也走这条，不然只剩 click 那条兜底）。
+        const backBox = e.target.closest && e.target.closest('.home-menu-second-page-title-box');
+        if (backBox) {
+            e.preventDefault();
+            const sp = backBox.closest('.home-menu-second-page');
+            if (sp) {
+                sp.style.display = 'none';
+            }
+            secondMenuPendingLink = null;
+            secondMenuTouchPoint = null;
+            return;
+        }
         if (isSecondMenuTextTarget(e.target)) {
             e.preventDefault();
             clearHomeMenuTextSelectionSoon();
@@ -315,6 +327,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function handleSecondMenuClick(e) {
         if (window.innerWidth > 768) {
+            return;
+        }
+        // 二级页标题栏（含返回箭头）：这个 capture 阶段的 handler 会 stopPropagation，把点击吃掉在
+        // 到达标题栏自己的 onclick 之前，所以返回箭头一直点了没反应——在这里直接处理「收起二级页、
+        // 回到服务列表」。
+        const backBox = e.target.closest && e.target.closest('.home-menu-second-page-title-box');
+        if (backBox) {
+            e.stopPropagation();
+            e.preventDefault();
+            const sp = backBox.closest('.home-menu-second-page');
+            if (sp) {
+                sp.style.display = 'none';
+            }
             return;
         }
         e.stopPropagation();
@@ -967,15 +992,99 @@ $(document).ready(function () {
     $('.slide-btns-wrapper > img:last-child').on('click', function () {
         scrollToTop()
     })
+
+    // 判断「现在」是否落在客服在线时间内。
+    //   onlineHours: "Mon-Fri 09:00-18:00" / "09:00-18:00"（每天）/ "Mon-Sun 00:00-24:00"，
+    //                跨天（如 22:00-06:00）也支持；多段用英文逗号分隔，任一段命中即在线。
+    //   tz: IANA 时区 ID（"Asia/Singapore"），空则按浏览器本地时区。
+    // 返回 true / false；格式无法解析时返回 null（调用方退回展示原文）。
+    function isCustomerServiceOnline(onlineHours, tz) {
+        if (!onlineHours) return null
+        var DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+        var now
+        try {
+            var parts = new Intl.DateTimeFormat('en-US', {
+                timeZone: tz || undefined, weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false
+            }).formatToParts(new Date())
+            var map = {}
+            parts.forEach(function (p) { map[p.type] = p.value })
+            now = {
+                day: DAYS.indexOf((map.weekday || '').toLowerCase().slice(0, 3)),
+                mins: (parseInt(map.hour, 10) % 24) * 60 + parseInt(map.minute, 10)
+            }
+        } catch (e) { return null }
+        if (now.day < 0 || isNaN(now.mins)) return null
+
+        var toMin = function (s) {
+            var m = /^(\d{1,2}):(\d{2})$/.exec(s.trim())
+            return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null
+        }
+        var result = null
+        onlineHours.split(',').forEach(function (seg) {
+            seg = seg.trim()
+            if (!seg) return
+            var dayRange = null
+            var dm = /^([A-Za-z]{3})\s*(?:-\s*([A-Za-z]{3}))?\s+(.*)$/.exec(seg)
+            var timePart = seg
+            if (dm) {
+                var d1 = DAYS.indexOf(dm[1].toLowerCase())
+                var d2 = dm[2] ? DAYS.indexOf(dm[2].toLowerCase()) : d1
+                if (d1 >= 0 && d2 >= 0) dayRange = [d1, d2]
+                timePart = dm[3]
+            }
+            var tm = /^(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/.exec(timePart.trim())
+            if (!tm) return
+            var start = toMin(tm[1]), end = toMin(tm[2])
+            if (start === null || end === null) return
+            if (result === null) result = false // 至少解析出一段，可以下结论了
+
+            var dayOk = true
+            if (dayRange) {
+                var a = dayRange[0], b = dayRange[1]
+                dayOk = a <= b ? (now.day >= a && now.day <= b) : (now.day >= a || now.day <= b)
+            }
+            if (!dayOk) return
+            var inRange = start <= end
+                ? (now.mins >= start && now.mins < end)
+                : (now.mins >= start || now.mins < end) // 跨天
+            if (inRange) result = true
+        })
+        return result
+    }
+
     $('.slide-btns-wrapper > img:first-child').on('click', function () {
-        // 客服入口：优先打开 ConfigKey.site_identity_info 里配的 customerServiceUrl（fragments/head.html
-        // 的 <meta name="site-customer-service-url">），没配就退回原来的占位提示。
-        var csMeta = document.querySelector('meta[name="site-customer-service-url"]')
-        var csUrl = csMeta ? (csMeta.getAttribute('content') || '').trim() : ''
+        // 客服入口：ConfigKey.site_customer_service（fragments/head.html 的 <meta name="site-customer-service-*">）。
+        // 配了三方链接就直接新窗口打开链接（不再弹提示）；没配链接时，按「当前是否在客服在线时间内」
+        // 弹在线/离线提示条。
+        var metaVal = function (name) {
+            var m = document.querySelector('meta[name="' + name + '"]')
+            return m ? (m.getAttribute('content') || '').trim() : ''
+        }
+        var csUrl = metaVal('site-customer-service-url')
         if (csUrl) {
             window.open(csUrl, '_blank', 'noopener')
+            return
+        }
+        var nickname = metaVal('site-customer-service-nickname')
+        var onlineHours = metaVal('site-customer-service-online')
+        var tz = metaVal('site-customer-service-timezone')
+        var who = nickname || 'Customer service'
+        var status = isCustomerServiceOnline(onlineHours, tz) // true / false / null(无法判断)
+        var hoursText = onlineHours + (tz ? ' (' + tz + ')' : '')
+        var msg
+        if (status === true) {
+            msg = who + ' is online now'
+        } else if (status === false) {
+            msg = who + ' is offline' + (onlineHours ? '. Online hours: ' + hoursText : '')
         } else {
-            alert('你好，客服为您服务')
+            msg = onlineHours ? (who + ' · Online hours: ' + hoursText) : ''
+        }
+        if (msg && window.FastFeedback && window.FastFeedback.tip) {
+            window.FastFeedback.tip[status === false ? 'warning' : 'info'](msg)
+        } else if (msg) {
+            alert(msg)
+        } else {
+            alert('Customer service is here to help.')
         }
     })
     const AIXIN_NORMAL_SRC = '/image/Vector_nor.svg'
@@ -991,7 +1100,10 @@ $(document).ready(function () {
         $icon.css({ color: like ? '#FF1B20' : '#C5C5C5' })
     }
 
-    $('body').on('click', '.icon-aixin', function () {
+    // 通用「爱心」乐观切换：SSR 首屏不知道登录态，点了先切视觉态。带 data-action 的爱心（如系统文章
+    // 详情页的收藏按钮 [data-action="follow"]）由各自的脚本按接口返回结果再更新状态，这里不抢先切——
+    // 否则未登录点击也会变色（用户反馈 /pages/xxx 收藏按钮未登录点也变）。
+    $('body').on('click', '.icon-aixin:not([data-action])', function () {
         const $icon = $(this)
         const like = Number($icon.data('like')) === 1
         $icon.data('like', like ? 0 : 1)

@@ -1,0 +1,96 @@
+<!--/*
+  移动端汉堡菜单抽屉。移植自 static-source src/pages/index.html 的 .home-menu-page。
+
+  ⚠️ 这个元素必须每页都在 DOM 里：common.js 的 DOMContentLoaded 里第一行就是
+     const homeMenuBack = document.querySelector('.home-menu-page').querySelector('.home-menu-back');
+     .home-menu-page 不存在 → 整个 DOMContentLoaded 回调直接抛异常中断 →
+     页脚手风琴、头部下拉、回到顶部、语言弹层 等所有后续绑定全部失效（这就是「所有 JS 弹窗都无效」的根因）。
+
+  结构里的 class 钩子（.home-menu-back / .home-menu-user-box / .home-menu-login-box /
+  .home-menu-first-page > span / .home-menu-seperate-line / .home-menu-item-title-box /
+  .home-menu-item-content / .home-menu-item-content-item / .home-menu-second-page /
+  .home-menu-second-page-title-box / .other-wrapper）都必须保留，common.js 按名字找。
+  分类内容 data-driven 自 ${topServices}（服务分类树）+ 头部导航；登录态相关值由 JS 填。
+*/-->
+<div xmlns:th="http://www.thymeleaf.org" class="home-menu-page" th:fragment="homeMenu">
+    <div class="home-menu-container">
+        <div class="home-menu-first-page">
+            <div class="home-menu-login-box"><span th:text="#{header.join}">Join in Fastresp</span></div>
+            <span th:text="#{header.signin}">Sign in</span>
+            <div class="home-menu-user-box">
+                <img alt="" />
+                <div class="home-menu-user-info-box"><p></p><p></p></div>
+                <img th:src="@{/image/logout.png}" alt="" />
+            </div>
+            <div class="home-menu-seperate-line"></div>
+
+            <!--/* 分类浏览：跟 PC 顶部 mega-menu 同一份数据（${topMenuCategories}，每个服务分类下挂
+                 关联到它的品牌）。点服务展开二级 → 二级列出该服务下的品牌（移动端不按字母分组，直接
+                 铺平；PC 那边才分 ABC/DEF… 组）→ 点品牌跳 /items?servicesId=&brandId=（跟 PC mega-menu
+                 fragments/top-menu.html 完全一样的链接）。 */-->
+            <div class="home-menu-item-title-box" th:if="${topMenuCategories != null and !topMenuCategories.isEmpty()}">
+                <div class="home-menu-item-title-content">
+                    <p th:text="#{header.nav.browseServices}">Browse Services</p>
+                    <img th:src="@{/image/more-arrow.png}" alt="" />
+                </div>
+                <div class="home-menu-item-content" style="display: none;">
+                    <div class="home-menu-item-content-item" th:each="cat : ${topMenuCategories}">
+                        <p th:text="${cat.node.services.name}">Design</p>
+                        <img th:src="@{/image/gray-arrow.png}" alt="" />
+                        <div class="home-menu-second-page" style="display: none;">
+                            <div class="home-menu-second-page-title-box">
+                                <img th:src="@{/image/more-arrow.png}" alt="" />
+                                <p th:text="${cat.node.services.name}">Design</p>
+                            </div>
+                            <div class="home-menu-second-page-group">
+                                <th:block th:each="group : ${cat.groups}">
+                                    <a th:each="brand : ${group.items}"
+                                       th:href="${link.to('/items') + '?servicesId=' + cat.node.services.id + '&brandId=' + brand.id}"
+                                       th:style="${brand.extra != null and !brand.extra.isEmpty()} ? ('color: ' + ${brand.extra})"
+                                       th:text="${brand.name}" target="_self">Brand</a>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 简单导航（Items / Demands） -->
+            <div class="home-menu-item-title-box" th:each="nav : ${headerSimpleBars}">
+                <a class="home-menu-item-title-content" th:href="${link.nav(nav.link)}" target="_self">
+                    <p th:text="${nav.name}">Items</p>
+                </a>
+            </div>
+
+            <!--/* 下拉导航（Resources / Posts）。跟 fragments/header.html 桌面端同一个数据 + 同一套链接规则：
+                 第 1 个下拉（Resources，PAGES_TYPE）的子项跳 /resources/{customUrl}，其余（Posts，POSTS_TYPE）
+                 跳 /topic/{customUrl}——child.link 后端只给裸 customUrl，不能直接 link.nav()（会拼成
+                 /en/{customUrl} 那种不存在的路由，之前移动端侧边栏点 Resources 进不去列表页就是这个）。 */-->
+            <div class="home-menu-item-title-box" th:each="nav, s : ${headerDropdownBars}">
+                <div class="home-menu-item-title-content">
+                    <p th:text="${nav.name}">Resources</p>
+                    <img th:src="@{/image/more-arrow.png}" alt="" />
+                </div>
+                <div class="home-menu-item-content" style="display: none;">
+                    <a class="home-menu-item-content-item" th:each="child : ${nav.children}"
+                       th:href="${s.index == 0} ? ${link.to('/resources/' + child.link)} : ${link.to('/topic/' + child.link)}"
+                       target="_self">
+                        <p th:text="${child.name}">Resource</p>
+                        <img th:src="@{/image/gray-arrow.png}" alt="" />
+                    </a>
+                </div>
+            </div>
+
+            <a th:href="${link.to('/become-seller')}" target="_self" style="text-decoration: none;"
+               th:text="#{header.nav.becomeSeller}">Become a seller</a>
+
+            <div class="other-wrapper">
+                <div class="split-line"></div>
+                <p class="language-btn" th:text="${languageNames.get(lang)}">English</p>
+                <p class="gmt-btn">GMT</p>
+                <p class="currency-btn">USD</p>
+            </div>
+        </div>
+    </div>
+    <div class="home-menu-back"></div>
+</div>

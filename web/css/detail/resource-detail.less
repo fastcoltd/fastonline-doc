@@ -349,6 +349,31 @@
     margin: 2rem 0;
 }
 
+/* CMS 富文本正文里的标题/段落/图片排版（真实正文是一整块 HTML，不是预分段 section）。 */
+.content-section > div :is(h1, h2, h3, h4) {
+    font-family: var(--primary-popfont);
+    font-weight: 600;
+    color: #000000;
+    line-height: 1.2;
+    margin: 2.5rem 0 1.25rem;
+    scroll-margin-top: 10rem;
+}
+.content-section > div h1 { font-size: 2.75rem; }
+.content-section > div h2 { font-size: 2.5rem; }
+.content-section > div h3 { font-size: 2.125rem; }
+.content-section > div h4 { font-size: 1.875rem; }
+.content-section > div p { margin: 0 0 1.25rem; }
+.content-section > div img { max-width: 100%; border-radius: 1.5rem; margin: 2rem 0; }
+.content-section > div :is(ul, ol) { margin: 0 0 1.25rem; padding-left: 3rem; }
+.content-section > div a { color: var(--primary-color); text-decoration: underline; }
+@media screen and (max-width: 768px) {
+    .content-section > div :is(h1, h2, h3, h4) { margin: 1.5rem 0 0.75rem; scroll-margin-top: 7rem; }
+    .content-section > div h1 { font-size: 2rem; }
+    .content-section > div h2 { font-size: 1.875rem; }
+    .content-section > div h3 { font-size: 1.75rem; }
+    .content-section > div h4 { font-size: 1.625rem; }
+}
+
 @media screen and (max-width: 768px) {
     .article-content {
         margin-left: 0;
