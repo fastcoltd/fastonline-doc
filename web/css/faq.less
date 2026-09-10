@@ -337,12 +337,66 @@
     .faq-list-filter-sticky {
         padding-top: 1rem;
         z-index: 40;
-        top: var(--faq-list-sticky-top, 16.8rem);
+        /* headerNotSticky 版：全局头部会滚走，这个筛选栏才是吸顶头，贴顶 top:0（原 16.8rem 是给
+           固定头部留的偏移）。 */
+        top: 0;
     }
 
     .page-header-content {
         align-items: center;
         border-bottom: 0.125rem solid #F0F0F3;
+        gap: 2rem;
+    }
+
+    /* 全品牌下拉（.filter-custom-select，跟国家/语言选择器同一套），放 Category 下拉前面；
+       品牌名用品牌主题色（内联 style 覆盖）。 */
+    .faq-list-brand-section {
+        flex-shrink: 0;
+    }
+    .page-dropdown-section {
+        flex-shrink: 0;
+
+        > [data-dropdown-role="label"] {
+            white-space: nowrap;
+        }
+    }
+    .faq-list-brand-select {
+        width: 22rem;
+
+        .filter-custom-select-trigger {
+            box-sizing: border-box;
+            height: 4.75rem;
+            border-color: #6D6D6D;
+            padding: 0 1.5rem;
+        }
+        .filter-custom-select-text {
+            font-family: "Inter", var(--primary-popfont);
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .filter-dropdown-item-text {
+            font-weight: 600;
+        }
+    }
+    @media screen and (max-width: 768px) {
+        .faq-list-brand-section {
+            grid-column: 1 / -1;
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            align-items: center;
+            column-gap: 0.5rem;
+        }
+        .faq-list-brand-select {
+            width: 100%;
+
+            .filter-custom-select-trigger {
+                height: 3.75rem;
+                border-radius: 1.25rem;
+            }
+        }
     }
 
     .page-dropdown-section > [data-dropdown-role="label"],
@@ -515,27 +569,8 @@
     width: 100%;
 }
 
-@media screen and (min-width: 769px) {
-    .faq-list-page .load-more.show-more-btn {
-        display: flex;
-        width: 25rem;
-        height: 6.25rem;
-        border-radius: 5rem;
-        margin-left: 0;
-
-        > span {
-            font-size: 1.75rem;
-        }
-
-        &:hover {
-            background: var(--primary-color);
-
-            > span {
-                color: #fff;
-            }
-        }
-    }
-}
+/* PC 端 FAQ 列表用多页码分页，不显示移动端专属的 Show more（.load-more 基础 display:none，只 ≤768px
+   才 flex）。原来这段 @media(min-width:769px) 把它强行显示成桌面按钮，是原型遗留，已删。 */
 
 .faq-detail-header {
     position: relative;

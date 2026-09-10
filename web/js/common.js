@@ -405,6 +405,10 @@ document.addEventListener('DOMContentLoaded', function () {
         homeMenuPage.classList.toggle('home-menu-open', true);
         body.classList.toggle('modal-open', true);
         body.classList.toggle('home-menu-open', true);
+        // <html> 也要加 modal-open——common.css 里 html.modal-open{overflow:hidden} 就是给这个用的，
+        // login.js 打开登录弹窗时会同时切 body 和 html，home 菜单之前只切了 body，导致移动端菜单打开后
+        // 页面（html）还能滚、右侧滚动条一直在，盖住菜单右边内容（用户反馈"打开左侧侧边栏出现滚动条遮挡内容"）。
+        document.documentElement.classList.toggle('modal-open', true);
         const homeMenuUserEle = homeMenuPage.querySelector('.home-menu-user-box');
         const homeMenuRegistEle = homeMenuPage.querySelector('.home-menu-login-box');
         const homeMenuLgoinEle = homeMenuPage.querySelector('.home-menu-first-page > span');
@@ -635,6 +639,8 @@ function dismissHomeMenuPage() {
     homeMenuPage.classList.toggle('home-menu-open', false);
     body.classList.toggle('modal-open', false);
     body.classList.toggle('home-menu-open', false);
+    // 跟开菜单时对称：把 <html> 的滚动锁也解掉（菜单和登录弹窗不会同时开，不用额外判断）。
+    document.documentElement.classList.toggle('modal-open', false);
 }
 
 function syncHeaderAvatarBadge(headerUser, isAuthenticated, currentUser) {
