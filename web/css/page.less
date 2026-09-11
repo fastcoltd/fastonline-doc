@@ -294,6 +294,8 @@
 
   .page-home-breadcrumb {
     width: fit-content;
+    max-width: 100%;
+    min-width: 0;
     height: 3.5rem;
     display: flex;
     align-items: center;
@@ -313,11 +315,16 @@
 
   .page-home-breadcrumb > p {
     margin: 0 0 0 1.25rem;
+    min-width: 0;
     font-family: 'Inter', var(--primary-popfont);
     font-size: 1.875rem;
     font-weight: 500;
     line-height: 3.5rem;
     white-space: nowrap;
+    /* 标题过长时（尤其移动端系统文章详情：面包屑 = 首页 / 很长的规则标题）整行截断，
+       末尾的当前页标题显示 …，不把 .page-nav-box 撑宽导致页面能左右滑。 */
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .page-home-breadcrumb > p > span:nth-child(odd) {

@@ -284,10 +284,12 @@
 }
 
 /* ==== 详情页描述「一行 + Show More / Show Less」通用样式（品牌 / 标签 / 属性详情共用）====
-   交互见 js/desc-toggle.js。按钮永远紧挨正文后面，不是「描述 | 按钮」左右两栏、也不贴到最右边：
-   - 收起态：容器 flex 一行，正文 flex:0 1 auto 可收缩 + 省略号，按钮 flex:0 0 auto 紧跟省略号后。
-   - 展开态（容器 .desc-expanded）：容器回 block，正文 display:inline + white-space:normal 铺满多行，
-     按钮 display:inline 跟文本后 → 落在最后一行末尾。
+   交互见 js/desc-toggle.js。
+   - 收起态：容器 flex 一行，正文 flex:0 1 auto 可收缩 + 省略号，按钮 flex:0 0 auto 紧跟省略号后
+     （不是「描述 | 按钮」左右两栏、也不贴到最右边）。
+   - 展开态（容器 .desc-expanded）：容器回 block，正文 white-space:normal + word-break:break-all
+     铺满多行（每行都排满再换，不留半行占位）；Show Less 单独占一行（block + text-align:right），
+     落在正文下一行的右端。
    - 只有正文放不下一行时 js 给容器加 .desc-has-toggle，按钮才显示。PC / 移动端同一套，不用 -webkit-line-clamp。 */
 .page-header-desc-right-detail-box,
 .tag-page-desc-row {
@@ -335,6 +337,8 @@
 .tag-page-desc-row.desc-has-toggle > [data-desc-toggle-btn] {
     display: inline-block;
 }
+/* 展开态：容器回 block，正文 word-break:break-all 每行排满再换（不留半行占位），
+   Show Less 单独占一行、贴右（block + text-align:right）—— 正文每行铺满，按钮落在正文下一行右端。 */
 .page-header-desc-right-detail-box.desc-expanded,
 .tag-page-desc-row.desc-expanded {
     display: block;
@@ -345,12 +349,15 @@
     display: inline;
     white-space: normal;
     overflow: visible;
-    word-break: break-word;
-    word-wrap: break-word;
+    word-break: break-all;
+    overflow-wrap: anywhere;
 }
 .page-header-desc-right-detail-box.desc-has-toggle.desc-expanded > [data-brand-detail-role="toggle"],
 .tag-page-desc-row.desc-has-toggle.desc-expanded > [data-desc-toggle-btn] {
-    display: inline;
+    display: block;
+    float: none;
+    margin-left: 0;
+    text-align: right;
 }
 
 .tag-page-header-desc-box {

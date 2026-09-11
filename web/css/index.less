@@ -1042,14 +1042,14 @@ body.index-purchase-open {
     }
 }
 
+/* .comments-pager 现在是 #comments 这个 carousel 的一个 slide（跟 .hot-posts-pager 同一套用法，
+   见 pages/index.html），不再自己 overflow-x 横向滚——分页/裁切交给 .carousel-container 外层处理。
+   间距靠 .comments-wrapper .pager-subtitle-box 的 margin-bottom（跟 hot-posts 一致），不用自己再加
+   margin-top，否则会跟 subtitle 的间距叠两份。 */
 .comments-pager {
-    margin-top: 2.5rem;
     width: 100%;
     display: flex;
     gap: 3.75rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
 }
 
 @media screen and (max-width: 980px) {
@@ -1120,13 +1120,9 @@ body.index-purchase-open {
     }
 
     .comments-pager {
-        margin-top: 1rem;
+        flex-direction: column;
         gap: 1rem;
     }
-}
-
-.comments-pager::-webkit-scrollbar {
-    display: none;
 }
 
 .brand-container {

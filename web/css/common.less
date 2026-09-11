@@ -1488,14 +1488,31 @@ button {
 
     .home-menu-second-page-group > a {
         width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
         font-family: var(--primary-popfont);
         font-size: 1.75rem;
         line-height: 2.75rem;
         color: var(--gray-color);
         font-weight: 400;
-        white-space: nowrap;
         overflow: hidden;
         cursor: pointer;
+
+        > img {
+            width: 3rem;
+            height: 3rem;
+            flex: 0 0 3rem;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+
+        > span {
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     }
 
 }
@@ -1537,6 +1554,9 @@ button {
             max-width: calc(100vw - 5rem);
             flex: 0 0 auto;
             padding: 3.25rem;
+            // 右侧内边距移到 .home-menu-first-page 上：让滚动条贴到抽屉真正的右边缘，
+            // 而不是浮在离边缘 3.25rem 的地方压住每行右侧的箭头。
+            padding-right: 0;
         }
 
         .home-menu-back {
@@ -1546,7 +1566,8 @@ button {
 
         .home-menu-first-page {
             gap: 2.5rem;
-            padding-right: 0;
+            // 正文（含右侧箭头）留出 3.25rem，滚动条在这段留白外侧、贴抽屉右缘，不再遮箭头。
+            padding-right: 3.25rem;
         }
 
         .home-menu-user-box {

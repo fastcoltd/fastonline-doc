@@ -26,7 +26,6 @@
 .product-title-mark-box {
     flex: 1;
     min-width: 0;
-    max-width: 144.375rem;
     gap: 1.25rem;
     align-items: center;
 }
@@ -39,10 +38,11 @@
     line-height: 5rem;
     flex: 1 1 auto;
     min-width: 0;
-    max-width: 117.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    // 原来这里跟 .product-title-mark-box 各自还有 max-width:117.25rem/144.375rem，比页面容器
+    // （--container-width:1440px）窄一截，标题没占满整行的可用宽度就被这层 max-width 提前顶到换行，
+    // 行尾明明还有空间。flex:1 1 auto + min-width:0 已经能让它老老实实撑到父级给的宽度，不需要这层
+    // 额外上限，删掉让标题用满整行再换行。
+    white-space: normal;
 }
 
 /* 分类路径 */
@@ -131,6 +131,8 @@
         line-height: 2.25rem;
         width: 100%;
         max-width: 100%;
+        // 移动端标题也不截断，正常换行显示完整——移动端唯一会出现省略号的是 page-nav-box 面包屑
+        // （超出可用宽度才截），这里跟 PC 一样让文字自动换行。
         white-space: normal;
         word-break: break-word;
         word-wrap: break-word;

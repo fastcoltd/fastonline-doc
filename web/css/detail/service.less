@@ -448,7 +448,12 @@
     background-color: #FFFFFF;
     border: 0.125rem solid #F0F0F3;
     border-radius: 2.5rem;
-    padding: 0 2.5rem;
+    // 顶部/底部到边框距离一致：flex column + gap 管条目间距（不在首条前、末条后加空隙），上下各留 2rem。
+    // 原来 padding 上下为 0 + 每个 .toc-item 各自 margin-bottom:1.25rem，首条贴顶、末条多出 1.25rem。
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 2rem 2.5rem;
 }
 
 .table-of-container > img {
@@ -591,7 +596,7 @@
     cursor: pointer;
     transition: color 0.2s ease;
     position: relative;
-    margin-bottom: 1.25rem;
+    // 条目间距由父级 .table-of-contents 的 gap 统一给（首尾不多不少），不再各自 margin-bottom。
 }
 .toc-item-sub {
     padding-left: 1rem;
