@@ -4,9 +4,58 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    .layout-controls-box {
-        display: none;
+}
+// 原型这里桌面端是隐藏的（只有移动端有横竖切换），fast-site 侧用户明确要求桌面端也要能切，是主动偏离
+// 原型设计的产品决定。宽高等数值跟 tag-all.less 桌面端（min-width:769px）那份横竖版切换完全一致，
+// 用户反馈过第一版随手估的尺寸偏窄偏高。选择器用 item-all 专属类名限定范围。
+// 真实回归过一次：这几条一开始没加 min-width 媒体查询守卫，跟 tag-all.less 同款规则不一致——双层类
+// 选择器比全局 `@media(max-width:768px) .layout-controls-box`（单类）specificity 更高，移动端也会被
+// 这条桌面数值赢过去，导致这个切换控件在手机视口被撑成 40.25rem 宽、严重溢出。补上
+// min-width:769px 才是桌面专属。
+@media screen and (min-width: 769px) {
+    .item-all-filter-layoutcontrol-box {
+        .layout-controls-box {
+            display: flex;
+            width: 40.25rem;
+            height: 5rem;
+            border: 0.125rem solid #C5C5C5;
+            border-radius: 2.5rem;
+            overflow: hidden;
+            background: #fff;
+
+            .layout-switch {
+                width: auto;
+                height: 5rem;
+                padding: 1.25rem 2.5rem 1rem;
+                font-family: "Inter", var(--primary-popfont);
+                font-size: 1.875rem;
+                line-height: 2.625rem;
+                font-weight: 500;
+                color: #000;
+                flex: 0 0 auto;
+                white-space: nowrap;
+
+                &:first-child {
+                    width: 17.5rem;
+                    padding-left: 1.875rem;
+                    padding-right: 1.875rem;
+                }
+                &:last-child {
+                    width: 22.75rem;
+                }
+                &.active {
+                    border-radius: 2.5rem;
+                    color: #fff;
+                }
+            }
+        }
     }
+}
+// 横竖版切换 + 排序下拉紧挨着放一起、贴右边，用户明确要求"放到选择排序的前面靠右边"。
+.item-all-layout-sort-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 .page-filter-box {
     width: 40.5rem;
@@ -40,7 +89,6 @@
     margin-top: 0;
     padding-left: 0;
     width: calc(100% - 40.5rem);
-    padding-left: 2rem;
 }
 
 @media screen and (max-width: 768px) {
@@ -73,6 +121,98 @@
         line-height: 2.625rem;
         font-family: var(--primary-arialfont);
         margin-left: 0.25rem;
+    }
+}
+
+// 已选筛选条件标签行（.active-filters-box），见 fast-site 侧 filter.css 同位置注释——黑底、右上角 X
+// 关闭；桌面端放不下就折叠成 "+N"，移动端放不下就整行左右滑动、不折叠。
+.active-filters-box {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    overflow: hidden;
+    min-height: 3.5rem;
+}
+.active-filter-chip {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    background: #000;
+    color: #fff;
+    border-radius: 1.75rem;
+    padding: 0.625rem 2.5rem 0.625rem 1.5rem;
+    font-family: var(--primary-arialfont);
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+    white-space: nowrap;
+    max-width: 24rem;
+}
+.active-filter-chip-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.active-filter-chip-remove {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.35);
+    }
+}
+.active-filter-more-chip {
+    padding: 0.625rem 1.5rem;
+    cursor: default;
+}
+.active-filter-clear-chip {
+    background: #fff;
+    color: #000;
+    border: 0.125rem solid #000;
+    padding: 0.5rem 1.5rem;
+    cursor: pointer;
+    font-weight: 500;
+
+    &:hover {
+        background: #000;
+        color: #fff;
+    }
+}
+@media screen and (max-width: 768px) {
+    .active-filters-box {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        // 没有任何已选条件时（真的是空节点），移动端不要占这行的高度/间距——基础规则给了
+        // min-height:3.5rem，即使没有筛选条件也会空占一整行。display:none 直接让它从 grid 里整行
+        // 消失，row-gap 也一并不占用，不是只缩高度留一条缝。只在移动端生效，见 fast-site 侧同位置注释。
+        &:empty {
+            display: none;
+        }
+    }
+    .active-filter-chip {
+        font-size: 1.5rem;
     }
 }
 
@@ -176,7 +316,7 @@
     grid-template-columns: 2rem 1fr auto;
     align-items: center;
     height: 5rem;
-    padding: 0 3.25rem;
+    padding: 0 3.25rem 0 0;
     column-gap: 1.5rem;
 }
 
@@ -269,7 +409,7 @@
 
 /* Filter group styles */
 .filter-group {
-    padding: 2.5rem 0;
+    padding: 1.5rem 0;
     &.filter-group-bottom-half {
         padding-bottom: 1.75rem;
     }
@@ -288,7 +428,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     cursor: pointer;
 }
 
@@ -500,6 +640,11 @@
 
 .filter-dropdown-item.selected {
     background-color: #F4F4F4;
+}
+
+// 多选下拉选中一项后从下拉列表里隐藏，chip 删掉后重新出现（fast-site 侧新加的交互，这里只补 CSS）。
+.filter-custom-select.multiselect .filter-dropdown-item.selected {
+    display: none;
 }
 
 .filter-dropdown-item.disabled {

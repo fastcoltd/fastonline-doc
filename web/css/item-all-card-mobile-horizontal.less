@@ -92,17 +92,44 @@
         margin-right: 0.5rem;
     }
 
+    // Brand 保持跟评分同一行不动，只要求 Service 换到 Price/Stock 同一行——fast-site 侧在 brand/service
+    // 之间加了一个 .item-meta-row-break 占位元素（flex-basis:100% 强制换行点），这里跟着补 CSS。
+    // 选择器坑（真实回归过一次，见 fast-site 侧 .css 同位置注释）：.item-meta-row-break 真实 DOM 父节点
+    // 是 <dl>，不是 [data-role=meta] 本身——子代选择器 `>` 认真实 DOM 树，不认 display:contents 之后的
+    // 渲染盒子树，`[data-role=meta] > .item-meta-row-break` 永远选不中，要写
+    // `[data-role=meta] > dl > .item-meta-row-break` 才是它真实匹配的路径。
+    [data-role="meta"] > dl > .item-meta-row-break {
+        display: block;
+        flex-basis: 100%;
+        width: 0;
+        height: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    // Service 换到跟 Price/Stock 同一行后这一行右边还空出来一截，第一版固定 20rem 在真机窄宽度下把
+    // Price/Stock 挤到下一行，返工——改成 flex-grow，Service 只拿 Price/Stock 用剩的空间，见 fast-site
+    // 侧同位置注释。
+    // flex-basis 用 0（不是 auto）：这一行是 flex-wrap:wrap，换行判定按每个项目的假设主轴尺寸
+    // （basis:auto 时是内容 max-content 宽度）算，发生在 flex-shrink 生效之前。Service 文案很长时（比如
+    // "Social Media Management"），即使自己最终能靠 min-width:0 缩到很窄，换行判定阶段还是按它没缩水的
+    // 自然宽度算，会把排在它后面的 Stock 直接判到下一行。改成 flex-basis:0（flex: 1 1 0%）让假设尺寸从
+    // 0 起算，不再受文案长度影响。
     [data-field="service"] {
-        width: 11.25rem;
+        flex: 1 1 0%;
+        min-width: 0;
+        max-width: 100%;
     }
 
     [data-field="service"] dd,
     [data-field="service"] dd > span {
         min-width: 0;
-        width: 9.25rem;
+        width: auto;
+        max-width: 100%;
         line-height: 2.25rem;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     [data-field="price"] dd {

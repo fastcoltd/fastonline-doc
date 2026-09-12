@@ -1,0 +1,122 @@
+// 联系我们页，见 fast-site 的 templates/pages/contact-us.html（SSR 工程新增页面，static-source 原稿没有
+// 对应的 src/pages 文件）。.page-content/.page-top-bread 等基础布局用 page.css，这里只补这个页面独有的
+// 部分——内容整体居中单栏、下面一组联系方式卡片（图标 + 名称 + 值）。
+.contact-us-body {
+    flex-direction: column;
+    align-items: center;
+}
+
+.contact-us-title {
+    font-family: var(--primary-popfont);
+    font-weight: 600;
+    font-size: 3.5rem;
+    line-height: 5rem;
+    color: #000;
+    text-align: center;
+}
+
+.contact-us-intro {
+    margin-top: 1.25rem;
+    max-width: 90rem;
+    font-family: var(--primary-robotofont);
+    font-size: 1.75rem;
+    line-height: 2.75rem;
+    color: var(--gray-color);
+    text-align: center;
+}
+
+.contact-us-grid {
+    width: 100%;
+    margin-top: 3.75rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+    gap: 1.5rem;
+}
+
+.contact-us-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    border: 0.125rem solid #f0f0f3;
+    border-radius: 1.25rem;
+    background-color: #fff;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+// 没有 link 的兜底态（用 <div> 渲染，见模板）——不可点击，鼠标不用改成手型，跟可点击卡片区分开。
+div.contact-us-card {
+    cursor: default;
+}
+
+a.contact-us-card:hover {
+    transform: translateY(-0.25rem);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+}
+
+.contact-us-card img {
+    width: 3.5rem;
+    height: 3.5rem;
+    flex-shrink: 0;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.contact-us-card-fallback {
+    width: 3.5rem;
+    height: 3.5rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f4f4f4;
+    color: var(--gray-color);
+    font-family: var(--primary-popfont);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.contact-us-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+
+    strong {
+        font-family: var(--primary-popfont);
+        font-weight: 500;
+        font-size: 1.75rem;
+        line-height: 2.5rem;
+        color: #000;
+    }
+
+    em {
+        font-style: normal;
+        font-family: var(--primary-robotofont);
+        font-size: 1.5rem;
+        line-height: 2.25rem;
+        color: var(--primary-color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .contact-us-title {
+        font-size: 2.5rem;
+        line-height: 3.5rem;
+    }
+
+    .contact-us-intro {
+        font-size: 1.5rem;
+        line-height: 2.25rem;
+    }
+
+    .contact-us-grid {
+        grid-template-columns: 1fr;
+        margin-top: 2.5rem;
+    }
+}

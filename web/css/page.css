@@ -117,6 +117,7 @@
   transform: none;
 }
 .page-top-sticky.is-sticky {
+  padding-top: 1rem;
   box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(1.25rem);
 }
@@ -142,11 +143,19 @@
 .page-section-empty {
   flex: 1;
 }
+/* 空状态要占满整个内容区高度、上下居中，见 fast-site 侧 page.css 同位置注释——跟通用的
+   .no-data-wrapper（common.css，站内已经在用的"空状态填满一屏"标准写法，50rem/移动端62.5rem）保持
+   同一套高度基准，flex 让它在自己所在的 flex/grid 容器里尽量撑满剩余空间，min-height 兜底纯 block
+   布局下没有 flex 父级可撑的场景。真实回归过一次：item-all.html 的 #items-grid 是条件渲染（有数据才
+   出现），没数据时 .no-data-wrapper 的真实父节点是 .items-container（block），flex:1 1 100% 在
+   block 父级下是无效属性，height:100% 才是真正吃到父级 stretch 出来的高度的写法；没有这层链路的其它
+   页面 height:100% 解析不出来会被忽略，退回 min-height 兜底。 */
 .no-data-wrapper.list-empty-state {
   width: 100%;
-  height: auto;
+  height: 100%;
+  flex: 1 1 100%;
+  min-height: 50rem;
   grid-column: 1 / -1;
-  flex: 0 0 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -181,6 +190,7 @@
     display: none;
   }
   .no-data-wrapper.list-empty-state {
+    min-height: 62.5rem;
     padding: 2rem 0;
   }
 }

@@ -646,7 +646,6 @@ body.index-purchase-open {
     text-transform: capitalize;
   }
   .page-top-sticky-main .header-search-mobile-box {
-    margin-top: 2rem;
     height: 4.25rem;
     border-radius: 0.625rem;
   }
@@ -950,9 +949,30 @@ body.index-purchase-open {
   .hot-posts-pager {
     gap: 1rem;
   }
-  .comments-pager {
-    flex-direction: column;
+  /* Comments 移动端改走跟 Popular demands 一样的独立横滑列表（#comments-mobile，见 index.html
+     顶部注释），桌面版的分屏轮播（#comments）这里直接隐藏，不用再让 .comments-pager 自己 overflow-x
+     横滑了——三条一屏 + 屏间轮播两层滚动叠一起体验绕，改成单层横滑更直接。 */
+  #comments {
+    display: none;
+  }
+  #comments-mobile {
+    display: flex;
+    flex-wrap: nowrap;
     gap: 1rem;
+    /* .comments-wrapper .pager-subtitle-box 在这个断点是 display:none（评论区没有"view more"，
+       空盒子没必要留着），平时是它在提供标题和下面卡片行之间的间距——现在那层没了，这里补一个
+       margin-top 撑开，不然标题和卡片贴在一起。 */
+    margin-top: 1.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    touch-action: pan-x;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  #comments-mobile::-webkit-scrollbar {
+    display: none;
   }
 }
 .brand-container {
@@ -1226,6 +1246,9 @@ body.index-purchase-open {
 .popular-demands-mobile-scroll {
   display: none;
 }
+.comments-mobile-scroll {
+  display: none;
+}
 .hot-posts-wrapper [data-pager-role=title] {
   font-size: 5rem;
   line-height: 5rem;
@@ -1261,39 +1284,60 @@ body.index-purchase-open {
   text-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.25);
 }
 /* Comments first item (Figma 129:3844) */
-.comments-pager .figma-comment-item .comment-item-user-box {
+.figma-comment-item .comment-item-user-box {
   gap: 0.75rem;
 }
-.comments-pager .figma-comment-item .comment-item-user-box img {
+.figma-comment-item .comment-item-user-box img {
   object-fit: cover;
 }
-.comments-pager .figma-comment-item .item-star-box {
+.figma-comment-item .item-star-box {
   gap: 0.75rem;
   align-items: center;
 }
-.comments-pager .figma-comment-item .item-star-box > p:first-of-type {
+.figma-comment-item .item-star-box > p:first-of-type {
   font-family: var(--primary-robotofont);
   color: rgba(0, 0, 0, 0.85);
 }
-.comments-pager .figma-comment-item .post-item-kind-box {
+/* .post-item-kind-box 现在是 dt/dd 定义列表（跟 item-card.html 的品牌/服务展示同一套结构），不再是
+   tag pill——一条评论固定最多 1 个品牌 + 1 个服务，不会超出，不需要折叠/省略号那一套了。 */
+.figma-comment-item .post-item-kind-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 2.5rem;
+}
+.figma-comment-item .post-item-kind-box > div {
+  display: flex;
+  align-items: center;
   gap: 0.75rem;
-  align-items: flex-start;
-  max-height: none;
-  overflow: visible;
 }
-.comments-pager .figma-comment-item .item-tag {
-  height: auto;
-  min-height: 4rem;
-  padding: 0.625rem 1.125rem;
-  border-radius: 2.5rem;
-  box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.01568627);
-}
-.comments-pager .figma-comment-item .item-tag-text {
+.figma-comment-item .post-item-kind-box dt {
+  font-family: var(--primary-popfont);
   font-size: 1.75rem;
   line-height: 2.75rem;
   color: #6d6d6d;
 }
-.comments-pager .figma-comment-item .comment-item-desc-box span {
+.figma-comment-item .post-item-kind-box dd {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.figma-comment-item .post-item-kind-box dd > img {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+}
+.figma-comment-item .post-item-kind-box dd > a,
+.figma-comment-item .post-item-kind-box dd > span {
+  font-family: var(--primary-popfont);
+  font-size: 1.75rem;
+  line-height: 2.75rem;
+  color: #000;
+}
+.figma-comment-item .post-item-kind-box dd > a {
+  text-decoration: none;
+}
+.figma-comment-item .comment-item-desc-box span {
   text-decoration: underline;
   text-underline-offset: 0.25rem;
 }
@@ -1302,16 +1346,23 @@ body.index-purchase-open {
     padding-top: 2.5rem;
     padding-bottom: 0;
   }
-  .comments-pager .figma-comment-item .comment-item-user-box {
+  .figma-comment-item .comment-item-user-box {
     gap: 0.5rem;
   }
-  .comments-pager .figma-comment-item .item-tag {
-    min-height: 2.25rem;
-    padding: 0 0.5rem;
-    border-radius: 1.125rem;
-    box-shadow: none;
+  /* 移动端 dt 文字标签隐藏，只留图标 + 值——跟 item-all-card-mobile-vertical.css 里
+     [data-field=brand] dt / [data-field=service] dt { display: none } 同一套省空间手法。 */
+  .figma-comment-item .post-item-kind-box {
+    gap: 0.75rem 1.5rem;
   }
-  .comments-pager .figma-comment-item .item-tag-text {
+  .figma-comment-item .post-item-kind-box dt {
+    display: none;
+  }
+  .figma-comment-item .post-item-kind-box dd > img {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .figma-comment-item .post-item-kind-box dd > a,
+  .figma-comment-item .post-item-kind-box dd > span {
     font-size: 1.25rem;
     line-height: 1.75rem;
   }
@@ -1338,22 +1389,6 @@ body.index-purchase-open {
     min-width: 18rem;
     flex: 0 0 18rem;
     margin: 0;
-  }
-  .comments-pager .figma-comment-item .item-tag {
-    height: 2.25rem;
-    padding: 0 0.625rem;
-    border-radius: 2.5rem;
-    border: 0.1rem solid #d9d9d9;
-    box-shadow: 0 0.2rem 0 rgba(0, 0, 0, 0.02);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .comments-pager .figma-comment-item .item-tag-text {
-    font-size: 1.25rem;
-    line-height: 1.5rem;
-    color: #6d6d6d;
-    white-space: nowrap;
   }
   .index-purchase-mask {
     position: fixed;

@@ -759,7 +759,6 @@ body.index-purchase-open {
     }
 
     .page-top-sticky-main .header-search-mobile-box {
-        margin-top: 2rem;
         height: 4.25rem;
         border-radius: 0.625rem;
     }
@@ -1119,9 +1118,32 @@ body.index-purchase-open {
         gap: 1rem;
     }
 
-    .comments-pager {
-        flex-direction: column;
+    /* Comments 移动端改走跟 Popular demands 一样的独立横滑列表（#comments-mobile，见 index.html
+       顶部注释），桌面版的分屏轮播（#comments）这里直接隐藏，不用再让 .comments-pager 自己 overflow-x
+       横滑了——三条一屏 + 屏间轮播两层滚动叠一起体验绕，改成单层横滑更直接。 */
+    #comments {
+        display: none;
+    }
+
+    #comments-mobile {
+        display: flex;
+        flex-wrap: nowrap;
         gap: 1rem;
+        /* .comments-wrapper .pager-subtitle-box 在这个断点是 display:none（评论区没有"view more"，
+           空盒子没必要留着），平时是它在提供标题和下面卡片行之间的间距——现在那层没了，这里补一个
+           margin-top 撑开，不然标题和卡片贴在一起。 */
+        margin-top: 1.5rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        width: 100%;
+        touch-action: pan-x;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
     }
 }
 
@@ -1496,8 +1518,10 @@ body.index-purchase-open {
     }
 }
 
-/* Comments first item (Figma 129:3844) */
-.comments-pager {
+/* Comments first item (Figma 129:3844)——.figma-comment-item 是 comment-item 组件本身的根 class，
+   桌面轮播（.comments-pager）和移动端横滑列表（.comments-mobile-scroll）用的是同一份组件，这里两个
+   父选择器都挂上，不用给每条子规则各写一遍。 */
+.comments-pager, .comments-mobile-scroll {
     .figma-comment-item .comment-item-user-box {
         gap: 0.75rem;
     }
@@ -1517,25 +1541,49 @@ body.index-purchase-open {
         color: rgba(0, 0, 0, 0.85);
     }
 
+    /* .post-item-kind-box 现在是 dt/dd 定义列表（跟 item-card.html 的品牌/服务展示同一套结构），不再是
+       tag pill——一条评论固定最多 1 个品牌 + 1 个服务，不会超出，不需要折叠/省略号那一套了。 */
     .figma-comment-item .post-item-kind-box {
-        gap: 0.75rem;
-        align-items: flex-start;
-        max-height: none;
-        overflow: visible;
-    }
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem 2.5rem;
 
-    .figma-comment-item .item-tag {
-        height: auto;
-        min-height: 4rem;
-        padding: 0.625rem 1.125rem;
-        border-radius: 2.5rem;
-        box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.0156862745);
-    }
+        > div {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
 
-    .figma-comment-item .item-tag-text {
-        font-size: 1.75rem;
-        line-height: 2.75rem;
-        color: #6d6d6d;
+        dt {
+            font-family: var(--primary-popfont);
+            font-size: 1.75rem;
+            line-height: 2.75rem;
+            color: #6d6d6d;
+        }
+
+        dd {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            > img {
+                width: 1.75rem;
+                height: 1.75rem;
+                flex-shrink: 0;
+            }
+
+            > a, > span {
+                font-family: var(--primary-popfont);
+                font-size: 1.75rem;
+                line-height: 2.75rem;
+                color: #000;
+            }
+
+            > a {
+                text-decoration: none;
+            }
+        }
     }
 
     .figma-comment-item .comment-item-desc-box span {
@@ -1550,21 +1598,29 @@ body.index-purchase-open {
         padding-bottom: 0;
     }
 
-    .comments-pager {
+    .comments-pager, .comments-mobile-scroll {
         .figma-comment-item .comment-item-user-box {
             gap: 0.5rem;
         }
 
-        .figma-comment-item .item-tag {
-            min-height: 2.25rem;
-            padding: 0 0.5rem;
-            border-radius: 1.125rem;
-            box-shadow: none;
-        }
+        /* 移动端 dt 文字标签隐藏，只留图标 + 值——跟 item-all-card-mobile-vertical.css 里
+           [data-field=brand] dt / [data-field=service] dt { display: none } 同一套省空间手法。 */
+        .figma-comment-item .post-item-kind-box {
+            gap: 0.75rem 1.5rem;
 
-        .figma-comment-item .item-tag-text {
-            font-size: 1.25rem;
-            line-height: 1.75rem;
+            dt {
+                display: none;
+            }
+
+            dd > img {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+
+            dd > a, dd > span {
+                font-size: 1.25rem;
+                line-height: 1.75rem;
+            }
         }
     }
 
@@ -1594,14 +1650,6 @@ body.index-purchase-open {
         min-width: 18rem;
         flex: 0 0 18rem;
         margin: 0;
-    }
-
-    .comments-pager .figma-comment-item .item-tag {
-        .index-mobile-tag-chip();
-    }
-
-    .comments-pager .figma-comment-item .item-tag-text {
-        .index-mobile-tag-chip-text();
     }
 
     .index-purchase-mask {

@@ -174,7 +174,13 @@
   color: var(--primary-color);
 }
 .signin-bg .signin-form > button[type="submit"],
-.signin-bg .registere-btn {
+.signin-bg .registere-btn,
+/* fast-site 那边找回密码/重置2FA拆成了多步，中间的"Verify"按钮不是 .signin-form 直接子元素也不是
+   type=submit 了，样式选择器两个条件都不满足会掉样式，补了这两个 class 进来保持一致。static-source
+   这边的 signin-modal.html 还没跟着改成多步结构（按现有 CSS/HTML 同步约定，改动只做到 CSS 这一层，
+   HTML 结构改动不在这次同步范围），这两个 class 目前在这份 HTML 里还用不上，先留着不算冲突。 */
+.signin-bg .signin-resetpwd-verify-btn,
+.signin-bg .signin-reset2fa-verify-btn {
   margin-top: 4.25rem;
   width: 100%;
   height: 6rem;
@@ -188,6 +194,8 @@
   line-height: 2.5rem;
   font-weight: 500;
   color: #fff;
+  border: none;
+  cursor: pointer;
 }
 .signin-bg .signin-empty-box {
   flex: 1;
@@ -585,7 +593,8 @@
   cursor: pointer;
 }
 .signin-bg .signin-content#signin-2fa .signin-form > button[type="submit"],
-.signin-bg .signin-content#signin-reset-2fa .signin-form > button[type="submit"] {
+.signin-bg .signin-content#signin-reset-2fa .signin-form > button[type="submit"],
+.signin-bg .signin-content#signin-reset-2fa .signin-reset2fa-verify-btn {
   margin-top: 5rem;
   border-radius: 0.75rem;
   font-size: 1.875rem;
@@ -902,6 +911,14 @@
   max-width: 100%;
   white-space: normal;
 }
+/* 服务协议/隐私条款真链接：跟随文字色，仅加下划线做区分，不做成醒目的蓝色按钮感（SSR 侧加的，static-source 的 HTML 还是纯文本，这里只补 CSS 保持两边一致） */
+.signin-bg .signin-content-regist .signin-regist-form-tool-box .agree-wrapper label a {
+  color: inherit;
+  text-decoration: underline;
+}
+.signin-bg .signin-content-regist .signin-regist-form-tool-box .agree-wrapper label a:hover {
+  color: #1890FF;
+}
 .signin-bg .signin-content-regist .registere-btn {
   margin-top: 3rem;
   height: 6rem;
@@ -1167,7 +1184,9 @@
     font-size: 1.5rem;
   }
   .signin-form > button[type="submit"],
-  .registere-btn {
+  .registere-btn,
+  .signin-resetpwd-verify-btn,
+  .signin-reset2fa-verify-btn {
     margin-top: 2.5rem;
     cursor: pointer;
   }
@@ -1289,7 +1308,9 @@
     height: 2.5rem;
   }
   .signin-bg .signin-form > button[type="submit"],
-  .signin-bg .registere-btn {
+  .signin-bg .registere-btn,
+  .signin-bg .signin-resetpwd-verify-btn,
+  .signin-bg .signin-reset2fa-verify-btn {
     margin-top: 3.75rem;
   }
   .signin-bg .login-google-box {

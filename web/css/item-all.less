@@ -15,6 +15,80 @@
     }
 }
 
+// 下面这几条选择器都加了 .item-all-page 前缀限定范围——attribute-all.html 的 .page-content 也顶着同一个
+// item-all-filter-design class（另有用途，见那个模板顶部注释），不加限定会把 attribute-all 页面的卡片
+// 列表布局一起改坏（fast-site 侧真实复现过，用户反馈"属性页卡片全部变形了"）。
+// 吸顶筛选条只有一行内容（筛选徽标+结果文案+横竖版切换+排序），共享的 .page-top-sticky 基础规则只给了
+// padding-top:1rem，padding-bottom 是 0——横竖版切换按钮（40.25rem/5rem，比这一行其它内容都高）几乎贴着
+// 吸顶条自己的下边缘，紧挨着下面筛选侧栏/卡片区，用户反馈"贴着下面的线了"、应该上下居中。tag-all/
+// attribute-all 的同名吸顶条内容多一整块，天然更高，没有这个问题，不能改共享的 .page-top-sticky。
+// #stickyHeader 这个 id 在 resource-detail/rules-detail 也用（各自独立页面，DOM 不会共存），这里用
+// .item-all-page 限定只影响 item-all 自己那份。
+.item-all-page #stickyHeader.page-top-sticky {
+    padding-bottom: 1rem;
+}
+
+.item-all-page .item-all-filter-design {
+    // 左侧筛选面板吸顶：position:sticky（fast-site 侧的改动，见 fast-site/CLAUDE.md §13），跟页面滚、
+    // #stickyHeader 贴住后停、滚到正文列表底再一起滚走；--sticky-content-top 由 js/sticky-offset.js 算。
+    &.page-content {
+        align-items: flex-start;
+        // 之前靠 .list-container 的 margin-left 撑开跟筛选面板的间距，改纯 flex 后清零了，用 gap 补上。
+        gap: 2.75rem;
+
+        // no-data 空状态出现时 .list-container 只按自己内容撑高，比筛选侧栏矮很多，"居中"只在它自己
+        // 那个矮盒子内部成立——只在这种情况下用 :has() 精确切到 stretch。真实回归过一次：如果无条件
+        // 对所有情况都用 stretch，会让 .list-container 在有真实卡片数据时也拿到一个确定高度而不是
+        // auto，移动端 Show more 按钮反而在这个确定高度之外发生视觉溢出，实测复现为按钮跑到框外、跟
+        // footer 撞在一起，用户反馈"show more 被遮挡看不见了"。只在真正空的时候才 stretch。对侧栏无
+        // 副作用：.filter-container 已有 max-height+overflow-y:auto，撑得比上限还高时会被截住。
+        &:has(.no-data-wrapper) {
+            align-items: stretch;
+        }
+    }
+
+    .filter-container.page-fix-box {
+        position: sticky;
+        left: auto;
+        top: var(--sticky-content-top, 2.5rem);
+        max-height: calc(100vh - var(--sticky-content-top, 2.5rem) - 2rem);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #C5C5C5 transparent;
+        // 改回 position:sticky 后变回正常 flex 子项，会被默认 flex-shrink:1 压窄，显式锁死不收缩。
+        flex-shrink: 0;
+
+        @media screen and (max-width: 768px) {
+            // 只重置 position/max-height 时，上面桌面端 top: var(--sticky-content-top) / left: auto
+            // 还留着生效（媒体查询没显式覆盖的属性不会自动清空），移动端全屏抽屉会偏出屏幕左上角、
+            // 四周露出下层页面，见 fast-site/CLAUDE.md §13 该规则的同一处改动记录。这里补上归零。
+            position: fixed;
+            top: 0;
+            left: 0;
+            max-height: 100vh;
+        }
+    }
+
+    // .list-container 通用规则给侧边栏仍是 fixed/absolute 的页面用（margin-left/width 手动让位）；
+    // item-all 侧边栏已经是正常 flex 子项自己占宽度，两边都让位会把没锁 flex-shrink 的一方挤窄，
+    // 这里改用纯 flex 接管。
+    .list-container {
+        flex: 1;
+        min-width: 0;
+        margin-left: 0;
+        width: auto;
+        // 通用规则的 overflow-y:auto 会把底部分页下拉菜单按容器底边裁掉，item-all 滚动发生在页面本身，
+        // 不需要这层内部滚动边界。
+        // 真实回归过一次：overflow 改成 visible 后不再建立 BFC，移动端 Show more 按钮的上外边距会
+        // 穿透合并塌陷，把按钮位置往下推进 footer 的层叠地盘，用户反馈"被遮挡看不见了"。原想用
+        // display:flow-root 建 BFC 挡住塌陷，实测这个容器同时是 flex 行里 align-items:stretch 的拉伸
+        // 目标，flow-root 触发的新格式化上下文会让"内容自身高度"只按 items-container 一个子项算，
+        // 反而让 #load-more 整个渲染到框外面。改用 padding-bottom 兜底，不影响 flex 拉伸尺寸计算。
+        overflow-y: visible;
+        padding-bottom: 0.1px;
+    }
+}
+
 .item-all-horizontal-item {
     width: 100%;
     padding: 2.5rem;
@@ -277,25 +351,39 @@
         padding: 0;
     }
 
+    // 移动端横竖版切换按钮：用户明确要求跟第一行（筛选计数徽标）同一行、靠右，不要跟第二行的
+    // "X results for Y" 挤在一起，见 fast-site 侧 item-all.css 同位置注释——.layout-controls-box 在
+    // DOM 里嵌套在 .page-filterresult-sort-box > .item-all-layout-sort-group 两层容器里面，Grid 的
+    // grid-row/grid-column 只认直接子元素，这两层中间容器在移动端改成 display:contents（自己不产生
+    // 盒子，只让子元素参与 grid 布局，不影响桌面端），把 .layout-controls-box 和 .page-sort-box 都
+    // 当成 .item-all-filter-layoutcontrol-box 的直接 grid 项显式摆放。
     .item-all-filter-layoutcontrol-box {
         display: grid;
         grid-template-columns: auto 1fr;
         column-gap: 2.5rem;
-        row-gap: 2rem;
+        row-gap: 1rem;
         align-items: center;
-        margin-top: 2rem;
+        margin-top: 1rem;
 
-        .page-filterresult-sort-box {
-            display: flex;
-            grid-column: 1 / -1;
-            width: 100%;
-            padding-left: 0;
-            margin-top: 0 !important;
-            align-items: center;
-            justify-content: space-between;
+        .page-filter-box {
+            grid-row: 1;
+            grid-column: 1;
+        }
+
+        .page-filterresult-sort-box,
+        .item-all-layout-sort-group {
+            display: contents;
+        }
+
+        .layout-controls-box {
+            grid-row: 1;
+            grid-column: 2;
+            justify-self: end;
         }
 
         .page-filterresult-box {
+            grid-row: 2;
+            grid-column: 1;
             font-size: 1.75rem;
             line-height: 2.75rem;
             gap: 0.5rem;
@@ -303,9 +391,15 @@
         }
 
         .page-sort-box {
+            grid-row: 2;
+            grid-column: 2;
+            justify-self: end;
+            // padding-right 之前误加了 0.5rem，把排序图标往左挤出去 0.5rem，.sort-triangle 箭头还是按
+            // "图标贴 box 右边缘（padding-right:0）"这个前提算的固定偏移（见 common.less 里 .sort-triangle
+            // 的 right:1rem，跟 3rem 图标中心对齐），两者就错开了，表现为箭头没对着图标、box 中间露一截
+            // 空隙。去掉这行，padding:0 已经统一清零。
             padding: 0;
             margin-left: 1.25rem;
-            padding-right: 0.5rem;
         }
 
         .page-sort-box > img {
@@ -623,6 +717,20 @@
     .item-all-items-pager {
         align-items: flex-start;
         justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+}
+
+// no-data 空状态要跟筛选侧栏一样高、真正居中（见上面 .page-content 的 align-items:stretch）——中间
+// .items-container（block）和 #items-grid（flex 容器，no-data 用 flex:1 1 100% 填满它）都得透传
+// height:100%，空状态的 flex:1 才有实际高度可填。列表本来就比侧栏高的场景下这里是无操作。
+.item-all-page .item-all-filter-design {
+    .items-container {
+        height: 100%;
+    }
+
+    .item-all-items-pager {
+        height: 100%;
         flex-wrap: wrap;
     }
 }
