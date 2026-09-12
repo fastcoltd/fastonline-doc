@@ -2200,28 +2200,26 @@ button {
   padding-top: 5rem;
   padding-bottom: 3.25rem;
 }
+/* 四列宽度改成真正等分：(容器宽度 - 3 个 gap) / 4，不再是 19.625/16.875/34.625/13.5rem 这种写死的
+   不等宽值。原来配 justify-content:space-between，四列宽度加起来（84.625rem）远小于 1440 容器宽度时，
+   多出来的空间全被 space-between 摊到列与列之间的空隙里而不是分给某一列——最窄的一列（13.5rem）链接
+   文案稍长就得靠 ellipsis 截断，可整行明明还有大把空间没用上。改成 gap + flex:1（flex-basis:0，四列
+   一样）后浏览器自动摊平，不用手算具体数值，列数变化（footerInfo.aboutList 数量后台可配）时也天然
+   适配。gap 复用组件内部本来就在用的 2.5rem。截断的 max-width:100%/ellipsis 仍保留当兜底。 */
 .common-footer-wrapper .footer-content {
-  margin: 0 auto 7.5rem;
+  margin: 0 auto 5rem;
   max-width: var(--container-width);
   display: flex;
-  justify-content: space-between;
+  gap: 2.5rem;
   align-items: flex-start;
 }
 .common-footer-wrapper .footer-item-content {
-  width: 19.625rem;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
   align-items: flex-start;
-}
-.common-footer-wrapper .footer-item-content:nth-child(2) {
-  width: 16.875rem;
-}
-.common-footer-wrapper .footer-item-content:nth-child(3) {
-  width: 34.625rem;
-}
-.common-footer-wrapper .footer-item-content:nth-child(4) {
-  width: 13.5rem;
 }
 .common-footer-wrapper .footer-item-title-box {
   width: 100%;
@@ -2230,7 +2228,7 @@ button {
   align-items: center;
 }
 .common-footer-wrapper .footer-item-title-box > strong {
-  color: #f4f4f4;
+  color: var(--gray-color);
   font-size: 1.75rem;
   line-height: 2.75rem;
   font-weight: 600;
@@ -2259,7 +2257,13 @@ button {
 .common-footer-wrapper .footer-item-desc-box {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 1rem;
+  /* .footer-item-content 显式 align-items:flex-start（不是默认 stretch），这个盒子作为它的 flex 子项
+     本来也会跟着按内容宽度收缩，不会自动撑满列宽——下面 <a> 的 max-width:100% 是相对这个盒子的宽度算的，
+     这个盒子自己没被限制住，max-width:100% 就是套了个寂寞。补上 width:100%，min-width:0 盖掉 flex
+     子项默认的 min-width:auto，不然显式 width 会被自动最小宽度顶住压不下去。 */
+  width: 100%;
+  min-width: 0;
 }
 .common-footer-wrapper .footer-item-desc-box > a {
   color: #FAFAFA;
@@ -2273,6 +2277,13 @@ button {
   display: inline-flex;
   align-self: flex-start;
   padding-bottom: 0.125rem;
+  /* 第 4 列（footer-item-content:nth-child(4)）只有 13.5rem 宽，链接文案比这个宽时（比如稍长的翻译）
+     会直接横向溢出，这一列又贴着 footer-content 的右边缘（max-width:1440px），溢出文字会探出 1440
+     容器边界。加 max-width:100% + 超出省略号，保留原来单行不换行的视觉，只是太长的文案优雅截断。 */
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .common-footer-wrapper .footer-item-desc-box > a::after {
   content: "";
