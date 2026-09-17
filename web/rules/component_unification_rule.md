@@ -105,7 +105,7 @@ docs/plan/<component-name>-unified-component-plan.md
 
 ```html
 <div class="product-card--desktop-vertical">
-<article class="product-card">
+<product class="product-card">
     <figure>
         <img src="image/product.png" alt="Product cover" />
     </figure>
@@ -118,9 +118,11 @@ docs/plan/<component-name>-unified-component-plan.md
         <nav aria-label="Product tags">...</nav>
         <footer>...</footer>
     </section>
-</article>
+</product>
 </div>
 ```
+
+组件根标签不再统一用 `<article>`，改成跟业务实体同名的标签（例如商品卡片 `<item>`、文章卡片 `<post>`，上面示例的 `product` 只是占位说明）——浏览器把它当未知元素渲染，跟 `<article>` 默认行为一致，前提是组件基础 class 必须显式声明 `display`（自定义标签默认 `display: inline`，跟 `<article>` 默认 `display: block` 不一样，别漏这一步）。CSS/JS 一律靠 class 选择器定位，不允许出现 `article` 元素选择器或绑死旧标签名的写法（如 `document.createElement('article')`）。
 
 ### 5.2 组件根节点与外层状态容器
 
@@ -139,7 +141,7 @@ PC / Mobile、Vertical / Horizontal 等互斥状态 class 必须设置在组件�
 
 内部节点必须遵守 `rules/html_selector_simplification_rule.md`：
 
-- 优先使用 `article`、`figure`、`section`、`header`、`h2`、`dl`、`dt`、`dd`、`nav`、`footer` 等语义标签；
+- 组件根标签用跟业务实体同名的标签（见 5.1 说明），内部结构优先使用 `figure`、`section`、`header`、`h2`、`dl`、`dt`、`dd`、`nav`、`footer` 等语义标签；
 - 稳定结构可以表达时，不新增仅用于样式的内部 class；
 - 结构不足以稳定定位时，使用 `data-role`、`data-field` 等属性；
 - 所有结构选择器必须带组件根作用域；
