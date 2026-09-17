@@ -1223,6 +1223,9 @@ button {
 
 .home-menu-page {
     z-index: 101;
+    // 2026-09-17 真机试错记录：曾经加过顶部/底部纯白块想掩盖"缺口跟系统UI对比强烈"的问题，结果
+    // 把真实页面内容也一起盖成不透明白色了，用户反馈应该保持遮罩透明——撤回，改回整块统一的半透明
+    // 灰遮罩。缺口交给 js/common.js 的 syncHomeMenuViewportMetrics()（visualViewport 实时同步）解决。
     background: rgba(0, 0, 0, 0.5);
     width: 0;
     height: 100vh;

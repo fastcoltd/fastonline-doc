@@ -402,6 +402,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const currentUser = getCurrentAuthUser();
         homeMenuPage.style.display = 'flex';
         homeMenuPage.style.width = '100vw';
+        // 用户明确反馈（真机实测）：移动端侧边栏打开后上下没有完全撑满到屏幕顶部/底部，首页只有底部
+        // 有缺口，其它页面（滚动过再打开）顶部+底部都有缺口——纯 CSS 的 height:100vh/100dvh 在真机上
+        // 跟不上浏览器地址栏动态收起/展开的那个瞬间。改成用 visualViewport API 实时同步，比 CSS dvh
+        // 更贴近地址栏过渡的实际状态，且在地址栏继续收起/展开时（resize/scroll 事件）持续校正。不支持
+        // visualViewport 的浏览器自动跳过，退回原来的 CSS height:100vh/100dvh，不会更差。
+        syncHomeMenuViewportMetrics(homeMenuPage);
+        if (window.visualViewport && !homeMenuPage._viewportSyncHandler) {
+            const handler = function () { syncHomeMenuViewportMetrics(homeMenuPage); };
+            homeMenuPage._viewportSyncHandler = handler;
+            window.visualViewport.addEventListener('resize', handler);
+            window.visualViewport.addEventListener('scroll', handler);
+        }
         homeMenuPage.classList.toggle('home-menu-open', true);
         body.classList.toggle('modal-open', true);
         body.classList.toggle('home-menu-open', true);
@@ -631,6 +643,17 @@ class HeaderMenu {
         this.updateSelectedState(defaultValue);
     }
 }
+// 见 headerMenu 点击处理里的注释：用 visualViewport 的实时可见区域覆盖 CSS 的 height:100vh/100dvh，
+// 修正真机上地址栏过渡瞬间的顶部/底部缺口。top 也一起同步——visualViewport.offsetTop 在地址栏收起
+// 过程中不总是 0（地址栏还没完全收起时，可视区域顶端相对 layout viewport 会有一个正偏移量）。
+function syncHomeMenuViewportMetrics(homeMenuPage) {
+    if (!window.visualViewport) {
+        return;
+    }
+    homeMenuPage.style.height = window.visualViewport.height + 'px';
+    homeMenuPage.style.top = window.visualViewport.offsetTop + 'px';
+}
+
 function dismissHomeMenuPage() {
     const body = document.getElementsByTagName('body')[0];
     const homeMenuPage = document.querySelector('.home-menu-page');
@@ -641,6 +664,14 @@ function dismissHomeMenuPage() {
     body.classList.toggle('home-menu-open', false);
     // 跟开菜单时对称：把 <html> 的滚动锁也解掉（菜单和登录弹窗不会同时开，不用额外判断）。
     document.documentElement.classList.toggle('modal-open', false);
+    // 对称清理 visualViewport 监听，同时清掉内联 height/top，恢复吃 CSS 的 height:100vh/100dvh 兜底值。
+    if (homeMenuPage._viewportSyncHandler && window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', homeMenuPage._viewportSyncHandler);
+        window.visualViewport.removeEventListener('scroll', homeMenuPage._viewportSyncHandler);
+        homeMenuPage._viewportSyncHandler = null;
+    }
+    homeMenuPage.style.height = '';
+    homeMenuPage.style.top = '';
 }
 
 function syncHeaderAvatarBadge(headerUser, isAuthenticated, currentUser) {
