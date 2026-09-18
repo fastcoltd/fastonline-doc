@@ -29,12 +29,20 @@
 .page-content .list-container .blog-header .left-part-wrapper .avatar-wrapper {
   flex-shrink: 0;
 }
-.page-content .list-container .blog-header .left-part-wrapper .avatar-wrapper > img {
+.page-content .list-container .blog-header .left-part-wrapper .avatar-wrapper > img,
+.page-content .list-container .blog-header .left-part-wrapper .avatar-wrapper > .avatar-fallback {
   width: 7.5rem;
   height: 7.5rem;
   border-radius: 50%;
   border: 0.1875rem solid #F0F0F3;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--primary-popfont);
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--gray-color);
+  background-color: #f4f4f4;
 }
 .page-content .list-container .blog-header .left-part-wrapper .blog-info-wrapper {
   display: flex;
@@ -62,24 +70,6 @@
   font-weight: 500;
   white-space: nowrap;
 }
-.page-content .list-container .blog-header .left-part-wrapper .blog-mark {
-  flex-shrink: 0;
-  padding: 0.5rem 1rem;
-  border-radius: 0 0 1rem 0;
-  font-weight: 600;
-  color: white;
-  font-family: var(--primary-popfont);
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  font-size: 1.75rem;
-  line-height: 1.75rem;
-}
-.page-content .list-container .blog-header .left-part-wrapper .blog-top-wrapper-title img {
-  width: 8rem;
-  height: 2rem;
-  flex-shrink: 0;
-}
 .page-content .list-container .blog-header .left-part-wrapper .blog-statistics-item {
   display: flex;
   align-items: center;
@@ -100,7 +90,10 @@
 .page-content .list-container .blog-header .right-part-wrapper {
   flex-shrink: 0;
 }
-.page-content .list-container .blog-header .right-part-wrapper [data-action="follow-blog"] {
+/* Follow 按钮：components/like-button.html :: followButton，跟爱心收藏共用 js/favorites.js 的交互，
+   文案走 content:attr() 读 data-label-follow/data-label-following（i18n 好的属性值，见该 fragment
+   顶部注释），不是 CSS content 硬编码英文。 */
+.page-content .list-container .blog-header .right-part-wrapper .btn-follow {
   width: 12.375rem;
   height: 4.625rem;
   border-radius: 6.25rem;
@@ -117,6 +110,18 @@
   border: 0;
   padding: 0;
 }
+.page-content .list-container .blog-header .right-part-wrapper .btn-follow::after {
+  content: attr(data-label-follow);
+}
+.page-content .list-container .blog-header .right-part-wrapper .btn-follow[data-like="1"] {
+  background-color: #fff;
+  color: var(--primary-color);
+  border: 0.125rem solid var(--primary-color);
+  box-shadow: none;
+}
+.page-content .list-container .blog-header .right-part-wrapper .btn-follow[data-like="1"]::after {
+  content: attr(data-label-following);
+}
 .page-content .list-container .blog-intro-section > p {
   font-size: 1.75rem;
   line-height: 2.75rem;
@@ -126,7 +131,7 @@
   font-size: 2.5rem;
   font-weight: 500;
 }
-.page-content .list-container #hot-posts {
+.page-content .list-container #posts-grid {
   margin-top: 2.5rem;
 }
 .page-content .other-info-wrapper {
@@ -151,31 +156,6 @@
   flex-direction: column;
   align-items: center;
   row-gap: 1.25rem;
-  /* 状态标签 */
-}
-.page-content .other-info-wrapper .store-info-wrapper .status-badge {
-  position: absolute;
-  top: 1.625rem;
-  right: -4rem;
-  width: 14rem;
-  height: 3.25rem;
-  padding: 0 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: rotate(37.82deg);
-}
-.page-content .other-info-wrapper .store-info-wrapper .status-badge p {
-  width: 100%;
-  font-family: var(--primary-robotofont);
-  font-weight: 500;
-  font-size: 2rem;
-  line-height: 2.75rem;
-  color: #ffffff;
-  text-align: center;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
 }
 .page-content .other-info-wrapper .store-info-wrapper .avatar-wrapper {
   display: flex;
@@ -183,11 +163,19 @@
   justify-content: center;
   padding: 0;
 }
-.page-content .other-info-wrapper .store-info-wrapper .avatar-wrapper > img {
+.page-content .other-info-wrapper .store-info-wrapper .avatar-wrapper > img,
+.page-content .other-info-wrapper .store-info-wrapper .avatar-wrapper > .avatar-fallback {
   width: 7.5rem;
   height: 7.5rem;
   border-radius: 50%;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--primary-popfont);
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--gray-color);
+  background-color: #f4f4f4;
 }
 .page-content .other-info-wrapper .store-info-wrapper .title {
   display: flex;
@@ -198,6 +186,7 @@
   font-size: 2.5rem;
   line-height: 2.5rem;
   padding: 0;
+  text-decoration: none;
 }
 .page-content .other-info-wrapper .store-info-wrapper .des {
   font-size: 1.75rem;
@@ -205,25 +194,23 @@
   text-align: justify;
   padding: 0;
 }
-.page-content .other-info-wrapper .store-info-wrapper .industry-wrapper {
+/* 品牌 chip 列表：替换原静态稿 .other-industry-wrapper 的假数据块，观感抄 post.css/store.css 里已有的
+   品牌 pill（brand-tinted-text 复用 components/post-card.html 那套，颜色是 NameResponse.extra 内联色，
+   这里只补外层排布）。 */
+.page-content .other-info-wrapper .store-info-wrapper .store-brand-list {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   column-gap: 1rem;
-  color: #FD8E2D;
-  font-size: 1.75rem;
-  line-height: 2.75rem;
+  row-gap: 0.5rem;
   padding: 0;
 }
-.page-content .other-info-wrapper .store-info-wrapper .other-industry-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  column-gap: 1rem;
-  color: #00C27C;
+.page-content .other-info-wrapper .store-info-wrapper .store-brand-item {
   font-size: 1.75rem;
   line-height: 2.75rem;
-  padding: 0;
+  font-weight: 500;
+  text-decoration: none;
 }
 .page-content .other-info-wrapper .store-info-wrapper .star-wrapper {
   display: flex;
@@ -278,35 +265,18 @@
   border-radius: 2.5rem;
   box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.02);
 }
-.page-content .other-info-wrapper .introduction-wrapper {
-  padding: 2.5rem 0;
-  border-radius: 1.5rem;
-  background: #fff;
-  box-sizing: border-box;
-}
-.page-content .other-info-wrapper .introduction-wrapper .title {
-  font-weight: 500;
-  font-size: 2.5rem;
-  line-height: normal;
-  margin: 0 0 1.25rem;
-}
-.page-content .other-info-wrapper .introduction-wrapper .des {
-  font-size: 1.75rem;
-  line-height: normal;
-  margin: 0;
-}
-.page-content .other-info-wrapper .introduction-wrapper .time {
-  font-size: 1.75rem;
-  line-height: normal;
-  margin-top: 2rem;
-}
 .page-content .other-info-wrapper .search-wrapper {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  column-gap: 2.5rem;
 }
-.page-content .other-info-wrapper .search-wrapper > [name="search"] {
+.page-content .other-info-wrapper .search-wrapper form {
+  display: flex;
+  align-items: center;
+  column-gap: 2.5rem;
+  width: 100%;
+}
+.page-content .other-info-wrapper .search-wrapper input[name="postsTitle"] {
   flex: 1;
   width: auto;
   height: 4.625rem;
@@ -320,7 +290,7 @@
   box-sizing: border-box;
   background: #fff;
 }
-.page-content .other-info-wrapper .search-wrapper > [data-action="search-posts"] {
+.page-content .other-info-wrapper .search-wrapper button[type="submit"] {
   width: 9.375rem;
   height: 4.625rem;
   display: flex;
@@ -369,6 +339,7 @@
   display: block;
   color: #000;
   line-height: normal;
+  text-decoration: none;
 }
 .page-content .other-info-wrapper .categories-wrapper {
   padding: 2.5rem 0;
@@ -389,6 +360,14 @@
   font-size: 1.75rem;
   line-height: normal;
   margin: 0;
+}
+.page-content .other-info-wrapper .categories-wrapper .ul-list a {
+  color: #000;
+  text-decoration: none;
+}
+.page-content .other-info-wrapper .categories-wrapper .ul-list a.active {
+  color: var(--primary-color);
+  font-weight: 500;
 }
 .page-content .other-info-wrapper .categories-wrapper .ul-list > dl {
   list-style: none;
@@ -427,7 +406,7 @@
   width: 100%;
   padding: 0;
 }
-.page-content .other-info-wrapper .tags-wrapper .tags-list .tag-item {
+.page-content .other-info-wrapper .tags-wrapper .tags-list a.tag-item {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -439,6 +418,12 @@
   color: #6D6D6D;
   border-radius: 2.5rem;
   box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.02);
+  text-decoration: none;
+}
+.page-content .other-info-wrapper .tags-wrapper .tags-list a.tag-item.active {
+  color: #fff;
+  background: var(--primary-color);
+  border-color: var(--primary-color);
 }
 .page-content .other-info-wrapper .latest-comments-wrapper {
   padding: 2.5rem 0;
@@ -501,105 +486,9 @@
     margin-bottom: 2.5rem;
     padding: 0 2rem;
   }
-  .page-content .list-container .blog-header .left-part-wrapper {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    min-width: 0;
-    font-size: 1.75rem;
-    column-gap: 1.25rem;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .avatar-wrapper {
-    flex-shrink: 0;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .avatar-wrapper > img {
-    width: 7.5rem;
-    height: 7.5rem;
-    border-radius: 50%;
-    border: 0.1875rem solid #F0F0F3;
-    display: block;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .blog-info-wrapper {
-    display: flex;
-    flex-direction: column;
-    row-gap: 0.5rem;
-    min-width: 0;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .blog-top-wrapper {
-    display: flex;
-    align-items: center;
-    min-width: 0;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .blog-top-wrapper-title {
-    column-gap: 1.25rem;
-    flex-wrap: wrap;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .blog-top-wrapper-statistics {
-    column-gap: 2.5rem;
-    row-gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper [data-blog-role="title"] {
-    font-size: 2.5rem;
-    line-height: 2.5rem;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .blog-mark {
-    flex-shrink: 0;
-    padding: 0.5rem 1rem;
-    border-radius: 0 0 1rem 0;
-    font-weight: 600;
-    color: white;
-    font-family: var(--primary-popfont);
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 1.75rem;
-    line-height: 1.75rem;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .blog-top-wrapper-title img {
-    width: 8rem;
-    height: 2rem;
-    flex-shrink: 0;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .blog-statistics-item {
-    display: flex;
-    align-items: center;
-    column-gap: 1.25rem;
-    font-size: 1.75rem;
-    line-height: 2.5rem;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .blog-statistics-item > [data-stat-role="label"] {
-    color: #6D6D6D;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .blog-statistics-item > [data-stat-role="value"] {
-    color: #000;
-    font-weight: 400;
-  }
-  .page-content .list-container .blog-header .left-part-wrapper .blog-statistics-item-paid > [data-stat-role="value"] {
-    font-weight: 700;
-  }
   .page-content .list-container .blog-header .right-part-wrapper {
     flex-shrink: 0;
     margin-left: auto;
-  }
-  .page-content .list-container .blog-header .right-part-wrapper [data-action="follow-blog"] {
-    width: 12.375rem;
-    height: 4.625rem;
-    border-radius: 6.25rem;
-    background-color: var(--primary-color);
-    color: #fff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.75rem;
-    line-height: 2.75rem;
-    font-family: var(--primary-robotofont);
-    box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.02);
-    border: 0;
-    padding: 0;
   }
   .page-content .list-container .blog-intro-section {
     padding: 1.5rem 0 2rem;
@@ -651,7 +540,7 @@
   .page-content .list-container .blog-intro-section > p {
     padding: 0;
   }
-  .page-content .list-container #hot-posts {
+  .page-content .list-container #posts-grid {
     margin-top: 1.5rem;
   }
   .detail-page-menu {
@@ -721,15 +610,10 @@
     background: #fff;
     row-gap: 1.5rem;
   }
-  .blog-sidebar-container .other-info-wrapper::before,
-  .blog-sidebar-container .other-info-wrapper::after {
-    display: none;
-  }
   .blog-sidebar-container .other-info-wrapper > * {
     flex-shrink: 0;
   }
   .blog-sidebar-container .other-info-wrapper .store-info-wrapper,
-  .blog-sidebar-container .other-info-wrapper .introduction-wrapper,
   .blog-sidebar-container .other-info-wrapper .hot-post-wrapper,
   .blog-sidebar-container .other-info-wrapper .categories-wrapper,
   .blog-sidebar-container .other-info-wrapper .tags-wrapper,
@@ -737,7 +621,7 @@
     padding-top: 1rem;
     padding-bottom: 1rem;
   }
-  .blog-sidebar-container .other-info-wrapper .search-wrapper {
+  .blog-sidebar-container .other-info-wrapper .search-wrapper form {
     column-gap: 1rem;
   }
   .page-content .blog-sidebar-container > img {

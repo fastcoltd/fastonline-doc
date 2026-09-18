@@ -117,7 +117,10 @@
             .right-part-wrapper {
                 flex-shrink: 0;
 
-                [data-action="follow-blog"] {
+                // Follow 按钮改用 components/like-button.html :: followButton（.btn-follow），跟爱心
+                // 收藏共用 js/favorites.js 的收藏/取消收藏交互；文案用 content:attr() 读
+                // data-label-follow/data-label-following（i18n 好的属性值），不是 CSS 里写死英文。
+                .btn-follow {
                     width: 12.375rem;
                     height: 4.625rem;
                     border-radius: 6.25rem;
@@ -133,6 +136,21 @@
                     box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.02);
                     border: 0;
                     padding: 0;
+
+                    &::after {
+                        content: attr(data-label-follow);
+                    }
+
+                    &[data-like="1"] {
+                        background-color: #fff;
+                        color: var(--primary-color);
+                        border: 0.125rem solid var(--primary-color);
+                        box-shadow: none;
+
+                        &::after {
+                            content: attr(data-label-following);
+                        }
+                    }
                 }
             }
         }
@@ -247,15 +265,24 @@
                 padding: 0;
             }
 
-            .other-industry-wrapper {
+            // 替换原来的 .other-industry-wrapper（数据本身是假的 "[object Object]"）：改成店铺关联的
+            // 多品牌 chip 列表（storeInfo.brandList，颜色走 NameResponse.extra 内联色，跟
+            // components/post-card.html 的 brand-tinted-text 是同一套）。
+            .store-brand-list {
                 display: flex;
+                flex-wrap: wrap;
                 align-items: center;
                 justify-content: center;
                 column-gap: 1rem;
-                color: #00C27C;
+                row-gap: 0.5rem;
+                padding: 0;
+            }
+
+            .store-brand-item {
                 font-size: 1.75rem;
                 line-height: 2.75rem;
-                padding: 0;
+                font-weight: 500;
+                text-decoration: none;
             }
 
             .star-wrapper {
@@ -677,7 +704,7 @@
                     flex-shrink: 0;
                     margin-left: auto;
 
-                    [data-action="follow-blog"] {
+                    .btn-follow {
                         width: 12.375rem;
                         height: 4.625rem;
                         border-radius: 6.25rem;
@@ -884,5 +911,68 @@
             transform: translateX(0);
         }
     }
+}
+
+// 下面几条是这次新加的（博主头像/店铺 logo 没图时的首字母兜底圆形块，跟 contact-us 页 view.avatarInitial
+// 是同一个思路；Categories/Tag List 当前激活项的高亮态，PJAX 切换筛选条件后要看得出选中了哪个）。
+.page-content .list-container .blog-header .left-part-wrapper .avatar-wrapper > img,
+.page-content .list-container .blog-header .left-part-wrapper .avatar-wrapper > .avatar-fallback {
+    width: 7.5rem;
+    height: 7.5rem;
+    border-radius: 50%;
+    border: 0.1875rem solid #F0F0F3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--primary-popfont);
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--gray-color);
+    background-color: #f4f4f4;
+}
+.page-content .other-info-wrapper .store-info-wrapper .avatar-wrapper > img,
+.page-content .other-info-wrapper .store-info-wrapper .avatar-wrapper > .avatar-fallback {
+    width: 7.5rem;
+    height: 7.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--primary-popfont);
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--gray-color);
+    background-color: #f4f4f4;
+}
+.page-content .other-info-wrapper .store-info-wrapper .title {
+    text-decoration: none;
+}
+.page-content .other-info-wrapper .categories-wrapper .ul-list a {
+    color: #000;
+    text-decoration: none;
+}
+.page-content .other-info-wrapper .categories-wrapper .ul-list a.active {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+.page-content .other-info-wrapper .tags-wrapper .tags-list a.tag-item {
+    text-decoration: none;
+}
+.page-content .other-info-wrapper .tags-wrapper .tags-list a.tag-item.active {
+    color: #fff;
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.page-content .other-info-wrapper .hot-post-wrapper .post-list > div > a {
+    text-decoration: none;
+}
+.page-content .other-info-wrapper .search-wrapper {
+    align-items: center;
+}
+.page-content .other-info-wrapper .search-wrapper form {
+    display: flex;
+    align-items: center;
+    column-gap: 2.5rem;
+    width: 100%;
 }
 }
