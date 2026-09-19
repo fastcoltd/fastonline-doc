@@ -18,7 +18,6 @@
     > section {
         flex: 1;
         width: calc(100% - 38rem);
-        padding: 1.25rem 0;
         display: grid;
         grid-template-columns: minmax(0, 1fr);
         grid-template-areas:
@@ -27,7 +26,7 @@
             "fields"
             "tags";
         align-items: start;
-        row-gap: 1.25rem;
+        row-gap: 1rem;
     }
 
     > section > header {
@@ -65,7 +64,7 @@
         display: flex;
         align-items: baseline;
         flex-wrap: wrap;
-        gap: 1.25rem 5rem;
+        gap: 1.25rem 1.5rem;
     }
 
     [data-role="meta"] > dl > div {
@@ -74,9 +73,46 @@
         flex: 0 0 auto;
     }
 
+    // 用户明确反馈过：Brand/Service/Price/In stock 这4项本来就该在一行，之前5rem的字段间距+Price写死
+    // 18.625rem的min-width，稍窄一点的桌面宽度（不只是 campaigns 详情页带侧边目录挤出来的窄列，
+    // /en/items 自己也复现过）就会把 In stock 顶到下一行。间距收紧、Price 的 min-width 去掉，Service
+    // 名字长的话做省略号截断（不截断会自己把行撑爆、变相挤出后面的字段）。
     [data-field="price"] {
-        min-width: 18.625rem;
+        min-width: 0;
         flex: 0 0 auto;
+    }
+
+    // Service 不用写死宽度——之前的选择器 [data-role=meta] > dl > div（第 70 行）比裸
+    // [data-field=service] 多两层元素选择器，优先级更高，flex:1 1 0% 从来没真正生效过，实际用的一直是
+    // 继承来的默认 flex:0 0 auto（用 DevTools 挂 computed style 现场验证到的）。选择器精确到
+    // [data-role=meta] > dl > [data-field=service] 这一层，优先级才够高，flex-grow 才真正生效。纯
+    // flex-grow（不加上限）实测又发现新问题：这个 div 自己也是 flex（dt+dd 一行），grow 撑大的是这个
+    // div 的盒子本身，里面的 dt/dd 不会跟着占满，文字后面会留一截空白，不好看（用户反馈）。折中方案：
+    // flex-grow 负责"抢到剩余空间"，max-width:36rem 兜底一个上限——正常桌面宽度下基本能完整显示大多数
+    // 服务名，只有极端长文案才会触发截断，也不会像无上限纯 grow 那样在文案短、空间富余时把格子撑出空白。
+    [data-role="meta"] > dl > [data-field="service"] {
+        flex: 1 1 0%;
+        min-width: 0;
+        max-width: 36rem;
+    }
+
+    // dd 本身是 flex（图标 + <span> 文案），text-overflow:ellipsis 直接写在 flex 容器上不生效——省略号
+    // 只对"自身文本溢出的单行块级/内联块级上下文"起作用，flex 容器裁剪只会硬切掉溢出的子元素，不出
+    // "..."（实测复现：长文案被齐边裁断，没有省略号）。真正需要 ellipsis 效果的必须落在文本节点自己的
+    // 直接容器（这里是 <span>）上。
+    [data-field="service"] dd {
+        min-width: 0;
+        max-width: 100%;
+
+        span {
+            display: inline-block;
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
     }
 
     > section > nav {

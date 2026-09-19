@@ -587,3 +587,533 @@
   }
 
 }
+
+/* ============================================================================================
+   以下是 fast-site SSR 详情页（templates/pages/compaign-detail.html）实际使用的规则，2026-09-20
+   补充同步。SSR 版没有照抄上面这套 static-source 原稿（section-0..7 手工分段 + 逐帧算位置的
+   initCompaignDetailStickySummary/initCompaignDetailAnchors），侧边目录改成 CLAUDE.md §13 标准
+   position:sticky 方案（跟 detail/resource-detail.less 的 .resource-detail-body 同一套技术），正文
+   content 是运营后台写的一整块富文本，标题现场用 JS 扫出来建目录，不是预先分好的 section。
+   这里只保证 fast-site/static/css/detail/compaign-detail.css 的最新内容有一份 .less 备份，不代表上面
+   那套旧结构在 static-source 的 compaign-detail.html 里已经跟着换掉——那部分改动不在本次任务范围内。
+   ============================================================================================ */
+
+.compaign-detail-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-bottom: 1.25rem;
+
+  &.is-sticky {
+    gap: 1rem;
+  }
+}
+@media screen and (max-width: 768px) {
+  .compaign-detail-summary.is-sticky {
+    gap: 0.5rem;
+  }
+}
+
+.compaign-detail-summary-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+
+  .icon-aixin {
+    position: relative;
+    right: unset;
+    top: unset;
+    left: unset;
+    margin-left: auto;
+    width: 3rem;
+    height: 3rem;
+    flex-shrink: 0;
+  }
+}
+
+.compaign-detail-summary-title-group {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.compaign-detail-summary-title-group > h1 {
+  font-family: var(--primary-popfont);
+  font-size: 3.5rem;
+  line-height: 5rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.compaign-detail-summary > p {
+  max-width: 100%;
+  font-family: var(--primary-popfont);
+  font-size: 1.75rem;
+  line-height: 3rem;
+  font-weight: 400;
+  color: #000;
+  margin: 0;
+}
+
+.compaign-detail-summary-meta {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5rem;
+
+  /* 标签 nav（SSR 版 components/tag-list.html 的 tags() 片段输出）直接是这里的子节点，没有额外包一层
+     带 class 的容器。用户明确要求"不用换行，一行显示不下就显示+n，移动端也显示一行超出可左右滚动"——
+     完全照抄 detail/post-detail.less 的 .reads-tag-wrapper > nav 那一套：桌面靠 js/item-all-tag-overflow.js
+     折叠成 "+N"（flex-wrap:wrap + max-height 只是给 JS 量"第一行能放几个"用），移动端 nowrap + 横滚。 */
+  > nav {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 4rem;
+    max-height: 4rem;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-content: flex-start;
+
+    > [data-role="more"] {
+      flex: 0 0 auto;
+      padding: 0.5rem 1rem;
+      color: #000;
+      font-family: var(--primary-popfont);
+      font-size: 1.75rem;
+      line-height: 2.75rem;
+      font-weight: 400;
+      text-decoration: underline;
+      white-space: nowrap;
+    }
+    > .item-all-tag-overflow-hidden {
+      display: none;
+    }
+  }
+}
+@media screen and (max-width: 768px) {
+  .compaign-detail-summary-meta > nav {
+    width: 100%;
+    height: 2.25rem;
+    max-height: 2.25rem;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    .item-tag {
+      flex: 0 0 auto;
+      height: 2.25rem;
+      padding: 0 0.5rem;
+      border-radius: 1.125rem;
+    }
+    .item-tag-text {
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+    }
+  }
+  .compaign-detail-summary-meta {
+    gap: 0.5rem;
+  }
+}
+
+.compaign-detail-summary-stats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem 5rem;
+}
+
+.compaign-detail-summary-stats p {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--primary-popfont);
+  font-size: 1.75rem;
+  line-height: 3rem;
+  margin: 0;
+}
+
+.compaign-detail-summary-stats [data-stat-role=label] {
+  color: var(--gray-color);
+}
+
+.compaign-detail-summary-stats [data-stat-role=value] {
+  color: #000;
+  line-height: 2.5rem;
+}
+
+.compaign-detail-body {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2.5rem;
+
+  > .article-content {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  > .table-of-container {
+    position: sticky;
+    top: var(--sticky-content-top, 2.5rem);
+    align-self: flex-start;
+    flex: 0 0 51.25rem;
+    max-height: calc(100vh - var(--sticky-content-top, 2.5rem) - 2rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+.article-content {
+  width: 100%;
+  gap: 3.75rem;
+  position: relative;
+  padding-bottom: 2.5rem;
+}
+
+.compaign-detail-content {
+  display: block;
+  width: 100%;
+  font-family: var(--primary-popfont);
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 2.75rem;
+  color: #000000;
+  white-space: normal;
+  word-break: break-word;
+  word-wrap: break-word;
+
+  // 全部用 "> " 只认直接子节点，不能用裸后代选择器——item-card.html 自己内部也有 <h2>（商品标题）和
+  // <p>（评分数字 "4.8"/"(9)" 两个 p:first-of-type/nth-of-type(2)），后代选择器会连带把这两条正文
+  // 排版规则套到商品卡片头上：p 的 margin:0 0 1.25rem 让 .item-star-box-mobile 里评分数字那个
+  // <p:first-of-type> 意外吃到 margin-bottom，flex 按"文字+margin"撑大的总高度去居中，数字文字就跟着
+  // 往上偏出星星图标的水平线（用户截图发现的"评分数字和星星不在同一条线上"）。
+  > :is(h1, h2, h3, h4) {
+    font-family: var(--primary-popfont);
+    font-weight: 600;
+    color: #000000;
+    line-height: 1.2;
+    margin: 2.5rem 0 1.25rem;
+    scroll-margin-top: 10rem;
+  }
+  // 正文第一个直接子节点如果就是标题，不要顶部间距——用户明确反馈这里空出一截不好看，第一个除外的意思
+  // 是"除了第一个都保留"。
+  > :is(h1, h2, h3, h4):first-child {
+    margin-top: 0;
+  }
+  > h1 { font-size: 2.75rem; }
+  > h2 { font-size: 2.5rem; }
+  > h3 { font-size: 2.125rem; }
+  > h4 { font-size: 1.875rem; }
+  > p {
+    margin: 0 0 1.25rem;
+
+    > img {
+      max-width: 60%;
+      border-radius: 1.5rem;
+      margin: 2rem 0;
+    }
+  }
+}
+// 商品占位卡片替换出来的 item-card 隔绝 .compaign-detail-content 的排版继承（font-size/line-height/
+// color 都是可继承属性），保险起见先断开，虽然实测发现真正的问题不在这——即使重置回默认值，横版移动态
+// 卡片内容高度依然比写死的 13.875rem 高出几像素（实测 114 vs /en/items 上刚好压线相等的 111），这个
+// 固定高度设计本身没有缓冲空间。超出的部分本来会被 overflow:hidden 切掉，表现成"BUY NOW 按钮被遮挡"
+// （用户真机截图发现的）——真正的修法是把固定 height 换成 min-height，让卡片按需要顺势长高，不裁按钮。
+.compaign-detail-embed-item {
+  font-family: initial;
+  font-size: initial;
+  font-weight: initial;
+  line-height: normal;
+  color: initial;
+  white-space: normal;
+
+  // desktop-horizontal 的 section 本来没写死 height（靠 figure 撑开），不需要也不该套这条，PC 端会
+  // 凭空多出空白，只覆盖移动横版这一态。
+  &.item-all-card--mobile-horizontal .item-all-card {
+    height: auto;
+    min-height: 13.875rem;
+
+    > section {
+      height: auto;
+      min-height: 13.875rem;
+    }
+  }
+
+  // PC 横版商品卡片 Brand/Service/Price/In stock 这一行——间距收紧、Price 去掉 min-width、Service 改成
+  // flex-grow 动态吃剩余空间这几条都是全局修复（见 item-all-card-desktop-horizontal.less）。之前这里
+  // 加过 max-width 硬上限兜底，后来发现全局那边 flex:1 1 0% 因为选择器优先级不够一直没真正生效——补对
+  // 优先级后就是标准的 flex-grow 效果，按实际剩余空间分配，本身就能适应任意宽度的容器，不需要再猜一个
+  // 页面专属的数字，这里不用再单独覆盖。
+}
+.compaign-detail-content {
+  // 只作用富文本正文里手写的插图，不能用裸 "img" 选择器——会连带匹配到商品占位卡片替换出来的
+  // item-card 自己的封面图（本来是 width:100%;height:100%），被 max-width:60% 强行封顶，figure
+  // 盒子本身没跟着变小，卡片空出一大块、按钮被挤没了，PC 端还看出卡片整体高度不对（用户实测发现）。
+  > img {
+    max-width: 60%;
+    border-radius: 1.5rem;
+    margin: 2rem 0;
+  }
+  // 不额外加 margin——卡片自己的横版状态样式已经带 margin-bottom，跟 /en/items 横版列表卡片间距一致，
+  // 这里再加会变成两倍间距（用户明确要求间距要跟 /items 一致）。
+}
+
+@media screen and (max-width: 768px) {
+  .compaign-detail-body {
+    display: block;
+    padding: 1rem 0 0 0;
+
+    > .table-of-container {
+      position: fixed;
+      top: 50%;
+      flex: none;
+      max-height: none;
+      overflow: hidden;
+    }
+  }
+  .article-content {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    gap: 1.25rem;
+    padding-bottom: 2.5rem;
+  }
+  .compaign-detail-content {
+    > :is(h1, h2, h3, h4) {
+      margin: 1.5rem 0 0.75rem;
+      scroll-margin-top: 7rem;
+    }
+    > :is(h1, h2, h3, h4):first-child {
+      margin-top: 0;
+    }
+    > h1 { font-size: 2rem; }
+    > h2 { font-size: 1.875rem; }
+    > h3 { font-size: 1.75rem; }
+    > h4 { font-size: 1.625rem; }
+    > img, > p > img {
+      max-width: 100%;
+      border-radius: 0.5rem;
+      margin: 0.75rem 0;
+    }
+  }
+  .compaign-detail-summary-title-group > h1 {
+    font-size: 2.5rem;
+    line-height: 3.5rem;
+  }
+  .compaign-detail-summary > p {
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+  }
+  // 移动端一行显示（用户明确要求），字段太多摆不下就横向滚动，不换行。
+  .compaign-detail-summary-stats {
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 0.5rem 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  .compaign-detail-summary-stats p {
+    flex: 0 0 auto;
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+    white-space: nowrap;
+  }
+}
+
+.table-of-container {
+  width: 51.25rem;
+  border-radius: 2.5rem;
+}
+.table-of-contents {
+  position: relative;
+  width: 51.25rem;
+  background-color: #FFFFFF;
+  border: 0.125rem solid #F0F0F3;
+  border-radius: 2.5rem;
+  padding: 2.5rem;
+
+  > p {
+    font-family: "Inter", var(--primary-popfont);
+    font-size: 2.5rem;
+    line-height: 2.75rem;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 1rem;
+  }
+  > div:first-of-type {
+    width: 100%;
+    height: 0;
+    border-top: 0.125rem solid #F0F0F3;
+    margin-bottom: 1rem;
+  }
+}
+.table-of-container > img {
+  display: none;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5rem;
+  height: 5rem;
+  margin-bottom: 2.5rem;
+  cursor: pointer;
+}
+.toc-item {
+  font-family: "Inter", var(--primary-popfont);
+  font-size: 1.75rem;
+  line-height: 2.75rem;
+  font-weight: 400;
+  color: var(--gray-color);
+  padding: 0.5rem 0;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+
+  &.active {
+    color: #FF1B20;
+    font-weight: 500;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .detail-page-menu {
+    z-index: 108;
+    padding: 0;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background: #FF1B20;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    overflow: hidden;
+
+    &[aria-expanded=true] {
+      display: none !important;
+    }
+    img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 50%;
+    }
+  }
+  .table-of-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 320;
+    background-color: #fff;
+    width: fit-content;
+    max-width: calc(100vw - 8rem);
+    height: auto;
+    max-height: 100vh;
+    max-height: 100dvh;
+    border-radius: 0;
+    transition: all 0.2s ease-in-out;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: -0.5rem 0 2rem rgba(0, 0, 0, 0.16);
+
+    &.page-fix-box {
+      left: auto;
+      right: 0;
+      transform: translateY(-50%);
+    }
+    &.is-open {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+  .table-of-contents {
+    background-color: #fff;
+    border-radius: 0;
+    border: 0.125rem solid #F0F0F3;
+    width: fit-content;
+    min-width: 30rem;
+    max-width: 100%;
+    padding: 2rem;
+    overflow-y: auto;
+  }
+  // 移动端浮窗底部的 X 关闭图标——照抄 detail/post-detail.less 同名规则，之前漏了这条移动端覆盖，
+  // 基础规则是 display:none，没补 display:block 之前图标不可见（DOM 和关闭逻辑都在，只是看不见）。
+  .table-of-container > img {
+    display: block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5rem;
+    height: 5rem;
+    margin: 0;
+    flex: 0 0 auto;
+  }
+}
+
+/* Recommend Campaigns 展示是轮播，跟首页 hot-compaigns 板块同一套 carousel-container/carousel-track/
+   carousel-indicators 用法（不是点击式分页，用户明确要求跟首页板块风格一致）。每屏固定 4 个卡片，
+   PC 一行放满 4 个、Mobile 两个一行——数值完全照抄首页 css/index.less 的 .hot-compaigns-pager，不用
+   compaign-all-card-desktop-vertical.less 默认的 3 列。 */
+.recommend-campaigns-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+
+  [data-section-role=title] {
+    font-family: "Inter", var(--primary-popfont);
+    font-size: 2.5rem;
+    line-height: 2.75rem;
+    font-weight: 500;
+    color: #000;
+  }
+}
+.recommend-campaigns-pager {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 2rem;
+}
+.compaign-all-card--desktop-vertical .recommend-campaigns-pager > .compaign-all-card {
+  width: calc((100% - 6rem) / 4);
+  margin: 0;
+}
+// mobile 状态 gap 也要跟着从 2rem 收到 1rem，卡片宽度公式是按 1rem gap 算的，不然两卡总宽度超出 100%
+// 挤成一行一个（照抄首页 index.less 在 ≤768px 把 .hot-compaigns-pager 的 gap 改成 1rem 那条）。
+.compaign-all-card--mobile-vertical .recommend-campaigns-pager {
+  gap: 1rem;
+}
+.compaign-all-card--mobile-vertical .recommend-campaigns-pager > .compaign-all-card {
+  width: calc((100% - 1rem) / 2);
+  margin: 0;
+}
