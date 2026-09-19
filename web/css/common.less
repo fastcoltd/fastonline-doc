@@ -125,6 +125,10 @@ body {
     color: #000;
     overflow: auto;
     overflow-x: hidden;
+    /* 禁止移动端双击放大（用户明确要求，2026-09-19，博客页反馈过）：viewport 的 user-scalable=no
+       理论上该管这个，但部分移动端浏览器双击缩放走的是独立手势识别，不完全受它约束，touch-action:
+       manipulation 才是显式关掉双击缩放+去掉 300ms 点击延迟的做法，全站统一加，不只是博客页单独加。 */
+    touch-action: manipulation;
     scrollbar-width: thin;
     scrollbar-color: #C5C5C5 transparent;
     position: relative;

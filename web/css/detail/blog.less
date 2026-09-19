@@ -3,10 +3,16 @@
     align-items: flex-start;
     justify-content: space-between;
     column-gap: 2rem;
+    padding: 0;
 
     .list-container {
         margin-left: 0;
         width: calc(100% - 51.25rem);
+        /* common.less 里全站共用的 .list-container 基础规则带了 overflow-y:auto（给 item-all 那种"侧边
+           筛选面板+可独立滚动列表"场景用的），博客页复用了同一个 class 名但语义不同，这个 overflow 会
+           意外裁掉底部分页"每页条数"下拉框往下展开超出容器的部分（用户 2026-09-19 反馈+实测确认，根因
+           不是 z-index，是这个裁剪）。显式覆盖回 visible。 */
+        overflow: visible;
 
         .blog-intro-section {
             padding: 1.5rem 0 2rem;
@@ -180,6 +186,8 @@
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
+        /* 用户明确要求（2026-09-19）：改成0之后各区块完全贴在一起，用户后来澄清要的是"统一的标准间距"
+           不是"没有间距"，改回原来的2.5rem。 */
         row-gap: 2.5rem;
 
         .store-info-wrapper {
@@ -322,17 +330,63 @@
                 }
             }
 
+            /* 服务展示跟 store-all-card 的 [data-field=service] 同一套风格（用户明确要求，2026-09-19）：
+               纯文字 + "|" 分隔符，不是标签 chip，所以跟 tags-wrapper 的 chip 样式分开写，不再共用。
+               PC 端超出一行折叠成 "+N"（用户明确要求）：nowrap + overflow:hidden，靠
+               js/blog-filter.js 的 fitStoreInfoOverflow() 按宽度算，超了就从末尾依次藏起来。 */
+            .store-service-list {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: nowrap;
+                overflow: hidden;
+                width: 33rem;
+                gap: 0.5rem;
+                padding: 0;
+
+                .store-card-value {
+                    flex-shrink: 0;
+                    white-space: nowrap;
+                    font-size: 1.75rem;
+                    line-height: 2.75rem;
+                    color: #000;
+
+                    &:not(:first-child)::before {
+                        content: '|';
+                        margin-right: 0.5rem;
+                        color: #b0b0b0;
+                    }
+
+                    &.store-card-value-hidden {
+                        display: none;
+                    }
+                }
+            }
+
+            .store-service-list,
+            .tags-wrapper {
+                [data-role='more'] {
+                    flex-shrink: 0;
+                    font-size: 1.75rem;
+                    line-height: 2.75rem;
+                    color: var(--gray-color);
+                }
+            }
+
             .tags-wrapper {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
                 justify-content: center;
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
+                overflow: hidden;
                 width: 33rem;
                 gap: 0.75rem;
                 padding: 0;
 
                 .tag-item {
+                    flex-shrink: 0;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -343,6 +397,11 @@
                     color: #6D6D6D;
                     border-radius: 2.5rem;
                     box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.02);
+                    text-decoration: none;
+
+                    &.tag-item-hidden {
+                        display: none;
+                    }
                 }
             }
         }
@@ -414,7 +473,8 @@
         }
 
         .hot-post-wrapper {
-            padding: 2.5rem 0;
+            /* 用户明确要求（2026-09-19）：PC端这里的上下padding改成0。 */
+            padding: 0;
             border-radius: 1.5rem;
             background: #fff;
 
@@ -452,7 +512,8 @@
         }
 
         .categories-wrapper {
-            padding: 2.5rem 0;
+            /* 用户明确要求（2026-09-19）：PC端这里的上下padding改成0。 */
+            padding: 0;
             border-radius: 1.5rem;
             background: #fff;
 
@@ -495,7 +556,8 @@
         }
 
         .tags-wrapper {
-            padding: 2.5rem 0;
+            /* 用户明确要求（2026-09-19）：PC端这里的上下padding改成0。 */
+            padding: 0;
             border-radius: 1.5rem;
             background: #fff;
             display: flex;
@@ -533,7 +595,8 @@
         }
 
         .latest-comments-wrapper {
-            padding: 2.5rem 0;
+            /* 用户明确要求（2026-09-19）：PC端这里的上下padding改成0。 */
+            padding: 0;
             border-radius: 1.5rem;
             background: #fff;
             display: flex;
@@ -777,6 +840,15 @@
                     right: 0;
                     margin-left: 0;
                     transform: translateY(-50%);
+
+                    /* Follow 按钮桌面尺寸（12.375rem × 4.625rem）照搬进移动端过大（用户明确要求，
+                       2026-09-19），收窄到跟这个页面其它移动端按钮同一密度。 */
+                    .btn-follow {
+                        width: 8.5rem;
+                        height: 3.5rem;
+                        font-size: 1.5rem;
+                        line-height: 2.25rem;
+                    }
                 }
 
                 .blog-top-wrapper-title {
@@ -798,8 +870,8 @@
     .detail-page-menu {
         z-index: 319;
         padding: 0;
-        width: 56px;
-        height: 56px;
+        width: 5rem;
+        height: 5rem;
         border-radius: 50%;
         background: #FF1B20;
         border: none;
@@ -833,7 +905,8 @@
         transform: none;
         z-index: 320;
         background-color: #fff;
-        width: calc(100vw - 8rem);
+        /* 用户明确要求（2026-09-19）：浮窗整体再窄一点，预留边距从 8rem 加到 10rem。 */
+        width: calc(100vw - 10rem);
         height: 100vh;
         height: 100dvh;
         max-height: 100vh;
@@ -858,14 +931,14 @@
         max-height: none;
         margin: 0;
         height: auto;
-        padding: 1rem;
+        padding: 1.5rem;
         border-radius: 0;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
         border: 0.125rem solid #F0F0F3;
         background: #fff;
-        row-gap: 1.5rem;
+        row-gap: 2rem;
     }
 
     .blog-sidebar-container .other-info-wrapper::before,
@@ -898,8 +971,187 @@
         transform: translateX(-50%);
         width: 5rem;
         height: 5rem;
-        margin: 1.5rem 0 max(2.25rem, env(safe-area-inset-bottom, 2.25rem));
+        /* 上下间距对齐 post-detail.less 移动端浮窗的 X 按钮写法（用户明确要求，2026-09-19，那边是
+           margin:0rem）。 */
+        margin: 0;
         flex: 0 0 auto;
+    }
+
+    /* 移动端抽屉内部字体/间距/按钮高宽紧凑化（用户明确要求，2026-09-19）：桌面态这些规则原样搬进抽屉后
+       字号/间距完全没变，视觉上过大过松，跟其它页面移动端的密度不一致。统一按站内惯例（正文
+       1.75rem→1.5rem、标题2.5rem→1.75rem、行高/内边距同比收紧）逐块收窄，不改布局结构，只改尺寸。 */
+    /* 用户反馈截图后再收紧一档（2026-09-19）：整体还是偏大，头像/标题/评分数字再往下调一级。 */
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper {
+        padding: 1rem;
+        /* 用户明确要求（2026-09-19，最终定为1rem）。 */
+        row-gap: 1rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .avatar-wrapper > img,
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .avatar-wrapper > .avatar-fallback {
+        width: 5rem;
+        height: 5rem;
+        font-size: 1.5rem;
+    }
+
+    /* 用户明确要求（2026-09-19）：店铺标题恢复桌面原尺寸，不在移动端缩小。 */
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .des {
+        font-size: 1.5rem;
+        line-height: 1.75rem;
+    }
+
+    /* 用户明确要求（2026-09-19）：品牌字号改成1.5rem。 */
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .store-brand-item {
+        font-size: 1.5rem;
+        line-height: 2rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .star-wrapper .item-star-box > p:first-of-type,
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .star-wrapper .item-star-box > p:nth-of-type(2) {
+        font-size: 1.5rem;
+        line-height: 2rem;
+    }
+
+    /* 用户明确要求（2026-09-19）：这里的评分要按标准5颗星形态展示，不要common.less全站≤768px默认切换成的
+       单图标简化版（.item-star-box-mobile，见 components/rating.html 顶部注释）——只在这一个位置覆盖
+       显隐，不改全站其它卡片的移动端评分展现方式。 */
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .star-wrapper .item-star-box-pc {
+        display: flex;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .star-wrapper .item-star-box-mobile {
+        display: none;
+    }
+
+    /* 星星图形本身站内从来没有移动端专属尺寸（.item-star-box-pc 平时全站在≤768px直接display:none，
+       这是第一次在移动端露出），星星素材固定21.125rem×3.625rem照搬进这么窄的抽屉里偏大，按比例缩小
+       （用户明确要求，2026-09-19）。 */
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .star-wrapper .star-bg {
+        width: 15rem;
+        height: 2.5rem;
+    }
+
+    /* 用户明确要求（2026-09-19）：统计/服务/标签字号统一。 */
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .store-statistics-wrapper {
+        column-gap: 0.5rem;
+        font-size: 1.5rem;
+        line-height: 1.75rem;
+    }
+
+    /* 店铺这里的标签/服务只显示一行（用户明确要求）：换成不换行 + 横向可滑动，而不是继续 wrap 占多行。
+       tag-item 加 flex-shrink:0 防止在 nowrap 容器里被压缩变形。宽度改回 100% 跟随抽屉实际可用宽度，
+       桌面态写死的 33rem 在这么窄的容器里没有意义。 */
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .store-service-list,
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .tags-wrapper {
+        width: 100%;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .store-service-list::-webkit-scrollbar,
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .tags-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* 服务字号对齐 store-all-card--mobile-vertical 卡片 dt/dd 的移动端字号（1.5rem/2rem），
+       用户明确要求，2026-09-19。 */
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .store-service-list .store-card-value {
+        flex-shrink: 0;
+        font-size: 1.5rem;
+        line-height: 1.75rem;
+    }
+
+    /* 标签沿用 .item-tag 移动端的紧凑高度/内边距/圆角，字号跟统计/服务统一改成 1.5rem
+       （用户明确要求，2026-09-19）。 */
+    .blog-sidebar-container .other-info-wrapper .store-info-wrapper .tags-wrapper .tag-item {
+        flex-shrink: 0;
+        height: 2.25rem;
+        padding: 0 0.5rem;
+        border-radius: 1.125rem;
+        font-size: 1.5rem;
+        line-height: 1.75rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .search-wrapper input[name='postsTitle'] {
+        height: 3.5rem;
+        line-height: 3.5rem;
+        padding: 0 1rem;
+        font-size: 1.5rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .search-wrapper button[type='submit'] {
+        width: 7rem;
+        height: 3.5rem;
+        font-size: 1.5rem;
+        line-height: 2.25rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper > .hot-post-wrapper,
+    .blog-sidebar-container .other-info-wrapper > .categories-wrapper,
+    .blog-sidebar-container .other-info-wrapper > .tags-wrapper,
+    .blog-sidebar-container .other-info-wrapper > .latest-comments-wrapper {
+        /* 用户明确要求（2026-09-19）：去掉这个上下内边距，不要1.5rem了。 */
+        padding: 0;
+        row-gap: 1rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper > .hot-post-wrapper .title,
+    .blog-sidebar-container .other-info-wrapper > .categories-wrapper .title,
+    .blog-sidebar-container .other-info-wrapper > .tags-wrapper .title,
+    .blog-sidebar-container .other-info-wrapper > .latest-comments-wrapper .title {
+        font-size: 1.75rem;
+        padding-bottom: 1rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .hot-post-wrapper .post-list {
+        row-gap: 1rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .hot-post-wrapper .post-list > div {
+        font-size: 1.5rem;
+    }
+
+    /* Hot Posts 移动端单行不换行、超出省略号（用户明确要求，2026-09-19）。 */
+    .blog-sidebar-container .other-info-wrapper .hot-post-wrapper .post-list > div > a {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .categories-wrapper .ul-list > li,
+    .blog-sidebar-container .other-info-wrapper .categories-wrapper .ul-list > dl > li {
+        font-size: 1.5rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .categories-wrapper .ul-list > dl {
+        margin: 0.5rem 0 1rem;
+        padding-left: 1.5rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper > .tags-wrapper .tags-list {
+        gap: 0.5rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper > .tags-wrapper .tags-list a.tag-item {
+        padding: 0.5rem 0.875rem;
+        font-size: 1.5rem;
+        line-height: 2.25rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .latest-comments-wrapper .content {
+        row-gap: 1rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .latest-comments-wrapper .content > div {
+        padding-bottom: 1rem;
+    }
+
+    .blog-sidebar-container .other-info-wrapper .latest-comments-wrapper .text,
+    .blog-sidebar-container .other-info-wrapper .latest-comments-wrapper .content > div > p:last-child {
+        font-size: 1.5rem;
     }
 
     @keyframes mobile-anchor-panel-slide-in {
@@ -972,7 +1224,46 @@
 .page-content .other-info-wrapper .search-wrapper form {
     display: flex;
     align-items: center;
-    column-gap: 2.5rem;
+    /* 用户明确要求（2026-09-19）：input和按钮之间间距改成0.5rem。 */
+    column-gap: 0.5rem;
     width: 100%;
+}
+/* 输入框套一层 wrapper 才能把清空按钮绝对定位在输入框内部尾部（用户明确要求，2026-09-19：有值时
+   出现一个 x 可以清空），flex:1 从 input 自己移到这个 wrapper 上，input 本身宽度改吃满 wrapper。 */
+.page-content .other-info-wrapper .search-wrapper .search-input-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+.page-content .other-info-wrapper .search-wrapper input[name='postsTitle'] {
+    width: 100%;
+    height: 4.625rem;
+    line-height: 4.625rem;
+    outline: none;
+    padding: 0 3.5rem 0 1.5rem;
+    border: 1px solid #C5C5C5;
+    border-radius: 0.625rem;
+    font-size: 1.75rem;
+    color: #6D6D6D;
+    box-sizing: border-box;
+    background: #fff;
+}
+.page-content .other-info-wrapper .search-wrapper .search-clear-btn {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--gray-color);
+}
+.page-content .other-info-wrapper .search-wrapper .search-clear-btn:hover {
+    color: #000;
 }
 }
