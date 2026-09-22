@@ -3,7 +3,7 @@
     position: relative;
     display: flex;
     width: 100%;
-    gap: 3.75rem;
+    gap: 2rem;
     margin-bottom: 1.25rem;
     background: #FFFFFF;
 }
@@ -26,7 +26,7 @@
     width: calc(100% - 35.75rem);
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.75rem;
 }
 
 /* 标题和操作区域 */
@@ -80,11 +80,31 @@
     width: 100%;
 }
 
-/* 价格信息区域 */
+// ---- 头部第一行：品牌/服务字段(用户明确要求)，风格照抄全局 item-card.html 的 data-field=brand/service。 ----
+.item-detail-purchase-brand-service-row {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+
+    .item-service-box > img {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+}
+
+/* 价格信息区域：stock/delivery 挪进来跟 price 同一行(用户明确要求)。 */
 .item-detail-purchase-price-section {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 2.5rem;
     width: 100%;
+
+    .item-price-box {
+        gap: 0.75rem;
+    }
 }
 
 .item-detail-purchase-price-section .item-price-text {
@@ -167,7 +187,8 @@
 }
 
 .item-detail-purchase-wholesale-badge {
-    height: 4.5rem;
+    // 用户明确要求：PC端批发价徽标改成4rem高度(原来4.5rem)。
+    height: 4rem;
     padding: 0 0.75rem;
     border: 0.125rem solid #C5C5C5;
     border-radius: 1.25rem;
@@ -198,7 +219,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 5rem;
+    gap: 2rem;
 }
 
 .item-detail-purchase-total-section {
@@ -234,8 +255,10 @@
     flex-shrink: 0;
 }
 
-/* 数量选择器和购买按钮 */
+/* 数量选择器和购买按钮：用户明确要求PC端改成4rem高度(原来4.5rem)，容器+按钮+数量输入框三处
+   高度联动，不然会出现外框4rem但里面按钮还是4.5rem的错位。 */
 .item-detail-purchase-controls {
+    height: 4rem;
     border: 0.125rem solid #C5C5C5;
     border-radius: 1.25rem;
     display: flex;
@@ -244,8 +267,8 @@
 }
 
 .item-detail-purchase-controls > button {
-    width: 4.5rem;
-    height: 4.5rem;
+    width: 4rem;
+    height: 4rem;
     border: none;
     border-radius: 0.5rem;
     background: transparent;
@@ -278,8 +301,8 @@
 }
 
 [data-purchase-role="quantity"] {
-    width: 4.5rem;
-    height: 4.5rem;
+    width: 4rem;
+    height: 4rem;
     padding: 0;
     border: none;
     border-left: 0.125rem solid #C5C5C5;
@@ -300,7 +323,7 @@
 #buy-now-btn {
     width: 22.875rem;
     padding: 0 1.875rem;
-    height: 6.25rem;
+    height: 5rem;
     background: var(--primary-color);
     border: none;
     border-radius: 6.25rem;
@@ -339,6 +362,14 @@
         padding-left: 0;
         padding-right: 0;
         box-sizing: border-box;
+        // 全局 page.css 给 .page-top-sticky 的默认 z-index 是 49，不管有没有 .is-sticky 都生效
+        // (是 position:relative/fixed 都带着这个值)。item-detail 这页 .page-top-sticky 内部包着购买区
+        // 收藏/分享/投诉图标行，往下滚动到图标行经过视口中线那一小段区间时会被 .detail-page-menu
+        // (position:fixed, z-index:319，视口垂直居中的全站浮窗按钮)盖住——层叠上下文是按祖先节点
+        // 整体比较的，图标行自己设再高的 z-index 也跳不出 .page-top-sticky 这层 49 的上限。这里改成
+        // 320，跟本文件里 .item-detail-right-box/关闭按钮已经在用的"320/321 盖过 319"是同一个套路，
+        // 只在 item-detail 这一页覆盖，不动其它详情页共用的 49。
+        z-index: 320;
     }
 
     .page-top-sticky:not(.is-sticky) {
@@ -352,7 +383,6 @@
         width: 100%;
         padding-left: 2rem;
         padding-right: 2rem;
-        z-index: 49;
     }
 
     .page-top-bread {
@@ -363,8 +393,8 @@
         box-sizing: border-box;
     }
 
+    // 用户明确要求去掉这个 margin-top:2rem。
     .page-top-sticky .item-detail-purchase-container {
-        margin-top: 2rem;
         margin-left: 0;
         width: calc(100% - 4rem);
     }
@@ -412,26 +442,38 @@
         overflow: hidden;
     }
 
-    /* 产品图片区域 */
+    /* 产品图片区域：用户反馈过两个问题——①之前靠全局 .is-sticky(scrollY>0 就触发，见
+       js/sticky-offset.js)配合 display:none/block 瞬间切换，图片"啪"一下消失，容器本身还在用
+       0.3s transition 动阴影/padding，两边节奏对不上，看起来像个不需要的"缩放"效果；②触发时机
+       是"只要有滚动"，不是用户要求的"滚到封面图底部才收起"。改成用独立的 .cover-collapsed 类
+       (item-detail.js 按封面图自身高度精确判断滚动位置来切，不跟全局 .is-sticky 混用)，配合
+       max-height+opacity 过渡做平滑收起，不是瞬间隐藏。 */
     .item-detail-purchase-container > img {
-        display: none;
-    }
-
-    .page-top-sticky:not(.is-sticky) .item-detail-purchase-container > img {
-        display: block;
         width: 100%;
         min-width: 0;
         height: 27.5rem;
+        max-height: 27.5rem;
         border-radius: 1.25rem;
         object-fit: cover;
+        overflow: hidden;
+        opacity: 1;
+        transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
+    }
+    .page-top-sticky.cover-collapsed .item-detail-purchase-container > img {
+        max-height: 0;
+        opacity: 0;
+        margin: 0;
+        border-width: 0;
     }
 
     /* 主要内容区域 */
+    // 用户明确要求：移动端各行(标题/品牌服务/价格/批发价/total price等)上下间距统一1rem，
+    // 原来是0(全靠各行自己的margin乱七八糟叠加撑开间距)。
     .item-detail-purchase-content {
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 0;
+        gap: 1rem;
     }
 
     /* 标题和操作区域 */
@@ -471,21 +513,15 @@
         display: none;
     }
 
-    /* 操作按钮区域 */
+    /* 操作按钮区域：移动端整体收窄成 2.75rem，圆圈内边距也要跟着缩小——不缩的话还是桌面端那个 1rem，
+       图标实际可见内容区被挤压到 0.25rem 见方，肉眼看基本等于消失(用户反馈过"移动端都看不见")。 */
 
-    .item-detail-purchase-title-row .icon-aixin {
-        width: 2.75rem;
-        height: 2.75rem;
-    }
-
-    .item-detail-purchase-title-actions > [data-action="share"] {
-        width: 2.75rem;
-        height: 2.75rem;
-    }
-
+    .item-detail-purchase-title-row .icon-aixin,
+    .item-detail-purchase-title-actions > [data-action="share"],
     .item-detail-purchase-title-actions > [data-action="open-complaint"] {
         width: 2.75rem;
         height: 2.75rem;
+        padding: 0.5rem;
     }
 
     /* 库存信息区域 */
@@ -619,9 +655,10 @@
     }
 
     .item-detail-purchase-total-section {
+        // 用户明确要求：移动端 total price 这里去掉 label 和金额之间的间距。
         grid-column: 1;
         grid-row: 2;
-        gap: 1.5rem;
+        gap: 0;
         width: auto;
         justify-content: flex-start;
     }
@@ -803,15 +840,32 @@
         color: #000;
     }
 
+    // 用户明确要求：移动端统计面板全屏时，关闭按钮要在底部（不是顶部头部那个小叉），改成 fixed 定位
+    // 贴在视口底部居中，加个圆形底衬方便点击，跟顶部标题栏那个视觉上区分开。
+    // 用户明确要求：这个底部悬浮的关闭按钮要红色底。CSS filter 对整个元素(含 background-color)
+    // 生效，在单个 img 上同时要红底+白图标做不到(filter 会把红底一起反色)，且这个 img 在模板里
+    // 没有包裹层可以拆分两层——先满足"红底"这条明确要求，图标保持 close.png 原色(深色)，在红色
+    // 底上依然清晰可辨识，不做反色处理。
     [data-action="close-statistics"] {
-        right: 1rem;
-        width: 2.1rem;
-        height: 2.1rem;
+        position: fixed;
+        left: 50%;
+        bottom: 2.5rem;
+        transform: translateX(-50%);
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 1.25rem;
+        box-sizing: border-box;
+        border-radius: 50%;
+        background: var(--primary-color, #FF4D10);
+        box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.2);
+        z-index: 321;
     }
 
     .item-detail-right-box .frame-container {
         border-radius: 1rem;
         padding: 2rem;
+        // 底部关闭按钮改 fixed 后悬浮在内容上方，留出空间不然滚到底会被挡住。
+        padding-bottom: 6rem;
         flex: 1;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
@@ -822,11 +876,18 @@
         min-height: 38rem;
     }
 
+    // CLAUDE.md §13(2026-09-18 起强制)：移动端浮窗开关按钮统一 5rem，不要用旧的固定像素 56px——
+    // 用户反馈"移动端detail-page-menu应该保持和其他页面一样的大小"，这里之前还是旧值。
+    // 定位保持跟全局 page.css 一样的 top:50%(视口垂直居中，不覆盖，直接继承)——之前一度改成
+    // right:2rem/bottom:2rem 的右下角固定位置，是因为怀疑它在垂直居中时盖住了购买区的收藏/分享/
+    // 投诉图标；但用户反馈"没有在中间，它到最底下了"，明确要求跟其它页面一样保持垂直居中，这里改回来。
+    // 若购买区图标被遮挡的问题复现，应该在购买区图标那侧(z-index/位置)处理，不要再靠挪动这个
+    // 全站统一的浮窗按钮来绕开。
     .detail-page-menu {
         z-index: 319;
         padding: 0;
-        width: 56px;
-        height: 56px;
+        width: 5rem;
+        height: 5rem;
         border-radius: 50%;
         background: #FF1B20;
         border: none;
@@ -920,6 +981,17 @@
     box-shadow: 0 0.25rem 0 0 rgba(0, 0, 0, 0.02);
 }
 
+// ---- "Tags:"/"Attributes:"/"Fields:" 这几个前缀 label，原来没有显式字号，继承环境字号偏小、跟页面
+// 其他 label(购买区价格label/店铺统计label 都是 1.75rem)不一致，用户反馈过。对齐成同一个 1.75rem。 ----
+.item-detail-info-section .item-tag-box > span {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    line-height: 2.75rem;
+    color: #000000;
+    flex-shrink: 0;
+}
+
 .item-detail-info-section .item-tag-text {
     font-size: 1.75rem;
     line-height: 2.75rem;
@@ -947,6 +1019,11 @@
     .item-detail-info-section .item-tag-text {
         font-size: 1.25rem;
         line-height: 1.75rem;
+    }
+
+    .item-detail-info-section .item-tag-box > span {
+        font-size: 1.5rem;
+        line-height: 2.25rem;
     }
 }
 
@@ -1049,7 +1126,8 @@
     margin-bottom: 2rem;
 }
 
-.item-detail-description-box > p {
+.item-detail-description-box > p,
+.item-detail-description-box > div {
     display: block;
     margin: 0;
     width: 100%;
@@ -1065,7 +1143,8 @@
         padding: 1.25rem;
     }
 
-    .item-detail-description-box > p {
+    .item-detail-description-box > p,
+    .item-detail-description-box > div {
         font-size: 1.5rem;
         line-height: 2.25rem;
     }
@@ -1265,6 +1344,20 @@
         display: flex;
     }
 
+    // 相似商品红点：移动端一直沿用桌面端尺寸(1.25rem/gap 1.25rem/margin-top 2.5rem)，跟首页移动端的
+    // 红点(1rem/gap 1rem/margin-top 1rem)不一致(用户反馈过)，这里补上首页同款的移动端覆盖值。
+    .item-detail-pager .home-section-indicators {
+        margin-top: 1rem;
+        gap: 1rem;
+    }
+    .item-detail-pager .home-section-indicator {
+        width: 1rem;
+        height: 1rem;
+    }
+    .item-detail-pager .home-section-indicator.active {
+        width: 1rem;
+    }
+
     [data-rules-role="title"] {
         font-size: 1.5rem;
         line-height: 2.25rem;
@@ -1324,7 +1417,8 @@
     position: relative;
 }
 
-.item-detail-store-image-box > img {
+.item-detail-store-image-box > img,
+.item-detail-store-image-box > .avatar-fallback {
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -1424,6 +1518,15 @@
 .item-detail-store-right-middle-item > img {
     width: 3rem;
     height: 3rem;
+}
+
+// 未认证：用户明确要求徽标继续显示，靠灰度区分已认证/未认证，不是有没有这个徽标。
+.item-detail-store-unverified > img {
+    filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);
+}
+.item-detail-store-unverified > span {
+    color: var(--gray-color, #999);
 }
 
 .item-detail-store-right-middle-item > span {
@@ -1673,11 +1776,26 @@
     }
 }
 
+// .reviews-section 是 align-items:flex-start 的 flex 列容器，子元素默认不会互相拉伸满宽——跟
+// post-detail 早前踩过的同一个坑(那边 .post-detail-review-list/-review-item 都补了 width:100%)，
+// 这里也要补，不然整条评论列表收缩成内容多宽就多宽，看起来比右侧统计栏窄很多(用户反馈过)。
 .item-detail-review-list {
+    width: 100%;
     gap: 3.75rem;
 }
 
+// 真正的坑在这里：.item-detail-review-card 的 width:100% 是相对它的直接父级
+// .item-detail-review-item 算的，但 .item-detail-review-item 才是 .item-detail-review-list
+// (flex-column, align-items:flex-start) 的直接子元素——只给 review-list/review-card 补 width:100%
+// 完全没用，中间这层 review-item 本身还是按内容宽度收缩，实测卡片宽度从446px到1010px不等，长内容
+// 撑多宽卡片就多宽(用户反馈"不管多少内容都应该是满行")。这层才是真正需要补的。
+.item-detail-review-item {
+    width: 100%;
+}
+
 .item-detail-review-card {
+    width: 100%;
+    box-sizing: border-box;
     margin-bottom: 0;
     padding: 3.75rem;
     border-radius: 5rem;
@@ -1727,7 +1845,8 @@
     width: 100%;
 }
 
-.item-detail-review-user-box > img {
+.item-detail-review-user-box > img,
+.item-detail-review-user-box > .avatar-fallback {
     width: 7.5rem;
     min-width: 7.5rem;
     height: 7.5rem;
@@ -1849,7 +1968,8 @@
     height: 100%;
 }
 
-.item-detail-review-info-item.icon > img {
+.item-detail-review-info-item.icon > img,
+.item-detail-review-info-item.icon > a > img {
     width: 7.5rem;
     height: 4.75rem;
     border-radius: 1rem;
@@ -1870,7 +1990,11 @@
     cursor: pointer;
 }
 
-.item-detail-reviewer-user-box > img:first-of-type {
+// 用 class 显式定位头像/箭头,不再靠 img:first-of-type/img:last-of-type 猜——回复者没头像时盒子里
+// 只剩箭头这一个 <img>,会同时命中 first-of-type 和 last-of-type 两条规则,5rem 头像尺寸叠加在箭头
+// 上,箭头被撑得巨大(用户反馈过),跟 post-detail 的 .post-detail-reply-avatar/-reply-arrow 同一个修法。
+.item-detail-reviewer-user-box > .item-detail-reply-avatar,
+.item-detail-reviewer-user-box > .avatar-fallback {
     width: 5rem;
     min-width: 5rem;
     height: 5rem;
@@ -1878,7 +2002,7 @@
     overflow: hidden;
 }
 
-.item-detail-reviewer-user-box > span {
+.item-detail-reviewer-user-box > span:not(.avatar-fallback) {
     margin-left: 1.25rem;
     margin-right: 1.25rem;
     font-family: var(--primary-popfont);
@@ -1895,7 +2019,7 @@
     flex: 1;
 }
 
-.item-detail-reviewer-user-box > img:last-of-type {
+.item-detail-reviewer-user-box > .item-detail-reply-arrow {
     width: 1.5rem;
     height: 1.5rem;
     transform: rotate(180deg);
@@ -1935,8 +2059,12 @@
 
 .item-detail-review-tool-item {
     gap: 0.5rem;
+    cursor: pointer;
 
     &.has-activate {
+        color: var(--primary-color);
+        font-weight: 500;
+
         .iconfont {
             display: inline-block;
         }
@@ -1944,6 +2072,11 @@
         > img {
             display: none;
         }
+    }
+
+    &.is-locked {
+        cursor: default;
+        opacity: 0.6;
     }
 }
 
@@ -2060,7 +2193,8 @@
         line-height: 2.25rem;
     }
 
-    .item-detail-review-info-item.icon > img {
+    .item-detail-review-info-item.icon > img,
+    .item-detail-review-info-item.icon > a > img {
         width: 7rem;
         height: 4.5rem;
     }
@@ -2069,13 +2203,14 @@
         margin: 1.25rem 0;
     }
 
-    .item-detail-reviewer-user-box > img:first-of-type {
+    .item-detail-reviewer-user-box > .item-detail-reply-avatar,
+    .item-detail-reviewer-user-box > .avatar-fallback {
         width: 4.5rem;
         min-width: 4.5rem;
         height: 4.5rem;
     }
 
-    .item-detail-reviewer-user-box > span {
+    .item-detail-reviewer-user-box > span:not(.avatar-fallback) {
         font-size: 1.75rem;
         line-height: 2.5rem;
     }
@@ -2193,10 +2328,20 @@
     .item-complaint-content {
         padding: 2rem;
         width: 52rem;
-        height: 50rem;
+        // 原来固定 height:50rem，标题+下拉+8行文本域+附件+2行商品信息+提交按钮叠起来经常超出这个高度，
+        // 内容会溢出弹窗边界(用户反馈过)。改成"内容撑开、最高不超过视口90%，超出内部滚动"。
+        max-height: 90vh;
+        overflow-y: auto;
         background: #fff;
         border-radius: 1.25rem;
         box-sizing: border-box;
+
+        > h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0 0 1.5rem;
+        }
 
         .item-complaint-close-wrappper {
             width: 100%;
@@ -2431,5 +2576,632 @@
     &.icon-not-dianzan {
         color: #FD8E2D;
         transform: rotate(180deg);
+    }
+}
+
+// ==========================================================================
+// 以下为 SSR 移植改造追加（用户 2026-09-20 明确要求，逐条对应，同步自 fast-site 编译产物
+// static/css/detail/item-detail.css）。原文件上半部分保留仍然正确的视觉基础（购买卡片/FAQ/
+// 评价等版式），这里只覆盖/新增机制性问题：吸顶改纯 CSS sticky（CLAUDE.md §13）、Show Case
+// 全新设计、投诉附件区、图标尺寸、移动端布局修复、图表调矮、分享弹窗紧凑化、相似商品轮播状态。
+// ==========================================================================
+
+// ---- 统计面板 PC 端 sticky：page-fix-box 家族统一约定（跟 post-detail/compaign-detail 的
+// .table-of-container 同一套机制），去掉旧版依赖 JS 现算 position:fixed 的写法。 ----
+.page-content {
+    align-items: flex-start;
+}
+.item-detail-right-box {
+    position: sticky;
+    top: var(--sticky-content-top, 2.5rem);
+    align-self: flex-start;
+    max-height: calc(100vh - var(--sticky-content-top, 2.5rem) - 2rem);
+    overflow-y: auto;
+
+    .frame-container {
+        padding: 2rem;
+    }
+}
+// 这条 PC sticky 规则不带媒体查询，全局生效，源码顺序又排在前面的移动端全屏 fixed 覆盖之后
+// （同选择器同优先级，后写的赢），把移动端悄悄改回了 sticky——统计面板在手机上打开后没有真正全屏，
+// 还是跟着页面正文一起滚(用户反馈过)。这里补一条排在更后面的移动端覆盖，把 fixed 全屏抢回来。
+@media screen and (max-width: 768px) {
+    .item-detail-right-box {
+        position: fixed;
+        // 同样要重置 top/max-height——它们也是前面那条不带媒体查询的全局 sticky 规则设的
+        // (top: var(--sticky-content-top) / max-height: calc(100vh - ...))，不重置的话面板虽然
+        // position 变成 fixed 了，还是会被那两个属性钉在页面中间一小块、高度被压扁，不是真正全屏。
+        top: 0;
+        max-height: 100vh;
+        max-height: 100dvh;
+    }
+}
+
+// ---- 统计图表调矮（原来 29.5rem 明显过高，跟页面其它区块比例失衡）。 ----
+.line-chart-container {
+    height: 18rem;
+    min-height: 18rem;
+}
+.statistics-period-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1.5rem 0 0.75rem;
+
+    > span {
+        font-family: var(--primary-popfont);
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #000;
+    }
+}
+.statistics-period-tabs {
+    display: flex;
+    gap: 0.5rem;
+
+    > span {
+        padding: 0.375rem 1rem;
+        border-radius: 6.25rem;
+        font-size: 1.25rem;
+        color: #666;
+        background: #F5F5F5;
+        cursor: pointer;
+
+        &.active {
+            background: var(--primary-color);
+            color: #fff;
+        }
+    }
+}
+.item-statistics-panel {
+    .stat-box-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 0.0625rem solid #EEE;
+
+        // 用户明确要求：总评分(星级+分数)独占一行，3个维度指标放第二行——原来靠 flex-wrap 按可用
+        // 宽度自然换行，不是刻意的两行布局。用 flex-basis:100% 强制评分撑满整行。
+        > .rating-widget {
+            flex: 1 0 100%;
+        }
+    }
+    .stat-box-item {
+        display: flex;
+        align-items: baseline;
+        gap: 0.375rem;
+        font-size: 1.375rem;
+
+        [data-stat-role="label"] {
+            color: #666;
+        }
+        [data-stat-role="value"] {
+            color: #000;
+            font-weight: 600;
+        }
+    }
+}
+// 评分星级分布柱状图容器：静态原型没写死尺寸(依赖父容器隐式高度)，这里显式给高度，不然
+// echarts.init 在一个 height:0 的容器上初始化图表不会显示任何东西。用户明确要求这个高度要跟
+// 下面 Overview 折线图(.line-chart-container，18rem)保持一致。注意：全局 item-statistics.css
+// 里 .bar-chart-frame 本身写死了 height:29.5rem(给别的页面统计面板用的高度)，只改 .chart-content
+// 的高度会导致外层 .bar-chart-frame 还留着 29.5rem，底下多出一大块空白——这里必须把
+// .bar-chart-frame 自身的高度也一起改成 18rem 才对齐。
+.bar-chart-frame {
+    width: 100%;
+    height: 18rem;
+    margin-top: 1rem;
+
+    .chart-content {
+        width: 100%;
+        height: 18rem;
+    }
+}
+
+// ---- 收藏/分享/投诉靠右紧凑排列，图标 5rem(用户最新要求，取代早前的 2.5rem)，hover 变色，
+// 间距从 1rem 加大到 1.5rem(用户反馈"间距过小")。 ----
+.item-detail-purchase-title-actions {
+    margin-left: auto;
+    justify-content: flex-end;
+    gap: 1.5rem;
+
+    .icon-aixin,
+    > [data-action="share"],
+    > [data-action="open-complaint"] {
+        width: 5rem;
+        height: 5rem;
+        font-size: 5rem;
+        cursor: pointer;
+        box-sizing: border-box;
+        border-radius: 50%;
+        padding: 1rem;
+        transition: background-color 0.2s ease, border-color 0.2s ease, filter 0.2s ease, color 0.2s ease;
+    }
+
+    // 分享/投诉是普通 img 图标，边框正常加；收藏心形(.icon-aixin)本身是字体图标(position:absolute)，
+    // 用户明确要求不要这圈外边框，单独排除。
+    > [data-action="share"],
+    > [data-action="open-complaint"] {
+        border: 0.0625rem solid #E5E5E5;
+    }
+
+    // 用户明确要求：鼠标滑入三个图标都要红底实心。分享/投诉是 img，用 filter 反色成白图；收藏心形是
+    // 字体图标，靠 color/-webkit-text-stroke 表现空心/实心两态——之前用同一招
+    // filter:brightness(0)invert(1) 套在它上面，跟它本来 color:transparent 的描边空心态冲突，视觉上是
+    // "一片空白"；改成直接把 color/-webkit-text-stroke-color 都设成白色，不用 filter。
+    > [data-action="share"]:hover,
+    > [data-action="open-complaint"]:hover {
+        background-color: var(--primary-color, #FF4D10);
+        border-color: var(--primary-color, #FF4D10);
+        filter: brightness(0) invert(1);
+    }
+    .icon-aixin:hover {
+        background-color: var(--primary-color, #FF4D10);
+        color: #fff !important;
+        -webkit-text-stroke-color: #fff !important;
+    }
+}
+
+// ---- Buy Now 按钮高度 5rem。 ----
+.item-buy-btn {
+    height: 5rem;
+}
+
+// ---- Description/Rules 展开收起按钮高度 5rem（"show more views"）。 ----
+.item-detail-show-more-btn {
+    height: 5rem;
+    width: 100%;
+    border: 0.0625rem solid #EEE;
+    border-radius: 1rem;
+    background: #fff;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+.item-detail-description-box {
+    max-height: 24rem;
+    overflow: hidden;
+    position: relative;
+
+    &.is-expanded {
+        max-height: none;
+    }
+}
+
+// ---- Show Case（原 screenshots）：缩略卡片 + 悬浮 title 条，全新设计。 ----
+.item-detail-showcase {
+    padding: 0;
+    position: relative;
+}
+// 单行横向滚动(原来 flex-wrap:wrap + overflow-x:auto 自相矛盾——一 wrap 内容就换行填满宽度，
+// overflow-x 根本没机会触发，实际表现是挤成好几行，不是横向可滚动一条)，改成真正单行 + 悬浮箭头。
+.item-detail-showcase-content {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1.25rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+.item-detail-showcase-card {
+    position: relative;
+    flex: 0 0 auto;
+    width: 18rem;
+    height: 18rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    cursor: pointer;
+
+    > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    > p {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+        color: #fff;
+        font-size: 1.25rem;
+        line-height: 1.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+}
+// 左右滚动箭头：悬浮不占宽度(保证首/尾卡片贴边)，加阴影防止红色图片背景下看不清。
+.item-detail-showcase-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #000;
+    padding: 0;
+
+    svg {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+
+    &[hidden] {
+        display: none;
+    }
+}
+.item-detail-showcase-nav-prev {
+    left: 0.75rem;
+}
+.item-detail-showcase-nav-next {
+    right: 0.75rem;
+}
+.item-detail-showcase-dots {
+    display: none;
+}
+
+// Show Case 弹窗（lightbox），JS 动态插入到 body 末尾，跟分享/投诉弹窗同一套遮罩语言。
+.item-showcase-mask {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    background: rgba(0, 0, 0, 0.75);
+    align-items: center;
+    justify-content: center;
+
+    &.is-open {
+        display: flex;
+    }
+}
+.item-showcase-content {
+    position: relative;
+    width: min(64rem, 90vw);
+    max-height: 90vh;
+    background: #fff;
+    border-radius: 1rem;
+    padding: 2.5rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+
+    > h3 {
+        margin: 1.5rem 0 0.5rem;
+        font-size: 1.75rem;
+        color: #000;
+    }
+    > p {
+        margin: 0;
+        font-size: 1.375rem;
+        color: #666;
+        line-height: 2rem;
+    }
+}
+// 用户反馈过：移动端有的图片会把这个X挡住/点不到——之前没有显式 z-index，跟图片同一个层叠上下文
+// 里排序不稳定；给个明确更高的 z-index 保证永远浮在图片上面。
+.item-showcase-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 2rem;
+    height: 2rem;
+    cursor: pointer;
+    z-index: 10;
+}
+.item-showcase-image-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.item-showcase-image {
+    max-width: 100%;
+    max-height: 50vh;
+    border-radius: 0.5rem;
+    object-fit: contain;
+}
+.item-showcase-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0.75rem;
+        height: 0.75rem;
+        border-top: 0.2rem solid #fff;
+        border-left: 0.2rem solid #fff;
+    }
+}
+.item-showcase-arrow-left {
+    left: -1.5rem;
+
+    &::before {
+        transform: translate(-30%, -50%) rotate(-45deg);
+    }
+}
+.item-showcase-arrow-right {
+    right: -1.5rem;
+
+    &::before {
+        transform: translate(-70%, -50%) rotate(135deg);
+    }
+}
+
+// ---- 相似商品轮播：PC 一行4个，移动端一个滑动页2行2列。
+// item-all-card-desktop-vertical.css / item-all-card-mobile-vertical.css 这两个全局卡片样式本身已经
+// 靠 margin-right(+ nth-of-type(3n)/(2n) 清零)做卡片间距(3列/2列布局)，这里额外用 flex gap 实现
+// 4列/2列会跟那份 margin 叠加算两遍间距，总宽度超出容器，导致 flex-wrap 提前换行——移动端实测卡片
+// 挤成单列。这里把全局卡片自带的 margin-right/margin-bottom 清零，间距统一只走本页 gap。 ----
+.item-detail-similar-items-pager {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+.item-detail-similar-items-container.item-all-card--desktop-vertical .item-detail-similar-items-pager > * {
+    width: calc((100% - 6rem) / 4);
+    margin-right: 0;
+    margin-bottom: 0;
+}
+.item-detail-similar-items-container.item-all-card--mobile-vertical {
+    .item-detail-similar-items-pager {
+        gap: 1rem;
+
+        > * {
+            width: calc((100% - 1rem) / 2);
+            margin-right: 0;
+            margin-bottom: 0;
+        }
+    }
+}
+
+// ---- 分享/投诉弹窗开关：原始拷贝的基础规则只有 display:none（原型自己的 JS 已经不用了），这里
+// 补上 .is-open 的 display:flex，跟本文件新增的 .item-showcase-mask.is-open 同一套开关约定。 ----
+.item-share-mask.is-open,
+.item-complaint-mask.is-open {
+    display: flex !important;
+}
+
+// ---- 分享弹窗：去掉原型 data-share-role="avatars" 头像墙之后要紧凑（弹窗内容换成全局
+// fragments/share.html，不再是原来那套写死的 platforms/avatars 两块）。 ----
+.item-share-mask .item-share-content .share-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+
+    > div {
+        display: flex;
+        gap: 1.5rem;
+    }
+    img {
+        width: 3rem;
+        height: 3rem;
+        cursor: pointer;
+    }
+}
+
+// ---- 投诉附件区（全新）。 ----
+.item-complaint-attachment-wrapper {
+    margin: 1rem 0;
+
+    > span {
+        display: block;
+        font-size: 1.375rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+}
+.item-complaint-attachment-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+.item-complaint-attachment-item {
+    position: relative;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+
+    > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+}
+.item-complaint-attachment-remove {
+    position: absolute;
+    top: 0.125rem;
+    right: 0.125rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.item-complaint-attachment-add {
+    border: 0.0625rem dashed #CCC;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #666;
+    font-size: 1.25rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+// ---- FAQ 展开箭头旋转态（手风琴交互配套）。 ----
+.item-detail-faq-box.is-open .item-detail-faq-title-box svg {
+    transform: rotate(90deg);
+}
+// ---- FAQ 展开灰色背景：静态原型里这个背景挂在 .item-detail-faq-title-box.toggle 上，但
+// item-detail.js 的手风琴交互实际切的是 .item-detail-faq-box 外层的 .is-open（跟上面箭头旋转态用的
+// 是同一个类），两边对不上，展开后一直是纯白背景（用户反馈过）。按 JS 实际用的 .is-open 补一条。 ----
+.item-detail-faq-box.is-open .item-detail-faq-title-box {
+    background-color: #fafafa;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: #f0f3f3 0.125rem solid;
+}
+.item-detail-faq-title-box svg {
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+@media screen and (max-width: 768px) {
+    // ---- 移动端吸顶后：总价 + 数量加减 + Buy Now 同一行，跟其它详情页吸顶态间距保持一致。 ----
+    .item-detail-purchase-buy-area {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: nowrap;
+    }
+    .item-detail-purchase-total-section {
+        flex-shrink: 0;
+    }
+    .item-detail-purchase-buy-box {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-shrink: 0;
+    }
+    .item-buy-btn {
+        height: 3.5rem;
+        padding: 0 1.25rem;
+        white-space: nowrap;
+    }
+
+    // ---- 移动端统计弹窗：一屏展示完，收紧字号/间距。 ----
+    .item-statistics-panel {
+        .stat-box-row {
+            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+        .stat-box-item {
+            font-size: 1.125rem;
+            gap: 0.25rem;
+        }
+    }
+    .statistics-period-header {
+        margin: 0.75rem 0 0.5rem;
+
+        > span {
+            font-size: 1.375rem;
+        }
+    }
+    .statistics-period-tabs > span {
+        padding: 0.25rem 0.75rem;
+        font-size: 1.125rem;
+    }
+    .item-detail-right-box .line-chart-container {
+        height: 16rem;
+        min-height: 16rem;
+    }
+    .item-detail-right-box .frame-container {
+        padding: 1.25rem;
+    }
+
+    // ---- 相似商品移动端已经在上面通用规则里处理（2行2列），这里只收窄间距。 ----
+    .item-detail-similar-items-container.item-all-card--mobile-vertical .carousel-slide {
+        row-gap: 1rem;
+    }
+
+    // ---- Show Case 移动端：一行 2 个 + scroll-snap 虚拟翻页(红点)，不用悬浮箭头；外层
+    // .page-section 自带的边框/内边距按用户要求去掉。 ----
+    .item-detail-showcase {
+        border: none;
+        padding: 0;
+    }
+    .item-detail-showcase-nav {
+        display: none !important;
+    }
+    .item-detail-showcase-content {
+        scroll-snap-type: x mandatory;
+    }
+    .item-detail-showcase-card {
+        width: calc((100% - 1.25rem) / 2);
+        height: auto;
+        aspect-ratio: 1 / 1;
+        flex: 0 0 calc((100% - 1.25rem) / 2);
+        scroll-snap-align: start;
+    }
+    .item-detail-showcase-dots {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.625rem;
+        margin-top: 1.25rem;
+
+        > span {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background: #d9d9d9;
+
+            &.active {
+                background: var(--primary-color, #FF4D10);
+            }
+        }
+    }
+
+    // ---- 图标/按钮移动端尺寸略收窄，保持可点击区域。 ----
+    .item-detail-purchase-title-actions {
+        .icon-aixin,
+        > [data-action="share"],
+        > [data-action="open-complaint"] {
+            width: 2.25rem;
+            height: 2.25rem;
+            font-size: 2.25rem;
+        }
+    }
+
+    .item-showcase-content {
+        padding: 1.5rem;
+        width: 92vw;
+    }
+    .item-showcase-arrow-left {
+        left: 0.5rem;
+    }
+    .item-showcase-arrow-right {
+        right: 0.5rem;
     }
 }
