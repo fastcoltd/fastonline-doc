@@ -1398,6 +1398,9 @@
   color: var(--gray-color);
 }
 .demand-bid-private {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   margin: 0;
   font-size: 1.5rem;
   line-height: 2.25rem;
@@ -1467,7 +1470,7 @@
   gap: 2rem;
 }
 .demand-detail-other-container.demand-all-card--desktop-vertical .demand-detail-other-pager > * {
-  width: calc((100% - 6rem) / 4);
+  width: calc((100% - 4rem) / 3);
   margin: 0;
 }
 .demand-detail-other-container.demand-all-card--mobile-vertical .demand-detail-other-pager {
@@ -1598,8 +1601,10 @@
   color: var(--gray-color);
 }
 .demand-profile-line > span > img {
-  width: 2rem;
-  height: 2rem;
+  /* 图标原图 11~14px、不是正方形，只定高度按比例缩放，不强制成正方形（之前被拉大变形） */
+  width: auto;
+  height: 1.75rem;
+  object-fit: contain;
   flex-shrink: 0;
 }
 .demand-profile-line > span > em {
@@ -1629,8 +1634,8 @@
     line-height: 2rem;
   }
   .demand-profile-line > span > img {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: auto;
+    height: 1.5rem;
   }
 }
 
@@ -1707,7 +1712,7 @@
 .demand-detail-desc-text {
   white-space: pre-wrap;
 }
-ul.demand-detail-rules-list[data-rules-role="content"] {
+ul.demand-detail-rules-list {
   margin: 0;
   padding-left: 2.25rem;
   list-style: disc;
@@ -1718,8 +1723,20 @@ ul.demand-detail-rules-list > li {
   color: #000;
   word-break: break-word;
 }
-ul.demand-detail-rules-list:not(.toggle) > li:not(:first-child) {
+ul.demand-detail-rules-list:not(.is-expanded) > li:not(:first-child) {
   display: none;
+}
+ul.demand-detail-rules-list .demand-detail-more {
+  margin-left: 0.75rem;
+}
+ul.demand-detail-rules-list.is-expanded .demand-clamp-more {
+  display: none;
+}
+ul.demand-detail-rules-list .demand-detail-less {
+  display: none;
+}
+ul.demand-detail-rules-list.is-expanded .demand-detail-less {
+  display: inline;
 }
 /* Show more / Show less：纯文字 + 下划线，跟正文区分 */
 .demand-detail-more {
@@ -1833,4 +1850,44 @@ ul.demand-detail-rules-list:not(.toggle) > li:not(:first-child) {
 }
 .demand-summary-card .item-service.demand-samples-no {
   color: #9a9a9a;
+}
+
+/* 需求详情主体不要顶部 2rem 间距（用户 2026-09-27 要求） */
+.demand-detail-page .page-content.demand-detail-main {
+  padding-top: 0;
+}
+/* 需求信息里的属性标签高度 3rem */
+.demand-summary-card .brand-tag-box .item-tag {
+  height: 3rem;
+  padding: 0 1rem;
+  display: inline-flex;
+  align-items: center;
+}
+.demand-summary-card .brand-tag-box .item-tag .item-tag-text {
+  font-size: 1.5rem;
+  line-height: 3rem;
+}
+/* 「仅发布者可见」跟在「Provide samples:」后面也不换行 */
+.demand-detail-bidding-card .other-info > p {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+/* 售后要求：标题单独一行，下面一行一条，前面小圆点对齐标题左边，默认 3 条 */
+.demand-detail-aftersales {
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.demand-detail-aftersales ul.demand-detail-rules-list {
+  padding-left: 2.25rem;
+}
+.demand-detail-aftersales ul.demand-detail-rules-list > li::marker {
+  color: #c5c5c5;
+}
+.demand-detail-aftersales ul.demand-detail-rules-list:not(.is-expanded) > li:not(:first-child) {
+  display: list-item;
+}
+.demand-detail-aftersales ul.demand-detail-rules-list:not(.is-expanded) > li:nth-child(n+4) {
+  display: none;
 }
