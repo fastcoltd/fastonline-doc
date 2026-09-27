@@ -691,3 +691,50 @@
       right: 2rem;
     }
   }
+
+/* 登录提示卡片（fragments/signin-required-notice.html，post-detail 评论区 / demand-detail 投标区共用，站内新设计，沿用 page.css 的 .page-section
+   卡片外观，按钮参照全站黑底白字主按钮观感——如 common.css 的 .header-join 配色，但不用它的固定尺寸，
+   这里是块级卡片内的按钮）。 */
+.signin-required-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+.signin-required-notice > p {
+  font-family: var(--primary-robotofont);
+  font-size: 1.75rem;
+  line-height: 2.75rem;
+  color: var(--gray-color);
+  margin: 0;
+}
+.signin-required-notice-btn {
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 1.25rem;
+  padding: 1rem 3rem;
+  font-family: var(--primary-popfont);
+  font-size: 1.75rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.signin-required-notice-btn:hover {
+  opacity: 0.85;
+}
+@media screen and (max-width: 768px) {
+  .signin-required-notice > p {
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+  }
+  .signin-required-notice-btn {
+    font-size: 1.5rem;
+    padding: 0.875rem 2.5rem;
+  }
+}
+
+.signin-required-notice-btn:is(a) {
+  text-decoration: none;
+  display: inline-block;
+}

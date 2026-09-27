@@ -1006,3 +1006,683 @@
     max-width: 100%;
   }
 }
+
+/* ==========================================================================================
+   SSR 需求详情页（pages/demand-detail.html）补充样式。以上是 static-source 原稿样式，以下是落地时的补充 / 覆盖：
+   跟全站已开发组件冲突的地方以全站为准（头像兜底 .avatar-fallback、标签 .item-tag、分页、登录提示卡片）。
+   ========================================================================================== */
+/* 摘要卡吸顶：滚过卡片原位置后 js/detail/demand-detail.js 给卡片加 .is-sticky（position:fixed 贴顶、收起成紧凑版：
+   只留标题 / 品牌服务 / 价格一行 / 我要投标），同时在原位置插一个同高的 .demand-summary-sticky-placeholder 占位，
+   页面不跳动。卡片原稿的 position:sticky 整张贴顶太高、会盖住投标列表，不用。 */
+.demand-detail-page .demand-summary-card {
+  position: relative;
+  top: auto;
+}
+.demand-detail-page .demand-summary-card:hover {
+  background-color: #ffffff;
+}
+.demand-summary-sticky-placeholder {
+  display: none;
+  width: 100%;
+  flex: 0 0 auto;
+}
+.demand-summary-sticky-placeholder.is-active {
+  display: block;
+}
+.demand-detail-page .demand-summary-card.is-sticky {
+  position: fixed;
+  top: 0;
+  /* left / width 由 JS 按占位位置算好写在行内；覆盖原稿移动端 is-sticky 的 left:50% + translateX(-50%) 居中写法 */
+  transform: none;
+  max-width: none;
+  z-index: 46;
+  padding: 1.5rem 2.5rem;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+  animation: demand-summary-drop 0.2s ease-out;
+}
+/* 吸顶后跟全站吸顶区块一致：整屏宽白底 + 底部一条横线 + 轻阴影（原稿 is-sticky 的 ::before / ::after 写法）。 */
+.demand-detail-page .demand-summary-card.is-sticky::before {
+  display: block;
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 50vw);
+  width: 100vw;
+  height: auto;
+  background: #fff;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+  z-index: -1;
+}
+.demand-detail-page .demand-summary-card.is-sticky::after {
+  display: block;
+  content: '';
+  position: absolute;
+  left: calc(50% - 50vw);
+  width: 100vw;
+  bottom: 0;
+  height: 1px;
+  background: #E5E5E5;
+}
+.demand-detail-page .demand-summary-card.is-sticky .card-content {
+  gap: 0.5rem;
+}
+.demand-detail-page .demand-summary-card.is-sticky .demand-detail-title {
+  margin-bottom: 0;
+  font-size: 2.25rem;
+  line-height: 3rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.demand-detail-page .demand-summary-card.is-sticky .user-section,
+.demand-detail-page .demand-summary-card.is-sticky .other-info,
+.demand-detail-page .demand-summary-card.is-sticky .demand-edit-box {
+  display: none;
+}
+.demand-detail-page .demand-summary-card.is-sticky .demand-summary-status-clip {
+  border-radius: 0;
+}
+.demand-detail-page .demand-summary-card.is-sticky .demand-detail-bid-entry {
+  position: absolute;
+  right: 14rem;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+@keyframes demand-summary-drop {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+/* 投标卡片鼠标划过背景色，跟全站卡片（.item-all-card / .demand-all-card:hover）一致 */
+.demand-detail-bidding-card {
+  transition: background-color 0.2s ease;
+}
+.demand-detail-page .demand-detail-bidding-card:hover {
+  background-color: #FDF5F2;
+}
+.demand-detail-title {
+  margin: 0 16rem 0.5rem 0;
+  font-family: var(--primary-popfont);
+  font-size: 3rem;
+  line-height: 4rem;
+  font-weight: 600;
+  color: #000;
+  word-break: break-word;
+}
+.demand-summary-card .user-section > .avatar-fallback {
+  width: 10rem;
+  height: 10rem;
+  font-size: 4rem;
+  flex-shrink: 0;
+}
+.demand-summary-card .user-section > img {
+  object-fit: cover;
+}
+.demand-summary-card a.item-service {
+  text-decoration: none;
+}
+.demand-detail-page .brand-service-section .item-service-text2 {
+  display: inline-block;
+}
+/* 右上角操作按钮（原稿是 div + 内联边框色） */
+.demand-detail-page .demand-edit-box {
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  cursor: pointer;
+  z-index: 2;
+}
+.demand-detail-page .demand-edit-box:hover {
+  background: var(--primary-color);
+  color: #fff;
+}
+.demand-detail-page .demand-bid-action {
+  border-color: #7CB3E8;
+  color: #7CB3E8;
+}
+.demand-detail-page .demand-bid-action:hover {
+  background: #7CB3E8;
+  color: #fff;
+}
+.demand-detail-page .demand-bid-action.is-select {
+  border-color: #31AA16;
+  color: #31AA16;
+}
+.demand-detail-page .demand-bid-action.is-select:hover {
+  background: #31AA16;
+  color: #fff;
+}
+/* 状态角标配色档位（SiteDemandController#statusTone） */
+.status-badge[data-tone="active"] {
+  background: linear-gradient(to right, #3EAEFD, #A3CCEA);
+}
+.status-badge[data-tone="upcoming"] {
+  background: linear-gradient(to right, #ff4d10, #ff7a02);
+}
+.status-badge[data-tone="progress"] {
+  background: linear-gradient(to right, #8F31D9, #C07BF0);
+}
+.status-badge[data-tone="done"] {
+  background: linear-gradient(to right, #31AA16, #77EE5C);
+}
+.status-badge[data-tone="draft"] {
+  background: linear-gradient(to right, #6d6d6d, #b9b9b9);
+}
+.status-badge[data-tone="muted"] {
+  background: linear-gradient(to right, #9a9a9a, #cfcfcf);
+}
+/* 需求信息右下角「我要投标」 */
+.demand-detail-bid-entry {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+.demand-detail-bid-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 3rem;
+  height: 5rem;
+  border-radius: 2.5rem;
+  background: #000;
+  color: #fff;
+  font-family: var(--primary-popfont);
+  font-size: 1.75rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+.demand-detail-bid-link:hover {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+/* 投标列表 */
+.demand-detail-bids {
+  width: 100%;
+}
+.demand-detail-bid-list {
+  margin-top: 2rem;
+  gap: 2rem;
+}
+.demand-detail-bids-empty {
+  margin: 3rem 0;
+  text-align: center;
+  font-size: 1.75rem;
+  color: var(--gray-color);
+}
+.demand-detail-bids .pagination-container {
+  margin-top: 2.5rem;
+}
+.demand-detail-bidding-card.is-mine {
+  background: rgba(253, 142, 45, 0.1);
+  border-color: rgba(253, 142, 45, 0.35);
+}
+.demand-detail-bidding-card .user-section > .avatar-fallback {
+  width: 7.5rem;
+  height: 7.5rem;
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+.demand-detail-bidding-card .user-section > img {
+  object-fit: cover;
+}
+.demand-detail-bidding-card .user-header > h2 {
+  margin-right: 14rem;
+}
+.demand-detail-bidding-card .user-header > h2 > a {
+  color: inherit;
+  text-decoration: none;
+}
+.demand-detail-bidding-card .user-header > h2 > a:hover {
+  color: var(--primary-color);
+}
+.demand-detail-bidding-content > .demand-bid-label {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 2.25rem;
+  color: var(--gray-color);
+}
+.demand-bid-private {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 2.25rem;
+  color: #9a9a9a !important;
+  font-style: italic;
+}
+.demand-bid-price-row {
+  column-gap: 4rem;
+}
+.demand-detail-bidding-card .bidding-item {
+  object-fit: cover;
+  cursor: zoom-in;
+  flex-shrink: 0;
+}
+.demand-detail-bidding-card .demand-bid-file {
+  display: inline-flex;
+  align-items: center;
+  height: 8rem;
+  max-width: 20rem;
+  padding: 0 1.5rem;
+  border-radius: 1.25rem;
+  border: 1px solid #e5e5e5;
+  background: #fafafa;
+  font-size: 1.375rem;
+  color: #000;
+  text-decoration: none;
+  word-break: break-all;
+  flex-shrink: 0;
+}
+.demand-detail-bidding-card .demand-bid-desc {
+  white-space: pre-wrap;
+}
+/* 投标入口卡片（未投标店铺）——跟登录提示卡片同一套外观 */
+.demand-detail-bid-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+.demand-detail-bid-cta > p {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 2.75rem;
+  color: var(--gray-color);
+}
+.demand-detail-page #bid,
+.demand-detail-page .signin-required-notice {
+  margin-top: 3rem;
+  scroll-margin-top: 10rem;
+}
+
+/* 其他需求：每屏 4 个，PC 一行 4 个，移动端 2×2（js/detail/detail-related.js） */
+.demand-detail-other-section {
+  width: 100%;
+}
+.demand-detail-other-section > .list-container-title {
+  margin-bottom: 2.5rem;
+}
+.demand-detail-other-container.is-loading {
+  min-height: 40rem;
+}
+.demand-detail-other-pager {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+.demand-detail-other-container.demand-all-card--desktop-vertical .demand-detail-other-pager > * {
+  width: calc((100% - 6rem) / 4);
+  margin: 0;
+}
+.demand-detail-other-container.demand-all-card--mobile-vertical .demand-detail-other-pager {
+  gap: 1rem;
+}
+.demand-detail-other-container.demand-all-card--mobile-vertical .demand-detail-other-pager > * {
+  width: calc((100% - 1rem) / 2);
+  margin: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .demand-detail-page .list-container-title {
+    display: block;
+  }
+  .demand-detail-title {
+    margin-right: 6rem;
+    font-size: 2.25rem;
+    line-height: 3rem;
+  }
+  .demand-summary-card .user-section > .avatar-fallback {
+    width: 7.5rem;
+    height: 7.5rem;
+    font-size: 3rem;
+  }
+  .demand-detail-bidding-card .user-section > .avatar-fallback {
+    width: 6.25rem;
+    height: 6.25rem;
+    font-size: 2.5rem;
+  }
+  .demand-detail-bidding-card .user-header > h2 {
+    margin-right: 6rem;
+  }
+  /* 投标卡片的 Edit / Select：移动端右上角会压住统计行，改成卡片底部右对齐、跟随文档流 */
+  .demand-detail-page .demand-detail-bidding-card .demand-bid-action {
+    position: static;
+    margin: 1.25rem 0 0 auto;
+    width: 12rem;
+  }
+  .demand-detail-bid-entry {
+    justify-content: stretch;
+  }
+  .demand-detail-page .demand-summary-card.is-sticky {
+    padding: 1rem 1.25rem;
+    border-radius: 0;
+  }
+  .demand-detail-page .demand-summary-card.is-sticky .demand-detail-title {
+    margin-right: 6rem;
+    font-size: 1.875rem;
+    line-height: 2.5rem;
+  }
+  /* 手机吸顶：品牌 / 服务文字收起，属性标签保留（用户要求吸顶后属性也要显示） */
+  .demand-detail-page .demand-summary-card.is-sticky .demand-summary-brand-row > .item-service-box {
+    display: none;
+  }
+  .demand-detail-page .demand-summary-card.is-sticky .demand-detail-bid-entry {
+    position: static;
+    transform: none;
+  }
+  .demand-detail-page .demand-summary-card.is-sticky .demand-detail-bid-link {
+    height: 4rem;
+  }
+  .demand-detail-bid-link {
+    flex: 1;
+    justify-content: center;
+    height: 5rem;
+    font-size: 1.625rem;
+  }
+  .demand-bid-price-row {
+    column-gap: 2rem;
+  }
+  .demand-detail-bidding-card .demand-bid-file {
+    height: 8.125rem;
+  }
+  .demand-detail-bid-cta > p {
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+  }
+  .demand-detail-other-container.is-loading {
+    min-height: 60rem;
+  }
+}
+
+/* 投标卡片：店铺 logo + 右下角在线状态点、国家母语 / 工作时间 / 时区一行 */
+.demand-bid-avatar {
+  position: relative;
+  flex-shrink: 0;
+}
+.demand-detail-bidding-card .demand-bid-avatar > img,
+.demand-detail-bidding-card .demand-bid-avatar > .avatar-fallback {
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 50%;
+  border: 0.5rem solid #ffffff;
+  object-fit: cover;
+  box-sizing: border-box;
+  font-size: 3rem;
+}
+.demand-bid-online {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  border: 0.25rem solid #fff;
+  background: #c5c5c5;
+  box-sizing: border-box;
+}
+.demand-bid-online.active {
+  background: #31AA16;
+}
+.demand-profile-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 2.5rem;
+  row-gap: 0.25rem;
+  min-width: 0;
+}
+.demand-profile-line > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 1.5rem;
+  line-height: 2.25rem;
+  color: var(--gray-color);
+}
+.demand-profile-line > span > img {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+}
+.demand-profile-line > span > em {
+  font-style: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media screen and (max-width: 768px) {
+  .demand-detail-bidding-card .demand-bid-avatar > img,
+  .demand-detail-bidding-card .demand-bid-avatar > .avatar-fallback {
+    width: 6.25rem;
+    height: 6.25rem;
+    font-size: 2.5rem;
+  }
+  .demand-bid-online {
+    right: 0.25rem;
+    bottom: 0.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .demand-profile-line {
+    column-gap: 1.25rem;
+  }
+  .demand-profile-line > span {
+    font-size: 1.375rem;
+    line-height: 2rem;
+  }
+  .demand-profile-line > span > img {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+}
+
+/* 需求描述 / 售后要求（折叠交互复用 js/detail/detail-common.js 的 toggle-rules，.toggle = 展开） */
+.demand-detail-text-block {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.demand-detail-block-label {
+  flex-shrink: 0;
+  font-size: 1.75rem;
+  line-height: 2.5rem;
+  color: #6d6d6d;
+}
+.demand-detail-rules-box {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+/* 说明：标题 + 正文同一段，默认 2 行，Show more 贴在第 2 行末尾（float + ::before 占位把按钮推到最后一行右侧，
+   省略号正好停在按钮前面）；展开后按钮落在最后一行末尾。 */
+.demand-detail-desc-wrap {
+  display: flex;
+  width: 100%;
+}
+.demand-detail-desc {
+  width: 100%;
+  font-size: 1.75rem;
+  line-height: 2.5rem;
+  color: #000;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.demand-detail-desc::before {
+  content: '';
+  float: right;
+  height: calc(100% - 2.5rem);
+}
+.demand-detail-desc.is-expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+.demand-detail-desc.is-expanded::before,
+.demand-detail-desc.is-expanded > [data-role="desc-more"] {
+  display: none;
+}
+.demand-detail-desc > .demand-detail-less {
+  display: none;
+  margin-left: 0.75rem;
+}
+.demand-detail-desc.is-expanded > .demand-detail-less {
+  display: inline;
+}
+.demand-detail-desc > [data-role="desc-more"] {
+  float: right;
+  clear: both;
+  margin-left: 1rem;
+  line-height: 2.5rem;
+}
+.demand-detail-desc > [data-role="desc-more"][hidden] {
+  display: none;
+}
+.demand-detail-desc > .demand-detail-block-label {
+  margin-right: 0.5rem;
+}
+.demand-detail-desc-text {
+  white-space: pre-wrap;
+}
+ul.demand-detail-rules-list[data-rules-role="content"] {
+  margin: 0;
+  padding-left: 2.25rem;
+  list-style: disc;
+}
+ul.demand-detail-rules-list > li {
+  font-size: 1.75rem;
+  line-height: 2.5rem;
+  color: #000;
+  word-break: break-word;
+}
+ul.demand-detail-rules-list:not(.toggle) > li:not(:first-child) {
+  display: none;
+}
+/* Show more / Show less：纯文字 + 下划线，跟正文区分 */
+.demand-detail-more {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 1.625rem;
+  line-height: 2.25rem;
+  color: #000;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 0.375rem;
+  cursor: pointer;
+}
+.demand-detail-more:hover {
+  color: var(--primary-color);
+}
+.demand-detail-page .demand-summary-card.is-sticky .demand-detail-text-block,
+.demand-detail-page .demand-summary-card.is-sticky .demand-detail-desc-wrap,
+.demand-detail-page .demand-summary-card.is-sticky .demand-profile-line {
+  display: none;
+}
+.demand-summary-card .user-info > .demand-profile-line {
+  margin-top: -0.25rem;
+}
+@media screen and (max-width: 768px) {
+  .demand-detail-text-block {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .demand-detail-block-label,
+  .demand-detail-desc,
+  ul.demand-detail-rules-list > li {
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+  }
+  .demand-detail-desc::before {
+    height: calc(100% - 2.25rem);
+  }
+  .demand-detail-desc > .demand-detail-more {
+    line-height: 2.25rem;
+    font-size: 1.5rem;
+  }
+  .demand-summary-card .user-info > .demand-profile-line {
+    margin-left: -8.75rem;
+    margin-top: 0.75rem;
+  }
+}
+
+/* 发布者区块整体收紧：名字字号 3.5rem → 2.5rem，头像 10rem → 8rem，右侧名字 / 国家语言时区 / 统计三行行高跟着变矮 */
+.demand-detail-page .demand-summary-card .user-section {
+  gap: 1.5rem;
+}
+.demand-detail-page .demand-summary-card .user-section > img,
+.demand-detail-page .demand-summary-card .user-section > .avatar-fallback {
+  width: 8rem;
+  height: 8rem;
+  font-size: 3.25rem;
+}
+.demand-detail-page .demand-summary-card .user-info {
+  gap: 0.25rem;
+}
+.demand-detail-page .demand-summary-card .user-header {
+  gap: 1.5rem;
+}
+.demand-detail-page .demand-summary-card .user-header > h2 {
+  font-size: 2.5rem;
+  line-height: 3.25rem;
+}
+.demand-detail-page .demand-summary-card .user-info > .demand-profile-line {
+  margin-top: 0;
+}
+.demand-detail-page .demand-summary-card .user-stats .item-service-text,
+.demand-detail-page .demand-summary-card .user-stats .item-service {
+  font-size: 1.625rem;
+  line-height: 2.5rem;
+}
+@media screen and (max-width: 768px) {
+  .demand-detail-page .demand-summary-card .user-section > img,
+  .demand-detail-page .demand-summary-card .user-section > .avatar-fallback {
+    width: 6.5rem;
+    height: 6.5rem;
+    font-size: 2.75rem;
+  }
+  .demand-detail-page .demand-summary-card .user-info {
+    margin-top: 0.25rem;
+  }
+  .demand-detail-page .demand-summary-card .user-header > h2 {
+    font-size: 2.125rem;
+    line-height: 2.75rem;
+  }
+  .demand-detail-page .demand-summary-card .user-info > .demand-profile-line {
+    margin-left: -8rem;
+    margin-top: 0.5rem;
+  }
+  .demand-detail-page .demand-summary-card .user-stats {
+    margin-left: -8rem;
+    margin-top: 0.5rem;
+  }
+  .demand-detail-page .demand-summary-card .user-stats .item-service-text,
+  .demand-detail-page .demand-summary-card .user-stats .item-service {
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+  }
+}
+
+/* 是否需要样品：Yes 绿色加粗、No 灰色 */
+.demand-summary-card .item-service.demand-samples-yes {
+  color: #31AA16;
+  font-weight: 600;
+}
+.demand-summary-card .item-service.demand-samples-no {
+  color: #9a9a9a;
+}

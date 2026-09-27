@@ -1,0 +1,205 @@
+/*
+ * 公共图片放大轮播（lightbox）样式，配合 js/showcase-lightbox.js。从 css/detail/item-detail.css 抽出来，
+ * 商品详情 Show Case、需求详情页投标图片共用。JS 动态插入到 body 末尾，跟分享/投诉弹窗同一套遮罩语言。
+ */
+.item-showcase-mask {
+  display: none;
+  position: fixed;
+  inset: 0;
+  /* 放大层要盖过所有弹窗（投标弹窗 500、首页购买弹窗 600+），投标弹窗里点图片预览时才不会被挡 */
+  z-index: 700;
+  background: rgba(0, 0, 0, 0.75);
+  align-items: center;
+  justify-content: center;
+}
+.item-showcase-mask.is-open {
+  display: flex;
+}
+.item-showcase-content {
+  position: relative;
+  width: min(100rem, 92vw);
+  max-height: 84vh;
+  max-height: 84dvh;
+  background: #fff;
+  border-radius: 1rem;
+  padding: 2.5rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+.item-showcase-close {
+  /* 用户反馈过：移动端有的图片会把这个X挡住/点不到——之前没有显式 z-index，跟图片同一个层叠上下文
+     里排序不稳定；给个明确更高的 z-index 保证永远浮在图片上面。 */
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+  z-index: 10;
+}
+.item-showcase-image-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(30rem, 52vh, 62rem);
+  max-height: calc(84dvh - 11rem);
+  overflow: hidden;
+  touch-action: pan-y;
+}
+.item-showcase-image-box.is-draggable {
+  cursor: grab;
+  user-select: none;
+}
+.item-showcase-image-box.is-dragging {
+  cursor: grabbing;
+}
+.item-showcase-image-box.is-zoomed {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.item-showcase-image-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex: 0 0 100%;
+  transform: translate3d(-100%, 0, 0);
+  will-change: transform;
+}
+.item-showcase-image-slide {
+  display: flex;
+  flex: 0 0 100%;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+.item-showcase-image {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 0.5rem;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  transition: transform 180ms ease-out;
+}
+.item-showcase-arrow {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 0;
+  background: var(--primary-color, #FF4D10);
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+.item-showcase-arrow:disabled {
+  background: #b9b9b9;
+  box-shadow: none;
+  cursor: default;
+}
+.item-showcase-arrow[hidden] {
+  display: none;
+}
+.item-showcase-arrow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-top: 0.2rem solid #fff;
+  border-left: 0.2rem solid #fff;
+}
+.item-showcase-arrow-left {
+  left: 0.25rem;
+}
+.item-showcase-arrow-left::before {
+  transform: translate(-30%, -50%) rotate(-45deg);
+}
+.item-showcase-arrow-right {
+  right: 0.25rem;
+}
+.item-showcase-arrow-right::before {
+  transform: translate(-70%, -50%) rotate(135deg);
+}
+.item-showcase-content > h3 {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 1.75rem;
+  color: #000;
+}
+.item-showcase-content > p {
+  margin: 0;
+  font-size: 1.375rem;
+  color: #666;
+  line-height: 2rem;
+}
+@media screen and (min-width: 769px) and (max-height: 650px) {
+  .item-showcase-image-box {
+    height: min(42vh, 34rem);
+  }
+}
+
+/* 大图下方的作者行（投标图片显示投标店铺头像 + 名字），没传 author 时 hidden。 */
+.item-showcase-author {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+.item-showcase-author[hidden] {
+  display: none;
+}
+.item-showcase-author > img,
+.item-showcase-author > .avatar-fallback {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.item-showcase-author > img[hidden],
+.item-showcase-author > .avatar-fallback[hidden] {
+  display: none;
+}
+.item-showcase-author > strong {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.item-showcase-content > h3[hidden] {
+  display: none;
+}
+.item-showcase-content > p {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+@media screen and (max-width: 768px) {
+  .item-showcase-content {
+    padding: 1.5rem;
+    width: 92vw;
+  }
+  .item-showcase-image-box {
+    height: min(38dvh, 42rem);
+  }
+  .item-showcase-arrow-left {
+    left: 0.5rem;
+  }
+  .item-showcase-arrow-right {
+    right: 0.5rem;
+  }
+  .item-showcase-author > img,
+  .item-showcase-author > .avatar-fallback {
+    width: 4rem;
+    height: 4rem;
+  }
+}
