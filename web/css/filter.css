@@ -1245,3 +1245,17 @@ body.scroll-disabled {
     letter-spacing: 0.0375rem;
   }
 }
+
+/* 多级分类下拉（posts 分类，js/post-filter.js 的 toTreeOrder）：只按层级缩进（不加连接线符号，用户 2026-09-28 要求），
+   父级文字加粗，子级文字略小略浅，一眼能看出层次（用户 2026-09-28 要求）。 */
+.filter-dropdown-item--tree {
+  position: relative;
+  padding-left: calc(2rem + var(--tree-depth, 0) * 2.5rem);
+}
+.filter-dropdown-item--tree.is-parent .filter-dropdown-item-text {
+  font-weight: 700;
+}
+.filter-dropdown-item--tree.is-child .filter-dropdown-item-text {
+  font-size: 1.625rem;
+  color: #555;
+}
