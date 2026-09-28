@@ -1164,7 +1164,8 @@ button {
     align-items: flex-start;
     justify-content: flex-start;
     /* 12.5rem 太宽，8 组字母全有时会超过 1440 主体区，收到 6.25rem。 */
-    gap: 6.25rem;
+    /* 列宽改成按内容自适应后（见 .top-menu-more-list），列间距再收到 4rem，把空间留给品牌名。 */
+    gap: 4rem;
     cursor: pointer;
     border-bottom-left-radius: 5rem;
     border-bottom-right-radius: 5rem;
@@ -1187,7 +1188,11 @@ button {
     display: flex;
     flex-direction: column;
     gap: 1.875rem;
-    width: 12.125rem;
+    /* 列宽按本列最长品牌名自适应：12.125rem 兜底（短名字保持原视觉），20rem 封顶（超长名字仍走省略号）。
+       原来固定 12.125rem，扣掉图标后文字只剩 ~69px，Confluence/ServiceNow 这类名字明明浮窗还有空间也被截断。 */
+    flex: 0 0 auto;
+    min-width: 12.125rem;
+    max-width: 20rem;
 }
 
 .top-menu-more-list > :first-child {
