@@ -31,15 +31,15 @@
             <div class="home-menu-item-title-box" th:if="${topMenuCategories != null and !topMenuCategories.isEmpty()}">
                 <div class="home-menu-item-title-content">
                     <p th:text="#{header.nav.browseServices}">Browse Services</p>
-                    <img th:src="@{/image/more-arrow.png}" alt="" />
+                    <i class="svg-icon--more-arrow" aria-hidden="true"></i>
                 </div>
                 <div class="home-menu-item-content" style="display: none;">
                     <div class="home-menu-item-content-item" th:each="cat : ${topMenuCategories}">
                         <p th:text="${cat.node.services.name}">Design</p>
-                        <img th:src="@{/image/gray-arrow.png}" alt="" />
+                        <i class="svg-icon--gray-arrow" aria-hidden="true"></i>
                         <div class="home-menu-second-page" style="display: none;">
                             <div class="home-menu-second-page-title-box">
-                                <img th:src="@{/image/more-arrow.png}" alt="" />
+                                <i class="svg-icon--more-arrow" aria-hidden="true"></i>
                                 <p th:text="${cat.node.services.name}">Design</p>
                             </div>
                             <div class="home-menu-second-page-group">
@@ -69,14 +69,14 @@
             <div class="home-menu-item-title-box" th:each="nav, s : ${headerDropdownBars}">
                 <div class="home-menu-item-title-content">
                     <p th:text="${nav.name}">Resources</p>
-                    <img th:src="@{/image/more-arrow.png}" alt="" />
+                    <i class="svg-icon--more-arrow" aria-hidden="true"></i>
                 </div>
                 <div class="home-menu-item-content" style="display: none;">
                     <a class="home-menu-item-content-item" th:each="child : ${nav.children}"
                        th:href="${s.index == 0} ? ${link.to('/resources/' + child.link)} : ${link.to('/topic/' + child.link)}"
                        target="_self">
                         <p th:text="${child.name}">Resource</p>
-                        <img th:src="@{/image/gray-arrow.png}" alt="" />
+                        <i class="svg-icon--gray-arrow" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>

@@ -1,4 +1,6 @@
 .pagination-container {
+    position: relative;
+    z-index: 50;
     max-width: 100%;
     padding: 1.25rem 0;
     line-height: 2.75rem;
@@ -83,6 +85,10 @@
     color: #D9D9D9;
     cursor: not-allowed;
 }
+.pagination-item:not(.disabled):active {
+    transform: scale(0.95);
+    transition-duration: 0.08s;
+}
 
 /* 上一页按钮 */
 #prevBtn {
@@ -132,7 +138,17 @@
     border-radius: 0.25rem;
     background: #FFFFFF;
     cursor: pointer;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.size-changer:active {
+  transform: scale(0.95);
+  transition-duration: 0.08s;
+}
+.pagination-item,
+.size-changer {
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .size-changer .selection-item {
@@ -261,4 +277,10 @@
     height: 0;
     overflow: hidden;
     white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+    .pagination-item,
+    .size-changer {
+        transition: none;
+    }
 }

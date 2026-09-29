@@ -11,11 +11,11 @@
 $(document).ready(function () {
     $('.faq-header-middle-box > div').on('click', function () {
         var $item = $(this).parents('.faq-item');
-        $item.find('.faq-header > img').toggleClass('open');
+        $item.find('.faq-header > .svg-icon--more-arrow').toggleClass('open');
         $item.find('.faq-content').toggle(100);
         $item.toggleClass('brand-faq-item-expanded');
     });
-    $('.faq-header > img').on('click', function (e) {
+    $('.faq-header > .svg-icon--more-arrow').on('click', function (e) {
         var $item = $(e.target).parents('.faq-item');
         $(e.target).toggleClass('open');
         $item.find('.faq-content').toggle(100);

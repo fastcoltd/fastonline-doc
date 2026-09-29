@@ -619,7 +619,7 @@ function createItemElement(item) {
                                     <img src="image/detailpage/review-reply-avatar.png" />
                                     <span>Erinasa</span>
                                     <div></div>
-                                    <img src="image/detailpage/arrow-down.png" style="transform: rotate(180deg);" />
+                                    <i style="transform: rotate(180deg);"  class="svg-icon svg-icon--arrow-down" aria-hidden="true"></i>
                                 </div>
                                 <span>Incidunt velit eveniet
                                     sint.

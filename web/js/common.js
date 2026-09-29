@@ -120,13 +120,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const body = document.getElementsByTagName('body')[0];
     this.headerSearchMenu = new HeaderMenu('.header-search-box-label', ':scope > img', ':scope > label', 'items');
-    this.headerResourceMenu = new HeaderMenu('.header-items-label-resource', ':scope > img', '', '');
-    this.headerPostMenu = new HeaderMenu('.header-items-label-post', ':scope > img', '', 'Blog');
+    this.headerResourceMenu = new HeaderMenu('.header-items-label-resource', ':scope > .svg-icon--header-items-arrow', '', '');
+    this.headerPostMenu = new HeaderMenu('.header-items-label-post', ':scope > .svg-icon--header-items-arrow', '', 'Blog');
     this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', ':scope > img', ':scope > label', 'items')
     refreshHeaderUserUI();
 
     function setHomeMenuSectionDisplay(sectionBox, shouldOpen) {
-        const titleArrow = sectionBox.querySelector('.home-menu-item-title-content > img');
+        const titleArrow = sectionBox.querySelector('.home-menu-item-title-content > .svg-icon--more-arrow');
         const titleContent = sectionBox.querySelector('.home-menu-item-content');
         if (!titleContent) {
             return;
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const homeMenuTitleBoxes = homeMenuRoot.querySelectorAll('.home-menu-item-title-box');
         for (let i = 0; i < homeMenuTitleBoxes.length; i++) {
             const titleBox = homeMenuTitleBoxes[i];
-            const titleArrow = titleBox.querySelector('.home-menu-item-title-content > img');
+            const titleArrow = titleBox.querySelector('.home-menu-item-title-content > .svg-icon--more-arrow');
             const titleContent = titleBox.querySelector('.home-menu-item-content');
             if (titleContent) {
                 titleContent.style.display = 'none';
@@ -1302,27 +1302,13 @@ $(document).ready(function () {
     const $headerNoticeTrigger = $('.header-user-box .item-notice');
     const $centerNoticeTrigger = $('.center-wrapper .account-info-box .notice-box');
     const centerNoticePopoverClass = 'notice-items-wrapper-mobile-center';
-    const centerNoticeIconList = [
-        'image/account-center-mobile/notice-popover-icon1.svg',
-        'image/account-center-mobile/notice-popover-icon2.svg',
-        'image/account-center-mobile/notice-popover-icon3.svg',
-        'image/account-center-mobile/notice-popover-icon4.svg',
-        'image/account-center-mobile/notice-popover-icon5.svg'
-    ];
     const centerNoticeCountList = ['10', '12', '8', '2', '22'];
     let noticeHideTimer = null;
 
     function applyCenterNoticeItems() {
         $noticeItemsWrapper.find('.notice-item').each(function (index) {
             const $item = $(this);
-            const iconSrc = centerNoticeIconList[index];
             const countText = centerNoticeCountList[index];
-            if (iconSrc) {
-                $item.find('.notice-icon').attr({
-                    src: iconSrc,
-                    alt: ''
-                });
-            }
             if (typeof countText === 'string') {
                 $item.find('span').text(countText);
             }

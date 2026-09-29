@@ -105,12 +105,12 @@ function createItemElement(item) {
             <div class="best-items-item-middle-box">
               <div class="item-brand-box">
                 <p class="item-brand-text">品牌: </p>
-                <img class="item-brand-icon" src="image/brand.png" />
+                <i class="svg-icon svg-icon--brand item-brand-icon" aria-hidden="true"></i>
                 <p class="item-brand" style="color: #06C70C;">{{Google}}</p>
               </div>
               <div class="item-service-box">
                 <p class="item-service-text">服务: </p>
-                <img class="item-service-icon" src="image/service.png" />
+                <i class="svg-icon svg-icon--service item-service-icon" aria-hidden="true"></i>
                 <p class="item-service">{{SEO & SA}}</p>
               </div>
               <div class="best-items-item-price-stock-box">
@@ -120,7 +120,7 @@ function createItemElement(item) {
                 </div>
                 <div class="item-stock-box">
                   <p class="item-stock-text">{{库存}}</p>
-                  <img class="item-stock-icon" src="image/stock.png" />
+                  <i class="svg-icon svg-icon--stock item-stock-icon" aria-hidden="true"></i>
                   <p class="item-stock">{{80}}</p>
                 </div>
               </div>

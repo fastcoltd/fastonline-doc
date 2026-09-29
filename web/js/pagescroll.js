@@ -113,6 +113,7 @@ function adjustFilterPosition() {
     };
     pageFix.classList.toggle('is-sticky', headIsSticky);
     syncStickyHorizontalPosition(headIsSticky);
+    const filterBottomGap = pageFix.classList.contains('campaign-filter-container') ? 8 : 40;
     // 计算页面头部所有固定元素的总高度
     let totalHeight = stickyHeaderHeight;
     if (pageHead && !headIsSticky) {
@@ -120,7 +121,7 @@ function adjustFilterPosition() {
     }
     // 设置过滤器的位置和高度
     if (!headIsSticky) {
-        const pageFixHeight = `calc(100vh - ${totalHeight + 40}px)`;
+        const pageFixHeight = `calc(100vh - ${totalHeight + filterBottomGap}px)`;
         // 非sticky状态：相对于page-content定位
         Object.assign(pageFix.style, {
             top: '20px',
@@ -133,7 +134,7 @@ function adjustFilterPosition() {
         if (menuContainerScrollTop < 0) {
             top = totalHeight + menuContainerScrollTop
         }
-        const pageFixHeight = `calc(100vh - ${totalHeight + 40}px)`;
+        const pageFixHeight = `calc(100vh - ${totalHeight + filterBottomGap}px)`;
         // sticky状态：固定定位
         Object.assign(pageFix.style, {
             top: top + 'px',

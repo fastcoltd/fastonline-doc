@@ -75,10 +75,10 @@
 }
 [data-filter-role="count"] {
   font-family: var(--primary-popfont);
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 400;
   line-height: 3.5rem;
-  margin-left: 1.25rem;
+  margin-left: 0.5rem;
   color: #000;
 }
 .page-filterresult-sort-box {
@@ -255,6 +255,12 @@
   flex-direction: column;
   overflow-x: hidden;
   padding-right: 1rem;
+}
+@media screen and (min-width: 769px) {
+  .filter-container.campaign-filter-container.page-fix-box {
+    min-height: 48rem;
+    overflow: visible;
+  }
 }
 @media screen and (max-width: 768px) {
   .filter-container {
@@ -518,6 +524,24 @@
 }
 .filter-custom-select.active .filter-select-arrow {
   transform: rotate(0deg);
+}
+
+/* Both directions advance clockwise while retaining the same resting angles. */
+@keyframes filter-arrow-open-clockwise {
+  from { transform: rotate(180deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes filter-arrow-close-clockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}
+.filter-content .filter-group:not(.collapsed) .filter-expand-icon,
+.filter-content .filter-custom-select.active .filter-select-arrow {
+  animation: filter-arrow-open-clockwise 0.2s ease both;
+}
+.filter-content .filter-group.collapsed .filter-expand-icon,
+.filter-content .filter-custom-select:not(.active) .filter-select-arrow {
+  animation: filter-arrow-close-clockwise 0.2s ease both;
 }
 /* Dropdown overlay and panel */
 .filter-dropdown-overlay {

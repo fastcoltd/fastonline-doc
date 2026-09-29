@@ -190,7 +190,7 @@ function createItemElement(item) {
                                     <img src="image/detailpage/review-reply-avatar.png" />
                                     <span>Erinasa</span>
                                     <div></div>
-                                    <img src="image/detailpage/arrow-down.png" />
+                                    <i  class="svg-icon svg-icon--arrow-down" aria-hidden="true"></i>
                                 </div>
                                 <span style="display: none;">Incidunt velit eveniet
                                     sint.

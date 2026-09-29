@@ -954,7 +954,7 @@ body.index-purchase-open {
     font-weight: 400;
 }
 
-[data-pager-role="more"] img {
+[data-pager-role="more"] .view-more-icon {
     width: 2.5rem;
     height: 2.5rem;
     margin: 0;
@@ -999,7 +999,7 @@ body.index-purchase-open {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    gap: 3.75rem;
+    gap: 1.75rem;
 
     .store-all-card--desktop-vertical & > .store-all-card {
         width: calc((100% - 7.5rem) / 3);
@@ -1166,14 +1166,16 @@ body.index-purchase-open {
 .brand-content {
     overflow-x: auto;
     /* pointer-events: none; */
-    width: calc(100% - 16rem);
+    width: calc(100% - 10rem);
+    box-sizing: border-box;
+    padding-inline: 1.75rem;
     margin: 0 auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 3.75rem;
+    gap: max(0px, calc((100% - 143rem) / 10));
     scroll-behavior: smooth;
 }
 
@@ -1185,8 +1187,8 @@ body.index-purchase-open {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 11.5rem;
-    flex: 0 0 11.5rem;
+    width: 13rem;
+    flex: 0 0 13rem;
     cursor: pointer;
 }
 
@@ -1198,9 +1200,10 @@ body.index-purchase-open {
     align-items: center;
     justify-content: center;
     border: .125rem solid #f0f0f3;
+    transition: border-color .2s ease;
 }
 
-.brand-icon-box img {
+.brand-icon-box :is(img, .svg-icon) {
     width: 7.5rem;
     aspect-ratio: 1;
     border-radius: 1.25rem;
@@ -1208,7 +1211,7 @@ body.index-purchase-open {
 }
 
 .brand-item p {
-    max-width: 11.5rem;
+    max-width: 13rem;
     margin-top: 1rem;
     color: #000;
     font-size: 2rem;
@@ -1218,6 +1221,14 @@ body.index-purchase-open {
     white-space: nowrap;
     overflow: hidden;
     cursor: pointer;
+    transition: color .2s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+    .brand-item:hover .brand-icon-box { border-color: var(--brand-color, var(--primary-color)); }
+    .brand-item:hover p {
+        color: var(--brand-color, var(--primary-color));
+        font-weight: 400;
+    }
 }
 
 .brand-right-box {
@@ -1230,11 +1241,6 @@ body.index-purchase-open {
     cursor: pointer;
 }
 
-.brand-right-box img {
-    width: 100%;
-    height: 100%;
-    display: block;
-}
 
 .brand-left-box {
     position: absolute;
@@ -1246,10 +1252,19 @@ body.index-purchase-open {
     cursor: pointer;
 }
 
-.brand-left-box img {
-    width: 100%;
-    height: 100%;
-    display: block;
+.brand-left-box,
+.brand-right-box {
+    border-radius: 50%;
+    background-color: #707070;
+    color: #000;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+    .brand-left-box:not(.brand-arrow-disabled):hover,
+    .brand-right-box:not(.brand-arrow-disabled):hover {
+        background-color: #fff;
+        color: var(--primary-color);
+    }
 }
 
 .brand-arrow-disabled {
@@ -1276,6 +1291,7 @@ body.index-purchase-open {
     .brand-content {
         width: 100%;
         margin: 0;
+        padding-inline: 0;
         gap: 2rem;
         align-items: flex-start;
     }
@@ -1285,7 +1301,7 @@ body.index-purchase-open {
         flex: 0 0 6.25rem;
     }
 
-    .brand-icon-box img {
+    .brand-icon-box :is(img, .svg-icon) {
         width: 3.75rem;
         height: 3.75rem;
     }
@@ -1351,7 +1367,7 @@ body.index-purchase-open {
         line-height: 2.75rem;
     }
 
-    [data-pager-role="more"] img {
+    [data-pager-role="more"] .view-more-icon {
         display: none;
         margin: 0;
     }
@@ -1360,7 +1376,7 @@ body.index-purchase-open {
         gap: 1.25rem;
     }
 
-    .best-items-wrapper [data-pager-role="more"] img {
+    .best-items-wrapper [data-pager-role="more"] .view-more-icon {
         display: block;
         width: 2.5rem;
         height: 2.5rem;
@@ -1628,7 +1644,7 @@ body.index-purchase-open {
                 display: none;
             }
 
-            dd > img {
+            dd > .svg-icon {
                 width: 1.5rem;
                 height: 1.5rem;
             }
@@ -1887,3 +1903,13 @@ body.index-purchase-open {
         display: none;
     }
 }
+
+/* Original brand carousel arrow silhouettes. */
+.brand-left-box, .brand-right-box { background: transparent; color: #6d6d6d; }
+.brand-left-box::before, .brand-right-box::before { width: 100%; height: 100%; }
+.round-arrow-icon.brand-left-box::before { transform: none; -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20109%20109%22%3E%3Cpath%20d%3D%22M51.62%209%20L42.38%2011%20L33%2015.12%20L24.5%2021.38%20L19.25%2027.12%20L14.5%2034.62%20L11.25%2042.75%20L9.5%2053.62%20L10%2063.75%20L12.12%2072%20L16.12%2080.38%20L22%2088.12%20L29.62%2094.88%20L36.5%2098.88%20L43.75%20101.62%20L54.38%20103.25%20L64.38%20102.75%20L72.38%20100.75%20L80.88%2096.75%20L86.38%2092.88%20L93.5%2085.75%20L97.88%2079.38%20L101.88%2070%20L103.75%2060.5%20L103.62%2050.5%20L101.75%2041.62%20L97.62%2032.38%20L90.62%2023.12%20L83.75%2017.25%20L76.25%2013%20L68%2010.12%20L61.25%209ZM66.5%2036.5%20L67.88%2037.75%20L67%2044.38%20L52.25%2055.12%20L51.5%2056.5%20L67%2067.88%20L67.88%2070.5%20L67.88%2074.38%20L67%2075.62%20L40%2056.5%20L42.12%2054Z%22%20fill%3D%22%23000%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20109%20109%22%3E%3Cpath%20d%3D%22M51.62%209%20L42.38%2011%20L33%2015.12%20L24.5%2021.38%20L19.25%2027.12%20L14.5%2034.62%20L11.25%2042.75%20L9.5%2053.62%20L10%2063.75%20L12.12%2072%20L16.12%2080.38%20L22%2088.12%20L29.62%2094.88%20L36.5%2098.88%20L43.75%20101.62%20L54.38%20103.25%20L64.38%20102.75%20L72.38%20100.75%20L80.88%2096.75%20L86.38%2092.88%20L93.5%2085.75%20L97.88%2079.38%20L101.88%2070%20L103.75%2060.5%20L103.62%2050.5%20L101.75%2041.62%20L97.62%2032.38%20L90.62%2023.12%20L83.75%2017.25%20L76.25%2013%20L68%2010.12%20L61.25%209ZM66.5%2036.5%20L67.88%2037.75%20L67%2044.38%20L52.25%2055.12%20L51.5%2056.5%20L67%2067.88%20L67.88%2070.5%20L67.88%2074.38%20L67%2075.62%20L40%2056.5%20L42.12%2054Z%22%20fill%3D%22%23000%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E") center / contain no-repeat; }
+.round-arrow-icon.brand-right-box::before { transform: none; -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20109%20109%22%3E%3Cpath%20d%3D%22M51.62%209%20L42.38%2011%20L33%2015.12%20L24.5%2021.38%20L19.25%2027.12%20L14.5%2034.62%20L11.25%2042.75%20L9.5%2053.62%20L10%2063.75%20L12.12%2072%20L16.12%2080.38%20L22%2088.12%20L29.62%2094.88%20L37.88%2099.5%20L47.62%20102.5%20L55.12%20103.25%20L64.38%20102.75%20L72.38%20100.75%20L80.88%2096.75%20L86.38%2092.88%20L93.5%2085.75%20L97.88%2079.38%20L101.88%2070%20L103.75%2060.5%20L103.62%2050.5%20L101.75%2041.62%20L97.62%2032.38%20L90.62%2023.12%20L83.75%2017.25%20L76.25%2013%20L68%2010.12%20L61.25%209ZM46.38%2036.5%20L73.25%2056%20L46.62%2075.75%20L45.62%2074.25%20L46.12%2068.12%20L61.88%2056.12%20L46.25%2044.25%20L45.62%2037.5Z%22%20fill%3D%22%23000%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20109%20109%22%3E%3Cpath%20d%3D%22M51.62%209%20L42.38%2011%20L33%2015.12%20L24.5%2021.38%20L19.25%2027.12%20L14.5%2034.62%20L11.25%2042.75%20L9.5%2053.62%20L10%2063.75%20L12.12%2072%20L16.12%2080.38%20L22%2088.12%20L29.62%2094.88%20L37.88%2099.5%20L47.62%20102.5%20L55.12%20103.25%20L64.38%20102.75%20L72.38%20100.75%20L80.88%2096.75%20L86.38%2092.88%20L93.5%2085.75%20L97.88%2079.38%20L101.88%2070%20L103.75%2060.5%20L103.62%2050.5%20L101.75%2041.62%20L97.62%2032.38%20L90.62%2023.12%20L83.75%2017.25%20L76.25%2013%20L68%2010.12%20L61.25%209ZM46.38%2036.5%20L73.25%2056%20L46.62%2075.75%20L45.62%2074.25%20L46.12%2068.12%20L61.88%2056.12%20L46.25%2044.25%20L45.62%2037.5Z%22%20fill%3D%22%23000%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E") center / contain no-repeat; }
+@media (hover: hover) and (pointer: fine) { .brand-left-box:not(.brand-arrow-disabled):hover, .brand-right-box:not(.brand-arrow-disabled):hover { background: transparent; color: var(--primary-color); } }
+.brand-left-box:not(.brand-arrow-disabled):active::before, .brand-right-box:not(.brand-arrow-disabled):active::before { transform: scale(.95); }
+.brand-left-box::before, .brand-right-box::before { will-change: transform; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+@media screen and (min-width: 769px) { .figma-comment-item .post-item-kind-box dd > .svg-icon { display: none; } }
