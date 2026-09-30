@@ -740,12 +740,12 @@ function setSearchData() {
 // "search-all.html?q=...&type=..."——从任何非首页页面点这个搜索框都是导航到一个 404（或者干脆
 // 拼出一个奇怪的相对路径），"网站搜索在二级页面上没有"这个反馈的根因就是这个（不是显示问题，是点了
 // 就走错路由）。SSR 这边 items/stores/demands/posts 四个真实列表路由（SiteItemController#searchItem
-// 等）都已经支持免费文本参数 k，这里改成按下拉框选中的 data-value（items/stories/demands/posts，见
+// 等）都已经支持免费文本参数 k，这里改成按下拉框选中的 data-value（items/stores/demands/posts，见
 // fragments/header.html 的 .header-menu-item[data-value]）映射到对应的真实路由，带上当前语言前缀
 // （从当前 URL 第一段读，不是首页也一样能拼对）。
 var SEARCH_TYPE_ROUTE_MAP = {
     items: 'items',
-    stories: 'stores',
+    stores: 'stores',
     demands: 'demands',
     posts: 'posts'
 };

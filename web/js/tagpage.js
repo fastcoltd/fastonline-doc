@@ -7,7 +7,7 @@ const brandPageIndexs = document.querySelectorAll(".page-link");
 // 不在 JS 中维护第二份 item HTML（遵循 docs/unified-item-components.md）。
 const itemAllCardRoot = document.querySelector('#best-items-item .items-pager');
 const itemAllCardPrototype = itemAllCardRoot ? itemAllCardRoot.querySelector(':scope > .item-all-card') : null;
-// Stories Tab 统一店铺卡片原型：动态新增卡片通过克隆统一组件原型生成，
+// Stores Tab 统一店铺卡片原型：动态新增卡片通过克隆统一组件原型生成，
 // 不在 JS 中维护第二份 store HTML（遵循 docs/unified-item-components.md）。
 const storeAllCardRoot = document.querySelector('#store-item .items-pager');
 const storeAllCardPrototype = storeAllCardRoot ? storeAllCardRoot.querySelector(':scope > .store-all-card') : null;
