@@ -74,6 +74,22 @@
     width: 1.2rem;
     height: 1.2rem;
 }
+/* 总价标签移动端只显示钱袋图标（图形变量在 common.css 的 --svg-mask-total-price，用户 2026-09-30）：文字 font-size:0
+   隐藏但保留给读屏，::before 画图标，尺寸跟投标时间图标一致。模板和 detail-related.js 拼的卡片都不用改。 */
+.demand-all-card--mobile-vertical .demand-all-card > dl [data-field="total-price"] dt {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0;
+}
+.demand-all-card--mobile-vertical .demand-all-card > dl [data-field="total-price"] dt::before {
+  content: "";
+  display: block;
+  width: 1.2rem;
+  height: 1.2rem;
+  background-color: #6d6d6d;
+  -webkit-mask: var(--svg-mask-total-price) center / contain no-repeat;
+  mask: var(--svg-mask-total-price) center / contain no-repeat;
+}
 
 .demand-all-card--mobile-vertical .demand-all-card > dl [data-field="service"] dd {
     max-width: 13.1rem;
