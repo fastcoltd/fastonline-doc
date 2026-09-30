@@ -350,6 +350,7 @@ button {
     .header-search-mobile-box-label > .svg-icon--more-arrow {
         width: 1.25rem;
         height: 1.24rem;
+        transition: transform 0.25s ease, color 0.2s ease;
     }
 
     .header-search-mobile-box-line {
@@ -949,6 +950,11 @@ button {
     .header-menu-box {
         display: block;
     }
+    .header-menu-box > .svg-icon--home-menu {
+        width: 2.5rem;
+        height: 2.5rem;
+        color: var(--gray-color);
+    }
 
     .a-link-logo > img {
         width: 16rem;
@@ -1231,11 +1237,8 @@ button {
 }
 
 .home-menu-page {
-    z-index: 101;
-    // 2026-09-17 真机试错记录：曾经加过顶部/底部纯白块想掩盖"缺口跟系统UI对比强烈"的问题，结果
-    // 把真实页面内容也一起盖成不透明白色了，用户反馈应该保持遮罩透明——撤回，改回整块统一的半透明
-    // 灰遮罩。缺口交给 js/common.js 的 syncHomeMenuViewportMetrics()（visualViewport 实时同步）解决。
-    background: rgba(0, 0, 0, 0.5);
+  z-index: 400;
+    background: transparent;
     width: 0;
     height: 100vh;
     height: 100dvh;
@@ -1262,6 +1265,7 @@ button {
     .home-menu-back {
         width: 6rem;
         height: 100%;
+        background: rgba(0, 0, 0, 0.5);
     }
 
     .home-menu-first-page {
@@ -1573,11 +1577,17 @@ button {
             // 右侧内边距移到 .home-menu-first-page 上：让滚动条贴到抽屉真正的右边缘，
             // 而不是浮在离边缘 3.25rem 的地方压住每行右侧的箭头。
             padding-right: 0;
+            padding-top: calc(3.25rem + var(--home-menu-content-offset, 0px));
         }
 
         .home-menu-back {
             flex: 1;
             min-width: 0;
+        }
+
+        .home-menu-second-page {
+            height: 100%;
+            padding-top: calc(3.25rem + var(--home-menu-content-offset, 0px));
         }
 
         .home-menu-first-page {

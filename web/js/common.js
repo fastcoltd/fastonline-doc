@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
     this.headerSearchMenu = new HeaderMenu('.header-search-box-label', ':scope > img', ':scope > label', 'items');
     this.headerResourceMenu = new HeaderMenu('.header-items-label-resource', ':scope > .svg-icon--header-items-arrow', '', '');
     this.headerPostMenu = new HeaderMenu('.header-items-label-post', ':scope > .svg-icon--header-items-arrow', '', 'Blog');
-    this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', ':scope > img', ':scope > label', 'items')
+    this.headerSearchMenuForMobile = new HeaderMenu('.header-search-mobile-box-label', ':scope > .svg-icon--more-arrow', ':scope > label', 'items')
     refreshHeaderUserUI();
 
     function setHomeMenuSectionDisplay(sectionBox, shouldOpen) {
@@ -402,11 +402,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const currentUser = getCurrentAuthUser();
         homeMenuPage.style.display = 'flex';
         homeMenuPage.style.width = '100vw';
-        // 用户明确反馈（真机实测）：移动端侧边栏打开后上下没有完全撑满到屏幕顶部/底部，首页只有底部
-        // 有缺口，其它页面（滚动过再打开）顶部+底部都有缺口——纯 CSS 的 height:100vh/100dvh 在真机上
-        // 跟不上浏览器地址栏动态收起/展开的那个瞬间。改成用 visualViewport API 实时同步，比 CSS dvh
-        // 更贴近地址栏过渡的实际状态，且在地址栏继续收起/展开时（resize/scroll 事件）持续校正。不支持
-        // visualViewport 的浏览器自动跳过，退回原来的 CSS height:100vh/100dvh，不会更差。
+        // 抽屉白底与右侧点击遮罩同层铺满；visualViewport 偏移只用于保持菜单正文的位置。
         syncHomeMenuViewportMetrics(homeMenuPage);
         if (window.visualViewport && !homeMenuPage._viewportSyncHandler) {
             const handler = function () { syncHomeMenuViewportMetrics(homeMenuPage); };
@@ -643,15 +639,15 @@ class HeaderMenu {
         this.updateSelectedState(defaultValue);
     }
 }
-// 见 headerMenu 点击处理里的注释：用 visualViewport 的实时可见区域覆盖 CSS 的 height:100vh/100dvh，
-// 修正真机上地址栏过渡瞬间的顶部/底部缺口。top 也一起同步——visualViewport.offsetTop 在地址栏收起
-// 过程中不总是 0（地址栏还没完全收起时，可视区域顶端相对 layout viewport 会有一个正偏移量）。
+// 抽屉背景固定从顶部开始，正文仍从可视区域顶部开始；右侧遮罩与抽屉使用同一高度。
 function syncHomeMenuViewportMetrics(homeMenuPage) {
     if (!window.visualViewport) {
         return;
     }
-    homeMenuPage.style.height = window.visualViewport.height + 'px';
-    homeMenuPage.style.top = window.visualViewport.offsetTop + 'px';
+    const offsetTop = Math.max(0, window.visualViewport.offsetTop);
+    homeMenuPage.style.height = window.visualViewport.height + offsetTop + 'px';
+    homeMenuPage.style.top = '0px';
+    homeMenuPage.style.setProperty('--home-menu-content-offset', offsetTop + 'px');
 }
 
 function dismissHomeMenuPage() {
@@ -672,6 +668,7 @@ function dismissHomeMenuPage() {
     }
     homeMenuPage.style.height = '';
     homeMenuPage.style.top = '';
+    homeMenuPage.style.removeProperty('--home-menu-content-offset');
 }
 
 function syncHeaderAvatarBadge(headerUser, isAuthenticated, currentUser) {

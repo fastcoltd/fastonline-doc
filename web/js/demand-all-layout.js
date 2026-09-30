@@ -54,6 +54,7 @@ class DemandAllLayout {
 
         this.observeTagLists();
         this.itemsObserver = new MutationObserver(mutations => {
+            if (this.isSyncingOverflow) return;
             const hasChangedItems = mutations.some(mutation =>
                 mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0
             );
@@ -108,13 +109,17 @@ class DemandAllLayout {
     syncTagOverflow() {
         if (!this.stateRoot) return;
 
+        this.isSyncingOverflow = true;
         this.stateRoot.querySelectorAll('.demand-all-card').forEach(card => {
             const tagList = card.querySelector(':scope > nav');
-            if (!tagList) return;
-
-            this.clearTagOverflow(tagList);
-            this.fitTagOverflow(tagList);
+            if (tagList) {
+                this.clearTagOverflow(tagList);
+                this.fitTagOverflow(tagList);
+            }
+            const bidders = card.querySelector(':scope > section[data-role="bidders"]');
+            if (bidders) this.fitBidderOverflow(bidders);
         });
+        requestAnimationFrame(() => { this.isSyncingOverflow = false; });
     }
 
     clearTagOverflow(tagList) {
@@ -154,6 +159,38 @@ class DemandAllLayout {
             hiddenCount += 1;
             more.textContent = `+${hiddenCount}`;
         }
+    }
+
+    fitBidderOverflow(bidders) {
+        const avatarsBox = bidders.querySelector(':scope > [data-role="avatars"]');
+        if (!avatarsBox) return;
+        const items = Array.from(avatarsBox.children).filter(el => el.dataset.role !== 'more');
+        items.forEach(el => el.classList.remove('demand-all-bidder-overflow-hidden'));
+        let more = avatarsBox.querySelector(':scope > [data-role="more"]');
+        if (!more) {
+            more = document.createElement('span');
+            more.dataset.role = 'more';
+            avatarsBox.appendChild(more);
+        }
+        more.hidden = true;
+        let hiddenCount = 0;
+        const overflows = () => {
+            const limit = bidders.getBoundingClientRect().right + 1;
+            const visible = items.filter(el => getComputedStyle(el).display !== 'none');
+            const last = more.hidden ? visible[visible.length - 1] : more;
+            return last ? last.getBoundingClientRect().right > limit : false;
+        };
+        if (overflows()) {
+            more.hidden = false;
+            while (overflows()) {
+                const lastVisible = items.slice().reverse().find(el => getComputedStyle(el).display !== 'none');
+                if (!lastVisible || lastVisible === items[0]) break;
+                lastVisible.classList.add('demand-all-bidder-overflow-hidden');
+                hiddenCount += 1;
+            }
+            more.textContent = `+${hiddenCount}`;
+        }
+        if (hiddenCount === 0) more.hidden = true;
     }
 
     getTagRowCount(elements) {

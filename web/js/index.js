@@ -22,7 +22,6 @@ window.addEventListener('DOMContentLoaded', function () {
     const brandLeftMore = brand.querySelector('.brand-left-box');
     // brandContent.addEventListener('wheel', { passive: window.innerWidth <= 750 });
     // brandContent.addEventListener('touchmove', { passive: window.innerWidth <= 750 });
-    let brandScrollOffsetX = brandContent.scrollLeft
     const BRAND_SCROLL_EPSILON = 1;
 
     function getBrandMaxScrollOffsetX() {
@@ -45,11 +44,7 @@ window.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
         event.stopPropagation();
         const maxBrandScrollOffsetX = getBrandMaxScrollOffsetX();
-        brandScrollOffsetX += getBrandScrollStep();
-        if (brandScrollOffsetX > maxBrandScrollOffsetX) {
-            brandScrollOffsetX = maxBrandScrollOffsetX
-        }
-        brandContent.scrollLeft = brandScrollOffsetX;
+        brandContent.scrollLeft = Math.min(maxBrandScrollOffsetX, brandContent.scrollLeft + getBrandScrollStep());
         requestAnimationFrame(() => {
             brandScroll();
         });
@@ -60,11 +55,7 @@ window.addEventListener('DOMContentLoaded', function () {
         }
         event.preventDefault();
         event.stopPropagation();
-        brandScrollOffsetX -= getBrandScrollStep();
-        if (brandScrollOffsetX < 0) {
-            brandScrollOffsetX = 0
-        }
-        brandContent.scrollLeft = brandScrollOffsetX;
+        brandContent.scrollLeft = Math.max(0, brandContent.scrollLeft - getBrandScrollStep());
         requestAnimationFrame(() => {
             brandScroll();
         });

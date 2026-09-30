@@ -1422,7 +1422,7 @@
 }
 .demand-bid-online {
   position: absolute;
-  right: 1.125rem;
+  right: 0.525rem;
   bottom: 0.75rem;
   width: 1.5rem;
   height: 1.5rem;
@@ -1473,7 +1473,7 @@
     font-size: 2.5rem;
   }
   .demand-bid-online {
-    right: 1.15rem;
+    right: 0.525rem;
     bottom: 0.75rem;
     width: 1.35rem;
     height: 1.35rem;
@@ -1511,8 +1511,7 @@
   align-items: flex-start;
   gap: 0.25rem;
 }
-/* 说明：标题 + 正文同一段，默认 2 行，Show more 贴在第 2 行末尾（float + ::before 占位把按钮推到最后一行右侧，
-   省略号正好停在按钮前面）；展开后按钮落在最后一行末尾。 */
+/* 说明：正文独立截断，避免 iOS 中浮动按钮与百分比高度伪元素造成空白。 */
 .demand-detail-desc-wrap {
   display: flex;
   width: 100%;
@@ -1523,42 +1522,48 @@
   line-height: 2.5rem;
   color: #000;
   word-break: break-word;
+  position: relative;
+}
+.demand-detail-desc-content {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
 }
-.demand-detail-desc::before {
-  content: '';
-  float: right;
-  height: calc(100% - 2.5rem);
-}
-.demand-detail-desc.is-expanded {
+.demand-detail-desc.is-expanded .demand-detail-desc-content {
   display: block;
   -webkit-line-clamp: unset;
   overflow: visible;
 }
-.demand-detail-desc.is-expanded::before,
 .demand-detail-desc.is-expanded > [data-role="desc-more"] {
   display: none;
 }
-.demand-detail-desc > .demand-detail-less {
+.demand-detail-desc-content > .demand-detail-less {
   display: none;
   margin-left: 0.75rem;
 }
-.demand-detail-desc.is-expanded > .demand-detail-less {
+.demand-detail-desc.is-expanded .demand-detail-desc-content > .demand-detail-less {
   display: inline;
+  float: right;
 }
 .demand-detail-desc > [data-role="desc-more"] {
-  float: right;
-  clear: both;
-  margin-left: 1rem;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding-left: 0.75rem;
+  background: #fff;
   line-height: 2.5rem;
+}
+.demand-detail-desc > [data-role="desc-more"]::before {
+  content: '…';
+  display: inline-block;
+  margin-right: 0.5rem;
+  text-decoration: none;
 }
 .demand-detail-desc > [data-role="desc-more"][hidden] {
   display: none;
 }
-.demand-detail-desc > .demand-detail-block-label {
+.demand-detail-desc-content > .demand-detail-block-label {
   margin-right: 0.5rem;
 }
 .demand-detail-desc-text {
@@ -1624,9 +1629,6 @@ ul.demand-detail-rules-list.is-expanded .demand-detail-less {
   ul.demand-detail-rules-list > li {
     font-size: 1.5rem;
     line-height: 2.25rem;
-  }
-  .demand-detail-desc::before {
-    height: calc(100% - 2.25rem);
   }
   .demand-detail-desc > .demand-detail-more {
     line-height: 2.25rem;
