@@ -1223,6 +1223,37 @@ body.index-purchase-open {
     cursor: pointer;
     transition: color .2s ease;
 }
+/* 品牌名过长：单行渐变淡出（不用 ellipsis）。短名居中，溢出时按 CSS Text 规范自动左对齐；
+   ::after 右侧白色渐变蒙层，支持滚动驱动动画时仅在真正溢出时显示。同步自 fast-site static/css/index.css。 */
+.brand-item .brand-name-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: none;
+    text-align: center;
+    --brand-name-fade-width: 2.5rem;
+}
+.brand-item .brand-name-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--brand-name-fade-width);
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--brand-name-fade-bg, #fff));
+    pointer-events: none;
+}
+@supports (animation-timeline: scroll()) {
+    .brand-item .brand-name-wrapper {
+        animation: brand-name-overflow linear both;
+        animation-timeline: scroll(self inline);
+    }
+    .brand-item .brand-name-wrapper::after {
+        opacity: var(--brand-name-fade, 0);
+    }
+}
+@keyframes brand-name-overflow {
+    from, to { --brand-name-fade: 1; }
+}
 @media (hover: hover) and (pointer: fine) {
     .brand-item:hover .brand-icon-box { border-color: var(--brand-color, var(--primary-color)); }
     .brand-item:hover p {
@@ -1316,6 +1347,11 @@ body.index-purchase-open {
         margin-top: 0;
         font-size: 1.5rem;
         line-height: 2.75rem;
+    }
+
+    .brand-item .brand-name-wrapper {
+        max-width: none;
+        --brand-name-fade-width: 2rem;
     }
 
     .brand-left-box,
